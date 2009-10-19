@@ -3,6 +3,8 @@ package com.aptana.shell.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,8 +20,7 @@ public class HttpServer extends Thread
 	protected Thread runningThread;
 	protected ExecutorService threadPool;
 	protected boolean isRunning;
-	
-//	private StringBuffer _buffer;
+	protected Map<String,StringBuffer> processById;
 	
 	/**
 	 * getInstance
@@ -44,14 +45,58 @@ public class HttpServer extends Thread
 	public HttpServer(int port)
 	{
 		this.port = port;
-		this.threadPool = Executors.newFixedThreadPool(10);
+		this.threadPool = Executors.newFixedThreadPool(5);
 		this.isRunning = true;
-		
-//		this._buffer = new StringBuffer();
+		this.processById = new HashMap<String,StringBuffer>();
 		
 		this.start();
 	}
 
+	/**
+	 * createProcess
+	 * 
+	 * @param id
+	 */
+	public void createProcess(String id)
+	{
+		if (this.processById.containsKey(id) == false)
+		{
+			this.processById.put(id, new StringBuffer());
+		}
+		else
+		{
+			throw new RuntimeException("Tried to create a process for an id that already exists: " + id);
+		}
+	}
+	
+	/**
+	 * getProcess
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public StringBuffer getProcess(String id)
+	{
+		return this.processById.get(id);
+	}
+	
+	/**
+	 * removeProcess
+	 * 
+	 * @param id
+	 */
+	public void removeProcess(String id)
+	{
+		if (this.processById.containsKey(id))
+		{
+			this.processById.remove(id);
+		}
+		else
+		{
+			throw new RuntimeException("Tried to remove a process for an id that does not exist: " + id);
+		}
+	}
+	
 	/**
 	 * run
 	 */
@@ -77,7 +122,7 @@ public class HttpServer extends Thread
 				throw new RuntimeException("Error accepting clien connection", e);
 			}
 			
-			this.threadPool.execute(new HttpWorker(clientSocket));
+			this.threadPool.execute(new HttpWorker(this, clientSocket));
 		}
 	}
 	

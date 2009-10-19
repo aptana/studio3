@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -17,16 +18,18 @@ import com.aptana.shell.Activator;
 
 public class HttpWorker implements Runnable
 {
-	protected Socket clientSocket;
+	private HttpServer _server;
+	private Socket _clientSocket;
 	
 	/**
 	 * HttpWorker
 	 * 
 	 * @param clientSocket
 	 */
-	public HttpWorker(Socket clientSocket)
+	public HttpWorker(HttpServer server, Socket clientSocket)
 	{
-		this.clientSocket = clientSocket;
+		this._server = server;
+		this._clientSocket = clientSocket;
 	}
 	
 	/**
@@ -77,8 +80,8 @@ public class HttpWorker implements Runnable
 	{
 		try
 		{
-			BufferedReader input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-			DataOutputStream output = new DataOutputStream(this.clientSocket.getOutputStream());
+			BufferedReader input = new BufferedReader(new InputStreamReader(this._clientSocket.getInputStream()));
+			DataOutputStream output = new DataOutputStream(this._clientSocket.getOutputStream());
 			
 			try
 			{
@@ -119,9 +122,16 @@ public class HttpWorker implements Runnable
 	{
 		String p = (get.split(" "))[1];
 		
-		if ("/stream".equals(p))
+		if (p.startsWith("/stream?id="))
 		{
-			processGetStream(output);
+			String id = p.substring(p.indexOf("=") + 1);
+			System.out.println("processGet for " + id);
+			
+			processGetStream(id, output);
+		}
+		else if ("/id".equals(p))
+		{
+			processGetId(output);
 		}
 		else
 		{
@@ -132,39 +142,44 @@ public class HttpWorker implements Runnable
 	}
 	
 	/**
+	 * processGetId
+	 * 
+	 * @param output
+	 */
+	private void processGetId(DataOutputStream output)
+	{
+		String id = UUID.randomUUID().toString();
+		
+		System.out.println("Create process for " + id);
+		
+		// start process for this id
+		this._server.createProcess(id);
+		
+		// send identifier back to client
+		this.sendText(output, id);
+	}
+	
+	/**
 	 * processStream
 	 * 
 	 * @param output
 	 */
-	private void processGetStream(DataOutputStream output)
+	private void processGetStream(String id, DataOutputStream output)
 	{
 		String text = null;
+		StringBuffer buffer = this._server.getProcess(id);
 		
 		// do stream thing
-//		synchronized (this._buffer)
-//		{
-//			if (this._buffer.length() > 0)
-//			{
-//				text = this._buffer.toString();
-//				
-//				this._buffer.setLength(0);
-//			}
-//		}
+		if (buffer != null && buffer.length() > 0)
+		{
+			text = buffer.toString();
+			
+			buffer.setLength(0);
+		}
 		
 		if (text != null)
 		{
-			try
-			{
-				byte[] bytes = text.getBytes();
-				int length = bytes.length;
-				
-				output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n");
-				output.write(bytes, 0, length);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			this.sendText(output, text);
 		}
 	}
 	
@@ -179,9 +194,12 @@ public class HttpWorker implements Runnable
 	{
 		String p = (post.split(" "))[1];
 		
-		if ("/stream".equals(p))
+		if (p.startsWith("/stream?id="))
 		{
-			processPostStream(input, output);
+			String id = p.substring(p.indexOf("=") + 1);
+			System.out.println("processPost for " + id);
+			
+			processPostStream(id, input, output);
 		}
 		else
 		{
@@ -195,7 +213,7 @@ public class HttpWorker implements Runnable
 	 * @param input
 	 * @param output
 	 */
-	private void processPostStream(BufferedReader input, DataOutputStream output)
+	private void processPostStream(String id, BufferedReader input, DataOutputStream output)
 	{
 		try
 		{
@@ -221,15 +239,39 @@ public class HttpWorker implements Runnable
 					char[] chars = new char[contentLength];
 					input.read(chars);
 					
-//					synchronized (this._buffer)
-//					{
-//						this._buffer.append(chars);
-//					}
+					StringBuffer buffer = this._server.getProcess(id);
+					
+					if (buffer != null)
+					{
+						buffer.append(chars);
+					}
 					
 					output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
 				}
 			}
 			while (input.ready());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * sendText
+	 * 
+	 * @param output
+	 * @param text
+	 */
+	private void sendText(DataOutputStream output, String text)
+	{
+		byte[] bytes = text.getBytes();
+		int length = bytes.length;
+		
+		try
+		{
+			output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n");
+			output.write(bytes, 0, length);
 		}
 		catch (IOException e)
 		{
