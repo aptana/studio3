@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Shell Category"
+            id="com.aptana.shell">
+      </category>
+      <view
+            name="Shell View"
+            icon="icons/sample.gif"
+            category="com.aptana.shell"
+            class="com.aptana.shell.views.ShellView"
+            id="com.aptana.shell.views.ShellView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.TaskList"
+               relationship="right"
+               id="com.aptana.shell.views.ShellView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <scheme
+            description="Scheme used when the Aptana Shell is active"
+            id="com.aptana.shell.scheme"
+            name="Shell Scheme">
+      </scheme>
+   </extension>
+
+</plugin>

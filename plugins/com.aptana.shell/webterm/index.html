@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link href="Term.css" rel="stylesheet" type="text/css" />
+        <title>Aptana Web Terminal</title>
+		<script src="webterm_compressed.js"></script>
+        <script>
+            var terminal;
+			var xtermHandler;
+			var debugHandler;
+            
+			/**
+			 * init
+			 */
+            function init()
+            {
+				// create terminal
+                terminal = new Term("terminal", 80, 24);
+            }
+			
+			/**
+			 * showActionSequence
+			 */
+			function showActionSequence()
+			{
+				var header = ["Action sequence", ""];
+				var entries = debugHandler.getActions();
+				
+				if (entries.length > 0)
+				{
+					entries = header.concat(entries);
+				}
+				else
+				{
+					entries = ["No actions have been seen"];
+				}
+				
+				document.getElementById("stdout").innerHTML = entries.join("<br />");
+			}
+			
+			/**
+			 * showProcessedActions
+			 */
+            function showProcessedActions()
+			{
+				var commands = debugHandler.getCommands();
+				var entries = getEntries(commands);
+				
+				if (entries.length > 0)
+				{
+					entries.unshift("");
+                    entries.unshift("Processed commands with frequency counts:");
+				}
+				else
+				{
+					entries.push("No commands have been processed");
+				}
+				
+				document.getElementById("stdout").innerHTML = entries.join("<br />");
+			}
+            
+			/**
+			 * showUnsupportedActions
+			 */
+            function showUnsupportedActions()
+			{
+				var missingCommands = xtermHandler.getMissingCommands();
+				var entries = getEntries(missingCommands);
+				
+				if (entries.length > 0)
+				{
+					entries.unshift("");
+                    entries.unshift("Unsupported sequences with frequency counts:");
+				}
+				else
+				{
+					entries.push("No unsupported actions");
+				}
+				
+				document.getElementById("stdout").innerHTML = entries.join("<br />");
+			}
+			
+			/**
+			 * getEntries
+			 * 
+			 * @param {Object} obj
+			 */
+			function getEntries(obj)
+			{
+                var names = [];
+                var result = [];
+                var message = "";
+                
+                for (var p in obj) 
+                {
+                    names.push(p);
+                }
+                
+                if (names.length > 0) 
+                {
+                    names.sort();
+                    
+                    for (var i = 0; i < names.length; i++) 
+                    {
+                        var name = names[i];
+                        
+                        result.push(name + ": " + obj[name]);
+                    }
+                }
+				
+				return result;
+            }
+			
+			/**
+			 * resetDebugInfo
+			 */
+			function resetDebugInfo()
+			{
+				debugHandler.clear();
+				document.getElementById("stdout").innerHTML = "Debug info cleared";
+			}
+			
+			/**
+			 * toggleRunState
+			 */
+			function toggleRunState()
+			{
+				var comm = terminal.getCommunicationHandler();
+				
+				comm.toggleRunState();
+				
+				document.getElementById("toggle").innerText = (comm.isRunning()) ? "Stop" : "Start";
+			}
+        </script>
+    </head>
+    <body onload="init()" style="background: rgb(230,230,230)">
+		<div id="terminal"></div>
+		<div style="clear: both; padding: 15px">
+	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
+	    	<button onclick="showActionSequence()">Actions</button>
+	    	<button onclick="showProcessedActions()">Seen</button>
+	    	<button onclick="showUnsupportedActions()">Unsupported</button>
+	    	<button onclick="resetDebugInfo()">Reset</button>
+	        <pre id="stdout">result:</pre>
+		</div>
+    </body>
+</html>
