@@ -1091,6 +1091,7 @@ TermComm.POLLING_INTERVAL_MIN=125;
 TermComm.POLLING_INTERVAL_MAX=2000;
 TermComm.POLLING_GROWTH_RATE=2;
 TermComm.DEFAULT_REQUEST_URL="/stream";
+TermComm.DEFAULT_GET_UNIQUE_ID_URL="/id";
 function TermComm(_c1,_c2){
 var _c3=this;
 this.terminal=_c1;
@@ -1103,6 +1104,7 @@ this.maxInterval=2000;
 this.growthRate=2;
 this.timeoutInterval=5000;
 this.requestURL=TermComm.DEFAULT_REQUEST_URL;
+this.getUniqueIdURL=TermComm.DEFAULT_GET_UNIQUE_ID_URL;
 if(isDefined(_c2)){
 if(_c2.hasOwnProperty("minInterval")&&isNumber(_c2.minInterval)){
 this.minInterval=_c2.minInterval;
@@ -1119,6 +1121,9 @@ this.timeoutInterval=_c2.timeoutInterval;
 if(_c2.hasOwnProperty("requestURL")&&isString(_c2.requestURL)&&_c2.requestURL.length>0){
 this.requestURL=_c2.requestURL;
 }
+if(_c2.hasOwnProperty("getUniqueIdURL")&&isString(_c2.getUniqueIdURL)&&_c2.getUniqueIdURL.length>0){
+this.getUniqueIdURL=_c2.getUniqueIdURL;
+}
 }
 this.pollingInterval=this.minInterval;
 this.watchdogID=null;
@@ -1126,14 +1131,21 @@ this.requestID=null;
 this.running=false;
 this.ie=(window.ActiveXObject)?true:false;
 };
+TermComm.prototype.getUniqueID=function(){
+var req=createXHR();
+req.open("GET",this.getUniqueIdURL,false);
+req.send();
+return req.responseText;
+};
 TermComm.prototype.isRunning=function(){
 return this.running;
 };
 TermComm.prototype.sendKeys=function(){
-if(isDefined(this.keyHandler)){
+var id=this.terminal.getId();
+if(isDefined(this.keyHandler)&&id!==null){
 if(this.keyHandler.hasContent()){
 var req=createXHR();
-req.open("POST",this.requestURL,false);
+req.open("POST",this.requestURL+"?id="+id,false);
 req.send(this.keyHandler.dequeueAll());
 }
 }
@@ -1141,7 +1153,7 @@ req.send(this.keyHandler.dequeueAll());
 TermComm.prototype.processURL=function(URL){
 var _c4=this;
 var req=createXHR();
-req.open("GET",URL,true);
+req.open("GET",URL+"?id="+this.terminal.getId(),true);
 if(this.ie){
 req.setRequestHeader("If-Modified-Since","Sat, 1 Jan 2000 00:00:00 GMT");
 }
@@ -1180,7 +1192,7 @@ this.update(true);
 }
 };
 TermComm.prototype.update=function(_c6){
-if(this.running){
+if(this.running&&this.terminal.getId()!==null){
 if(isBoolean(_c6)){
 if(this.requestID!==null){
 window.clearTimeout(this.requestID);
@@ -1202,6 +1214,7 @@ function Term(id,_c7,_c8,_c9){
 if(isString(id)===false||id.length===0){
 id="terminal";
 }
+this._id=null;
 this._rootNode=document.getElementById(id);
 if(this._rootNode){
 this._rootNode.className="webterm";
@@ -1229,7 +1242,7 @@ var _cf=(_c9&&_c9.hasOwnProperty("autoStart"))?_c9.autoStart:true;
 this._commHandler=_ce;
 this.refresh();
 if(_cf){
-this._commHandler.toggleRunState();
+this.toggleRunState();
 }
 }else{
 throw new Error("Unable to create a new Term because there is no element named '"+id+"'");
@@ -1327,6 +1340,9 @@ return this._currentAttribute.copy();
 };
 Term.prototype.getHeight=function(){
 return this._height;
+};
+Term.prototype.getId=function(){
+return this._id;
 };
 Term.prototype.getKeyHandler=function(){
 return this._keyHandler;
@@ -1528,6 +1544,14 @@ this._scrollRegion={top:top,left:_f2,bottom:_f3,right:_f4};
 };
 Term.prototype.setTitle=function(_f9){
 this._title=_f9;
+};
+Term.prototype.toggleRunState=function(){
+if(this._commHandler!==null){
+if(this._id===null&&this._commHandler.isRunning()==false){
+this._id=this._commHandler.getUniqueID();
+}
+this._commHandler.toggleRunState();
+}
 };
 Term.prototype.setWidth=function(_fa){
 if(isNumber(_fa)&&Line.MIN_WIDTH<=_fa&&_fa<=Line.MAX_WIDTH&&this._width!=_fa){
