@@ -5,15 +5,15 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            name="Shell Category"
-            id="com.aptana.shell">
+            name="Aptana Terminal"
+            id="com.aptana.terminal">
       </category>
       <view
-            name="Shell View"
+            name="Aptana Terminal"
             icon="icons/sample.gif"
-            category="com.aptana.shell"
-            class="com.aptana.shell.views.ShellView"
-            id="com.aptana.shell.views.ShellView">
+            category="com.aptana.terminal"
+            class="com.aptana.terminal.views.TerminalView"
+            id="com.aptana.terminal.views.TerminalView">
       </view>
    </extension>
    <extension
@@ -37,9 +37,9 @@
    <extension
          point="org.eclipse.ui.bindings">
       <scheme
-            description="Scheme used when the Aptana Shell is active"
-            id="com.aptana.shell.scheme"
-            name="Shell Scheme">
+            description="Scheme used when the Aptana Terminal is active"
+            id="com.aptana.terminal.scheme"
+            name="Terminal Key Binding Scheme">
       </scheme>
    </extension>
 

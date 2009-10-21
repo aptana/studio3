@@ -1,4 +1,6 @@
-package com.aptana.shell.views;
+package com.aptana.terminal.views;
+
+import java.util.UUID;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.action.Action;
@@ -27,15 +29,15 @@ import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
-import com.aptana.shell.server.HttpServer;
+import com.aptana.terminal.server.HttpServer;
 
-public class ShellView extends ViewPart
+public class TerminalView extends ViewPart
 {
-	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.shell.scheme";
+	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme";
 
 	private static final String TERMINAL_URL = "http://127.0.0.1:8181/webterm/";
 	
-	public static final String ID = "com.aptana.shell.views.ShellView";
+	public static final String ID = "com.aptana.terminal.views.TerminalView";
 	
 	private Browser browser;
 	private Action action1;
@@ -44,7 +46,7 @@ public class ShellView extends ViewPart
 	/**
 	 * The constructor.
 	 */
-	public ShellView()
+	public TerminalView()
 	{
 	}
 
@@ -64,8 +66,10 @@ public class ShellView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
+		String id = UUID.randomUUID().toString();
+		HttpServer.getInstance().createProcess(id);
 		browser = new Browser(parent, SWT.NONE);
-		browser.setUrl(TERMINAL_URL);
+		browser.setUrl(TERMINAL_URL + "?id=" + id);
 		
 		// Create the help context id for the viewer's control
 //		PlatformUI.getWorkbench().getHelpSystem().setHelp(browser, "com.aptana.shell.viewer");
@@ -78,9 +82,9 @@ public class ShellView extends ViewPart
 			@Override
 			public void partActivated(IWorkbenchPart part)
 			{
-				if (part == ShellView.this)
+				if (part == TerminalView.this)
 				{
-					System.out.println("Activating shell scheme");
+					//System.out.println("Activating shell scheme");
 					
 					try
 					{
@@ -100,27 +104,27 @@ public class ShellView extends ViewPart
 			@Override
 			public void partBroughtToTop(IWorkbenchPart part)
 			{
-				if (part == ShellView.this)
+				if (part == TerminalView.this)
 				{
-					System.out.println("Shell brought to top");
+					//System.out.println("Shell brought to top");
 				}
 			}
 
 			@Override
 			public void partClosed(IWorkbenchPart part)
 			{
-				if (part == ShellView.this)
+				if (part == TerminalView.this)
 				{
-					System.out.println("Shell closed");
+					//System.out.println("Shell closed");
 				}
 			}
 
 			@Override
 			public void partDeactivated(IWorkbenchPart part)
 			{
-				if (part == ShellView.this)
+				if (part == TerminalView.this)
 				{
-					System.out.println("Deactivating shell scheme");
+					//System.out.println("Deactivating shell scheme");
 					
 					try
 					{
@@ -139,9 +143,9 @@ public class ShellView extends ViewPart
 			@Override
 			public void partOpened(IWorkbenchPart part)
 			{
-				if (part == ShellView.this)
+				if (part == TerminalView.this)
 				{
-					System.out.println("Shell opened");
+					//System.out.println("Shell opened");
 				}
 			}
 		});
@@ -201,7 +205,7 @@ public class ShellView extends ViewPart
 		{
 			public void menuAboutToShow(IMenuManager manager)
 			{
-				ShellView.this.fillContextMenu(manager);
+				TerminalView.this.fillContextMenu(manager);
 			}
 		});
 		

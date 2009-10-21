@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Shell
-Bundle-SymbolicName: com.aptana.shell; singleton:=true
+Bundle-Name: Aptana Terminal
+Bundle-SymbolicName: com.aptana.terminal;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.shell.Activator
+Bundle-Activator: com.aptana.terminal.Activator
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
