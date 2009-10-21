@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.team.core.ignore">
+      <ignore
+            enabled="true"
+            pattern=".git">
+      </ignore>
+   </extension>
+   <extension
+         point="org.eclipse.team.core.repository">
+      <repository
+            class="com.aptana.ide.red.git.RepositoryProvider"
+            id="com.aptana.ide.red.git.RepositoryProvider">
+      </repository>
+   </extension>
+</plugin>
