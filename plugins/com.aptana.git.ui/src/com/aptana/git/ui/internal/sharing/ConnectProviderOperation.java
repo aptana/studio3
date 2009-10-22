@@ -70,7 +70,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 				m.worked(40);
 				if (repo != null)
 				{
-					RepositoryProvider.map(project, RepositoryProvider.class.getName());
+					RepositoryProvider.map(project, com.aptana.git.core.RepositoryProvider.ID);
 					m.worked(10);
 					project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 50));
 					GitLightweightDecorator.refresh();
