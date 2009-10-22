@@ -133,4 +133,23 @@ public class Activator extends AbstractUIPlugin
 		
 		return null;
 	}
+	
+	public static String encodeString(String text)
+	{
+		StringBuffer buffer = new StringBuffer();
+		
+		for (char c : text.toCharArray())
+		{
+			if (0 <= c && c < 32 || 128 <= c)
+			{
+				buffer.append("\\x").append(Integer.toString(c, 16));
+			}
+			else
+			{
+				buffer.append(c);
+			}
+		}
+		
+		return buffer.toString();
+	}
 }
