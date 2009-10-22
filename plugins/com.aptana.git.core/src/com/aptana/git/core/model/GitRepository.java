@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.TeamException;
 
@@ -30,7 +29,11 @@ import com.aptana.git.core.GitRepositoryProvider;
 public class GitRepository
 {
 
+	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD";
+	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG";
+	private static final String COMMIT_FILE_ENCODING = "UTF-8";
 	private static final String HEAD = "HEAD";
+	
 	public static final String GIT_DIR = ".git";
 
 	// private GitRevList revisionList;
@@ -217,7 +220,7 @@ public class GitRepository
 			return _headRef;
 
 		String branch = parseSymbolicReference(HEAD);
-		if (branch != null && branch.startsWith("refs/heads/"))
+		if (branch != null && branch.startsWith(GitRef.REFS_HEADS))
 			_headRef = new GitRevSpecifier(GitRef.refFromString(branch));
 		else
 			_headRef = new GitRevSpecifier(GitRef.refFromString(HEAD));
@@ -228,7 +231,7 @@ public class GitRepository
 	private String parseSymbolicReference(String reference)
 	{
 		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference);
-		if (ref.startsWith("refs/"))
+		if (ref.startsWith(GitRef.REFS))
 			return ref;
 
 		return null;
@@ -239,7 +242,7 @@ public class GitRepository
 		String type = components.get(1);
 
 		String sha;
-		if (type.equals("tag") && components.size() == 4)
+		if (type.equals(GitRef.TAG_TYPE) && components.size() == 4)
 			sha = components.get(3);
 		else
 			sha = components.get(2);
@@ -297,8 +300,7 @@ public class GitRepository
 
 	public boolean hasMerges()
 	{
-		File mergeHead = new File(fileURL.getPath(), "MERGE_HEAD");
-		return mergeHead.exists();
+		return new File(fileURL.getPath(), MERGE_HEAD_FILENAME).exists();
 	}
 
 	boolean executeHook(String name)
@@ -328,8 +330,7 @@ public class GitRepository
 
 	String commitMessageFile()
 	{
-		File commitMessageFile = new File(fileURL.getPath(), "COMMIT_EDITMSG");
-		return commitMessageFile.getAbsolutePath();
+		return new File(fileURL.getPath(), COMMIT_MSG_FILENAME).getAbsolutePath();
 	}
 
 	void writetoCommitFile(String commitMessage)
@@ -339,7 +340,7 @@ public class GitRepository
 		try
 		{
 			out = new FileOutputStream(commitMessageFile);
-			out.write(commitMessage.getBytes("UTF-8"));
+			out.write(commitMessage.getBytes(COMMIT_FILE_ENCODING));
 			out.flush();
 		}
 		catch (IOException ioe)
@@ -398,13 +399,13 @@ public class GitRepository
 	 */
 	public String[] commitsAhead(String branchName)
 	{
-		String local = "refs/heads/" + branchName;
+		String local = GitRef.REFS_HEADS + branchName;
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
 				"^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = "refs/remotes/" + remoteSubname + "/" + branchName;
+		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
 		return index().commitsBetween(remote, local);
 	}
 
@@ -435,13 +436,13 @@ public class GitRepository
 	public String[] commitsBehind(String branchName)
 	{
 		// TODO Refactor with commitsAhead
-		String local = "refs/heads/" + branchName;
+		String local = GitRef.REFS_HEADS + branchName;
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
 				"^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = "refs/remotes/" + remoteSubname + "/" + branchName;
+		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
 		return index().commitsBetween(local, remote);
 	}
 
@@ -485,15 +486,12 @@ public class GitRepository
 			RepositoryProvider.map(project, GitRepositoryProvider.ID);
 			m.worked(10);
 			fireRepositoryAddedEvent(repo);
-			project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 50));
+			m.worked(50);
 		}
 		catch (TeamException e)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
 		}
 		return repo;
-
-		// GitLightweightDecorator.refresh();
-		// TODO Notify Listeners about a new repo
 	}
 }

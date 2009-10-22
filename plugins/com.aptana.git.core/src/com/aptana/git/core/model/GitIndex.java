@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-
 public class GitIndex
 {
 
@@ -62,11 +61,9 @@ public class GitIndex
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
 			return;
+
 		Set<Job> jobs = new HashSet<Job>();
-		// TODO Now we want to launch these other process simultaneously and listen for their execution to finish
-		// and their output to be read!
-		refreshStatus++;
-		Job job = new Job("other files")
+		jobs.add(new Job("other files")
 		{
 
 			@Override
@@ -77,13 +74,8 @@ public class GitIndex
 				readOtherFiles(output);
 				return Status.OK_STATUS;
 			}
-		};
-		job.setSystem(true);
-		jobs.add(job);
-		job.schedule();
-
-		refreshStatus++;
-		job = new Job("unstaged files")
+		});
+		jobs.add(new Job("unstaged files")
 		{
 
 			@Override
@@ -93,13 +85,8 @@ public class GitIndex
 				readUnstagedFiles(output);
 				return Status.OK_STATUS;
 			}
-		};
-		job.setSystem(true);
-		jobs.add(job);
-		job.schedule();
-
-		refreshStatus++;
-		job = new Job("staged files")
+		});
+		jobs.add(new Job("staged files")
 		{
 
 			@Override
@@ -110,10 +97,17 @@ public class GitIndex
 				readStagedFiles(output);
 				return Status.OK_STATUS;
 			}
-		};
-		job.setSystem(true);
-		jobs.add(job);
-		job.schedule();
+		});
+
+		// Schedule all the jobs
+		for (Job toSchedule : jobs)
+		{
+			refreshStatus++;
+			toSchedule.setSystem(true);
+			toSchedule.setPriority(Job.SHORT);
+			toSchedule.schedule();
+		}
+		// Now wait for them to finish
 		for (Job toJoin : jobs)
 		{
 			try
@@ -122,11 +116,9 @@ public class GitIndex
 			}
 			catch (InterruptedException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				// ignore
 			}
 		}
-
 	}
 
 	private String getParentTree()
@@ -183,11 +175,11 @@ public class GitIndex
 		// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
 		// The line below is not used at all, as for these files the commitBlob isn't set
 		List<String> fileStatus = new ArrayList<String>();
-		fileStatus.add(":000000");
+		fileStatus.add(":000000"); // for new file
 		fileStatus.add("100644");
+		fileStatus.add("0000000000000000000000000000000000000000"); // SHA
 		fileStatus.add("0000000000000000000000000000000000000000");
-		fileStatus.add("0000000000000000000000000000000000000000");
-		fileStatus.add("A");
+		fileStatus.add("A"); // A for Add, D for delete
 		fileStatus.add(null);
 		for (String path : lines)
 		{
