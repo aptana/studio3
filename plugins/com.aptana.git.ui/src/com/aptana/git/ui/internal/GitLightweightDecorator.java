@@ -20,6 +20,7 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
@@ -63,8 +64,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				.getEntry("icons/ovr/untracked.gif")));
 		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/staged_added.gif")));
-		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
-				.getEntry("icons/ovr/staged_removed.gif")));
+		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault()
+				.getBundle().getEntry("icons/ovr/staged_removed.gif")));
 	}
 
 	private static Color greenFG;
@@ -289,6 +290,13 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// FIXME We need to walk the project and pass all files into the event, or we need to get the diff of updated
 		// files from the event and force refreshes of just those! just grabbing the "changedFiles" after the index
 		// change isn't sufficient!
+		postLabelEvent(new LabelProviderChangedEvent(this));
+	}
+
+	@Override
+	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+		// FIXME Grab the repo and only refresh the project's attached to it (and their children)
 		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 

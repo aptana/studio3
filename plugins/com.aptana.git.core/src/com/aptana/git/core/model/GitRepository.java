@@ -15,8 +15,16 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.TeamException;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.ProcessUtil;
 
@@ -281,6 +289,13 @@ public class GitRepository
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
 	}
+	
+	private static void fireRepositoryAddedEvent(GitRepository repo)
+	{
+		RepositoryAddedEvent e = new RepositoryAddedEvent(repo);
+		for (IGitRepositoryListener listener : listeners)
+			listener.repositoryAdded(e);
+	}
 
 	public boolean hasMerges()
 	{
@@ -449,5 +464,38 @@ public class GitRepository
 			return;
 
 		GitExecutable.instance().runInBackground(path, "init");
+	}
+
+	/**
+	 * Given an existing repo on disk, we wrap it with our model and hook it up to the eclipse team provider.
+	 * 
+	 * @param project
+	 * @param m
+	 * @return
+	 */
+	public static GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
+	{
+		if (m == null)
+			m = new NullProgressMonitor();
+		GitRepository repo = GitRepository.getUnattachedExisting(project.getLocationURI());
+		m.worked(40);
+		if (repo == null)
+			return null;
+
+		try
+		{
+			RepositoryProvider.map(project, GitRepositoryProvider.ID);
+			m.worked(10);
+			fireRepositoryAddedEvent(repo);
+			project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 50));
+		}
+		catch (TeamException e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
+		}
+		return repo;
+
+		// GitLightweightDecorator.refresh();
+		// TODO Notify Listeners about a new repo
 	}
 }

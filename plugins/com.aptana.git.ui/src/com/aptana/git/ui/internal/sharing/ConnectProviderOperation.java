@@ -10,19 +10,14 @@
 package com.aptana.git.ui.internal.sharing;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 /**
  * Connects Eclipse to an existing Git repository
@@ -67,21 +62,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 			for (IProject project : projects)
 			{
 				m.setTaskName(NLS.bind("Connecting project {0}", project.getName()));
-				GitRepository repo = GitRepository.getUnattachedExisting(project.getLocationURI());
-				m.worked(40);
-				if (repo != null)
-				{
-					RepositoryProvider.map(project, GitRepositoryProvider.ID);
-					m.worked(10);
-					project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 50));
-					GitLightweightDecorator.refresh();
-				}
-				else
-				{
-					GitUIPlugin.logInfo("Attempted to share project without repository ignored :" //$NON-NLS-1$
-							+ project);
-					m.worked(60);
-				}
+				GitRepository.attachExisting(project, new SubProgressMonitor(m, 100));
 			}
 		}
 		finally
