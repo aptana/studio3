@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.GitUIPlugin;
 
 /**
  * Disconnects the Git team provider from a project.
@@ -62,7 +62,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 				{
 					final IProject p = (IProject) res;
 
-					Activator.trace("disconnect " + p.getName());
+					GitUIPlugin.trace("disconnect " + p.getName());
 					unmarkTeamPrivate(p);
 					RepositoryProvider.unmap(p);
 					m.worked(100);
@@ -95,7 +95,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 				}
 				if (c[k].isTeamPrivateMember())
 				{
-					Activator.trace("notTeamPrivate " + c[k]);
+					GitUIPlugin.trace("notTeamPrivate " + c[k]);
 					c[k].setTeamPrivateMember(false);
 				}
 			}

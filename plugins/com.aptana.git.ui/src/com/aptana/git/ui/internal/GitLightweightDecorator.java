@@ -20,7 +20,7 @@ import com.aptana.git.model.ChangedFile;
 import com.aptana.git.model.GitRepository;
 import com.aptana.git.model.IGitRepositoryListener;
 import com.aptana.git.model.IndexChangedEvent;
-import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
@@ -59,11 +59,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	static
 	{
 		trackedImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CHECKEDIN_OVR));
-		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(Activator.getDefault().getBundle()
+		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/untracked.gif")));
-		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(Activator.getDefault().getBundle()
+		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/staged_added.gif")));
-		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(Activator.getDefault().getBundle()
+		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/staged_removed.gif")));
 	}
 
@@ -89,7 +89,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			return;
 
 		// Don't decorate if UI plugin is not running
-		Activator activator = Activator.getDefault();
+		GitUIPlugin activator = GitUIPlugin.getDefault();
 		if (activator == null)
 			return;
 
@@ -301,7 +301,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			public void run()
 			{
-				Activator.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
+				GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
 			}
 		});
 	}

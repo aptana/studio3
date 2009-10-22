@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.team.core.RepositoryProvider;
 
 import com.aptana.git.model.GitRepository;
-import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 /**
@@ -77,7 +77,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 				}
 				else
 				{
-					Activator.logInfo("Attempted to share project without repository ignored :" //$NON-NLS-1$
+					GitUIPlugin.logInfo("Attempted to share project without repository ignored :" //$NON-NLS-1$
 							+ project);
 					m.worked(60);
 				}

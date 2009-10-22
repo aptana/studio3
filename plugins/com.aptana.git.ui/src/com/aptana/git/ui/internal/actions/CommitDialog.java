@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.git.model.ChangedFile;
 import com.aptana.git.model.GitRepository;
-import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class CommitDialog extends StatusDialog
 {
@@ -61,11 +61,11 @@ public class CommitDialog extends StatusDialog
 		super(parentShell);
 		this.gitRepository = gitRepository;
 		newFileImage = ImageDescriptor.createFromURL(
-				Activator.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage();
 		deletedFileImage = ImageDescriptor.createFromURL(
-				Activator.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage();
 		emptyFileImage = ImageDescriptor.createFromURL(
-				Activator.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage();
 	}
 
 	@Override
@@ -329,19 +329,19 @@ public class CommitDialog extends StatusDialog
 	{
 		if (commitMessage.getText().length() < 3)
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 					"Please enter a commit message before committing"));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 					"You must first stage some changes before committing"));
 			return;
 		}
 		if (gitRepository.hasMerges())
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 					"Cannot commit merges yet. Please commit your changes from the command line."));
 			return;
 		}

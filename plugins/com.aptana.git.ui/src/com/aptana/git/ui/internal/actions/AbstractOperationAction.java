@@ -27,7 +27,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.GitUIPlugin;
 
 /**
  * Common functionality for EGit operations.
@@ -105,11 +105,11 @@ abstract class AbstractOperationAction implements IObjectActionDelegate {
 					status = ((CoreException) e).getStatus();
 					e = status.getException();
 				} else {
-					status = new Status(IStatus.ERROR, Activator.getPluginId(),
+					status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 							1, msg, e);
 				}
 
-				Activator.logError(msg, e);
+				GitUIPlugin.logError(msg, e);
 				ErrorDialog.openError(wp.getSite().getShell(), act.getText(),
 						msg, status, status.getSeverity());
 			}

@@ -8,19 +8,19 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class GitUIPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
 	private static final String PLUGIN_ID = "com.aptana.git.ui";
 
 	// The shared instance
-	private static Activator plugin;
+	private static GitUIPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public GitUIPlugin()
 	{
 	}
 
@@ -49,7 +49,7 @@ public class Activator extends AbstractUIPlugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static GitUIPlugin getDefault()
 	{
 		return plugin;
 	}

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Git UI
 Bundle-SymbolicName: com.aptana.git.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.git.ui.Activator
+Bundle-Activator: com.aptana.git.ui.GitUIPlugin
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.0",
