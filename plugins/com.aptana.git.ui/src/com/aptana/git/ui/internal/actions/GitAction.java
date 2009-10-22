@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.team.internal.ui.actions.TeamAction;
 
-import com.aptana.git.Activator;
+import com.aptana.git.GitPlugin;
 import com.aptana.git.model.GitRepository;
 
 abstract class GitAction extends TeamAction
@@ -22,7 +22,7 @@ abstract class GitAction extends TeamAction
 		String working = null;
 		if (workingDir != null)
 			working = workingDir.toString();
-		Activator.getDefault().getExecutable().run(working, getCommand());
+		GitPlugin.getDefault().getExecutable().run(working, getCommand());
 	}
 
 	protected abstract String getCommand();

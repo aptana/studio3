@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.git.Activator;
+import com.aptana.git.GitPlugin;
 import com.aptana.git.StringUtil;
 
 public class GitIndex
@@ -55,7 +55,7 @@ public class GitIndex
 		this.notify = notify;
 		refreshStatus = 0;
 
-		Map<Integer, String> result = Activator.getDefault().getExecutable().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory,
 				"update-index", "-q", "--unmerged", "--ignore-missing", "--refresh");
 
 		int exitValue = result.keySet().iterator().next();
@@ -71,7 +71,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = Activator.getDefault().getExecutable().outputForCommand(workingDirectory, "ls-files",
+				String output = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory, "ls-files",
 						"--others", "--exclude-standard", "-z");
 				readOtherFiles(output);
 				return Status.OK_STATUS;
@@ -88,7 +88,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = Activator.getDefault().getExecutable().outputForCommand(workingDirectory, "diff-files",
+				String output = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory, "diff-files",
 						"-z");
 				readUnstagedFiles(output);
 				return Status.OK_STATUS;
@@ -105,7 +105,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = Activator.getDefault().getExecutable().outputForCommand(workingDirectory, "diff-index",
+				String output = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory, "diff-index",
 						"--cached", "-z", getParentTree());
 				readStagedFiles(output);
 				return Status.OK_STATUS;
@@ -154,7 +154,7 @@ public class GitIndex
 		// If we amend, we want to keep the author information for the previous commit
 		// We do this by reading in the previous commit, and storing the information
 		// in a dictionary. This dictionary will then later be read by [self commit:]
-		String message = Activator.getDefault().getExecutable().outputForCommand("cat-file commit HEAD");
+		String message = GitPlugin.getDefault().getExecutable().outputForCommand("cat-file commit HEAD");
 		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n");
 		Matcher m = p.matcher(message);
 		if (m.find())
@@ -408,7 +408,7 @@ public class GitIndex
 			args.add(file.getPath());
 		}
 
-		Map<Integer, String> result = Activator.getDefault().getExecutable().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory,
 				args.toArray(new String[args.size()]));
 		int ret = result.keySet().iterator().next();
 
@@ -436,7 +436,7 @@ public class GitIndex
 		}
 
 		int ret = 1;
-		Map<Integer, String> result = Activator.getDefault().getExecutable().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory,
 				input.toString(), null, new String[] { "update-index", "-z", "--index-info" });
 		ret = result.keySet().iterator().next();
 		if (ret != 0)
@@ -465,7 +465,7 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" };
 
 		int ret = 1;
-		Map<Integer, String> result = Activator.getDefault().getExecutable().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory,
 				input.toString(), null, arguments);
 		ret = result.keySet().iterator().next();
 
@@ -493,7 +493,7 @@ public class GitIndex
 		repository.writetoCommitFile(commitMessage);
 
 		postCommitUpdate("Creating tree");
-		String tree = Activator.getDefault().getExecutable().outputForCommand(workingDirectory, "write-tree");
+		String tree = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory, "write-tree");
 		if (tree.length() != 40)
 		{
 			postCommitFailure("Creating tree failed");
@@ -512,7 +512,7 @@ public class GitIndex
 
 		postCommitUpdate("Creating commit");
 		int ret = 1;
-		Map<Integer, String> result = Activator.getDefault().getExecutable().runInBackground(workingDirectory,
+		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory,
 				commitMessage, amendEnvironment, arguments.toArray(new String[arguments.size()]));
 		String commit = result.values().iterator().next();
 		ret = result.keySet().iterator().next();
@@ -537,7 +537,7 @@ public class GitIndex
 		}
 
 		postCommitUpdate("Updating HEAD");
-		result = Activator.getDefault().getExecutable().runInBackground(workingDirectory, "update-ref", "-m",
+		result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory, "update-ref", "-m",
 				commitSubject, "HEAD", commit);
 		ret = result.keySet().iterator().next();
 
@@ -598,7 +598,7 @@ public class GitIndex
 	 */
 	String[] commitsBetween(String sha1, String sha2)
 	{
-		String result = Activator.getDefault().getExecutable().outputForCommand(workingDirectory, "log",
+		String result = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory, "log",
 				"--pretty=format:\"%s\"", sha1 + ".." + sha2);
 		if (result == null || result.trim().length() == 0)
 			return new String[0];

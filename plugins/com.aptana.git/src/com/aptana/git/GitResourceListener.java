@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.model.GitRepository;
 
-public class GitResourceListener implements IResourceChangeListener
+class GitResourceListener implements IResourceChangeListener
 {
 
 	/**

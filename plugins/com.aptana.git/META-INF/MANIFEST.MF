@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Git
 Bundle-SymbolicName: com.aptana.git;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.git.Activator
+Bundle-Activator: com.aptana.git.GitPlugin
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.team.core,

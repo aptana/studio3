@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.eclipse.debug.core.ILaunch;
 
-import com.aptana.git.Activator;
+import com.aptana.git.GitPlugin;
 import com.aptana.git.ProcessUtil;
 
 public class GitExecutable
@@ -62,7 +62,7 @@ public class GitExecutable
 
 	private static void log(String string)
 	{
-		Activator.logInfo(string);
+		GitPlugin.logInfo(string);
 	}
 
 	private static List<String> searchLocations()

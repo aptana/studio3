@@ -14,7 +14,7 @@ public class RepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 
 	public RepositoryProvider()
 	{
-		// TODO Auto-generated constructor stub
+		// nothing
 	}
 
 	@Override
@@ -36,14 +36,13 @@ public class RepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 	@Override
 	public String getID()
 	{
-		return getClass().getName();
+		return ID;
 	}
 
 	@Override
 	public void deconfigure() throws CoreException
 	{
-		// TODO Auto-generated method stub
-
+		// nothing
 	}
 
 }
