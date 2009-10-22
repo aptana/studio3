@@ -34,12 +34,12 @@ import com.aptana.terminal.server.HttpServer;
 public class TerminalView extends ViewPart
 {
 	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme";
-
 	private static final String TERMINAL_URL = "http://127.0.0.1:8181/webterm/";
 	
 	public static final String ID = "com.aptana.terminal.views.TerminalView";
 	
 	private Browser browser;
+	private String id;
 	private Action action1;
 	private Action action2;
 
@@ -66,10 +66,11 @@ public class TerminalView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		String id = UUID.randomUUID().toString();
-		HttpServer.getInstance().createProcess(id);
+		this.id = UUID.randomUUID().toString();
+		
+		HttpServer.getInstance().createProcess(this.id);
 		browser = new Browser(parent, SWT.NONE);
-		browser.setUrl(TERMINAL_URL + "?id=" + id);
+		browser.setUrl(TERMINAL_URL + "?id=" + this.id);
 		
 		// Create the help context id for the viewer's control
 //		PlatformUI.getWorkbench().getHelpSystem().setHelp(browser, "com.aptana.shell.viewer");
@@ -115,7 +116,7 @@ public class TerminalView extends ViewPart
 			{
 				if (part == TerminalView.this)
 				{
-					//System.out.println("Shell closed");
+					HttpServer.getInstance().removeProcess(TerminalView.this.id);
 				}
 			}
 
