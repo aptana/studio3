@@ -25,7 +25,7 @@ abstract class StagingAction extends ChangedFileAction
 			ChangedFile correspondingChangedFile = getChangedFile(resource);
 			if (!changedFileIsValid(correspondingChangedFile))
 				continue;
-			GitRepository repo = GitRepository.instance(resource.getProject());
+			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			List<ChangedFile> changedFiles = repoToChangedFiles.get(repo);
 			if (changedFiles == null)
 			{

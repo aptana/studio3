@@ -23,7 +23,7 @@ public class CommitAction extends GitAction
 		Set<GitRepository> repos = new HashSet<GitRepository>();
 		for (IResource resource : resources)
 		{
-			GitRepository repo = GitRepository.instance(resource.getProject());
+			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			if (repo != null)
 				repos.add(repo);
 		}
@@ -61,7 +61,7 @@ public class CommitAction extends GitAction
 		{
 			if (resource == null)
 				return false;
-			GitRepository repo = GitRepository.instance(resource.getProject());
+			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			if (repo == null)
 				return false;
 

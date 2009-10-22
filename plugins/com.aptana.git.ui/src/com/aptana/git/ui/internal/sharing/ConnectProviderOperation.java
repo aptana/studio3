@@ -67,7 +67,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 			for (IProject project : projects)
 			{
 				m.setTaskName(NLS.bind("Connecting project {0}", project.getName()));
-				GitRepository repo = GitRepository.create(project.getLocationURI());
+				GitRepository repo = GitRepository.getUnattachedExisting(project.getLocationURI());
 				m.worked(40);
 				if (repo != null)
 				{

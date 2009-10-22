@@ -35,7 +35,7 @@ public class PullAction extends GitAction
 		for (IProject project : getSelectedProjects())
 		{
 			affectedProjects.add(project);
-			GitRepository repo = GitRepository.instance(project);
+			GitRepository repo = GitRepository.getAttached(project);
 			if (repo != null)
 			{
 				affectedProjects.addAll(getAssociatedProjects(repo));
@@ -69,7 +69,7 @@ public class PullAction extends GitAction
 		Set<IProject> projects = new HashSet<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository other = GitRepository.instance(project);
+			GitRepository other = GitRepository.getAttached(project);
 			if (other != null && other.equals(repo))
 			{
 				projects.add(project);

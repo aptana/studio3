@@ -62,7 +62,7 @@ public class GitRepository
 	 * @param project
 	 * @return
 	 */
-	public static GitRepository instance(IProject project)
+	public static GitRepository getAttached(IProject project)
 	{
 		if (project == null)
 			return null;
@@ -71,7 +71,7 @@ public class GitRepository
 		if (provider == null)
 			return null;
 
-		return create(project.getLocationURI());
+		return getUnattachedExisting(project.getLocationURI());
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class GitRepository
 	 * @param path
 	 * @return
 	 */
-	public static GitRepository create(URI path)
+	public static GitRepository getUnattachedExisting(URI path)
 	{
 		if (GitExecutable.instance().path() == null)
 			return null;
@@ -430,5 +430,24 @@ public class GitRepository
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
 		String remote = "refs/remotes/" + remoteSubname + "/" + branchName;
 		return index().commitsBetween(local, remote);
+	}
+
+	/**
+	 * Generates a brand new git repository in the specified location.
+	 */
+	public static void create(String path)
+	{
+		if (path == null)
+			return;
+		if (path.endsWith(File.separator + GIT_DIR))
+		{
+			path = path.substring(0, path.length() - GIT_DIR.length());
+		}
+
+		URI existing = gitDirForURL(new File(path).toURI());
+		if (existing != null)
+			return;
+
+		GitExecutable.instance().runInBackground(path, "init");
 	}
 }

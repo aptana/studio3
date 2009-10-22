@@ -123,6 +123,6 @@ class GitResourceListener implements IResourceChangeListener
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.instance(project);
+		return GitRepository.getAttached(project);
 	}
 }

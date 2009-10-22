@@ -263,7 +263,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.instance(project);
+		return GitRepository.getAttached(project);
 	}
 
 	/**

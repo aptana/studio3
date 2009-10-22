@@ -23,7 +23,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 	public void metaFilesDetected(IProject project, IContainer[] containers)
 	{
 		// FIXME What if the container isn't the project root!
-		if (GitRepository.instance(project) != null)
+		if (GitRepository.getAttached(project) != null)
 			return;
 
 		final IProject toConnect = project;
@@ -37,7 +37,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 					monitor = new NullProgressMonitor();
 				try
 				{
-					GitRepository repo = GitRepository.create(toConnect.getLocationURI());
+					GitRepository repo = GitRepository.getUnattachedExisting(toConnect.getLocationURI());
 					monitor.worked(40);
 					if (repo != null)
 					{

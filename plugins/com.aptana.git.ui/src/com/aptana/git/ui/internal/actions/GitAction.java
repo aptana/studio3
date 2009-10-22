@@ -65,7 +65,7 @@ abstract class GitAction extends TeamAction
 		if (resources == null || resources.length != 1)
 			return false;
 		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.instance(project);
+		GitRepository repo = GitRepository.getAttached(project);
 		if (repo == null)
 			return false;
 		return true;

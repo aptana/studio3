@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -99,7 +98,7 @@ class ExistingOrNewPage extends WizardPage
 				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR); //$NON-NLS-1$
 				try
 				{
-					GitExecutable.instance().runInBackground(gitDir.getParentFile().getAbsolutePath(), "init");
+					GitRepository.create(gitDir.getParentFile().getAbsolutePath());
 					for (IProject project : getProjects())
 					{
 						// If we don't refresh the project directories right
