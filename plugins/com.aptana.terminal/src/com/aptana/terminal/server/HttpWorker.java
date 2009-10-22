@@ -74,32 +74,32 @@ public class HttpWorker implements Runnable
 		}
 	}
 	
-	/**
-	 * getQuery
-	 * 
-	 * @param URL
-	 * @return
-	 */
-	private Map<String,String> getQuery(String URL)
-	{
-		Map<String,String> result = new HashMap<String,String>();
-		int queryStart = URL.indexOf('?');
-		
-		if (queryStart != -1)
-		{
-			String query = URL.substring(queryStart + 1);
-			String[] keyPairs = query.split("&");
-			
-			for (String keyPair : keyPairs)
-			{
-				String[] parts = keyPair.split("=");
-				
-				result.put(parts[0], parts[1]);
-			}
-		}
-		
-		return result;
-	}
+//	/**
+//	 * getQuery
+//	 * 
+//	 * @param URL
+//	 * @return
+//	 */
+//	private Map<String,String> getQuery(String URL)
+//	{
+//		Map<String,String> result = new HashMap<String,String>();
+//		int queryStart = URL.indexOf('?');
+//		
+//		if (queryStart != -1)
+//		{
+//			String query = URL.substring(queryStart + 1);
+//			String[] keyPairs = query.split("&");
+//			
+//			for (String keyPair : keyPairs)
+//			{
+//				String[] parts = keyPair.split("=");
+//				
+//				result.put(parts[0], parts[1]);
+//			}
+//		}
+//		
+//		return result;
+//	}
 	
 	/**
 	 * run
