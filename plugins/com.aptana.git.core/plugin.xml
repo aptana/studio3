@@ -12,7 +12,9 @@
          point="org.eclipse.team.core.repository">
       <repository
             class="com.aptana.git.core.GitRepositoryProvider"
-            id="com.aptana.git.core.RepositoryProvider">
+            id="com.aptana.git.core.GitRepositoryProvider"
+            metaFilePaths=".git/HEAD,.git/index"
+            typeClass="com.aptana.git.core.GitRepositoryProviderType">
       </repository>
    </extension>
 </plugin>
