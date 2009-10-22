@@ -2,6 +2,7 @@ package com.aptana.terminal.editor;
 
 import java.util.UUID;
 
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.swt.SWT;
@@ -14,6 +15,8 @@ import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.keys.BindingService;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
@@ -130,18 +133,19 @@ public class TerminalEditor extends EditorPart
 				{
 					System.out.println("TODO: Activating shell scheme");
 					
-//					try
-//					{
-//						BindingService bindingService = (BindingService) getViewSite().getService(IBindingService.class);
-//						oldScheme = bindingService.getBindingManager().getActiveScheme();
-//						
-//						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-//						bindingService.getBindingManager().setActiveScheme(scheme);
-//					}
-//					catch (NotDefinedException e)
-//					{
-//						e.printStackTrace();
-//					}
+					try
+					{
+						IEditorSite editorSite = TerminalEditor.this.getEditorSite();
+						BindingService bindingService = (BindingService) editorSite.getService(IBindingService.class);
+						oldScheme = bindingService.getBindingManager().getActiveScheme();
+						
+						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
+						bindingService.getBindingManager().setActiveScheme(scheme);
+					}
+					catch (NotDefinedException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -170,17 +174,18 @@ public class TerminalEditor extends EditorPart
 				{
 					System.out.println("TODO: Deactivating shell scheme");
 					
-//					try
-//					{
-//						BindingService bindingService = (BindingService) getViewSite().getService(IBindingService.class);
-//						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-//						
-//						bindingService.getBindingManager().setActiveScheme(oldScheme);
-//					}
-//					catch (NotDefinedException e)
-//					{
-//						e.printStackTrace();
-//					}
+					try
+					{
+						IEditorSite editorSite = TerminalEditor.this.getEditorSite();
+						BindingService bindingService = (BindingService) editorSite.getService(IBindingService.class);
+						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
+						
+						bindingService.getBindingManager().setActiveScheme(oldScheme);
+					}
+					catch (NotDefinedException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 
