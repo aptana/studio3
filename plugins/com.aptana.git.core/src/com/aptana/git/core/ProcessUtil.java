@@ -21,7 +21,7 @@ public class ProcessUtil
 		return result.values().iterator().next();
 	}
 
-	private static String read(InputStream stream)
+	public static String read(InputStream stream)
 	{
 		StringBuilder builder = new StringBuilder();
 		try

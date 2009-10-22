@@ -1,5 +1,8 @@
 package com.aptana.git.core.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +20,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+
+import com.aptana.git.core.ProcessUtil;
 
 public class GitIndex
 {
@@ -52,8 +57,8 @@ public class GitIndex
 		this.notify = notify;
 		refreshStatus = 0;
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				"update-index", "-q", "--unmerged", "--ignore-missing", "--refresh");
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q",
+				"--unmerged", "--ignore-missing", "--refresh");
 
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
@@ -68,8 +73,8 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "ls-files",
-						"--others", "--exclude-standard", "-z");
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "ls-files", "--others",
+						"--exclude-standard", "-z");
 				readOtherFiles(output);
 				return Status.OK_STATUS;
 			}
@@ -85,8 +90,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files",
-						"-z");
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z");
 				readUnstagedFiles(output);
 				return Status.OK_STATUS;
 			}
@@ -102,8 +106,8 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-index",
-						"--cached", "-z", getParentTree());
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", "--cached",
+						"-z", getParentTree());
 				readStagedFiles(output);
 				return Status.OK_STATUS;
 			}
@@ -433,8 +437,8 @@ public class GitIndex
 		}
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				input.toString(), null, new String[] { "update-index", "-z", "--index-info" });
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
+				null, new String[] { "update-index", "-z", "--index-info" });
 		ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
@@ -462,8 +466,8 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" };
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				input.toString(), null, arguments);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
+				null, arguments);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -509,8 +513,8 @@ public class GitIndex
 
 		postCommitUpdate("Creating commit");
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-				commitMessage, amendEnvironment, arguments.toArray(new String[arguments.size()]));
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
+				amendEnvironment, arguments.toArray(new String[arguments.size()]));
 		String commit = result.values().iterator().next();
 		ret = result.keySet().iterator().next();
 
@@ -534,8 +538,8 @@ public class GitIndex
 		}
 
 		postCommitUpdate("Updating HEAD");
-		result = GitExecutable.instance().runInBackground(workingDirectory, "update-ref", "-m",
-				commitSubject, "HEAD", commit);
+		result = GitExecutable.instance().runInBackground(workingDirectory, "update-ref", "-m", commitSubject, "HEAD",
+				commit);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -595,10 +599,49 @@ public class GitIndex
 	 */
 	String[] commitsBetween(String sha1, String sha2)
 	{
-		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log",
-				"--pretty=format:\"%s\"", sha1 + ".." + sha2);
+		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log", "--pretty=format:\"%s\"",
+				sha1 + ".." + sha2);
 		if (result == null || result.trim().length() == 0)
 			return new String[0];
-		return result.split("[\r\n]+");		
+		return result.split("[\r\n]+");
+	}
+
+	/**
+	 * @param file
+	 *            the ChangedFile to generate a diff for.
+	 * @param staged
+	 *            Whether the file is staged or not
+	 * @param contextLines
+	 *            number of lines to show context for. default for underlying command is 3.
+	 * @return
+	 */
+	public String diffForFile(ChangedFile file, boolean staged, int contextLines)
+	{
+		String parameter = "-U" + contextLines;
+		if (staged)
+		{
+			String indexPath = ":0:" + file.path;
+
+			if (file.status == ChangedFile.Status.NEW)
+				return GitExecutable.instance().outputForCommand(workingDirectory, "show", indexPath);
+
+			return GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", parameter, "--cached",
+					getParentTree(), "--", file.path);
+		}
+
+		// unstaged
+		if (file.status == ChangedFile.Status.NEW)
+		{
+			try
+			{
+				return ProcessUtil.read(new FileInputStream(new File(workingDirectory, file.path)));
+			}
+			catch (FileNotFoundException e)
+			{
+				return null;
+			}
+		}
+
+		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
 	}
 }

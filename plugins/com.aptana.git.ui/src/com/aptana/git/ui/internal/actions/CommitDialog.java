@@ -25,6 +25,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -55,6 +57,7 @@ public class CommitDialog extends StatusDialog
 	private Image newFileImage;
 	private Image deletedFileImage;
 	private Image emptyFileImage;
+	private Text diffArea;
 
 	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -83,7 +86,9 @@ public class CommitDialog extends StatusDialog
 		Composite container = (Composite) super.createDialogArea(parent);
 		parent.getShell().setText("Commit changes");
 
-		// TODO Create a diff area
+		container.setLayout(new GridLayout(1, true));
+
+		createDiffArea(container);
 
 		SashForm sashForm = new SashForm(container, SWT.HORIZONTAL);
 		sashForm.setLayout(new FillLayout());
@@ -98,6 +103,17 @@ public class CommitDialog extends StatusDialog
 		validate();
 
 		return container;
+	}
+
+	private void createDiffArea(Composite container)
+	{
+		diffArea = new Text(container, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		data.heightHint = 300;
+		diffArea.setLayoutData(data);
+		diffArea.setEditable(false);
+		diffArea.setText("No file selected. Please select a file.");
+		// TODO Make it much prettier, like GitX does!
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -275,7 +291,26 @@ public class CommitDialog extends StatusDialog
 			}
 		});
 
+		table.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				String path = ((TableItem) e.item).getText(1);
+				ChangedFile file = findChangedFile(path);
+				if (file == null)
+					return;
+				String diff = gitRepository.index().diffForFile(file, staged, 3);
+				updateDiff(diff);
+				super.widgetSelected(e);
+			}
+		});
 		return table;
+	}
+
+	protected void updateDiff(String diff)
+	{
+		diffArea.setText(diff);
 	}
 
 	protected ChangedFile findChangedFile(String path)
