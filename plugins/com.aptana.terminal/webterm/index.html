@@ -8,7 +8,6 @@
         <script>
             var terminal;
 			var xtermHandler;
-			var debugHandler;
             
 			/**
 			 * init
@@ -22,6 +21,7 @@
 				
 				// create terminal
                 terminal = new Term("terminal", 80, 24, config);
+				xtermhandler = terminal.getParser().getHandler();
             }
 			
 			function getQuery()
@@ -40,47 +40,6 @@
 				}
 				
 				return result;
-			}
-			
-			/**
-			 * showActionSequence
-			 */
-			function showActionSequence()
-			{
-				var header = ["Action sequence", ""];
-				var entries = debugHandler.getActions();
-				
-				if (entries.length > 0)
-				{
-					entries = header.concat(entries);
-				}
-				else
-				{
-					entries = ["No actions have been seen"];
-				}
-				
-				document.getElementById("stdout").innerHTML = entries.join("<br />");
-			}
-			
-			/**
-			 * showProcessedActions
-			 */
-            function showProcessedActions()
-			{
-				var commands = debugHandler.getCommands();
-				var entries = getEntries(commands);
-				
-				if (entries.length > 0)
-				{
-					entries.unshift("");
-                    entries.unshift("Processed commands with frequency counts:");
-				}
-				else
-				{
-					entries.push("No commands have been processed");
-				}
-				
-				document.getElementById("stdout").innerHTML = entries.join("<br />");
 			}
             
 			/**
