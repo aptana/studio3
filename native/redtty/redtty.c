@@ -23,7 +23,7 @@ main (void)
 	fd_set descriptor_set;
 
 	int pty;
-	int stderr_fd = dup(STDERR_FILENO);
+	//int stderr_fd = dup(STDERR_FILENO);
 	switch (forkpty(&pty,  /* pseudo-terminal master end descriptor */ 
 					 NULL,  /* This can be a char[] buffer used to get... */ 
 							/* ...the device name of the pseudo-terminal */ 
@@ -36,7 +36,7 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			dup2(stderr_fd, 2);
+			//dup2(stderr_fd, 2);
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
@@ -54,11 +54,11 @@ main (void)
 					perror ("select()"); 
 					exit (EXIT_FAILURE); 
 				}
+				
 				/* User typed something at STDIN */
 				if (FD_ISSET (STDIN_FILENO, &descriptor_set)) 
 				{ 
-					if ( (read (STDIN_FILENO, &c, 1) != 1) 
-						|| (write (pty, &c, 1) != 1) ) 
+					if ( (read (STDIN_FILENO, &c, 1) != 1) || (write (pty, &c, 1) != 1) ) 
 					{ 
 						fprintf (stderr, "Done\n"); 
 						exit (EXIT_SUCCESS); 
@@ -68,8 +68,7 @@ main (void)
 				/* Output from the bash */
 				if (FD_ISSET (pty, &descriptor_set)) 
 				{ 
-					if ((read (pty, &c, 1) != 1) 
-						|| (write (STDOUT_FILENO, &c, 1) != 1) ) 
+					if ( (read (pty, &c, 1) != 1) || (write (STDOUT_FILENO, &c, 1) != 1) ) 
 					{ 
 						fprintf (stderr, "Disconnected.\n"); 
 						exit (EXIT_FAILURE); 
