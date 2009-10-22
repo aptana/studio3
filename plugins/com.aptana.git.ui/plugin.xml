@@ -91,7 +91,7 @@
       <decorator
             lightweight="true"
             adaptable="true"
-            label="%Decorator_name"
+            label="%Decorator.name"
             class="com.aptana.git.ui.internal.GitLightweightDecorator"
             state="true"
             location="BOTTOM_RIGHT"
@@ -100,8 +100,16 @@
               <objectClass name="org.eclipse.core.resources.IResource"/>
             </enablement>
          <description>
-            %Decorator_description
+            %Decorator.description
          </description>
       </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.team.ui.teamDecorators">
+      <teamDecorator
+            decoratedDirection="OUTGOING"
+            decoratorId="com.aptana.git.ui.internal.GitLightweightDecorator"
+            repositoryId="com.aptana.git.core.GitRepositoryProvider">
+      </teamDecorator>
    </extension>
 </plugin>
