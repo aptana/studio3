@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Git
-Bundle-SymbolicName: com.aptana.git;singleton:=true
+Bundle-Name: Git Core
+Bundle-SymbolicName: com.aptana.git.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.git.GitPlugin
 Bundle-Vendor: APTANA
@@ -12,5 +12,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.git,
- com.aptana.git.model
+Export-Package: com.aptana.git.core,
+ com.aptana.git.core.model
