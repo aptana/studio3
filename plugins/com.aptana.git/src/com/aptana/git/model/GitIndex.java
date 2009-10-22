@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.GitPlugin;
-import com.aptana.git.StringUtil;
 
 public class GitIndex
 {

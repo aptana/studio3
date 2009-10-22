@@ -1,13 +1,13 @@
-package com.aptana.git;
+package com.aptana.git.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public abstract class StringUtil
+abstract class StringUtil
 {
 
-	public static List<String> componentsSeparatedByString(String inputString, String delim)
+	static List<String> componentsSeparatedByString(String inputString, String delim)
 	{
 		List<String> tokens = new ArrayList<String>();
 		StringTokenizer tokenizer = new StringTokenizer(inputString, delim);

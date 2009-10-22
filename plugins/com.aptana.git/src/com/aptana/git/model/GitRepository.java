@@ -19,7 +19,6 @@ import org.eclipse.team.core.RepositoryProvider;
 
 import com.aptana.git.GitPlugin;
 import com.aptana.git.ProcessUtil;
-import com.aptana.git.StringUtil;
 
 public class GitRepository
 {
