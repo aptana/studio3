@@ -75,7 +75,7 @@ public class GitRepository
 	}
 
 	/**
-	 * Used solely for creating a new repository when connecting Eclipse team stuff to a project!
+	 * Used solely for grabbing an existing repository when attaching Eclipse team stuff to a project!
 	 * 
 	 * @param path
 	 * @return
