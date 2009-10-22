@@ -17,12 +17,22 @@ public class GitExecutable
 	private static ArrayList<String> fgLocations;
 	private String gitPath;
 
+	private static GitExecutable fgExecutable;
+	
 	private GitExecutable(String gitPath)
 	{
 		this.gitPath = gitPath;
 	}
+	
+	public static GitExecutable instance()
+	{
+		if (fgExecutable == null)
+			fgExecutable = GitExecutable.find();
+		return fgExecutable;
+	}
+	
 
-	public static GitExecutable find()
+	private static GitExecutable find()
 	{
 		// Check what we might have in user defaults
 		// NOTE: Currently this should NOT have a registered default, or the searching bits below won't work
@@ -86,7 +96,7 @@ public class GitExecutable
 		return string.replaceAll("~", userHome);
 	}
 
-	public static String versionForPath(String path)
+	private static String versionForPath(String path)
 	{
 		if (path == null)
 			return null;
@@ -102,7 +112,7 @@ public class GitExecutable
 		return null;
 	}
 
-	public static boolean acceptBinary(String path)
+	private static boolean acceptBinary(String path)
 	{
 		if (path == null)
 			return false;
@@ -121,7 +131,7 @@ public class GitExecutable
 		return false;
 	}
 
-	public String path()
+	String path()
 	{
 		return gitPath;
 	}
@@ -139,12 +149,6 @@ public class GitExecutable
 	public Map<Integer, String> runInBackground(String workingDir, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath, workingDir, args);
-	}
-
-	public Map<Integer, String> runInBackground(String workingDirectory, Map<String, String> amendEnvironment,
-			String... args)
-	{
-		return ProcessUtil.runInBackground(gitPath, workingDirectory, amendEnvironment, args);
 	}
 
 	public Map<Integer, String> runInBackground(String workingDirectory, String input,

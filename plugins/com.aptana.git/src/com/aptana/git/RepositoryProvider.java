@@ -21,12 +21,12 @@ public class RepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 	public void configureProject() throws CoreException
 	{
 		// look for .git sub dir
-		final IResource dotGit = getProject().findMember(".git");
+		final IResource dotGit = getProject().findMember(GitRepository.GIT_DIR);
 		if (dotGit != null && dotGit.exists())
 		{
 			// if it exists and it actually is the right .git meta dir, let's mark it as team private
-			URI blah = GitRepository.gitDirForURL(getProject().getLocationURI());
-			if (dotGit.getLocationURI().equals(blah))
+			URI gitDir = GitRepository.gitDirForURL(getProject().getLocationURI());
+			if (dotGit.getLocationURI().equals(gitDir))
 			{
 				dotGit.setTeamPrivateMember(true);
 			}

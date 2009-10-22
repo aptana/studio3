@@ -1,6 +1,6 @@
 package com.aptana.git.model;
 
-public class GitRef
+class GitRef
 {
 
 	private String ref;
@@ -10,24 +10,24 @@ public class GitRef
 		this.ref = string;
 	}
 
-	public static GitRef refFromString(String string)
+	static GitRef refFromString(String string)
 	{
 		return new GitRef(string);
 	}
 
-	public String ref()
+	String ref()
 	{
 		return ref;
 	}
 
-	public String shortName()
+	String shortName()
 	{
 		if (type() != null)
 			return ref.substring(type().length() + 7);
 		return ref;
 	}
 
-	private String type()
+	String type()
 	{
 		if (ref.startsWith("refs/heads"))
 			return "head";

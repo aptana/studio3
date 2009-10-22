@@ -1,6 +1,6 @@
 package com.aptana.git.model;
 
-public class GitRevList
+class GitRevList
 {
 	private GitRepository repository;
 

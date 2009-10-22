@@ -23,8 +23,6 @@ public class GitPlugin extends Plugin
 	// The shared instance
 	private static GitPlugin plugin;
 
-	private GitExecutable executable;
-
 	/**
 	 * The constructor
 	 */
@@ -75,13 +73,13 @@ public class GitPlugin extends Plugin
 		return plugin;
 	}
 
+	/**
+	 * @deprecated Please use {@link GitExecutable.instance()}
+	 * @return
+	 */
 	public GitExecutable getExecutable()
 	{
-		if (executable == null)
-		{
-			executable = GitExecutable.find();
-		}
-		return executable;
+		return GitExecutable.instance();
 	}
 
 	public static String getPluginId()

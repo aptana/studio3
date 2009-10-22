@@ -5,12 +5,12 @@ package com.aptana.git.model;
  * @author cwilliams
  *
  */
-public class GitConfig
+class GitConfig
 {
 
 	private String repositoryPath;
 
-	public GitConfig(String path)
+	GitConfig(String path)
 	{
 		repositoryPath = path;
 	}

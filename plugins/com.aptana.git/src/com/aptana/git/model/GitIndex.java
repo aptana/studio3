@@ -32,7 +32,7 @@ public class GitIndex
 	private boolean notify;
 	private Map<String, String> amendEnvironment;
 
-	public GitIndex(GitRepository repository, String workingDirectory)
+	GitIndex(GitRepository repository, String workingDirectory)
 	{
 		super();
 
@@ -139,7 +139,7 @@ public class GitIndex
 		return parent;
 	}
 
-	public void setAmend(boolean amend)
+	void setAmend(boolean amend)
 	{
 		if (this.amend == amend)
 			return;

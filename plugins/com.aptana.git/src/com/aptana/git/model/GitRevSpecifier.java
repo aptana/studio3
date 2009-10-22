@@ -4,38 +4,38 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GitRevSpecifier
+class GitRevSpecifier
 {
 
 	private List<String> parameters;
 	private String description;
 	private String workingDirectory;
 
-	public GitRevSpecifier(String... parameters)
+	GitRevSpecifier(String... parameters)
 	{
 		this.parameters = Arrays.asList(parameters);
 	}
 
-	public GitRevSpecifier(GitRef newRef)
+	GitRevSpecifier(GitRef newRef)
 	{
 		parameters = new ArrayList<String>();
 		parameters.add(newRef.ref());
 		description = newRef.shortName();
 	}
 
-	public List<String> parameters()
+	List<String> parameters()
 	{
 		return parameters;
 	}
 
-	public static GitRevSpecifier allBranchesRevSpec()
+	static GitRevSpecifier allBranchesRevSpec()
 	{
 		GitRevSpecifier revspec = new GitRevSpecifier("--all");
 		revspec.description = "All branches";
 		return revspec;
 	}
 
-	public static GitRevSpecifier localBranchesRevSpec()
+	static GitRevSpecifier localBranchesRevSpec()
 	{
 		GitRevSpecifier revspec = new GitRevSpecifier("--branches");
 		revspec.description = "Local branches";

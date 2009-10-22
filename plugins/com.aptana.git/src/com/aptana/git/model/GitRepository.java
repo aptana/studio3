@@ -24,7 +24,7 @@ public class GitRepository
 {
 
 	private static final String HEAD = "HEAD";
-	private static final String GIT_DIR = ".git";
+	public static final String GIT_DIR = ".git";
 
 	// private GitRevList revisionList;
 	private List<GitRevSpecifier> branches;
@@ -109,7 +109,7 @@ public class GitRepository
 		// this.revisionList = new GitRevList(this);
 	}
 
-	public String workingDirectory()
+	private String workingDirectory()
 	{
 		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
@@ -318,13 +318,13 @@ public class GitRepository
 		return ret == 0;
 	}
 
-	public String commitMessageFile()
+	String commitMessageFile()
 	{
 		File commitMessageFile = new File(fileURL.getPath(), "COMMIT_EDITMSG");
 		return commitMessageFile.getAbsolutePath();
 	}
 
-	public void writetoCommitFile(String commitMessage)
+	void writetoCommitFile(String commitMessage)
 	{
 		File commitMessageFile = new File(commitMessageFile());
 		OutputStream out = null;
