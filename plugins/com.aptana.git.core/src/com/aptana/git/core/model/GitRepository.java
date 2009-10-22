@@ -319,8 +319,8 @@ public class GitRepository
 			return true;
 
 		Map<String, String> env = new HashMap<String, String>();
-		env.put("GIT_DIR", fileURL.getPath());
-		env.put("GIT_INDEX_FILE", fileURL.getPath() + File.separator + "index");
+		env.put(GitEnv.GIT_DIR, fileURL.getPath());
+		env.put(GitEnv.GIT_INDEX_FILE, fileURL.getPath() + File.separator + "index");
 
 		int ret = 1;
 		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);

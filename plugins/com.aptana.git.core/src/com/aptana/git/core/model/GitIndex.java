@@ -145,16 +145,16 @@ public class GitIndex
 
 		// If we amend, we want to keep the author information for the previous commit
 		// We do this by reading in the previous commit, and storing the information
-		// in a dictionary. This dictionary will then later be read by [self commit:]
+		// in a dictionary. This dictionary will then later be read by commit()
 		String message = GitExecutable.instance().outputForCommand("cat-file commit HEAD");
 		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n");
 		Matcher m = p.matcher(message);
 		if (m.find())
 		{
 			amendEnvironment = new HashMap<String, String>();
-			amendEnvironment.put("GIT_AUTHOR_NAME", m.group(1));
-			amendEnvironment.put("GIT_AUTHOR_EMAIL", m.group(2));
-			amendEnvironment.put("GIT_AUTHOR_DATE", m.group(3));
+			amendEnvironment.put(GitEnv.GIT_AUTHOR_NAME, m.group(1));
+			amendEnvironment.put(GitEnv.GIT_AUTHOR_EMAIL, m.group(2));
+			amendEnvironment.put(GitEnv.GIT_AUTHOR_DATE, m.group(3));
 		}
 
 		// Find the commit message

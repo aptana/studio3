@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
+
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IPreferenceConstants;
 
 public class GitExecutable
 {
@@ -30,23 +33,22 @@ public class GitExecutable
 
 	private static GitExecutable find()
 	{
-		// Check what we might have in user defaults
-		// NOTE: Currently this should NOT have a registered default, or the searching bits below won't work
-		// gitPath = [[NSUserDefaults standardUserDefaults] stringForKey:@"gitExecutable"];
-		// if (gitPath.length > 0) {
-		// if (acceptBinary(gitPath))
-		// return;
-		// [[NSAlert alertWithMessageText:@"Invalid git path"
-		// defaultButton:@"OK"
-		// alternateButton:nil
-		// otherButton:nil
-		// informativeTextWithFormat:@"You entered a custom git path in the Preferences pane, "
-		// "but this path is not a valid git v" MIN_GIT_VERSION " or higher binary. We're going to use the default "
-		// "search paths instead"] runModal];
-		// }
+
+		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
+		if (prefPath != null && prefPath.length() > 0)
+		{
+			if (acceptBinary(prefPath))
+			{
+				return new GitExecutable(prefPath);
+			}
+			GitPlugin.logError(
+					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
+							+ MIN_GIT_VERSION
+							+ " or higher binary. We're going to use the default search paths instead", null);
+		}
 
 		// Try to find the path of the Git binary
-		String gitPath = System.getenv("GIT_PATH");
+		String gitPath = System.getenv(GitEnv.GIT_PATH);
 		if (gitPath != null && acceptBinary(gitPath))
 			return new GitExecutable(gitPath);
 
@@ -110,7 +112,7 @@ public class GitExecutable
 
 	private static boolean acceptBinary(String path)
 	{
-		if (path == null)
+		if (path == null || path.length() == 0)
 			return false;
 
 		String version = versionForPath(path);
