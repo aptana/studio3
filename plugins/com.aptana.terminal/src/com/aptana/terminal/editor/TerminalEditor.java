@@ -131,8 +131,6 @@ public class TerminalEditor extends EditorPart
 			{
 				if (part == TerminalEditor.this)
 				{
-					System.out.println("TODO: Activating shell scheme");
-					
 					try
 					{
 						IEditorSite editorSite = TerminalEditor.this.getEditorSite();
@@ -172,8 +170,6 @@ public class TerminalEditor extends EditorPart
 			{
 				if (part == TerminalEditor.this)
 				{
-					System.out.println("TODO: Deactivating shell scheme");
-					
 					try
 					{
 						IEditorSite editorSite = TerminalEditor.this.getEditorSite();
