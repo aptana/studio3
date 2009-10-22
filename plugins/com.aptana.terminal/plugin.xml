@@ -9,8 +9,8 @@
             id="com.aptana.terminal">
       </category>
       <view
-            name="Aptana Terminal"
-            icon="icons/sample.gif"
+            name="Terminal"
+            icon="icons/terminal.png"
             category="com.aptana.terminal"
             class="com.aptana.terminal.views.TerminalView"
             id="com.aptana.terminal.views.TerminalView">
@@ -23,8 +23,8 @@
          <view
                ratio="0.5"
                relative="org.eclipse.ui.views.TaskList"
-               relationship="right"
-               id="com.aptana.shell.views.ShellView">
+               relationship="bottom"
+               id="com.aptana.terminal.views.TerminalView">
          </view>
       </perspectiveExtension>
    </extension>
@@ -41,6 +41,23 @@
             id="com.aptana.terminal.scheme"
             name="Terminal Key Binding Scheme">
       </scheme>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.terminal.editor.TerminalEditor"
+            default="false"
+            icon="icons/terminal.png"
+            id="com.aptana.terminal.TerminalEditor"
+            name="Terminal Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="com.aptana.terminal.editor.TerminalElementFactory"
+            id="com.aptana.terminal.TerminalElementFactory">
+      </factory>
    </extension>
 
 </plugin>

@@ -29,6 +29,8 @@ import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.terminal.Activator;
+import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.HttpServer;
 
 public class TerminalView extends ViewPart
@@ -40,8 +42,7 @@ public class TerminalView extends ViewPart
 	
 	private Browser browser;
 	private String id;
-	private Action action1;
-	private Action action2;
+	private Action openEditor;
 
 	/**
 	 * The constructor.
@@ -73,7 +74,6 @@ public class TerminalView extends ViewPart
 		browser.setUrl(TERMINAL_URL + "?id=" + this.id);
 		
 		// Create the help context id for the viewer's control
-//		PlatformUI.getWorkbench().getHelpSystem().setHelp(browser, "com.aptana.shell.viewer");
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(browser, ID);
 			
 		IPartService service = (IPartService) getSite().getService(IPartService.class);
@@ -163,8 +163,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		manager.add(action1);
-		manager.add(action2);
+		manager.add(openEditor);
 		
 		// Other plug-ins can contribute there actions here
 		
@@ -178,9 +177,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalPullDown(IMenuManager manager)
 	{
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
+		manager.add(openEditor);
 	}
 
 	/**
@@ -190,8 +187,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalToolBar(IToolBarManager manager)
 	{
-		manager.add(action1);
-		manager.add(action2);
+		manager.add(openEditor);
 	}
 
 	/**
@@ -241,29 +237,18 @@ public class TerminalView extends ViewPart
 	 */
 	private void makeActions()
 	{
-		ImageDescriptor icon = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK);
+		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png");
 		
-		action1 = new Action()
+		openEditor = new Action()
 		{
 			public void run()
 			{
-				showMessage("Action 1 executed");
+				Activator.openEditor(TerminalEditor.ID, true);
 			}
 		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(icon);
-
-		action2 = new Action()
-		{
-			public void run()
-			{
-				showMessage("Action 2 executed");
-			}
-		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(icon);
+		openEditor.setText("Open Terminal Editor");
+		openEditor.setToolTipText("Create a Terminal Editor");
+		openEditor.setImageDescriptor(icon);
 	}
 
 	/**
@@ -281,6 +266,6 @@ public class TerminalView extends ViewPart
 	 */
 	private void showMessage(String message)
 	{
-		MessageDialog.openInformation(browser.getShell(), "Shell View", message);
+		MessageDialog.openInformation(browser.getShell(), "Terminal View", message);
 	}
 }
