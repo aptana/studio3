@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.debug.core.ILaunch;
-
 import com.aptana.git.GitPlugin;
 import com.aptana.git.ProcessUtil;
 
@@ -18,19 +16,18 @@ public class GitExecutable
 	private String gitPath;
 
 	private static GitExecutable fgExecutable;
-	
+
 	private GitExecutable(String gitPath)
 	{
 		this.gitPath = gitPath;
 	}
-	
+
 	public static GitExecutable instance()
 	{
 		if (fgExecutable == null)
 			fgExecutable = GitExecutable.find();
 		return fgExecutable;
 	}
-	
 
 	private static GitExecutable find()
 	{
@@ -131,14 +128,9 @@ public class GitExecutable
 		return false;
 	}
 
-	String path()
+	public String path()
 	{
 		return gitPath;
-	}
-
-	public ILaunch run(String workingDir, String... args)
-	{
-		return ProcessUtil.run(gitPath, workingDir, args);
 	}
 
 	public String outputForCommand(String workingDir, String... args)

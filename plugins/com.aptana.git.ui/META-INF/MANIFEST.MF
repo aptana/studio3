@@ -9,10 +9,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources;bundle-version="3.4.0",
  org.eclipse.debug.core;bundle-version="3.4.0",
  org.eclipse.team.core;bundle-version="3.4.0",
- org.eclipse.ui,
  com.aptana.git;bundle-version="1.0.0",
+ org.eclipse.ui,
+ org.eclipse.ui.ide;bundle-version="3.4.0",
  org.eclipse.team.ui;bundle-version="3.4.0",
- org.eclipse.ui.ide;bundle-version="3.4.0"
+ org.eclipse.debug.ui;bundle-version="3.4.0",
+ org.eclipse.ui.externaltools
 Bundle-RequiredExecutionEnvironment: JavaSE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
