@@ -83,7 +83,7 @@ public class GitRepository
 	 */
 	public static GitRepository create(URI path)
 	{
-		if (GitPlugin.getDefault().getExecutable().path() == null)
+		if (GitExecutable.instance().path() == null)
 			return null;
 
 		URI gitDirURL = gitDirForURL(path);
@@ -113,16 +113,16 @@ public class GitRepository
 	{
 		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitPlugin.getDefault().getExecutable().outputForCommand(fileURL.getPath(),
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(),
 				"rev-parse --is-inside-work-tree").equals("true"))
-			return GitPlugin.getDefault().getExecutable().path(); // FIXME This doesn't seem right....
+			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
 		return null;
 	}
 
 	public static URI gitDirForURL(URI repositoryURL)
 	{
-		if (GitPlugin.getDefault().getExecutable() == null)
+		if (GitExecutable.instance() == null)
 			return null;
 
 		String repositoryPath = repositoryURL.getPath();
@@ -131,7 +131,7 @@ public class GitRepository
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		String newPath = GitPlugin.getDefault().getExecutable().outputForCommand(repositoryPath, "rev-parse",
+		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse",
 				"--git-dir");
 		if (newPath.equals(GIT_DIR))
 			return new File(repositoryPath, GIT_DIR).toURI();
@@ -143,7 +143,7 @@ public class GitRepository
 
 	public boolean parseReference(String parent)
 	{
-		Map<Integer, String> result = GitPlugin.getDefault().getExecutable().runInBackground(workingDirectory(),
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
 				"rev-parse", "--verify", parent);
 		int exitValue = result.keySet().iterator().next();
 		return exitValue == 0;
@@ -151,7 +151,7 @@ public class GitRepository
 
 	private static boolean isBareRepository(String path)
 	{
-		String output = GitPlugin.getDefault().getExecutable().outputForCommand(path, "rev-parse",
+		String output = GitExecutable.instance().outputForCommand(path, "rev-parse",
 				"--is-bare-repository");
 		return "true".equals(output);
 	}
@@ -163,7 +163,7 @@ public class GitRepository
 
 		refs = new HashMap<String, List<GitRef>>();
 
-		String output = GitPlugin.getDefault().getExecutable().outputForCommand(fileURL.getPath(), "for-each-ref",
+		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref",
 				"--format=%(refname) %(objecttype) %(objectname)", " %(*objectname)", "refs");
 		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
 
@@ -224,7 +224,7 @@ public class GitRepository
 
 	private String parseSymbolicReference(String reference)
 	{
-		String ref = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory(), "symbolic-ref", "-q",
+		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q",
 				reference);
 		if (ref.startsWith("refs/"))
 			return ref;
@@ -257,7 +257,7 @@ public class GitRepository
 
 	public String currentBranch()
 	{
-		String output = GitPlugin.getDefault().getExecutable().outputForCommand(fileURL.getPath(), "branch",
+		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch",
 				"--no-color");
 		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
 		for (String line : lines)
@@ -391,7 +391,7 @@ public class GitRepository
 	public String[] commitsAhead(String branchName)
 	{
 		String local = "refs/heads/" + branchName;
-		String output = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory(), "config",
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config",
 				"--get-regexp", "^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;
@@ -428,7 +428,7 @@ public class GitRepository
 	{
 		// TODO Refactor with commitsAhead
 		String local = "refs/heads/" + branchName;
-		String output = GitPlugin.getDefault().getExecutable().outputForCommand(workingDirectory(), "config",
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config",
 				"--get-regexp", "^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;

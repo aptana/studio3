@@ -73,15 +73,6 @@ public class GitPlugin extends Plugin
 		return plugin;
 	}
 
-	/**
-	 * @deprecated Please use {@link GitExecutable.instance()}
-	 * @return
-	 */
-	public GitExecutable getExecutable()
-	{
-		return GitExecutable.instance();
-	}
-
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
