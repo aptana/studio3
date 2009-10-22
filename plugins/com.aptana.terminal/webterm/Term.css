@@ -2,9 +2,16 @@
 div.webterm {
 	float: left;
 	border: 1px solid rgb(255,145,38);
+	background: black;
 }
+
 /* top-level pre element */
-div.webterm pre { margin: 0px 0px 0px; }
+div.webterm pre {
+	margin: 0px 0px 0px;
+	font-family: Monaco, Courier, monospace;
+	font-size: 9pt;
+	line-height: 12pt;
+}
 
 /* title bar */
 div.webterm pre div.title {
@@ -15,6 +22,17 @@ div.webterm pre div.title {
 }
 
 /* foreground colors */
+div.webterm pre span.fn {  color: rgb(227,227,227); }
+div.webterm pre span.f0 {  color: rgb(108,108,108); }
+div.webterm pre span.f1 {  color: rgb(233,137,124); }
+div.webterm pre span.f2 {  color: rgb(181,231,125); }
+div.webterm pre span.f3 {  color: rgb(236,236,190); }
+div.webterm pre span.f4 {  color: rgb(183,221,255); }
+div.webterm pre span.f5 {  color: rgb(255,161,255); }
+div.webterm pre span.f6 {  color: rgb(215,215,255); }
+div.webterm pre span.f7 {  color: rgb(223,223,223); }
+
+/*
 div.webterm pre span.f0 {  color: rgb(0,0,0);       }
 div.webterm pre span.f1 {  color: rgb(200,0,0);     }
 div.webterm pre span.f2 {  color: rgb(0,200,0);     }
@@ -23,8 +41,20 @@ div.webterm pre span.f4 {  color: rgb(0,0,200);     }
 div.webterm pre span.f5 {  color: rgb(200,0,200);   }
 div.webterm pre span.f6 {  color: rgb(0,200,200);   }
 div.webterm pre span.f7 {  color: rgb(255,255,255); }
+*/
 
 /* background colors */
+div.webterm pre span.bn {  background-color: rgb(0,0,0);       }
+div.webterm pre span.b0 {  background-color: rgb(108,108,108); }
+div.webterm pre span.b1 {  background-color: rgb(233,137,124); }
+div.webterm pre span.b2 {  background-color: rgb(181,231,125); }
+div.webterm pre span.b3 {  background-color: rgb(236,236,190); }
+div.webterm pre span.b4 {  background-color: rgb(183,221,255); }
+div.webterm pre span.b5 {  background-color: rgb(255,161,255); }
+div.webterm pre span.b6 {  background-color: rgb(215,215,255); }
+div.webterm pre span.b7 {  background-color: rgb(223,223,223); }
+
+/*
 div.webterm pre span.b0 {  background-color: rgb(0,0,0);       }
 div.webterm pre span.b1 {  background-color: rgb(200,0,0);     }
 div.webterm pre span.b2 {  background-color: rgb(0,200,0);     }
@@ -33,9 +63,10 @@ div.webterm pre span.b4 {  background-color: rgb(0,0,200);     }
 div.webterm pre span.b5 {  background-color: rgb(200,0,200);   }
 div.webterm pre span.b6 {  background-color: rgb(0,200,200);   }
 div.webterm pre span.b7 {  background-color: rgb(255,255,255); }
+*/
 
 /* text styles */
-div.webterm pre span.b  { font-weight: bold             }
+div.webterm pre span.b  { font-weight: bolder           }
 div.webterm pre span.i  { font-style: italic            }
 div.webterm pre span.u  { text-decoration: underline    }
 div.webterm pre span.lt { text-decoration: line-through }
