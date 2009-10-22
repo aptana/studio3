@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Git
-Bundle-SymbolicName: com.aptana.ide.red.git;singleton:=true
+Bundle-SymbolicName: com.aptana.git;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.ide.red.git.Activator
+Bundle-Activator: com.aptana.git.Activator
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.team.core,
@@ -14,5 +14,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.ide.red.git,
- com.aptana.ide.red.git.model
+Export-Package: com.aptana.git,
+ com.aptana.git.model

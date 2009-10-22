@@ -11,8 +11,8 @@
    <extension
          point="org.eclipse.team.core.repository">
       <repository
-            class="com.aptana.ide.red.git.RepositoryProvider"
-            id="com.aptana.ide.red.git.RepositoryProvider">
+            class="com.aptana.git.RepositoryProvider"
+            id="com.aptana.git.RepositoryProvider">
       </repository>
    </extension>
 </plugin>
