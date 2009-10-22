@@ -45,7 +45,7 @@ public class GitRepository
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
-	private static Map<URI, WeakReference<GitRepository>> cachedRepos = new HashMap<URI, WeakReference<GitRepository>>(
+	private static Map<String, WeakReference<GitRepository>> cachedRepos = new HashMap<String, WeakReference<GitRepository>>(
 			3);
 
 	public static void addListener(IGitRepositoryListener listener)
@@ -88,21 +88,20 @@ public class GitRepository
 	 * @param path
 	 * @return
 	 */
-	public static GitRepository getUnattachedExisting(URI path)
+	public static synchronized GitRepository getUnattachedExisting(URI path)
 	{
 		if (GitExecutable.instance().path() == null)
 			return null;
 
-		URI gitDirURL = gitDirForURL(path);
-		if (gitDirURL == null)
-			return null;
-
-		WeakReference<GitRepository> ref = cachedRepos.get(gitDirURL);
+		WeakReference<GitRepository> ref = cachedRepos.get(path.getPath());
 		if (ref == null || ref.get() == null)
 		{
-			GitRepository repo = new GitRepository(gitDirURL);
-			cachedRepos.put(gitDirURL, new WeakReference<GitRepository>(repo));
-			return repo;
+			URI gitDirURL = gitDirForURL(path);
+			if (gitDirURL == null)
+				return null;
+
+			ref = new WeakReference<GitRepository>(new GitRepository(gitDirURL));
+			cachedRepos.put(path.getPath(), ref);
 		}
 		return ref.get();
 	}
@@ -273,7 +272,7 @@ public class GitRepository
 		return null;
 	}
 
-	public GitIndex index()
+	public synchronized GitIndex index()
 	{
 		if (index == null)
 		{
@@ -289,7 +288,7 @@ public class GitRepository
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
 	}
-	
+
 	private static void fireRepositoryAddedEvent(GitRepository repo)
 	{
 		RepositoryAddedEvent e = new RepositoryAddedEvent(repo);
