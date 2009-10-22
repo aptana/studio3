@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.model;
+package com.aptana.git.model;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,9 +17,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.ide.red.git.Activator;
-import com.aptana.ide.red.git.ProcessUtil;
-import com.aptana.ide.red.git.StringUtil;
+import com.aptana.git.Activator;
+import com.aptana.git.ProcessUtil;
+import com.aptana.git.StringUtil;
 
 public class GitRepository
 {
@@ -69,7 +69,7 @@ public class GitRepository
 			return null;
 
 		RepositoryProvider provider = RepositoryProvider.getProvider(project,
-				com.aptana.ide.red.git.RepositoryProvider.ID);
+				com.aptana.git.RepositoryProvider.ID);
 		if (provider == null)
 			return null;
 

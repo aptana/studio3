@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.model;
+package com.aptana.git.model;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.eclipse.debug.core.ILaunch;
 
-import com.aptana.ide.red.git.Activator;
-import com.aptana.ide.red.git.ProcessUtil;
+import com.aptana.git.Activator;
+import com.aptana.git.ProcessUtil;
 
 public class GitExecutable
 {

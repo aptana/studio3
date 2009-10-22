@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.model;
+package com.aptana.git.model;
 
 public interface IGitRepositoryListener
 {

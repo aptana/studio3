@@ -1,11 +1,11 @@
-package com.aptana.ide.red.git;
+package com.aptana.git;
 
 import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.GitRepository;
 
 public class RepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 {

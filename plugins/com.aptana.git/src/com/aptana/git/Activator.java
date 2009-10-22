@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git;
+package com.aptana.git;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.ide.red.git.model.GitExecutable;
+import com.aptana.git.model.GitExecutable;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -18,7 +18,7 @@ public class Activator extends Plugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.ide.red.git";
+	public static final String PLUGIN_ID = "com.aptana.git";
 
 	// The shared instance
 	private static Activator plugin;

@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.model;
+package com.aptana.git.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.ide.red.git.Activator;
-import com.aptana.ide.red.git.StringUtil;
+import com.aptana.git.Activator;
+import com.aptana.git.StringUtil;
 
 public class GitIndex
 {
