@@ -17,7 +17,8 @@ int
 main (void) 
 {
 	/* Read char */
-	char c;
+	char buffer[1024];
+	int read_count;
 		
 	/* Descriptor set for select */
 	fd_set descriptor_set;
@@ -57,22 +58,64 @@ main (void)
 				
 				/* User typed something at STDIN */
 				if (FD_ISSET (STDIN_FILENO, &descriptor_set)) 
-				{ 
-					if ( (read (STDIN_FILENO, &c, 1) != 1) || (write (pty, &c, 1) != 1) ) 
+				{
+					read_count = read(STDIN_FILENO, &buffer, 1024);
+					
+					switch (read_count)
+					{
+						case -1:
+							fprintf(stderr, "Disconnected.\n"); 
+							exit (EXIT_FAILURE);
+							break;
+							
+						case 0:
+							fprintf (stderr, "Done\n"); 
+							exit (EXIT_SUCCESS);
+							break;
+							
+						default:
+							write(pty, &buffer, read_count);
+							break;
+					}
+					
+					/*
+					if ( (read (STDIN_FILENO, &c, 1024) <= 0) || (write (pty, &c, 1) != 1) ) 
 					{ 
 						fprintf (stderr, "Done\n"); 
 						exit (EXIT_SUCCESS); 
-					} 
+					}
+					*/
 				} 
 				
 				/* Output from the bash */
 				if (FD_ISSET (pty, &descriptor_set)) 
-				{ 
+				{
+					read_count = read(pty, &buffer, 1024);
+					
+					switch (read_count)
+					{
+						case -1:
+							fprintf (stderr, "Disconnected.\n"); 
+							exit (EXIT_FAILURE); 
+							break;
+							
+						case 0:
+							fprintf (stderr, "Done\n"); 
+							exit (EXIT_SUCCESS);
+							break;
+							
+						default:
+							write (STDOUT_FILENO, &buffer, read_count);
+							break;
+					}
+					
+					/*
 					if ( (read (pty, &c, 1) != 1) || (write (STDOUT_FILENO, &c, 1) != 1) ) 
 					{ 
 						fprintf (stderr, "Disconnected.\n"); 
 						exit (EXIT_FAILURE); 
-					} 
+					}
+					*/
 				} 
 			} 
     } 
