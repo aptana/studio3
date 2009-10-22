@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal;
+package com.aptana.git.ui.internal;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -16,16 +16,16 @@ import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.red.git.model.ChangedFile;
-import com.aptana.ide.red.git.model.GitRepository;
-import com.aptana.ide.red.git.model.IGitRepositoryListener;
-import com.aptana.ide.red.git.model.IndexChangedEvent;
-import com.aptana.ide.red.git.ui.Activator;
+import com.aptana.git.model.ChangedFile;
+import com.aptana.git.model.GitRepository;
+import com.aptana.git.model.IGitRepositoryListener;
+import com.aptana.git.model.IndexChangedEvent;
+import com.aptana.git.ui.Activator;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
-	private static final String DECORATOR_ID = "com.aptana.ide.red.git.ui.internal.GitLightweightDecorator";
+	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator";
 
 	/**
 	 * Define a cached image descriptor which only creates the image data once

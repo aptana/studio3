@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 public class StatusAction extends GitAction
 {

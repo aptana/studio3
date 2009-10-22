@@ -5,36 +5,36 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="com.aptana.ide.red.git.ui.projectContributions"
+            id="com.aptana.git.ui.projectContributions"
             objectClass="org.eclipse.core.resources.IProject">
          <filter
                name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.ide.red.git.RepositoryProvider">
+               value="org.eclipse.team.core.repository=com.aptana.git.RepositoryProvider">
          </filter>
           <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
-                class="com.aptana.ide.red.git.ui.internal.actions.DisconnectAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.DisconnectAction"
+                class="com.aptana.git.ui.internal.actions.DisconnectAction"
+               id="com.aptana.git.ui.internal.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
          </action>
          <action
-               class="com.aptana.ide.red.git.ui.internal.actions.PushAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.PushAction"
+               class="com.aptana.git.ui.internal.actions.PushAction"
+               id="com.aptana.git.ui.internal.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%PushAction_tooltip">
          </action>
          <action
-               class="com.aptana.ide.red.git.ui.internal.actions.PullAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.PullAction"
+               class="com.aptana.git.ui.internal.actions.PullAction"
+               id="com.aptana.git.ui.internal.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%PullAction_tooltip">
          </action>
          <action
-               class="com.aptana.ide.red.git.ui.internal.actions.StatusAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.StatusAction"
+               class="com.aptana.git.ui.internal.actions.StatusAction"
+               id="com.aptana.git.ui.internal.actions.StatusAction"
                label="%StatusAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%StatusAction_tooltip">
@@ -42,38 +42,38 @@
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="com.aptana.ide.red.git.ui.projectContributions"
+            id="com.aptana.git.ui.projectContributions"
             objectClass="org.eclipse.core.resources.IFile">
          <filter
                name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.ide.red.git.RepositoryProvider">
+               value="org.eclipse.team.core.repository=com.aptana.git.RepositoryProvider">
          </filter>
          <action
                label="%RevertAction_label"
                tooltip="%RevertAction_tooltip"
-               class="com.aptana.ide.red.git.ui.internal.actions.RevertAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.RevertAction"
+               class="com.aptana.git.ui.internal.actions.RevertAction"
+               id="com.aptana.git.ui.internal.actions.RevertAction"
                menubarPath="team.main/projectGroup">
          </action>
          <action
                label="%UnstageAction_label"
                tooltip="%UnstageAction_tooltip"
-               class="com.aptana.ide.red.git.ui.internal.actions.UnstageAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.UnstageAction"
+               class="com.aptana.git.ui.internal.actions.UnstageAction"
+               id="com.aptana.git.ui.internal.actions.UnstageAction"
                menubarPath="team.main/projectGroup">
          </action>
          <action
                label="%StageAction_label"
                tooltip="%StageAction_tooltip"
-               class="com.aptana.ide.red.git.ui.internal.actions.StageAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.StageAction"
+               class="com.aptana.git.ui.internal.actions.StageAction"
+               id="com.aptana.git.ui.internal.actions.StageAction"
                menubarPath="team.main/projectGroup">
          </action>
          <action
                label="%CommitAction_label"
                tooltip="%CommitAction_tooltip"
-               class="com.aptana.ide.red.git.ui.internal.actions.CommitAction"
-               id="com.aptana.ide.red.git.ui.internal.actions.CommitAction"
+               class="com.aptana.git.ui.internal.actions.CommitAction"
+               id="com.aptana.git.ui.internal.actions.CommitAction"
                menubarPath="team.main/projectGroup">
          </action>
       </objectContribution>
@@ -82,8 +82,8 @@
    <extension point="org.eclipse.team.ui.configurationWizards">
       <wizard name="%SharingWizard_name"
 	    icon="icons/etool16/newconnect_wiz.gif"
-            class="com.aptana.ide.red.git.ui.internal.sharing.SharingWizard"
-            id="com.aptana.ide.red.git.ui.internal.sharing.SharingWizard">
+            class="com.aptana.git.ui.internal.sharing.SharingWizard"
+            id="com.aptana.git.ui.internal.sharing.SharingWizard">
       </wizard>
    </extension>
    
@@ -92,10 +92,10 @@
             lightweight="true"
             adaptable="true"
             label="%Decorator_name"
-            class="com.aptana.ide.red.git.ui.internal.GitLightweightDecorator"
+            class="com.aptana.git.ui.internal.GitLightweightDecorator"
             state="true"
             location="BOTTOM_RIGHT"
-            id="com.aptana.ide.red.git.ui.internal.GitLightweightDecorator">
+            id="com.aptana.git.ui.internal.GitLightweightDecorator">
             <enablement>
               <objectClass name="org.eclipse.core.resources.IResource"/>
             </enablement>

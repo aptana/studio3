@@ -1,9 +1,9 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.List;
 
-import com.aptana.ide.red.git.model.ChangedFile;
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.ChangedFile;
+import com.aptana.git.model.GitRepository;
 
 public class UnstageAction extends StagingAction
 {

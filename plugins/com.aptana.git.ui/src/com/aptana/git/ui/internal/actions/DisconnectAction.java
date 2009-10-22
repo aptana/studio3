@@ -7,14 +7,14 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.ide.red.git.ui.internal.GitLightweightDecorator;
+import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 /**
  * Action to disassociate a project from its Git repository.

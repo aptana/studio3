@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.ide.red.git.model.ChangedFile;
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.ChangedFile;
+import com.aptana.git.model.GitRepository;
 
 public class RevertAction extends StagingAction
 {

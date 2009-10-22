@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.sharing;
+package com.aptana.git.ui.internal.sharing;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -14,7 +14,7 @@ import org.eclipse.team.ui.IConfigurationWizard;
 import org.eclipse.team.ui.IConfigurationWizardExtension;
 import org.eclipse.ui.IWorkbench;
 
-import com.aptana.ide.red.git.Activator;
+import com.aptana.git.Activator;
 
 public class SharingWizard extends Wizard implements IConfigurationWizard, IConfigurationWizardExtension
 {

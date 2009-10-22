@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.Collection;
 
@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.ide.red.git.Activator;
+import com.aptana.git.ui.Activator;
 
 /**
  * Disconnects the Git team provider from a project.

@@ -1,14 +1,10 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.ide.red.git.ui.internal.GitLightweightDecorator;
+import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 public class PushAction extends GitAction
 {

@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.ide.red.git.ui.internal.sharing;
+package com.aptana.git.ui.internal.sharing;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -17,11 +17,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.ide.red.git.Activator;
-import com.aptana.ide.red.git.RepositoryProvider;
-import com.aptana.ide.red.git.model.GitRepository;
-import com.aptana.ide.red.git.ui.internal.GitLightweightDecorator;
+import com.aptana.git.model.GitRepository;
+import com.aptana.git.ui.Activator;
+import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 /**
  * Connects Eclipse to an existing Git repository

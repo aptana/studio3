@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,9 +39,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.ide.red.git.model.ChangedFile;
-import com.aptana.ide.red.git.model.GitRepository;
-import com.aptana.ide.red.git.ui.Activator;
+import com.aptana.git.model.ChangedFile;
+import com.aptana.git.model.GitRepository;
+import com.aptana.git.ui.Activator;
 
 public class CommitDialog extends StatusDialog
 {
@@ -329,19 +329,19 @@ public class CommitDialog extends StatusDialog
 	{
 		if (commitMessage.getText().length() < 3)
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
 					"Please enter a commit message before committing"));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
 					"You must first stage some changes before committing"));
 			return;
 		}
 		if (gitRepository.hasMerges())
 		{
-			updateStatus(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			updateStatus(new Status(IStatus.ERROR, Activator.getPluginId(),
 					"Cannot commit merges yet. Please commit your changes from the command line."));
 			return;
 		}

@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.GitRepository;
 
 public class PullAction extends GitAction
 {

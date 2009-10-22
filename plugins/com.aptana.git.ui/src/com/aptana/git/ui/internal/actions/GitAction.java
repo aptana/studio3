@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -9,8 +9,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.team.internal.ui.actions.TeamAction;
 
-import com.aptana.ide.red.git.Activator;
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.Activator;
+import com.aptana.git.model.GitRepository;
 
 abstract class GitAction extends TeamAction
 {

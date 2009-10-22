@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.ide.red.git.ui.internal.sharing;
+package com.aptana.git.ui.internal.sharing;
 
 import java.io.File;
 import java.net.URI;
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.GitRepository;
 
 /**
  * Wizard page for connecting projects to Git repositories.

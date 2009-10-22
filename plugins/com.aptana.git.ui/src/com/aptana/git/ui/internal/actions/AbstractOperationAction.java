@@ -7,7 +7,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -27,7 +27,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.red.git.Activator;
+import com.aptana.git.ui.Activator;
 
 /**
  * Common functionality for EGit operations.

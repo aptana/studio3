@@ -1,4 +1,4 @@
-package com.aptana.ide.red.git.ui.internal.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -9,7 +9,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
-import com.aptana.ide.red.git.model.GitRepository;
+import com.aptana.git.model.GitRepository;
 
 public class CommitAction extends GitAction
 {
