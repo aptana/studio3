@@ -5,19 +5,26 @@ import java.io.OutputStream;
 
 public class ProcessWriter
 {
-	OutputStream os;
+	private OutputStream _os;
 	
+	/**
+	 * ProcessWriter
+	 * 
+	 * @param os
+	 */
 	public ProcessWriter(OutputStream os)
 	{
-		this.os = os;
+		this._os = os;
 	}
 	
 	public void sendText(String text)
 	{
 		try
 		{
-			os.write(text.getBytes());
-			os.flush();
+			this._os.write(text.getBytes());
+			this._os.flush();
+			
+			//System.out.println("STDIN:~" + Activator.encodeString(text) + "~");
 		}
 		catch (IOException e)
 		{

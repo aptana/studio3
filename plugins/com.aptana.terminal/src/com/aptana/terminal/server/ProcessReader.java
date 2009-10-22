@@ -4,15 +4,15 @@ import java.io.InputStream;
 
 public class ProcessReader extends Thread
 {
-	InputStream is;
-	String type;
-	StringBuffer output;
+	private InputStream _input;
+	private String _name;
+	private StringBuffer _output;
 
-	public ProcessReader(String type, InputStream is, StringBuffer output)
+	public ProcessReader(String name, InputStream is, StringBuffer output)
 	{
-		this.is = is;
-		this.type = type;
-		this.output = output;
+		this._input = is;
+		this._name = name;
+		this._output = output;
 	}
 
 	public void run()
@@ -22,14 +22,16 @@ public class ProcessReader extends Thread
 			byte[] line = new byte[1024];
 			int count;
 			
-			while ((count = is.read(line)) != -1)
+			while ((count = this._input.read(line)) != -1)
 			{
 				String text = new String(line, 0, count);
 				
-				synchronized (output)
+				synchronized (this._output)
 				{
-					output.append(text);
+					this._output.append(text);
 				}
+				
+				//System.out.println(this._name + ":~" + Activator.encodeString(text) + "~");
 			}
 		}
 		catch (IOException ioe)
