@@ -1,4 +1,4 @@
-package com.aptana.git.core;
+package com.aptana.git.core.model;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProcessUtil
+abstract class ProcessUtil
 {
 
-	public static String outputForCommand(String command, String workingDir, String... args)
+	static String outputForCommand(String command, String workingDir, String... args)
 	{
 		Map<Integer, String> result = runInBackground(command, workingDir, args);
 		if (result == null || result.isEmpty())
@@ -21,7 +21,7 @@ public class ProcessUtil
 		return result.values().iterator().next();
 	}
 
-	public static String read(InputStream stream)
+	static String read(InputStream stream)
 	{
 		StringBuilder builder = new StringBuilder();
 		try
@@ -33,7 +33,7 @@ public class ProcessUtil
 			}
 			return builder.toString();
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,18 +53,18 @@ public class ProcessUtil
 		return null;
 	}
 
-	public static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
+	static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
 	{
 		return runInBackground(command, workingDir, null, args);
 	}
 
-	public static Map<Integer, String> runInBackground(String command, String workingDir, Map<String, String> env,
+	static Map<Integer, String> runInBackground(String command, String workingDir, Map<String, String> env,
 			String[] args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
 	}
 
-	public static Map<Integer, String> runInBackground(String command, String workingDir, String input,
+	static Map<Integer, String> runInBackground(String command, String workingDir, String input,
 			Map<String, String> env, String[] args)
 	{
 		List<String> commands = new ArrayList<String>();

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.ProcessUtil;
 
 public class GitExecutable
 {
