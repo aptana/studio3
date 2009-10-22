@@ -2,7 +2,6 @@
 div.webterm {
 	float: left;
 	border: 1px solid rgb(255,145,38);
-	background: black;
 }
 
 /* top-level pre element */
@@ -10,7 +9,7 @@ div.webterm pre {
 	margin: 0px 0px 0px;
 	font-family: Monaco, Courier, monospace;
 	font-size: 9pt;
-	line-height: 12pt;
+	line-height: 11.5pt;
 }
 
 /* title bar */
