@@ -7,12 +7,12 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.git.core.model.GitRepository;
 
-public class RepositoryProvider extends org.eclipse.team.core.RepositoryProvider
+public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 {
 
-	public static final String ID = RepositoryProvider.class.getName();
+	public static final String ID = GitRepositoryProvider.class.getName();
 
-	public RepositoryProvider()
+	public GitRepositoryProvider()
 	{
 		// nothing
 	}

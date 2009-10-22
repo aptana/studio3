@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.team.core.RepositoryProvider;
 
+import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
@@ -70,7 +71,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 				m.worked(40);
 				if (repo != null)
 				{
-					RepositoryProvider.map(project, com.aptana.git.core.RepositoryProvider.ID);
+					RepositoryProvider.map(project, GitRepositoryProvider.ID);
 					m.worked(10);
 					project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 50));
 					GitLightweightDecorator.refresh();

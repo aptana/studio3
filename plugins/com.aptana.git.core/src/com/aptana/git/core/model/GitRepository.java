@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.team.core.RepositoryProvider;
 
+import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.ProcessUtil;
 
 public class GitRepository
@@ -66,8 +67,7 @@ public class GitRepository
 		if (project == null)
 			return null;
 
-		RepositoryProvider provider = RepositoryProvider
-				.getProvider(project, com.aptana.git.core.RepositoryProvider.ID);
+		RepositoryProvider provider = RepositoryProvider.getProvider(project, GitRepositoryProvider.ID);
 		if (provider == null)
 			return null;
 
