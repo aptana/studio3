@@ -39,8 +39,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.git.model.ChangedFile;
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class CommitDialog extends StatusDialog

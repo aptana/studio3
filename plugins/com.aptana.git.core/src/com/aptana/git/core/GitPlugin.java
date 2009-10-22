@@ -1,4 +1,4 @@
-package com.aptana.git;
+package com.aptana.git.core;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -8,8 +8,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
-
-import com.aptana.git.model.GitExecutable;
 
 /**
  * The activator class controls the plug-in life cycle

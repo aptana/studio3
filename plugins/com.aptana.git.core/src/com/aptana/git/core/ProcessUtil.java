@@ -1,4 +1,4 @@
-package com.aptana.git;
+package com.aptana.git.core;
 
 import java.io.BufferedInputStream;
 import java.io.File;

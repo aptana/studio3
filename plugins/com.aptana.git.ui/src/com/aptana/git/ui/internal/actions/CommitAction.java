@@ -9,7 +9,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.GitRepository;
 
 public class CommitAction extends GitAction
 {

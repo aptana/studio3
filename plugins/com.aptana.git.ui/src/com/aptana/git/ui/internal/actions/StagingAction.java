@@ -9,8 +9,8 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.git.model.ChangedFile;
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitRepository;
 
 abstract class StagingAction extends ChangedFileAction
 {

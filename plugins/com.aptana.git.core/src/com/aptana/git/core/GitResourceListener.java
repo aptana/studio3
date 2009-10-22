@@ -1,4 +1,4 @@
-package com.aptana.git;
+package com.aptana.git.core;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.GitRepository;
 
 class GitResourceListener implements IResourceChangeListener
 {

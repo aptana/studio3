@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.GitRepository;
 
 public class PullAction extends GitAction
 {

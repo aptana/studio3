@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.GitRepository;
 
 /**
  * Wizard page for connecting projects to Git repositories.

@@ -4,8 +4,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.team.internal.ui.actions.TeamAction;
 
-import com.aptana.git.model.ChangedFile;
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitRepository;
 
 abstract class ChangedFileAction extends TeamAction
 {

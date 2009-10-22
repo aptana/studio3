@@ -9,7 +9,7 @@
             objectClass="org.eclipse.core.resources.IProject">
          <filter
                name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.git.RepositoryProvider">
+               value="org.eclipse.team.core.repository=com.aptana.git.core.RepositoryProvider">
          </filter>
           <action
                label="%DisconnectAction_label"
@@ -46,7 +46,7 @@
             objectClass="org.eclipse.core.resources.IFile">
          <filter
                name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.git.RepositoryProvider">
+               value="org.eclipse.team.core.repository=com.aptana.git.core.RepositoryProvider">
          </filter>
          <action
                label="%RevertAction_label"

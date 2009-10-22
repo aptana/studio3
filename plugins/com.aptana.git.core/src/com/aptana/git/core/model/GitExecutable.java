@@ -1,12 +1,12 @@
-package com.aptana.git.model;
+package com.aptana.git.core.model;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.git.GitPlugin;
-import com.aptana.git.ProcessUtil;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.ProcessUtil;
 
 public class GitExecutable
 {

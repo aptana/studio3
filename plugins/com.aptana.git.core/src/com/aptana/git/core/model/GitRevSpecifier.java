@@ -1,4 +1,4 @@
-package com.aptana.git.model;
+package com.aptana.git.core.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;

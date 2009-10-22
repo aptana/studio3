@@ -14,7 +14,7 @@ import org.eclipse.team.ui.IConfigurationWizard;
 import org.eclipse.team.ui.IConfigurationWizardExtension;
 import org.eclipse.ui.IWorkbench;
 
-import com.aptana.git.GitPlugin;
+import com.aptana.git.core.GitPlugin;
 
 public class SharingWizard extends Wizard implements IConfigurationWizard, IConfigurationWizardExtension
 {

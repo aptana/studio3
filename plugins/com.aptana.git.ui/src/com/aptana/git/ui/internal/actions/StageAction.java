@@ -2,8 +2,8 @@ package com.aptana.git.ui.internal.actions;
 
 import java.util.List;
 
-import com.aptana.git.model.ChangedFile;
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitRepository;
 
 public class StageAction extends StagingAction
 {

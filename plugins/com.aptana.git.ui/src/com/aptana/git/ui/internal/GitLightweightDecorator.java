@@ -16,10 +16,10 @@ import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.git.model.ChangedFile;
-import com.aptana.git.model.GitRepository;
-import com.aptana.git.model.IGitRepositoryListener;
-import com.aptana.git.model.IndexChangedEvent;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,

@@ -1,4 +1,4 @@
-package com.aptana.git.model;
+package com.aptana.git.core.model;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,8 +17,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.git.GitPlugin;
-import com.aptana.git.ProcessUtil;
+import com.aptana.git.core.ProcessUtil;
 
 public class GitRepository
 {
@@ -67,8 +66,8 @@ public class GitRepository
 		if (project == null)
 			return null;
 
-		RepositoryProvider provider = RepositoryProvider.getProvider(project,
-				com.aptana.git.RepositoryProvider.ID);
+		RepositoryProvider provider = RepositoryProvider
+				.getProvider(project, com.aptana.git.core.RepositoryProvider.ID);
 		if (provider == null)
 			return null;
 
@@ -113,8 +112,8 @@ public class GitRepository
 	{
 		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(),
-				"rev-parse --is-inside-work-tree").equals("true"))
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse --is-inside-work-tree")
+				.equals("true"))
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
 		return null;
@@ -131,8 +130,7 @@ public class GitRepository
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse",
-				"--git-dir");
+		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir");
 		if (newPath.equals(GIT_DIR))
 			return new File(repositoryPath, GIT_DIR).toURI();
 		if (newPath.length() > 0)
@@ -143,16 +141,15 @@ public class GitRepository
 
 	public boolean parseReference(String parent)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
-				"rev-parse", "--verify", parent);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse",
+				"--verify", parent);
 		int exitValue = result.keySet().iterator().next();
 		return exitValue == 0;
 	}
 
 	private static boolean isBareRepository(String path)
 	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse",
-				"--is-bare-repository");
+		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository");
 		return "true".equals(output);
 	}
 
@@ -224,8 +221,7 @@ public class GitRepository
 
 	private String parseSymbolicReference(String reference)
 	{
-		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q",
-				reference);
+		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference);
 		if (ref.startsWith("refs/"))
 			return ref;
 
@@ -257,8 +253,7 @@ public class GitRepository
 
 	public String currentBranch()
 	{
-		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch",
-				"--no-color");
+		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch", "--no-color");
 		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
 		for (String line : lines)
 		{
@@ -391,8 +386,8 @@ public class GitRepository
 	public String[] commitsAhead(String branchName)
 	{
 		String local = "refs/heads/" + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config",
-				"--get-regexp", "^branch\\." + branchName + "\\.remote");
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
+				"^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
@@ -428,8 +423,8 @@ public class GitRepository
 	{
 		// TODO Refactor with commitsAhead
 		String local = "refs/heads/" + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config",
-				"--get-regexp", "^branch\\." + branchName + "\\.remote");
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
+				"^branch\\." + branchName + "\\.remote");
 		if (output == null || output.trim().length() == 0)
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();

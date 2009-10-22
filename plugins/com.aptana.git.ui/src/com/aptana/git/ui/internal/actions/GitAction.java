@@ -19,8 +19,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.team.internal.ui.actions.TeamAction;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
-import com.aptana.git.model.GitExecutable;
-import com.aptana.git.model.GitRepository;
+import com.aptana.git.core.model.GitExecutable;
+import com.aptana.git.core.model.GitRepository;
 
 /**
  * Base class for actions that simple call out to actions/commands on the Git executable to be run inside the Eclipse

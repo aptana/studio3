@@ -1,4 +1,4 @@
-package com.aptana.git.model;
+package com.aptana.git.core.model;
 
 /**
  * Used to set and get values from the .gitconfig
