@@ -42,13 +42,13 @@ public class ProcessWrapper
 			ProcessBuilder builder = new ProcessBuilder(file.getAbsolutePath());
 			Map<String, String> env = builder.environment();
 			env.put("TERM", "xterm-color");
-	
+			
 			try
 			{
 				this._process = builder.start();
 				this._output = new StringBuffer();
 				this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output);
-				this._stderr = new ProcessReader("STDERR", this._process.getInputStream(), this._output);
+				this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output);
 				this._stdin = new ProcessWriter(this._process.getOutputStream());
 				
 				this._stdout.start();
