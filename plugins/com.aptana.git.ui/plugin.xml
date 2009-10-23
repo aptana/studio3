@@ -49,6 +49,12 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
+               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               id="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               label="%ShowResourceInHistoryAction_label"
+               menubarPath="team.main/group1"
+               tooltip="%ShowResourceInHistoryAction_tooltip"/>
+         <action
                label="%RevertAction_label"
                tooltip="%RevertAction_tooltip"
                class="com.aptana.git.ui.internal.actions.RevertAction"
@@ -111,5 +117,23 @@
             decoratorId="com.aptana.git.ui.internal.GitLightweightDecorator"
             repositoryId="com.aptana.git.core.GitRepositoryProvider">
       </teamDecorator>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+         <factory
+               adaptableType="com.aptana.git.internal.core.storage.GitFileHistoryProvider"
+               class="com.aptana.git.ui.internal.GitAdapterFactory">
+            <adapter
+                  type="org.eclipse.team.ui.history.IHistoryPageSource">
+            </adapter>
+         </factory>
+         <factory
+	       adaptableType="org.eclipse.core.resources.IResource"
+               class="com.aptana.git.ui.internal.GitAdapterFactory">
+            <adapter
+                  type="org.eclipse.team.ui.history.IHistoryPageSource">
+            </adapter>
+         </factory>
    </extension>
 </plugin>
