@@ -9,14 +9,14 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swt.graphics.Point;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Utils;
 
 public class HttpWorker implements Runnable
 {
@@ -101,45 +101,48 @@ public class HttpWorker implements Runnable
 //		return result;
 //	}
 	
-	/**
-	 * run
-	 */
-	@Override
-	public void run()
+	private String getPostContent(BufferedReader input)
 	{
+		String result = null;
+		
 		try
 		{
-			BufferedReader input = new BufferedReader(new InputStreamReader(this._clientSocket.getInputStream()));
-			DataOutputStream output = new DataOutputStream(this._clientSocket.getOutputStream());
-			
-			//System.out.println("Socket: " + this._clientSocket);
-			
-			try
+			while (input.ready())
 			{
-				String s;
+				String line = input.readLine();
 				
-				while ((s = input.readLine()).length() > 0)
+				if (line.indexOf("Content-Length:") != -1)
 				{
-					if (s.startsWith("GET "))
+					String contentLengthString = line.split(" ")[1];
+					int contentLength = Integer.parseInt(contentLengthString);
+					
+					while (true)
 					{
-						this.processGet(s, input, output);
+						line = input.readLine();
+						
+						if (line.length() == 0)
+						{
+							break;
+						}
 					}
-					else if (s.startsWith("POST "))
-					{
-						this.processPost(s, input, output);
-					}
+					
+					char[] chars = new char[contentLength];
+					input.read(chars);
+					
+					result = new String(chars);
 				}
 			}
-			catch (Exception e)
-			{
-				output.writeBytes("HTTP/1.0 404 ERROR\n\n");
-			}
-			
-			output.close();
 		}
-		catch (Exception e)
+		catch (NumberFormatException e)
 		{
+			e.printStackTrace();
 		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -163,6 +166,10 @@ public class HttpWorker implements Runnable
 		else if ("/id".equals(p))
 		{
 			processGetId(output);
+		}
+		else if (p.startsWith("/size"))
+		{
+			processGetSize(output);
 		}
 		else
 		{
@@ -227,7 +234,6 @@ public class HttpWorker implements Runnable
 		if (p.startsWith("/stream?id="))
 		{
 			String id = p.substring(p.indexOf("=") + 1);
-			//System.out.println("processPost for " + id);
 			
 			processPostStream(id, input, output);
 		}
@@ -238,6 +244,21 @@ public class HttpWorker implements Runnable
 	}
 	
 	/**
+	 * processPostSize
+	 * 
+	 * @param id
+	 * @param input
+	 * @param output
+	 */
+	private void processGetSize(DataOutputStream output)
+	{
+		Point size = Utils.getCharacterWidth();
+		String responseText = Integer.toString(size.x) + "," + Integer.toString(size.y);
+		
+		this.sendText(output, responseText);
+	}
+	
+	/**
 	 * processPostStream
 	 * 
 	 * @param input
@@ -245,45 +266,62 @@ public class HttpWorker implements Runnable
 	 */
 	private void processPostStream(String id, BufferedReader input, DataOutputStream output)
 	{
+		String content = getPostContent(input);
+		ProcessWrapper wrapper = this._server.getProcess(id);
+		
+		if (wrapper != null)
+		{
+			wrapper.sendText(content);
+		}
+		
 		try
 		{
-			do
-			{
-				String line = input.readLine();
-				
-				if (line.indexOf("Content-Length:") != -1)
-				{
-					String contentLengthString = line.split(" ")[1];
-					int contentLength = Integer.parseInt(contentLengthString);
-					
-					while (true)
-					{
-						line = input.readLine();
-						
-						if (line.length() == 0)
-						{
-							break;
-						}
-					}
-					
-					char[] chars = new char[contentLength];
-					input.read(chars);
-					
-					ProcessWrapper wrapper = this._server.getProcess(id);
-					
-					if (wrapper != null)
-					{
-						wrapper.sendText(chars);
-					}
-					
-					output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
-				}
-			}
-			while (input.ready());
+			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * run
+	 */
+	@Override
+	public void run()
+	{
+		try
+		{
+			BufferedReader input = new BufferedReader(new InputStreamReader(this._clientSocket.getInputStream()));
+			DataOutputStream output = new DataOutputStream(this._clientSocket.getOutputStream());
+			
+			//System.out.println("Socket: " + this._clientSocket);
+			
+			try
+			{
+				String s;
+				
+				while ((s = input.readLine()).length() > 0)
+				{
+					if (s.startsWith("GET "))
+					{
+						this.processGet(s, input, output);
+					}
+					else if (s.startsWith("POST "))
+					{
+						this.processPost(s, input, output);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				output.writeBytes("HTTP/1.0 404 ERROR\n\n");
+			}
+			
+			output.close();
+		}
+		catch (Exception e)
+		{
 		}
 	}
 	
