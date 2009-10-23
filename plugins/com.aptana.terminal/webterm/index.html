@@ -4,10 +4,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link href="Term.css" rel="stylesheet" type="text/css" />
         <title>Aptana Web Terminal</title>
-		<script src="webterm_compressed.js"></script>
+		<!--script src="webterm_compressed.js"></script-->
+		<script src="webterm_debug_compressed.js"></script>
         <script>
             var terminal;
 			var xtermHandler;
+			var debugHandler;
             
 			/**
 			 * init
@@ -15,13 +17,29 @@
             function init()
             {
 				var query = getQuery();
+				// create a list of handlers so we can cature debug info while
+				// allowing regular processing to occur
+				xtermHandler = new XTermHandler();
+				debugHandler = new DebugHandler();
+				
+				var handlerList = new BroadcastHandler();
+				handlerList.addHandler(debugHandler);
+				handlerList.addHandler(xtermHandler);
+				
 				var config = {
-					id: (query !== null && query.hasOwnProperty("id")) ? query.id : null
+					handler: handlerList,
+					id: (query !== null && query.hasOwnProperty("id")) ? query.id : null,
+					autoStart: false
 				};
 				
 				// create terminal
-                terminal = new Term("terminal", 80, 24, config);
-				xtermhandler = terminal.getParser().getHandler();
+                terminal = new Term("terminal", 40, 10, config);
+				
+				// HACK due to architecture flaw!
+				xtermHandler._term = terminal;
+				
+				// start processing
+				terminal.toggleRunState();
             }
 			
 			function getQuery()
@@ -42,6 +60,47 @@
 				return result;
 			}
             
+			/**
+			 * showActionSequence
+			 */
+			function showActionSequence()
+			{
+				var header = ["Action sequence", ""];
+				var entries = debugHandler.getActions();
+				
+				if (entries.length > 0)
+				{
+					entries = header.concat(entries);
+				}
+				else
+				{
+					entries = ["No actions have been seen"];
+				}
+				
+				document.getElementById("stdout").innerHTML = entries.join("<br />");
+			}
+			
+			/**
+			 * showProcessedActions
+			 */
+            function showProcessedActions()
+			{
+				var commands = debugHandler.getCommands();
+				var entries = getEntries(commands);
+				
+				if (entries.length > 0)
+				{
+					entries.unshift("");
+                    entries.unshift("Processed commands with frequency counts:");
+				}
+				else
+				{
+					entries.push("No commands have been processed");
+				}
+				
+				document.getElementById("stdout").innerHTML = entries.join("<br />");
+			}
+			
 			/**
 			 * showUnsupportedActions
 			 */
