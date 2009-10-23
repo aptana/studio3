@@ -1,6 +1,13 @@
+body {
+	margin: 0;
+	background-color: rgb(0,0,0);
+}
+
 /* root element */
 div.webterm {
+	/*
 	float: left;
+	*/
 	border: 1px solid rgb(255,145,38);
 }
 
