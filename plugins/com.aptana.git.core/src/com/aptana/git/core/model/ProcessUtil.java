@@ -73,7 +73,7 @@ abstract class ProcessUtil
 			commands.add(arg);
 
 		ProcessBuilder builder = new ProcessBuilder(commands);
-		if (workingDir != null)
+		if (workingDir != null && workingDir.trim().length() > 0)
 			builder.directory(new File(workingDir));
 
 		if (env != null && !env.isEmpty())
@@ -134,5 +134,19 @@ abstract class ProcessUtil
 				// ignore
 			}
 		}
+	}
+
+	public static Process run(String command, String workingDir, List<String> args) throws IOException
+	{
+		List<String> commands = new ArrayList<String>();
+		commands.add(command);
+		for (String arg : args)
+			commands.add(arg);
+
+		ProcessBuilder builder = new ProcessBuilder(commands);
+		if (workingDir != null)
+			builder.directory(new File(workingDir));
+		
+		return builder.start();
 	}
 }
