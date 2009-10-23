@@ -7,9 +7,10 @@ div.webterm {
 /* top-level pre element */
 div.webterm pre {
 	margin: 0px 0px 0px;
-	font-family: Monaco, Courier, monospace;
+	/*font-family: Monaco, Courier, monospace;*/
+	font-family: monospace;
 	font-size: 9pt;
-	line-height: 11.5pt;
+	line-height: 11pt;
 }
 
 /* title bar */
