@@ -17,7 +17,7 @@
             function init()
             {
 				var query = getQuery();
-				// create a list of handlers so we can cature debug info while
+				// create a list of handlers so we can capture debug info while
 				// allowing regular processing to occur
 				xtermHandler = new XTermHandler();
 				debugHandler = new DebugHandler();
@@ -33,7 +33,7 @@
 				};
 				
 				// create terminal
-                terminal = new Term("terminal", 40, 10, config);
+                terminal = new Term("terminal", 80,20, config);
 				
 				// HACK due to architecture flaw!
 				xtermHandler._term = terminal;
@@ -175,7 +175,7 @@
 			}
         </script>
     </head>
-    <body onload="init()" style="background: rgb(230,230,230)">
+    <body onload="init()">
 		<div id="terminal"></div>
 		<div style="clear: both; padding: 15px">
 	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
