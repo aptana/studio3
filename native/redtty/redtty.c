@@ -2,7 +2,7 @@
 #include <stdlib.h> 
 #include <unistd.h> 
 #include <errno.h> 
-#include <sys/types.h> 
+#include <sys/types.h>
 
 #ifdef LINUX 
 #include <pty.h> 
@@ -24,6 +24,7 @@ main (void)
 	fd_set descriptor_set;
 
 	int pty;
+
 	//int stderr_fd = dup(STDERR_FILENO);
 	switch (forkpty(&pty,  /* pseudo-terminal master end descriptor */ 
 					 NULL,  /* This can be a char[] buffer used to get... */ 
@@ -37,13 +38,15 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
+			//fprintf(stderr, "PID = %i\n", getpid());
+			
 			//dup2(stderr_fd, 2);
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
 			exit (EXIT_FAILURE); 
 			
-		default: /* This is the parent process */ 
+		default: /* This is the parent process */
 			while (1) 
 			{ 
 				FD_ZERO (&descriptor_set);
@@ -55,6 +58,12 @@ main (void)
 					perror ("select()"); 
 					exit (EXIT_FAILURE); 
 				}
+				
+				// try forcing a resize
+				//struct winsize size;
+				//size.ws_row = 10;
+				//size.ws_col = 40;
+				//ioctl(pty, TIOCSWINSZ, &size);
 				
 				/* User typed something at STDIN */
 				if (FD_ISSET (STDIN_FILENO, &descriptor_set)) 
@@ -77,14 +86,6 @@ main (void)
 							write(pty, &buffer, read_count);
 							break;
 					}
-					
-					/*
-					if ( (read (STDIN_FILENO, &c, 1024) <= 0) || (write (pty, &c, 1) != 1) ) 
-					{ 
-						fprintf (stderr, "Done\n"); 
-						exit (EXIT_SUCCESS); 
-					}
-					*/
 				} 
 				
 				/* Output from the bash */
@@ -108,14 +109,6 @@ main (void)
 							write (STDOUT_FILENO, &buffer, read_count);
 							break;
 					}
-					
-					/*
-					if ( (read (pty, &c, 1) != 1) || (write (STDOUT_FILENO, &c, 1) != 1) ) 
-					{ 
-						fprintf (stderr, "Disconnected.\n"); 
-						exit (EXIT_FAILURE); 
-					}
-					*/
 				} 
 			} 
     } 
