@@ -32,10 +32,12 @@ public class PullAction extends GitAction
 		super.execute(action);
 
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
-		for (IProject project : getSelectedProjects())
+		for (IResource resource : getSelectedResources())
 		{
-			affectedProjects.add(project);
-			GitRepository repo = GitRepository.getAttached(project);
+			if (resource == null)
+				continue;
+			affectedProjects.add(resource.getProject());
+			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			if (repo != null)
 			{
 				affectedProjects.addAll(getAssociatedProjects(repo));

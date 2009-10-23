@@ -39,11 +39,6 @@ public class ShowResourceInHistoryAction extends TeamAction
 		TeamUI.getHistoryView().showHistoryFor(getSelectedResources()[0]);
 	}
 
-	// void showCompareInDialog(Shell shell, Object object)
-	// {
-	// HistoryPageSaveablePart.showHistoryInDialog(shell, object);
-	// }
-
 	public boolean isEnabled()
 	{
 		return getSelection().size() == 1;

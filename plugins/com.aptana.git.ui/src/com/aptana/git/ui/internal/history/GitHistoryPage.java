@@ -69,8 +69,19 @@ public class GitHistoryPage extends HistoryPage
 		// Generate the commit list and set the components up with it!
 		GitRepository repo = GitRepository.getAttached(resource.getProject());
 		GitRevList revList = new GitRevList(repo);
-		String repoRelativePath = resource.getProjectRelativePath().toPortableString();
-		revList.walkRevisionListWithSpecifier(new GitRevSpecifier(repoRelativePath), -1);
+		// Need the repo relative path
+		String workingDirectory = repo.workingDirectory();
+		String resourcePath = resource.getLocationURI().getPath();
+		if (resourcePath.startsWith(workingDirectory))
+		{
+			resourcePath = resourcePath.substring(workingDirectory.length());
+		}
+		// What if we have some trailing slash or something?
+		if (resourcePath.length() == 0)
+		{
+			resourcePath = repo.currentBranch();
+		}
+		revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), -1);
 		List<GitCommit> commits = revList.getCommits();
 		graph.setInput(commits);
 

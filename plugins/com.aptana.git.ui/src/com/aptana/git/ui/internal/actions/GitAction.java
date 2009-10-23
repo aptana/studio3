@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
@@ -45,17 +44,14 @@ abstract class GitAction extends TeamAction
 
 	private File getWorkingDir()
 	{
-		IProject[] selected = getSelectedProjects();
-		if (selected != null)
-		{
-			if (selected[0] != null)
-			{
-				IProject project = selected[0];
-				IPath path = project.getLocation();
-				return path.toFile();
-			}
-		}
-		return null;
+		IResource[] resources = getSelectedResources();
+		if (resources == null || resources.length == 0)
+			return null;
+		IProject project = resources[0].getProject();
+		GitRepository repo = GitRepository.getAttached(project);
+		if (repo == null)
+			return null;
+		return new File(repo.workingDirectory());
 	}
 
 	@Override

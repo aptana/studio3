@@ -6,7 +6,7 @@
       <objectContribution
             adaptable="true"
             id="com.aptana.git.ui.projectContributions"
-            objectClass="org.eclipse.core.resources.IProject">
+            objectClass="org.eclipse.core.resources.IResource">
          <filter
                name="projectPersistentProperty"
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
@@ -39,6 +39,20 @@
                menubarPath="team.main/projectGroup"
                tooltip="%StatusAction_tooltip">
          </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               id="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               label="%ShowResourceInHistoryAction_label"
+               menubarPath="team.main/group1"
+               tooltip="%ShowResourceInHistoryAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.CommitAction"
+               id="com.aptana.git.ui.internal.actions.CommitAction"
+               label="%CommitAction_label"
+               menubarPath="team.main/projectGroup"
+               tooltip="%CommitAction_tooltip">
+         </action>
       </objectContribution>
       <objectContribution
             adaptable="true"
@@ -48,12 +62,6 @@
                name="projectPersistentProperty"
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
-         <action
-               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
-               id="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
-               label="%ShowResourceInHistoryAction_label"
-               menubarPath="team.main/group1"
-               tooltip="%ShowResourceInHistoryAction_tooltip"/>
          <action
                label="%RevertAction_label"
                tooltip="%RevertAction_tooltip"
@@ -73,13 +81,6 @@
                tooltip="%StageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.StageAction"
                id="com.aptana.git.ui.internal.actions.StageAction"
-               menubarPath="team.main/projectGroup">
-         </action>
-         <action
-               label="%CommitAction_label"
-               tooltip="%CommitAction_tooltip"
-               class="com.aptana.git.ui.internal.actions.CommitAction"
-               id="com.aptana.git.ui.internal.actions.CommitAction"
                menubarPath="team.main/projectGroup">
          </action>
       </objectContribution>
