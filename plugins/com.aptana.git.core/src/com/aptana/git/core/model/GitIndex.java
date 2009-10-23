@@ -125,7 +125,7 @@ public class GitIndex
 	{
 		String parent = amend ? "HEAD^" : "HEAD";
 
-		if (!repository.parseReference(parent))
+		if (repository.parseReference(parent) == null)
 			// We don't have a head ref. Return the empty tree.
 			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
@@ -496,7 +496,7 @@ public class GitIndex
 		arguments.add("commit-tree");
 		arguments.add(tree);
 		String parent = amend ? "HEAD^" : "HEAD";
-		if (repository.parseReference(parent))
+		if (repository.parseReference(parent) != null)
 		{
 			arguments.add("-p");
 			arguments.add(parent);

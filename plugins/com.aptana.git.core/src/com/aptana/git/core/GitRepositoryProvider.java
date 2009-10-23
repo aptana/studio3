@@ -4,13 +4,16 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.team.core.history.IFileHistoryProvider;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.internal.core.storage.GitFileHistoryProvider;
 
 public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvider
 {
 
 	public static final String ID = GitRepositoryProvider.class.getName();
+	private GitFileHistoryProvider historyProvider;
 
 	public GitRepositoryProvider()
 	{
@@ -43,6 +46,13 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 	public void deconfigure() throws CoreException
 	{
 		// nothing
+	}
+	
+	public synchronized IFileHistoryProvider getFileHistoryProvider() {
+		if (historyProvider == null) {
+			historyProvider = new GitFileHistoryProvider();
+		}
+		return historyProvider;
 	}
 
 }

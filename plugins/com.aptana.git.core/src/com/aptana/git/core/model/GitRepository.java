@@ -33,17 +33,16 @@ public class GitRepository
 	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG";
 	private static final String COMMIT_FILE_ENCODING = "UTF-8";
 	private static final String HEAD = "HEAD";
-	
+
 	public static final String GIT_DIR = ".git";
 
-	// private GitRevList revisionList;
 	private List<GitRevSpecifier> branches;
-	private Map<String, List<GitRef>> refs;
-	// private GitConfig config;
+	Map<String, List<GitRef>> refs;
 	private URI fileURL;
 	private GitRevSpecifier _headRef;
 	private GitIndex index;
 	private boolean hasChanged;
+	GitRevSpecifier currentBranch;
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
@@ -108,26 +107,6 @@ public class GitRepository
 		return ref.get();
 	}
 
-	private GitRepository(URI fileURL)
-	{
-		this.fileURL = fileURL;
-		// this.config = new GitConfig(fileURL.getPath());
-		this.branches = new ArrayList<GitRevSpecifier>();
-		reloadRefs();
-		// this.revisionList = new GitRevList(this);
-	}
-
-	private String workingDirectory()
-	{
-		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
-			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse --is-inside-work-tree")
-				.equals("true"))
-			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
-
-		return null;
-	}
-
 	public static URI gitDirForURL(URI repositoryURL)
 	{
 		if (GitExecutable.instance() == null)
@@ -148,12 +127,38 @@ public class GitRepository
 		return null;
 	}
 
-	public boolean parseReference(String parent)
+	private GitRepository(URI fileURL)
+	{
+		this.fileURL = fileURL;
+		this.branches = new ArrayList<GitRevSpecifier>();
+		reloadRefs();
+		readCurrentBranch();
+	}
+
+	public String workingDirectory()
+	{
+		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
+			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse --is-inside-work-tree")
+				.equals("true"))
+			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
+
+		return null;
+	}
+
+	private void readCurrentBranch()
+	{
+		this.currentBranch = addBranch(headRef());
+	}
+
+	public String parseReference(String parent)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse",
 				"--verify", parent);
 		int exitValue = result.keySet().iterator().next();
-		return exitValue == 0;
+		if (exitValue != 0)
+			return null;
+		return result.values().iterator().next();
 	}
 
 	private static boolean isBareRepository(String path)
@@ -260,6 +265,11 @@ public class GitRepository
 		}
 	}
 
+	/**
+	 * get the name of the current branch as a string FIXME How does this relate to the current branch object?!
+	 * 
+	 * @return
+	 */
 	public String currentBranch()
 	{
 		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch", "--no-color");

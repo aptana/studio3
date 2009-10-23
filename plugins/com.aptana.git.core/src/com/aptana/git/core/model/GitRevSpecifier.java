@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class GitRevSpecifier
+public class GitRevSpecifier
 {
 
 	private List<String> parameters;
 	private String description;
 	private String workingDirectory;
 
-	GitRevSpecifier(String... parameters)
+	public GitRevSpecifier(String... parameters)
 	{
 		this.parameters = Arrays.asList(parameters);
 	}
@@ -28,6 +28,11 @@ class GitRevSpecifier
 		return parameters;
 	}
 
+	String getWorkingDirectory()
+	{
+		return workingDirectory;
+	}
+	
 	static GitRevSpecifier allBranchesRevSpec()
 	{
 		GitRevSpecifier revspec = new GitRevSpecifier("--all");
@@ -40,5 +45,25 @@ class GitRevSpecifier
 		GitRevSpecifier revspec = new GitRevSpecifier("--branches");
 		revspec.description = "Local branches";
 		return revspec;
+	}
+
+	public boolean isSimpleRef()
+	{
+		return parameters.size() == 1 && !parameters.get(0).startsWith("-");
+	}
+
+	public String simpleRef()
+	{
+		if (!isSimpleRef())
+			return null;
+		return parameters.get(0);
+	}
+
+	public boolean hasLeftRight()
+	{
+		for (String param : parameters)
+			if (param.equals("--left-right"))
+				return true;
+		return false;
 	}
 }
