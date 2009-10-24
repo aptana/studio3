@@ -3,6 +3,10 @@
 #include <unistd.h> 
 #include <errno.h> 
 #include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <string.h>
 
 #ifdef LINUX 
 #include <pty.h> 
@@ -13,11 +17,14 @@
 #include <util.h> 
 #endif
 
+#define PORT		8182
+#define GETDIM		"GETDIM\n"
+
 int 
 main (void) 
 {
 	/* Read char */
-	char buffer[1024];
+	char buffer[1024+1];
 	int read_count;
 		
 	/* Descriptor set for select */
@@ -25,6 +32,30 @@ main (void)
 
 	int pty;
 
+	int sd;
+	struct sockaddr_in sa;
+	struct hostent *host;
+	
+	if ((host = gethostbyname("localhost")) == 0) {
+		perror("gethostbyname(localhost)");
+		exit(EXIT_FAILURE);
+	}
+	
+	memset(&sa, 0, sizeof(sa));
+	sa.sin_family = AF_INET;
+	sa.sin_addr.s_addr = ((struct in_addr *)(host->h_addr))->s_addr;
+	sa.sin_port = htons(PORT);
+	
+	if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		perror("socket");
+		exit(EXIT_FAILURE);
+	}
+	
+	if (connect(sd, (struct sockaddr *)&sa, sizeof(sa)) == -1) {
+		perror("connect");
+		exit(EXIT_FAILURE);
+	}
+		
 	//int stderr_fd = dup(STDERR_FILENO);
 	switch (forkpty(&pty,  /* pseudo-terminal master end descriptor */ 
 					 NULL,  /* This can be a char[] buffer used to get... */ 
@@ -38,7 +69,7 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			//fprintf(stderr, "PID = %i\n", getpid());
+			write(sd, buffer, sprintf(buffer, "%i\n", getpid()));
 			
 			//dup2(stderr_fd, 2);
 			execl("/bin/bash", "-bash", "-li", NULL); 
@@ -52,6 +83,7 @@ main (void)
 				FD_ZERO (&descriptor_set);
 				FD_SET (STDIN_FILENO, &descriptor_set); 
 				FD_SET (pty, &descriptor_set); 
+				FD_SET (sd, &descriptor_set); 
 				
 				if (select (FD_SETSIZE, &descriptor_set, NULL, NULL, NULL) < 0) 
 				{ 
@@ -68,7 +100,7 @@ main (void)
 				/* User typed something at STDIN */
 				if (FD_ISSET (STDIN_FILENO, &descriptor_set)) 
 				{
-					read_count = read(STDIN_FILENO, &buffer, 1024);
+					read_count = read(STDIN_FILENO, &buffer, sizeof(buffer)-1);
 					
 					switch (read_count)
 					{
@@ -91,7 +123,7 @@ main (void)
 				/* Output from the bash */
 				if (FD_ISSET (pty, &descriptor_set)) 
 				{
-					read_count = read(pty, &buffer, 1024);
+					read_count = read(pty, &buffer, sizeof(buffer)-1);
 					
 					switch (read_count)
 					{
@@ -110,7 +142,31 @@ main (void)
 							break;
 					}
 				} 
-			} 
+				/* Input from socket */
+				if (FD_ISSET (sd, &descriptor_set)) 
+				{
+					read_count = read(sd, &buffer, sizeof(buffer)-1);
+					switch (read_count)
+					{
+						case -1:
+							fprintf (stderr, "Socket disconnected.\n"); 
+							exit (EXIT_FAILURE); 
+							break;
+							
+						case 0:
+							fprintf (stderr, "Socket done\n"); 
+							exit (EXIT_SUCCESS);
+							break;
+							
+						default:
+							buffer[read_count] = '\0';
+							if (!strncmp(buffer, GETDIM, strlen(GETDIM))) {
+								write(sd, buffer, sprintf(buffer, "%i,%i\n", 10, 10));
+							}
+							break;
+					}
+				}
+			}
     } 
 	
 	return EXIT_FAILURE; 
