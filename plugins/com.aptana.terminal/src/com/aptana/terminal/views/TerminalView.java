@@ -30,6 +30,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.HttpServer;
 
@@ -245,7 +246,7 @@ public class TerminalView extends ViewPart
 		{
 			public void run()
 			{
-				Activator.openEditor(TerminalEditor.ID, true);
+				Utils.openEditor(TerminalEditor.ID, true);
 			}
 		};
 		openEditor.setText("Open Terminal Editor");
