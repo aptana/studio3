@@ -118,7 +118,7 @@ public class HttpWorker implements Runnable
 			{
 				String s;
 				
-				while ((s = input.readLine()).length() > 0)
+				while ((s = input.readLine()) != null && s.length() > 0)
 				{
 					if (s.startsWith("GET "))
 					{

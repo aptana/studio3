@@ -132,7 +132,9 @@ public class TerminalView extends ViewPart
 						BindingService bindingService = (BindingService) getViewSite().getService(IBindingService.class);
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
 						
-						bindingService.getBindingManager().setActiveScheme(oldScheme);
+						if (oldScheme != null) {
+							bindingService.getBindingManager().setActiveScheme(oldScheme);
+						}
 					}
 					catch (NotDefinedException e)
 					{
