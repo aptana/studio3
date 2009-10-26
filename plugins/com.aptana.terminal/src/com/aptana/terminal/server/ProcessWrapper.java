@@ -2,8 +2,6 @@ package com.aptana.terminal.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
@@ -21,9 +19,6 @@ public class ProcessWrapper
 	private ProcessWriter _stdin;
 	private StringBuffer _output;
 	
-	private boolean _useSocket = false;
-	private Socket _socket;
-
 	/**
 	 * ProcessWrapper
 	 * 
@@ -47,51 +42,6 @@ public class ProcessWrapper
 			ProcessBuilder builder = new ProcessBuilder(file.getAbsolutePath());
 			Map<String, String> env = builder.environment();
 			env.put("TERM", "xterm-color");
-
-			if (this._useSocket)
-			{
-				final ServerSocket serverSocket = new ServerSocket(8182);
-				new Thread("Controlling socket")
-				{
-					@Override
-					public void run()
-					{
-						try
-						{
-							serverSocket.setSoTimeout(3000);
-							_socket = serverSocket.accept();
-							byte[] buffer = new byte[1024];
-							int read_count = _socket.getInputStream().read(buffer);
-							if (read_count > 0)
-							{
-								String string = new String(buffer, 0, read_count, "ISO-8859-1");
-								if (string.endsWith("\n"))
-								{
-									int pid = Integer.parseInt(string.substring(0, string.length() - 1));
-									System.out.println("BASH PID=" + pid);
-									// socket.getOutputStream().write("GETDIM\n".getBytes("ISO-8859-1"));
-									return;
-								}
-							}
-							_socket.close();
-						}
-						catch (IOException e)
-						{
-							e.printStackTrace();
-						}
-						finally
-						{
-							try
-							{
-								serverSocket.close();
-							}
-							catch (IOException ignore)
-							{
-							}
-						}
-					}
-				}.start();
-			}
 
 			this._process = builder.start();
 			this._output = new StringBuffer();
@@ -130,17 +80,6 @@ public class ProcessWrapper
 			{
 				e.printStackTrace();
 			}
-		}
-		if (_socket != null)
-		{
-			try
-			{
-				_socket.close();
-			}
-			catch (IOException ignore)
-			{
-			}
-			_socket = null;
 		}
 	}
 
