@@ -16,6 +16,26 @@ import com.aptana.terminal.editor.TerminalEditorInput;
 
 public class Utils
 {
+	private static final String SAMPLE_TEXT;
+
+	/*
+	 * static
+	 */
+	static
+	{
+		char[] chars = new char[200];
+		
+		for (int i = 0; i < chars.length; i++)
+		{
+			chars[i] = 'M';
+		}
+		
+		SAMPLE_TEXT = new String(chars);
+	}
+	
+	/*
+	 * Utils
+	 */
 	private Utils()
 	{
 	}
@@ -82,7 +102,7 @@ public class Utils
 	 * 
 	 * @return
 	 */
-	public static Point getCharacterWidth()
+	public static Size getCharacterWidth()
 	{
 		Display display = Display.getCurrent();
 		Image canvas = new Image(display, 100,100);
@@ -91,11 +111,15 @@ public class Utils
 		
 		gc.setFont(font);
 		
-		Point size = gc.textExtent("M");
+		Point size = gc.textExtent(SAMPLE_TEXT);
+		Size result = new Size(
+			(double) size.x / SAMPLE_TEXT.length(),
+			(double) size.y
+		);
 		
 	    gc.dispose();
 	    canvas.dispose();
 	    
-	    return size;
+	    return result;
 	}
 }

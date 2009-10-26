@@ -13,9 +13,9 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.graphics.Point;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Size;
 import com.aptana.terminal.Utils;
 
 public class HttpWorker implements Runnable
@@ -252,10 +252,9 @@ public class HttpWorker implements Runnable
 	 */
 	private void processGetSize(DataOutputStream output)
 	{
-		Point size = Utils.getCharacterWidth();
-		String responseText = Integer.toString(size.x) + "," + Integer.toString(size.y);
+		Size size = Utils.getCharacterWidth();
 		
-		this.sendText(output, responseText);
+		this.sendText(output, size.toString());
 	}
 	
 	/**
