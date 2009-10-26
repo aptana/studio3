@@ -1,11 +1,9 @@
 package com.aptana.terminal.server;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -20,6 +18,11 @@ import com.aptana.terminal.Utils;
 
 public class HttpWorker implements Runnable
 {
+	private static final String ID_PARAMETER = "id";
+	private static final String INDEX_PAGE_NAME = "index.html";
+	private static final String SIZE_URL = "/size";
+	private static final String ID_URL = "/id";
+	private static final String STREAM_URL = "/stream";
 	private HttpServer _server;
 	private Socket _clientSocket;
 	
@@ -56,12 +59,11 @@ public class HttpWorker implements Runnable
 				
 				new FileInputStream(file).read(bytes);
 				
-				output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n");
-				output.write(bytes, 0, length);
+				this.sendByteResponse(output, bytes);
 			}
 			else
 			{
-				output.writeBytes("HTTP/1.0 404 ERROR\n\n");
+				this.sendErrorResponse(output);
 			}
 		}
 		catch (IOException e)
@@ -74,77 +76,6 @@ public class HttpWorker implements Runnable
 		}
 	}
 	
-//	/**
-//	 * getQuery
-//	 * 
-//	 * @param URL
-//	 * @return
-//	 */
-//	private Map<String,String> getQuery(String URL)
-//	{
-//		Map<String,String> result = new HashMap<String,String>();
-//		int queryStart = URL.indexOf('?');
-//		
-//		if (queryStart != -1)
-//		{
-//			String query = URL.substring(queryStart + 1);
-//			String[] keyPairs = query.split("&");
-//			
-//			for (String keyPair : keyPairs)
-//			{
-//				String[] parts = keyPair.split("=");
-//				
-//				result.put(parts[0], parts[1]);
-//			}
-//		}
-//		
-//		return result;
-//	}
-	
-	private String getPostContent(BufferedReader input)
-	{
-		String result = null;
-		
-		try
-		{
-			while (input.ready())
-			{
-				String line = input.readLine();
-				
-				if (line != null && line.indexOf("Content-Length:") != -1)
-				{
-					String contentLengthString = line.split(" ")[1];
-					int contentLength = Integer.parseInt(contentLengthString);
-					
-					while (true)
-					{
-						line = input.readLine();
-						
-						if (line.length() == 0)
-						{
-							break;
-						}
-					}
-					
-					char[] chars = new char[contentLength];
-					input.read(chars);
-					
-					result = new String(chars);
-				}
-			}
-		}
-		catch (NumberFormatException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
-	
 	/**
 	 * processGet
 	 * 
@@ -152,71 +83,43 @@ public class HttpWorker implements Runnable
 	 * @param input
 	 * @param output
 	 */
-	private void processGet(String get, BufferedReader input, DataOutputStream output)
+	private void processGet(Request request, DataOutputStream output)
 	{
-		String p = (get.split(" "))[1];
+		String url = request.getURL();
 		
-		if (p.startsWith("/stream?id="))
+		if (STREAM_URL.equals(url))
 		{
-			String id = p.substring(p.indexOf("=") + 1);
-			//System.out.println("processGet for " + id);
+			String id = request.getParameter(ID_PARAMETER);
+			ProcessWrapper wrapper = this._server.getProcess(id);
+			String text = wrapper.getText();
 			
-			processGetStream(id, output);
+			if (text != null)
+			{
+				this.sendTextResponse(output, text);
+			}
+			else
+			{
+				this.sendEmptyResponse(output);
+			}
 		}
-		else if ("/id".equals(p))
+		else if (ID_URL.equals(url))
 		{
-			processGetId(output);
+			String id = UUID.randomUUID().toString();
+			
+			this._server.createProcess(id);
+			this.sendTextResponse(output, id);
 		}
-		else if (p.startsWith("/size"))
+		else if (SIZE_URL.equals(url))
 		{
-			processGetSize(output);
+			Size size = Utils.getCharacterWidth();
+			
+			this.sendTextResponse(output, size.toString());
 		}
 		else
 		{
-			int queryIndex = p.indexOf('?');
+			url = ("." + (url.endsWith("/") ? url + INDEX_PAGE_NAME : url)).replace('/', File.separatorChar);
 			
-			if (queryIndex != -1)
-			{
-				p = p.substring(0, queryIndex);
-			}
-			
-			p = ("." + (p.endsWith("/") ? p + "index.html" : p)).replace('/', File.separatorChar);
-			
-			emitFile(output, p);
-		}
-	}
-	
-	/**
-	 * processGetId
-	 * 
-	 * @param output
-	 */
-	private void processGetId(DataOutputStream output)
-	{
-		String id = UUID.randomUUID().toString();
-		
-		System.out.println("Create process for " + id);
-		
-		// start process for this id
-		this._server.createProcess(id);
-		
-		// send identifier back to client
-		this.sendText(output, id);
-	}
-	
-	/**
-	 * processStream
-	 * 
-	 * @param output
-	 */
-	private void processGetStream(String id, DataOutputStream output)
-	{
-		ProcessWrapper wrapper = this._server.getProcess(id);
-		String text = wrapper.getText();
-		
-		if (text != null)
-		{
-			this.sendText(output, text);
+			emitFile(output, url);
 		}
 	}
 	
@@ -227,59 +130,26 @@ public class HttpWorker implements Runnable
 	 * @param input
 	 * @param output
 	 */
-	private void processPost(String post, BufferedReader input, DataOutputStream output)
+	private void processPost(Request request, DataOutputStream output)
 	{
-		String p = (post.split(" "))[1];
+		String url = request.getURL();
 		
-		if (p.startsWith("/stream?id="))
+		if (STREAM_URL.equals(url))
 		{
-			String id = p.substring(p.indexOf("=") + 1);
+			String content = request.getRawContent();
+			String id = request.getParameter(ID_PARAMETER);
+			ProcessWrapper wrapper = this._server.getProcess(id);
 			
-			processPostStream(id, input, output);
+			if (wrapper != null)
+			{
+				wrapper.sendText(content);
+			}
+			
+			this.sendEmptyResponse(output);
 		}
 		else
 		{
-			System.out.println("Unrecognized POST URL: " + p);
-		}
-	}
-	
-	/**
-	 * processPostSize
-	 * 
-	 * @param id
-	 * @param input
-	 * @param output
-	 */
-	private void processGetSize(DataOutputStream output)
-	{
-		Size size = Utils.getCharacterWidth();
-		
-		this.sendText(output, size.toString());
-	}
-	
-	/**
-	 * processPostStream
-	 * 
-	 * @param input
-	 * @param output
-	 */
-	private void processPostStream(String id, BufferedReader input, DataOutputStream output)
-	{
-		String content = getPostContent(input);
-		ProcessWrapper wrapper = this._server.getProcess(id);
-		
-		if (wrapper != null)
-		{
-			wrapper.sendText(content);
-		}
-		
-		try
-		{
-			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
+			System.out.println("Unrecognized POST URL: " + url);
 		}
 	}
 	
@@ -291,30 +161,29 @@ public class HttpWorker implements Runnable
 	{
 		try
 		{
-			BufferedReader input = new BufferedReader(new InputStreamReader(this._clientSocket.getInputStream()));
 			DataOutputStream output = new DataOutputStream(this._clientSocket.getOutputStream());
-			
-			//System.out.println("Socket: " + this._clientSocket);
 			
 			try
 			{
-				String s;
+				Request request = Request.fromInputStream(this._clientSocket.getInputStream());
+				String method = request.getMethod();
 				
-				while ((s = input.readLine()).length() > 0)
+				if ("GET".equals(method))
 				{
-					if (s.startsWith("GET "))
-					{
-						this.processGet(s, input, output);
-					}
-					else if (s.startsWith("POST "))
-					{
-						this.processPost(s, input, output);
-					}
+					this.processGet(request, output);
+				}
+				else if ("POST".equals(method))
+				{
+					this.processPost(request, output);
+				}
+				else
+				{
+					this.sendErrorResponse(output);
 				}
 			}
 			catch (Exception e)
 			{
-				output.writeBytes("HTTP/1.0 404 ERROR\n\n");
+				this.sendErrorResponse(output);
 			}
 			
 			output.close();
@@ -325,14 +194,13 @@ public class HttpWorker implements Runnable
 	}
 	
 	/**
-	 * sendText
+	 * sendByteResponse
 	 * 
 	 * @param output
-	 * @param text
+	 * @param bytes
 	 */
-	private void sendText(DataOutputStream output, String text)
+	private void sendByteResponse(DataOutputStream output, byte[] bytes)
 	{
-		byte[] bytes = text.getBytes();
 		int length = bytes.length;
 		
 		try
@@ -342,7 +210,49 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * sendEmptyResponse
+	 * 
+	 * @param output
+	 */
+	private void sendEmptyResponse(DataOutputStream output)
+	{
+		try
+		{
+			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
+		}
+		catch (IOException e)
+		{
+		}
+	}
+	
+	/**
+	 * sendError
+	 * 
+	 * @param output
+	 */
+	private void sendErrorResponse(DataOutputStream output)
+	{
+		try
+		{
+			output.writeBytes("HTTP/1.0 404 ERROR\n\n");
+		}
+		catch (IOException e)
+		{
+		}
+	}
+	
+	/**
+	 * sendText
+	 * 
+	 * @param output
+	 * @param text
+	 */
+	private void sendTextResponse(DataOutputStream output, String text)
+	{
+		this.sendByteResponse(output, text.getBytes());
 	}
 }
