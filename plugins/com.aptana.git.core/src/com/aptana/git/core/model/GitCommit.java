@@ -126,4 +126,11 @@ public class GitCommit
 	{
 		return parentShas != null && !parentShas.isEmpty();
 	}
+
+	public int parentCount()
+	{
+		if (parentShas == null || parentShas.isEmpty())
+			return 0;
+		return parentShas.size();
+	}
 }

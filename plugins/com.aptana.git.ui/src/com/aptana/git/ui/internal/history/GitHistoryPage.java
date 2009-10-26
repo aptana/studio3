@@ -6,25 +6,17 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.BaseLabelProvider;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.team.ui.history.HistoryPage;
 
 import com.aptana.git.core.model.Diff;
@@ -86,7 +78,6 @@ public class GitHistoryPage extends HistoryPage
 		revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), -1);
 		List<GitCommit> commits = revList.getCommits();
 		graph.setInput(commits);
-
 		return true;
 	}
 
@@ -134,64 +125,7 @@ public class GitHistoryPage extends HistoryPage
 
 	private TableViewer createCommitTable(Composite parent)
 	{
-		Table table = new Table(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
-		table.setHeaderVisible(true);
-		table.setLinesVisible(false);
-		final TableLayout layout = new TableLayout();
-		table.setLayout(layout);
-
-		final TableColumn graph = new TableColumn(table, SWT.NONE);
-		graph.setResizable(true);
-		graph.setText(""); //$NON-NLS-1$
-		graph.setWidth(250);
-		layout.addColumnData(new ColumnWeightData(20, true));
-
-		final TableColumn author = new TableColumn(table, SWT.NONE);
-		author.setResizable(true);
-		author.setText("Author");
-		author.setWidth(250);
-		layout.addColumnData(new ColumnWeightData(10, true));
-
-		final TableColumn date = new TableColumn(table, SWT.NONE);
-		date.setResizable(true);
-		date.setText("Date");
-		date.setWidth(250);
-		layout.addColumnData(new ColumnWeightData(5, true));
-
-		TableViewer viewer = new TableViewer(table);
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setLabelProvider(new CommitLabelProvider());
-		return viewer;
-	}
-
-	static class CommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
-	{
-
-		private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
-
-		@Override
-		public Image getColumnImage(Object element, int columnIndex)
-		{
-			return null;
-		}
-
-		@Override
-		public String getColumnText(Object element, int columnIndex)
-		{
-			GitCommit commit = (GitCommit) element;
-			switch (columnIndex)
-			{
-				case 0:
-					return commit.getSubject();
-				case 1:
-					return commit.getAuthor();
-				case 2:
-					return fmt.format(commit.date());
-				default:
-					return "";
-			}
-		}
-
+		return new CommitGraphTable(parent);
 	}
 
 	private void attachCommitSelectionChanged()
@@ -311,7 +245,7 @@ public class GitHistoryPage extends HistoryPage
 			}
 		}
 		builder.append("\n").append(commit.getComment()).append("\n\n");
-		
+
 		List<Diff> diffs = commit.getDiff();
 		for (Diff diff : diffs)
 		{
@@ -329,7 +263,7 @@ public class GitHistoryPage extends HistoryPage
 			}
 			builder.append(diff.fileName()).append("\n");
 		}
-		
+
 		return new Document(builder.toString());
 	}
 

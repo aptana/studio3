@@ -35,18 +35,18 @@ public class GitExecutable
 	private static GitExecutable find()
 	{
 
-		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
-		if (prefPath != null && prefPath.length() > 0)
-		{
-			if (acceptBinary(prefPath))
-			{
-				return new GitExecutable(prefPath);
-			}
-			GitPlugin.logError(
-					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
-							+ MIN_GIT_VERSION
-							+ " or higher binary. We're going to use the default search paths instead", null);
-		}
+//		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
+//		if (prefPath != null && prefPath.length() > 0)
+//		{
+//			if (acceptBinary(prefPath))
+//			{
+//				return new GitExecutable(prefPath);
+//			}
+//			GitPlugin.logError(
+//					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
+//							+ MIN_GIT_VERSION
+//							+ " or higher binary. We're going to use the default search paths instead", null);
+//		}
 
 		// Try to find the path of the Git binary
 		String gitPath = System.getenv(GitEnv.GIT_PATH);
