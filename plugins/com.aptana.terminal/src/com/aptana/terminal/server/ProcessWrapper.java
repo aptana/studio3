@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
@@ -21,7 +20,9 @@ public class ProcessWrapper
 	private ProcessReader _stderr;
 	private ProcessWriter _stdin;
 	private StringBuffer _output;
-	private Socket socket;
+	
+	private boolean _useSocket = false;
+	private Socket _socket;
 
 	/**
 	 * ProcessWrapper
@@ -38,7 +39,7 @@ public class ProcessWrapper
 	public void start()
 	{
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null);
-		
+
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
@@ -46,53 +47,60 @@ public class ProcessWrapper
 			ProcessBuilder builder = new ProcessBuilder(file.getAbsolutePath());
 			Map<String, String> env = builder.environment();
 			env.put("TERM", "xterm-color");
-			
-			final ServerSocket serverSocket = new ServerSocket(8182);
-			new Thread("Controlling socket") {
-				@Override
-				public void run() {
-					try {
-						serverSocket.setSoTimeout(3000);
-						socket = serverSocket.accept();
-						byte[] buffer = new byte[1024];
-						int read_count = socket.getInputStream().read(buffer);
-						if (read_count > 0) {
-							String string = new String(buffer, 0, read_count, "ISO-8859-1");
-							if (string.endsWith("\n")) {
-								int pid = Integer.parseInt(string.substring(0, string.length()-1));
-								System.out.println("BASH PID="+pid);
-								//socket.getOutputStream().write("GETDIM\n".getBytes("ISO-8859-1"));
-								return;
+
+			if (this._useSocket)
+			{
+				final ServerSocket serverSocket = new ServerSocket(8182);
+				new Thread("Controlling socket")
+				{
+					@Override
+					public void run()
+					{
+						try
+						{
+							serverSocket.setSoTimeout(3000);
+							_socket = serverSocket.accept();
+							byte[] buffer = new byte[1024];
+							int read_count = _socket.getInputStream().read(buffer);
+							if (read_count > 0)
+							{
+								String string = new String(buffer, 0, read_count, "ISO-8859-1");
+								if (string.endsWith("\n"))
+								{
+									int pid = Integer.parseInt(string.substring(0, string.length() - 1));
+									System.out.println("BASH PID=" + pid);
+									// socket.getOutputStream().write("GETDIM\n".getBytes("ISO-8859-1"));
+									return;
+								}
+							}
+							_socket.close();
+						}
+						catch (IOException e)
+						{
+							e.printStackTrace();
+						}
+						finally
+						{
+							try
+							{
+								serverSocket.close();
+							}
+							catch (IOException ignore)
+							{
 							}
 						}
-						socket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
-						try {
-							serverSocket.close();
-						} catch (IOException ignore) {
-						}
 					}
-				}
-			}.start();
-			
-			try
-			{
-				this._process = builder.start();
-				this._output = new StringBuffer();
-				this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output);
-				this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output);
-				this._stdin = new ProcessWriter(this._process.getOutputStream());
-				
-				this._stdout.start();
-				this._stderr.start();
+				}.start();
 			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
+
+			this._process = builder.start();
+			this._output = new StringBuffer();
+			this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output);
+			this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output);
+			this._stdin = new ProcessWriter(this._process.getOutputStream());
+
+			this._stdout.start();
+			this._stderr.start();
 		}
 		catch (IOException e)
 		{
@@ -123,15 +131,19 @@ public class ProcessWrapper
 				e.printStackTrace();
 			}
 		}
-		if (socket != null) {
-			try {
-				socket.close();
-			} catch (IOException ignore) {
+		if (_socket != null)
+		{
+			try
+			{
+				_socket.close();
 			}
-			socket = null;
+			catch (IOException ignore)
+			{
+			}
+			_socket = null;
 		}
 	}
-	
+
 	/**
 	 * sendText
 	 * 
