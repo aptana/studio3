@@ -8,10 +8,16 @@
  *******************************************************************************/
 package com.aptana.git.ui.internal.history;
 
+import org.eclipse.compare.CompareUI;
+import org.eclipse.compare.ITypedElement;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.IOpenListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -20,7 +26,10 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.team.core.history.IFileRevision;
+import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.Diff;
 import com.aptana.git.core.model.GitCommit;
 
@@ -41,6 +50,32 @@ class CommitFileDiffViewer extends TableViewer
 
 		setContentProvider(new CommitDiffContentProvider());
 		setLabelProvider(new SingleCommitLabelProvider());
+
+		addOpenListener(new IOpenListener()
+		{
+			public void open(final OpenEvent event)
+			{
+				final ISelection s = event.getSelection();
+				if (s.isEmpty() || !(s instanceof IStructuredSelection))
+					return;
+				final IStructuredSelection iss = (IStructuredSelection) s;
+				final Diff d = (Diff) iss.getFirstElement();
+				if (d != null && d.commit().hasParent())
+					showTwoWayFileDiff(d);
+			}
+		});
+	}
+
+	void showTwoWayFileDiff(final Diff d)
+	{
+		// TODO What about binary files? Files that are really big? When a file is created/deleted?
+		final GitCommit c = d.commit();
+		final IFileRevision baseFile = GitPlugin.revisionForCommit(c.getFirstParent(), d.oldName());
+		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, d.newName());
+		final ITypedElement base = new FileRevisionTypedElement(baseFile);
+		final ITypedElement next = new FileRevisionTypedElement(nextFile);
+		final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
+		CompareUI.openCompareEditor(in);
 	}
 
 	private void createColumns(final Table rawTable, final TableLayout layout)

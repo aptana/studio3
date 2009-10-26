@@ -7,7 +7,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.git.core.model.GitCommit;
+import com.aptana.git.internal.core.storage.CommitFileRevision;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -91,4 +95,14 @@ public class GitPlugin extends Plugin
 		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
 	}
 
+	/**
+	 * FIXME This doesn't seem like the best place to stick this.
+	 * @param commit
+	 * @param fileName
+	 * @return
+	 */
+	public static IFileRevision revisionForCommit(GitCommit commit, String fileName)
+	{
+		return new CommitFileRevision(commit, fileName);
+	}
 }

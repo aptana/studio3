@@ -75,6 +75,8 @@ public class GitHistoryPage extends HistoryPage
 		if (resourcePath.startsWith(workingDirectory))
 		{
 			resourcePath = resourcePath.substring(workingDirectory.length());
+			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\"))
+				resourcePath = resourcePath.substring(1);
 		}
 		// What if we have some trailing slash or something?
 		if (resourcePath.length() == 0)

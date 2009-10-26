@@ -111,8 +111,19 @@ public class GitCommit
 	public synchronized List<Diff> getDiff()
 	{
 		if (diffs == null)
-			diffs = Diff.parse(GitExecutable.instance().outputForCommand(repository.workingDirectory(), "show",
-					"--pretty=raw", "-M", "--no-color", sha));
+			diffs = Diff.create(this);
 		return diffs;
+	}
+
+	public GitCommit getFirstParent()
+	{
+		if (parents() == null || parents().isEmpty())
+			return null;
+		return new GitCommit(repository, parentShas.get(0));
+	}
+
+	public boolean hasParent()
+	{
+		return parentShas != null && !parentShas.isEmpty();
 	}
 }

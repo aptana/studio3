@@ -9,7 +9,7 @@ public class Diff
 {
 
 	private static final String DEV_NULL = "/dev/null";
-	
+
 	private boolean isBinary;
 	private String oldName;
 	private String newName;
@@ -17,10 +17,12 @@ public class Diff
 	private boolean hasModeChange;
 	private String oldMode;
 	private String newMode;
+	private GitCommit commit;
 
-	private Diff(boolean binary, String startname, String endname, String diffContent, boolean modeChange,
-			String oldMode, String newMode)
+	private Diff(GitCommit commit, boolean binary, String startname, String endname, String diffContent,
+			boolean modeChange, String oldMode, String newMode)
 	{
+		this.commit = commit;
 		this.isBinary = binary;
 		this.oldName = startname;
 		this.newName = endname;
@@ -30,7 +32,7 @@ public class Diff
 		this.newMode = newMode;
 	}
 
-	public static List<Diff> parse(String content)
+	private static List<Diff> parse(GitCommit commit, String content)
 	{
 		boolean header = false;
 		boolean binary = false;
@@ -59,7 +61,9 @@ public class Diff
 				if (!readPrologue)
 					readPrologue = true;
 				else
-					files.add(new Diff(binary, startname, endname, diffContent, mode_change, old_mode, new_mode));
+					files
+							.add(new Diff(commit, binary, startname, endname, diffContent, mode_change, old_mode,
+									new_mode));
 				diffContent = "";
 				startname = "";
 				endname = "";
@@ -196,7 +200,7 @@ public class Diff
 			// lindex++;
 			diffContent += l + "\n";
 		}
-		files.add(new Diff(binary, startname, endname, diffContent, mode_change, old_mode, new_mode));
+		files.add(new Diff(commit, binary, startname, endname, diffContent, mode_change, old_mode, new_mode));
 		return files;
 	}
 
@@ -204,17 +208,44 @@ public class Diff
 	{
 		return oldName.equals(DEV_NULL);
 	}
-	
+
 	public boolean fileDeleted()
 	{
 		return newName.equals(DEV_NULL);
 	}
-	
+
 	public String fileName()
 	{
 		if (newName.equals(DEV_NULL))
 			return oldName;
 		return newName;
+	}
+
+	public GitCommit commit()
+	{
+		return commit;
+	}
+
+	public String oldName()
+	{
+		return oldName;
+	}
+
+	public String newName()
+	{
+		return newName;
+	}
+
+	/**
+	 * Generates a List of Diff Objects, one for each file changed in the commit.
+	 * 
+	 * @param gitCommit
+	 * @return
+	 */
+	public static List<Diff> create(GitCommit gitCommit)
+	{
+		return parse(gitCommit, GitExecutable.instance().outputForCommand(gitCommit.repository().workingDirectory(),
+				"show", "--pretty=raw", "-M", "--no-color", gitCommit.sha()));
 	}
 
 }

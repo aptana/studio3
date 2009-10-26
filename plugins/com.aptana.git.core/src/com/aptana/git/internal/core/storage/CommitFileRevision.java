@@ -25,7 +25,7 @@ import com.aptana.git.core.model.GitExecutable;
 /**
  * An {@link IFileRevision} for a version of a specified resource in the specified commit (revision).
  */
-class CommitFileRevision extends GitFileRevision
+public class CommitFileRevision extends GitFileRevision
 {
 
 	private GitCommit commit;
@@ -41,7 +41,7 @@ class CommitFileRevision extends GitFileRevision
 	{
 		final GitFileRevision self = this;
 		final String output = GitExecutable.instance().outputForCommand(commit.repository().workingDirectory(), "show",
-				commit.sha());
+				commit.sha() + ":" + path);
 		return new IStorage()
 		{
 
@@ -95,4 +95,9 @@ class CommitFileRevision extends GitFileRevision
 		return commit.getTimestamp();
 	}
 
+	@Override
+	public String getContentIdentifier()
+	{
+		return commit.sha();
+	}
 }
