@@ -17,9 +17,6 @@
 #include <util.h> 
 #endif
 
-#define PORT		8182
-#define GETDIM		"GETDIM\n"
-
 int 
 main (void) 
 {
@@ -30,8 +27,9 @@ main (void)
 	/* Descriptor set for select */
 	fd_set descriptor_set;
 
-	int pty;
-
+#ifdef USE_CONTROL_SOCKET
+#define PORT		8182
+#define GETDIM		"GETDIM\n"
 	int sd;
 	struct sockaddr_in sa;
 	struct hostent *host;
@@ -55,7 +53,10 @@ main (void)
 		perror("connect");
 		exit(EXIT_FAILURE);
 	}
-		
+#endif
+	
+	int pty;
+	
 	//int stderr_fd = dup(STDERR_FILENO);
 	switch (forkpty(&pty,  /* pseudo-terminal master end descriptor */ 
 					 NULL,  /* This can be a char[] buffer used to get... */ 
@@ -69,7 +70,7 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			write(sd, buffer, sprintf(buffer, "%i\n", getpid()));
+			//write(sd, buffer, sprintf(buffer, "%i\n", getpid()));
 			
 			//dup2(stderr_fd, 2);
 			execl("/bin/bash", "-bash", "-li", NULL); 
@@ -82,8 +83,10 @@ main (void)
 			{ 
 				FD_ZERO (&descriptor_set);
 				FD_SET (STDIN_FILENO, &descriptor_set); 
-				FD_SET (pty, &descriptor_set); 
+				FD_SET (pty, &descriptor_set);
+#ifdef USE_CONTROL_SOCKET
 				FD_SET (sd, &descriptor_set); 
+#endif
 				
 				if (select (FD_SETSIZE, &descriptor_set, NULL, NULL, NULL) < 0) 
 				{ 
@@ -141,7 +144,9 @@ main (void)
 							write (STDOUT_FILENO, &buffer, read_count);
 							break;
 					}
-				} 
+				}
+				
+#ifdef USE_CONTROL_SOCKET
 				/* Input from socket */
 				if (FD_ISSET (sd, &descriptor_set)) 
 				{
@@ -166,6 +171,7 @@ main (void)
 							break;
 					}
 				}
+#endif
 			}
     } 
 	
