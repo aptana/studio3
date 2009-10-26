@@ -8,6 +8,13 @@ public class ProcessReader extends Thread
 	private String _name;
 	private StringBuffer _output;
 
+	/**
+	 * ProcessReader
+	 * 
+	 * @param name
+	 * @param is
+	 * @param output
+	 */
 	public ProcessReader(String name, InputStream is, StringBuffer output)
 	{
 		this._input = is;
@@ -15,6 +22,17 @@ public class ProcessReader extends Thread
 		this._output = output;
 	}
 
+	/**
+	 * getReaderName
+	 */
+	public String getReaderName()
+	{
+		return this._name;
+	}
+	
+	/**
+	 * run
+	 */
 	public void run()
 	{
 		try
