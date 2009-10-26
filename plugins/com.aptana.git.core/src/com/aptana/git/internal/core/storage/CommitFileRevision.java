@@ -10,15 +10,19 @@
 package com.aptana.git.internal.core.storage;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.history.IFileRevision;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitExecutable;
 
@@ -40,8 +44,6 @@ public class CommitFileRevision extends GitFileRevision
 	public IStorage getStorage(IProgressMonitor monitor) throws CoreException
 	{
 		final GitFileRevision self = this;
-		final String output = GitExecutable.instance().outputForCommand(commit.repository().workingDirectory(), "show",
-				commit.sha() + ":" + path);
 		return new IStorage()
 		{
 
@@ -66,13 +68,23 @@ public class CommitFileRevision extends GitFileRevision
 			@Override
 			public IPath getFullPath()
 			{
-				return new Path(self.path);
+				return new Path(path);
 			}
 
 			@Override
 			public InputStream getContents() throws CoreException
 			{
-				return new ByteArrayInputStream(output.getBytes());
+				try
+				{
+					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show",
+							commit.sha() + ":" + path);
+					return p.getInputStream();
+				}
+				catch (IOException e)
+				{
+					throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
+				}
+				
 			}
 		};
 	}

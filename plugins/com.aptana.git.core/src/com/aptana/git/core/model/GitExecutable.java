@@ -1,6 +1,7 @@
 package com.aptana.git.core.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -134,20 +135,56 @@ public class GitExecutable
 		return gitPath;
 	}
 
+	/**
+	 * Launches the git process and returns a map from the exit value to the stdout output read in.
+	 * 
+	 * @param workingDir
+	 * @param args
+	 * @return
+	 */
 	public String outputForCommand(String workingDir, String... args)
 	{
 		return ProcessUtil.outputForCommand(gitPath, workingDir, args);
 	}
 
+	/**
+	 * Launches the git process and returns a map from the exit value to the stdout output read in.
+	 * 
+	 * @param workingDir
+	 * @param args
+	 * @return
+	 */
 	public Map<Integer, String> runInBackground(String workingDir, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath, workingDir, args);
 	}
 
+	/**
+	 * Launches the git process and returns a map from the exit value to the stdout output read in.
+	 * 
+	 * @param workingDirectory
+	 * @param input
+	 * @param amendEnvironment
+	 * @param args
+	 * @return
+	 */
 	public Map<Integer, String> runInBackground(String workingDirectory, String input,
 			Map<String, String> amendEnvironment, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath, workingDirectory, input, amendEnvironment, args);
+	}
+
+	/**
+	 * Launches the git process and returns the handle to the active process.
+	 * 
+	 * @param directory
+	 * @param arguments
+	 * @return
+	 * @throws IOException
+	 */
+	public Process run(String directory, String... arguments) throws IOException
+	{
+		return ProcessUtil.run(gitPath, directory, arguments);
 	}
 
 }

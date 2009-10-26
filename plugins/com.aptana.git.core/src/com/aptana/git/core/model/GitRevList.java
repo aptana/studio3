@@ -92,7 +92,7 @@ public class GitRevList
 
 		try
 		{
-			Process p = ProcessUtil.run(GitExecutable.instance().path(), directory, arguments);
+			Process p = GitExecutable.instance().run(directory, arguments.toArray(new String[arguments.size()]));
 			InputStream stream = p.getInputStream();
 
 			int num = 0;

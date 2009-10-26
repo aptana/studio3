@@ -64,6 +64,16 @@ abstract class ProcessUtil
 		return runInBackground(command, workingDir, null, env, args);
 	}
 
+	/**
+	 * Launches the process and returns a map from the exit value to the stdout output read in.
+	 * 
+	 * @param command
+	 * @param workingDir
+	 * @param input
+	 * @param env
+	 * @param args
+	 * @return
+	 */
 	static Map<Integer, String> runInBackground(String command, String workingDir, String input,
 			Map<String, String> env, String[] args)
 	{
@@ -136,7 +146,16 @@ abstract class ProcessUtil
 		}
 	}
 
-	public static Process run(String command, String workingDir, List<String> args) throws IOException
+	/**
+	 * Launches the process and returns a handle to the active Process.
+	 * 
+	 * @param command
+	 * @param workingDir
+	 * @param args
+	 * @return
+	 * @throws IOException
+	 */
+	static Process run(String command, String workingDir, String... args) throws IOException
 	{
 		List<String> commands = new ArrayList<String>();
 		commands.add(command);
@@ -146,7 +165,7 @@ abstract class ProcessUtil
 		ProcessBuilder builder = new ProcessBuilder(commands);
 		if (workingDir != null)
 			builder.directory(new File(workingDir));
-		
+
 		return builder.start();
 	}
 }
