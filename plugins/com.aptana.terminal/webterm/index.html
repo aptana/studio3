@@ -10,6 +10,10 @@
             var terminal;
 			var xtermHandler;
 			var debugHandler;
+			
+			var ESC = String.fromCharCode(0x1B);
+			var CSI = ESC + "[";
+			var characterWidth, characterHeight;
             
 			/**
 			 * init
@@ -34,6 +38,16 @@
 				
 				// create terminal
                 terminal = new Term("terminal", 80,20, config);
+				
+				// get character info
+				var comm = terminal.getCommunicationHandler();
+				var size = comm.getCharacterSize().split(",");
+				
+				characterWidth = size[0] - 0;
+				characterHeight = size[1] - 0;
+				
+				// resize to fit
+				autoSize();
 				
 				// HACK due to architecture flaw!
 				xtermHandler._term = terminal;
@@ -173,17 +187,34 @@
 				
 				document.getElementById("toggle").innerText = (comm.isRunning()) ? "Stop" : "Start";
 			}
+			
+			/**
+			 * autoSize
+			 */
+			function autoSize()
+			{
+				var keys = terminal.getKeyHandler();
+				var viewWidth = window.innerWidth - 15;
+				var viewHeight = document.getElementById("terminal").offsetWidth - 0;
+				var width = Math.floor(viewWidth / characterWidth);
+				var height = Math.floor(viewHeight / characterHeight);
+				
+				terminal.setHeight(height);
+				terminal.setWidth(width);
+				
+				keys.addKeys(CSI + [8,height,width].join(";") + "t");
+			}
         </script>
     </head>
-    <body onload="init()">
+    <body onload="init();" onresize="autoSize();">
 		<div id="terminal"></div>
-		<div style="clear: both; padding: 15px">
+		<!--div style="clear: both; padding: 15px">
 	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
 	    	<button onclick="showActionSequence()">Actions</button>
 	    	<button onclick="showProcessedActions()">Seen</button>
 	    	<button onclick="showUnsupportedActions()">Unsupported</button>
 	    	<button onclick="resetDebugInfo()">Reset</button>
 	        <pre id="stdout">result:</pre>
-		</div>
+		</div-->
     </body>
 </html>
