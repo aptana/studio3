@@ -12,7 +12,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git.ui";
+	private static final String PLUGIN_ID = "com.aptana.git.ui"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitUIPlugin plugin;

@@ -64,11 +64,11 @@ public class CommitDialog extends StatusDialog
 		super(parentShell);
 		this.gitRepository = gitRepository;
 		newFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage(); //$NON-NLS-1$
 		deletedFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage(); //$NON-NLS-1$
 		emptyFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage();
+				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage(); //$NON-NLS-1$
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class CommitDialog extends StatusDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText("Commit changes");
+		parent.getShell().setText(Messages.CommitDialog_3);
 
 		container.setLayout(new GridLayout(1, true));
 
@@ -112,7 +112,7 @@ public class CommitDialog extends StatusDialog
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
 		diffArea.setEditable(false);
-		diffArea.setText("No file selected. Please select a file.");
+		diffArea.setText(Messages.CommitDialog_4);
 		// TODO Make it much prettier, like GitX does!
 	}
 
@@ -131,9 +131,9 @@ public class CommitDialog extends StatusDialog
 		Composite composite = new Composite(sashForm, SWT.NONE);
 		composite.setLayout(new GridLayout(1, true));
 		Label label = new Label(composite, SWT.NONE);
-		String text = "Staged Changes";
+		String text = Messages.CommitDialog_5;
 		if (!staged)
-			text = "Unstaged Changes";
+			text = Messages.CommitDialog_6;
 		label.setText(text);
 		Table table = createTable(composite, staged);
 		if (staged)
@@ -147,7 +147,7 @@ public class CommitDialog extends StatusDialog
 		Composite msgComp = new Composite(sashForm, SWT.NONE);
 		msgComp.setLayout(new GridLayout(1, true));
 		Label messageLabel = new Label(msgComp, SWT.NONE);
-		messageLabel.setText("Commit Message");
+		messageLabel.setText(Messages.CommitDialog_MessageLabel);
 		commitMessage = new Text(msgComp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 		commitMessage.addKeyListener(new KeyListener()
 		{
@@ -180,7 +180,7 @@ public class CommitDialog extends StatusDialog
 		data.heightHint = 200;
 		data.widthHint = 250;
 		table.setLayoutData(data);
-		String[] titles = { " ", "Resource" };
+		String[] titles = { " ", Messages.CommitDialog_PathColumnLabel }; //$NON-NLS-1$
 		for (int i = 0; i < titles.length; i++)
 		{
 			TableColumn column = new TableColumn(table, SWT.NONE);
@@ -219,7 +219,7 @@ public class CommitDialog extends StatusDialog
 				StringBuffer buff = new StringBuffer();
 				for (int i = 0, n = selection.length; i < n; i++)
 				{
-					buff.append(selection[i].getText(1)).append(",");
+					buff.append(selection[i].getText(1)).append(","); //$NON-NLS-1$
 				}
 				if (buff.length() > 0)
 					buff.deleteCharAt(buff.length() - 1);
@@ -262,7 +262,7 @@ public class CommitDialog extends StatusDialog
 					String data = (String) event.data;
 					// Translate the comma delimited paths back into the matching ChangedFile objects
 					Map<String, ChangedFile> draggedFiles = new HashMap<String, ChangedFile>();
-					StringTokenizer tokenizer = new StringTokenizer(data, ",");
+					StringTokenizer tokenizer = new StringTokenizer(data, ","); //$NON-NLS-1$
 					while (tokenizer.hasMoreTokens())
 					{
 						String path = tokenizer.nextToken();
@@ -336,16 +336,16 @@ public class CommitDialog extends StatusDialog
 	{
 		TableItem item = new TableItem(table, SWT.NONE);
 		Image image = emptyFileImage;
-		String text = "modified";
+		String text = Messages.CommitDialog_modified;
 		if (file.getStatus() == ChangedFile.Status.DELETED)
 		{
 			image = deletedFileImage;
-			text = "deleted";
+			text = Messages.CommitDialog_deleted;
 		}
 		else if (file.getStatus() == ChangedFile.Status.NEW)
 		{
 			image = newFileImage;
-			text = "new";
+			text = Messages.CommitDialog_new;
 		}
 		item.setText(0, text);
 		item.setImage(0, image);
@@ -365,19 +365,19 @@ public class CommitDialog extends StatusDialog
 		if (commitMessage.getText().length() < 3)
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					"Please enter a commit message before committing"));
+					Messages.CommitDialog_EnterMessage_Error));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					"You must first stage some changes before committing"));
+					Messages.CommitDialog_StageFilesFirst_Error));
 			return;
 		}
 		if (gitRepository.hasMerges())
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					"Cannot commit merges yet. Please commit your changes from the command line."));
+					Messages.CommitDialog_CannotMerge_Error));
 			return;
 		}
 		fMessage = commitMessage.getText();
@@ -390,7 +390,7 @@ public class CommitDialog extends StatusDialog
 	protected Button createButton(Composite parent, int id, String label, boolean defaultButton)
 	{
 		if (id == IDialogConstants.OK_ID)
-			label = "Commit";
+			label = Messages.CommitDialog_CommitButton_Label;
 		return super.createButton(parent, id, label, defaultButton);
 	}
 

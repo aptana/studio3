@@ -34,7 +34,7 @@ public class RevertAction extends StagingAction
 			}
 		}
 		repo.index().discardChangesForFiles(changedFiles);
-		WorkspaceJob job = new WorkspaceJob("Refresh reverted resources")
+		WorkspaceJob job = new WorkspaceJob(Messages.RevertAction_RefreshJob_Title)
 		{
 
 			@Override

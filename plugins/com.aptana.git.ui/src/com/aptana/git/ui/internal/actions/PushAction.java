@@ -9,7 +9,7 @@ import com.aptana.git.ui.internal.GitLightweightDecorator;
 public class PushAction extends GitAction
 {
 
-	private static final String COMMAND = "push";
+	private static final String COMMAND = "push"; //$NON-NLS-1$
 
 	@Override
 	protected String getCommand()

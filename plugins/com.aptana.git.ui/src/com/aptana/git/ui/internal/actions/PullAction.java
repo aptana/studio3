@@ -24,7 +24,7 @@ public class PullAction extends GitAction
 	@Override
 	protected String getCommand()
 	{
-		return "pull";
+		return "pull"; //$NON-NLS-1$
 	}
 
 	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
@@ -44,7 +44,7 @@ public class PullAction extends GitAction
 			}
 		}
 
-		WorkspaceJob job = new WorkspaceJob("Refresh resources")
+		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
 		{
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException

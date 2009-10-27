@@ -93,7 +93,7 @@ abstract class AbstractOperationAction implements IObjectActionDelegate {
 					postOperation();
 				}
 			} catch (Throwable e) {
-				final String msg = NLS.bind("{0} Failed", act
+				final String msg = NLS.bind(Messages.AbstractOperationAction_GenericFailed_Message, act
 						.getText());
 				final IStatus status;
 

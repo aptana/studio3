@@ -156,7 +156,7 @@ class GitGrapher
 
 		previous = new GraphCellInfo(newPos, lines);
 		if (lines.size() > maxLines)
-			log("Number of lines: " + lines.size() + " vs allocated: " + maxLines);
+			log("Number of lines: " + lines.size() + " vs allocated: " + maxLines); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// If a parent was added, we have room to not indent.
 		if (addedParent)

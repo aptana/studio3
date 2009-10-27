@@ -52,7 +52,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 			m = new NullProgressMonitor();
 		}
 
-		m.beginTask("Disconnecting Git team provider", projectList.size() * 200);
+		m.beginTask(Messages.DisconnectProviderOperation_DisconnectJob_Title, projectList.size() * 200);
 		try
 		{
 			for (IAdaptable obj : projectList)
@@ -62,7 +62,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 				{
 					final IProject p = (IProject) res;
 
-					GitUIPlugin.trace("disconnect " + p.getName());
+					GitUIPlugin.trace("disconnect " + p.getName()); //$NON-NLS-1$
 					unmarkTeamPrivate(p);
 					RepositoryProvider.unmap(p);
 					m.worked(100);
@@ -95,7 +95,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 				}
 				if (c[k].isTeamPrivateMember())
 				{
-					GitUIPlugin.trace("notTeamPrivate " + c[k]);
+					GitUIPlugin.trace("notTeamPrivate " + c[k]); //$NON-NLS-1$
 					c[k].setTeamPrivateMember(false);
 				}
 			}

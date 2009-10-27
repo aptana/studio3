@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -51,8 +52,8 @@ class ExistingOrNewPage extends WizardPage
 	ExistingOrNewPage(SharingWizard w)
 	{
 		super(ExistingOrNewPage.class.getName());
-		setTitle("Configure Git repository");
-		setDescription("Select git repository location");
+		setTitle(Messages.ExistingOrNewPage_Title);
+		setDescription(Messages.ExistingOrNewPage_Description);
 		// setImageDescriptor(UIIcons.WIZBAN_CONNECT_REPO);
 		this.myWizard = w;
 	}
@@ -67,13 +68,13 @@ class ExistingOrNewPage extends WizardPage
 		tree.setLayout(new GridLayout());
 		tree.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).span(3, 1).create());
 		TreeColumn c1 = new TreeColumn(tree, SWT.NONE);
-		c1.setText("Project");
+		c1.setText(Messages.ExistingOrNewPage_ProjectColumn_Label);
 		c1.setWidth(100);
 		TreeColumn c2 = new TreeColumn(tree, SWT.NONE);
-		c2.setText("Path");
+		c2.setText(Messages.ExistingOrNewPage_PathColumn_Label);
 		c2.setWidth(400);
 		TreeColumn c3 = new TreeColumn(tree, SWT.NONE);
-		c3.setText("Repository");
+		c3.setText(Messages.ExistingOrNewPage_RepositoryColumn_Label);
 		c3.setWidth(200);
 		for (IProject project : myWizard.projects)
 		{
@@ -90,7 +91,7 @@ class ExistingOrNewPage extends WizardPage
 
 		button = new Button(g, SWT.PUSH);
 		button.setLayoutData(GridDataFactory.fillDefaults().create());
-		button.setText("&Create...");
+		button.setText(Messages.ExistingOrNewPage_CreateButton_Label);
 		button.addSelectionListener(new SelectionListener()
 		{
 			public void widgetSelected(SelectionEvent e)
@@ -116,7 +117,7 @@ class ExistingOrNewPage extends WizardPage
 				}
 				catch (CoreException e2)
 				{
-					GitUIPlugin.logError("ErrorFailedToRefreshRepository" + gitDir, e2);
+					GitUIPlugin.logError(NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir), e2);
 				}
 				for (TreeItem ti : tree.getSelection())
 				{

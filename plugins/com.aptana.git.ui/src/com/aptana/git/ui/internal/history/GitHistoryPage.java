@@ -28,7 +28,7 @@ import com.aptana.git.core.model.GitRevSpecifier;
 public class GitHistoryPage extends HistoryPage
 {
 	
-	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss z");
+	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
 
 	private Composite ourControl;
 	private SashForm graphDetailSplit;
@@ -69,7 +69,7 @@ public class GitHistoryPage extends HistoryPage
 		if (resourcePath.startsWith(workingDirectory))
 		{
 			resourcePath = resourcePath.substring(workingDirectory.length());
-			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\"))
+			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
 				resourcePath = resourcePath.substring(1);
 		}
 		// What if we have some trailing slash or something?
@@ -199,7 +199,7 @@ public class GitHistoryPage extends HistoryPage
 		{
 			IResource[] resources = (IResource[]) input;
 			if (resources == null || resources.length == 0)
-				return "";
+				return ""; //$NON-NLS-1$
 			resource = resources[0];
 		}
 		else if (input instanceof IResource)
@@ -207,7 +207,7 @@ public class GitHistoryPage extends HistoryPage
 			resource = (IResource) input;
 		}
 		if (resource == null)
-			return "";
+			return ""; //$NON-NLS-1$
 
 		return resource.getProject().getName();
 	}
@@ -233,44 +233,44 @@ public class GitHistoryPage extends HistoryPage
 	protected Document commitToDocument(GitCommit commit)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("SHA: ").append(commit.sha()).append("\n");
-		builder.append("Author: ").append(commit.getAuthor()).append("\n");
-		builder.append("Date: ").append(TIMESTAMP_FORMAT.format(commit.date())).append("\n");
-		builder.append("Subject: ").append(commit.getSubject()).append("\n");
+		builder.append(Messages.GitHistoryPage_SHA).append(commit.sha()).append("\n"); //$NON-NLS-1$
+		builder.append(Messages.GitHistoryPage_AuthorHeader).append(commit.getAuthor()).append("\n"); //$NON-NLS-1$
+		builder.append(Messages.GitHistoryPage_DateHeader).append(TIMESTAMP_FORMAT.format(commit.date())).append("\n"); //$NON-NLS-1$
+		builder.append(Messages.GitHistoryPage_SubjectHeader).append(commit.getSubject()).append("\n"); //$NON-NLS-1$
 		if (commit.parents() != null && !commit.parents().isEmpty())
 		{
 			for (String parentSha : commit.parents())
 			{
-				builder.append("Parent: ");
-				builder.append(parentSha).append("\n");
+				builder.append(Messages.GitHistoryPage_ParentHeader);
+				builder.append(parentSha).append("\n"); //$NON-NLS-1$
 			}
 		}
-		builder.append("\n").append(commit.getComment()).append("\n\n");
+		builder.append("\n").append(commit.getComment()).append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		List<Diff> diffs = commit.getDiff();
 		for (Diff diff : diffs)
 		{
 			if (diff.renamed())
 			{
-				builder.append("Renamed: ");
-				builder.append(diff.oldName()).append(" -> ");
-				builder.append(diff.newName()).append("\n");
+				builder.append(Messages.GitHistoryPage_RenamedHeader);
+				builder.append(diff.oldName()).append(" -> "); //$NON-NLS-1$
+				builder.append(diff.newName()).append("\n"); //$NON-NLS-1$
 			}
 			else
 			{
 				if (diff.fileCreated())
 				{
-					builder.append("Created: ");
+					builder.append(Messages.GitHistoryPage_CreatedHeader);
 				}
 				else if (diff.fileDeleted())
 				{
-					builder.append("Deleted: ");
+					builder.append(Messages.GitHistoryPage_DeletedHeader);
 				}
 				else
 				{
-					builder.append("Modified: ");
+					builder.append(Messages.GitHistoryPage_ModifiedHeader);
 				}
-				builder.append(diff.fileName()).append("\n");
+				builder.append(diff.fileName()).append("\n"); //$NON-NLS-1$
 			}
 		}
 

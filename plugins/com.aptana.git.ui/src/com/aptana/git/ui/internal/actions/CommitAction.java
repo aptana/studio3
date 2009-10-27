@@ -14,7 +14,7 @@ import com.aptana.git.core.model.GitRepository;
 public class CommitAction extends GitAction
 {
 
-	private static final String COMMAND = "commit";
+	private static final String COMMAND = "commit"; //$NON-NLS-1$
 
 	@Override
 	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
@@ -29,14 +29,14 @@ public class CommitAction extends GitAction
 		}
 		if (repos.isEmpty())
 		{
-			MessageDialog.openError(getShell(), "No Git repository",
-					"No Git repository is tied to the selected resources.");
+			MessageDialog.openError(getShell(), Messages.CommitAction_NoRepo_Title,
+					Messages.CommitAction_NoRepo_Message);
 			return;
 		}
 		if (repos.size() > 1)
 		{
-			MessageDialog.openError(getShell(), "More than one repository",
-					"More than one repository is tied to the selected resources.");
+			MessageDialog.openError(getShell(), Messages.CommitAction_MultipleRepos_Title,
+					Messages.CommitAction_MultipleRepos_Message);
 			return;
 		}
 		GitRepository theRepo = repos.iterator().next();

@@ -55,13 +55,13 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 			m = new NullProgressMonitor();
 		}
 
-		m.beginTask("Connecting Git team provider", 100 * projects.length);
+		m.beginTask(Messages.ConnectProviderOperation_ConnectingProviderJob_Title, 100 * projects.length);
 		try
 		{
 
 			for (IProject project : projects)
 			{
-				m.setTaskName(NLS.bind("Connecting project {0}", project.getName()));
+				m.setTaskName(NLS.bind(Messages.ConnectProviderOperation_ConnectingProjectJob_Title, project.getName()));
 				GitRepository.attachExisting(project, new SubProgressMonitor(m, 100));
 			}
 		}

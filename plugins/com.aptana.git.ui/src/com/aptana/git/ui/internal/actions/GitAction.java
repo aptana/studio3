@@ -91,11 +91,11 @@ abstract class GitAction extends TeamAction
 	private static ILaunchConfigurationWorkingCopy createLaunchConfig(String command, String workingDir, String... args)
 			throws CoreException
 	{
-		String toolArgs = join(args, " ");
+		String toolArgs = join(args, " "); //$NON-NLS-1$
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IExternalToolConstants.ID_PROGRAM_BUILDER_LAUNCH_CONFIGURATION_TYPE);
-		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, getLastPortion(command) + " " + toolArgs);
+		ILaunchConfigurationWorkingCopy config = configType.newInstance(null, getLastPortion(command) + " " + toolArgs); //$NON-NLS-1$
 		config.setAttribute(IExternalToolConstants.ATTR_LOCATION, command);
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
 		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir);

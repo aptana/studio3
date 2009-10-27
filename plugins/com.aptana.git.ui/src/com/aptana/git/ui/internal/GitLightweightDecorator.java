@@ -26,7 +26,7 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
-	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator";
+	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
 	/**
 	 * Define a cached image descriptor which only creates the image data once
@@ -61,11 +61,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	{
 		trackedImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CHECKEDIN_OVR));
 		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
-				.getEntry("icons/ovr/untracked.gif")));
+				.getEntry("icons/ovr/untracked.gif"))); //$NON-NLS-1$
 		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
-				.getEntry("icons/ovr/staged_added.gif")));
+				.getEntry("icons/ovr/staged_added.gif"))); //$NON-NLS-1$
 		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault()
-				.getBundle().getEntry("icons/ovr/staged_removed.gif")));
+				.getBundle().getEntry("icons/ovr/staged_removed.gif"))); //$NON-NLS-1$
 	}
 
 	private static Color greenFG;
@@ -160,21 +160,21 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			return;
 
 		StringBuilder builder = new StringBuilder();
-		builder.append(" [");
+		builder.append(" ["); //$NON-NLS-1$
 		String branch = repo.currentBranch();
 		builder.append(branch);
 		String[] commits = repo.commitsBehind(branch);
 		if (commits != null && commits.length > 0)
 		{
-			builder.append("-").append(commits.length);
+			builder.append("-").append(commits.length); //$NON-NLS-1$
 		}
 		else
 		{
 			commits = repo.commitsAhead(branch);
 			if (commits != null && commits.length > 0)
-				builder.append("+").append(commits.length);
+				builder.append("+").append(commits.length); //$NON-NLS-1$
 		}
-		builder.append("]");
+		builder.append("]"); //$NON-NLS-1$
 		decoration.addSuffix(builder.toString());
 	}
 

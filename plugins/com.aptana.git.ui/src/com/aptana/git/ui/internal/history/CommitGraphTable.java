@@ -60,13 +60,13 @@ class CommitGraphTable extends TableViewer
 
 		final TableColumn author = new TableColumn(table, SWT.NONE);
 		author.setResizable(true);
-		author.setText("Author");
+		author.setText(Messages.CommitGraphTable_AuthorColumn_Label);
 		author.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(10, true));
 
 		final TableColumn date = new TableColumn(table, SWT.NONE);
 		date.setResizable(true);
-		date.setText("Date");
+		date.setText(Messages.CommitGraphTable_DateColumn_Label);
 		date.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(5, true));
 

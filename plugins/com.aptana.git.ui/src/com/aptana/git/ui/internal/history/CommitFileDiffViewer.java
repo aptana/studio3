@@ -89,7 +89,7 @@ class CommitFileDiffViewer extends TableViewer
 
 		final TableColumn path = new TableColumn(rawTable, SWT.NONE);
 		path.setResizable(true);
-		path.setText("Path");
+		path.setText(Messages.CommitFileDiffViewer_PathColumnLabel);
 		path.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(20, true));
 	}
@@ -139,12 +139,12 @@ class CommitFileDiffViewer extends TableViewer
 			{
 				case 0:
 					if (diff.renamed())
-						return "R";
+						return Messages.CommitFileDiffViewer_Renamed;
 					if (diff.fileCreated())
-						return "A";
+						return Messages.CommitFileDiffViewer_Created;
 					if (diff.fileDeleted())
-						return "D";
-					return "M";
+						return Messages.CommitFileDiffViewer_Deleted;
+					return Messages.CommitFileDiffViewer_Modified;
 				case 1:
 					if (diff.renamed())
 						return diff.oldName() + " -> " + diff.newName(); //$NON-NLS-1$

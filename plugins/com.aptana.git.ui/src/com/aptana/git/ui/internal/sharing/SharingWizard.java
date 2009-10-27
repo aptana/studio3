@@ -24,7 +24,7 @@ public class SharingWizard extends Wizard implements IConfigurationWizard, IConf
 
 	public SharingWizard()
 	{
-		setWindowTitle("Configure Git repository");
+		setWindowTitle(Messages.SharingWizard_Title);
 		setNeedsProgressMonitor(true);
 	}
 
@@ -71,11 +71,11 @@ public class SharingWizard extends Wizard implements IConfigurationWizard, IConf
 				e = status.getException();
 			} else {
 				status = new Status(IStatus.ERROR, GitPlugin.getPluginId(), 1,
-						"SharingWizard_failed", e);
+						Messages.SharingWizard_failed, e);
 			}
-			GitPlugin.logError("SharingWizard_failed", e);
+			GitPlugin.logError(Messages.SharingWizard_failed, e);
 			ErrorDialog.openError(getContainer().getShell(), getWindowTitle(),
-					"SharingWizard_failed", status, status.getSeverity());
+					Messages.SharingWizard_failed, status, status.getSeverity());
 			return false;
 		}
 	}
