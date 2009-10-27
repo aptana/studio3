@@ -75,6 +75,7 @@ public class GitHistoryPage extends HistoryPage
 		{
 			resourcePath = repo.currentBranch();
 		}
+		repo.lazyReload();
 		revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), -1);
 		List<GitCommit> commits = revList.getCommits();
 		graph.setInput(commits);
@@ -218,8 +219,7 @@ public class GitHistoryPage extends HistoryPage
 	@Override
 	public void refresh()
 	{
-		// TODO Auto-generated method stub
-
+		// TODO Force a reload of the index and the refs and set input.
 	}
 
 	@Override
