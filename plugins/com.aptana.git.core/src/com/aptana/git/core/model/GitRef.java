@@ -1,6 +1,6 @@
 package com.aptana.git.core.model;
 
-class GitRef
+public class GitRef
 {
 
 	/**
@@ -14,9 +14,9 @@ class GitRef
 	/**
 	 * Ref Types
 	 */
-	static final String TAG_TYPE = "tag";
-	private static final String HEAD_TYPE = "head";
-	private static final String REMOTE_TYPE = "remote";
+	public static final String TAG_TYPE = "tag";
+	public static final String HEAD_TYPE = "head";
+	public static final String REMOTE_TYPE = "remote";
 
 	private String ref;
 
@@ -30,19 +30,19 @@ class GitRef
 		return new GitRef(string);
 	}
 
-	String ref()
+	public String ref()
 	{
 		return ref;
 	}
 
-	String shortName()
+	public String shortName()
 	{
 		if (type() != null)
 			return ref.substring(type().length() + 7);
 		return ref;
 	}
 
-	private String type()
+	public String type()
 	{
 		if (ref.startsWith(REFS_HEADS))
 			return HEAD_TYPE;
@@ -51,5 +51,11 @@ class GitRef
 		if (ref.startsWith(REFS_REMOTES))
 			return REMOTE_TYPE;
 		return null;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ref;
 	}
 }

@@ -11,6 +11,8 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -24,6 +26,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import com.aptana.git.core.model.GitCommit;
+import com.aptana.git.core.model.GitRef;
 
 /**
  * Table to show the list of commits for a resource in reverse chronological order. Custom paints the first column so
@@ -34,8 +37,6 @@ import com.aptana.git.core.model.GitCommit;
 class CommitGraphTable extends TableViewer
 {
 
-	public static final int LANE_WIDTH = 14;
-	public static final int LINE_WIDTH = 2;
 	private BranchPainter renderer;
 	private Map<GitCommit, GraphCellInfo> decorations;
 
@@ -73,6 +74,15 @@ class CommitGraphTable extends TableViewer
 		setLabelProvider(new CommitLabelProvider());
 
 		createPaintListener(table);
+		table.addDisposeListener(new DisposeListener()
+		{
+			
+			@Override
+			public void widgetDisposed(DisposeEvent e)
+			{
+				renderer.dispose();				
+			}
+		});
 	}
 
 	/**
@@ -160,6 +170,10 @@ class CommitGraphTable extends TableViewer
 	private class BranchPainter
 	{
 
+		private static final int HORIZONTAL_PADDING = 8;
+		private static final int LANE_WIDTH = 10;
+		private static final int LINE_WIDTH = 2;
+		
 		private GC g;
 		private int cellX;
 		private int cellY;
@@ -174,8 +188,14 @@ class CommitGraphTable extends TableViewer
 		private Color purple;
 		private Color orange;
 		private Color[] laneColors;
-		// Color for the "dot"
+		// Color for the "dot" (and ref border and text)
 		private Color sys_black;
+		// Color for refs
+		private Color sys_white; // (unknown)
+		private Color refOrange; // head
+		private Color refBlue; // remote
+		private Color refYellow; // tag
+		private Color[] refColors;
 
 		public BranchPainter(Display d)
 		{
@@ -186,13 +206,23 @@ class CommitGraphTable extends TableViewer
 			purple = new Color(d, 112, 72, 121);
 			orange = new Color(d, 216, 112, 0);
 			laneColors = new Color[] { green, blue, yellow, purple, red, orange };
+			
+			refOrange = new Color(d, 253, 180, 97);
+			refBlue = new Color(d, 190, 229, 254);
+			refYellow = new Color(d, 252, 237, 96);
+			refColors = new Color[] { refOrange, refBlue, refYellow };
+			
 			sys_black = d.getSystemColor(SWT.COLOR_BLACK);
+			sys_white = d.getSystemColor(SWT.COLOR_WHITE);
 		}
 
-		// FIXME Call this when our table is disposed!
 		void dispose()
 		{
 			for (Color color : laneColors)
+			{
+				color.dispose();
+			}
+			for (Color color : refColors)
 			{
 				color.dispose();
 			}
@@ -224,6 +254,11 @@ class CommitGraphTable extends TableViewer
 					y1 = height / 2;
 					y2 = height;
 				}
+				if (info.getLines().size() == 1)
+				{
+					y1 = 0;
+					y2 = height;
+				}
 				int x1 = (line.getFrom() * LANE_WIDTH) + (LANE_WIDTH / 2);
 				int x2 = (line.getTo() * LANE_WIDTH) + (LANE_WIDTH / 2);
 				maxCenter = Math.max(maxCenter, Math.max(x1, x2));
@@ -249,8 +284,60 @@ class CommitGraphTable extends TableViewer
 			drawCommitDot(dotX, dotY, dotSize, dotSize);
 
 			final String msg = commit.getSubject();
-			int textx = (maxCenter + LANE_WIDTH / 2) + 8;
-			drawText(msg, textx, height / 2);
+			int textx = Math.max(maxCenter + LANE_WIDTH / 2, dotX + dotSize) + HORIZONTAL_PADDING;
+			int n = commit.refCount();
+			if (commit.hasRefs())
+			{
+				for (GitRef ref : commit.getRefs())
+				{
+					textx += drawLabel(textx + dotSize, height / 2, ref);
+				}
+			}
+			drawText(msg, textx + dotSize + n * 2, height / 2);
+		}
+
+		protected int drawLabel(int x, int y, GitRef ref)
+		{
+			y+= 1;
+			String txt = ref.shortName();
+			if (ref.type().equals(GitRef.HEAD_TYPE))
+			{
+				g.setBackground(refOrange);
+			}
+			else if (ref.type().equals(GitRef.REMOTE_TYPE))
+			{
+				g.setBackground(refBlue);
+			}
+			else if (ref.type().equals(GitRef.TAG_TYPE))
+			{
+				g.setBackground(refYellow);
+			}
+			else
+			{
+				// Whatever this would be
+				g.setBackground(sys_white);
+			}
+
+			if (txt.length() > 12)
+				txt = txt.substring(0, 11) + "\u2026"; // ellipsis "É" (in UTF-8) //$NON-NLS-1$
+
+			Point textsz = g.stringExtent(txt);
+			int arc = textsz.y / 2;
+			final int texty = (y * 2 - textsz.y) / 2;
+
+			// Draw backgrounds
+			g.fillRoundRectangle(x + 1, cellY + texty, textsz.x + 3, textsz.y - 1, arc, arc);
+			g.setForeground(sys_black);
+			g.drawString(txt, x + 2, cellY + texty, true);
+			g.setLineWidth(2);
+
+			// Add a thin black border
+			g.setLineWidth(1);
+			g.setForeground(sys_black);
+			g.drawRoundRectangle(x + 1, cellY + texty, textsz.x + 3, textsz.y - 1, arc, arc);
+			g.setAlpha(255);
+
+			return HORIZONTAL_PADDING + textsz.x;
 		}
 
 		protected void drawCommitDot(final int x, final int y, final int w, final int h)
@@ -276,8 +363,7 @@ class CommitGraphTable extends TableViewer
 		 */
 		private Color color(int index)
 		{
-			index = index % laneColors.length;
-			return laneColors[index];
+			return laneColors[index % laneColors.length];
 		}
 
 		protected void drawLine(final Color color, final int x1, final int y1, final int x2, final int y2,

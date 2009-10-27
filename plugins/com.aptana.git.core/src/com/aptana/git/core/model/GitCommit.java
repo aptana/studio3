@@ -1,6 +1,7 @@
 package com.aptana.git.core.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -132,5 +133,22 @@ public class GitCommit
 		if (parentShas == null || parentShas.isEmpty())
 			return 0;
 		return parentShas.size();
+	}
+
+	public Collection<GitRef> getRefs()
+	{
+		return repository.refs.get(sha);
+	}
+
+	public boolean hasRefs()
+	{
+		return getRefs() != null;
+	}
+
+	public int refCount()
+	{
+		if (!hasRefs())
+			return 0;
+		return getRefs().size();
 	}
 }
