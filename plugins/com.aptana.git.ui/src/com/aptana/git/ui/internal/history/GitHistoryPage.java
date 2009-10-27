@@ -27,6 +27,8 @@ import com.aptana.git.core.model.GitRevSpecifier;
 
 public class GitHistoryPage extends HistoryPage
 {
+	
+	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss z");
 
 	private Composite ourControl;
 	private SashForm graphDetailSplit;
@@ -230,11 +232,10 @@ public class GitHistoryPage extends HistoryPage
 
 	protected Document commitToDocument(GitCommit commit)
 	{
-		SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss z");
 		StringBuilder builder = new StringBuilder();
 		builder.append("SHA: ").append(commit.sha()).append("\n");
 		builder.append("Author: ").append(commit.getAuthor()).append("\n");
-		builder.append("Date: ").append(format.format(commit.date())).append("\n");
+		builder.append("Date: ").append(TIMESTAMP_FORMAT.format(commit.date())).append("\n");
 		builder.append("Subject: ").append(commit.getSubject()).append("\n");
 		if (commit.parents() != null && !commit.parents().isEmpty())
 		{
@@ -249,19 +250,28 @@ public class GitHistoryPage extends HistoryPage
 		List<Diff> diffs = commit.getDiff();
 		for (Diff diff : diffs)
 		{
-			if (diff.fileCreated())
+			if (diff.renamed())
 			{
-				builder.append("Created: ");
-			}
-			else if (diff.fileDeleted())
-			{
-				builder.append("Deleted: ");
+				builder.append("Renamed: ");
+				builder.append(diff.oldName()).append(" -> ");
+				builder.append(diff.newName()).append("\n");
 			}
 			else
 			{
-				builder.append("Modified: ");
+				if (diff.fileCreated())
+				{
+					builder.append("Created: ");
+				}
+				else if (diff.fileDeleted())
+				{
+					builder.append("Deleted: ");
+				}
+				else
+				{
+					builder.append("Modified: ");
+				}
+				builder.append(diff.fileName()).append("\n");
 			}
-			builder.append(diff.fileName()).append("\n");
 		}
 
 		return new Document(builder.toString());

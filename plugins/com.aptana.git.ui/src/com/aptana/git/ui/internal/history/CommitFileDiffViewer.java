@@ -60,15 +60,16 @@ class CommitFileDiffViewer extends TableViewer
 					return;
 				final IStructuredSelection iss = (IStructuredSelection) s;
 				final Diff d = (Diff) iss.getFirstElement();
-				if (d != null && d.commit().hasParent())
-					showTwoWayFileDiff(d);
+				showTwoWayFileDiff(d);
 			}
 		});
 	}
 
 	void showTwoWayFileDiff(final Diff d)
 	{
-		// TODO What about binary files? Files that are really big? When a file is created/deleted?
+		if (d == null || d.isBinary())
+			return;
+		// TODO What about files that are really big? When a file is created/deleted?
 		final GitCommit c = d.commit();
 		final IFileRevision baseFile = GitPlugin.revisionForCommit(c.getFirstParent(), d.oldName());
 		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, d.newName());
@@ -137,12 +138,16 @@ class CommitFileDiffViewer extends TableViewer
 			switch (columnIndex)
 			{
 				case 0:
+					if (diff.renamed())
+						return "R";
 					if (diff.fileCreated())
 						return "A";
 					if (diff.fileDeleted())
 						return "D";
 					return "M";
 				case 1:
+					if (diff.renamed())
+						return diff.oldName() + " -> " + diff.newName(); //$NON-NLS-1$
 					return diff.fileName();
 				default:
 					return ""; //$NON-NLS-1$
