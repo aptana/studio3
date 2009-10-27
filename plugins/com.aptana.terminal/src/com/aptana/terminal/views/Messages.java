@@ -8,7 +8,6 @@ public class Messages extends NLS
 	public static String TerminalView_Could_Not_Start_Server;
 	public static String TerminalView_Create_Terminal_Editor_Tooltip;
 	public static String TerminalView_Open_Terminal_Editor;
-	public static String TerminalView_Server_Started;
 	static
 	{
 		// initialize resource bundle

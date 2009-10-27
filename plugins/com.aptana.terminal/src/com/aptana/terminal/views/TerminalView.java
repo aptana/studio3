@@ -147,11 +147,7 @@ public class TerminalView extends ViewPart
 		
 		HttpServer server = HttpServer.getInstance();
 		
-		if (server != null)
-		{
-			System.out.println(Messages.TerminalView_Server_Started);
-		}
-		else
+		if (server == null)
 		{
 			System.out.println(Messages.TerminalView_Could_Not_Start_Server);
 		}
