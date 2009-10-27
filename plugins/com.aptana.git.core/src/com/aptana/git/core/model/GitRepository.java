@@ -175,7 +175,7 @@ public class GitRepository
 		refs = new HashMap<String, List<GitRef>>();
 
 		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref",
-				"--format=%(refname) %(objecttype) %(objectname)", " %(*objectname)", "refs");
+				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs");
 		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
 
 		for (String line : lines)
@@ -371,13 +371,12 @@ public class GitRepository
 		}
 	}
 
-	private void lazyReload()
+	public void lazyReload()
 	{
 		if (!hasChanged)
 			return;
 
 		reloadRefs();
-		// revisionList.reload();
 		hasChanged = false;
 	}
 
