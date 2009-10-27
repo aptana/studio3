@@ -74,4 +74,9 @@ public class GitUIPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
 	}
 
+	public static void logWarning(String msg)
+	{
+		getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), msg));
+	}
+
 }

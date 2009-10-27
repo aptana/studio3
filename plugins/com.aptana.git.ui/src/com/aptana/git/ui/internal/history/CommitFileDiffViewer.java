@@ -145,7 +145,7 @@ class CommitFileDiffViewer extends TableViewer
 				case 1:
 					return diff.fileName();
 				default:
-					return "";
+					return ""; //$NON-NLS-1$
 			}
 		}
 

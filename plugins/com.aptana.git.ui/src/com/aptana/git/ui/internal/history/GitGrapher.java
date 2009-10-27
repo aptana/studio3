@@ -1,7 +1,5 @@
 package com.aptana.git.ui.internal.history;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,11 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.GitRevList;
-import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.ui.GitUIPlugin;
 
-public class GitGrapher
+/**
+ * Traverses an in-order List of GitCommits to generate the necessary info to draw the branching history.
+ * 
+ * @author cwilliams
+ */
+class GitGrapher
 {
 	private static final int MAX_LANES = 32;
 	private List<GitLane> pl;
@@ -26,8 +27,17 @@ public class GitGrapher
 		pl = new ArrayList<GitLane>();
 	}
 
-	public Map<GitCommit, GraphCellInfo> decorateCommits(List<GitCommit> commits)
+	/**
+	 * The method which traverse the list of GitCommits and returns a GraphCellInfo per commit to tell us how to
+	 * generate the branch history graphics.
+	 * 
+	 * @param commits
+	 *            an in-order List of GitCommits. The order is reverse chronological (newest to oldest).
+	 * @return
+	 */
+	Map<GitCommit, GraphCellInfo> decorateCommits(List<GitCommit> commits)
 	{
+		GitLane.resetColors();
 		Map<GitCommit, GraphCellInfo> decorations = new HashMap<GitCommit, GraphCellInfo>();
 		for (GitCommit commit : commits)
 		{
@@ -37,47 +47,13 @@ public class GitGrapher
 		return decorations;
 	}
 
-	// TODO Walk through the commits and create lanes to track hierarchy
-	// private void generateLanes(List<GitCommit> commits)
-	// {
-	// GitLane currentLane = null;
-	// List<GitLane> lanes = new ArrayList<GitLane>();
-	// lanes.add(new GitLane(commits.get(0).sha())); // add a lane for root path
-	// for (GitCommit gitCommit : commits)
-	// {
-	// // TODO What if two (or more) lanes have the same SHA at this point? We need to merge them...
-	// mergeLanes(lanes);
-	// for (GitLane lane : lanes)
-	// { // draw the lanes
-	// if (lane.isCommit(gitCommit.sha())) // our lane for this commit
-	// {
-	// System.out.print("* ");
-	// currentLane = lane;
-	// }
-	// else
-	// System.out.print("| ");
-	// }
-	// System.out.println(" " + gitCommit.sha());
-	//
-	// // for first parent, add it to our current lane?
-	// String firstParent = gitCommit.parents().get(0);
-	// currentLane.setSha(firstParent);
-	// add_line(currentLane.index(), currentLane.index()); // vertical line, stay in current lane
-	// if (gitCommit.parentCount() > 1)
-	// { // Split off new lane(s)
-	// // Adding a new lane for each parent > 1
-	// for (String parent : gitCommit.parents().subList(1, gitCommit.parentCount()))
-	// {
-	// GitLane newLane = new GitLane(parent);
-	// lanes.add(newLane);
-	// // Add a line from our current lane center to new lane track
-	// add_line(currentLane.index(), newLane.index());
-	// }
-	// System.out.println("|\\");
-	// }
-	// }
-	// }
-
+	/**
+	 * Does the actual dirty work of figuring out the lanes and lines for a commit. This method uses the shared state of
+	 * {@link #pl} and {@link #previous}. Must be called in reverse chronological order for commits!
+	 * 
+	 * @param commit
+	 * @return
+	 */
 	private GraphCellInfo decorateCommit(GitCommit commit)
 	{
 		int i = 0, newPos = -1;
@@ -121,15 +97,12 @@ public class GitGrapher
 				}
 				else
 				{
-					// We are not this commit.
+					// We are not this commit, so this is a 'passing' lane.
 					currentLanes.add(lane);
-					lines.add(new GitGraphLine(true, i, currentLanes.size(), lane.index())); // upper. map previous lane
-					// to current lane
-					lines.add(new GitGraphLine(false, currentLanes.size(), currentLanes.size(), lane.index())); // lower,
-					// continue
-					// current
-					// lane
-					// down
+					// upper. map previous lane to current lane
+					lines.add(new GitGraphLine(true, i, currentLanes.size(), lane.index()));
+					// lower, continue current lane down
+					lines.add(new GitGraphLine(false, currentLanes.size(), currentLanes.size(), lane.index()));
 				}
 			}
 		}
@@ -152,18 +125,16 @@ public class GitGrapher
 
 		if (commit.parentCount() > 1)
 		{
-			for (String parent : commit.parents().subList(1, commit.parentCount())) // Skip the first parent!
+			// Skip the first parent!
+			for (String parent : commit.parents().subList(1, commit.parentCount()))
 			{
-				int x = 0;
 				boolean was_displayed = false;
-				Iterator<GitLane> it = currentLanes.iterator();
-				while (it.hasNext())
+				for (int x = 0; x < currentLanes.size(); x++)
 				{
-					x++;
-					GitLane lane = it.next();
+					GitLane lane = currentLanes.get(x);
 					if (lane.isCommit(parent))
 					{
-						lines.add(new GitGraphLine(false, x, newPos, lane.index()));
+						lines.add(new GitGraphLine(false, x + 1, newPos, lane.index()));
 						was_displayed = true;
 						break;
 					}
@@ -206,63 +177,9 @@ public class GitGrapher
 
 	private void log(String string)
 	{
-		// TODO Auto-generated method stub
-
-	}
-
-	public static void main(String[] args) throws URISyntaxException
-	{
-		URI path = new URI(null, null, "/Users/cwilliams/workspaces/master/gitx", null);
-		GitRepository repo = GitRepository.getUnattachedExisting(path);
-		GitRevList list = new GitRevList(repo);
-		list.walkRevisionListWithSpecifier(new GitRevSpecifier("master"), -1);
-		List<GitCommit> commits = list.getCommits();
-		Map<GitCommit, GraphCellInfo> decorations = new GitGrapher().decorateCommits(commits);
-		for (GitCommit commit : commits)
-		{
-			GraphCellInfo info = decorations.get(commit);
-			// fill with spaces
-			StringBuilder upper = new StringBuilder();
-			for (int i = 0; i < info.getLines().size(); i++)
-			{
-				upper.append("  ");
-			}
-			upper.append(commit.sha());
-			StringBuilder lower = new StringBuilder();
-			for (int i = 0; i < info.getLines().size(); i++)
-			{
-				lower.append("  ");
-			}
-			for (GitGraphLine line : info.getLines())
-			{
-				StringBuilder target = upper;
-				if (!line.isUpper())
-					target = lower;
-				int from = line.getFrom();
-				int to = line.getTo();
-				int stringIndex = (from - 1) * 2;
-				if (from == to)
-				{
-					target.setCharAt(stringIndex, '|');
-				}
-				else if (from > to)
-				{
-					if (line.isUpper())
-						target.setCharAt(stringIndex - 1, '/');
-					else
-						target.setCharAt(stringIndex - 1, '\\');
-
-				}
-				else
-				{
-					if (line.isUpper())
-						target.setCharAt(stringIndex - 1, '\\');
-					else
-						target.setCharAt(stringIndex - 1, '/');
-				}
-			}
-			System.out.println(upper.toString());
-			System.out.println(lower.toString());
-		}
+		if (GitUIPlugin.getDefault() != null)
+			GitUIPlugin.logWarning(string);
+		else
+			System.out.println(string);
 	}
 }

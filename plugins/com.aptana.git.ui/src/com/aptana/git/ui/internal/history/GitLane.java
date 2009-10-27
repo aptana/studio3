@@ -1,49 +1,79 @@
 package com.aptana.git.ui.internal.history;
 
-import java.util.List;
-
-public class GitLane
+/**
+ * @author cwilliams
+ */
+class GitLane
 {
-	
-	private static int s_colorIndex = 0;
-	private String d_sha;
-	private int d_index;
+
+	/**
+	 * Global incrementing index. This is so that a new lane gets a new index.
+	 */
+	private static int fgIndex = 0;
+
+	/**
+	 * SHA representing the parent that this lane is tracking.
+	 */
+	private String fSha;
+
+	/**
+	 * Index of the current lane.
+	 */
+	private int fIndex;
 
 	GitLane(String sha)
 	{
-		d_index = s_colorIndex++;
-		d_sha = sha;
-	}
-		
-	GitLane()
-	{
-		d_index = s_colorIndex++;
+		fIndex = fgIndex++;
+		fSha = sha;
 	}
 
+	/**
+	 * To determine if this lane is the one where the passed in commit's SHA is attached to.
+	 * 
+	 * @param sha
+	 * @return
+	 */
 	boolean isCommit(String sha)
 	{
-		return d_sha.equals(sha);
+		return fSha.equals(sha);
 	}
-	
+
+	/**
+	 * The SHA of the commit/parent this lane is tracking.
+	 * 
+	 * @return
+	 */
 	String sha()
 	{
-		return d_sha;
+		return fSha;
 	}
 
+	/**
+	 * Index of the lane. Used to identify the lane for coloring and tracking.
+	 * 
+	 * @return
+	 */
 	int index()
 	{
-		return d_index;
+		return fIndex;
 	}
 
+	/**
+	 * Set the new commit/parent SHA to track.
+	 * 
+	 * @param sha
+	 */
 	void setSha(String sha)
 	{
-		d_sha = sha;
+		fSha = sha;
 	}
 
+	/**
+	 * Used to reset our global incrementer.
+	 */
 	static void resetColors()
 	{
-		s_colorIndex = 0;
+		fgIndex = 0;
 	}
-
 
 }

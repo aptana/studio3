@@ -25,7 +25,13 @@ import org.eclipse.swt.widgets.TableItem;
 
 import com.aptana.git.core.model.GitCommit;
 
-public class CommitGraphTable extends TableViewer
+/**
+ * Table to show the list of commits for a resource in reverse chronological order. Custom paints the first column so
+ * that we can draw the branching history graphically.
+ * 
+ * @author cwilliams
+ */
+class CommitGraphTable extends TableViewer
 {
 
 	public static final int LANE_WIDTH = 14;
@@ -33,7 +39,7 @@ public class CommitGraphTable extends TableViewer
 	private BranchPainter renderer;
 	private Map<GitCommit, GraphCellInfo> decorations;
 
-	public CommitGraphTable(Composite parent)
+	CommitGraphTable(Composite parent)
 	{
 		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 
@@ -69,10 +75,13 @@ public class CommitGraphTable extends TableViewer
 		createPaintListener(table);
 	}
 
+	/**
+	 * Tell SWT that we'll be painting the first column.
+	 * 
+	 * @param rawTable
+	 */
 	private void createPaintListener(final Table rawTable)
 	{
-		// Tell SWT we will completely handle painting for some columns.
-		//
 		rawTable.addListener(SWT.EraseItem, new Listener()
 		{
 			public void handleEvent(final Event event)
@@ -93,18 +102,13 @@ public class CommitGraphTable extends TableViewer
 
 	void doPaint(final Event event)
 	{
-		final GitCommit c = (GitCommit) ((TableItem) event.item).getData();
-		// if (highlight != null && c.has(highlight))
-		// event.gc.setFont(hFont);
-		// else
-		// event.gc.setFont(nFont);
-
 		if (event.index == 0)
 		{
 			renderer.paint(event);
 			return;
 		}
 
+		final GitCommit c = (GitCommit) ((TableItem) event.item).getData();
 		final ITableLabelProvider lbl = (ITableLabelProvider) getLabelProvider();
 		final String txt = lbl.getColumnText(c, event.index);
 
@@ -122,7 +126,7 @@ public class CommitGraphTable extends TableViewer
 		GitGrapher grapher = new GitGrapher();
 		decorations = grapher.decorateCommits(commits);
 	}
-	
+
 	static class CommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
 	{
 
@@ -147,7 +151,7 @@ public class CommitGraphTable extends TableViewer
 				case 2:
 					return fmt.format(commit.date());
 				default:
-					return "";
+					return ""; //$NON-NLS-1$
 			}
 		}
 
@@ -241,28 +245,35 @@ public class CommitGraphTable extends TableViewer
 			}
 			final int dotSize = computeDotSize(height);
 			final int dotX = myLaneX - dotSize / 2 - 1;
-			final int dotY = (height - dotSize) / 2;			
+			final int dotY = (height - dotSize) / 2;
 			drawCommitDot(dotX, dotY, dotSize, dotSize);
-			
+
 			final String msg = commit.getSubject();
 			int textx = (maxCenter + LANE_WIDTH / 2) + 8;
 			drawText(msg, textx, height / 2);
 		}
-		
-		protected void drawCommitDot(final int x, final int y, final int w,
-				final int h) {
+
+		protected void drawCommitDot(final int x, final int y, final int w, final int h)
+		{
 			g.fillOval(cellX + x, cellY + y, w, h);
 			g.setForeground(sys_black);
 			g.setLineWidth(2);
 			g.drawOval(cellX + x, cellY + y, w, h);
 		}
-		
-		private int computeDotSize(final int h) {
+
+		private int computeDotSize(final int h)
+		{
 			int d = (int) (Math.min(h, LANE_WIDTH) * 0.50f);
 			d += (d & 1);
 			return d;
 		}
 
+		/**
+		 * Use the lane's index to assign it a color. Cycle through the set we have.
+		 * 
+		 * @param index
+		 * @return
+		 */
 		private Color color(int index)
 		{
 			index = index % laneColors.length;
