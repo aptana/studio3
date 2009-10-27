@@ -1331,6 +1331,7 @@ this._cursorVisible=true;
 this._buffers=[];
 this._positions=[];
 this._currentAttribute=new Attribute();
+this._sendResizeSequence=(_da&&_da.hasOwnProperty("sendResizeSequence"))?_da.sendResizeSequence:true;
 var _db=(_da&&_da.hasOwnProperty("handler"))?_da.handler:new XTermHandler(this);
 var _dc=(_da&&_da.hasOwnProperty("tables"))?_da.tables:XTermTables;
 var _dd=(_da&&_da.hasOwnProperty("parser"))?_da.parser:new TermParser(_dc,_db);
@@ -1606,18 +1607,7 @@ this._cursorVisible=_100;
 }
 };
 Term.prototype.setHeight=function(_101){
-if(isNumber(_101)&&Term.MIN_HEIGHT<=_101&&_101<=Term.MAX_HEIGHT&&this._height!=_101){
-if(_101>this._height){
-for(var i=this._height;i<_101;i++){
-this._lines.push(new Line(this._width));
-}
-}else{
-this._lines.splice(_101,this._height-_101);
-}
-this._height=_101;
-this._scrollRegion.top=0;
-this._scrollRegion.bottom=_101-1;
-}
+this.setSize(this._width,_101);
 };
 Term.prototype.setPosition=function(row,_102){
 if(isNumber(row)&&0<=row&&row<this._height){
@@ -1646,11 +1636,36 @@ this._scrollRegion={top:top,left:left,bottom:_103,right:_104};
 }
 };
 Term.prototype.setSize=function(_109,_10a){
-this.setWidth(_109);
-this.setHeight(_10a);
+var _10b=false;
+if(isNumber(_109)&&Line.MIN_WIDTH<=_109&&_109<=Line.MAX_WIDTH&&this._width!=_109){
+for(var i=0;i<this._height;i++){
+this._lines[i].resize(_109);
+}
+this._width=_109;
+_10b=true;
+}
+if(isNumber(_10a)&&Term.MIN_HEIGHT<=_10a&&_10a<=Term.MAX_HEIGHT&&this._height!=_10a){
+if(_10a>this._height){
+for(var i=this._height;i<_10a;i++){
+this._lines.push(new Line(this._width));
+}
+}else{
+this._lines.splice(_10a,this._height-_10a);
+}
+this._height=_10a;
+_10b=true;
+}
+if(_10b){
+this.setScrollRegion(0,0,this._height-1,this._width-1);
+if(this._sendResizeSequence){
+var ESC=String.fromCharCode(27);
+var CSI=ESC+"[";
+this._keyHandler.addKeys(CSI+[8,this._height,this._width].join(";")+"t");
+}
+}
 };
-Term.prototype.setTitle=function(_10b){
-this._title=_10b;
+Term.prototype.setTitle=function(_10c){
+this._title=_10c;
 };
 Term.prototype.toggleRunState=function(){
 if(this._commHandler!==null){
@@ -1660,21 +1675,14 @@ this._id=this._commHandler.getUniqueID();
 this._commHandler.toggleRunState();
 }
 };
-Term.prototype.setWidth=function(_10c){
-if(isNumber(_10c)&&Line.MIN_WIDTH<=_10c&&_10c<=Line.MAX_WIDTH&&this._width!=_10c){
-for(var i=0;i<this._height;i++){
-this._lines[i].resize(_10c);
-}
-this._width=_10c;
-this._scrollRegion.left=0;
-this._scrollRegion.right=_10c-1;
-}
+Term.prototype.setWidth=function(_10d){
+this.setSize(_10d,this._height);
 };
 Term.prototype.toString=function(){
-var _10d=[];
+var _10e=[];
 for(var i=0;i<this._lines.length;i++){
-_10d.push(this._lines[i].toString());
+_10e.push(this._lines[i].toString());
 }
-return _10d.join("\n");
+return _10e.join("\n");
 };
 

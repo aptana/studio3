@@ -10,9 +10,6 @@
             var terminal;
 			var xtermHandler;
 			var debugHandler;
-			
-			var ESC = String.fromCharCode(0x1B);
-			var CSI = ESC + "[";
 			var characterWidth, characterHeight;
             
 			/**
@@ -193,16 +190,12 @@
 			 */
 			function autoSize()
 			{
-				var keys = terminal.getKeyHandler();
 				var viewWidth = window.innerWidth - 15;
 				var viewHeight = document.getElementById("terminal").offsetWidth - 0;
 				var width = Math.floor(viewWidth / characterWidth);
 				var height = Math.floor(viewHeight / characterHeight);
 				
-				terminal.setHeight(height);
-				terminal.setWidth(width);
-				
-				keys.addKeys(CSI + [8,height,width].join(";") + "t");
+				terminal.setSize(width,height);
 			}
         </script>
     </head>
