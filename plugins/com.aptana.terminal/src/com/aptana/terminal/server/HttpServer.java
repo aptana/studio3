@@ -146,6 +146,9 @@ public class HttpServer extends Thread
 		}
 	}
 
+	/**
+	 * openServerSocket
+	 */
 	private void openServerSocket()
 	{
 		try
