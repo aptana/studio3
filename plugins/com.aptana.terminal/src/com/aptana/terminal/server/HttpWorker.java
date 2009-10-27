@@ -18,11 +18,11 @@ import com.aptana.terminal.Utils;
 
 public class HttpWorker implements Runnable
 {
-	private static final String ID_PARAMETER = "id";
-	private static final String INDEX_PAGE_NAME = "index.html";
-	private static final String SIZE_URL = "/size";
-	private static final String ID_URL = "/id";
-	private static final String STREAM_URL = "/stream";
+	private static final String ID_PARAMETER = "id"; //$NON-NLS-1$
+	private static final String INDEX_PAGE_NAME = "index.html"; //$NON-NLS-1$
+	private static final String SIZE_URL = "/size"; //$NON-NLS-1$
+	private static final String ID_URL = "/id"; //$NON-NLS-1$
+	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
 	private HttpServer _server;
 	private Socket _clientSocket;
 	
@@ -117,7 +117,7 @@ public class HttpWorker implements Runnable
 		}
 		else
 		{
-			url = ("." + (url.endsWith("/") ? url + INDEX_PAGE_NAME : url)).replace('/', File.separatorChar);
+			url = ("." + (url.endsWith("/") ? url + INDEX_PAGE_NAME : url)).replace('/', File.separatorChar); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			emitFile(output, url);
 		}
@@ -149,7 +149,7 @@ public class HttpWorker implements Runnable
 		}
 		else
 		{
-			System.out.println("Unrecognized POST URL: " + url);
+			System.out.println(Messages.HttpWorker_Unrecognized_POST_URL + url);
 		}
 	}
 	
@@ -168,11 +168,11 @@ public class HttpWorker implements Runnable
 				Request request = Request.fromInputStream(this._clientSocket.getInputStream());
 				String method = request.getMethod();
 				
-				if ("GET".equals(method))
+				if ("GET".equals(method)) //$NON-NLS-1$
 				{
 					this.processGet(request, output);
 				}
-				else if ("POST".equals(method))
+				else if ("POST".equals(method)) //$NON-NLS-1$
 				{
 					this.processPost(request, output);
 				}
@@ -205,7 +205,7 @@ public class HttpWorker implements Runnable
 		
 		try
 		{
-			output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n");
+			output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			output.write(bytes, 0, length);
 		}
 		catch (IOException e)
@@ -222,7 +222,7 @@ public class HttpWorker implements Runnable
 	{
 		try
 		{
-			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n");
+			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{
@@ -238,7 +238,7 @@ public class HttpWorker implements Runnable
 	{
 		try
 		{
-			output.writeBytes("HTTP/1.0 404 ERROR\n\n");
+			output.writeBytes("HTTP/1.0 404 ERROR\n\n"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{

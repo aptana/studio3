@@ -86,7 +86,7 @@ public class Utils
 		{
 			if (0 <= c && c < 32 || 128 <= c)
 			{
-				buffer.append("\\x").append(Integer.toString(c, 16));
+				buffer.append("\\x").append(Integer.toString(c, 16)); //$NON-NLS-1$
 			}
 			else
 			{
@@ -107,7 +107,7 @@ public class Utils
 		Display display = Display.getCurrent();
 		Image canvas = new Image(display, 100,100);
 		GC gc = new GC(canvas);
-		Font font = new Font(display, "Courier", SWT.NORMAL, 9);
+		Font font = new Font(display, "Courier", SWT.NORMAL, 9); //$NON-NLS-1$
 		
 		gc.setFont(font);
 		

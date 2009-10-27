@@ -40,7 +40,7 @@ public class Request
 					String protocol = s.substring(urlEnd + 1);
 					String url;
 					
-					int paramIndex = urlWithParams.indexOf("?");
+					int paramIndex = urlWithParams.indexOf("?"); //$NON-NLS-1$
 					
 					if (paramIndex == -1)
 					{
@@ -50,11 +50,11 @@ public class Request
 					{
 						url = urlWithParams.substring(0, paramIndex);
 						String params = urlWithParams.substring(paramIndex + 1);
-						String[] keyPairs = params.split("&");
+						String[] keyPairs = params.split("&"); //$NON-NLS-1$
 						
 						for (String keyPair : keyPairs)
 						{
-							String[] parts = keyPair.split("=");
+							String[] parts = keyPair.split("="); //$NON-NLS-1$
 							
 							result.addParameter(parts[0], parts[1]);
 						}
@@ -88,7 +88,7 @@ public class Request
 			
 			while (br.ready())
 			{
-				String lengthString = result.getHeader("Content-Length");
+				String lengthString = result.getHeader("Content-Length"); //$NON-NLS-1$
 				
 				if (lengthString != null && lengthString.length() > 0)
 				{
@@ -150,7 +150,7 @@ public class Request
 	 */
 	public String getHeader(String header)
 	{
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		
 		if (this._headers.containsKey(header))
 		{
@@ -178,7 +178,7 @@ public class Request
 	 */
 	public String getParameter(String parameter)
 	{
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		
 		if (this._parameters.containsKey(parameter))
 		{

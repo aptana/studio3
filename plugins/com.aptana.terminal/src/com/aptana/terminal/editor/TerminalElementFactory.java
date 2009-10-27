@@ -6,7 +6,7 @@ import org.eclipse.ui.IMemento;
 
 public class TerminalElementFactory implements IElementFactory
 {
-	public static final String ID = "com.aptana.terminal.TerminalElementFactory";
+	public static final String ID = "com.aptana.terminal.TerminalElementFactory"; //$NON-NLS-1$
 	
 	/*
 	 * (non-Javadoc)

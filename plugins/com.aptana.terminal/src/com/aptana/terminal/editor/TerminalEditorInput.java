@@ -33,7 +33,7 @@ public class TerminalEditorInput implements IEditorInput
 	@Override
 	public String getName()
 	{
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/*
@@ -53,7 +53,7 @@ public class TerminalEditorInput implements IEditorInput
 	@Override
 	public String getToolTipText()
 	{
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	/*

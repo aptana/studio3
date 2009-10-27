@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Aptana Terminal
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.terminal;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.terminal.Activator
-Bundle-Vendor: APTANA
+Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

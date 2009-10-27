@@ -33,7 +33,7 @@ public class ProcessWrapper
 	 */
 	public void start()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null);
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
 
 		try
 		{
@@ -41,12 +41,12 @@ public class ProcessWrapper
 			File file = new File(fileURL.toURI());
 			ProcessBuilder builder = new ProcessBuilder(file.getAbsolutePath());
 			Map<String, String> env = builder.environment();
-			env.put("TERM", "xterm-color");
+			env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 
 			this._process = builder.start();
 			this._output = new StringBuffer();
-			this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output);
-			this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output);
+			this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output); //$NON-NLS-1$
+			this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output); //$NON-NLS-1$
 			this._stdin = new ProcessWriter(this._process.getOutputStream());
 
 			this._stdout.start();

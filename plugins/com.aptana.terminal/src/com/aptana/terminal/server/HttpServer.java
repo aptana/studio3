@@ -71,7 +71,7 @@ public class HttpServer extends Thread
 		}
 		else
 		{
-			throw new RuntimeException("Tried to create a process for an id that already exists: " + id);
+			throw new RuntimeException(Messages.HttpServer_Process_ID_Already_In_Use + id);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class HttpServer extends Thread
 		}
 		else
 		{
-			throw new RuntimeException("Tried to remove a process for an id that does not exist: " + id);
+			throw new RuntimeException(Messages.HttpServer_Process_ID_Does_Not_Exist + id);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class HttpServer extends Thread
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException("Error accepting client connection", e);
+				throw new RuntimeException(Messages.HttpServer_Client_Accept_Error, e);
 			}
 		}
 	}
@@ -154,7 +154,7 @@ public class HttpServer extends Thread
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException("Unable to open port " + this.port, e);
+			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port + this.port, e);
 		}
 	}
 }

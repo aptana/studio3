@@ -5,11 +5,11 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            name="Aptana Terminal"
+            name="%category.name"
             id="com.aptana.terminal">
       </category>
       <view
-            name="Terminal"
+            name="%view.name"
             icon="icons/terminal.png"
             category="com.aptana.terminal"
             class="com.aptana.terminal.views.TerminalView"
@@ -37,9 +37,9 @@
    <extension
          point="org.eclipse.ui.bindings">
       <scheme
-            description="Scheme used when the Aptana Terminal is active"
+            description="%scheme.description"
             id="com.aptana.terminal.scheme"
-            name="Terminal Key Binding Scheme">
+            name="%scheme.name">
       </scheme>
    </extension>
    <extension
@@ -49,7 +49,7 @@
             default="false"
             icon="icons/terminal.png"
             id="com.aptana.terminal.TerminalEditor"
-            name="Terminal Editor">
+            name="%editor.name">
       </editor>
    </extension>
    <extension

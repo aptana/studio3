@@ -23,6 +23,6 @@ public class Size
 	 */
 	public String toString()
 	{
-		return Double.toString(this.width) + "," + Double.toString(this.height);
+		return Double.toString(this.width) + "," + Double.toString(this.height); //$NON-NLS-1$
 	}
 }

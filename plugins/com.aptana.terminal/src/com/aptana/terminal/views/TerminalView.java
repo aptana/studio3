@@ -1,48 +1,33 @@
 package com.aptana.terminal.views;
 
-import java.util.UUID;
-
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.bindings.Scheme;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IPartService;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.keys.BindingService;
-import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.HttpServer;
 
 public class TerminalView extends ViewPart
 {
-	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme";
-	private static final String TERMINAL_URL = "http://127.0.0.1:8181/webterm/";
+	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
 	
-	public static final String ID = "com.aptana.terminal.views.TerminalView";
-	
-	private Browser browser;
-	private String id;
+	private TerminalBrowser browser;
 	private Action openEditor;
 
 	/**
@@ -68,95 +53,31 @@ public class TerminalView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		this.id = UUID.randomUUID().toString();
-		
-		HttpServer.getInstance().createProcess(this.id);
-		browser = new Browser(parent, SWT.NONE);
-		browser.setUrl(TERMINAL_URL + "?id=" + this.id);
+		this.browser = new TerminalBrowser(this);
+		this.browser.createControl(parent);
 		
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(browser, ID);
-			
-		IPartService service = (IPartService) getSite().getService(IPartService.class);
-		service.addPartListener(new IPartListener() {
-			Scheme oldScheme = null;
-		
-			@Override
-			public void partActivated(IWorkbenchPart part)
-			{
-				if (part == TerminalView.this)
-				{
-					//System.out.println("Activating shell scheme");
-					
-					try
-					{
-						BindingService bindingService = (BindingService) getViewSite().getService(IBindingService.class);
-						oldScheme = bindingService.getBindingManager().getActiveScheme();
-						
-						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-						bindingService.getBindingManager().setActiveScheme(scheme);
-					}
-					catch (NotDefinedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part)
-			{
-				if (part == TerminalView.this)
-				{
-					//System.out.println("Shell brought to top");
-				}
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPart part)
-			{
-				if (part == TerminalView.this)
-				{
-					HttpServer.getInstance().removeProcess(TerminalView.this.id);
-				}
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part)
-			{
-				if (part == TerminalView.this)
-				{
-					//System.out.println("Deactivating shell scheme");
-					
-					try
-					{
-						BindingService bindingService = (BindingService) getViewSite().getService(IBindingService.class);
-						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-						
-						if (oldScheme != null) {
-							bindingService.getBindingManager().setActiveScheme(oldScheme);
-						}
-					}
-					catch (NotDefinedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-
-			@Override
-			public void partOpened(IWorkbenchPart part)
-			{
-				if (part == TerminalView.this)
-				{
-					//System.out.println("Shell opened");
-				}
-			}
-		});
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.browser.getControl(), ID);
 		
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (this.browser != null)
+		{
+			this.browser.dispose();
+			this.browser = null;
+		}
+		
+		super.dispose();
 	}
 
 	/**
@@ -198,7 +119,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void hookContextMenu()
 	{
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener()
@@ -209,8 +130,9 @@ public class TerminalView extends ViewPart
 			}
 		});
 		
-		Menu menu = menuMgr.createContextMenu(browser);
-		browser.setMenu(menu);
+		Control browserControl = browser.getControl();
+		Menu menu = menuMgr.createContextMenu(browserControl);
+		browserControl.setMenu(menu);
 //		getSite().registerContextMenu(menuMgr, viewer);
 	}
 
@@ -227,11 +149,11 @@ public class TerminalView extends ViewPart
 		
 		if (server != null)
 		{
-			System.out.println("Server started");
+			System.out.println(Messages.TerminalView_Server_Started);
 		}
 		else
 		{
-			System.out.println("Server could not start");
+			System.out.println(Messages.TerminalView_Could_Not_Start_Server);
 		}
 	}
 
@@ -240,7 +162,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void makeActions()
 	{
-		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png");
+		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png"); //$NON-NLS-1$
 		
 		openEditor = new Action()
 		{
@@ -249,8 +171,8 @@ public class TerminalView extends ViewPart
 				Utils.openEditor(TerminalEditor.ID, true);
 			}
 		};
-		openEditor.setText("Open Terminal Editor");
-		openEditor.setToolTipText("Create a Terminal Editor");
+		openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
+		openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
 		openEditor.setImageDescriptor(icon);
 	}
 
@@ -262,13 +184,13 @@ public class TerminalView extends ViewPart
 		browser.setFocus();
 	}
 
-	/**
-	 * showMessage
-	 * 
-	 * @param message
-	 */
-	private void showMessage(String message)
-	{
-		MessageDialog.openInformation(browser.getShell(), "Terminal View", message);
-	}
+//	/**
+//	 * showMessage
+//	 * 
+//	 * @param message
+//	 */
+//	private void showMessage(String message)
+//	{
+//		MessageDialog.openInformation(browser.getShell(), "Terminal View", message);
+//	}
 }
