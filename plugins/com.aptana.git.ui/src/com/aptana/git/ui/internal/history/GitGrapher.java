@@ -18,7 +18,8 @@ import com.aptana.git.ui.GitUIPlugin;
  */
 class GitGrapher
 {
-	private static final int MAX_LANES = 32;
+	// GitX uses 32, but I bumped this up to 64 because the Git repo of Git actually uses more than 32 (!)
+	private static final int MAX_LANES = 64;
 	private List<GitLane> pl;
 	private GraphCellInfo previous;
 

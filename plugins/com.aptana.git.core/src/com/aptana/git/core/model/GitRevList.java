@@ -21,7 +21,8 @@ public class GitRevList
 		repository = repo;
 	}
 
-	// TODO This seems an odd model. Maybe we hide it and hang a method off the repo? Maybe we just return the commits as the return of the walk method calls? Should we take in progress monitors?
+	// TODO This seems an odd model. Maybe we hide it and hang a method off the repo? Maybe we just return the commits
+	// as the return of the walk method calls? Should we take in progress monitors?
 	/**
 	 * Walks a revision to collect all the commits in reverse chronological order.
 	 * 
@@ -86,7 +87,6 @@ public class GitRevList
 				{
 					num = 0;
 					setCommits(revisions);
-					// g = new GitGrapher(repository);
 					revisions = new ArrayList<GitCommit>();
 
 					// If the length is < 40, then there are no commits.. quit now
@@ -148,13 +148,16 @@ public class GitRevList
 					break;
 
 				if (++num % 1000 == 0)
+				{
 					setCommits(revisions);
+				}
+
 			}
 
 			long duration = System.currentTimeMillis() - start;
 			logInfo("Loaded " + num + " commits in " + duration + " ms");
 			// Make sure the commits are stored before exiting.
-			setCommits(revisions);
+			setCommits(revisions, true);
 			p.waitFor();
 		}
 		catch (Exception e)
@@ -199,9 +202,23 @@ public class GitRevList
 
 	private void setCommits(List<GitCommit> revisions)
 	{
-		if (this.commits == null)
-			this.commits = new ArrayList<GitCommit>();
-		this.commits.addAll(revisions);
+		setCommits(revisions, false);
+	}
+
+	private void setCommits(List<GitCommit> revisions, boolean trimToSize)
+	{
+		if (trimToSize)
+		{
+			if (revisions instanceof ArrayList<?>)
+			{
+				((ArrayList<?>) revisions).trimToSize();
+			}
+			this.commits = new ArrayList<GitCommit>(revisions);
+			revisions.clear();
+			revisions = null;
+		}
+		else
+			this.commits = revisions;
 	}
 
 	private String getline(InputStream stream, char c)
