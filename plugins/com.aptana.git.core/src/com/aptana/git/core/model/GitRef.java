@@ -1,5 +1,10 @@
 package com.aptana.git.core.model;
 
+/**
+ * Represents a reference in the git repo. Typically branches or tags.
+ * 
+ * @author cwilliams
+ */
 public class GitRef
 {
 
@@ -30,11 +35,19 @@ public class GitRef
 		return new GitRef(string);
 	}
 
+	/**
+	 * The full name of the ref. i.e. "refs/heads/master" or "refs/tags/v0.7"
+	 * @return
+	 */
 	public String ref()
 	{
 		return ref;
 	}
 
+	/**
+	 * Short name for the ref. i.e. "master" or "v0.7"
+	 * @return
+	 */
 	public String shortName()
 	{
 		if (type() != null)
@@ -42,8 +55,13 @@ public class GitRef
 		return ref;
 	}
 
+	/**
+	 * Type of reference. head (local branch), remote (remote branch) or tag.
+	 * @return
+	 */
 	public String type()
 	{
+		// TODO Use an enum here?
 		if (ref.startsWith(REFS_HEADS))
 			return HEAD_TYPE;
 		if (ref.startsWith(REFS_TAGS))
@@ -52,7 +70,7 @@ public class GitRef
 			return REMOTE_TYPE;
 		return null;
 	}
-	
+
 	@Override
 	public String toString()
 	{

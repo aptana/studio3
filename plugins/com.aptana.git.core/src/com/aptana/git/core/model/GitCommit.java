@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Represents a commit in the repo.
+ * 
+ * @author cwilliams
+ */
 public class GitCommit
 {
 
@@ -14,8 +19,6 @@ public class GitCommit
 	private long timestamp;
 	private String author;
 	private List<String> parentShas;
-	private char sign;
-	private String lineInfo;
 	private String comment;
 	private List<Diff> diffs;
 
@@ -53,11 +56,6 @@ public class GitCommit
 	void setAuthor(String author)
 	{
 		this.author = author;
-	}
-
-	void setSign(char c)
-	{
-		this.sign = c;
 	}
 
 	void setTimestamp(long time)
@@ -140,11 +138,21 @@ public class GitCommit
 		return repository.refs.get(sha);
 	}
 
+	/**
+	 * Are there any refs associated with this commit?
+	 * 
+	 * @return
+	 */
 	public boolean hasRefs()
 	{
 		return getRefs() != null;
 	}
 
+	/**
+	 * Number of refs associated with the commit.
+	 * 
+	 * @return
+	 */
 	public int refCount()
 	{
 		if (!hasRefs())

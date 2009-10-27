@@ -7,68 +7,45 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-
 import com.aptana.git.core.GitPlugin;
 
 public class GitRevList
 {
 	private GitRepository repository;
-	private String lastSha;
 	private List<GitCommit> commits;
+
+	public static final int NO_LIMIT = -1;
 
 	public GitRevList(GitRepository repo)
 	{
 		repository = repo;
 	}
 
-	void readCommitsForce(boolean force)
+	// TODO This seems an odd model. Maybe we hide it and hang a method off the repo? Maybe we just return the commits as the return of the walk method calls? Should we take in progress monitors?
+	/**
+	 * Walks a revision to collect all the commits in reverse chronological order.
+	 * 
+	 * @param gitRevSpecifier
+	 */
+	public void walkRevisionListWithSpecifier(GitRevSpecifier gitRevSpecifier)
 	{
-		// We use refparse to get the commit sha that we will parse. That way,
-		// we can check if the current branch is the same as the previous one
-		// and in that case we don't have to reload the revision list.
-
-		// If no branch is selected, don't do anything
-		if (repository.currentBranch == null)
-			return;
-
-		GitRevSpecifier newRev = repository.currentBranch;
-		String newSha = null;
-		if (!force && newRev != null && newRev.isSimpleRef())
-		{
-			newSha = repository.parseReference(newRev.simpleRef());
-			if (newSha.equals(lastSha))
-				return;
-		}
-		lastSha = newSha;
-
-		final GitRevSpecifier toWalk = newRev;
-		Job job = new Job("walk revision list")
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				walkRevisionListWithSpecifier(toWalk, -1);
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.schedule();
+		walkRevisionListWithSpecifier(gitRevSpecifier, NO_LIMIT);
 	}
 
+	/**
+	 * Walks a revision to collect commits in reverse chronological order, limited to value of max results.
+	 * 
+	 * @param rev
+	 * @param max
+	 *            Maximum number of results to return. {@link #NO_LIMIT} represent no limit.
+	 */
 	public void walkRevisionListWithSpecifier(GitRevSpecifier rev, int max)
 	{
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
-		// GitGrapher g = new GitGrapher(repository);
-
 		String formatString = "--pretty=format:%H\01%e\01%an\01%s\01%b\01%P\01%at";
 		boolean showSign = rev.hasLeftRight();
-
 		if (showSign)
 			formatString += "\01%m";
 
@@ -108,7 +85,7 @@ public class GitRevList
 				if (sha.charAt(1) == 'i') // Matches 'Final output'
 				{
 					num = 0;
-					setCommits(revisions, false);
+					setCommits(revisions);
 					// g = new GitGrapher(repository);
 					revisions = new ArrayList<GitCommit>();
 
@@ -120,21 +97,7 @@ public class GitRevList
 					sha = sha.substring(startIndex, startIndex + 40);
 				}
 
-				// From now on, 1.2 seconds
 				String encoding = getline(stream, '\1', "UTF-8");
-				// String encoding = null;
-				// if (encoding_str.length() != 0)
-				// {
-				// if (encodingMap.hasKey(encoding_str)) {
-				// encoding = encodingMap.get(encoding_str);
-				// } else {
-				// encoding =
-				// CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((CFStringRef)[NSString
-				// stringWithUTF8String:encoding_str.c_str()]));
-				// encodingMap.put(encoding_str, encoding);
-				// }
-				// }
-
 				GitCommit newCommit = new GitCommit(repository, sha);
 
 				String author = getline(stream, '\1', encoding);
@@ -172,7 +135,7 @@ public class GitRevList
 					char c = (char) stream.read();
 					if (c != '>' && c != '<' && c != '^' && c != '-')
 						GitPlugin.logError("Error loading commits: sign not correct", null);
-					newCommit.setSign(c);
+					// newCommit.setSign(c);
 				}
 
 				int read = stream.read();
@@ -180,19 +143,18 @@ public class GitRevList
 					System.out.println("Error");
 
 				revisions.add(newCommit);
-				// g.decorateCommit(newCommit);
 
 				if (read == -1)
 					break;
 
 				if (++num % 1000 == 0)
-					setCommits(revisions, false);
+					setCommits(revisions);
 			}
 
 			long duration = System.currentTimeMillis() - start;
 			logInfo("Loaded " + num + " commits in " + duration + " ms");
 			// Make sure the commits are stored before exiting.
-			setCommits(revisions, true);
+			setCommits(revisions);
 			p.waitFor();
 		}
 		catch (Exception e)
@@ -235,7 +197,7 @@ public class GitRevList
 		return time + (5 * 60 * 1000);
 	}
 
-	private void setCommits(List<GitCommit> revisions, boolean b)
+	private void setCommits(List<GitCommit> revisions)
 	{
 		if (this.commits == null)
 			this.commits = new ArrayList<GitCommit>();

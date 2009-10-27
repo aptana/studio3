@@ -31,10 +31,21 @@ public class GitFileHistory extends FileHistory implements IFileHistory
 	{
 		GitRepository repo = GitRepository.getAttached(this.resource.getProject());
 		if (repo == null)
-			return new IFileRevision[0];
-		String repoRelativePath = resource.getLocationURI().getPath();
-		// String working = repo.workingDirectory();
-
+			return new IFileRevision[0];		
+		// Need the repo relative path TODO Refactor this common code with the stuff in GitHistoryPage, lines 64-77
+		String workingDirectory = repo.workingDirectory();
+		String resourcePath = resource.getLocationURI().getPath();
+		if (resourcePath.startsWith(workingDirectory))
+		{
+			resourcePath = resourcePath.substring(workingDirectory.length());
+			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\"))
+				resourcePath = resourcePath.substring(1);
+		}
+		// What if we have some trailing slash or something?
+		if (resourcePath.length() == 0)
+		{
+			resourcePath = repo.currentBranch();
+		}		
 		List<IFileRevision> revisions = new ArrayList<IFileRevision>();
 		GitRevList list = new GitRevList(repo);
 		int max = -1;
@@ -42,7 +53,7 @@ public class GitFileHistory extends FileHistory implements IFileHistory
 		{
 			max = 1;
 		}
-		list.walkRevisionListWithSpecifier(new GitRevSpecifier(repoRelativePath), max);
+		list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), max);
 		List<GitCommit> commits = list.getCommits();
 		for (GitCommit gitCommit : commits)
 		{
