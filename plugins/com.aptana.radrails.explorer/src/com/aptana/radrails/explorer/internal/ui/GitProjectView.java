@@ -4,7 +4,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -18,6 +22,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.actions.CommitAction;
+import com.aptana.git.ui.actions.PullAction;
+import com.aptana.git.ui.actions.PushAction;
+import com.aptana.git.ui.actions.StashAction;
 import com.aptana.radrails.explorer.ExplorerPlugin;
 
 public class GitProjectView extends CommonNavigator
@@ -46,9 +54,6 @@ public class GitProjectView extends CommonNavigator
 		data1.left = new FormAttachment(0, 0);
 		data1.top = new FormAttachment(0, 0);
 		gitStuff.setLayoutData(data1);
-
-		Label projectLabel = new Label(gitStuff, SWT.NONE);
-		projectLabel.setText("Project: ");
 
 		projectCombo = new Combo(gitStuff, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
@@ -79,6 +84,95 @@ public class GitProjectView extends CommonNavigator
 
 				String branchName = branchCombo.getText();
 				setNewBranch(branchName);
+			}
+		});
+
+		// Add icon for commit (disk)
+		Label commit = new Label(gitStuff, SWT.NONE);
+		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
+		commit.setToolTipText("Commit...");
+		commit.addMouseListener(new MouseListener()
+		{
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				CommitAction action = new CommitAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run(null);
+			}
+		});
+
+		Label push = new Label(gitStuff, SWT.NONE);
+		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
+		push.setToolTipText("Push");
+		push.addMouseListener(new MouseListener()
+		{
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				PushAction action = new PushAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run(null);
+			}
+		});
+
+		Label pull = new Label(gitStuff, SWT.NONE);
+		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
+		pull.setToolTipText("Pull");
+		pull.addMouseListener(new MouseListener()
+		{
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				PullAction action = new PullAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run(null);
+			}
+		});
+
+		Label stash = new Label(gitStuff, SWT.NONE);
+		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png"));
+		stash.setToolTipText("Stash");
+		stash.addMouseListener(new MouseListener()
+		{
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				StashAction action = new StashAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run(null);
 			}
 		});
 

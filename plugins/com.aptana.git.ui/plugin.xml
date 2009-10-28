@@ -19,14 +19,14 @@
                menubarPath="team.main/projectGroup">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.PushAction"
+               class="com.aptana.git.ui.actions.PushAction"
                id="com.aptana.git.ui.internal.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%PushAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.PullAction"
+               class="com.aptana.git.ui.actions.PullAction"
                id="com.aptana.git.ui.internal.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
@@ -47,7 +47,7 @@
                tooltip="%ShowResourceInHistoryAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.CommitAction"
+               class="com.aptana.git.ui.actions.CommitAction"
                id="com.aptana.git.ui.internal.actions.CommitAction"
                label="%CommitAction_label"
                menubarPath="team.main/projectGroup"

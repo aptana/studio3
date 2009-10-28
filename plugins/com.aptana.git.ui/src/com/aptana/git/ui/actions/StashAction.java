@@ -1,15 +1,16 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jface.action.IAction;
 
 import com.aptana.git.ui.internal.GitLightweightDecorator;
+import com.aptana.git.ui.internal.actions.GitAction;
 
-public class PushAction extends GitAction
+public class StashAction extends GitAction
 {
 
-	private static final String COMMAND = "push"; //$NON-NLS-1$
+	private static final String COMMAND = "stash"; //$NON-NLS-1$
 
 	@Override
 	protected String getCommand()
