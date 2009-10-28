@@ -27,7 +27,7 @@ import com.aptana.git.core.model.GitRepository;
  * 
  * @author cwilliams
  */
-abstract class GitAction extends TeamAction
+public abstract class GitAction extends TeamAction
 {
 
 	@Override
@@ -37,7 +37,7 @@ abstract class GitAction extends TeamAction
 		String working = null;
 		if (workingDir != null)
 			working = workingDir.toString();
-		run(GitExecutable.instance().path(), working, getCommand());
+		launch(GitExecutable.instance().path(), working, getCommand());
 	}
 
 	protected abstract String getCommand();
@@ -73,7 +73,7 @@ abstract class GitAction extends TeamAction
 	 * @param args
 	 * @return
 	 */
-	public static ILaunch run(String command, String workingDir, String... args)
+	private static ILaunch launch(String command, String workingDir, String... args)
 	{
 		try
 		{
