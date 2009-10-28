@@ -146,6 +146,32 @@ public class GitRepository
 		return null;
 	}
 
+	public Set<String> localBranches()
+	{
+		// TODO Cache/memoize
+		Set<String> localBranches = new HashSet<String>();
+		for (GitRevSpecifier revSpec : branches)
+		{
+			if (!revSpec.isSimpleRef())
+				continue;
+			GitRef ref = revSpec.simpleRef();
+			if (ref == null || !ref.type().equals(GitRef.HEAD_TYPE))
+				continue;
+			localBranches.add(ref.shortName());
+		}
+		return localBranches;
+	}
+
+	public boolean switchBranch(String branchName)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
+				branchName);
+		if (result.keySet().iterator().next().intValue() != 0)
+			return false;
+		readCurrentBranch();
+		return true;
+	}
+
 	private void readCurrentBranch()
 	{
 		this.currentBranch = addBranch(headRef());
@@ -266,22 +292,15 @@ public class GitRepository
 	}
 
 	/**
-	 * get the name of the current branch as a string FIXME How does this relate to the current branch object?!
+	 * get the name of the current branch as a string
 	 * 
 	 * @return
 	 */
 	public String currentBranch()
 	{
-		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch", "--no-color");
-		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
-		for (String line : lines)
-		{
-			if (line.trim().startsWith("*"))
-			{
-				return line.substring(1).trim();
-			}
-		}
-		return null;
+		if (currentBranch == null)
+			return null;
+		return currentBranch.simpleRef().shortName();
 	}
 
 	public synchronized GitIndex index()
