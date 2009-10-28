@@ -28,13 +28,11 @@ public class SharingWizard extends Wizard implements IConfigurationWizard, IConf
 		setNeedsProgressMonitor(true);
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IProject project)
 	{
 		init(workbench, new IProject[] { project });
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IProject[] projects)
 	{
 		this.projects = new IProject[projects.length];

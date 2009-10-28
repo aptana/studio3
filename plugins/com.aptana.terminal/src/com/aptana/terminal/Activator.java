@@ -1,6 +1,7 @@
 package com.aptana.terminal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -74,14 +75,18 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public static Image getImage(String path)
 	{
-		if (getDefault().getImageRegistry().get(path) == null)
+		ImageRegistry registry = getDefault().getImageRegistry();
+		
+		if (registry.get(path) == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
+			
 			if (id != null)
 			{
-				getDefault().getImageRegistry().put(path, id);
+				registry.put(path, id);
 			}
 		}
-		return getDefault().getImageRegistry().get(path);
+		
+		return registry.get(path);
 	}
 }

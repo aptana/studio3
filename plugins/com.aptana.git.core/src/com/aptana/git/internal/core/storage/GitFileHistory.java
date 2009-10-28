@@ -62,21 +62,18 @@ public class GitFileHistory extends FileHistory implements IFileHistory
 		return revisions.toArray(new IFileRevision[revisions.size()]);
 	}
 
-	@Override
 	public IFileRevision[] getContributors(IFileRevision revision)
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public IFileRevision getFileRevision(String id)
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public IFileRevision[] getFileRevisions()
 	{
 		final IFileRevision[] r = new IFileRevision[revisions.length];
@@ -84,7 +81,6 @@ public class GitFileHistory extends FileHistory implements IFileHistory
 		return r;
 	}
 
-	@Override
 	public IFileRevision[] getTargets(IFileRevision revision)
 	{
 		// TODO Auto-generated method stub

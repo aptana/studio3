@@ -152,13 +152,11 @@ public class CommitDialog extends StatusDialog
 		commitMessage.addKeyListener(new KeyListener()
 		{
 
-			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				validate();
 			}
 
-			@Override
 			public void keyPressed(KeyEvent e)
 			{
 			}

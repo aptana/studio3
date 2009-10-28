@@ -97,7 +97,6 @@ class CommitFileDiffViewer extends TableViewer
 	private static class CommitDiffContentProvider implements IStructuredContentProvider
 	{
 
-		@Override
 		public Object[] getElements(Object inputElement)
 		{
 			if (inputElement instanceof GitCommit)
@@ -108,13 +107,11 @@ class CommitFileDiffViewer extends TableViewer
 			return new Object[0];
 		}
 
-		@Override
 		public void dispose()
 		{
 			// do nothing
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 		{
 			// do nothing
@@ -125,13 +122,11 @@ class CommitFileDiffViewer extends TableViewer
 	private static class SingleCommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
 	{
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex)
 		{
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex)
 		{
 			Diff diff = (Diff) element;
