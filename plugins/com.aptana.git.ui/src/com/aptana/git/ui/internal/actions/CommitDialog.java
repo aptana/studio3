@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
@@ -59,25 +58,13 @@ public class CommitDialog extends StatusDialog
 	private Image emptyFileImage;
 	private Text diffArea;
 
-	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
+	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
 		this.gitRepository = gitRepository;
-		newFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage(); //$NON-NLS-1$
-		deletedFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage(); //$NON-NLS-1$
-		emptyFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage(); //$NON-NLS-1$
-	}
-
-	@Override
-	public boolean close()
-	{
-		newFileImage.dispose();
-		deletedFileImage.dispose();
-		emptyFileImage.dispose();
-		return super.close();
+		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
+		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
+		emptyFileImage = GitUIPlugin.getImage("icons/obj16/empty_file.png"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -362,8 +349,7 @@ public class CommitDialog extends StatusDialog
 	{
 		if (commitMessage.getText().length() < 3)
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_EnterMessage_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
@@ -374,8 +360,7 @@ public class CommitDialog extends StatusDialog
 		}
 		if (gitRepository.hasMerges())
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_CannotMerge_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_CannotMerge_Error));
 			return;
 		}
 		fMessage = commitMessage.getText();

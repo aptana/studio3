@@ -2,6 +2,8 @@ package com.aptana.git.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -77,6 +79,17 @@ public class GitUIPlugin extends AbstractUIPlugin
 	public static void logWarning(String msg)
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), msg));
+	}
+
+	public static Image getImage(String string)
+	{
+		if (getDefault().getImageRegistry().get(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(getPluginId(), string);
+			if (id != null)
+				getDefault().getImageRegistry().put(string, id);
+		}
+		return getDefault().getImageRegistry().get(string);
 	}
 
 }
