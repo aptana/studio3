@@ -83,18 +83,24 @@ main (void)
 							{
 								char *start = buffer + strlen(SET_SIZE);
 								char *semi = strstr(start, ";");
-								char *t = strstr(semi + 1, "t");
-								int height = strtol(start, &semi, 0);
-								int width = strtol(semi + 1, &t, 0);
+								char *t = (semi != NULL) ? strstr(semi + 1, "t") : NULL;
 								
-								//fprintf(stderr, "%dx%d", width, height);
-								
-								struct winsize size;
-								size.ws_row = height;
-								size.ws_col = width;
-								ioctl(pty, TIOCSWINSZ, &size);
-								
-								write(pty, t + 1, read_count - (t - buffer) - 1);
+								if (semi != NULL && t != NULL)
+								{
+									int height = strtol(start, &semi, 0);
+									int width = strtol(semi + 1, &t, 0);
+									
+									struct winsize size;
+									size.ws_row = height;
+									size.ws_col = width;
+									ioctl(pty, TIOCSWINSZ, &size);
+									
+									write(pty, t + 1, read_count - (t - buffer) - 1);
+								}
+								else
+								{
+									write(pty, &buffer, read_count);
+								}
 							}
 							else
 							{
