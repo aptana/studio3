@@ -21,6 +21,7 @@ main (void)
 {
 	/* Read char */
 	char buffer[1024+1];
+	char old_char;
 	int read_count;
 		
 	/* Descriptor set for select */
@@ -76,6 +77,7 @@ main (void)
 							break;
 							
 						default:
+							old_char = buffer[read_count];
 							buffer[read_count] = '\0';
 							
 							if (!strncmp(buffer, SET_SIZE, strlen(SET_SIZE)))
@@ -92,6 +94,12 @@ main (void)
 								size.ws_row = height;
 								size.ws_col = width;
 								ioctl(pty, TIOCSWINSZ, &size);
+								
+								if (read_count > strlen(SET_SIZE))
+								{
+									buffer[read_count] = old_char;
+									write(pty, t + 1, read_count - (t - buffer) - 1);
+								}
 							}
 							else
 							{
