@@ -1,8 +1,5 @@
 package com.aptana.terminal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -18,7 +15,6 @@ public class Activator extends AbstractUIPlugin
 	public static final String PLUGIN_ID = "com.aptana.terminal"; //$NON-NLS-1$
 
 	private static Activator plugin;
-	private static Map<String, Image> images = new HashMap<String, Image>();
 
 	/**
 	 * The constructor
@@ -78,18 +74,14 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public static Image getImage(String path)
 	{
-		if (images.containsKey(path) == false)
+		if (getDefault().getImageRegistry().get(path) == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
-
 			if (id != null)
 			{
-				Image i = id.createImage();
-
-				images.put(path, i);
+				getDefault().getImageRegistry().put(path, id);
 			}
 		}
-
-		return images.get(path);
+		return getDefault().getImageRegistry().get(path);
 	}
 }
