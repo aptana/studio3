@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aptana.git.core.GitPlugin;
+
 public class Diff
 {
 
@@ -34,8 +36,8 @@ public class Diff
 	private String newMode;
 	private GitCommit commit;
 
-	private Diff(GitCommit commit, boolean binary, String startname, String endname, 
-			boolean modeChange, String oldMode, String newMode)
+	private Diff(GitCommit commit, boolean binary, String startname, String endname, boolean modeChange,
+			String oldMode, String newMode)
 	{
 		this.commit = commit;
 		this.isBinary = binary;
@@ -65,10 +67,9 @@ public class Diff
 		String l = null;
 		while ((l = buffReader.readLine()) != null)
 		{
-			if (l == null || l.length() == 0)
+			if (l.length() == 0)
 				continue;
 			char firstChar = l.charAt(0);
-
 			if (firstChar == 'd' && l.charAt(1) == 'i')
 			{ // "diff", i.e. new file, we have to reset everything
 				header = true; // diff always starts with a header
@@ -77,12 +78,9 @@ public class Diff
 				if (!readPrologue)
 					readPrologue = true;
 				else
-					files
-							.add(new Diff(commit, binary, startname, endname, mode_change, old_mode,
-									new_mode));
+					files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
 				startname = "";
 				endname = "";
-
 				old_mode = "";
 				new_mode = "";
 				binary = false;
@@ -98,10 +96,12 @@ public class Diff
 				continue;
 			}
 
-			if (header)
+			if (!header)
+				continue;
+
+			switch (firstChar)
 			{
-				if (firstChar == 'n')
-				{
+				case 'n':
 					Matcher m = NEW_FILE_MODE_PATTERN.matcher(l);
 					if (m.find())
 						startname = DEV_NULL;
@@ -112,45 +112,34 @@ public class Diff
 						mode_change = true;
 						new_mode = m.group(1);
 					}
-					continue;
-				}
-				if (firstChar == 'o')
-				{
-					Matcher m = OLD_MODE_PATTERN.matcher(l);
+					break;
+				case 'o':
+					m = OLD_MODE_PATTERN.matcher(l);
 					if (m.find())
 					{
 						mode_change = true;
 						old_mode = m.group(1);
 					}
-					continue;
-				}
-
-				if (firstChar == 'd')
-				{
-					Matcher m = DELETED_FILE_MODE_PATTERN.matcher(l);
+					break;
+				case 'd':
+					m = DELETED_FILE_MODE_PATTERN.matcher(l);
 					if (m.find())
 						endname = DEV_NULL;
-					continue;
-				}
-				if (firstChar == '-')
-				{
-					Matcher m = MINUS_PATTERN.matcher(l);
+					break;
+				case '-':
+					m = MINUS_PATTERN.matcher(l);
 					if (m.find())
 						startname = m.group(2);
-					continue;
-				}
-				if (firstChar == '+')
-				{
-					Matcher m = PLUS_PATTERN.matcher(l);
+					break;
+				case '+':
+					m = PLUS_PATTERN.matcher(l);
 					if (m.find())
 						endname = m.group(2);
-					continue;
-				}
-				// If it is a complete rename, we don't know the name yet
-				// We can figure this out from the 'rename from.. rename to.. thing
-				if (firstChar == 'r')
-				{
-					Matcher m = RENAME_PATTERN.matcher(l);
+					break;
+				case 'r':
+					// If it is a complete rename, we don't know the name yet
+					// We can figure this out from the 'rename from.. rename to.. thing
+					m = RENAME_PATTERN.matcher(l);
 					if (m.find())
 					{
 						if (m.group(1).equals("from"))
@@ -158,33 +147,36 @@ public class Diff
 						else
 							endname = m.group(2);
 					}
-					continue;
-				}
-				if (firstChar == 'B') // "Binary files .. and .. differ"
-				{
+					break;
+				case 'B':
 					binary = true;
 					// We might not have a diff from the binary file if it's new.
 					// So, we use a regex to figure that out
-
-					Matcher m = BINARY_FILES_DIFFER_PATTERN.matcher(l);
+					m = BINARY_FILES_DIFFER_PATTERN.matcher(l);
 					if (m.find())
 					{
 						startname = m.group(2);
 						endname = m.group(4);
 					}
-				}
-
-				// Finish the header
-				if (firstChar == '@')
+					break;
+				case '@': // Finish the header
 					header = false;
-				else
-					continue;
+					break;
+				default:
+					break;
 			}
 		}
 		files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
-		System.out.println("Took " + (System.currentTimeMillis() - start) + "ms to parse out " + files.size()
-				+ " diffs");
+		log("Took " + (System.currentTimeMillis() - start) + "ms to parse out " + files.size() + " diffs");
 		return files;
+	}
+
+	private static void log(String string)
+	{
+		if (GitPlugin.getDefault() != null)
+			GitPlugin.logInfo(string);
+		else
+			System.out.println(string);
 	}
 
 	public boolean fileCreated()
