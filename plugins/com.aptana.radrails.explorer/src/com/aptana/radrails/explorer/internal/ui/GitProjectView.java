@@ -8,6 +8,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -34,11 +37,15 @@ public class GitProjectView extends CommonNavigator
 	{
 		// Create our own parent
 		Composite myComposite = new Composite(aParent, SWT.NONE);
-		myComposite.setLayout(new FillLayout(SWT.VERTICAL));
+		myComposite.setLayout(new FormLayout());
 
 		// Create our special git stuff
 		Composite gitStuff = new Composite(myComposite, SWT.NONE);
 		gitStuff.setLayout(new RowLayout());
+		FormData data1 = new FormData();
+		data1.left = new FormAttachment(0, 0);
+		data1.top = new FormAttachment(0, 0);
+		gitStuff.setLayoutData(data1);
 
 		Label projectLabel = new Label(gitStuff, SWT.NONE);
 		projectLabel.setText("Project: ");
@@ -49,7 +56,7 @@ public class GitProjectView extends CommonNavigator
 		{
 			projectCombo.add(iProject.getName());
 		}
-		
+
 		projectCombo.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -74,13 +81,19 @@ public class GitProjectView extends CommonNavigator
 				setNewBranch(branchName);
 			}
 		});
-		
+
 		if (projects.length > 0)
 			detectSelectProject();
 
 		// Now create the typical stuff for the navigator
 		Composite viewer = new Composite(myComposite, SWT.NONE);
 		viewer.setLayout(new FillLayout());
+		FormData data2 = new FormData();
+		data2.top = new FormAttachment(gitStuff);
+		data2.bottom = new FormAttachment(100, 0);
+		data2.right = new FormAttachment(100, 0);
+		data2.left = new FormAttachment(0, 0);
+		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
 	}
 
