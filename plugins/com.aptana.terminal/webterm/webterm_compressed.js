@@ -1567,7 +1567,7 @@ for(var i=this._height;i<_fe;i++){
 this._lines.push(new Line(this._width));
 }
 }else{
-this._lines.splice(_fe,this._height-_fe);
+this._lines=this._lines.splice(this._height-_fe,_fe);
 }
 this._height=_fe;
 this._row=Math.min(this._height-1,this._row);
