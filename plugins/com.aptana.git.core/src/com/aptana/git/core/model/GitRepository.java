@@ -522,4 +522,9 @@ public class GitRepository
 		}
 		return repo;
 	}
+
+	public boolean isDirty()
+	{
+		return !index().changedFiles().isEmpty();
+	}
 }
