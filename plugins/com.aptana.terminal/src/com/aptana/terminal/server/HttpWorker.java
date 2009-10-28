@@ -156,7 +156,6 @@ public class HttpWorker implements Runnable
 	/**
 	 * run
 	 */
-	@Override
 	public void run()
 	{
 		try

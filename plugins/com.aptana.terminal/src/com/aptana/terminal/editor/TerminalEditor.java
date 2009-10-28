@@ -99,6 +99,10 @@ public class TerminalEditor extends EditorPart
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.browser.getControl(), ID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
 	public void setFocus()
 	{

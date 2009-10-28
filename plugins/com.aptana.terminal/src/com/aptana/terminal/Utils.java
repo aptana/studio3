@@ -18,9 +18,6 @@ public class Utils
 {
 	private static final String SAMPLE_TEXT;
 
-	/*
-	 * static
-	 */
 	static
 	{
 		char[] chars = new char[200];
@@ -33,9 +30,6 @@ public class Utils
 		SAMPLE_TEXT = new String(chars);
 	}
 	
-	/*
-	 * Utils
-	 */
 	private Utils()
 	{
 	}
