@@ -6,7 +6,7 @@
       <view
             allowMultiple="false"
             category="org.eclipse.ui"
-            class="com.aptana.radrails.explorer.internal.ui.ChrisView"
+            class="com.aptana.radrails.explorer.internal.ui.GitProjectView"
             icon="icons/full/cview16/filenav_nav.gif"
             id="org.eclipse.ui.examples.navigator.view"
             name="Git View"

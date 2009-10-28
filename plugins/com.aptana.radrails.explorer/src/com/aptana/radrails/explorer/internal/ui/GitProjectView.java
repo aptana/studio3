@@ -17,7 +17,7 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.radrails.explorer.ExplorerPlugin;
 
-public class ChrisView extends CommonNavigator
+public class GitProjectView extends CommonNavigator
 {
 	/**
 	 * Property we assign to a project to make it the active one that this view is filtered to.
