@@ -77,7 +77,6 @@ main (void)
 							break;
 							
 						default:
-							old_char = buffer[read_count];
 							buffer[read_count] = '\0';
 							
 							if (!strncmp(buffer, SET_SIZE, strlen(SET_SIZE)))
@@ -95,11 +94,7 @@ main (void)
 								size.ws_col = width;
 								ioctl(pty, TIOCSWINSZ, &size);
 								
-								if (read_count > strlen(SET_SIZE))
-								{
-									buffer[read_count] = old_char;
-									write(pty, t + 1, read_count - (t - buffer) - 1);
-								}
+								write(pty, t + 1, read_count - (t - buffer) - 1);
 							}
 							else
 							{
