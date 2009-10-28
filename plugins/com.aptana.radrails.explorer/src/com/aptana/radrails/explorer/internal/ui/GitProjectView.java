@@ -1,6 +1,11 @@
 package com.aptana.radrails.explorer.internal.ui;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
@@ -15,20 +20,25 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.navigator.CommonNavigator;
 
+import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.radrails.explorer.ExplorerPlugin;
 
-public class GitProjectView extends CommonNavigator
+public class GitProjectView extends CommonNavigator implements IGitRepositoryListener
 {
 	/**
 	 * Property we assign to a project to make it the active one that this view is filtered to.
@@ -40,6 +50,10 @@ public class GitProjectView extends CommonNavigator
 
 	private Combo branchCombo;
 
+	private Label summary;
+
+	private ResourceListener fResourceListener;
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -49,7 +63,7 @@ public class GitProjectView extends CommonNavigator
 
 		// Create our special git stuff
 		Composite gitStuff = new Composite(myComposite, SWT.NONE);
-		gitStuff.setLayout(new RowLayout());
+		gitStuff.setLayout(new GridLayout(3, false));
 		FormData data1 = new FormData();
 		data1.left = new FormAttachment(0, 0);
 		data1.top = new FormAttachment(0, 0);
@@ -110,9 +124,17 @@ public class GitProjectView extends CommonNavigator
 			}
 		});
 
+		summary = new Label(gitStuff, SWT.WRAP);
+		summary.setText("");
+		GridData summaryData = new GridData();
+		summaryData.horizontalSpan = 2;
+		summaryData.verticalSpan = 3;
+		summary.setLayoutData(summaryData);
+
 		Label push = new Label(gitStuff, SWT.NONE);
 		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
 		push.setToolTipText("Push");
+		// TODO Disable unless there's a remote tracking branch and we have commits
 		push.addMouseListener(new MouseListener()
 		{
 			public void mouseDoubleClick(MouseEvent e)
@@ -135,6 +157,7 @@ public class GitProjectView extends CommonNavigator
 		Label pull = new Label(gitStuff, SWT.NONE);
 		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
 		pull.setToolTipText("Pull");
+		// TODO Disable unless there's a remote tracking branch
 		pull.addMouseListener(new MouseListener()
 		{
 			public void mouseDoubleClick(MouseEvent e)
@@ -176,9 +199,6 @@ public class GitProjectView extends CommonNavigator
 			}
 		});
 
-		if (projects.length > 0)
-			detectSelectProject();
-
 		// Now create the typical stuff for the navigator
 		Composite viewer = new Composite(myComposite, SWT.NONE);
 		viewer.setLayout(new FillLayout());
@@ -189,20 +209,50 @@ public class GitProjectView extends CommonNavigator
 		data2.left = new FormAttachment(0, 0);
 		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
+
+		if (projects.length > 0)
+			detectSelectedProject();
+		fResourceListener = new ResourceListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
+		GitRepository.addListener(this);
+	}
+
+	@Override
+	public void dispose()
+	{
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
+		GitRepository.removeListener(this);
+		super.dispose();
+	}
+
+	protected void reloadProjects()
+	{
+		// FIXME What if the active project was deleted or renamed?
+		projectCombo.removeAll();
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject iProject : projects)
+		{
+			projectCombo.add(iProject.getName());
+		}
+		projectCombo.setText(selectedProject.getName());
 	}
 
 	protected void setNewBranch(String branchName)
 	{
-		// TODO Switch to the new branch if possible, refresh the viewer's contents
+		if (branchName.endsWith("*"))
+			branchName = branchName.substring(0, branchName.length() - 1);
+
 		GitRepository repo = GitRepository.getAttached(selectedProject);
 		if (repo != null)
 		{
+			if (branchName.equals(repo.currentBranch()))
+				return;
 			repo.switchBranch(branchName);
 			refreshViewer();
 		}
 	}
 
-	private void detectSelectProject()
+	private void detectSelectedProject()
 	{
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		if (projects == null)
@@ -236,21 +286,30 @@ public class GitProjectView extends CommonNavigator
 		try
 		{
 			if (selectedProject != null)
+			{
 				selectedProject
 						.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT), null);
+			}
 			selectedProject = newSelectedProject;
 			selectedProject.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT),
 					Boolean.TRUE.toString());
 			branchCombo.removeAll();
 			GitRepository repo = GitRepository.getAttached(newSelectedProject);
+			updateSummaryText(repo);
 			if (repo != null)
 			{
-				// TODO Change the branch name to get a star appended if it's "dirty"
+				// FIXME This doesn't seem to indicate proper dirty status and changed files on initial load!
+				String currentBranchName = repo.currentBranch();
 				for (String branchName : repo.localBranches())
 				{
-					branchCombo.add(branchName);
+					if (branchName.equals(currentBranchName) && repo.isDirty())
+						branchCombo.add(branchName + "*");
+					else
+						branchCombo.add(branchName);
 				}
-				branchCombo.setText(repo.currentBranch());
+				if (repo.isDirty())
+					currentBranchName += "*";
+				branchCombo.setText(currentBranchName);
 				branchCombo.pack(true);
 			}
 			// Refresh the view so our filter gets updated!
@@ -268,6 +327,83 @@ public class GitProjectView extends CommonNavigator
 		if (getCommonViewer() == null)
 			return;
 		getCommonViewer().refresh();
+	}
+
+	public void indexChanged(IndexChangedEvent e)
+	{
+		// TODO Update the branch list so we can reset the dirty status on the branch
+		updateSummaryText(e.getRepository());
+	}
+
+	private void updateSummaryText(GitRepository repo)
+	{
+		if (repo == null)
+			summary.setText("");
+		int deletedCount = 0;
+		int addedCount = 0;
+		int modifiedCount = 0;
+		for (ChangedFile file : repo.index().changedFiles())
+		{
+			if (file.getStatus().equals(ChangedFile.Status.DELETED))
+			{
+				deletedCount++;
+			}
+			else if (file.getStatus().equals(ChangedFile.Status.NEW))
+			{
+				addedCount++;
+			}
+			else
+			{
+				modifiedCount++;
+			}
+		}
+		StringBuilder builder = new StringBuilder();
+		builder.append(modifiedCount).append(" file(s) modified\n");
+		builder.append(deletedCount).append(" file(s) deleted\n");
+		builder.append(addedCount).append(" file(s) added");
+		summary.setText(builder.toString());
+	}
+
+	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+		// ignore
+	}
+
+	private class ResourceListener implements IResourceChangeListener
+	{
+
+		public void resourceChanged(IResourceChangeEvent event)
+		{
+			IResourceDelta delta = event.getDelta();
+			if (delta == null)
+				return;
+			try
+			{
+				delta.accept(new IResourceDeltaVisitor()
+				{
+
+					public boolean visit(IResourceDelta delta) throws CoreException
+					{
+						IResource resource = delta.getResource();
+						if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)
+							return false;
+						if (resource.getType() == IResource.ROOT)
+							return true;
+						if (resource.getType() == IResource.PROJECT)
+						{
+							// a project was added, removed, or changed!
+							reloadProjects();
+						}
+						return false;
+					}
+				});
+			}
+			catch (CoreException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
