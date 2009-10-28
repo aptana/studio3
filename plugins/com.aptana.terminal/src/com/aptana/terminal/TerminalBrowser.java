@@ -55,10 +55,14 @@ public class TerminalBrowser
 		this.setUrl(TERMINAL_URL + "?id=" + this._id); //$NON-NLS-1$
 		
 		IPartService service = (IPartService) this._owningPart.getSite().getService(IPartService.class);
-		service.addPartListener(new IPartListener() {
+		service.addPartListener(new IPartListener()
+		{
 			Scheme oldScheme = null;
 		
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
+			 */
 			public void partActivated(IWorkbenchPart part)
 			{
 				if (part == TerminalBrowser.this._owningPart)
@@ -80,7 +84,10 @@ public class TerminalBrowser
 				}
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.ui.IPartListener#partBroughtToTop(org.eclipse.ui.IWorkbenchPart)
+			 */
 			public void partBroughtToTop(IWorkbenchPart part)
 			{
 				if (part == TerminalBrowser.this._owningPart)
@@ -89,7 +96,6 @@ public class TerminalBrowser
 				}
 			}
 
-			@Override
 			public void partClosed(IWorkbenchPart part)
 			{
 				if (part == TerminalBrowser.this._owningPart)
@@ -98,7 +104,10 @@ public class TerminalBrowser
 				}
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.ui.IPartListener#partDeactivated(org.eclipse.ui.IWorkbenchPart)
+			 */
 			public void partDeactivated(IWorkbenchPart part)
 			{
 				if (part == TerminalBrowser.this._owningPart)
@@ -121,7 +130,10 @@ public class TerminalBrowser
 				}
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
+			 */
 			public void partOpened(IWorkbenchPart part)
 			{
 				if (part == TerminalBrowser.this._owningPart)
