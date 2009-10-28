@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
