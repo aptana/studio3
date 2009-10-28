@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="com.aptana.radrails.explorer.internal.ui.ChrisView"
+            id="org.eclipse.ui.examples.navigator.view"
+            name="Chris View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="org.eclipse.ui.examples.navigator.view">
+      </viewer>
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.examples.navigator.view">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.red.explorer.filters.hideNonRailsProjects">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="org.eclipse.ui.examples.navigator.view">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonFilter
+            id="com.aptana.red.explorer.filters.hideNonRailsProjects"
+            name="Hide non-Rails Projects">
+         <filterExpression>
+            <not>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.radrails.rails.core.railsnature">
+                  </test>
+               </adapt>
+            </not>
+         </filterExpression>
+      </commonFilter>
+   </extension>
+
+</plugin>
