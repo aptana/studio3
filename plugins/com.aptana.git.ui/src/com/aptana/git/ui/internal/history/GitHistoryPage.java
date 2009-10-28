@@ -183,13 +183,11 @@ public class GitHistoryPage extends HistoryPage
 		graph.getControl().setFocus();
 	}
 
-	@Override
 	public String getDescription()
 	{
 		return getName();
 	}
 
-	@Override
 	public String getName()
 	{
 		Object input = super.getInput();
@@ -212,19 +210,16 @@ public class GitHistoryPage extends HistoryPage
 		return resource.getProject().getName();
 	}
 
-	@Override
 	public boolean isValidInput(final Object object)
 	{
 		return canShowHistoryFor(object);
 	}
 
-	@Override
 	public void refresh()
 	{
 		// TODO Force a reload of the index and the refs and set input.
 	}
 
-	@Override
 	public Object getAdapter(Class adapter)
 	{
 		return null;

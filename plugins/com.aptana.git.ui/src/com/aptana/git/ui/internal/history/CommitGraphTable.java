@@ -77,7 +77,6 @@ class CommitGraphTable extends TableViewer
 		table.addDisposeListener(new DisposeListener()
 		{
 			
-			@Override
 			public void widgetDisposed(DisposeEvent e)
 			{
 				renderer.dispose();				
@@ -142,13 +141,11 @@ class CommitGraphTable extends TableViewer
 
 		private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
-		@Override
 		public Image getColumnImage(Object element, int columnIndex)
 		{
 			return null;
 		}
 
-		@Override
 		public String getColumnText(Object element, int columnIndex)
 		{
 			GitCommit commit = (GitCommit) element;

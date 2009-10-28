@@ -78,7 +78,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		GitRepository.addListener(this);
 	}
 
-	@Override
 	public void decorate(Object element, IDecoration decoration)
 	{
 		final IResource resource = getResource(element);
@@ -284,7 +283,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		});
 	}
 
-	@Override
 	public void indexChanged(IndexChangedEvent e)
 	{
 		// FIXME We need to walk the project and pass all files into the event, or we need to get the diff of updated
@@ -293,7 +291,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
-	@Override
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
 		// FIXME Grab the repo and only refresh the project's attached to it (and their children)
