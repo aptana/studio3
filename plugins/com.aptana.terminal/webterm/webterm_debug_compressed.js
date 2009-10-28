@@ -1642,6 +1642,7 @@ for(var i=0;i<this._height;i++){
 this._lines[i].resize(_109);
 }
 this._width=_109;
+this._column=Math.min(this._width-1,this._column);
 _10b=true;
 }
 if(isNumber(_10a)&&Term.MIN_HEIGHT<=_10a&&_10a<=Term.MAX_HEIGHT&&this._height!=_10a){
@@ -1653,6 +1654,7 @@ this._lines.push(new Line(this._width));
 this._lines.splice(_10a,this._height-_10a);
 }
 this._height=_10a;
+this._row=Math.min(this._height-1,this._row);
 _10b=true;
 }
 if(_10b){

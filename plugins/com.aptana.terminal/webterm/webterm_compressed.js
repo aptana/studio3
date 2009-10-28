@@ -1558,6 +1558,7 @@ for(var i=0;i<this._height;i++){
 this._lines[i].resize(_fd);
 }
 this._width=_fd;
+this._column=Math.min(this._width-1,this._column);
 _ff=true;
 }
 if(isNumber(_fe)&&Term.MIN_HEIGHT<=_fe&&_fe<=Term.MAX_HEIGHT&&this._height!=_fe){
@@ -1569,6 +1570,7 @@ this._lines.push(new Line(this._width));
 this._lines.splice(_fe,this._height-_fe);
 }
 this._height=_fe;
+this._row=Math.min(this._height-1,this._row);
 _ff=true;
 }
 if(_ff){
