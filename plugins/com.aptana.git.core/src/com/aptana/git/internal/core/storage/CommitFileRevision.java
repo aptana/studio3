@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -40,38 +39,32 @@ public class CommitFileRevision extends GitFileRevision
 		this.commit = gitCommit;
 	}
 
-	@Override
 	public IStorage getStorage(IProgressMonitor monitor) throws CoreException
 	{
 		final GitFileRevision self = this;
 		return new IStorage()
 		{
 
-			@Override
 			public Object getAdapter(Class adapter)
 			{
 				return null;
 			}
 
-			@Override
 			public boolean isReadOnly()
 			{
 				return true;
 			}
 
-			@Override
 			public String getName()
 			{
 				return self.getName();
 			}
 
-			@Override
 			public IPath getFullPath()
 			{
 				return new Path(path);
 			}
 
-			@Override
 			public InputStream getContents() throws CoreException
 			{
 				try
