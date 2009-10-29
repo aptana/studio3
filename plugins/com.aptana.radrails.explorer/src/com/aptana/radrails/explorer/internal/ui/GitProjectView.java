@@ -57,7 +57,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private Button push;
 	private Button commit;
 	private Button stash;
-	
+
 	private ResourceListener fResourceListener;
 
 	@Override
@@ -87,10 +87,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				super.widgetSelected(e);
-
-				String projectName = projectCombo.getText();
-				setActiveProject(projectName);
+				setActiveProject(projectCombo.getText());
 			}
 		});
 
@@ -100,10 +97,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				super.widgetSelected(e);
-
-				String branchName = branchCombo.getText();
-				setNewBranch(branchName);
+				setNewBranch(branchCombo.getText());
 			}
 		});
 
@@ -203,14 +197,26 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	protected void reloadProjects()
 	{
-		// FIXME What if the active project was deleted or renamed?
-		projectCombo.removeAll();
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		for (IProject iProject : projects)
+		Job job = new UIJob("Reload Projects")
 		{
-			projectCombo.add(iProject.getName());
-		}
-		projectCombo.setText(selectedProject.getName());
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				// FIXME What if the active project was deleted or renamed?
+				projectCombo.removeAll();
+				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+				for (IProject iProject : projects)
+				{
+					projectCombo.add(iProject.getName());
+				}
+				projectCombo.setText(selectedProject.getName());
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.setPriority(Job.INTERACTIVE);
+		job.schedule();
 	}
 
 	protected void setNewBranch(String branchName)
@@ -270,7 +276,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			selectedProject.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT),
 					Boolean.TRUE.toString());
 			GitRepository repo = GitRepository.getAttached(newSelectedProject);
-			updateSummaryText(repo);	
+			updateSummaryText(repo);
 			populateBranches(repo);
 			// Refresh the view so our filter gets updated!
 			refreshViewer();
@@ -311,50 +317,63 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	public void indexChanged(final IndexChangedEvent e)
 	{
+		refreshUI(e.getRepository());
+	}
+
+	protected void refreshUI(final GitRepository repository)
+	{
 		Job job = new UIJob("update UI for index changes")
 		{
-			
+
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				// Disable push unless there's a remote tracking branch and we have committed changes
-				String[] commitsAhead = e.getRepository().commitsAhead(e.getRepository().currentBranch());
+				String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 				push.setEnabled(commitsAhead != null && commitsAhead.length > 0);
 				// Disable pull unless there's a remote tracking branch
-				pull.setEnabled(e.getRepository().trackingRemote(e.getRepository().currentBranch()));
+				pull.setEnabled(repository.trackingRemote(repository.currentBranch()));
 				// TODO Disable stash unless we have changes to stash
 				// TODO Disable commit unless there are changes to commit
 				// Update the branch list so we can reset the dirty status on the branch
-				populateBranches(e.getRepository());
-				updateSummaryText(e.getRepository());
+				populateBranches(repository);
+				updateSummaryText(repository);
 				return Status.OK_STATUS;
 			}
 		};
 		job.setSystem(true);
 		job.setPriority(Job.INTERACTIVE);
-		job.schedule();		
+		job.schedule();
 	}
 
 	private void updateSummaryText(GitRepository repo)
 	{
 		if (repo == null)
+		{
 			summary.setText("");
+			return;
+		}
 		int deletedCount = 0;
 		int addedCount = 0;
 		int modifiedCount = 0;
-		for (ChangedFile file : repo.index().changedFiles())
+		if (repo.index().changedFiles() != null)
 		{
-			if (file.getStatus().equals(ChangedFile.Status.DELETED))
+			for (ChangedFile file : repo.index().changedFiles())
 			{
-				deletedCount++;
-			}
-			else if (file.getStatus().equals(ChangedFile.Status.NEW))
-			{
-				addedCount++;
-			}
-			else
-			{
-				modifiedCount++;
+				if (file == null)
+					continue;
+				if (file.getStatus().equals(ChangedFile.Status.DELETED))
+				{
+					deletedCount++;
+				}
+				else if (file.getStatus().equals(ChangedFile.Status.NEW))
+				{
+					addedCount++;
+				}
+				else
+				{
+					modifiedCount++;
+				}
 			}
 		}
 		String branch = repo.currentBranch();
@@ -374,7 +393,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// ignore
+		// TODO Someone may have just attached the current project to a repo! We need to update our UI if they did
+		GitRepository repo = e.getRepository();
+		GitRepository selectedRepo = GitRepository.getAttached(selectedProject);
+		if (selectedRepo != null && selectedRepo.equals(repo))
+			refreshUI(e.getRepository());
 	}
 
 	private class ResourceListener implements IResourceChangeListener
