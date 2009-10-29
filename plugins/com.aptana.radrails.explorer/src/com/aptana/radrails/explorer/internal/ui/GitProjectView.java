@@ -59,6 +59,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private Button stash;
 
 	private ResourceListener fResourceListener;
+	private Composite gitStuff;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -68,7 +69,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		myComposite.setLayout(new FormLayout());
 
 		// Create our special git stuff
-		Composite gitStuff = new Composite(myComposite, SWT.NONE);
+		gitStuff = new Composite(myComposite, SWT.NONE);
 		gitStuff.setLayout(new GridLayout(3, false));
 		FormData data1 = new FormData();
 		data1.left = new FormAttachment(0, 0);
@@ -132,10 +133,22 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				PushAction action = new PushAction();
-				ISelection selection = new StructuredSelection(selectedProject);
-				action.selectionChanged(null, selection);
-				action.run(null);
+				final PushAction action = new PushAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git push")
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
 			}
 		});
 
@@ -147,10 +160,21 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				PullAction action = new PullAction();
-				ISelection selection = new StructuredSelection(selectedProject);
-				action.selectionChanged(null, selection);
-				action.run(null);
+				final PullAction action = new PullAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git pull")
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
 			}
 		});
 
@@ -162,10 +186,22 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				StashAction action = new StashAction();
-				ISelection selection = new StructuredSelection(selectedProject);
-				action.selectionChanged(null, selection);
-				action.run(null);
+				final StashAction action = new StashAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git stash")
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
 			}
 		});
 
@@ -275,9 +311,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			selectedProject = newSelectedProject;
 			selectedProject.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT),
 					Boolean.TRUE.toString());
-			GitRepository repo = GitRepository.getAttached(newSelectedProject);
-			updateSummaryText(repo);
-			populateBranches(repo);
+			refreshUI(GitRepository.getAttached(newSelectedProject));
 			// Refresh the view so our filter gets updated!
 			refreshViewer();
 		}
@@ -328,16 +362,29 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				// Disable push unless there's a remote tracking branch and we have committed changes
-				String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
-				push.setEnabled(commitsAhead != null && commitsAhead.length > 0);
-				// Disable pull unless there's a remote tracking branch
-				pull.setEnabled(repository.trackingRemote(repository.currentBranch()));
-				// TODO Disable stash unless we have changes to stash
-				// TODO Disable commit unless there are changes to commit
+				if (repository == null)
+				{
+					push.setEnabled(false);
+					pull.setEnabled(false);
+					stash.setEnabled(false);
+					commit.setEnabled(false);
+				}
+				else
+				{
+					// Disable push unless there's a remote tracking branch and we have committed changes
+					String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
+					push.setEnabled(commitsAhead != null && commitsAhead.length > 0);
+					// Disable pull unless there's a remote tracking branch
+					pull.setEnabled(repository.trackingRemote(repository.currentBranch()));
+					// TODO Disable stash unless we have changes to stash
+					stash.setEnabled(true);
+					// TODO Disable commit unless there are changes to commit
+					commit.setEnabled(true);
+				}
 				// Update the branch list so we can reset the dirty status on the branch
 				populateBranches(repository);
 				updateSummaryText(repository);
+				gitStuff.pack(true);
 				return Status.OK_STATUS;
 			}
 		};
