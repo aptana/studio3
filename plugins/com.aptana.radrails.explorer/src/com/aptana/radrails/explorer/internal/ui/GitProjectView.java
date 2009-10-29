@@ -8,12 +8,14 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -22,10 +24,12 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -47,11 +51,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
-
 	private Combo branchCombo;
-
 	private Label summary;
-
+	private Button pull;
+	private Button push;
+	private Button commit;
+	private Button stash;
+	
 	private ResourceListener fResourceListener;
 
 	@Override
@@ -102,20 +108,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		});
 
 		// Add icon for commit (disk)
-		Label commit = new Label(gitStuff, SWT.NONE);
+		commit = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
 		commit.setToolTipText("Commit...");
-		commit.addMouseListener(new MouseListener()
+		commit.addSelectionListener(new SelectionAdapter()
 		{
-			public void mouseDoubleClick(MouseEvent e)
-			{
-			}
-
-			public void mouseUp(MouseEvent e)
-			{
-			}
-
-			public void mouseDown(MouseEvent e)
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
 				CommitAction action = new CommitAction();
 				ISelection selection = new StructuredSelection(selectedProject);
@@ -131,21 +130,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		summaryData.verticalSpan = 3;
 		summary.setLayoutData(summaryData);
 
-		Label push = new Label(gitStuff, SWT.NONE);
+		push = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
 		push.setToolTipText("Push");
-		// TODO Disable unless there's a remote tracking branch and we have commits
-		push.addMouseListener(new MouseListener()
+		push.addSelectionListener(new SelectionAdapter()
 		{
-			public void mouseDoubleClick(MouseEvent e)
-			{
-			}
-
-			public void mouseUp(MouseEvent e)
-			{
-			}
-
-			public void mouseDown(MouseEvent e)
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
 				PushAction action = new PushAction();
 				ISelection selection = new StructuredSelection(selectedProject);
@@ -154,21 +145,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		});
 
-		Label pull = new Label(gitStuff, SWT.NONE);
+		pull = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
 		pull.setToolTipText("Pull");
-		// TODO Disable unless there's a remote tracking branch
-		pull.addMouseListener(new MouseListener()
+		pull.addSelectionListener(new SelectionAdapter()
 		{
-			public void mouseDoubleClick(MouseEvent e)
-			{
-			}
-
-			public void mouseUp(MouseEvent e)
-			{
-			}
-
-			public void mouseDown(MouseEvent e)
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
 				PullAction action = new PullAction();
 				ISelection selection = new StructuredSelection(selectedProject);
@@ -177,20 +160,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		});
 
-		Label stash = new Label(gitStuff, SWT.NONE);
+		stash = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png"));
 		stash.setToolTipText("Stash");
-		stash.addMouseListener(new MouseListener()
+		stash.addSelectionListener(new SelectionAdapter()
 		{
-			public void mouseDoubleClick(MouseEvent e)
-			{
-			}
-
-			public void mouseUp(MouseEvent e)
-			{
-			}
-
-			public void mouseDown(MouseEvent e)
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
 				StashAction action = new StashAction();
 				ISelection selection = new StructuredSelection(selectedProject);
@@ -210,11 +186,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
 
-		if (projects.length > 0)
-			detectSelectedProject();
 		fResourceListener = new ResourceListener();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
 		GitRepository.addListener(this);
+		if (projects.length > 0)
+			detectSelectedProject();
 	}
 
 	@Override
@@ -293,25 +269,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			selectedProject = newSelectedProject;
 			selectedProject.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT),
 					Boolean.TRUE.toString());
-			branchCombo.removeAll();
 			GitRepository repo = GitRepository.getAttached(newSelectedProject);
-			updateSummaryText(repo);
-			if (repo != null)
-			{
-				// FIXME This doesn't seem to indicate proper dirty status and changed files on initial load!
-				String currentBranchName = repo.currentBranch();
-				for (String branchName : repo.localBranches())
-				{
-					if (branchName.equals(currentBranchName) && repo.isDirty())
-						branchCombo.add(branchName + "*");
-					else
-						branchCombo.add(branchName);
-				}
-				if (repo.isDirty())
-					currentBranchName += "*";
-				branchCombo.setText(currentBranchName);
-				branchCombo.pack(true);
-			}
+			updateSummaryText(repo);	
+			populateBranches(repo);
 			// Refresh the view so our filter gets updated!
 			refreshViewer();
 		}
@@ -322,6 +282,26 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 	}
 
+	private void populateBranches(GitRepository repo)
+	{
+		branchCombo.removeAll();
+		if (repo == null)
+			return;
+		// FIXME This doesn't seem to indicate proper dirty status and changed files on initial load!
+		String currentBranchName = repo.currentBranch();
+		for (String branchName : repo.localBranches())
+		{
+			if (branchName.equals(currentBranchName) && repo.isDirty())
+				branchCombo.add(branchName + "*");
+			else
+				branchCombo.add(branchName);
+		}
+		if (repo.isDirty())
+			currentBranchName += "*";
+		branchCombo.setText(currentBranchName);
+		branchCombo.pack(true);
+	}
+
 	private void refreshViewer()
 	{
 		if (getCommonViewer() == null)
@@ -329,10 +309,30 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		getCommonViewer().refresh();
 	}
 
-	public void indexChanged(IndexChangedEvent e)
+	public void indexChanged(final IndexChangedEvent e)
 	{
-		// TODO Update the branch list so we can reset the dirty status on the branch
-		updateSummaryText(e.getRepository());
+		Job job = new UIJob("update UI for index changes")
+		{
+			
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				// Disable push unless there's a remote tracking branch and we have committed changes
+				String[] commitsAhead = e.getRepository().commitsAhead(e.getRepository().currentBranch());
+				push.setEnabled(commitsAhead != null && commitsAhead.length > 0);
+				// Disable pull unless there's a remote tracking branch
+				pull.setEnabled(e.getRepository().trackingRemote(e.getRepository().currentBranch()));
+				// TODO Disable stash unless we have changes to stash
+				// TODO Disable commit unless there are changes to commit
+				// Update the branch list so we can reset the dirty status on the branch
+				populateBranches(e.getRepository());
+				updateSummaryText(e.getRepository());
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.setPriority(Job.INTERACTIVE);
+		job.schedule();		
 	}
 
 	private void updateSummaryText(GitRepository repo)
@@ -357,7 +357,15 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				modifiedCount++;
 			}
 		}
+		String branch = repo.currentBranch();
+		String[] commitsAhead = repo.commitsAhead(branch);
 		StringBuilder builder = new StringBuilder();
+		if (commitsAhead != null && commitsAhead.length > 0)
+		{
+			builder.append("Your branch is ahead of '");
+			builder.append(repo.remoteTrackingBranch(branch).shortName()).append("' by ");
+			builder.append(commitsAhead.length).append(" commit(s)\n");
+		}
 		builder.append(modifiedCount).append(" file(s) modified\n");
 		builder.append(deletedCount).append(" file(s) deleted\n");
 		builder.append(addedCount).append(" file(s) added");
