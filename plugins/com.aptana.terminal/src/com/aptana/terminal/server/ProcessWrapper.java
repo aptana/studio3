@@ -40,6 +40,12 @@ public class ProcessWrapper
 			URL fileURL = FileLocator.toFileURL(url);
 			File file = new File(fileURL.toURI());
 			ProcessBuilder builder = new ProcessBuilder(file.getAbsolutePath());
+			String userHome = System.getProperty("user.home");
+			if (userHome != null)
+			{
+				File workingDir = new File(userHome);
+				builder.directory(workingDir);
+			}
 			Map<String, String> env = builder.environment();
 			env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 
