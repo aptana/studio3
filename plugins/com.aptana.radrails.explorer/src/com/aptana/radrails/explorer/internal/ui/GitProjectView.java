@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -62,9 +63,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private FormData showGitDetailsData;
 	private FormData hideGitDetailsData;
-	
+
 	private ResourceListener fResourceListener;
-	
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -258,13 +258,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		showGitDetailsData.bottom = new FormAttachment(100, 0);
 		showGitDetailsData.right = new FormAttachment(100, 0);
 		showGitDetailsData.left = new FormAttachment(0, 0);
-		
+
 		hideGitDetailsData = new FormData();
 		hideGitDetailsData.top = new FormAttachment(0);
 		hideGitDetailsData.bottom = new FormAttachment(0);
 		hideGitDetailsData.right = new FormAttachment(0);
 		hideGitDetailsData.left = new FormAttachment(0);
-		
+
 		gitDetails.setLayoutData(hideGitDetailsData);
 	}
 
@@ -323,18 +323,41 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		job.schedule();
 	}
 
-	protected void setNewBranch(String branchName)
+	protected boolean setNewBranch(String branchName)
 	{
 		if (branchName.endsWith("*"))
 			branchName = branchName.substring(0, branchName.length() - 1);
 
-		GitRepository repo = GitRepository.getAttached(selectedProject);
-		if (repo != null)
+		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		if (repo == null)
+			return false;
+		if (branchName.equals(repo.currentBranch()))
+			return false;
+		if (repo.switchBranch(branchName))
 		{
-			if (branchName.equals(repo.currentBranch()))
-				return;
-			repo.switchBranch(branchName);
 			refreshViewer();
+			return true;
+		}
+		else
+		{
+			Job job = new UIJob("")
+			{
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					String currentBranchName = repo.currentBranch();
+					if (repo.isDirty())
+						currentBranchName += "*";
+					branchCombo.setText(currentBranchName);
+					// TODO Pop a dialog saying we couldn't branches
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.setPriority(Job.INTERACTIVE);
+			job.schedule();
+			return false;
 		}
 	}
 
@@ -469,8 +492,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 					summaryData.verticalSpan = 3;
 					summaryData.widthHint = projectCombo.getBounds().width;
-					// Minimum height should be to bottom of push, pull, stash icons ((3 * icon height) + (2 * space between icons))
-					summaryData.minimumHeight = (commit.getBounds().height * 3) + ((GridLayout) gitDetails.getLayout()).verticalSpacing * 2;
+					// Minimum height should be to bottom of push, pull, stash icons ((3 * icon height) + (2 * space
+					// between icons))
+					summaryData.minimumHeight = (commit.getBounds().height * 3)
+							+ ((GridLayout) gitDetails.getLayout()).verticalSpacing * 2;
 					summary.setLayoutData(summaryData);
 				}
 				gitStuff.getParent().layout();
@@ -571,6 +596,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void branchChanged(BranchChangedEvent e)
+	{
+		GitRepository repo = e.getRepository();
+		GitRepository selectedRepo = GitRepository.getAttached(selectedProject);
+		if (selectedRepo != null && selectedRepo.equals(repo))
+			refreshUI(e.getRepository());
 	}
 
 }

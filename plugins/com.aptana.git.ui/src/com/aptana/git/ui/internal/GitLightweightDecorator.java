@@ -16,6 +16,7 @@ import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -309,5 +310,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
 			}
 		});
+	}
+
+	public void branchChanged(BranchChangedEvent e)
+	{
+		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 }

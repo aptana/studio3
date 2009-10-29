@@ -176,12 +176,14 @@ public class GitRepository
 
 	public boolean switchBranch(String branchName)
 	{
+		String oldBranchName = currentBranch.simpleRef().shortName();
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
 				branchName);
 		if (result.keySet().iterator().next().intValue() != 0)
 			return false;
 		_headRef = null;
 		readCurrentBranch();
+		fireBranchChangeEvent(oldBranchName, branchName);
 		return true;
 	}
 
@@ -326,6 +328,13 @@ public class GitRepository
 		return index;
 	}
 
+	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
+	{
+		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
+		for (IGitRepositoryListener listener : listeners)
+			listener.branchChanged(e);
+	}
+	
 	void fireIndexChangeEvent()
 	{
 		IndexChangedEvent e = new IndexChangedEvent(this);

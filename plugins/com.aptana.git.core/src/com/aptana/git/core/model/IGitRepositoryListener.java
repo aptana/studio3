@@ -16,4 +16,11 @@ public interface IGitRepositoryListener
 	 * @param e
 	 */
 	public void repositoryAdded(RepositoryAddedEvent e);
+
+	/**
+	 * The working branch has been changed for a repository
+	 * 
+	 * @param e
+	 */
+	public void branchChanged(BranchChangedEvent e);
 }
