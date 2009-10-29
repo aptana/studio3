@@ -100,7 +100,7 @@ public class GitRepository
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
-
+			// TODO Search the cached Repos and if one has the same git dir, that's a match!			
 			ref = new WeakReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
@@ -427,14 +427,10 @@ public class GitRepository
 	 */
 	public String[] commitsAhead(String branchName)
 	{
-		String local = GitRef.REFS_HEADS + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
-				"^branch\\." + branchName + "\\.remote");
-		if (output == null || output.trim().length() == 0)
+		GitRef remote = remoteTrackingBranch(branchName);
+		if (remote == null)
 			return null;
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
-		return index().commitsBetween(remote, local);
+		return index().commitsBetween(remote.ref(), GitRef.REFS_HEADS + branchName);
 	}
 
 	public ChangedFile getChangedFileForResource(IResource resource)
@@ -463,15 +459,10 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
-		// TODO Refactor with commitsAhead
-		String local = GitRef.REFS_HEADS + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
-				"^branch\\." + branchName + "\\.remote");
-		if (output == null || output.trim().length() == 0)
+		GitRef remote = remoteTrackingBranch(branchName);
+		if (remote == null)
 			return null;
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
-		return index().commitsBetween(local, remote);
+		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
 	/**
@@ -526,5 +517,32 @@ public class GitRepository
 	public boolean isDirty()
 	{
 		return !index().changedFiles().isEmpty();
+	}
+
+	/**
+	 * Determine if the passed in branch has a remote tracking branch.
+	 * 
+	 * @param branchName
+	 * @return
+	 */
+	public boolean trackingRemote(String branchName)
+	{
+		return remoteTrackingBranch(branchName) != null;
+	}
+
+	/**
+	 * Returns the remote tracking branch name for the branch passed in. Returns null if there is none.
+	 * 
+	 * @param branchName
+	 * @return
+	 */
+	public GitRef remoteTrackingBranch(String branchName)
+	{
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
+				"^branch\\." + branchName + "\\.remote");
+		if (output == null || output.trim().length() == 0)
+			return null;
+		String remoteSubname = output.substring(14 + branchName.length()).trim();
+		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
 	}
 }
