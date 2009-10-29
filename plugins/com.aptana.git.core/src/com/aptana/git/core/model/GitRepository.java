@@ -180,6 +180,7 @@ public class GitRepository
 				branchName);
 		if (result.keySet().iterator().next().intValue() != 0)
 			return false;
+		_headRef = null;
 		readCurrentBranch();
 		return true;
 	}
