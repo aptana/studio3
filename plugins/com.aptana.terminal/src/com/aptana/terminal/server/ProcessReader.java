@@ -51,7 +51,7 @@ public class ProcessReader extends Thread
 					this._output.append(text);
 				}
 				
-				//System.out.println(this._name + ":~" + Activator.encodeString(text) + "~");
+				//System.out.println(this._name + ":~" + encodeString(text) + "~");
 			}
 		}
 		catch (IOException e)
@@ -59,4 +59,29 @@ public class ProcessReader extends Thread
 			Activator.logError(Messages.ProcessReader_Error_Reading_From_Process, e);
 		}
 	}
+	
+//	/**
+//	 * encodeString
+//	 * 
+//	 * @param text
+//	 * @return
+//	 */
+//	protected String encodeString(String text)
+//	{
+//		StringBuilder builder = new StringBuilder();
+//		
+//		for (char c : text.toCharArray())
+//		{
+//			if (c < 32 || 127 < c)
+//			{
+//				builder.append("\\x").append(Integer.toString((int) c, 16));
+//			}
+//			else
+//			{
+//				builder.append(c);
+//			}
+//		}
+//		
+//		return builder.toString();
+//	}
 }

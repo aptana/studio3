@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.terminal.Activator;
@@ -26,6 +27,8 @@ public class HttpWorker implements Runnable
 	private static final String SIZE_URL = "/size"; //$NON-NLS-1$
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
+	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
+	
 	private HttpServer _server;
 	private Socket _clientSocket;
 	
@@ -105,11 +108,19 @@ public class HttpWorker implements Runnable
 		{
 			String id = request.getParameter(ID_PARAMETER);
 			ProcessWrapper wrapper = this._server.getProcess(id);
-			String text = wrapper.getText();
 			
-			if (text != null)
+			if (wrapper != null)
 			{
-				this.sendTextResponse(output, text);
+				String text = wrapper.getText();
+				
+				if (text != null)
+				{
+					this.sendTextResponse(output, text);
+				}
+				else
+				{
+					this.sendEmptyResponse(output);
+				}
 			}
 			else
 			{
@@ -151,12 +162,21 @@ public class HttpWorker implements Runnable
 		if (STREAM_URL.equals(url))
 		{
 			String content = request.getRawContent();
-			String id = request.getParameter(ID_PARAMETER);
-			ProcessWrapper wrapper = this._server.getProcess(id);
 			
-			if (wrapper != null)
+			if (content != null && content.length() > 0)
 			{
-				wrapper.sendText(content);
+				String id = request.getParameter(ID_PARAMETER);
+				ProcessWrapper wrapper = this._server.getProcess(id);
+				
+				if (wrapper != null)
+				{
+					if (content.equals("\r") && IS_WINDOWS)
+					{
+						content += "\n";
+					}
+					
+					wrapper.sendText(content);
+				}
 			}
 			
 			this.sendEmptyResponse(output);

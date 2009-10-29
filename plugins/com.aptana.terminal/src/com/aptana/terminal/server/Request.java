@@ -88,19 +88,16 @@ public class Request
 				s = br.readLine();
 			}
 			
-			while (br.ready())
+			String lengthString = result.getHeader("Content-Length"); //$NON-NLS-1$
+			
+			if (lengthString != null && lengthString.length() > 0)
 			{
-				String lengthString = result.getHeader("Content-Length"); //$NON-NLS-1$
+				int contentLength = Integer.parseInt(lengthString);
 				
-				if (lengthString != null && lengthString.length() > 0)
-				{
-					int contentLength = Integer.parseInt(lengthString);
-					
-					char[] chars = new char[contentLength];
-					br.read(chars);
-					
-					result.setRawContent(new String(chars));
-				}
+				char[] chars = new char[contentLength];
+				br.read(chars);
+				
+				result.setRawContent(new String(chars));
 			}
 		}
 		catch (IOException e)
