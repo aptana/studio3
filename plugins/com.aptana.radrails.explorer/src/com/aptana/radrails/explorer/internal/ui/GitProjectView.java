@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -70,13 +71,16 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		// Create our special git stuff
 		gitStuff = new Composite(myComposite, SWT.NONE);
-		gitStuff.setLayout(new GridLayout(3, false));
-		FormData data1 = new FormData();
-		data1.left = new FormAttachment(0, 0);
-		data1.top = new FormAttachment(0, 0);
-		gitStuff.setLayoutData(data1);
+		gitStuff.setLayout(new GridLayout(2, false));
+		FormData gitStuffLayoutData = new FormData();
+		gitStuffLayoutData.left = new FormAttachment(0, 0);
+		gitStuffLayoutData.top = new FormAttachment(0, 0);
+		gitStuff.setLayoutData(gitStuffLayoutData);
 
 		projectCombo = new Combo(gitStuff, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
+		GridData projectData = new GridData();
+		projectData.horizontalSpan = 2;
+		projectCombo.setLayoutData(projectData);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject iProject : projects)
 		{
@@ -104,6 +108,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		// Add icon for commit (disk)
 		commit = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		commit.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
 		commit.setToolTipText("Commit...");
 		commit.addSelectionListener(new SelectionAdapter()
@@ -120,14 +125,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		summary = new Label(gitStuff, SWT.NONE);
 		summary.setText("");
-		GridData summaryData = new GridData();
-		summaryData.horizontalSpan = 2;
+		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
 		summaryData.verticalSpan = 3;
 		summary.setLayoutData(summaryData);
 
 		push = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
 		push.setToolTipText("Push");
+		push.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		push.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -153,6 +158,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		});
 
 		pull = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		pull.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
 		pull.setToolTipText("Pull");
 		pull.addSelectionListener(new SelectionAdapter()
@@ -179,6 +185,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		});
 
 		stash = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		stash.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png"));
 		stash.setToolTipText("Stash");
 		stash.addSelectionListener(new SelectionAdapter()
@@ -368,6 +375,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					pull.setEnabled(false);
 					stash.setEnabled(false);
 					commit.setEnabled(false);
+					push.setVisible(false);
+					pull.setVisible(false);
+					commit.setVisible(false);
+					stash.setVisible(false);
+					branchCombo.setVisible(false);
+					summary.setVisible(false);
+					// FIXME Make gitStuff have a form layout, add composite to hold the buttons/summary/branch and use two form layouts to toggle between showing the details or not!
 				}
 				else
 				{
@@ -380,11 +394,17 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					stash.setEnabled(true);
 					// TODO Disable commit unless there are changes to commit
 					commit.setEnabled(true);
+					push.setVisible(true);
+					pull.setVisible(true);
+					commit.setVisible(true);
+					stash.setVisible(true);
+					summary.setVisible(true);
+					branchCombo.setVisible(true);
 				}
 				// Update the branch list so we can reset the dirty status on the branch
 				populateBranches(repository);
 				updateSummaryText(repository);
-				gitStuff.pack(true);
+				gitStuff.layout(true);
 				return Status.OK_STATUS;
 			}
 		};
