@@ -40,7 +40,15 @@ public class ProcessWrapper
 	 */
 	protected String[] getCommandLineArguments()
 	{
-		return new String[0];
+		String OS = Platform.getOS();
+		String[] result = new String[0];
+		
+		if (OS.equals(Platform.OS_WIN32))
+		{
+			result = new String[] { "/K", "cd" };
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -48,34 +56,46 @@ public class ProcessWrapper
 	 * 
 	 * @return
 	 */
-	protected File getProcessFile()
+	protected String getProcessName()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
-		File result = null;
-
-		try
+		String OS = Platform.getOS();
+		String result = null;
+		
+		if (OS.equals(Platform.OS_WIN32))
 		{
-			URL fileURL = FileLocator.toFileURL(url);
-			
-			result = new File(fileURL.toURI());
+			result = "cmd.exe";
 		}
-		catch (IOException e)
+		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{
-			String message = MessageFormat.format(
-				Messages.ProcessWrapper_Error_Locating_Terminal_Executable,
-				new Object[] { url.toString() }
-			);
-			
-			Activator.logError(message, e);
-		}
-		catch (URISyntaxException e)
-		{
-			String message = MessageFormat.format(
+			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
+			File file = null;
+	
+			try
+			{
+				URL fileURL = FileLocator.toFileURL(url);
+				
+				file = new File(fileURL.toURI());
+				
+				result = file.getAbsolutePath();
+			}
+			catch (IOException e)
+			{
+				String message = MessageFormat.format(
+					Messages.ProcessWrapper_Error_Locating_Terminal_Executable,
+					new Object[] { url.toString() }
+				);
+				
+				Activator.logError(message, e);
+			}
+			catch (URISyntaxException e)
+			{
+				String message = MessageFormat.format(
 					Messages.ProcessWrapper_Malformed_Terminal_Executable_URI,
 					new Object[] { url.toString() }
 				);
 				
 				Activator.logError(message, e);
+			}
 		}
 		
 		return result;
@@ -155,14 +175,14 @@ public class ProcessWrapper
 	 */
 	public void start()
 	{
-		File file = this.getProcessFile();
+		String file = this.getProcessName();
 
-		if (file != null && file.exists())
+		if (file != null && file.length() > 0)
 		{
 			List<String> argList = new ArrayList<String>();
 			String[] args;
 			
-			argList.add(file.getAbsolutePath());
+			argList.add(file);
 			argList.addAll(Arrays.asList(this.getCommandLineArguments()));
 			args = argList.toArray(new String[argList.size()]);
 			
@@ -201,7 +221,7 @@ public class ProcessWrapper
 			{
 				String message = MessageFormat.format(
 					Messages.ProcessWrapper_Error_Starting_Process,
-					new Object[] { file.getAbsoluteFile() }
+					new Object[] { file }
 				);
 				
 				Activator.logError(message, e);
@@ -209,12 +229,7 @@ public class ProcessWrapper
 		}
 		else
 		{
-			String message = MessageFormat.format(
-				Messages.ProcessWrapper_Process_File_Does_Not_Exist,
-				new Object [] { file.getAbsoluteFile() }
-			);
-			
-			Activator.logWarning(message);
+			Activator.logWarning(Messages.ProcessWrapper_Process_File_Does_Not_Exist);
 		}
 	}
 

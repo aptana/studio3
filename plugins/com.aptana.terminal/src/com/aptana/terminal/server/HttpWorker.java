@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Size;
@@ -51,7 +53,8 @@ public class HttpWorker implements Runnable
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
-			File file = new File(fileURL.toURI());
+			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
+			File file = new File(fileURI);
 			
 			if (file.exists() && file.canRead())
 			{
