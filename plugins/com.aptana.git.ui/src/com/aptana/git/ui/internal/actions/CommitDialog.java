@@ -281,13 +281,15 @@ public class CommitDialog extends StatusDialog
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				super.widgetSelected(e);
+				if (e.item == null)
+					return;
 				String path = ((TableItem) e.item).getText(1);
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
 					return;
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				updateDiff(diff);
-				super.widgetSelected(e);
+				updateDiff(diff);				
 			}
 		});
 		return table;
