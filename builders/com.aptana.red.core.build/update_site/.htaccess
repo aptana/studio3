@@ -1,0 +1,3 @@
+Options +FollowSymlinks
+#RewriteEngine on
+#RewriteRule messages.xml messages.php

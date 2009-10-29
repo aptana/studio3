@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Sep 1st 2009                                                        
+
+     RED Core    
+     Builds the RED core features
+                   
+     cwilliams
+     schitale                                                               
+     ====================================================================== -->
+<project name="red-core" default="build">
+	<description>
+            Builds the RED Core feature
+    </description>
+
+	<property environment="env" />
+	<property file="build_local.properties" />
+	<!-- Set is.windows property IF the OS is from the Windows family -->
+	<condition property="is.windows" value="true">
+		<os family="windows" />
+	</condition>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="ant-contrib/ant-contrib.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- ================================= 
+          target: build              
+         ================================= -->
+	<target name="build" description="Builds the Studio feature" depends="generate.build.properties,get.revision,replace.versions,generate.base">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
+			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
+		</java>
+		<antcall target="categorize" />
+		<antcall target="clean.after" />
+	</target>
+
+	<!-- ================================= 
+          target: generate.build.properties              
+         ================================= -->
+	<target name="generate.build.properties" description="Takes in properties from build_local.properties and the command line overrides and generates a combined build.properties to use for the build">
+		<echoproperties destfile="build.properties">
+			<propertyset negate="true">
+				<propertyref prefix="java." />
+				<propertyref prefix="ant." />
+				<propertyref prefix="awt." />
+				<propertyref prefix="user." />
+				<propertyref prefix="sun." />
+			</propertyset>
+		</echoproperties>
+	</target>
+
+	<!-- ================================= 
+         target: categorize              
+        ================================= -->
+	<target name="categorize" description="categorize the update site">
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
+			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher -nosplash -console -consolelog -metadataRepository file:${deploy.dir} -categoryDefinition file:${deploy.dir}/site.xml" />
+		</java>
+		<!-- Re-JAR the content.xml file! -->
+		<jar destfile="${deploy.dir}/content.jar">
+			<fileset file="${deploy.dir}/content.xml" />
+		</jar>
+		<delete file="${deploy.dir}/content.xml" />
+	</target>
+
+	<!-- ================================= 
+	      target: clean              
+	     ================================= -->
+	<target name="clean" depends="generate.build.properties" description="Clean up temp and build files">
+		<delete failonerror="false">
+			<fileset dir="${buildDirectory}" defaultexcludes="true">
+				<include name="assemble.*" />
+				<include name="finalFeaturesVersions.*" />
+				<include name="finalPluginsVersions.*" />
+				<include name="package.*" />
+			</fileset>
+		</delete>
+		<delete dir="${buildDirectory}/${buildLabel}" failonerror="false" />
+		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="false">
+			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -nosplash clean" />
+		</java>
+		<delete dir="${baseLocation}" />
+		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
+		<delete dir="${p2.repo.dir}" failonerror="false" />
+		<!-- Do a git checkout -f of the build directory -->
+		<exec executable="/bin/bash" dir="${buildDirectory}">
+			<arg value="-c" />
+			<arg value="${git.executable} checkout -f" />
+		</exec>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+	      target: clean.after                      
+	     - - - - - - - - - - - - - - - - - -->
+	<target name="clean.after" if="cleanAfter">
+		<antcall target="clean" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: generate.base                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="generate.base" depends="copy.base.windows,copy.base">
+		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
+		<delete failonerror="false">
+			<fileset dir="${baseLocation}/configuration/.settings">
+				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
+			</fileset>
+		</delete>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: copy.base                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="copy.base" unless="is.windows">
+		<!-- Copy over the original base eclipse to a new location.
+								Have to use exec cp to retain permissions on *nix, Mac -->
+		<exec executable="cp">
+			<arg line="-R ${vanilla.eclipse} ${baseLocation}" />
+		</exec>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: copy.base.windows                      
+	     - - - - - - - - - - - - - - - - - -->
+	<target name="copy.base.windows" if="is.windows">
+		<copy todir="${baseLocation}">
+			<fileset dir="${vanilla.eclipse}" includes="**/*" defaultexcludes="false" />
+		</copy>
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: get.revision                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="get.revision">
+		<echo message="Retrieving Git timestamp for latest revision" level="info" />
+		<exec executable="/bin/bash" dir="${basedir}" outputproperty="git.revision.max">
+			<arg value="-c" />
+			<arg value="${git.executable} log --max-count=1 --pretty=format:'%ct'" />
+		</exec>
+		<property name="build.revision" value="${git.revision.max}" />
+		<echo message="Revision timestamp: ${build.revision}" level="info" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - -
+	      target: replace.versions
+	     - - - - - - - - - - - - - - - - - -->
+	<target name="replace.versions" description="Replaces all the qualifiers for plugins/features with the last changed rev for that plugin/feature.">
+		<!-- Iterate through every plugin and feature directory and replace qualifier in
+		        build.properties with qualifier for just that plugin/feature! -->
+		<!-- TODO Handle if build.properties has no qualifier entry! -->
+		<for param="file">
+			<path>
+				<dirset dir="${buildDirectory}" defaultexcludes="true">
+					<include name="plugins/*" />
+					<include name="features/*" />
+					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
+				</dirset>
+			</path>
+			<sequential>
+				<exec executable="/bin/bash" dir="@{file}" outputproperty="@{file}.committed.max">
+					<arg value="-c" />
+					<arg value="${git.executable} log --max-count=1 --pretty=format:'%ct' ." />
+				</exec>
+				<echo message="Replacing qualifier for @{file} with ${@{file}.committed.max}" />
+				<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+			</sequential>
+		</for>
+	</target>
+	
+	<target name="create-artifact-symlink">
+		<exec executable="unlink">
+			<arg value="${env.WORKSPACE}/build-artifacts" />
+		</exec>
+		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false"/>
+	</target>
+</project>
