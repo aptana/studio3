@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -58,9 +57,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private Button push;
 	private Button commit;
 	private Button stash;
-
-	private ResourceListener fResourceListener;
 	private Composite gitStuff;
+	private Composite gitDetails;
+
+	private FormData showGitDetailsData;
+	private FormData hideGitDetailsData;
+	
+	private ResourceListener fResourceListener;
+	
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -71,121 +75,48 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		// Create our special git stuff
 		gitStuff = new Composite(myComposite, SWT.NONE);
-		gitStuff.setLayout(new GridLayout(2, false));
+		gitStuff.setLayout(new FormLayout());
 		FormData gitStuffLayoutData = new FormData();
 		gitStuffLayoutData.left = new FormAttachment(0, 0);
 		gitStuffLayoutData.top = new FormAttachment(0, 0);
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
-		projectCombo = new Combo(gitStuff, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
-		GridData projectData = new GridData();
-		projectData.horizontalSpan = 2;
-		projectCombo.setLayoutData(projectData);
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		for (IProject iProject : projects)
-		{
-			projectCombo.add(iProject.getName());
-		}
+		IProject[] projects = createProjectCombo(gitStuff);
+		createGitDetailsComposite(gitStuff);
+		createGitBranchCombo(gitDetails);
+		createCommitButton(gitDetails);
+		createSummaryLabel(gitDetails);
+		createPushButton(gitDetails);
+		createPullButton(gitDetails);
+		createStashButton(gitDetails);
 
-		projectCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				setActiveProject(projectCombo.getText());
-			}
-		});
+		// Now create the typical stuff for the navigator
+		createNavigator(myComposite);
 
-		branchCombo = new Combo(gitStuff, SWT.DROP_DOWN | SWT.READ_ONLY);
-		branchCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				setNewBranch(branchCombo.getText());
-			}
-		});
+		fResourceListener = new ResourceListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
+		GitRepository.addListener(this);
+		if (projects.length > 0)
+			detectSelectedProject();
+	}
 
-		// Add icon for commit (disk)
-		commit = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
-		commit.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
-		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
-		commit.setToolTipText("Commit...");
-		commit.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				CommitAction action = new CommitAction();
-				ISelection selection = new StructuredSelection(selectedProject);
-				action.selectionChanged(null, selection);
-				action.run(null);
-			}
-		});
+	private void createNavigator(Composite myComposite)
+	{
+		Composite viewer = new Composite(myComposite, SWT.NONE);
+		viewer.setLayout(new FillLayout());
+		FormData data2 = new FormData();
+		data2.top = new FormAttachment(gitStuff);
+		data2.bottom = new FormAttachment(100, 0);
+		data2.right = new FormAttachment(100, 0);
+		data2.left = new FormAttachment(0, 0);
+		viewer.setLayoutData(data2);
+		super.createPartControl(viewer);
+	}
 
-		summary = new Label(gitStuff, SWT.NONE);
-		summary.setText("");
-		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-		summaryData.verticalSpan = 3;
-		summary.setLayoutData(summaryData);
-
-		push = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
-		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
-		push.setToolTipText("Push");
-		push.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
-		push.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final PushAction action = new PushAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git push")
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run(null);
-						refreshUI(GitRepository.getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-
-		pull = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
-		pull.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
-		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
-		pull.setToolTipText("Pull");
-		pull.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final PullAction action = new PullAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git pull")
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run(null);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-
-		stash = new Button(gitStuff, SWT.FLAT | SWT.PUSH | SWT.CENTER);
-		stash.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
+	private void createStashButton(Composite parent)
+	{
+		stash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		stash.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png"));
 		stash.setToolTipText("Stash");
 		stash.addSelectionListener(new SelectionAdapter()
@@ -211,23 +142,153 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				job.schedule();
 			}
 		});
+	}
 
-		// Now create the typical stuff for the navigator
-		Composite viewer = new Composite(myComposite, SWT.NONE);
-		viewer.setLayout(new FillLayout());
-		FormData data2 = new FormData();
-		data2.top = new FormAttachment(gitStuff);
-		data2.bottom = new FormAttachment(100, 0);
-		data2.right = new FormAttachment(100, 0);
-		data2.left = new FormAttachment(0, 0);
-		viewer.setLayoutData(data2);
-		super.createPartControl(viewer);
+	private void createPullButton(Composite parent)
+	{
+		pull = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		pull.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
+		pull.setToolTipText("Pull");
+		pull.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final PullAction action = new PullAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git pull")
+				{
 
-		fResourceListener = new ResourceListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
-		GitRepository.addListener(this);
-		if (projects.length > 0)
-			detectSelectedProject();
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createPushButton(Composite parent)
+	{
+		push = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
+		push.setToolTipText("Push");
+		push.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		push.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final PushAction action = new PushAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git push")
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createSummaryLabel(Composite parent)
+	{
+		summary = new Label(parent, SWT.WRAP);
+		summary.setText("");
+		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+		summaryData.verticalSpan = 3;
+		summary.setLayoutData(summaryData);
+	}
+
+	private void createCommitButton(Composite parent)
+	{
+		commit = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		commit.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
+		commit.setToolTipText("Commit...");
+		commit.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				CommitAction action = new CommitAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run(null);
+			}
+		});
+	}
+
+	private void createGitBranchCombo(Composite parent)
+	{
+		branchCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		branchCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				setNewBranch(branchCombo.getText());
+			}
+		});
+	}
+
+	private void createGitDetailsComposite(Composite parent)
+	{
+		gitDetails = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		gitDetails.setLayout(layout);
+		showGitDetailsData = new FormData();
+		showGitDetailsData.top = new FormAttachment(projectCombo);
+		showGitDetailsData.bottom = new FormAttachment(100, 0);
+		showGitDetailsData.right = new FormAttachment(100, 0);
+		showGitDetailsData.left = new FormAttachment(0, 0);
+		
+		hideGitDetailsData = new FormData();
+		hideGitDetailsData.top = new FormAttachment(0);
+		hideGitDetailsData.bottom = new FormAttachment(0);
+		hideGitDetailsData.right = new FormAttachment(0);
+		hideGitDetailsData.left = new FormAttachment(0);
+		
+		gitDetails.setLayoutData(hideGitDetailsData);
+	}
+
+	private IProject[] createProjectCombo(Composite parent)
+	{
+		projectCombo = new Combo(parent, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
+		FormData projectData = new FormData();
+		projectData.left = new FormAttachment(0, 0);
+		projectData.top = new FormAttachment(0, 0);
+		projectCombo.setLayoutData(projectData);
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject iProject : projects)
+		{
+			projectCombo.add(iProject.getName());
+		}
+		projectCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				setActiveProject(projectCombo.getText());
+			}
+		});
+		return projects;
 	}
 
 	@Override
@@ -369,6 +430,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
+				// Update the branch list so we can reset the dirty status on the branch
+				populateBranches(repository);
+				updateSummaryText(repository);
 				if (repository == null)
 				{
 					push.setEnabled(false);
@@ -381,7 +445,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					stash.setVisible(false);
 					branchCombo.setVisible(false);
 					summary.setVisible(false);
-					// FIXME Make gitStuff have a form layout, add composite to hold the buttons/summary/branch and use two form layouts to toggle between showing the details or not!
+					gitDetails.setLayoutData(hideGitDetailsData);
 				}
 				else
 				{
@@ -400,11 +464,16 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					stash.setVisible(true);
 					summary.setVisible(true);
 					branchCombo.setVisible(true);
+					gitDetails.setLayoutData(showGitDetailsData);
+					// Make the summary as wide as the project combo, and as tall as the 3 icons
+					GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
+					summaryData.verticalSpan = 3;
+					summaryData.widthHint = projectCombo.getBounds().width;
+					// Minimum height should be to bottom of push, pull, stash icons ((3 * icon height) + (2 * space between icons))
+					summaryData.minimumHeight = (commit.getBounds().height * 3) + ((GridLayout) gitDetails.getLayout()).verticalSpacing * 2;
+					summary.setLayoutData(summaryData);
 				}
-				// Update the branch list so we can reset the dirty status on the branch
-				populateBranches(repository);
-				updateSummaryText(repository);
-				gitStuff.layout(true);
+				gitStuff.getParent().layout();
 				return Status.OK_STATUS;
 			}
 		};
