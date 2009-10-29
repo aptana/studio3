@@ -100,7 +100,19 @@ public class GitRepository
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
-			// TODO Search the cached Repos and if one has the same git dir, that's a match!			
+			for (WeakReference<GitRepository> reference : cachedRepos.values())
+			{
+				if (reference == null)
+					continue;
+				GitRepository cachedRepo = reference.get();
+				if (cachedRepo == null)
+					continue;
+				if (cachedRepo.fileURL.getPath().equals(path.getPath()))
+				{
+					cachedRepos.put(path.getPath(), reference);
+					return cachedRepo;
+				}
+			}
 			ref = new WeakReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
