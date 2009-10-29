@@ -118,7 +118,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		});
 
-		summary = new Label(gitStuff, SWT.WRAP);
+		summary = new Label(gitStuff, SWT.NONE);
 		summary.setText("");
 		GridData summaryData = new GridData();
 		summaryData.horizontalSpan = 2;
