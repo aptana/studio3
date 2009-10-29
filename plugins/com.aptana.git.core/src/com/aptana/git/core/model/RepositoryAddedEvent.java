@@ -1,17 +1,10 @@
 package com.aptana.git.core.model;
 
-public class RepositoryAddedEvent
+public class RepositoryAddedEvent extends RepositoryEvent
 {
 
-	private GitRepository repository;
-
-	public RepositoryAddedEvent(GitRepository repository)
+	RepositoryAddedEvent(GitRepository repository)
 	{
-		this.repository = repository;
-	}
-
-	public GitRepository getRepository()
-	{
-		return repository;
+		super(repository);
 	}
 }

@@ -1,17 +1,11 @@
 package com.aptana.git.core.model;
 
-public class IndexChangedEvent
+public class IndexChangedEvent extends RepositoryEvent
 {
 
-	private GitRepository repository;
-
-	public IndexChangedEvent(GitRepository repository)
+	IndexChangedEvent(GitRepository repository)
 	{
-		this.repository = repository;
+		super(repository);
 	}
 
-	public GitRepository getRepository()
-	{
-		return repository;
-	}
 }
