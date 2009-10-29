@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -68,11 +69,21 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Error_Locating_File,
+				new Object[] { url.toString() }
+			);
+			
+			Activator.logError(message, e);
 		}
 		catch (URISyntaxException e)
 		{
-			e.printStackTrace();
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Malformed_URI,
+				new Object[] { url.toString() }
+			);
+			
+			Activator.logError(message, e);
 		}
 	}
 	
@@ -149,7 +160,12 @@ public class HttpWorker implements Runnable
 		}
 		else
 		{
-			System.out.println(Messages.HttpWorker_Unrecognized_POST_URL + url);
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Unrecognized_POST_URL,
+				new Object[] { url }
+			);
+			
+			Activator.logWarning(message);
 		}
 	}
 	
@@ -187,8 +203,9 @@ public class HttpWorker implements Runnable
 			
 			output.close();
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Accessing_Output_Stream, e);
 		}
 	}
 	
@@ -209,6 +226,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	
@@ -225,6 +243,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	
@@ -241,6 +260,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	

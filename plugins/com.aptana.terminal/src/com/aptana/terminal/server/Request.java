@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.terminal.Activator;
+
 public class Request
 {
 	private String _method;
@@ -103,7 +105,7 @@ public class Request
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(Messages.Request_Request_Processing_Error, e);
 		}
 		
 		return result;

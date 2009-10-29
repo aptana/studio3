@@ -1,5 +1,6 @@
 package com.aptana.terminal;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -36,7 +37,6 @@ public class TerminalBrowser
 	public TerminalBrowser(WorkbenchPart owningPart)
 	{
 		this._owningPart = owningPart;
-//		this._serviceLocator = serviceLocator;
 		this._serviceLocator = owningPart.getSite();
 		this._id = UUID.randomUUID().toString();
 	}
@@ -79,7 +79,12 @@ public class TerminalBrowser
 					}
 					catch (NotDefinedException e)
 					{
-						e.printStackTrace();
+						String message = MessageFormat.format(
+							Messages.TerminalBrowser_Key_Binding_Scheme_Does_Not_Exist,
+							new Object[] { SHELL_KEY_BINDING_SCHEME }
+						);
+						
+						Activator.logError(message, e);
 					}
 				}
 			}
@@ -125,7 +130,7 @@ public class TerminalBrowser
 					}
 					catch (NotDefinedException e)
 					{
-						e.printStackTrace();
+						Activator.logError(Messages.TerminalBrowser_Unable_To_Restore_Key_Binding, e);
 					}
 				}
 			}

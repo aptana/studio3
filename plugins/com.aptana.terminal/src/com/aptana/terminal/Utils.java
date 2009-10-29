@@ -1,5 +1,7 @@
 package com.aptana.terminal;
 
+import java.text.MessageFormat;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -59,7 +61,12 @@ public class Utils
 			}
 			catch (PartInitException e)
 			{
-				e.printStackTrace();
+				String message = MessageFormat.format(
+					Messages.Utils_Unable_To_Open_Editor,
+					new Object[] { editorId }
+				);
+				
+				Activator.logError(message, e);
 			}
 		}
 		

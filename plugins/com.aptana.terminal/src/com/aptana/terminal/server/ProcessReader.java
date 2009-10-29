@@ -2,6 +2,8 @@ package com.aptana.terminal.server;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.aptana.terminal.Activator;
+
 public class ProcessReader extends Thread
 {
 	private InputStream _input;
@@ -52,9 +54,9 @@ public class ProcessReader extends Thread
 				//System.out.println(this._name + ":~" + Activator.encodeString(text) + "~");
 			}
 		}
-		catch (IOException ioe)
+		catch (IOException e)
 		{
-			ioe.printStackTrace();
+			Activator.logError(Messages.ProcessReader_Error_Reading_From_Process, e);
 		}
 	}
 }
