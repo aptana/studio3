@@ -252,7 +252,7 @@ public class GitHistoryPage extends HistoryPage
 		if (commit.getAuthorEmail() != null)
 		{
 			String md5 = md5(commit.getAuthorEmail().toLowerCase());
-			avatar = "<img src=\"http://www.gravatar.com/avatar/" + md5 + "?d=wavatar\" />";
+			avatar = md5;
 		}
 		variables.put("avatar", avatar);
 		
@@ -270,26 +270,31 @@ public class GitHistoryPage extends HistoryPage
 		List<Diff> diffs = commit.getDiff();
 		for (Diff diff : diffs)
 		{
+			diffList.append("<li class=\"");
+			
 			if (diff.renamed())
 			{
+				diffList.append("renamed");
+				diffList.append("\">");
 				diffList.append(diff.oldName()).append(" -&gt; "); //$NON-NLS-1$
-				diffList.append(diff.newName()).append("<br />"); //$NON-NLS-1$
+				diffList.append(diff.newName()).append("</li>"); //$NON-NLS-1$
 			}
 			else
 			{
 				if (diff.fileCreated())
 				{
-					diffList.append(Messages.GitHistoryPage_CreatedHeader);
+					diffList.append("added");
 				}
 				else if (diff.fileDeleted())
 				{
-					diffList.append(Messages.GitHistoryPage_DeletedHeader);
+					diffList.append("removed");
 				}
 				else
 				{
-					diffList.append(Messages.GitHistoryPage_ModifiedHeader);
+					diffList.append("modified");
 				}
-				diffList.append(diff.fileName()).append("<br />"); //$NON-NLS-1$
+				diffList.append("\">");
+				diffList.append(diff.fileName()).append("</li>"); //$NON-NLS-1$
 			}
 		}
 		variables.put("changed", diffList.toString());
