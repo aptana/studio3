@@ -5,7 +5,7 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
-            id="com.aptana.git.ui.projectContributions"
+            id="com.aptana.git.ui.resourceContributions"
             objectClass="org.eclipse.core.resources.IResource">
          <filter
                name="projectPersistentProperty"
@@ -50,13 +50,13 @@
                class="com.aptana.git.ui.actions.CommitAction"
                id="com.aptana.git.ui.internal.actions.CommitAction"
                label="%CommitAction_label"
-               menubarPath="team.main/projectGroup"
+               menubarPath="team.main/targetGroup"
                tooltip="%CommitAction_tooltip">
-         </action>
+         </action>      
       </objectContribution>
       <objectContribution
             adaptable="true"
-            id="com.aptana.git.ui.projectContributions"
+            id="com.aptana.git.ui.fileContributions"
             objectClass="org.eclipse.core.resources.IFile">
          <filter
                name="projectPersistentProperty"
@@ -67,21 +67,21 @@
                tooltip="%RevertAction_tooltip"
                class="com.aptana.git.ui.internal.actions.RevertAction"
                id="com.aptana.git.ui.internal.actions.RevertAction"
-               menubarPath="team.main/projectGroup">
+               menubarPath="team.main/targetGroup">
          </action>
          <action
                label="%UnstageAction_label"
                tooltip="%UnstageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.UnstageAction"
                id="com.aptana.git.ui.internal.actions.UnstageAction"
-               menubarPath="team.main/projectGroup">
+               menubarPath="team.main/targetGroup">
          </action>
          <action
                label="%StageAction_label"
                tooltip="%StageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.StageAction"
                id="com.aptana.git.ui.internal.actions.StageAction"
-               menubarPath="team.main/projectGroup">
+               menubarPath="team.main/targetGroup">
          </action>
       </objectContribution>
    </extension>
