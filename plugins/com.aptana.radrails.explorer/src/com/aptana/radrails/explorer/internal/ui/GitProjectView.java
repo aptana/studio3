@@ -77,8 +77,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		gitStuff = new Composite(myComposite, SWT.NONE);
 		gitStuff.setLayout(new FormLayout());
 		FormData gitStuffLayoutData = new FormData();
-		gitStuffLayoutData.left = new FormAttachment(0, 0);
-		gitStuffLayoutData.top = new FormAttachment(0, 0);
+		gitStuffLayoutData.top = new FormAttachment(0, 5);
+		gitStuffLayoutData.left = new FormAttachment(0, 5);
+		gitStuffLayoutData.right= new FormAttachment(100, -5);
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
 		IProject[] projects = createProjectCombo(gitStuff);
@@ -207,7 +208,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private void createSummaryLabel(Composite parent)
 	{
-		summary = new Label(parent, SWT.WRAP);
+		summary = new Label(parent, SWT.NONE);
 		summary.setText("");
 		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 		summaryData.verticalSpan = 3;
@@ -244,6 +245,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				setNewBranch(branchCombo.getText());
 			}
 		});
+		
+//		FormData data2 = new FormData();
+//		data2.top = new FormAttachment(projectCombo);
+//		data2.right = new FormAttachment(100, 0);
+//		data2.left = new FormAttachment(0, 0);
+//		branchCombo.setLayoutData(data2);
 	}
 
 	private void createGitDetailsComposite(Composite parent)
@@ -254,7 +261,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		layout.marginHeight = 0;
 		gitDetails.setLayout(layout);
 		showGitDetailsData = new FormData();
-		showGitDetailsData.top = new FormAttachment(projectCombo);
+		showGitDetailsData.top = new FormAttachment(projectCombo, 0);
 		showGitDetailsData.bottom = new FormAttachment(100, 0);
 		showGitDetailsData.right = new FormAttachment(100, 0);
 		showGitDetailsData.left = new FormAttachment(0, 0);
@@ -274,6 +281,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		FormData projectData = new FormData();
 		projectData.left = new FormAttachment(0, 0);
 		projectData.top = new FormAttachment(0, 0);
+		projectData.right = new FormAttachment(100, 0);
 		projectCombo.setLayoutData(projectData);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject iProject : projects)
