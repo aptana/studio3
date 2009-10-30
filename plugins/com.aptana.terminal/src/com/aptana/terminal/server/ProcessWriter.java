@@ -2,6 +2,8 @@ package com.aptana.terminal.server;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.aptana.terminal.Activator;
+
 
 public class ProcessWriter
 {
@@ -17,6 +19,11 @@ public class ProcessWriter
 		this._os = os;
 	}
 	
+	/**
+	 * sendText
+	 * 
+	 * @param text
+	 */
 	public void sendText(String text)
 	{
 		try
@@ -28,7 +35,7 @@ public class ProcessWriter
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(Messages.ProcessWriter_Error_Wrinting_To_Process, e);
 		}
 	}
 }

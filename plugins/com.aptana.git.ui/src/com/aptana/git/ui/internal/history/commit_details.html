@@ -1,0 +1,106 @@
+<html>
+  <head>
+    <style>        
+*{margin:0;padding:0;}
+html,body{height:100%;color:black;}
+body{background-color:white;font:12px helvetica,arial,freesans,clean,sans-serif;*font-size:small;}
+table{font-size:inherit;font:100%;}
+select,input[type=text],input[type=password],input[type=image],textarea{font:99% helvetica,arial,freesans,sans-serif;}
+select,option{padding:0 .25em;}
+input.text{padding:1px 0;}
+optgroup{margin-top:.5em;}
+pre,code{font:115% Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;*font-size:100%;}
+body *{line-height:1.4em;}
+img{border:0;}
+a{color:#4183c4;text-decoration:none;outline:none;}
+a.action{color:#d00;text-decoration:underline;}
+a.action span{text-decoration:none;}
+a:hover{text-decoration:underline;}
+#commit{overflow:hidden;}
+#commit .group{border-top:1px solid #bedce7;}
+#commit .separator{padding-top:1em;}
+#commit .envelope{border-bottom:1px solid #bedce7;border-left:1px solid #bedce7;border-right:1px solid #bedce7;padding:0 .7em .7em .7em;background-color:#eaf2f5;overflow:hidden;}
+#commit .envelope.selected{background:#fffeeb!important;}
+#commit .envelope.selected .machine span{border-bottom:1px dotted #4183c4;}
+#commit.single_commit .envelope .machine span{border-bottom:1px dotted #4183c4;}
+#commit .human{padding-top:.7em;}
+#commit .human .refs{font-size:150%;}
+#commit .human .message{font-size:92%;font-family:Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;}
+#commit .human .message a{color:#000;}
+#commit .human .message a.vis{color:#4183c4;}
+#commit .human .actor{clear:left;margin-top:.75em;}
+#commit .human .actor .gravatar{border:1px solid #d0d0d0;padding:2px;background-color:white;float:left;margin-right:.7em;}
+#commit .human .actor .name{line-height:1.5em;}
+#commit .human .actor .name a{color:#000;}
+#commit .human .actor .name span{color:#888;font-size:90%;}
+#commit .human .actor .date{color:#888;font-size:90%;line-height:1em;}
+#commit .machine{float:right;width:30em;padding:.7em 0 .7em .7em;border-left:1px solid #bedce7;color:#808080;font-family:Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;font-size:.85em;line-height:1.5em;}
+#toc{padding:1.5em 0;font-family:Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;font-size:90%;}
+#toc ul{border-top:1px solid #eee;}
+#toc ul li{list-style-type:none;padding:.4em 0 .4em 20px;border-bottom:1px solid #eee;}
+#toc ul li.added{background:white url(https://assets0.github.com/images/modules/toc/added.png) 0 50% no-repeat;}
+#toc ul li.removed{background:white url(https://assets0.github.com/images/modules/toc/removed.png) 0 50% no-repeat;}
+#toc ul li.modified{background:white url(https://assets0.github.com/images/modules/toc/modified.png) 0 50% no-repeat;}
+    </style>
+  </head>
+  <body>
+    <div id="main"
+      <div class="site">
+      
+    <div id="commit" class="single_commit">
+      <div class="group">
+        <div class="envelope commit">
+          <div class="machine">
+            <span>c</span>ommit&nbsp;{sha}<br />
+            <span>p</span>arent&nbsp;{parent}
+          </div>
+          <div class="human">
+            
+            <div class="actor">
+              <div class="gravatar">
+                <img alt="" height="30" src="https://secure.gravatar.com/avatar/{avatar}?s=30&amp;d=http%3A%2F%2Fgithub.com%2Fimages%2Fgravatars%2Fgravatar-30.png" width="30" />
+              </div>
+              <div class="name">{author} <span>(author)</span></div>
+              <div class="date">
+                <abbr class="relatize">{date}</abbr> 
+              </div>
+            </div>
+            <div class="message"><p>{subject}</p></div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <div id="toc">
+      <ul>
+        {changed}
+      </ul>
+    </div>
+
+<!--
+    <div id="files">
+      <div id="diff-0" class="file">
+        <div class="meta">
+          <div class="bubble faux-bubble"><span>0</span></div>
+          <div class="info">
+            <span><a href="/aptana/red_core/tree/e8b1914abdc0412d215d497a41e53342babeb623/plugins/com.aptana.git.core/.classpath">plugins/com.aptana.git.core/.classpath</a></span>
+          </div>
+          <div class="actions"></div>
+        </div>
+        <div class="data syntax">
+          <table cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td><pre class="line_numbers">...<br /><a id="L0L1" href="#L0L1">1</a><br /><a id="L0L2" href="#L0L2">2</a><br /><a id="L0L3" href="#L0L3">3</a><br /><a id="L0L4" href="#L0L4">4</a><br /><a id="L0L5" href="#L0L5">5</a><br />&nbsp;<br /><a id="L0L6" href="#L0L6">6</a><br /><a id="L0L7" href="#L0L7">7</a></pre></td>
+              <td><pre class="line_numbers">...<br /><a id="L0R1" href="#L0R1">1</a><br /><a id="L0R2" href="#L0R2">2</a><br />&nbsp;<br /><a id="L0R3" href="#L0R3">3</a><br /><a id="L0R4" href="#L0R4">4</a><br /><a id="L0R5" href="#L0R5">5</a><br /><a id="L0R6" href="#L0R6">6</a><br /><a id="L0R7" href="#L0R7">7</a></pre></td>
+              <td width="100%"><div class="highlight"><pre><div class="gc"><div class="bubble empty cp-0"><span>0</span></div>@@&nbsp;-1,7&nbsp;+1,7&nbsp;@@</div><div class=""><div class="bubble empty cp-1"><span>0</span></div>&nbsp;&lt;?xml&nbsp;version=&quot;1.0&quot;&nbsp;encoding=&quot;UTF-8&quot;?&gt;</div><div class=""><div class="bubble empty cp-2"><span>0</span></div>&nbsp;&lt;classpath&gt;</div><div class="gd"><div class="bubble empty cp-3"><span>0</span></div>-&nbsp;&nbsp;&lt;classpathentry&nbsp;kind=&quot;con&quot;&nbsp;path=&quot;org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6&quot;/&gt;</div><div class=""><div class="bubble empty cp-4"><span>0</span></div>&nbsp;&nbsp;&nbsp;&lt;classpathentry&nbsp;kind=&quot;con&quot;&nbsp;path=&quot;org.eclipse.pde.core.requiredPlugins&quot;/&gt;</div><div class=""><div class="bubble empty cp-5"><span>0</span></div>&nbsp;&nbsp;&nbsp;&lt;classpathentry&nbsp;kind=&quot;src&quot;&nbsp;path=&quot;src&quot;/&gt;</div><div class="gi"><div class="bubble empty cp-6"><span>0</span></div>+&nbsp;&nbsp;&lt;classpathentry&nbsp;kind=&quot;con&quot;&nbsp;path=&quot;org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5&quot;/&gt;</div><div class=""><div class="bubble empty cp-7"><span>0</span></div>&nbsp;&nbsp;&nbsp;&lt;classpathentry&nbsp;kind=&quot;output&quot;&nbsp;path=&quot;bin&quot;/&gt;</div><div class=""><div class="bubble empty cp-8"><span>0</span></div>&nbsp;&lt;/classpath&gt;</div></pre></div></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+-->
+      </div>
+    </div>
+  </body>
+</html>

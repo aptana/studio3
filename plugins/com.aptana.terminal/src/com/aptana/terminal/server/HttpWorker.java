@@ -5,12 +5,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Size;
@@ -23,6 +27,8 @@ public class HttpWorker implements Runnable
 	private static final String SIZE_URL = "/size"; //$NON-NLS-1$
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
+	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
+	
 	private HttpServer _server;
 	private Socket _clientSocket;
 	
@@ -50,7 +56,8 @@ public class HttpWorker implements Runnable
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
-			File file = new File(fileURL.toURI());
+			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
+			File file = new File(fileURI);
 			
 			if (file.exists() && file.canRead())
 			{
@@ -68,11 +75,21 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Error_Locating_File,
+				new Object[] { url.toString() }
+			);
+			
+			Activator.logError(message, e);
 		}
 		catch (URISyntaxException e)
 		{
-			e.printStackTrace();
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Malformed_URI,
+				new Object[] { url.toString() }
+			);
+			
+			Activator.logError(message, e);
 		}
 	}
 	
@@ -91,11 +108,19 @@ public class HttpWorker implements Runnable
 		{
 			String id = request.getParameter(ID_PARAMETER);
 			ProcessWrapper wrapper = this._server.getProcess(id);
-			String text = wrapper.getText();
 			
-			if (text != null)
+			if (wrapper != null)
 			{
-				this.sendTextResponse(output, text);
+				String text = wrapper.getText();
+				
+				if (text != null)
+				{
+					this.sendTextResponse(output, text);
+				}
+				else
+				{
+					this.sendEmptyResponse(output);
+				}
 			}
 			else
 			{
@@ -137,19 +162,33 @@ public class HttpWorker implements Runnable
 		if (STREAM_URL.equals(url))
 		{
 			String content = request.getRawContent();
-			String id = request.getParameter(ID_PARAMETER);
-			ProcessWrapper wrapper = this._server.getProcess(id);
 			
-			if (wrapper != null)
+			if (content != null && content.length() > 0)
 			{
-				wrapper.sendText(content);
+				String id = request.getParameter(ID_PARAMETER);
+				ProcessWrapper wrapper = this._server.getProcess(id);
+				
+				if (wrapper != null)
+				{
+					if (content.equals("\r") && IS_WINDOWS)
+					{
+						content += "\n";
+					}
+					
+					wrapper.sendText(content);
+				}
 			}
 			
 			this.sendEmptyResponse(output);
 		}
 		else
 		{
-			System.out.println(Messages.HttpWorker_Unrecognized_POST_URL + url);
+			String message = MessageFormat.format(
+				Messages.HttpWorker_Unrecognized_POST_URL,
+				new Object[] { url }
+			);
+			
+			Activator.logWarning(message);
 		}
 	}
 	
@@ -187,8 +226,9 @@ public class HttpWorker implements Runnable
 			
 			output.close();
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Accessing_Output_Stream, e);
 		}
 	}
 	
@@ -209,6 +249,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	
@@ -225,6 +266,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	
@@ -241,6 +283,7 @@ public class HttpWorker implements Runnable
 		}
 		catch (IOException e)
 		{
+			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
 		}
 	}
 	

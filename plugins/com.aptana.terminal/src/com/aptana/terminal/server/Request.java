@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.terminal.Activator;
+
 public class Request
 {
 	private String _method;
@@ -86,24 +88,21 @@ public class Request
 				s = br.readLine();
 			}
 			
-			while (br.ready())
+			String lengthString = result.getHeader("Content-Length"); //$NON-NLS-1$
+			
+			if (lengthString != null && lengthString.length() > 0)
 			{
-				String lengthString = result.getHeader("Content-Length"); //$NON-NLS-1$
+				int contentLength = Integer.parseInt(lengthString);
 				
-				if (lengthString != null && lengthString.length() > 0)
-				{
-					int contentLength = Integer.parseInt(lengthString);
-					
-					char[] chars = new char[contentLength];
-					br.read(chars);
-					
-					result.setRawContent(new String(chars));
-				}
+				char[] chars = new char[contentLength];
+				br.read(chars);
+				
+				result.setRawContent(new String(chars));
 			}
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			Activator.logError(Messages.Request_Request_Processing_Error, e);
 		}
 		
 		return result;
