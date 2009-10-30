@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -325,8 +326,23 @@ public class GitRepository
 			hookPath += File.separator;
 		hookPath += "hooks" + File.separator + name;
 		File hook = new File(hookPath);
-		if (!hook.exists() || !hook.canExecute())
+		if (!hook.exists() || !hook.isFile())
 			return true;
+		
+		try
+		{
+			Method method = File.class.getMethod("canExecute", null);
+			if (method != null)
+			{
+				Boolean canExecute = (Boolean) method.invoke(hook, null);
+				if (!canExecute)
+					return true;
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
 
 		Map<String, String> env = new HashMap<String, String>();
 		env.put(GitEnv.GIT_DIR, fileURL.getPath());
