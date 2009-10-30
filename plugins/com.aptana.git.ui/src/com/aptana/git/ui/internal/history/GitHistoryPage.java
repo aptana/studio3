@@ -265,39 +265,6 @@ public class GitHistoryPage extends HistoryPage
 			}
 		}
 		variables.put("parent", parents.toString());
-		
-		StringBuilder diffList = new StringBuilder();
-		List<Diff> diffs = commit.getDiff();
-		for (Diff diff : diffs)
-		{
-			diffList.append("<li class=\"");
-			
-			if (diff.renamed())
-			{
-				diffList.append("renamed");
-				diffList.append("\">");
-				diffList.append(diff.oldName()).append(" -&gt; "); //$NON-NLS-1$
-				diffList.append(diff.newName()).append("</li>"); //$NON-NLS-1$
-			}
-			else
-			{
-				if (diff.fileCreated())
-				{
-					diffList.append("added");
-				}
-				else if (diff.fileDeleted())
-				{
-					diffList.append("removed");
-				}
-				else
-				{
-					diffList.append("modified");
-				}
-				diffList.append("\">");
-				diffList.append(diff.fileName()).append("</li>"); //$NON-NLS-1$
-			}
-		}
-		variables.put("changed", diffList.toString());
 
 		return populateTemplate(loadTemplate(), variables);
 	}
