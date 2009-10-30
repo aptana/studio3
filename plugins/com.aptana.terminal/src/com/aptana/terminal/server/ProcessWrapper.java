@@ -45,7 +45,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = new String[] { "/K", "cd" };
+			result = new String[] { "/K" };
 		}
 		
 		return result;
