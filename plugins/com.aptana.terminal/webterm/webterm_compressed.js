@@ -1010,7 +1010,7 @@ break;
 if(_ac==-1){
 if(this._handler!=null){
 if(this._handler.processCharacter){
-this._handler.processCharacter("processCharacter",_a8[_a9]);
+this._handler.processCharacter("processCharacter",_a8.charAt(_a9));
 }
 }
 _a9++;

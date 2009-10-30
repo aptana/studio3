@@ -1094,7 +1094,7 @@ break;
 if(_b9==-1){
 if(this._handler!=null){
 if(this._handler.processCharacter){
-this._handler.processCharacter("processCharacter",_b5[_b6]);
+this._handler.processCharacter("processCharacter",_b5.charAt(_b6));
 }
 }
 _b6++;
