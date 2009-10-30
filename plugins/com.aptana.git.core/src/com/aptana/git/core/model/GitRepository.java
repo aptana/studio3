@@ -168,7 +168,7 @@ public class GitRepository
 			if (!revSpec.isSimpleRef())
 				continue;
 			GitRef ref = revSpec.simpleRef();
-			if (ref == null || !ref.type().equals(GitRef.HEAD_TYPE))
+			if (ref == null || ref.type() == null || !ref.type().equals(GitRef.HEAD_TYPE))
 				continue;
 			localBranches.add(ref.shortName());
 		}
