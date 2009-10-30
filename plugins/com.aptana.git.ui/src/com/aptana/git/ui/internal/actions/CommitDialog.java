@@ -1,10 +1,16 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -12,6 +18,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -47,6 +54,7 @@ import com.aptana.git.ui.GitUIPlugin;
 
 public class CommitDialog extends StatusDialog
 {
+	private static final Pattern gitDiffHeaderRegexp = Pattern.compile("@@ \\-([0-9]+),?\\d* \\+(\\d+),?\\d* @@");
 
 	private GitRepository gitRepository;
 	private Text commitMessage;
@@ -57,7 +65,7 @@ public class CommitDialog extends StatusDialog
 	private Image newFileImage;
 	private Image deletedFileImage;
 	private Image emptyFileImage;
-	private Text diffArea;
+	private Browser diffArea;
 
 	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -107,13 +115,11 @@ public class CommitDialog extends StatusDialog
 
 	private void createDiffArea(Composite container)
 	{
-		diffArea = new Text(container, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		diffArea = new Browser(container, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
-		diffArea.setEditable(false);
 		diffArea.setText(Messages.CommitDialog_4);
-		// TODO Make it much prettier, like GitX does!
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -308,7 +314,107 @@ public class CommitDialog extends StatusDialog
 
 	protected void updateDiff(String diff)
 	{
-		diffArea.setText(diff);
+		if (diff == null)
+		{
+			diffArea.setText("");
+			return;
+		}
+		if (!diff.startsWith("diff"))
+		{
+			diffArea.setText("<pre>" + diff + "</pre>");
+			return;
+		}
+		String title = ""; // FIXME Grab the filename!
+		StringBuilder html = new StringBuilder();
+		html.append("<div class=\"file\">");
+		html.append("<div class=\"fileHeader\">").append(title).append("</div>");
+		html.append("<div class=\"diffContent\">");
+		String[] lines = diff.split("\r|\n|\r\n");
+		StringBuilder diffContent = new StringBuilder();
+		StringBuilder line1 = new StringBuilder();
+		StringBuilder line2 = new StringBuilder();
+		int hunkStartLine1 = 0;
+		int hunkStartLine2 = 0;
+		for (int i = 4; i < lines.length; i++)
+		{
+			String line = lines[i];
+			char c = line.charAt(0);
+			switch (c)
+			{
+				case '@':
+					
+					Matcher m = gitDiffHeaderRegexp.matcher(line);
+					if (m.find())
+					{
+						hunkStartLine1 = Integer.parseInt(m.group(1)) - 1;
+						hunkStartLine2 = Integer.parseInt(m.group(2)) - 1;
+					}
+					line1.append("..\n");
+					line2.append("..\n");
+					diffContent.append("<div class=\"hunkheader\">").append(line).append("</div>\n");
+					break;
+
+				case '+':
+					// Highlight trailing whitespace
+					line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>");
+					line1.append("\n");
+					line2.append(++hunkStartLine2).append("\n");
+					diffContent.append("<div class=\"addline\">").append(line).append("</div>");
+					break;
+
+				case ' ':
+					line1.append(++hunkStartLine1).append("\n");
+					line2.append(++hunkStartLine2).append("\n");
+					diffContent.append("<div class=\"noopline\">").append(line).append("</div>");
+					break;
+
+				case '-':
+					line1.append(++hunkStartLine1).append("\n");
+					line2.append("\n");
+					diffContent.append("<div class=\"delline\">").append(line).append("</div>");
+					break;
+
+				default:
+					break;
+			}
+
+		}
+		html.append("<div class=\"lineno\">").append(line1).append("</div>");
+		html.append("<div class=\"lineno\">").append(line2).append("</div>");
+		html.append("<div class=\"lines\">").append(diffContent).append("</div>");
+		html.append("</div>").append("</div>");
+
+		InputStream stream = null;
+		try
+		{
+			stream = getClass().getResourceAsStream("diff.html");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			StringBuilder template = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				template.append(line).append("\n");
+			}
+			diffArea.setText(template.toString().replaceFirst("\\{diff\\}", html.toString()));
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			diffArea.setText("<pre>" + diff + "</pre>");
+		}
+		finally
+		{
+			try
+			{
+				if (stream != null)
+					stream.close();
+			}
+			catch (IOException e)
+			{
+				// ingore
+			}
+		}
 	}
 
 	protected ChangedFile findChangedFile(String path)
@@ -362,8 +468,7 @@ public class CommitDialog extends StatusDialog
 	{
 		if (commitMessage.getText().length() < 3)
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_EnterMessage_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
@@ -374,8 +479,7 @@ public class CommitDialog extends StatusDialog
 		}
 		if (gitRepository.hasMerges())
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_CannotMerge_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_CannotMerge_Error));
 			return;
 		}
 		fMessage = commitMessage.getText();
