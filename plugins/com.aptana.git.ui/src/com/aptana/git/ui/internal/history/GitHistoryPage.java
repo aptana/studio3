@@ -1,17 +1,27 @@
 package com.aptana.git.ui.internal.history;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,14 +37,14 @@ import com.aptana.git.core.model.GitRevSpecifier;
 
 public class GitHistoryPage extends HistoryPage
 {
-	
+
 	private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat(Messages.GitHistoryPage_DateFormat);
 
 	private Composite ourControl;
 	private SashForm graphDetailSplit;
 	private SashForm revInfoSplit;
 	private TableViewer graph;
-	private TextViewer commentViewer;
+	private Browser commentViewer;
 	private CommitFileDiffViewer fileViewer;
 
 	@Override
@@ -105,7 +115,7 @@ public class GitHistoryPage extends HistoryPage
 
 		graph = createCommitTable(graphDetailSplit);
 		revInfoSplit = new SashForm(graphDetailSplit, SWT.HORIZONTAL);
-		commentViewer = new TextViewer(revInfoSplit, SWT.H_SCROLL | SWT.V_SCROLL | SWT.READ_ONLY);
+		commentViewer = new Browser(revInfoSplit, SWT.READ_ONLY);
 		fileViewer = new CommitFileDiffViewer(revInfoSplit);
 
 		graphDetailSplit.setWeights(new int[] { 500, 500 });
@@ -140,14 +150,14 @@ public class GitHistoryPage extends HistoryPage
 				final ISelection s = event.getSelection();
 				if (s.isEmpty() || !(s instanceof IStructuredSelection))
 				{
-					commentViewer.setInput(null);
+					commentViewer.setText("");
 					fileViewer.setInput(null);
 					return;
 				}
 
 				final IStructuredSelection sel = ((IStructuredSelection) s);
 				GitCommit commit = (GitCommit) sel.getFirstElement();
-				commentViewer.setInput(commitToDocument(commit));
+				commentViewer.setText(commitToHTML(commit));
 				fileViewer.setInput(commit);
 			}
 		});
@@ -225,51 +235,138 @@ public class GitHistoryPage extends HistoryPage
 		return null;
 	}
 
-	protected Document commitToDocument(GitCommit commit)
+	protected String commitToHTML(GitCommit commit)
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(Messages.GitHistoryPage_SHA).append(commit.sha()).append("\n"); //$NON-NLS-1$
-		builder.append(Messages.GitHistoryPage_AuthorHeader).append(commit.getAuthor()).append("\n"); //$NON-NLS-1$
-		builder.append(Messages.GitHistoryPage_DateHeader).append(TIMESTAMP_FORMAT.format(commit.date())).append("\n"); //$NON-NLS-1$
-		builder.append(Messages.GitHistoryPage_SubjectHeader).append(commit.getSubject()).append("\n"); //$NON-NLS-1$
+		Map<String, String> variables = new HashMap<String, String>();
+		variables.put("sha", commit.sha());
+		variables.put("date", TIMESTAMP_FORMAT.format(commit.date()));
+		variables.put("author", commit.getAuthor());
+		variables.put("subject", commit.getSubject());
+		String comment = commit.getComment();
+		// Auto convert references to URLs into links
+		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); 
+		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads
+		variables.put("comment", comment);
+		
+		String avatar = "";
+		if (commit.getAuthorEmail() != null)
+		{
+			String md5 = md5(commit.getAuthorEmail().toLowerCase());
+			avatar = "<img src=\"http://www.gravatar.com/avatar/" + md5 + "?d=wavatar\" />";
+		}
+		variables.put("avatar", avatar);
+		
+		StringBuilder parents = new StringBuilder();
 		if (commit.parents() != null && !commit.parents().isEmpty())
 		{
 			for (String parentSha : commit.parents())
 			{
-				builder.append(Messages.GitHistoryPage_ParentHeader);
-				builder.append(parentSha).append("\n"); //$NON-NLS-1$
+				parents.append(parentSha).append("<br />"); //$NON-NLS-1$
 			}
 		}
-		builder.append("\n").append(commit.getComment()).append("\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
-
+		variables.put("parent", parents.toString());
+		
+		StringBuilder diffList = new StringBuilder();
 		List<Diff> diffs = commit.getDiff();
 		for (Diff diff : diffs)
 		{
 			if (diff.renamed())
 			{
-				builder.append(Messages.GitHistoryPage_RenamedHeader);
-				builder.append(diff.oldName()).append(" -> "); //$NON-NLS-1$
-				builder.append(diff.newName()).append("\n"); //$NON-NLS-1$
+				diffList.append(diff.oldName()).append(" -&gt; "); //$NON-NLS-1$
+				diffList.append(diff.newName()).append("<br />"); //$NON-NLS-1$
 			}
 			else
 			{
 				if (diff.fileCreated())
 				{
-					builder.append(Messages.GitHistoryPage_CreatedHeader);
+					diffList.append(Messages.GitHistoryPage_CreatedHeader);
 				}
 				else if (diff.fileDeleted())
 				{
-					builder.append(Messages.GitHistoryPage_DeletedHeader);
+					diffList.append(Messages.GitHistoryPage_DeletedHeader);
 				}
 				else
 				{
-					builder.append(Messages.GitHistoryPage_ModifiedHeader);
+					diffList.append(Messages.GitHistoryPage_ModifiedHeader);
 				}
-				builder.append(diff.fileName()).append("\n"); //$NON-NLS-1$
+				diffList.append(diff.fileName()).append("<br />"); //$NON-NLS-1$
 			}
 		}
+		variables.put("changed", diffList.toString());
 
-		return new Document(builder.toString());
+		return populateTemplate(loadTemplate(), variables);
+	}
+
+	private String populateTemplate(String template, Map<String, String> variables)
+	{
+		for (Map.Entry<String, String> entry : variables.entrySet())
+		{
+			template = template.replaceFirst("\\{" + entry.getKey() + "\\}", entry.getValue());
+		}
+		return template;
+	}
+
+	private String loadTemplate()
+	{
+		StringBuilder builder = new StringBuilder();
+		InputStream stream = null;
+		try
+		{
+			stream = getClass().getResourceAsStream("commit_details.html");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				builder.append(line);
+			}
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (stream != null)
+				try
+				{
+					stream.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+		}
+		return builder.toString();
+	}
+
+	private String md5(String lowerCase)
+	{
+		try
+		{
+			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8");
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] thedigest = md.digest(bytesOfMessage);
+			BigInteger bigInt = new BigInteger(1, thedigest);
+			String hashtext = bigInt.toString(16);
+			// Now we need to zero pad it if you actually want the full 32 chars.
+			while (hashtext.length() < 32)
+			{
+				hashtext = "0" + hashtext;
+			}
+			return hashtext;
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**

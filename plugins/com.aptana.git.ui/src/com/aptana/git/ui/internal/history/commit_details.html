@@ -1,0 +1,57 @@
+<html>
+  <head>
+    <style>        
+      dt {
+        color: #ccc;
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      
+      dd {
+        margin-left: 0;
+        margin-right: 5px;
+      }
+      
+      #subject {
+        font-weight: bold;
+      }
+      
+      #avatar {
+        float: left;
+        border: 1px solid;
+        margin: 5px;
+      }
+      
+      #details {
+        clear: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="avatar">{avatar}</div>
+    <div id="header">
+      <dl>
+        <dt>SHA</dt>
+        <dd class="sha">{sha}</dd>
+      
+        <dt>Author</dt>
+        <dd>{author}</dd>
+      
+        <dt>Date</dt>
+        <dd class="date">{date}</dd>
+      
+        <dt>Subject</dt>
+        <dd id="subject">{subject}</dd>
+      
+        <dt>Parent</dt>
+        <dd class="sha">{parent}</dd>
+      </dl>
+    </div>
+    
+    <div id="details">
+      <p id="comment">{comment}</p>
+    
+      <p id="changed">{changed}</p>
+    </div>
+  </body>
+</html>
