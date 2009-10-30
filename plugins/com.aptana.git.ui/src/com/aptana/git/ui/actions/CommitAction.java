@@ -51,9 +51,9 @@ public class CommitAction extends GitAction
 	}
 
 	@Override
-	protected String getCommand()
+	protected String[] getCommand()
 	{
-		return COMMAND;
+		return new String[] { COMMAND };
 	}
 
 	@Override

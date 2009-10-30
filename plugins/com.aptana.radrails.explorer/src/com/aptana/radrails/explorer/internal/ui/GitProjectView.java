@@ -18,6 +18,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -41,6 +43,7 @@ import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
+import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.radrails.explorer.ExplorerPlugin;
 
 public class GitProjectView extends CommonNavigator implements IGitRepositoryListener
@@ -58,6 +61,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private Button push;
 	private Button commit;
 	private Button stash;
+	private Button unstash;
 	private Composite gitStuff;
 	private Composite gitDetails;
 
@@ -90,6 +94,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		createPushButton(gitDetails);
 		createPullButton(gitDetails);
 		createStashButton(gitDetails);
+		createUnstashButton(gitDetails);
 
 		// Now create the typical stuff for the navigator
 		createNavigator(myComposite);
@@ -128,6 +133,37 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				final StashAction action = new StashAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
 				Job job = new Job("git stash")
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run(null);
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+	
+	private void createUnstashButton(Composite parent)
+	{
+		unstash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
+		unstash.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		unstash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_up.png"));
+		unstash.setToolTipText("Unstash");
+		unstash.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final UnstashAction action = new UnstashAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job("git unstash")
 				{
 
 					@Override
@@ -208,8 +244,19 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private void createSummaryLabel(Composite parent)
 	{
-		summary = new Label(parent, SWT.NONE);
+		summary = new Label(parent, SWT.WRAP);
 		summary.setText("");
+		Font font = summary.getFont();
+		FontData[] oldData = font.getFontData();
+		FontData[] newData = new FontData[oldData.length];
+		System.arraycopy(oldData, 0, newData, 0, oldData.length);
+		for (int i = 0; i < newData.length; i++)
+		{
+			FontData data = newData[i];
+			data.setStyle(data.getStyle() | SWT.ITALIC);
+		}
+		Font newFont = new Font(font.getDevice(), newData);
+		summary.setFont(newFont);
 		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 		summaryData.verticalSpan = 3;
 		summary.setLayoutData(summaryData);
@@ -237,6 +284,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private void createGitBranchCombo(Composite parent)
 	{
 		branchCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		GridData branchComboData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
+		branchComboData.horizontalSpan = 2;
+		branchCombo.setLayoutData(branchComboData);
 		branchCombo.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -245,18 +295,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				setNewBranch(branchCombo.getText());
 			}
 		});
-		
-//		FormData data2 = new FormData();
-//		data2.top = new FormAttachment(projectCombo);
-//		data2.right = new FormAttachment(100, 0);
-//		data2.left = new FormAttachment(0, 0);
-//		branchCombo.setLayoutData(data2);
 	}
 
 	private void createGitDetailsComposite(Composite parent)
 	{
 		gitDetails = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		gitDetails.setLayout(layout);
@@ -474,6 +518,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					pull.setVisible(false);
 					commit.setVisible(false);
 					stash.setVisible(false);
+					unstash.setVisible(false);
 					branchCombo.setVisible(false);
 					summary.setVisible(false);
 					gitDetails.setLayoutData(hideGitDetailsData);
@@ -485,14 +530,17 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					push.setEnabled(commitsAhead != null && commitsAhead.length > 0);
 					// Disable pull unless there's a remote tracking branch
 					pull.setEnabled(repository.trackingRemote(repository.currentBranch()));
-					// TODO Disable stash unless we have changes to stash
+					// TODO Disable stash unless there are staged or unstaged (but not untracked) changes
 					stash.setEnabled(true);
+					// TODO Disable unstash unless there's a refs/stash ref
+					unstash.setEnabled(true);
 					// TODO Disable commit unless there are changes to commit
 					commit.setEnabled(true);
 					push.setVisible(true);
 					pull.setVisible(true);
 					commit.setVisible(true);
 					stash.setVisible(true);
+					unstash.setVisible(true);
 					summary.setVisible(true);
 					branchCombo.setVisible(true);
 					gitDetails.setLayoutData(showGitDetailsData);
@@ -522,18 +570,19 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			summary.setText("");
 			return;
 		}
-		int deletedCount = 0;
+		// TODO Check if repo has merges and add that in red if it does!
+		int stagedCount = 0;
 		int addedCount = 0;
-		int modifiedCount = 0;
+		int unstagedCount = 0;
 		if (repo.index().changedFiles() != null)
 		{
 			for (ChangedFile file : repo.index().changedFiles())
 			{
 				if (file == null)
 					continue;
-				if (file.getStatus().equals(ChangedFile.Status.DELETED))
+				if (file.hasStagedChanges())
 				{
-					deletedCount++;
+					stagedCount++;
 				}
 				else if (file.getStatus().equals(ChangedFile.Status.NEW))
 				{
@@ -541,7 +590,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				}
 				else
 				{
-					modifiedCount++;
+					unstagedCount++;
 				}
 			}
 		}
@@ -554,9 +603,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			builder.append(repo.remoteTrackingBranch(branch).shortName()).append("' by ");
 			builder.append(commitsAhead.length).append(" commit(s)\n");
 		}
-		builder.append(modifiedCount).append(" file(s) modified\n");
-		builder.append(deletedCount).append(" file(s) deleted\n");
-		builder.append(addedCount).append(" file(s) added");
+		builder.append(stagedCount).append("/");
+		builder.append(unstagedCount).append("/");
+		builder.append(addedCount).append("\n");
+		builder.append("staged/unstaged/untracked");
 		summary.setText(builder.toString());
 	}
 

@@ -4,8 +4,8 @@ public class StatusAction extends GitAction
 {
 
 	@Override
-	protected String getCommand()
+	protected String[] getCommand()
 	{
-		return "status"; //$NON-NLS-1$
+		return new String[] { "status" }; //$NON-NLS-1$
 	}
 }

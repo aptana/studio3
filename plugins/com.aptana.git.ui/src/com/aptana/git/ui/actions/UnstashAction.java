@@ -6,15 +6,13 @@ import org.eclipse.jface.action.IAction;
 
 import com.aptana.git.ui.internal.actions.GitAction;
 
-public class StashAction extends GitAction
+public class UnstashAction extends GitAction
 {
-
-	private static final String COMMAND = "stash"; //$NON-NLS-1$
 
 	@Override
 	protected String[] getCommand()
 	{
-		return new String[] { COMMAND };
+		return new String[] { "stash", "apply" }; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -25,6 +23,5 @@ public class StashAction extends GitAction
 		refreshAffectedProjects();
 	}
 
-	// TODO Only enable if there are staged or unstaged files (but not untracked/new ones!)
-	
+	// TODO Only enable if there's a "ref/stash" ref!
 }

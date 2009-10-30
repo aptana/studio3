@@ -24,61 +24,14 @@ public class PullAction extends GitAction
 {
 
 	@Override
-	protected String getCommand()
+	protected String[] getCommand()
 	{
-		return "pull"; //$NON-NLS-1$
+		return new String[] { "pull" }; //$NON-NLS-1$
 	}
 
 	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
 	{
 		super.execute(action);
-
-		final Set<IProject> affectedProjects = new HashSet<IProject>();
-		for (IResource resource : getSelectedResources())
-		{
-			if (resource == null)
-				continue;
-			affectedProjects.add(resource.getProject());
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
-			if (repo != null)
-			{
-				affectedProjects.addAll(getAssociatedProjects(repo));
-			}
-		}
-
-		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
-		{
-			@Override
-			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
-			{
-				int work = 100 * affectedProjects.size();
-				SubMonitor sub = SubMonitor.convert(monitor, work);
-				for (IProject resource : affectedProjects)
-				{
-					if (sub.isCanceled())
-						return Status.CANCEL_STATUS;
-					resource.refreshLocal(IResource.DEPTH_INFINITE, sub.newChild(100));
-				}
-				sub.done();
-				return Status.OK_STATUS;
-			}
-		};
-		job.setRule(ResourcesPlugin.getWorkspace().getRoot());
-		job.setUser(true);
-		job.schedule();
-	}
-
-	private Collection<? extends IProject> getAssociatedProjects(GitRepository repo)
-	{
-		Set<IProject> projects = new HashSet<IProject>();
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
-		{
-			GitRepository other = GitRepository.getAttached(project);
-			if (other != null && other.equals(repo))
-			{
-				projects.add(project);
-			}
-		}
-		return projects;
+		refreshAffectedProjects();
 	}
 }
