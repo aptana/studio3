@@ -570,6 +570,16 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			summary.setText("");
 			return;
 		}
+		StringBuilder builder = new StringBuilder();
+		if (repo.hasMerges())
+		{
+			builder.append("You have unresolved merges!\n");
+			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+		}
+		else
+		{
+			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+		}
 		// TODO Check if repo has merges and add that in red if it does!
 		int stagedCount = 0;
 		int addedCount = 0;
@@ -596,7 +606,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 		String branch = repo.currentBranch();
 		String[] commitsAhead = repo.commitsAhead(branch);
-		StringBuilder builder = new StringBuilder();
 		if (commitsAhead != null && commitsAhead.length > 0)
 		{
 			builder.append("Your branch is ahead of '");
