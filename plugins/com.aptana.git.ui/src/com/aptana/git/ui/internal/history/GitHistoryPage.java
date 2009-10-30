@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.text.Document;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -157,6 +156,7 @@ public class GitHistoryPage extends HistoryPage
 
 				final IStructuredSelection sel = ((IStructuredSelection) s);
 				GitCommit commit = (GitCommit) sel.getFirstElement();
+				// TODO If we know the user's github project URL, we can point them to the GitHub URL for this instead of generating our own!
 				commentViewer.setText(commitToHTML(commit));
 				fileViewer.setInput(commit);
 			}
