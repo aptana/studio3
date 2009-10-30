@@ -153,10 +153,10 @@ public class ProcessWrapper
 		{
 			this._stdin.sendText(text);
 			
-			if (Platform.getOS().equals(Platform.OS_WIN32))
-			{
-				this._output.append(text);
-			}
+//			if (Platform.getOS().equals(Platform.OS_WIN32))
+//			{
+//				this._output.append(text);
+//			}
 		}
 	}
 
