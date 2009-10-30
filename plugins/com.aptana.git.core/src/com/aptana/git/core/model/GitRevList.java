@@ -45,7 +45,7 @@ public class GitRevList
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
-		String formatString = "--pretty=format:%H\01%e\01%an\01%s\01%b\01%P\01%at";
+		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at";
 		boolean showSign = rev.hasLeftRight();
 		if (showSign)
 			formatString += "\01%m";
@@ -101,6 +101,7 @@ public class GitRevList
 				GitCommit newCommit = new GitCommit(repository, sha);
 
 				String author = getline(stream, '\1', encoding);
+				String authorEmail = getline(stream, '\1', encoding);
 				String subject = getline(stream, '\1', encoding);
 				String body = getline(stream, '\1', encoding);
 				String parentString = getline(stream, '\1');
@@ -127,6 +128,7 @@ public class GitRevList
 				newCommit.setSubject(subject);
 				newCommit.setComment(body);
 				newCommit.setAuthor(author);
+				newCommit.setAuthorEmail(authorEmail);
 				newCommit.setTimestamp(time);
 
 				if (showSign)

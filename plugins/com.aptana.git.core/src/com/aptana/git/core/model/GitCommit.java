@@ -18,6 +18,7 @@ public class GitCommit
 	private String subject;
 	private long timestamp;
 	private String author;
+	private String authorEmail;
 	private List<String> parentShas;
 	private String comment;
 	private List<Diff> diffs;
@@ -158,5 +159,15 @@ public class GitCommit
 		if (!hasRefs())
 			return 0;
 		return getRefs().size();
+	}
+
+	public String getAuthorEmail()
+	{
+		return authorEmail;
+	}
+
+	void setAuthorEmail(String authorEmail)
+	{
+		this.authorEmail = authorEmail;
 	}
 }
