@@ -45,7 +45,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = new String[] { "/K" };
+			result = new String[] { "/K", "cd" };
 		}
 		
 		return result;
@@ -152,6 +152,11 @@ public class ProcessWrapper
 		if (this._stdin != null)
 		{
 			this._stdin.sendText(text);
+			
+			if (Platform.getOS().equals(Platform.OS_WIN32))
+			{
+				this._output.append(text);
+			}
 		}
 	}
 
