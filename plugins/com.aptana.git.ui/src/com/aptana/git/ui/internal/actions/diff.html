@@ -4,16 +4,8 @@
 body {
 	margin: 0;
 	margin-top: 5px;
-	width: 100%;
 	font-family: 'Lucida Grande', Arial;
 	font-size: 12px;
-}
-.diff .file {
-	margin: 10px;
-	padding: 10px;
-	-webkit-border-radius: 10px;
-	border: 1px solid #CCC;
-	-webkit-box-shadow: 1px 1px 2px #DDD;
 }
 
 .diff .file .fileHeader {
@@ -25,7 +17,6 @@ body {
 .diff .file .diffContent {
 	white-space: pre;
 	font-family: Monaco;
-	width: 100%;
 }
 
 .diff .file .diffcontent .lineno {
@@ -39,14 +30,13 @@ body {
 }
 
 .diff .file .diffContent .lines {
-	overflow: auto;
+	overflow: visible;
 }
 
 .diff .file .diffContent .lines .hunkheader {
   background-color: #f7f7f7;
   color: #bbb;
 }
-
 
 .diff .file .diffcontent .lines .delline {
   background-color: #FEE;
