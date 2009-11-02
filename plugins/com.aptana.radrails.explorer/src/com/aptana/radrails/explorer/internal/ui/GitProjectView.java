@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -51,7 +52,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	/**
 	 * Property we assign to a project to make it the active one that this view is filtered to.
 	 */
-	private static final String ACTIVE_PROJECT = "activeProject";
+	private static final String ACTIVE_PROJECT = "activeProject"; //$NON-NLS-1$
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
@@ -123,8 +124,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		stash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		stash.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png"));
-		stash.setToolTipText("Stash");
+		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png")); //$NON-NLS-1$
+		stash.setToolTipText(Messages.GitProjectView_StashTooltip);
 		stash.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -132,7 +133,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			{
 				final StashAction action = new StashAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git stash")
+				Job job = new Job(Messages.GitProjectView_StashJobTitle)
 				{
 
 					@Override
@@ -154,8 +155,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		unstash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		unstash.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		unstash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_up.png"));
-		unstash.setToolTipText("Unstash");
+		unstash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_up.png")); //$NON-NLS-1$
+		unstash.setToolTipText(Messages.GitProjectView_UnstashTooltip);
 		unstash.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -163,7 +164,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			{
 				final UnstashAction action = new UnstashAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git unstash")
+				Job job = new Job(Messages.GitProjectView_UnstashJobTitle)
 				{
 
 					@Override
@@ -185,8 +186,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		pull = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		pull.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png"));
-		pull.setToolTipText("Pull");
+		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png")); //$NON-NLS-1$
+		pull.setToolTipText(Messages.GitProjectView_PullTooltip);
 		pull.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -194,7 +195,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			{
 				final PullAction action = new PullAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git pull")
+				Job job = new Job(Messages.GitProjectView_PullJobTitle)
 				{
 
 					@Override
@@ -214,8 +215,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private void createPushButton(Composite parent)
 	{
 		push = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
-		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png"));
-		push.setToolTipText("Push");
+		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png")); //$NON-NLS-1$
+		push.setToolTipText(Messages.GitProjectView_PushTooltip);
 		push.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		push.addSelectionListener(new SelectionAdapter()
 		{
@@ -224,7 +225,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			{
 				final PushAction action = new PushAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job("git push")
+				Job job = new Job(Messages.GitProjectView_PushJobTitle)
 				{
 
 					@Override
@@ -245,7 +246,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private void createSummaryLabel(Composite parent)
 	{
 		summary = new Label(parent, SWT.WRAP);
-		summary.setText("");
+		summary.setText(""); //$NON-NLS-1$
 		Font font = summary.getFont();
 		FontData[] oldData = font.getFontData();
 		FontData[] newData = new FontData[oldData.length];
@@ -266,8 +267,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		commit = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
 		commit.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png"));
-		commit.setToolTipText("Commit...");
+		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png")); //$NON-NLS-1$
+		commit.setToolTipText(Messages.GitProjectView_CommitTooltip);
 		commit.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -353,7 +354,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	protected void reloadProjects()
 	{
-		Job job = new UIJob("Reload Projects")
+		Job job = new UIJob("Reload Projects") //$NON-NLS-1$
 		{
 
 			@Override
@@ -377,7 +378,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	protected boolean setNewBranch(String branchName)
 	{
-		if (branchName.endsWith("*"))
+		if (branchName.endsWith("*")) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 1);
 
 		final GitRepository repo = GitRepository.getAttached(selectedProject);
@@ -392,7 +393,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 		else
 		{
-			Job job = new UIJob("")
+			Job job = new UIJob("") //$NON-NLS-1$
 			{
 
 				@Override
@@ -400,7 +401,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				{
 					String currentBranchName = repo.currentBranch();
 					if (repo.isDirty())
-						currentBranchName += "*";
+						currentBranchName += "*"; //$NON-NLS-1$
 					branchCombo.setText(currentBranchName);
 					// TODO Pop a dialog saying we couldn't branches
 					return Status.OK_STATUS;
@@ -475,12 +476,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		for (String branchName : repo.localBranches())
 		{
 			if (branchName.equals(currentBranchName) && repo.isDirty())
-				branchCombo.add(branchName + "*");
+				branchCombo.add(branchName + "*"); //$NON-NLS-1$
 			else
 				branchCombo.add(branchName);
 		}
 		if (repo.isDirty())
-			currentBranchName += "*";
+			currentBranchName += "*"; //$NON-NLS-1$
 		branchCombo.setText(currentBranchName);
 		branchCombo.pack(true);
 	}
@@ -499,7 +500,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	protected void refreshUI(final GitRepository repository)
 	{
-		Job job = new UIJob("update UI for index changes")
+		Job job = new UIJob("update UI for index changes") //$NON-NLS-1$
 		{
 
 			@Override
@@ -567,13 +568,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		if (repo == null)
 		{
-			summary.setText("");
+			summary.setText(""); //$NON-NLS-1$
 			return;
 		}
 		StringBuilder builder = new StringBuilder();
 		if (repo.hasMerges())
 		{
-			builder.append("You have unresolved merges!\n");
+			builder.append(Messages.GitProjectView_UnresolvedMerges_msg);
 			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
 		}
 		else
@@ -608,14 +609,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		String[] commitsAhead = repo.commitsAhead(branch);
 		if (commitsAhead != null && commitsAhead.length > 0)
 		{
-			builder.append("Your branch is ahead of '");
-			builder.append(repo.remoteTrackingBranch(branch).shortName()).append("' by ");
-			builder.append(commitsAhead.length).append(" commit(s)\n");
+			builder.append(NLS.bind(Messages.GitProjectView_BranchAhead_msg, new Object[] {repo.remoteTrackingBranch(branch).shortName(), commitsAhead.length}));
 		}
-		builder.append(stagedCount).append("/");
-		builder.append(unstagedCount).append("/");
-		builder.append(addedCount).append("\n");
-		builder.append("staged/unstaged/untracked");
+		builder.append(NLS.bind(Messages.GitProjectView_FileCounts, new Object[] {stagedCount, unstagedCount, addedCount}));
+		builder.append(Messages.GitProjectView_FileCountsLabel);
 		summary.setText(builder.toString());
 	}
 

@@ -12,7 +12,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.explorer";
+	public static final String PLUGIN_ID = "com.aptana.radrails.explorer"; //$NON-NLS-1$
 
 	// The shared instance
 	private static ExplorerPlugin plugin;
