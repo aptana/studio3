@@ -13,8 +13,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -92,7 +96,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	protected String initialText = ""; //$NON-NLS-1$
 	private String previousFilterText;
 	
-	private PatternFilter patternFilter;
+	private PathFilter patternFilter;
 	private boolean narrowingDown;
 	private WorkbenchJob refreshJob;
 
@@ -149,7 +153,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		data2.left = new FormAttachment(0, 0);
 		focus.setLayoutData(data2);
 		
-		patternFilter = new PatternFilter();
+		patternFilter = new PathFilter();
 		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH	| SWT.ICON_CANCEL);
 		filterText.setText(initialText);
 		filterText.addModifyListener(new ModifyListener() {
