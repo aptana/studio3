@@ -300,6 +300,8 @@ public class CommitDialog extends StatusDialog
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				if (e.item == null)
+					return;
 				String path = ((TableItem) e.item).getText(1);
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
