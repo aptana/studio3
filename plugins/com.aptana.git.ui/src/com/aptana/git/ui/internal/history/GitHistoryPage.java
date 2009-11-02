@@ -1,13 +1,7 @@
 package com.aptana.git.ui.internal.history;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +29,8 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.util.IOUtil;
+import com.aptana.util.StringUtil;
 
 public class GitHistoryPage extends HistoryPage
 {
@@ -253,8 +249,7 @@ public class GitHistoryPage extends HistoryPage
 		String avatar = ""; //$NON-NLS-1$
 		if (commit.getAuthorEmail() != null)
 		{
-			String md5 = md5(commit.getAuthorEmail().toLowerCase());
-			avatar = md5;
+			avatar = StringUtil.md5(commit.getAuthorEmail().toLowerCase());
 		}
 		variables.put("avatar", avatar); //$NON-NLS-1$
 		
@@ -267,80 +262,21 @@ public class GitHistoryPage extends HistoryPage
 			}
 		}
 		variables.put("parent", parents.toString()); //$NON-NLS-1$
-
-		return populateTemplate(loadTemplate(), variables);
-	}
-
-	private String populateTemplate(String template, Map<String, String> variables)
-	{
-		for (Map.Entry<String, String> entry : variables.entrySet())
-		{
-			template = template.replaceFirst("\\{" + entry.getKey() + "\\}", entry.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return template;
+		return StringUtil.replaceAll(loadTemplate(), variables);
 	}
 
 	private String loadTemplate()
 	{
-		StringBuilder builder = new StringBuilder();
-		InputStream stream = null;
 		try
 		{
-			stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates").append("commit_details.html"), false); //$NON-NLS-1$ //$NON-NLS-2$
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			String line = null;
-			while ((line = reader.readLine()) != null)
-			{
-				builder.append(line);
-			}
+			InputStream stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates").append("commit_details.html"), false); //$NON-NLS-1$ //$NON-NLS-2$
+			return IOUtil.read(stream);
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitUIPlugin.logError(e.getMessage(), e);
+			return "";
 		}
-		finally
-		{
-			if (stream != null)
-				try
-				{
-					stream.close();
-				}
-				catch (IOException e)
-				{
-					// ignore
-				}
-		}
-		return builder.toString();
-	}
-
-	private String md5(String lowerCase)
-	{
-		try
-		{
-			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8"); //$NON-NLS-1$
-			MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
-			byte[] thedigest = md.digest(bytesOfMessage);
-			BigInteger bigInt = new BigInteger(1, thedigest);
-			String hashtext = bigInt.toString(16);
-			// Now we need to zero pad it if you actually want the full 32 chars.
-			while (hashtext.length() < 32)
-			{
-				hashtext = "0" + hashtext; //$NON-NLS-1$
-			}
-			return hashtext;
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (NoSuchAlgorithmException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	/**

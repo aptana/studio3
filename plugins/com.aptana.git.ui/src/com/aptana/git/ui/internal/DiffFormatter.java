@@ -1,9 +1,6 @@
 package com.aptana.git.ui.internal;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +8,8 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.util.IOUtil;
+import com.aptana.util.StringUtil;
 
 /**
  * Used to share common code for formatting Diffs for display.
@@ -24,6 +23,7 @@ public abstract class DiffFormatter
 
 	/**
 	 * Generates a colored HTML view of the diff
+	 * 
 	 * @param diff
 	 * @return
 	 */
@@ -63,7 +63,8 @@ public abstract class DiffFormatter
 					}
 					line1.append("..\n");
 					line2.append("..\n");
-					diffContent.append("<div class=\"hunkheader\">").append(sanitizeHTML(line)).append("</div>");
+					diffContent.append("<div class=\"hunkheader\">").append(StringUtil.sanitizeHTML(line)).append(
+							"</div>");
 					break;
 
 				case '+':
@@ -71,19 +72,22 @@ public abstract class DiffFormatter
 					line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>");
 					line1.append("\n");
 					line2.append(++hunkStartLine2).append("\n");
-					diffContent.append("<div class=\"addline\">").append(sanitizeHTML(line)).append("</div>");
+					diffContent.append("<div class=\"addline\">").append(StringUtil.sanitizeHTML(line))
+							.append("</div>");
 					break;
 
 				case ' ':
 					line1.append(++hunkStartLine1).append("\n");
 					line2.append(++hunkStartLine2).append("\n");
-					diffContent.append("<div class=\"noopline\">").append(sanitizeHTML(line)).append("</div>");
+					diffContent.append("<div class=\"noopline\">").append(StringUtil.sanitizeHTML(line)).append(
+							"</div>");
 					break;
 
 				case '-':
 					line1.append(++hunkStartLine1).append("\n");
 					line2.append("\n");
-					diffContent.append("<div class=\"delline\">").append(sanitizeHTML(line)).append("</div>");
+					diffContent.append("<div class=\"delline\">").append(StringUtil.sanitizeHTML(line))
+							.append("</div>");
 					break;
 
 				default:
@@ -101,13 +105,7 @@ public abstract class DiffFormatter
 		{
 			stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates")
 					.append("diff.html"), false);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			StringBuilder template = new StringBuilder();
-			String line = null;
-			while ((line = reader.readLine()) != null)
-			{
-				template.append(line).append("\n");
-			}			
+			String template = IOUtil.read(stream);
 			// Sanitize to remove $ so Java doesn't think I'm referring to groups for our replacement here
 			String sanitizedHTML = html.toString().replace('$', (char) 1);
 			return template.toString().replaceFirst("\\{diff\\}", sanitizedHTML).replace((char) 1, '$');
@@ -117,23 +115,6 @@ public abstract class DiffFormatter
 			GitUIPlugin.logError(e.getMessage(), e);
 			return html.toString();
 		}
-		finally
-		{
-			try
-			{
-				if (stream != null)
-					stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-	}
-
-	private static String sanitizeHTML(String line)
-	{
-		return line.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 	}
 
 }
