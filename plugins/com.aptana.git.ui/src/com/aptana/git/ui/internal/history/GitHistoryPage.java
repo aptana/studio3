@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,11 +30,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.team.ui.history.HistoryPage;
 
-import com.aptana.git.core.model.Diff;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class GitHistoryPage extends HistoryPage
 {
@@ -238,23 +240,23 @@ public class GitHistoryPage extends HistoryPage
 	protected String commitToHTML(GitCommit commit)
 	{
 		Map<String, String> variables = new HashMap<String, String>();
-		variables.put("sha", commit.sha());
-		variables.put("date", TIMESTAMP_FORMAT.format(commit.date()));
-		variables.put("author", commit.getAuthor());
-		variables.put("subject", commit.getSubject());
+		variables.put("sha", commit.sha()); //$NON-NLS-1$
+		variables.put("date", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
+		variables.put("author", commit.getAuthor()); //$NON-NLS-1$
+		variables.put("subject", commit.getSubject()); //$NON-NLS-1$
 		String comment = commit.getComment();
 		// Auto convert references to URLs into links
 		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); 
 		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads
-		variables.put("comment", comment);
+		variables.put("comment", comment); //$NON-NLS-1$
 		
-		String avatar = "";
+		String avatar = ""; //$NON-NLS-1$
 		if (commit.getAuthorEmail() != null)
 		{
 			String md5 = md5(commit.getAuthorEmail().toLowerCase());
 			avatar = md5;
 		}
-		variables.put("avatar", avatar);
+		variables.put("avatar", avatar); //$NON-NLS-1$
 		
 		StringBuilder parents = new StringBuilder();
 		if (commit.parents() != null && !commit.parents().isEmpty())
@@ -264,7 +266,7 @@ public class GitHistoryPage extends HistoryPage
 				parents.append(parentSha).append("<br />"); //$NON-NLS-1$
 			}
 		}
-		variables.put("parent", parents.toString());
+		variables.put("parent", parents.toString()); //$NON-NLS-1$
 
 		return populateTemplate(loadTemplate(), variables);
 	}
@@ -273,7 +275,7 @@ public class GitHistoryPage extends HistoryPage
 	{
 		for (Map.Entry<String, String> entry : variables.entrySet())
 		{
-			template = template.replaceFirst("\\{" + entry.getKey() + "\\}", entry.getValue());
+			template = template.replaceFirst("\\{" + entry.getKey() + "\\}", entry.getValue()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return template;
 	}
@@ -284,7 +286,7 @@ public class GitHistoryPage extends HistoryPage
 		InputStream stream = null;
 		try
 		{
-			stream = getClass().getResourceAsStream("commit_details.html");
+			stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates").append("commit_details.html"), false); //$NON-NLS-1$ //$NON-NLS-2$
 			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 			String line = null;
 			while ((line = reader.readLine()) != null)
@@ -316,15 +318,15 @@ public class GitHistoryPage extends HistoryPage
 	{
 		try
 		{
-			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8");
-			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8"); //$NON-NLS-1$
+			MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
 			byte[] thedigest = md.digest(bytesOfMessage);
 			BigInteger bigInt = new BigInteger(1, thedigest);
 			String hashtext = bigInt.toString(16);
 			// Now we need to zero pad it if you actually want the full 32 chars.
 			while (hashtext.length() < 32)
 			{
-				hashtext = "0" + hashtext;
+				hashtext = "0" + hashtext; //$NON-NLS-1$
 			}
 			return hashtext;
 		}
