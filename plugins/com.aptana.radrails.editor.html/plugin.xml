@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.html.HTMLEditor"
+            default="true"
+            extensions="html"
+            id="com.aptana.radrails.editor.html"
+            name="HTML Editor">
+      </editor>
+   </extension>
+
+</plugin>

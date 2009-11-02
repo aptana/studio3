@@ -32,31 +32,49 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+import com.aptana.radrails.editor.common.TextUtils;
 
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
+public class HTMLSourceViewerConfiguration extends SourceViewerConfiguration {
+	
+	private HTMLDoubleClickStrategy doubleClickStrategy;
 
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+		return TextUtils.combine(new String[][] {
+				{ IDocument.DEFAULT_CONTENT_TYPE },
+				HTMLSourceConfiguration.CONTENT_TYPES
+			});
+	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
+	@Override
+	public ITextDoubleClickStrategy getDoubleClickStrategy( ISourceViewer sourceViewer, String contentType) {
+		if (doubleClickStrategy == null)
+			doubleClickStrategy = new HTMLDoubleClickStrategy();
+		return doubleClickStrategy;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+		PresentationReconciler reconciler = new PresentationReconciler();
+		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		return reconciler;
 	}
 
 }

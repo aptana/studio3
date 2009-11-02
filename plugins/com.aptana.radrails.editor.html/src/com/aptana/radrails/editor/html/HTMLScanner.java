@@ -32,31 +32,28 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.jface.text.rules.*;
+import org.eclipse.jface.text.*;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+import com.aptana.radrails.editor.common.ColorManager;
+import com.aptana.radrails.editor.common.WhitespaceDetector;
 
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
+public class HTMLScanner extends RuleBasedScanner {
 
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	public HTMLScanner() {
+		IToken procInstr =
+			new Token(
+				new TextAttribute(
+					ColorManager.getDefault().getColor(IHTMLColorConstants.PROC_INSTR)));
+
+		IRule[] rules = new IRule[2];
+		//Add rule for processing instructions
+		rules[0] = new SingleLineRule("<?", "?>", procInstr);
+		// Add generic whitespace rule.
+		rules[1] = new WhitespaceRule(new WhitespaceDetector());
+
+		setRules(rules);
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
-	}
-
 }

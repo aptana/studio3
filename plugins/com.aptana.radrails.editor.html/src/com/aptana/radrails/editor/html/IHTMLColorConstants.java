@@ -32,31 +32,14 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.swt.graphics.RGB;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
-
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
-
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
-	}
-
+public interface IHTMLColorConstants {
+	RGB XML_COMMENT = new RGB(128, 0, 0);
+	RGB PROC_INSTR = new RGB(128, 128, 128);
+	RGB STRING = new RGB(0, 128, 0);
+	RGB DEFAULT = new RGB(0, 0, 0);
+	RGB TAG = new RGB(0, 0, 128);
 }

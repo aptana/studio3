@@ -32,31 +32,25 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+public class HTMLDocumentProvider extends FileDocumentProvider {
 
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
-
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	protected IDocument createDocument(Object element) throws CoreException {
+		IDocument document = super.createDocument(element);
+		if (document != null) {
+			IDocumentPartitioner partitioner = new FastPartitioner(
+					new HTMLPartitionScanner(),
+					HTMLSourceConfiguration.CONTENT_TYPES);
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+		}
+		return document;
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
-	}
-
 }

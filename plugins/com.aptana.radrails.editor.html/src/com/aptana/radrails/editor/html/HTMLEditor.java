@@ -32,31 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.ui.editors.text.TextEditor;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+public class HTMLEditor extends TextEditor {
 
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
-
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	public HTMLEditor() {
+		super();
+		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration());
+		setDocumentProvider(new HTMLDocumentProvider());
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
-	}
-
 }

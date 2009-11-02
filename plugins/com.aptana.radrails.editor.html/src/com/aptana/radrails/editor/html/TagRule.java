@@ -32,31 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.radrails.editor.html;
 
-package com.aptana.radrails.editor.erb.html;
+import org.eclipse.jface.text.rules.*;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+public class TagRule extends MultiLineRule {
 
-/**
- * @author Max Stepanov
- *
- */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
-
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	public TagRule(IToken token) {
+		super("<", ">", token);
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
+	protected boolean sequenceDetected(
+		ICharacterScanner scanner,
+		char[] sequence,
+		boolean eofAllowed) {
+		int c = scanner.read();
+		if (sequence[0] == '<') {
+			if (c == '?') {
+				// processing instruction - abort
+				scanner.unread();
+				return false;
+			}
+			if (c == '!') {
+				scanner.unread();
+				// comment - abort
+				return false;
+			}
+		} else if (sequence[0] == '>') {
+			scanner.unread();
+		}
+		return super.sequenceDetected(scanner, sequence, eofAllowed);
 	}
-
 }
