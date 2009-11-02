@@ -17,6 +17,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -30,9 +32,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
@@ -70,16 +77,35 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private FormData hideGitDetailsData;
 
 	private ResourceListener fResourceListener;
+	
+	/**
+	 * Maximum time spent expanding the tree after the filter text has been
+	 * updated (this is only used if we were able to at least expand the visible
+	 * nodes)
+	 */
+	private static final long SOFT_MAX_EXPAND_TIME = 200;
+
+	private Text filterText;
+	/**
+	 * The text to initially show in the filter text control.
+	 */
+	protected String initialText = ""; //$NON-NLS-1$
+	private String previousFilterText;
+	
+	private PatternFilter patternFilter;
+	private boolean narrowingDown;
+	private WorkbenchJob refreshJob;
 
 	@Override
 	public void createPartControl(Composite aParent)
 	{
 		// Create our own parent
-		Composite myComposite = new Composite(aParent, SWT.NONE);
-		myComposite.setLayout(new FormLayout());
+		Composite customComposite = new Composite(aParent, SWT.NONE);
+		customComposite.setLayout(new FormLayout());
+		// TODO Each composite we're hanging off here should probably be defined in it's own class and attached to this view using an extension or something. tht way we can mix and match and dynamically turn on and off the various components (like filter, git actions, single project focus, etc)
 
 		// Create our special git stuff
-		gitStuff = new Composite(myComposite, SWT.NONE);
+		gitStuff = new Composite(customComposite, SWT.NONE);
 		gitStuff.setLayout(new FormLayout());
 		FormData gitStuffLayoutData = new FormData();
 		gitStuffLayoutData.top = new FormAttachment(0, 5);
@@ -87,7 +113,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		gitStuffLayoutData.right= new FormAttachment(100, -5);
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
-		IProject[] projects = createProjectCombo(gitStuff);
+		IProject[] projects = createProjectCombo(gitStuff); // TODO Attach project combo in it's own area, not in git composite
 		createGitDetailsComposite(gitStuff);
 		createGitBranchCombo(gitDetails);
 		createCommitButton(gitDetails);
@@ -96,23 +122,79 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		createPullButton(gitDetails);
 		createStashButton(gitDetails);
 		createUnstashButton(gitDetails);
-
-		// Now create the typical stuff for the navigator
-		createNavigator(myComposite);
+		
+		// focus filter stuff, attach top to bottom of 'gitStuff'
+		Composite focus = createFocusComposite(customComposite, gitStuff);
+				
+		// Now create the typical stuff for the navigator, attach top to bottom of 'focus'
+		createNavigator(customComposite, focus);
 
 		fResourceListener = new ResourceListener();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
 		GitRepository.addListener(this);
 		if (projects.length > 0)
 			detectSelectedProject();
+		
+		getCommonViewer().addFilter(patternFilter);
+		createRefreshJob();
 	}
 
-	private void createNavigator(Composite myComposite)
+	private Composite createFocusComposite(Composite myComposite, Composite top)
+	{
+		Composite focus = new Composite(myComposite, SWT.BORDER);
+		focus.setLayout(new GridLayout(2, false));
+		FormData data2 = new FormData();
+		data2.top = new FormAttachment(top);
+		data2.right = new FormAttachment(100, 0);
+		data2.left = new FormAttachment(0, 0);
+		focus.setLayoutData(data2);
+		
+		patternFilter = new PatternFilter();
+		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH	| SWT.ICON_CANCEL);
+		filterText.setText(initialText);
+		filterText.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
+			public void modifyText(ModifyEvent e) {
+				textChanged();
+			}
+		});
+
+		// if we're using a field with built in cancel we need to listen for
+		// default selection changes (which tell us the cancel button has been
+		// pressed)
+		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
+			filterText.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetDefaultSelected(SelectionEvent e) {
+					if (e.detail == SWT.ICON_CANCEL)
+						clearText();
+				}
+			});
+		}
+		
+		GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);
+		// if the text widget supported cancel then it will have it's own
+		// integrated button. We can take all of the space.
+		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
+			gridData.horizontalSpan = 2;
+		filterText.setLayoutData(gridData);
+		return focus;
+	}
+	
+	private void createNavigator(Composite myComposite, Composite top)
 	{
 		Composite viewer = new Composite(myComposite, SWT.NONE);
 		viewer.setLayout(new FillLayout());
 		FormData data2 = new FormData();
-		data2.top = new FormAttachment(gitStuff);
+		data2.top = new FormAttachment(top);
 		data2.bottom = new FormAttachment(100, 0);
 		data2.right = new FormAttachment(100, 0);
 		data2.left = new FormAttachment(0, 0);
@@ -581,7 +663,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		{
 			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		}
-		// TODO Check if repo has merges and add that in red if it does!
 		int stagedCount = 0;
 		int addedCount = 0;
 		int unstagedCount = 0;
@@ -669,5 +750,201 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		if (selectedRepo != null && selectedRepo.equals(repo))
 			refreshUI(e.getRepository());
 	}
+	
+	/**
+	 * Clears the text in the filter text widget.
+	 */
+	protected void clearText() {
+		setFilterText(""); //$NON-NLS-1$
+		textChanged();
+	}
+	
+	/**
+	 * Set the text in the filter control.
+	 * 
+	 * @param string
+	 */
+	protected void setFilterText(String string) {
+		if (filterText != null) {
+			filterText.setText(string);
+			selectAll();
+		}
+	}
+	
+	/**
+	 * Select all text in the filter text field.
+	 * 
+	 */
+	protected void selectAll() {
+		if (filterText != null) {
+			filterText.selectAll();
+		}
+	}
+
+	/**
+	 * Create the refresh job for the receiver.
+	 * 
+	 */
+	private void createRefreshJob() {
+		refreshJob = doCreateRefreshJob();
+		refreshJob.setSystem(true);
+	}
+
+	/**
+	 * Update the receiver after the text has changed.
+	 */
+	protected void textChanged() {
+		narrowingDown = previousFilterText == null
+				|| getFilterString().startsWith(previousFilterText);
+		previousFilterText = getFilterString();
+		// cancel currently running job first, to prevent unnecessary redraw
+		refreshJob.cancel();
+		refreshJob.schedule(getRefreshJobDelay());
+	}
+	
+	/**
+	 * Return the time delay that should be used when scheduling the
+	 * filter refresh job.  Subclasses may override.
+	 * 
+	 * @return a time delay in milliseconds before the job should run
+	 * 
+	 * @since 3.5
+	 */
+	protected long getRefreshJobDelay() {
+		return 200;
+	}
+	
+	protected WorkbenchJob doCreateRefreshJob() {
+		return new WorkbenchJob("Refresh Filter") {//$NON-NLS-1$
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (getCommonViewer().getControl().isDisposed()) {
+					return Status.CANCEL_STATUS;
+				}
+
+				String text = getFilterString();
+				if (text == null) {
+					return Status.OK_STATUS;
+				}
+
+				boolean initial = initialText != null
+						&& initialText.equals(text);
+				if (initial) {
+					patternFilter.setPattern(null);
+				} else if (text != null) {
+					patternFilter.setPattern(text);
+				}
+
+				Control redrawFalseControl = getCommonViewer().getControl();
+				try {
+					// don't want the user to see updates that will be made to
+					// the tree
+					// we are setting redraw(false) on the composite to avoid
+					// dancing scrollbar
+					redrawFalseControl.setRedraw(false);
+					if (!narrowingDown) {
+						// collapse all
+						TreeItem[] is = getCommonViewer().getTree().getItems();
+						for (int i = 0; i < is.length; i++) {
+							TreeItem item = is[i];
+							if (item.getExpanded()) {
+								getCommonViewer().setExpandedState(item.getData(),
+										false);
+							}
+						}
+					}
+					getCommonViewer().refresh(true);
+
+					if (text.length() > 0 && !initial) {
+						/*
+						 * Expand elements one at a time. After each is
+						 * expanded, check to see if the filter text has been
+						 * modified. If it has, then cancel the refresh job so
+						 * the user doesn't have to endure expansion of all the
+						 * nodes.
+						 */
+						TreeItem[] items = getCommonViewer().getTree().getItems();
+						int treeHeight = getCommonViewer().getTree().getBounds().height;
+						int numVisibleItems = treeHeight
+								/ getCommonViewer().getTree().getItemHeight();
+						long stopTime = SOFT_MAX_EXPAND_TIME
+								+ System.currentTimeMillis();
+						boolean cancel = false;
+						if (items.length > 0
+								&& recursiveExpand(items, monitor, stopTime,
+										new int[] { numVisibleItems })) {
+							cancel = true;
+						}
+
+						// enabled toolbar - there is text to clear
+						// and the list is currently being filtered
+//						updateToolbar(true);
+						
+						if (cancel) {
+							return Status.CANCEL_STATUS;
+						}
+					} else {
+						// disabled toolbar - there is no text to clear
+						// and the list is currently not filtered
+//						updateToolbar(false);
+					}
+				} finally {
+					// done updating the tree - set redraw back to true
+					TreeItem[] items = getCommonViewer().getTree().getItems();
+					if (items.length > 0
+							&& getCommonViewer().getTree().getSelectionCount() == 0) {
+						getCommonViewer().getTree().setTopItem(items[0]);
+					}
+					redrawFalseControl.setRedraw(true);
+				}
+				return Status.OK_STATUS;
+			}
+
+			/**
+			 * Returns true if the job should be canceled (because of timeout or
+			 * actual cancellation).
+			 * 
+			 * @param items
+			 * @param monitor
+			 * @param cancelTime
+			 * @param numItemsLeft
+			 * @return true if canceled
+			 */
+			private boolean recursiveExpand(TreeItem[] items,
+					IProgressMonitor monitor, long cancelTime,
+					int[] numItemsLeft) {
+				boolean canceled = false;
+				for (int i = 0; !canceled && i < items.length; i++) {
+					TreeItem item = items[i];
+					boolean visible = numItemsLeft[0]-- >= 0;
+					if (monitor.isCanceled()
+							|| (!visible && System.currentTimeMillis() > cancelTime)) {
+						canceled = true;
+					} else {
+						Object itemData = item.getData();
+						if (itemData != null) {
+							if (!item.getExpanded()) {
+								// do the expansion through the viewer so that
+								// it can refresh children appropriately.
+								getCommonViewer().setExpandedState(itemData, true);
+							}
+							TreeItem[] children = item.getItems();
+							if (items.length > 0) {
+								canceled = recursiveExpand(children, monitor,
+										cancelTime, numItemsLeft);
+							}
+						}
+					}
+				}
+				return canceled;
+			}
+
+		};
+	}
+
+	protected String getFilterString()
+	{
+		return filterText != null ? filterText.getText() : null;
+	}
+
 
 }
