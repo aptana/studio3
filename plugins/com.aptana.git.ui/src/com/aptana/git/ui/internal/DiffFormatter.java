@@ -69,11 +69,11 @@ public abstract class DiffFormatter
 
 				case '+':
 					// Highlight trailing whitespace
+					line = StringUtil.sanitizeHTML(line);
 					line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>");
 					line1.append("\n");
 					line2.append(++hunkStartLine2).append("\n");
-					diffContent.append("<div class=\"addline\">").append(StringUtil.sanitizeHTML(line))
-							.append("</div>");
+					diffContent.append("<div class=\"addline\">").append(line).append("</div>");
 					break;
 
 				case ' ':
