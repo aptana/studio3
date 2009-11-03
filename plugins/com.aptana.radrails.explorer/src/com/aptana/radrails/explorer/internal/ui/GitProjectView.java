@@ -13,12 +13,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -40,7 +36,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -81,11 +76,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private FormData hideGitDetailsData;
 
 	private ResourceListener fResourceListener;
-	
+
 	/**
-	 * Maximum time spent expanding the tree after the filter text has been
-	 * updated (this is only used if we were able to at least expand the visible
-	 * nodes)
+	 * Maximum time spent expanding the tree after the filter text has been updated (this is only used if we were able
+	 * to at least expand the visible nodes)
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
@@ -93,12 +87,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	/**
 	 * The text to initially show in the filter text control.
 	 */
-	protected String initialText = "Type filter here"; //$NON-NLS-1$
+	protected String initialText = "Type filter here";
 	private String previousFilterText;
-	
+
 	private PathFilter patternFilter;
 	private boolean narrowingDown;
 	private WorkbenchJob refreshJob;
+
+	private Button filter;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -106,7 +102,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// Create our own parent
 		Composite customComposite = new Composite(aParent, SWT.NONE);
 		customComposite.setLayout(new FormLayout());
-		// TODO Each composite we're hanging off here should probably be defined in it's own class and attached to this view using an extension or something. tht way we can mix and match and dynamically turn on and off the various components (like filter, git actions, single project focus, etc)
+		// TODO Each composite we're hanging off here should probably be defined in it's own class and attached to this
+		// view using an extension or something. tht way we can mix and match and dynamically turn on and off the
+		// various components (like filter, git actions, single project focus, etc)
 
 		// Create our special git stuff
 		gitStuff = new Composite(customComposite, SWT.NONE);
@@ -114,22 +112,25 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		FormData gitStuffLayoutData = new FormData();
 		gitStuffLayoutData.top = new FormAttachment(0, 5);
 		gitStuffLayoutData.left = new FormAttachment(0, 5);
-		gitStuffLayoutData.right= new FormAttachment(100, -5);
+		gitStuffLayoutData.right = new FormAttachment(100, -5);
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
-		IProject[] projects = createProjectCombo(gitStuff); // TODO Attach project combo in it's own area, not in git composite
+		IProject[] projects = createProjectCombo(gitStuff); // TODO Attach project combo in it's own area, not in git
+															// composite
 		createGitDetailsComposite(gitStuff);
-		createGitBranchCombo(gitDetails);
+		// TODO Add a button/arrow to allow expanding/hiding the stuff below branch/commit widgets
+		createGitBranchCombo(gitDetails);// FIXME fix layout now that I added the filter button
+		createFilterButton(gitDetails);
 		createCommitButton(gitDetails);
 		createSummaryLabel(gitDetails);
 		createPushButton(gitDetails);
 		createPullButton(gitDetails);
 		createStashButton(gitDetails);
 		createUnstashButton(gitDetails);
-		
+
 		// focus filter stuff, attach top to bottom of 'gitStuff'
 		Composite focus = createFocusComposite(customComposite, gitStuff);
-				
+
 		// Now create the typical stuff for the navigator, attach top to bottom of 'focus'
 		createNavigator(customComposite, focus);
 
@@ -138,7 +139,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		GitRepository.addListener(this);
 		if (projects.length > 0)
 			detectSelectedProject();
-		
+
 		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
 	}
@@ -152,17 +153,18 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		data2.right = new FormAttachment(100, 0);
 		data2.left = new FormAttachment(0, 0);
 		focus.setLayoutData(data2);
-		
+
 		patternFilter = new PathFilter();
 		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 		filterText.setText(initialText);
-		filterText.addModifyListener(new ModifyListener() {
+		filterText.addModifyListener(new ModifyListener()
+		{
 			/*
 			 * (non-Javadoc)
-			 * 
 			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
 			 */
-			public void modifyText(ModifyEvent e) {
+			public void modifyText(ModifyEvent e)
+			{
 				textChanged();
 			}
 		});
@@ -170,21 +172,24 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// if we're using a field with built in cancel we need to listen for
 		// default selection changes (which tell us the cancel button has been
 		// pressed)
-		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0) {
-			filterText.addSelectionListener(new SelectionAdapter() {
+		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
+		{
+			filterText.addSelectionListener(new SelectionAdapter()
+			{
 				/*
 				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.swt.events.SelectionAdapter#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+				 * @see
+				 * org.eclipse.swt.events.SelectionAdapter#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
-				public void widgetDefaultSelected(SelectionEvent e) {
+				public void widgetDefaultSelected(SelectionEvent e)
+				{
 					if (e.detail == SWT.ICON_CANCEL)
 						clearText();
 				}
 			});
 		}
-		
-		GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);
+
+		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		// if the text widget supported cancel then it will have it's own
 		// integrated button. We can take all of the space.
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
@@ -192,7 +197,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		filterText.setLayoutData(gridData);
 		return focus;
 	}
-	
+
 	private void createNavigator(Composite myComposite, Composite top)
 	{
 		Composite viewer = new Composite(myComposite, SWT.NONE);
@@ -236,7 +241,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		});
 	}
-	
+
 	private void createUnstashButton(Composite parent)
 	{
 		unstash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
@@ -349,6 +354,33 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		summary.setLayoutData(summaryData);
 	}
 
+	private void createFilterButton(Composite parent)
+	{
+		filter = new Button(parent, SWT.FLAT | SWT.TOGGLE | SWT.CENTER);
+		filter.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		filter.setImage(ExplorerPlugin.getImage("icons/full/elcl16/filter.png")); //$NON-NLS-1$
+		filter.setToolTipText("Filter to changed files");
+		filter.addSelectionListener(new SelectionAdapter()
+		{
+			private GitChangedFilesFilter fChangedFilesFilter;
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (fChangedFilesFilter == null)
+				{
+					fChangedFilesFilter = new GitChangedFilesFilter();
+					getCommonViewer().addFilter(fChangedFilesFilter);
+				}
+				else
+				{
+					getCommonViewer().removeFilter(fChangedFilesFilter);
+					fChangedFilesFilter = null;
+				}
+			}
+		});
+	}
+
 	private void createCommitButton(Composite parent)
 	{
 		commit = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
@@ -372,7 +404,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		branchCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		GridData branchComboData = new GridData(SWT.BEGINNING, SWT.CENTER, true, false);
-		branchComboData.horizontalSpan = 2;
 		branchCombo.setLayoutData(branchComboData);
 		branchCombo.addSelectionListener(new SelectionAdapter()
 		{
@@ -543,6 +574,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					Boolean.TRUE.toString());
 			refreshUI(GitRepository.getAttached(newSelectedProject));
 			// Refresh the view so our filter gets updated!
+			clearText();
 			refreshViewer();
 		}
 		catch (CoreException e1)
@@ -601,11 +633,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					pull.setEnabled(false);
 					stash.setEnabled(false);
 					commit.setEnabled(false);
+					filter.setEnabled(false);
 					push.setVisible(false);
 					pull.setVisible(false);
 					commit.setVisible(false);
 					stash.setVisible(false);
 					unstash.setVisible(false);
+					filter.setVisible(false);
 					branchCombo.setVisible(false);
 					summary.setVisible(false);
 					gitDetails.setLayoutData(hideGitDetailsData);
@@ -623,12 +657,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					unstash.setEnabled(true);
 					// TODO Disable commit unless there are changes to commit
 					commit.setEnabled(true);
+					filter.setEnabled(gitFilterEnabled(repository));
 					push.setVisible(true);
 					pull.setVisible(true);
 					commit.setVisible(true);
 					stash.setVisible(true);
 					unstash.setVisible(true);
 					summary.setVisible(true);
+					filter.setVisible(true);
 					branchCombo.setVisible(true);
 					gitDetails.setLayoutData(showGitDetailsData);
 					// Make the summary as wide as the project combo, and as tall as the 3 icons
@@ -694,9 +730,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		String[] commitsAhead = repo.commitsAhead(branch);
 		if (commitsAhead != null && commitsAhead.length > 0)
 		{
-			builder.append(NLS.bind(Messages.GitProjectView_BranchAhead_msg, new Object[] {repo.remoteTrackingBranch(branch).shortName(), commitsAhead.length}));
+			builder.append(NLS.bind(Messages.GitProjectView_BranchAhead_msg, new Object[] {
+					repo.remoteTrackingBranch(branch).shortName(), commitsAhead.length }));
 		}
-		builder.append(NLS.bind(Messages.GitProjectView_FileCounts, new Object[] {stagedCount, unstagedCount, addedCount}));
+		builder.append(NLS.bind(Messages.GitProjectView_FileCounts, new Object[] { stagedCount, unstagedCount,
+				addedCount }));
 		builder.append(Messages.GitProjectView_FileCountsLabel);
 		summary.setText(builder.toString());
 	}
@@ -754,42 +792,46 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		if (selectedRepo != null && selectedRepo.equals(repo))
 			refreshUI(e.getRepository());
 	}
-	
+
 	/**
 	 * Clears the text in the filter text widget.
 	 */
-	protected void clearText() {
+	protected void clearText()
+	{
 		setFilterText(""); //$NON-NLS-1$
 		textChanged();
 	}
-	
+
 	/**
 	 * Set the text in the filter control.
 	 * 
 	 * @param string
 	 */
-	protected void setFilterText(String string) {
-		if (filterText != null) {
+	protected void setFilterText(String string)
+	{
+		if (filterText != null)
+		{
 			filterText.setText(string);
 			selectAll();
 		}
 	}
-	
+
 	/**
 	 * Select all text in the filter text field.
-	 * 
 	 */
-	protected void selectAll() {
-		if (filterText != null) {
+	protected void selectAll()
+	{
+		if (filterText != null)
+		{
 			filterText.selectAll();
 		}
 	}
 
 	/**
 	 * Create the refresh job for the receiver.
-	 * 
 	 */
-	private void createRefreshJob() {
+	private void createRefreshJob()
+	{
 		refreshJob = doCreateRefreshJob();
 		refreshJob.setSystem(true);
 	}
@@ -797,105 +839,118 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	/**
 	 * Update the receiver after the text has changed.
 	 */
-	protected void textChanged() {
-		narrowingDown = previousFilterText == null
-				|| getFilterString().startsWith(previousFilterText);
+	protected void textChanged()
+	{
+		narrowingDown = previousFilterText == null || getFilterString().startsWith(previousFilterText);
 		previousFilterText = getFilterString();
 		// cancel currently running job first, to prevent unnecessary redraw
-		refreshJob.cancel();
-		refreshJob.schedule(getRefreshJobDelay());
+		if (refreshJob != null)
+		{
+			refreshJob.cancel();
+			refreshJob.schedule(getRefreshJobDelay());
+		}
 	}
-	
+
 	/**
-	 * Return the time delay that should be used when scheduling the
-	 * filter refresh job.  Subclasses may override.
+	 * Return the time delay that should be used when scheduling the filter refresh job. Subclasses may override.
 	 * 
 	 * @return a time delay in milliseconds before the job should run
-	 * 
 	 * @since 3.5
 	 */
-	protected long getRefreshJobDelay() {
+	protected long getRefreshJobDelay()
+	{
 		return 200;
 	}
-	
-	protected WorkbenchJob doCreateRefreshJob() {
+
+	protected WorkbenchJob doCreateRefreshJob()
+	{
 		return new WorkbenchJob("Refresh Filter") {//$NON-NLS-1$
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				if (getCommonViewer().getControl().isDisposed()) {
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				if (getCommonViewer().getControl().isDisposed())
+				{
 					return Status.CANCEL_STATUS;
 				}
 
 				String text = getFilterString();
-				if (text == null) {
+				if (text == null)
+				{
 					return Status.OK_STATUS;
 				}
 
-				boolean initial = initialText != null
-						&& initialText.equals(text);
-				if (initial) {
+				boolean initial = initialText != null && initialText.equals(text);
+				if (initial)
+				{
 					patternFilter.setPattern(null);
-				} else if (text != null) {
+				}
+				else if (text != null)
+				{
 					patternFilter.setPattern(text);
 				}
 
 				Control redrawFalseControl = getCommonViewer().getControl();
-				try {
+				try
+				{
 					// don't want the user to see updates that will be made to
 					// the tree
 					// we are setting redraw(false) on the composite to avoid
 					// dancing scrollbar
 					redrawFalseControl.setRedraw(false);
-					if (!narrowingDown) {
+					if (!narrowingDown)
+					{
 						// collapse all
 						TreeItem[] is = getCommonViewer().getTree().getItems();
-						for (int i = 0; i < is.length; i++) {
+						for (int i = 0; i < is.length; i++)
+						{
 							TreeItem item = is[i];
-							if (item.getExpanded()) {
-								getCommonViewer().setExpandedState(item.getData(),
-										false);
+							if (item.getExpanded())
+							{
+								getCommonViewer().setExpandedState(item.getData(), false);
 							}
 						}
 					}
 					getCommonViewer().refresh(true);
 
-					if (text.length() > 0 && !initial) {
+					if (text.length() > 0 && !initial)
+					{
 						/*
-						 * Expand elements one at a time. After each is
-						 * expanded, check to see if the filter text has been
-						 * modified. If it has, then cancel the refresh job so
-						 * the user doesn't have to endure expansion of all the
-						 * nodes.
+						 * Expand elements one at a time. After each is expanded, check to see if the filter text has
+						 * been modified. If it has, then cancel the refresh job so the user doesn't have to endure
+						 * expansion of all the nodes.
 						 */
 						TreeItem[] items = getCommonViewer().getTree().getItems();
 						int treeHeight = getCommonViewer().getTree().getBounds().height;
-						int numVisibleItems = treeHeight
-								/ getCommonViewer().getTree().getItemHeight();
-						long stopTime = SOFT_MAX_EXPAND_TIME
-								+ System.currentTimeMillis();
+						int numVisibleItems = treeHeight / getCommonViewer().getTree().getItemHeight();
+						long stopTime = SOFT_MAX_EXPAND_TIME + System.currentTimeMillis();
 						boolean cancel = false;
 						if (items.length > 0
-								&& recursiveExpand(items, monitor, stopTime,
-										new int[] { numVisibleItems })) {
+								&& recursiveExpand(items, monitor, stopTime, new int[] { numVisibleItems }))
+						{
 							cancel = true;
 						}
 
 						// enabled toolbar - there is text to clear
 						// and the list is currently being filtered
-//						updateToolbar(true);
-						
-						if (cancel) {
+						// updateToolbar(true);
+
+						if (cancel)
+						{
 							return Status.CANCEL_STATUS;
 						}
-					} else {
+					}
+					else
+					{
 						// disabled toolbar - there is no text to clear
 						// and the list is currently not filtered
-//						updateToolbar(false);
+						// updateToolbar(false);
 					}
-				} finally {
+				}
+				finally
+				{
 					// done updating the tree - set redraw back to true
 					TreeItem[] items = getCommonViewer().getTree().getItems();
-					if (items.length > 0
-							&& getCommonViewer().getTree().getSelectionCount() == 0) {
+					if (items.length > 0 && getCommonViewer().getTree().getSelectionCount() == 0)
+					{
 						getCommonViewer().getTree().setTopItem(items[0]);
 					}
 					redrawFalseControl.setRedraw(true);
@@ -904,8 +959,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 
 			/**
-			 * Returns true if the job should be canceled (because of timeout or
-			 * actual cancellation).
+			 * Returns true if the job should be canceled (because of timeout or actual cancellation).
 			 * 
 			 * @param items
 			 * @param monitor
@@ -913,28 +967,33 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			 * @param numItemsLeft
 			 * @return true if canceled
 			 */
-			private boolean recursiveExpand(TreeItem[] items,
-					IProgressMonitor monitor, long cancelTime,
-					int[] numItemsLeft) {
+			private boolean recursiveExpand(TreeItem[] items, IProgressMonitor monitor, long cancelTime,
+					int[] numItemsLeft)
+			{
 				boolean canceled = false;
-				for (int i = 0; !canceled && i < items.length; i++) {
+				for (int i = 0; !canceled && i < items.length; i++)
+				{
 					TreeItem item = items[i];
 					boolean visible = numItemsLeft[0]-- >= 0;
-					if (monitor.isCanceled()
-							|| (!visible && System.currentTimeMillis() > cancelTime)) {
+					if (monitor.isCanceled() || (!visible && System.currentTimeMillis() > cancelTime))
+					{
 						canceled = true;
-					} else {
+					}
+					else
+					{
 						Object itemData = item.getData();
-						if (itemData != null) {
-							if (!item.getExpanded()) {
+						if (itemData != null)
+						{
+							if (!item.getExpanded())
+							{
 								// do the expansion through the viewer so that
 								// it can refresh children appropriately.
 								getCommonViewer().setExpandedState(itemData, true);
 							}
 							TreeItem[] children = item.getItems();
-							if (items.length > 0) {
-								canceled = recursiveExpand(children, monitor,
-										cancelTime, numItemsLeft);
+							if (items.length > 0)
+							{
+								canceled = recursiveExpand(children, monitor, cancelTime, numItemsLeft);
 							}
 						}
 					}
@@ -950,5 +1009,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		return filterText != null ? filterText.getText() : null;
 	}
 
+	private boolean gitFilterEnabled(final GitRepository repository)
+	{
+		// TODO The files also have to be children of the active project!
+		return !repository.index().changedFiles().isEmpty();
+	}
 
 }
