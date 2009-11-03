@@ -34,10 +34,15 @@
  */
 package com.aptana.radrails.editor.xml;
 
-import org.eclipse.jface.text.rules.*;
-import org.eclipse.jface.text.*;
+import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WhitespaceRule;
 
-import com.aptana.radrails.editor.common.ColorManager;
+import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.WhitespaceDetector;
 
 public class XMLScanner extends RuleBasedScanner {
@@ -46,7 +51,7 @@ public class XMLScanner extends RuleBasedScanner {
 		IToken procInstr =
 			new Token(
 				new TextAttribute(
-					ColorManager.getDefault().getColor(IXMLColorConstants.PROC_INSTR)));
+						CommonEditorPlugin.getDefault().getColorManager().getColor(IXMLColorConstants.PROC_INSTR)));
 
 		IRule[] rules = new IRule[2];
 		//Add rule for processing instructions

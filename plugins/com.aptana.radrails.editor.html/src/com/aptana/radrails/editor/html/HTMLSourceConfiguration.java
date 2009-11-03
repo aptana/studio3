@@ -46,7 +46,7 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.ColorManager;
+import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 
@@ -111,7 +111,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(
-				new TextAttribute(ColorManager.getDefault().getColor(IHTMLColorConstants.XML_COMMENT)));
+				new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.XML_COMMENT)));
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 	}
@@ -120,7 +120,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (htmlScanner == null) {
 			htmlScanner = new HTMLScanner();
 			htmlScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(IHTMLColorConstants.DEFAULT))));
+					CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.DEFAULT))));
 		}
 		return htmlScanner;
 	}
@@ -129,7 +129,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (tagScanner == null) {
 			tagScanner = new HTMLTagScanner();
 			tagScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(IHTMLColorConstants.TAG))));
+					CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.TAG))));
 		}
 		return tagScanner;
 	}

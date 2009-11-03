@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.aptana.radrails.editor.common.theme.preferences.ThemePreferencePage"
+            id="com.aptana.radrails.editor.common.theme.page"
+            name="Themes">
+      </page>
+   </extension>
 </plugin>

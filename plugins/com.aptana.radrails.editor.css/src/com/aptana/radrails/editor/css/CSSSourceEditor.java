@@ -34,12 +34,20 @@
  */
 package com.aptana.radrails.editor.css;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class CSSSourceEditor extends TextEditor {
+public class CSSSourceEditor extends AbstractThemeableEditor {
 
 	public CSSSourceEditor() {
 		super();
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on AbstractTextEditor
+	 */
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration());
 		setDocumentProvider(new CSSDocumentProvider());
 	}

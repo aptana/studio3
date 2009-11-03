@@ -35,44 +35,101 @@
 
 package com.aptana.radrails.editor.css;
 
-import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.ColorManager;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
  *
  */
 public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
-
-	public final static String WORD = "__css_word";
 	public final static String STRING = "__css_string";
+	public final static String MULTILINE_COMMENT = "__css_multiline_comment";
 
 	public static final String[] CONTENT_TYPES = new String[] {
-		WORD,
+		MULTILINE_COMMENT,
 		STRING
 	};
+	
+	/**
+	 * Detector for empty comments.
+	 */
+	static class EmptyCommentDetector implements IWordDetector
+	{
+		/**
+		 * isWordStart
+		 */
+		public boolean isWordStart(char c)
+		{
+			return (c == '/');
+		}
 
-	private IToken wordToken = new Token(WORD);
+		/**
+		 * isWordPart
+		 */
+		public boolean isWordPart(char c)
+		{
+			return (c == '*' || c == '/');
+		}
+	}
+
+	/**
+	 * WordPredicateRule
+	 */
+	static class WordPredicateRule extends WordRule implements IPredicateRule
+	{
+		private IToken fSuccessToken;
+
+		/**
+		 * WordPredicateRule
+		 * 
+		 * @param successToken
+		 */
+		public WordPredicateRule(IToken successToken)
+		{
+			super(new EmptyCommentDetector());
+			fSuccessToken = successToken;
+			addWord("/**/", fSuccessToken); //$NON-NLS-1$
+		}
+
+		/**
+		 * evaluate
+		 */
+		public IToken evaluate(ICharacterScanner scanner, boolean resume)
+		{
+			return super.evaluate(scanner);
+		}
+
+		/**
+		 * getSuccessToken
+		 */
+		public IToken getSuccessToken()
+		{
+			return fSuccessToken;
+		}
+	}
+
 	private IToken stringToken = new Token(STRING);
 	
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new SingleLineRule("\"", "\"", stringToken, '\\'),
-			new SingleLineRule("\'", "\'", stringToken, '\\')
-	};
+	private IPredicateRule[] partitioningRules;
 
-	private RuleBasedScanner wordScanner;
+	private RuleBasedScanner multilineCommentScanner;
 	private RuleBasedScanner stringScanner;
 
 	private static CSSSourceConfiguration instance;
@@ -82,6 +139,18 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 			instance = new CSSSourceConfiguration();
 		}
 		return instance;
+	}
+	
+	private CSSSourceConfiguration() {
+		
+		IToken comment = new Token(MULTILINE_COMMENT);
+		
+		partitioningRules = new IPredicateRule[] {
+				new SingleLineRule("\"", "\"", stringToken, '\\'),
+				new SingleLineRule("\'", "\'", stringToken, '\\'),
+				new WordPredicateRule(comment),
+				new MultiLineRule("/*", "*/", comment, (char) 0, true)
+		};
 	}
 
 	/* (non-Javadoc)
@@ -102,9 +171,14 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getWordScanner());
-		reconciler.setDamager(dr, CSSSourceConfiguration.WORD);
-		reconciler.setRepairer(dr, CSSSourceConfiguration.WORD);
+		
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
+		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		
+		dr = new DefaultDamagerRepairer(getWordScanner());
+		reconciler.setDamager(dr, CSSSourceConfiguration.MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, CSSSourceConfiguration.MULTILINE_COMMENT);
 
 		dr = new DefaultDamagerRepairer(getStringScanner());
 		reconciler.setDamager(dr, CSSSourceConfiguration.STRING);
@@ -112,19 +186,17 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	protected ITokenScanner getWordScanner() {
-		if (wordScanner == null) {
-			wordScanner = new RuleBasedScanner();
-			wordScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(ICSSColorConstants.WORD))));
+		if (multilineCommentScanner == null) {
+			multilineCommentScanner = new RuleBasedScanner();
+			multilineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.css"));
 		}
-		return wordScanner;
+		return multilineCommentScanner;
 	}
 	
 	protected ITokenScanner getStringScanner() {
 		if (stringScanner == null) {
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(ICSSColorConstants.STRING))));
+			stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.css"));
 		}
 		return stringScanner;
 	}

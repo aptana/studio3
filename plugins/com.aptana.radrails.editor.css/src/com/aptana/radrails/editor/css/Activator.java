@@ -14,6 +14,8 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
+	private CSSCodeScanner _codeScanner;
+	
 	/**
 	 * The constructor
 	 */
@@ -47,4 +49,20 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	
+
+	/**
+	 * getCodeScanner
+	 * 
+	 * @return
+	 */
+	public CSSCodeScanner getCodeScanner()
+	{
+		if (this._codeScanner == null)
+		{
+			this._codeScanner = new CSSCodeScanner();
+		}
+
+		return this._codeScanner;
+	}
 }

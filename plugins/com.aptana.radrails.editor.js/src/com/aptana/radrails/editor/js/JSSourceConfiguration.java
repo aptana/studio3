@@ -46,7 +46,7 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.ColorManager;
+import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 
@@ -115,7 +115,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (wordScanner == null) {
 			wordScanner = new RuleBasedScanner();
 			wordScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(IJSColorConstants.WORD))));
+					CommonEditorPlugin.getDefault().getColorManager().getColor(IJSColorConstants.WORD))));
 		}
 		return wordScanner;
 	}
@@ -124,7 +124,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (stringScanner == null) {
 			stringScanner = new RuleBasedScanner();
 			stringScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						ColorManager.getDefault().getColor(IJSColorConstants.STRING))));
+					CommonEditorPlugin.getDefault().getColorManager().getColor(IJSColorConstants.STRING))));
 		}
 		return stringScanner;
 	}

@@ -109,7 +109,7 @@ public abstract class CombinedSourceViewerConfiguration extends SourceViewerConf
 		if (startEndTokenScanner == null) {
 			RuleBasedScanner ts = new RuleBasedScanner();
 			IToken seqToken = new Token(
-					new TextAttribute(ColorManager.getDefault().getColor(ICommonColorConstants.START_END_SEQUENCE)));
+					new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(ICommonColorConstants.START_END_SEQUENCE)));
 			List<IRule> rules = new ArrayList<IRule>();
 			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs()) {
 				rules.add(new SingleTagRule(pair[0], seqToken));
@@ -117,7 +117,7 @@ public abstract class CombinedSourceViewerConfiguration extends SourceViewerConf
 			}
 			ts.setRules(rules.toArray(new IRule[rules.size()]));
 			ts.setDefaultReturnToken(new Token(
-					new TextAttribute(ColorManager.getDefault().getColor(ICommonColorConstants.DEFAULT))));
+					new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(ICommonColorConstants.DEFAULT))));
 			startEndTokenScanner = ts;
 		}
 		return startEndTokenScanner;

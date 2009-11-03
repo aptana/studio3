@@ -3,6 +3,8 @@ package com.aptana.radrails.editor.common;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.radrails.editor.common.theme.ColorManager;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -13,6 +15,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin {
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;
+	
+	private ColorManager _colorManager;
 	
 	/**
 	 * The constructor
@@ -47,4 +51,19 @@ public class CommonEditorPlugin extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	
+	/**
+	 * getColorManager
+	 * 
+	 * @return
+	 */
+	public ColorManager getColorManager()
+	{
+		if (this._colorManager == null)
+		{
+			this._colorManager = new ColorManager();
+		}
+
+		return this._colorManager;
+	}
 }
