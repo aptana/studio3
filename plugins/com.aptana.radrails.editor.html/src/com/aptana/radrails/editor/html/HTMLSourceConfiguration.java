@@ -49,6 +49,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
+import com.aptana.radrails.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**

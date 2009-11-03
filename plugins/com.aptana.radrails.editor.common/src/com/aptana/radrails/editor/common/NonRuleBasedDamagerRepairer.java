@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.radrails.editor.common;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
