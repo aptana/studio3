@@ -58,9 +58,9 @@ import com.aptana.radrails.explorer.ExplorerPlugin;
 
 public class GitProjectView extends CommonNavigator implements IGitRepositoryListener
 {
-	private static final String BRANCH_SEPARATOR = "--------";
+	private static final String BRANCH_SEPARATOR = "--------"; //$NON-NLS-1$
 
-	private static final String CREATE_NEW_BRANCH_TEXT = "Create new...";
+	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
 
 	/**
 	 * Property we assign to a project to make it the active one that this view is filtered to.
@@ -94,7 +94,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	/**
 	 * The text to initially show in the filter text control.
 	 */
-	protected String initialText = "Type filter here";
+	protected String initialText = Messages.GitProjectView_InitialFileFilterText;
 	private String previousFilterText;
 
 	private PathFilter patternFilter;
@@ -366,7 +366,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		filter = new Button(parent, SWT.FLAT | SWT.TOGGLE | SWT.CENTER);
 		filter.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		filter.setImage(ExplorerPlugin.getImage("icons/full/elcl16/filter.png")); //$NON-NLS-1$
-		filter.setToolTipText("Filter to changed files");
+		filter.setToolTipText(Messages.GitProjectView_ChangedFilesFilterTooltip);
 		filter.addSelectionListener(new SelectionAdapter()
 		{
 			private GitChangedFilesFilter fChangedFilesFilter;
@@ -519,21 +519,20 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// If user selected "Create New..." then pop a dialog to generate a new branch
 		if (branchName.equals(CREATE_NEW_BRANCH_TEXT))
 		{
-			InputDialog dialog = new InputDialog(getSite().getShell(), "Create New Branch", "Name of new branch: ", "",
+			InputDialog dialog = new InputDialog(getSite().getShell(), Messages.GitProjectView_CreateBranchDialog_Title, Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-3$
 					new IInputValidator()
 					{
 
 						public String isValid(String newText)
 						{
 							if (newText == null || newText.trim().length() == 0)
-								return "Branch name must not be empty";
-							// TODO Only allow alphanumeric?
-							if (newText.trim().contains(" ") || newText.trim().contains("\t"))
-								return "Branch name must not contain a space or tab";
+								return Messages.GitProjectView_NonEmptyBranchNameMessage;
+							if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
+								return Messages.GitProjectView_NoWhitespaceBranchNameMessage;
 							if (repo.localBranches().contains(newText.trim()))
-								return "A branch with that name already exists";
+								return Messages.GitProjectView_BranchAlreadyExistsMessage;
 							if (!repo.validBranchName(newText.trim()))
-								return "Branch name not valid according to git standards";
+								return Messages.GitProjectView_InvalidBranchNameMessage;
 							return null;
 						}
 					});
