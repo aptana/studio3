@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 {
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/(.+\\.rb)"); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle.rb"); //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -34,6 +34,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 
 			if (file != null && file.getLocation() != null)
 			{
+				//IFolder folder = (IFolder) file.getParent();
 				fullPath = file.getLocation().toPortableString();
 				System.out.println("processing " + fullPath);
 
