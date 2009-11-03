@@ -36,17 +36,16 @@
 package com.aptana.radrails.editor.xml;
 
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.NonRuleBasedDamagerRepairer;
@@ -54,85 +53,141 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
- *
  */
-public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String XML_COMMENT = "__xml_comment";
-	public final static String XML_TAG = "__xml_tag";
+	public final static String STRING_DOUBLE = "__xml_string_double";
+	public final static String STRING_SINGLE = "__xml_string_single";
+	public final static String CDATA = "__xml_cdata";
+	public final static String PRE_PROCESSOR = "__xml_pre_processor";
 
-	public static final String[] CONTENT_TYPES = new String[] {
-		XML_COMMENT,
-		XML_TAG
-	};
+	public static final String[] CONTENT_TYPES = new String[] { XML_COMMENT, STRING_SINGLE, STRING_DOUBLE,
+			CDATA, PRE_PROCESSOR };
 
-	private IToken xmlCommentToken = new Token(XML_COMMENT);
-	private IToken tagToken = new Token(XML_TAG);
-	
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!--", "-->", xmlCommentToken),
-			new TagRule(tagToken)
-	};
+			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)),
+			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)),
+			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'),
+			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'),
+			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA))};
 
-	private XMLTagScanner tagScanner;
 	private XMLScanner xmlScanner;
+	private RuleBasedScanner doubleQuotedStringScanner;
+	private RuleBasedScanner singleQuotedStringScanner;
+	private RuleBasedScanner cdataScanner;
+	private RuleBasedScanner preProcessorScanner;
 
 	private static XMLSourceConfiguration instance;
-	
-	public static XMLSourceConfiguration getDefault() {
-		if (instance == null) {
+
+	public static XMLSourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new XMLSourceConfiguration();
 		}
 		return instance;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return CONTENT_TYPES;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
+	 * .presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLTagScanner());
-		reconciler.setDamager(dr, XMLSourceConfiguration.XML_TAG);
-		reconciler.setRepairer(dr, XMLSourceConfiguration.XML_TAG);
-
-		dr = new DefaultDamagerRepairer(getXMLScanner());
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+
+		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
+		reconciler.setDamager(dr, PRE_PROCESSOR);
+		reconciler.setRepairer(dr, PRE_PROCESSOR);
+		
+		dr = new DefaultDamagerRepairer(getCDATAScanner());
+		reconciler.setDamager(dr, CDATA);
+		reconciler.setRepairer(dr, CDATA);
+
+		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		reconciler.setDamager(dr, STRING_SINGLE);
+		reconciler.setRepairer(dr, STRING_SINGLE);
+
+		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		reconciler.setDamager(dr, STRING_DOUBLE);
+		reconciler.setRepairer(dr, STRING_DOUBLE);
 
 		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.xml"));
 		reconciler.setDamager(ndr, XMLSourceConfiguration.XML_COMMENT);
 		reconciler.setRepairer(ndr, XMLSourceConfiguration.XML_COMMENT);
 	}
 
-	protected ITokenScanner getXMLScanner() {
-		if (xmlScanner == null) {
-			xmlScanner = new XMLScanner();
-			xmlScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IXMLColorConstants.DEFAULT))));
+	private ITokenScanner getPreProcessorScanner()
+	{
+		if (preProcessorScanner == null)
+		{
+			preProcessorScanner = new RuleBasedScanner();
+			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("meta.tag.preprocessor.xml"));
 		}
-		return xmlScanner;
+		return preProcessorScanner;
 	}
 	
-	protected ITokenScanner getXMLTagScanner() {
-		if (tagScanner == null) {
-			tagScanner = new XMLTagScanner();
-			tagScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IXMLColorConstants.TAG))));
+	private ITokenScanner getCDATAScanner()
+	{
+		if (cdataScanner == null)
+		{
+			cdataScanner = new RuleBasedScanner();
+			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml"));
 		}
-		return tagScanner;
+		return cdataScanner;
+	}
+
+	private ITokenScanner getDoubleQuotedStringScanner()
+	{
+		if (doubleQuotedStringScanner == null)
+		{
+			doubleQuotedStringScanner = new RuleBasedScanner();
+			doubleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.xml"));
+		}
+		return doubleQuotedStringScanner;
+	}
+
+	private ITokenScanner getSingleQuotedStringScanner()
+	{
+		if (singleQuotedStringScanner == null)
+		{
+			singleQuotedStringScanner = new RuleBasedScanner();
+			singleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.xml"));
+		}
+		return singleQuotedStringScanner;
+	}
+
+	protected ITokenScanner getXMLScanner()
+	{
+		if (xmlScanner == null)
+		{
+			xmlScanner = new XMLScanner();
+		}
+		return xmlScanner;
 	}
 
 }

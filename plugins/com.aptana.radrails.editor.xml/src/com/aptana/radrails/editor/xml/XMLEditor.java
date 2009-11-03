@@ -34,12 +34,23 @@
  */
 package com.aptana.radrails.editor.xml;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class XMLEditor extends TextEditor {
+public class XMLEditor extends AbstractThemeableEditor
+{
 
-	public XMLEditor() {
+	public XMLEditor()
+	{
 		super();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration());
 		setDocumentProvider(new XMLDocumentProvider());
 	}

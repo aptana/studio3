@@ -34,31 +34,49 @@
  */
 package com.aptana.radrails.editor.xml;
 
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
-import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
+import com.aptana.radrails.editor.common.RegexpRule;
 import com.aptana.radrails.editor.common.WhitespaceDetector;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
-public class XMLScanner extends RuleBasedScanner {
+public class XMLScanner extends RuleBasedScanner
+{
 
-	public XMLScanner() {
-		IToken procInstr =
-			new Token(
-				new TextAttribute(
-						CommonEditorPlugin.getDefault().getColorManager().getColor(IXMLColorConstants.PROC_INSTR)));
-
-		IRule[] rules = new IRule[2];
-		//Add rule for processing instructions
-		rules[0] = new SingleLineRule("<?", "?>", procInstr);
-		// Add generic whitespace rule.
-		rules[1] = new WhitespaceRule(new WhitespaceDetector());
-
+	public XMLScanner()
+	{
+		IRule[] rules = new IRule[4];
+		rules[0] = new WhitespaceRule(new WhitespaceDetector());
+		rules[1] = new RegexpRule("[a-zA-Z0-9]+=", ThemeUtil.getToken("entity.other.attribute-name.xml"));
+		rules[2] = new RegexpRule("<|>", ThemeUtil.getToken("punctuation.definition.tag.xml"));
+		rules[3] = new WordRule(new WordDetector(), ThemeUtil.getToken("entity.name.tag.xml"));
 		setRules(rules);
+		setDefaultReturnToken(ThemeUtil.getToken("text"));
+	}
+
+	/**
+	 * A key word detector.
+	 */
+	static class WordDetector implements IWordDetector
+	{
+		/*
+		 * (non-Javadoc) Method declared on IWordDetector
+		 */
+		public boolean isWordStart(char c)
+		{
+			return Character.isLetter(c);
+		}
+
+		/*
+		 * (non-Javadoc) Method declared on IWordDetector
+		 */
+		public boolean isWordPart(char c)
+		{
+			return Character.isLetterOrDigit(c);
+		}
 	}
 }
