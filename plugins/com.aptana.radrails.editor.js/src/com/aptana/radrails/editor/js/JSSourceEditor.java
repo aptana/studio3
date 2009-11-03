@@ -34,12 +34,22 @@
  */
 package com.aptana.radrails.editor.js;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class JSSourceEditor extends TextEditor {
+public class JSSourceEditor extends AbstractThemeableEditor
+{
 
-	public JSSourceEditor() {
+	public JSSourceEditor()
+	{
 		super();
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on AbstractTextEditor
+	 */
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration());
 		setDocumentProvider(new JSDocumentProvider());
 	}

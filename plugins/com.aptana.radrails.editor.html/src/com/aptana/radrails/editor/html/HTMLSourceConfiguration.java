@@ -49,6 +49,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
@@ -110,8 +111,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(
-				new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.XML_COMMENT)));
+		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html"));
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 	}

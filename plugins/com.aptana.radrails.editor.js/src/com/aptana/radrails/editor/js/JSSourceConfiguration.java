@@ -35,98 +35,186 @@
 
 package com.aptana.radrails.editor.js;
 
-import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
- *
+ * @author cwilliams
  */
-public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
-	public final static String WORD = "__js_word";
-	public final static String STRING = "__js_string";
+	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment";
+	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment";
+	public final static String JS_DOC = "__js_sdoc";
+	public final static String STRING_DOUBLE = "__js_string_double";
+	public final static String STRING_SINGLE = "__js_string_single";
+	public final static String JS_REGEXP = "__js_regexp";
+	public final static String[] JS_PARTITION_TYPES = new String[] { JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
+			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	public static final String[] CONTENT_TYPES = new String[] {
-		WORD,
-		STRING
-	};
+	public static final String[] CONTENT_TYPES = new String[] { JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT, JS_DOC,
+			STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	private IToken wordToken = new Token(WORD);
-	private IToken stringToken = new Token(STRING);
-	
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new SingleLineRule("\"", "\"", stringToken, '\\'),
-			new SingleLineRule("\'", "\'", stringToken, '\\')
-	};
+			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)),
+			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'),
+			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'),
+			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true),
+			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true),
+			new SingleLineRule("/", "/", new Token(JS_REGEXP), '\\') };
 
-	private RuleBasedScanner wordScanner;
-	private RuleBasedScanner stringScanner;
+	private JSCodeScanner codeScanner;
+	private JSDocScanner docScanner;
+	private JSSingleQuotedStringScanner singleQuoteScanner;
+	private JSDoubleQuotedStringScanner doubleQuoteScanner;
+	private JSRegexpScanner regexpScanner;
+	private RuleBasedScanner multiLineCommentScanner;
+	private RuleBasedScanner singleLineCommentScanner;
 
 	private static JSSourceConfiguration instance;
-	
-	public static JSSourceConfiguration getDefault() {
-		if (instance == null) {
+
+	public static JSSourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new JSSourceConfiguration();
 		}
 		return instance;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return CONTENT_TYPES;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
+	 * .presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getWordScanner());
-		reconciler.setDamager(dr, JSSourceConfiguration.WORD);
-		reconciler.setRepairer(dr, JSSourceConfiguration.WORD);
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, JSSourceConfiguration.STRING);
-		reconciler.setRepairer(dr, JSSourceConfiguration.STRING);
+		dr = new DefaultDamagerRepairer(getJSDocScanner());
+		reconciler.setDamager(dr, JS_DOC);
+		reconciler.setRepairer(dr, JS_DOC);
+
+		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		reconciler.setDamager(dr, JS_MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, JS_MULTILINE_COMMENT);
+
+		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		reconciler.setDamager(dr, STRING_SINGLE);
+		reconciler.setRepairer(dr, STRING_SINGLE);
+
+		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		reconciler.setDamager(dr, STRING_DOUBLE);
+		reconciler.setRepairer(dr, STRING_DOUBLE);
+
+		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		reconciler.setDamager(dr, JS_SINGLELINE_COMMENT);
+		reconciler.setRepairer(dr, JS_SINGLELINE_COMMENT);
+
+		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		reconciler.setDamager(dr, JS_REGEXP);
+		reconciler.setRepairer(dr, JS_REGEXP);
 	}
 
-	protected ITokenScanner getWordScanner() {
-		if (wordScanner == null) {
-			wordScanner = new RuleBasedScanner();
-			wordScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IJSColorConstants.WORD))));
+	private ITokenScanner getMultiLineCommentScanner()
+	{
+		if (multiLineCommentScanner == null)
+		{
+			multiLineCommentScanner = new RuleBasedScanner();
+			multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.js"));
 		}
-		return wordScanner;
+		return multiLineCommentScanner;
 	}
-	
-	protected ITokenScanner getStringScanner() {
-		if (stringScanner == null) {
-			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IJSColorConstants.STRING))));
+
+	private ITokenScanner getSingleLineCommentScanner()
+	{
+		if (singleLineCommentScanner == null)
+		{
+			singleLineCommentScanner = new RuleBasedScanner();
+			singleLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.line.double-slash.js"));
 		}
-		return stringScanner;
+		return singleLineCommentScanner;
+	}
+
+	private ITokenScanner getRegexpScanner()
+	{
+		if (regexpScanner == null)
+		{
+			regexpScanner = new JSRegexpScanner();
+		}
+		return regexpScanner;
+	}
+
+	private ITokenScanner getDoubleQuotedStringScanner()
+	{
+		if (doubleQuoteScanner == null)
+		{
+			doubleQuoteScanner = new JSDoubleQuotedStringScanner();
+		}
+		return doubleQuoteScanner;
+	}
+
+	private ITokenScanner getSingleQuotedStringScanner()
+	{
+		if (singleQuoteScanner == null)
+		{
+			singleQuoteScanner = new JSSingleQuotedStringScanner();
+		}
+		return singleQuoteScanner;
+	}
+
+	private ITokenScanner getJSDocScanner()
+	{
+		if (docScanner == null)
+		{
+			docScanner = new JSDocScanner();
+		}
+		return docScanner;
+	}
+
+	protected ITokenScanner getCodeScanner()
+	{
+		if (codeScanner == null)
+		{
+			codeScanner = new JSCodeScanner();
+		}
+		return codeScanner;
 	}
 
 }
