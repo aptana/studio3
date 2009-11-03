@@ -93,7 +93,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	/**
 	 * The text to initially show in the filter text control.
 	 */
-	protected String initialText = ""; //$NON-NLS-1$
+	protected String initialText = "Type filter here"; //$NON-NLS-1$
 	private String previousFilterText;
 	
 	private PathFilter patternFilter;
@@ -154,7 +154,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		focus.setLayoutData(data2);
 		
 		patternFilter = new PathFilter();
-		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH	| SWT.ICON_CANCEL);
+		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
 		filterText.setText(initialText);
 		filterText.addModifyListener(new ModifyListener() {
 			/*
