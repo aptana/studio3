@@ -335,7 +335,7 @@ public class GitRepository
 		for (IGitRepositoryListener listener : listeners)
 			listener.branchChanged(e);
 	}
-	
+
 	void fireIndexChangeEvent()
 	{
 		IndexChangedEvent e = new IndexChangedEvent(this);
@@ -369,7 +369,7 @@ public class GitRepository
 		File hook = new File(hookPath);
 		if (!hook.exists() || !hook.isFile())
 			return true;
-		
+
 		try
 		{
 			Method method = File.class.getMethod("canExecute", null);
@@ -582,5 +582,19 @@ public class GitRepository
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
+	}
+
+	public boolean createBranch(String branchName)
+	{
+		Map<Integer, String> result = GitExecutable.instance()
+				.runInBackground(workingDirectory(), "branch", branchName);
+		return result.keySet().iterator().next() == 0;
+	}
+
+	public boolean validBranchName(String branchName)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format",
+				"refs/heads/" + branchName);
+		return result.keySet().iterator().next() == 0;
 	}
 }

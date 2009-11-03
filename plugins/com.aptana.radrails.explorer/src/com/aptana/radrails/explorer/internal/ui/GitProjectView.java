@@ -13,8 +13,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -55,6 +58,10 @@ import com.aptana.radrails.explorer.ExplorerPlugin;
 
 public class GitProjectView extends CommonNavigator implements IGitRepositoryListener
 {
+	private static final String BRANCH_SEPARATOR = "--------";
+
+	private static final String CREATE_NEW_BRANCH_TEXT = "Create new...";
+
 	/**
 	 * Property we assign to a project to make it the active one that this view is filtered to.
 	 */
@@ -116,7 +123,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
 		IProject[] projects = createProjectCombo(gitStuff); // TODO Attach project combo in it's own area, not in git
-															// composite
+		// composite
 		createGitDetailsComposite(gitStuff);
 		// TODO Add a button/arrow to allow expanding/hiding the stuff below branch/commit widgets
 		createGitBranchCombo(gitDetails);// FIXME fix layout now that I added the filter button
@@ -503,6 +510,45 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			return false;
 		if (branchName.equals(repo.currentBranch()))
 			return false;
+		// If user selected separator, revert
+		if (branchName.equals(BRANCH_SEPARATOR))
+		{
+			revertToCurrentBranch(repo);
+			return false;
+		}
+		// If user selected "Create New..." then pop a dialog to generate a new branch
+		if (branchName.equals(CREATE_NEW_BRANCH_TEXT))
+		{
+			InputDialog dialog = new InputDialog(getSite().getShell(), "Create New Branch", "Name of new branch: ", "",
+					new IInputValidator()
+					{
+
+						public String isValid(String newText)
+						{
+							if (newText == null || newText.trim().length() == 0)
+								return "Branch name must not be empty";
+							// TODO Only allow alphanumeric?
+							if (newText.trim().contains(" ") || newText.trim().contains("\t"))
+								return "Branch name must not contain a space or tab";
+							if (repo.localBranches().contains(newText.trim()))
+								return "A branch with that name already exists";
+							if (!repo.validBranchName(newText.trim()))
+								return "Branch name not valid according to git standards";
+							return null;
+						}
+					});
+			if (dialog.open() != Window.OK)
+			{
+				revertToCurrentBranch(repo);
+				return false;
+			}
+			branchName = dialog.getValue().trim();
+			if (!repo.createBranch(branchName))
+			{
+				revertToCurrentBranch(repo);
+				return false;
+			}
+		}
 		if (repo.switchBranch(branchName))
 		{
 			refreshViewer();
@@ -510,25 +556,30 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 		else
 		{
-			Job job = new UIJob("") //$NON-NLS-1$
-			{
-
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor)
-				{
-					String currentBranchName = repo.currentBranch();
-					if (repo.isDirty())
-						currentBranchName += "*"; //$NON-NLS-1$
-					branchCombo.setText(currentBranchName);
-					// TODO Pop a dialog saying we couldn't branches
-					return Status.OK_STATUS;
-				}
-			};
-			job.setSystem(true);
-			job.setPriority(Job.INTERACTIVE);
-			job.schedule();
+			revertToCurrentBranch(repo);
 			return false;
 		}
+	}
+
+	private void revertToCurrentBranch(final GitRepository repo)
+	{
+		Job job = new UIJob("") //$NON-NLS-1$
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				String currentBranchName = repo.currentBranch();
+				if (repo.isDirty())
+					currentBranchName += "*"; //$NON-NLS-1$
+				branchCombo.setText(currentBranchName);
+				// TODO Pop a dialog saying we couldn't branches
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.setPriority(Job.INTERACTIVE);
+		job.schedule();
 	}
 
 	private void detectSelectedProject()
@@ -598,6 +649,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			else
 				branchCombo.add(branchName);
 		}
+		branchCombo.add(BRANCH_SEPARATOR);
+		branchCombo.add(CREATE_NEW_BRANCH_TEXT);
 		if (repo.isDirty())
 			currentBranchName += "*"; //$NON-NLS-1$
 		branchCombo.setText(currentBranchName);
