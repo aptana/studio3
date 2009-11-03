@@ -12,6 +12,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -44,10 +45,10 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.git.ui.internal.DiffFormatter;
 
 public class CommitDialog extends StatusDialog
 {
-
 	private GitRepository gitRepository;
 	private Text commitMessage;
 	private String fMessage;
@@ -57,7 +58,7 @@ public class CommitDialog extends StatusDialog
 	private Image newFileImage;
 	private Image deletedFileImage;
 	private Image emptyFileImage;
-	private Text diffArea;
+	private Browser diffArea;
 
 	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -107,13 +108,11 @@ public class CommitDialog extends StatusDialog
 
 	private void createDiffArea(Composite container)
 	{
-		diffArea = new Text(container, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		diffArea = new Browser(container, SWT.BORDER);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
-		diffArea.setEditable(false);
 		diffArea.setText(Messages.CommitDialog_4);
-		// TODO Make it much prettier, like GitX does!
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -294,6 +293,8 @@ public class CommitDialog extends StatusDialog
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				if (e.item == null)
+					return;
 				String path = ((TableItem) e.item).getText(1);
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
@@ -308,7 +309,7 @@ public class CommitDialog extends StatusDialog
 
 	protected void updateDiff(String diff)
 	{
-		diffArea.setText(diff);
+		diffArea.setText(DiffFormatter.toHTML(diff));
 	}
 
 	protected ChangedFile findChangedFile(String path)
@@ -362,8 +363,7 @@ public class CommitDialog extends StatusDialog
 	{
 		if (commitMessage.getText().length() < 3)
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_EnterMessage_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;
 		}
 		if (stagedTable.getItemCount() == 0)
@@ -374,8 +374,7 @@ public class CommitDialog extends StatusDialog
 		}
 		if (gitRepository.hasMerges())
 		{
-			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-					Messages.CommitDialog_CannotMerge_Error));
+			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_CannotMerge_Error));
 			return;
 		}
 		fMessage = commitMessage.getText();
