@@ -34,12 +34,16 @@
  */
 package com.aptana.radrails.editor.ruby;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class RubySourceEditor extends TextEditor {
+public class RubySourceEditor extends AbstractThemeableEditor {
 
-	public RubySourceEditor() {
-		super();
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
+	@Override
+	protected void initializeEditor() {
+		super.initializeEditor();
 		setSourceViewerConfiguration(new RubySourceViewerConfiguration());
 		setDocumentProvider(new RubyDocumentProvider());
 	}

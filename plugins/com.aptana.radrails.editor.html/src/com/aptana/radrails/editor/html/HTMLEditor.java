@@ -38,10 +38,6 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 public class HTMLEditor extends AbstractThemeableEditor {
 
-	public HTMLEditor() {
-		super();
-	}
-
 	/*
 	 * (non-Javadoc) Method declared on AbstractTextEditor
 	 */

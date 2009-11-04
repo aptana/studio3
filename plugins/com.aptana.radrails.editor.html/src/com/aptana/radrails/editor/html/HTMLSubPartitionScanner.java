@@ -49,6 +49,10 @@ import com.aptana.radrails.editor.js.JSSourceConfiguration;
  */
 public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 
+	private static final int TYPE_HTML = 0;
+	private static final int TYPE_JS = 1;
+	private static final int TYPE_CSS = 2;
+	
 	/**
 	 *
 	 */
@@ -65,6 +69,13 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	 */
 	@Override
 	public void setLastToken(IToken token) {
+		System.out.println(""+token+" "+token.getData());
+		Object contentType = token.getData();
+		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType)) {
+			current = TYPE_JS;
+		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)) {
+			current = TYPE_CSS;
+		}
 	}
 
 }
