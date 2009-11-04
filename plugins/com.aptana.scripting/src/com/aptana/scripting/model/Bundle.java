@@ -32,6 +32,7 @@ public class Bundle
 	 * 
 	 * @param command
 	 */
+	@JRubyMethod(name="add_command")
 	public void addCommand(Command command)
 	{
 		if (command != null)

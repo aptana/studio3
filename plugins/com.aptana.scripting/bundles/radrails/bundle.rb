@@ -14,6 +14,10 @@ module RadRails
       end
     end
     
+    def add_command(command)
+      @jobj.add_command command.java_object
+    end
+    
     def add_snippet(snippet)
       @jobj.add_snippet snippet.java_object
     end
