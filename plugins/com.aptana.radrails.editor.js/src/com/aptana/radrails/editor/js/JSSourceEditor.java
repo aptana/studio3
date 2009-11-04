@@ -39,11 +39,6 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 public class JSSourceEditor extends AbstractThemeableEditor
 {
 
-	public JSSourceEditor()
-	{
-		super();
-	}
-
 	/*
 	 * (non-Javadoc) Method declared on AbstractTextEditor
 	 */

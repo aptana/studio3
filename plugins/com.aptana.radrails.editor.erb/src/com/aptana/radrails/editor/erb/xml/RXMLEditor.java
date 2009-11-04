@@ -35,18 +35,20 @@
 
 package com.aptana.radrails.editor.erb.xml;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 /**
  * @author Max Stepanov
  *
  */
-public class RXMLEditor extends TextEditor {
+public class RXMLEditor extends AbstractThemeableEditor {
 
-	/**
-	 * 
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
-	public RXMLEditor() {
+	@Override
+	protected void initializeEditor() {
+		super.initializeEditor();
 		setSourceViewerConfiguration(new RXMLSourceViewerConfiguration());
 		setDocumentProvider(new RXMLDocumentProvider());
 	}
