@@ -64,13 +64,6 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	/**
 	 * 
 	 */
-	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes) {
-		this(rules, contentTypes, null);
-	}
-
-	/**
-	 * 
-	 */
 	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes, IToken defaultToken) {
 		this.rules.addAll(Arrays.asList(rules));
 		this.contentTypes.addAll(Arrays.asList(contentTypes));

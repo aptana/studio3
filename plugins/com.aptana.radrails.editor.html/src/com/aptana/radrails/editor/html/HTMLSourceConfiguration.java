@@ -149,7 +149,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	        return false;
 	    }
 	}
-	
+
+	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String HTML_COMMENT = "__html_comment";
 	public final static String CDATA = "__xml_cdata";
 	public final static String HTML_DOCTYPE = "__html_doctype";
@@ -215,10 +216,16 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		
+
+		reconciler.setDamager(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);
+
 		dr = new DefaultDamagerRepairer(getHTMLTagScanner());		
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_SCRIPT);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_SCRIPT);
@@ -237,8 +244,6 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
 		
-		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 	}
 
 	protected ITokenScanner getHTMLScanner() {

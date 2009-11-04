@@ -59,6 +59,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String XML_COMMENT = "__xml_comment";
 	public final static String STRING_DOUBLE = "__xml_string_double";
 	public final static String STRING_SINGLE = "__xml_string_single";
@@ -114,7 +115,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES);
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/*
@@ -128,6 +129,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+
+		reconciler.setDamager(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);
 
 		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, PRE_PROCESSOR);

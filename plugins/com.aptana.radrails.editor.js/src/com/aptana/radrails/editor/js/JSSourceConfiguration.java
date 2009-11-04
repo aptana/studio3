@@ -60,6 +60,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment";
 	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment";
 	public final static String JS_DOC = "__js_sdoc";
@@ -121,7 +122,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES);
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/*
@@ -135,6 +136,9 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		
+		reconciler.setDamager(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);
 
 		dr = new DefaultDamagerRepairer(getJSDocScanner());
 		reconciler.setDamager(dr, JS_DOC);

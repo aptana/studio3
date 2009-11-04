@@ -61,6 +61,8 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  *
  */
 public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+
+	public final static String DEFAULT = "__css" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String STRING = "__css_string";
 	public final static String MULTILINE_COMMENT = "__css_multiline_comment";
 
@@ -173,7 +175,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES);
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/* (non-Javadoc)
@@ -185,13 +187,16 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		
+		reconciler.setDamager(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);
+		
 		dr = new DefaultDamagerRepairer(getWordScanner());
-		reconciler.setDamager(dr, CSSSourceConfiguration.MULTILINE_COMMENT);
-		reconciler.setRepairer(dr, CSSSourceConfiguration.MULTILINE_COMMENT);
+		reconciler.setDamager(dr, MULTILINE_COMMENT);
+		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
 		dr = new DefaultDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, CSSSourceConfiguration.STRING);
-		reconciler.setRepairer(dr, CSSSourceConfiguration.STRING);
+		reconciler.setDamager(dr, STRING);
+		reconciler.setRepairer(dr, STRING);
 	}
 
 	protected ITokenScanner getWordScanner() {

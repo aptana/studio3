@@ -35,6 +35,7 @@
 
 package com.aptana.radrails.editor.ruby;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -58,6 +59,7 @@ import com.aptana.radrails.editor.common.SubPartitionScanner;
  */
 public class RubySourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
+	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String WORD = "__rb_word";
 	public final static String STRING = "__rb_string";
 
@@ -104,7 +106,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES);
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/* (non-Javadoc)

@@ -36,6 +36,7 @@
 package com.aptana.radrails.editor.html;
 
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.radrails.editor.common.CompositeSubPartitionScanner;
 import com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy;
@@ -68,7 +69,7 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	 */
 	public HTMLSubPartitionScanner() {
 		super(new ISubPartitionScanner[] {
-				new SubPartitionScanner(HTMLSourceConfiguration.getDefault().getPartitioningRules(), HTMLSourceConfiguration.CONTENT_TYPES),
+				new SubPartitionScanner(HTMLSourceConfiguration.getDefault().getPartitioningRules(), HTMLSourceConfiguration.CONTENT_TYPES, new Token(HTMLSourceConfiguration.DEFAULT)),
 				JSSourceConfiguration.getDefault().createSubPartitionScanner(),
 				CSSSourceConfiguration.getDefault().createSubPartitionScanner()
 			}, new IPartitionScannerSwitchStrategy[] {
