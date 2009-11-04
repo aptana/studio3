@@ -7,8 +7,9 @@
             class="com.aptana.radrails.editor.js.JSSourceEditor"
             default="true"
             extensions="js"
+            icon="icons/js.gif"
             id="com.aptana.radrails.editor.js"
-            name="JavaScript Source Editor">
+            name="JavaScript Source Editor (Aptana)">
       </editor>
    </extension>
 
