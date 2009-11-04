@@ -86,7 +86,6 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		}
 				
 		currentPartitionScanner = defaultPartitionScanner;
-		setDefaultReturnToken(new Token(IDocument.DEFAULT_CONTENT_TYPE));
 	}
 
 	/**
@@ -146,10 +145,11 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
 				if (!token.isUndefined()) {
 					fContentType = null;
+					currentPartitionScanner.setLastToken(token);
 					return token;
 				}
 				if (hasSwitchingSequence()) {
-					return fDefaultReturnToken;
+					return currentPartitionScanner.getDefaultToken();
 				}
 			}
 		}
@@ -180,10 +180,11 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 				IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 				if (!token.isUndefined()) {
+					currentPartitionScanner.setLastToken(token);
 					return token;
 				}
 				if (hasSwitchingSequence()) {
-					return fDefaultReturnToken;
+					return currentPartitionScanner.getDefaultToken();
 				}
 			}
 		}
@@ -191,7 +192,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (read() == EOF) {
 			return Token.EOF;
 		}
-		return fDefaultReturnToken;
+		return currentPartitionScanner.getDefaultToken();
 	}
 	
 	private boolean hasSwitchingSequence() {

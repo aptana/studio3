@@ -35,88 +35,74 @@
 
 package com.aptana.radrails.editor.common;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
 
 /**
  * @author Max Stepanov
  *
  */
-public class SubPartitionScanner implements ISubPartitionScanner {
+public abstract class CompositeSubPartitionScanner implements ISubPartitionScanner {
 
-	private static final IToken DEFAULT_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
+	private ISubPartitionScanner[] subPartitionScanners;
+	private SequenceCharacterScanner sequenceCharacterScanner;
+	protected int current = 0;
 	
-	private List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
-	private IToken defaultToken;
-	private Set<String> contentTypes = new HashSet<String>();
-	private SequenceCharacterScanner characterScanner;
-
 	/**
 	 * 
 	 */
-	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes) {
-		this(rules, contentTypes, null);
-	}
-
-	/**
-	 * 
-	 */
-	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes, IToken defaultToken) {
-		this.rules.addAll(Arrays.asList(rules));
-		this.contentTypes.addAll(Arrays.asList(contentTypes));
-		this.defaultToken = defaultToken != null ? defaultToken : DEFAULT_TOKEN;
+	protected CompositeSubPartitionScanner(ISubPartitionScanner[] subPartitionScanners) {
+		this.subPartitionScanners = subPartitionScanners;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy)
 	 */
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
-		this.characterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
+		sequenceCharacterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getRules()
 	 */
 	public Collection<IPredicateRule> getRules() {
-		return rules;
+		return subPartitionScanners[current].getRules();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getDefaultToken()
 	 */
 	public IToken getDefaultToken() {
-		return defaultToken;
+		return subPartitionScanners[current].getDefaultToken();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getCharacterScanner()
 	 */
 	public ICharacterScanner getCharacterScanner() {
-		return characterScanner;
+		return sequenceCharacterScanner;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#foundSequence()
 	 */
 	public boolean foundSequence() {
-		return characterScanner.foundSequence();
+		return sequenceCharacterScanner.foundSequence();
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
 	 */
 	public boolean hasContentType(String contentType) {
-		return contentTypes.contains(contentType);
+		for (ISubPartitionScanner i : subPartitionScanners) {
+			if (i.hasContentType(contentType)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -124,4 +110,5 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	 */
 	public void setLastToken(IToken token) {
 	}
+
 }

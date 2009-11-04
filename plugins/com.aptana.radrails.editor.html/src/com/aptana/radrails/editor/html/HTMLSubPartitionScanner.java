@@ -33,25 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.radrails.editor.html;
 
-import java.util.Collection;
-
-import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 
-public interface ISubPartitionScanner {
+import com.aptana.radrails.editor.common.CompositeSubPartitionScanner;
+import com.aptana.radrails.editor.common.ISubPartitionScanner;
+import com.aptana.radrails.editor.common.SubPartitionScanner;
+import com.aptana.radrails.editor.css.CSSSourceConfiguration;
+import com.aptana.radrails.editor.js.JSSourceConfiguration;
 
-	public Collection<IPredicateRule> getRules();
-	public IToken getDefaultToken();
-	
-	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy);
-	public ICharacterScanner getCharacterScanner();
-	public boolean foundSequence();
-	
-	public boolean hasContentType(String contentType);
-	
-	public void setLastToken(IToken token);
-	
+/**
+ * @author Max Stepanov
+ *
+ */
+public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
+
+	/**
+	 *
+	 */
+	public HTMLSubPartitionScanner() {
+		super(new ISubPartitionScanner[] {
+				new SubPartitionScanner(HTMLSourceConfiguration.getDefault().getPartitioningRules(), HTMLSourceConfiguration.CONTENT_TYPES),
+				JSSourceConfiguration.getDefault().createSubPartitionScanner(),
+				CSSSourceConfiguration.getDefault().createSubPartitionScanner()
+		});
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
+	 */
+	@Override
+	public void setLastToken(IToken token) {
+	}
+
 }
