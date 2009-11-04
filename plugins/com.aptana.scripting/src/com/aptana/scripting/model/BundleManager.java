@@ -1,6 +1,7 @@
 package com.aptana.scripting.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,47 @@ public class BundleManager
 		
 		return result;
 	}
+	
+	/**
+	 * getCommandsFromScope
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public Command[] getCommandsFromScope(String scope)
+	{
+		List<Command> result = new ArrayList<Command>();
+		
+		for (Bundle bundle : this._bundles)
+		{
+			Command[] commands = bundle.getCommands();
+			
+			result.addAll(Arrays.asList(commands));
+		}
+		
+		return result.toArray(new Command[result.size()]);
+	}
 
+	/**
+	 * getSnippetsFromScope
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public Snippet[] getSnippetsFromScope(String scope)
+	{
+		List<Snippet> result = new ArrayList<Snippet>();
+		
+		for (Bundle bundle : this._bundles)
+		{
+			Snippet[] snippets = bundle.getSnippets();
+			
+			result.addAll(Arrays.asList(snippets));
+		}
+		
+		return result.toArray(new Snippet[result.size()]);
+	}
+	
 	/**
 	 * removeBundle
 	 * 

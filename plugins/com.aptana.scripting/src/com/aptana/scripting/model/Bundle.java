@@ -7,6 +7,9 @@ import org.jruby.anno.JRubyMethod;
 
 public class Bundle
 {
+	private static final Snippet[] NO_SNIPPETS = new Snippet[0];
+	private static final Command[] NO_COMMANDS = new Command[0];
+	
 	private String _path;
 	private String _displayName;
 	private String _author;
@@ -77,6 +80,23 @@ public class Bundle
 	}
 	
 	/**
+	 * getCommands
+	 * 
+	 * @return
+	 */
+	public Command[] getCommands()
+	{
+		Command[] result = NO_COMMANDS;
+		
+		if (this._commands != null && this._commands.size() > 0)
+		{
+			result = this._commands.toArray(new Command[this._commands.size()]);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getCopyright
 	 * 
 	 * @return
@@ -140,6 +160,23 @@ public class Bundle
 	public String getPath()
 	{
 		return this._path;
+	}
+	
+	/**
+	 * getSnippets
+	 * 
+	 * @return
+	 */
+	public Snippet[] getSnippets()
+	{
+		Snippet[] result = NO_SNIPPETS;
+		
+		if (this._snippets != null && this._snippets.size() > 0)
+		{
+			result = this._snippets.toArray(new Snippet[this._snippets.size()]);
+		}
+		
+		return result;
 	}
 	
 	/**
