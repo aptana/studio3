@@ -34,12 +34,20 @@
  */
 package com.aptana.radrails.editor.html;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class HTMLEditor extends TextEditor {
+public class HTMLEditor extends AbstractThemeableEditor {
 
 	public HTMLEditor() {
 		super();
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on AbstractTextEditor
+	 */
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration());
 		setDocumentProvider(new HTMLDocumentProvider());
 	}

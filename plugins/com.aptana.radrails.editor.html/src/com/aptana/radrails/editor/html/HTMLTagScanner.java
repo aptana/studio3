@@ -34,6 +34,9 @@
  */
 package com.aptana.radrails.editor.html;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -41,26 +44,62 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.WhitespaceDetector;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.radrails.editor.js.WordDetector;
 
 public class HTMLTagScanner extends RuleBasedScanner {
 
+	private static final String[] EVENT_HANDLERS = new String[] {
+		 "onload"
+		,"onunload"
+		,"onclick"
+		,"ondblclick"
+		,"onmousedown"
+		,"onmouseup"
+		,"onmouseover"
+		,"onmousemove"
+		,"onmouseout"
+		,"onfocus"
+		,"onblur"
+		,"onkeypress"
+		,"onkeydown"
+		,"onkeyup"
+		,"onsubmit"
+		,"onreset"
+		,"onselect"
+		,"onchange"
+		};
+	
 	public HTMLTagScanner() {
 		IToken string =
 			new Token(
 				new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.STRING)));
 
-		IRule[] rules = new IRule[3];
-
-		// Add rule for double quotes
-		rules[0] = new SingleLineRule("\"", "\"", string, '\\');
-		// Add a rule for single quotes
-		rules[1] = new SingleLineRule("'", "'", string, '\\');
+		List<IRule> rules = new ArrayList<IRule>();
+		
 		// Add generic whitespace rule.
-		rules[2] = new WhitespaceRule(new WhitespaceDetector());
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+		
+		// Add rule for double quotes
+		rules.add(new SingleLineRule("\"", "\"", string, '\\'));
+		// Add a rule for single quotes
+		rules.add(new SingleLineRule("'", "'", string, '\\'));
+		
+		// Add word rule for keywords, types, and constants.
+		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
+		
+		IToken eventHandler = ThemeUtil.getToken("keyword.control.js");
+		for (String word : EVENT_HANDLERS)
+		{
+			wordRule.addWord(word, eventHandler);
+		}
+		
+		rules.add(wordRule);
 
-		setRules(rules);
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 }

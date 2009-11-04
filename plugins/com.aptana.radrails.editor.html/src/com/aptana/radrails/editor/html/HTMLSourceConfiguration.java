@@ -60,18 +60,22 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  */
 public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
+	public final static String HTML_DOCTYPE = "__html_doctype";
 	public final static String HTML_COMMENT = "__html_comment";
 	public final static String HTML_TAG = "__html_tag";
 
 	public static final String[] CONTENT_TYPES = new String[] {
+		HTML_DOCTYPE,
 		HTML_COMMENT,
 		HTML_TAG
 	};
 
+	private IToken htmlDoctypeToken = new Token(HTML_COMMENT);
 	private IToken htmlCommentToken = new Token(HTML_COMMENT);
 	private IToken tagToken = new Token(HTML_TAG);
 	
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new MultiLineRule("<!DOCTYPE ", ">", htmlCommentToken),
 			new MultiLineRule("<!--", "-->", htmlCommentToken),
 			new TagRule(tagToken)
 	};
@@ -113,11 +117,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getXMLTagScanner());
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLTagScanner());
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
 
-		dr = new DefaultDamagerRepairer(getXMLScanner());
+		dr = new DefaultDamagerRepairer(getHTMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
@@ -126,7 +130,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 	}
 
-	protected ITokenScanner getXMLScanner() {
+	protected ITokenScanner getHTMLScanner() {
 		if (htmlScanner == null) {
 			htmlScanner = new HTMLScanner();
 			htmlScanner.setDefaultReturnToken(new Token(new TextAttribute(
@@ -135,7 +139,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return htmlScanner;
 	}
 	
-	protected ITokenScanner getXMLTagScanner() {
+	protected ITokenScanner getHTMLTagScanner() {
 		if (tagScanner == null) {
 			tagScanner = new HTMLTagScanner();
 			tagScanner.setDefaultReturnToken(new Token(new TextAttribute(

@@ -34,31 +34,26 @@
  */
 package com.aptana.radrails.editor.html;
 
-import org.eclipse.jface.text.TextAttribute;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.rules.IRule;
-import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.WhitespaceDetector;
 
 public class HTMLScanner extends RuleBasedScanner {
 
+
+
 	public HTMLScanner() {
-		IToken procInstr =
-			new Token(
-				new TextAttribute(
-						CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.PROC_INSTR)));
+		List<IRule> rules = new ArrayList<IRule>();
 
-		IRule[] rules = new IRule[2];
-		//Add rule for processing instructions
-		rules[0] = new SingleLineRule("<?", "?>", procInstr);
 		// Add generic whitespace rule.
-		rules[1] = new WhitespaceRule(new WhitespaceDetector());
-
-		setRules(rules);
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+	
+		
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 }
