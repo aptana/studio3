@@ -1,5 +1,8 @@
 package com.aptana.radrails.explorer;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -63,6 +66,16 @@ public class ExplorerPlugin extends AbstractUIPlugin
 				getDefault().getImageRegistry().put(string, id);
 		}
 		return getDefault().getImageRegistry().get(string);
+	}
+
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
 }
