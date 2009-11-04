@@ -15,11 +15,16 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.internal.misc.StringMatcher;
 
+import com.aptana.radrails.explorer.ExplorerPlugin;
+
 class PathFilter extends ViewerFilter
 {
 
 	private static Object[] EMPTY = new Object[0];
-	private StringMatcher matcher;
+	
+	private StringMatcher singularMatcher;
+	private StringMatcher pluralMatcher;
+	
 	/*
 	 * Cache of filtered elements in the tree
 	 */
@@ -84,8 +89,7 @@ class PathFilter extends ViewerFilter
 			}
 			catch (CoreException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExplorerPlugin.logError(e);
 			}
 		}
 
@@ -101,11 +105,11 @@ class PathFilter extends ViewerFilter
 	 */
 	private boolean match(String string)
 	{
-		if (matcher == null)
+		if (singularMatcher == null)
 		{
 			return true;
 		}
-		return matcher.match(string);
+		return singularMatcher.match(string) || (pluralMatcher != null && pluralMatcher.match(string));
 	}
 
 	/**
@@ -117,12 +121,19 @@ class PathFilter extends ViewerFilter
 	{
 		clearCaches();
 		if (patternString == null || patternString.equals("")) { //$NON-NLS-1$
-			matcher = null;
+			singularMatcher = null;
+			pluralMatcher = null;
 		}
 		else
 		{
-			String pattern = "*" + patternString + "*"; //$NON-NLS-1$ //$NON-NLS-2$
-			matcher = new StringMatcher(pattern, true, false);
+			singularMatcher = new StringMatcher("*" + patternString + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
+			if (patternString.contains("?") || patternString.contains("*"))
+				return;
+			// TODO Generate a matcher for the singular and plural forms of the pattern unless singular is prefix of
+			// plural!
+			// i.e. people/person vs user/users
+			// For now let's assume user always inputs singular and we always generate singular.
+			pluralMatcher = new StringMatcher("*" + Inflector.pluralize(patternString) + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
