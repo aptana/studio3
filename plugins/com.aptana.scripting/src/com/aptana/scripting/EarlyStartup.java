@@ -5,6 +5,8 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.IStartup;
 
+import com.aptana.scripting.model.BundleLoader;
+
 /**
  * EarlyStartup
  */
