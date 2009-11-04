@@ -31,6 +31,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -246,33 +247,37 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		});
 
+		getCommonViewer().getControl().addMouseMoveListener(new MouseMoveListener()
+		{
+
+			public void mouseMove(MouseEvent e)
+			{
+				if (hoveredItem == null)
+					return;
+
+				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
+				if (!hoveredItem.equals(t))
+					removeHoveredItem();
+			}
+		});
 		getCommonViewer().getControl().addMouseTrackListener(new MouseTrackAdapter()
 		{
 			@Override
 			public void mouseExit(MouseEvent e)
 			{
 				super.mouseExit(e);
-				if (hoveredItem != null)
-				{
-					final Rectangle bounds = hoveredItem.getBounds();
-					hoveredItem = null;
-					Display.getDefault().asyncExec(new Runnable()
-					{
-
-						public void run()
-						{
-							getCommonViewer().getTree().redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
-						}
-					});
-				}
+				if (hoveredItem == null)
+					return;
+				removeHoveredItem();
 			}
 
 			@Override
 			public void mouseHover(MouseEvent e)
 			{
 				super.mouseHover(e);
-				// TODO If the filter is already on, we shouldn't do this stuff
-				if (getFilterString() != null && getFilterString().trim().length() > 0)
+				// If the filter is already on, we shouldn't do this stuff
+				if (getFilterString() != null && getFilterString().trim().length() > 0
+						&& !getFilterString().equals(initialText))
 					return;
 				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
 				if (hoveredItem != null && hoveredItem.equals(t))
@@ -917,8 +922,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 			catch (CoreException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExplorerPlugin.logError(e);
 			}
 		}
 	}
@@ -943,10 +947,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			clearText();
 			refreshViewer();
 		}
-		catch (CoreException e1)
+		catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			ExplorerPlugin.logError(e);
 		}
 	}
 
@@ -1147,8 +1150,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 			catch (CoreException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExplorerPlugin.logError(e);
 			}
 		}
 	}
@@ -1166,7 +1168,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	 */
 	protected void clearText()
 	{
-		setFilterText(""); //$NON-NLS-1$
+		setFilterText(initialText);
 		textChanged();
 	}
 
@@ -1444,6 +1446,20 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			}
 		}
 		return text;
+	}
+
+	private void removeHoveredItem()
+	{
+		final Rectangle bounds = hoveredItem.getBounds();
+		hoveredItem = null;
+		Display.getDefault().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				getCommonViewer().getTree().redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+			}
+		});
 	}
 
 }
