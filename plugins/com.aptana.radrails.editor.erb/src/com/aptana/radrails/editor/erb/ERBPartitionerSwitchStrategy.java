@@ -35,13 +35,13 @@
 
 package com.aptana.radrails.editor.erb;
 
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
+import com.aptana.radrails.editor.common.PartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov
  *
  */
-public class ERBPartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
+public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 
 	private static ERBPartitionerSwitchStrategy instance;
 	
@@ -59,6 +59,7 @@ public class ERBPartitionerSwitchStrategy implements IPartitionerSwitchStrategy 
 	 * 
 	 */
 	private ERBPartitionerSwitchStrategy() {
+		super(ERB_PAIRS, ESCAPE_PAIRS);
 	}
 	
 	public static ERBPartitionerSwitchStrategy getDafault() {
@@ -73,13 +74,6 @@ public class ERBPartitionerSwitchStrategy implements IPartitionerSwitchStrategy 
 	 */
 	public String[][] getSwitchTagPairs() {
 		return ERB_PAIRS;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getEscapePairs()
-	 */
-	public String[][] getEscapePairs() {
-		return ESCAPE_PAIRS;
 	}
 
 }

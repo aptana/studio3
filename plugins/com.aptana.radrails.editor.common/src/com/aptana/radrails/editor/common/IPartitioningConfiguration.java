@@ -47,4 +47,6 @@ public interface IPartitioningConfiguration {
 	
 	public IPredicateRule[] getPartitioningRules();
 	
+	public ISubPartitionScanner createSubPartitionScanner();
+	
 }

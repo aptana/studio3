@@ -33,30 +33,14 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb.xml;
-
-import com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
-import com.aptana.radrails.editor.xml.XMLSourceConfiguration;
+package com.aptana.radrails.editor.common;
 
 /**
  * @author Max Stepanov
  *
  */
-public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
-	
-	protected RXMLSourceViewerConfiguration() {
-		super(XMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
-	}
+public interface IPartitionScannerSwitchStrategy {
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration#getPartitionerSwitchStrategy()
-	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
-	}
-
+	public char[][] getSwitchSequences();
+	public char[][][] getEscapeSequences();
 }

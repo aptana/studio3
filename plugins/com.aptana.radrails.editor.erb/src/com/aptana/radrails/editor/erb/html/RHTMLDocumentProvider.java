@@ -35,7 +35,7 @@
 
 package com.aptana.radrails.editor.erb.html;
 
-import com.aptana.radrails.editor.common.CombinedDocumentProvider;
+import com.aptana.radrails.editor.common.CompositeDocumentProvider;
 import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
 import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
@@ -44,7 +44,7 @@ import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
  * @author Max Stepanov
  *
  */
-public class RHTMLDocumentProvider extends CombinedDocumentProvider {
+public class RHTMLDocumentProvider extends CompositeDocumentProvider {
 
 	protected RHTMLDocumentProvider() {
 		super(HTMLSourceConfiguration.getDefault(),

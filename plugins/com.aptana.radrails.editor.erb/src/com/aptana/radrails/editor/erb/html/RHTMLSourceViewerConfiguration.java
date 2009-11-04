@@ -35,7 +35,7 @@
 
 package com.aptana.radrails.editor.erb.html;
 
-import com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration;
+import com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
@@ -45,14 +45,14 @@ import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
  * @author Max Stepanov
  *
  */
-public class RHTMLSourceViewerConfiguration extends CombinedSourceViewerConfiguration {
+public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
 
 	protected RHTMLSourceViewerConfiguration() {
 		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CombinedSourceViewerConfiguration#getLanguageSpecification()
+	 * @see com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration#getLanguageSpecification()
 	 */
 	@Override
 	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {

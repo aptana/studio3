@@ -35,10 +35,6 @@
 
 package com.aptana.radrails.editor.common;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -50,7 +46,7 @@ import org.eclipse.jface.text.rules.Token;
  * @author Max Stepanov
  *
  */
-public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionScanner {
+public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
 	public final static String START_SWITCH_TAG = "__cl_start_switch_tag";
 	public final static String END_SWITCH_TAG = "__cl_end_switch_tag";
@@ -60,50 +56,36 @@ public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionS
 			END_SWITCH_TAG
 		};
 		
-	private IPredicateRule[] defaultRules;
-	private IPredicateRule[] primaryRules;
+	private ISubPartitionScanner defaultPartitionScanner;
+	private ISubPartitionScanner primaryPartitionScanner;
+	
+	private ISubPartitionScanner currentPartitionScanner;
+	
 	private IPredicateRule[] switchRules;
-	
-	private Set<String> defaultContentTypes = new HashSet<String>();
-	private Set<String> primaryContentTypes = new HashSet<String>();
-	
-	private IPartitionerSwitchStrategy partitionerSwitchStrategy;
+		
 	private IExtendedPartitioner partitioner;
 	
 	private boolean hasSwitch = false;
-	private SequenceCharacterScanner startSequenceCharacterScanner;
-	private SequenceCharacterScanner endSequenceCharacterScanner;
-
-	private SequenceCharacterScanner sequenceCharacterScanner;
 		
 
 	/**
 	 * 
 	 */
-	public CombinedSwitchingPartitionScanner(IPredicateRule[] defaultRules, IPredicateRule[] primaryRules,
-			String[] defaultContentTypes, String[] primaryContentTypes,
+	public CompositePartitionScanner(ISubPartitionScanner defaultPartitionScanner, ISubPartitionScanner primaryPartitionScanner,
 			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
-		this.defaultRules = defaultRules;
-		this.primaryRules = primaryRules;
-		this.defaultContentTypes.addAll(Arrays.asList(defaultContentTypes));
-		this.primaryContentTypes.addAll(Arrays.asList(primaryContentTypes));
-		this.partitionerSwitchStrategy = partitionerSwitchStrategy;
+		this.defaultPartitionScanner = defaultPartitionScanner;
+		this.primaryPartitionScanner = primaryPartitionScanner;
+		defaultPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getDefaultSwitchStrategy());
+		primaryPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getPrimarySwitchStrategy());
 				
 		String[][] pairs = partitionerSwitchStrategy.getSwitchTagPairs();
-		char[][] startSequences = new char[pairs.length][];
-		char[][] endSequences = new char[pairs.length][];
 		switchRules = new IPredicateRule[pairs.length*2];
 		for (int i = 0; i < pairs.length; ++i) {
-			startSequences[i] = pairs[i][0].toCharArray();
-			endSequences[i] = pairs[i][1].toCharArray();
 			switchRules[2*i] = new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG));
 			switchRules[2*i+1] = new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG));
 		}
-		startSequenceCharacterScanner = new SequenceCharacterScanner(this, startSequences);
-		endSequenceCharacterScanner = new SequenceCharacterScanner(this, endSequences);
-		
-		fRules = defaultRules;
-		sequenceCharacterScanner = startSequenceCharacterScanner;
+				
+		currentPartitionScanner = defaultPartitionScanner;
 		setDefaultReturnToken(new Token(IDocument.DEFAULT_CONTENT_TYPE));
 	}
 
@@ -131,12 +113,10 @@ public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionS
 			TypedPosition partition = partitioner.findClosestPosition(offset);
 			if (partition != null) {
 				String type = partition.getType();
-				if (primaryContentTypes.contains(type) || START_SWITCH_TAG.equals(type)) {
-					fRules = primaryRules;
-					sequenceCharacterScanner = endSequenceCharacterScanner;
-				} else if (defaultContentTypes.contains(type) || END_SWITCH_TAG.equals(type)) {
-					fRules = defaultRules;
-					sequenceCharacterScanner = startSequenceCharacterScanner;
+				if (primaryPartitionScanner.hasContentType(type) || START_SWITCH_TAG.equals(type)) {
+					currentPartitionScanner = primaryPartitionScanner;
+				} else if (defaultPartitionScanner.hasContentType(type) || END_SWITCH_TAG.equals(type)) {
+					currentPartitionScanner = defaultPartitionScanner;
 				}
 			}
 		}
@@ -158,14 +138,12 @@ public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionS
 		boolean resume = (fPartitionOffset > -1 && fPartitionOffset < fOffset);
 		fTokenOffset = resume ? fPartitionOffset : fOffset;
 		
-		IPredicateRule rule;
 		IToken token;
 
-		for (int i = 0; i < fRules.length; ++i) {
-			rule = (IPredicateRule) fRules[i];
+		for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 			token = rule.getSuccessToken();
 			if (fContentType.equals(token.getData())) {
-				token = rule.evaluate(sequenceCharacterScanner, resume);
+				token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
 				if (!token.isUndefined()) {
 					fContentType = null;
 					return token;
@@ -190,18 +168,17 @@ public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionS
 
 		if (hasSwitch) {
 			hasSwitch = false;
-			boolean toPrimary = (fRules == defaultRules);
+			boolean toPrimary = (currentPartitionScanner == defaultPartitionScanner);
 			for (int i = 0; i < switchRules.length; ++i) {
 				IToken token = (switchRules[i].evaluate(this));
 				if (!token.isUndefined()) {
-					fRules = toPrimary ? primaryRules : defaultRules;
-					sequenceCharacterScanner = toPrimary ? endSequenceCharacterScanner : startSequenceCharacterScanner;
+					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
 					return token;
 				}
 			}
 		} else {
-			for (int i = 0; i < fRules.length; ++i) {
-				IToken token = (fRules[i].evaluate(sequenceCharacterScanner));
+			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
+				IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 				if (!token.isUndefined()) {
 					return token;
 				}
@@ -218,7 +195,7 @@ public final class CombinedSwitchingPartitionScanner extends RuleBasedPartitionS
 	}
 	
 	private boolean hasSwitchingSequence() {
-		if (sequenceCharacterScanner.foundSequence()) {
+		if (currentPartitionScanner.foundSequence()) {
 			hasSwitch = true;
 			return true;
 		}

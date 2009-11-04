@@ -33,30 +33,65 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb.xml;
-
-import com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
-import com.aptana.radrails.editor.xml.XMLSourceConfiguration;
+package com.aptana.radrails.editor.common;
 
 /**
  * @author Max Stepanov
  *
  */
-public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
+public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
+
+	private static final char[][][] EMPTY = new char[][][] {};
 	
-	protected RXMLSourceViewerConfiguration() {
-		super(XMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	private char[][][] switchSequences;
+	private char[][][] escapeSequences;
+	
+	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, String[][] escapeSequencePairs) {
+		char[][] startSequences = new char[switchSequencePairs.length][];
+		char[][] endSequences = new char[switchSequencePairs.length][];
+		for (int i = 0; i < switchSequencePairs.length; ++i) {
+			startSequences[i] = switchSequencePairs[i][0].toCharArray();
+			endSequences[i] = switchSequencePairs[i][1].toCharArray();
+		}
+
+		switchSequences = new char[][][] { startSequences, endSequences };
+		escapeSequences = new char[escapeSequencePairs.length][][];
+		for (int i = 0; i < escapeSequencePairs.length; ++i) {
+			escapeSequences[i] = new char[][] {
+					escapeSequencePairs[i][0].toCharArray(),
+					escapeSequencePairs[i][1] != null ? escapeSequencePairs[i][1].toCharArray() : null
+			};
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration#getPartitionerSwitchStrategy()
+	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
 	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
+	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy() {
+		return new IPartitionScannerSwitchStrategy() {
+			public char[][] getSwitchSequences() {
+				return switchSequences[0];
+			}
+			
+			public char[][][] getEscapeSequences() {
+				return EMPTY;
+			}
+		};
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
+	 */
+	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy() {
+		return new IPartitionScannerSwitchStrategy() {
+			public char[][] getSwitchSequences() {
+				return switchSequences[1];
+			}
+			
+			public char[][][] getEscapeSequences() {
+				return escapeSequences;
+			}
+		};
 	}
 
 }

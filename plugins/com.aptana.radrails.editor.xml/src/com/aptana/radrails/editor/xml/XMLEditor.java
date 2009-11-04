@@ -38,12 +38,6 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 public class XMLEditor extends AbstractThemeableEditor
 {
-
-	public XMLEditor()
-	{
-		super();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()

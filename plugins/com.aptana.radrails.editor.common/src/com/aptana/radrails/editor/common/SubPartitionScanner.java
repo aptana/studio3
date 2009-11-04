@@ -35,90 +35,66 @@
 
 package com.aptana.radrails.editor.common;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IPredicateRule;
 
 /**
  * @author Max Stepanov
  *
  */
-public class SequenceCharacterScanner implements ICharacterScanner {
+public class SubPartitionScanner implements ISubPartitionScanner {
 
-	private ICharacterScanner characterScanner;
-	private char[][] sequences;
-	private char[][][] escapes;
-	private boolean found = false;
-	
+	private List<IPredicateRule> rules = new ArrayList<IPredicateRule>();
+	private Set<String> contentTypes = new HashSet<String>();
+	private SequenceCharacterScanner characterScanner;
+
 	/**
-	 * @param baseCharacterScanner
+	 * 
 	 */
-	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
-		this.characterScanner = characterScanner;
-		this.sequences = switchStrategy.getSwitchSequences();
-		this.escapes = switchStrategy.getEscapeSequences();
+	public SubPartitionScanner(IPredicateRule[] rules, String[] contentTypes) {
+		this.rules.addAll(Arrays.asList(rules));
+		this.contentTypes.addAll(Arrays.asList(contentTypes));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ICharacterScanner#getColumn()
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy)
 	 */
-	public int getColumn() {
-		return characterScanner.getColumn();
+	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
+		this.characterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ICharacterScanner#getLegalLineDelimiters()
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getRules()
 	 */
-	public char[][] getLegalLineDelimiters() {
-		return characterScanner.getLegalLineDelimiters();
+	public Collection<IPredicateRule> getRules() {
+		return rules;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ICharacterScanner#read()
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getCharacterScanner()
 	 */
-	public int read() {
-		int c = characterScanner.read();
-		if (c != ICharacterScanner.EOF) {
-			for (char[] sequence : sequences) {
-				if (c == sequence[0] && sequenceDetected(sequence)) {
-					found = true;
-					return ICharacterScanner.EOF;
-				}
-			}
-		}
-		return c;
+	public ICharacterScanner getCharacterScanner() {
+		return characterScanner;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.ICharacterScanner#unread()
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#foundSequence()
 	 */
-	public void unread() {
-		characterScanner.unread();
-	}
-		
 	public boolean foundSequence() {
-		try {
-			return found;
-		} finally {
-			found = false;
-		}
-	}
-	
-	private boolean sequenceDetected(char[] sequence) {
-		for (int i = 1; i < sequence.length; ++i) {
-			int c = characterScanner.read();
-			if (c != sequence[i]) {
-				// Non-matching character detected, rewind the scanner back to the start.
-				// Do not unread the first character.
-				characterScanner.unread();
-				for (int j = i-1; j > 0; --j) {
-					characterScanner.unread();
-				}
-				return false;
-			}
-		}
-		for (int j = sequence.length-1; j > 0; --j) {
-			characterScanner.unread();
-		}
-		return true;
+		return characterScanner.foundSequence();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
+	 */
+	public boolean hasContentType(String contentType) {
+		return contentTypes.contains(contentType);
+	}
 }

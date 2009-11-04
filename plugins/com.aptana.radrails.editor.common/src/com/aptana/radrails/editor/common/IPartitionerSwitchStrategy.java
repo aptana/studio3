@@ -42,5 +42,8 @@ package com.aptana.radrails.editor.common;
 public interface IPartitionerSwitchStrategy {
 
 	public String[][] getSwitchTagPairs();	
-	public String[][] getEscapePairs();
+	
+	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy();
+	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy();
+	
 }

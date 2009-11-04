@@ -54,7 +54,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
  * @author Max Stepanov
  *
  */
-public abstract class CombinedSourceViewerConfiguration extends SourceViewerConfiguration {
+public abstract class CompositeSourceViewerConfiguration extends SourceViewerConfiguration {
 
 	private ITokenScanner startEndTokenScanner;
 	private ISourceViewerConfiguration defaultSourceViewerConfiguration;
@@ -64,7 +64,7 @@ public abstract class CombinedSourceViewerConfiguration extends SourceViewerConf
 	 * @param defaultSourceViewerConfiguration
 	 * @param primarySourceViewerConfiguration
 	 */
-	protected CombinedSourceViewerConfiguration(
+	protected CompositeSourceViewerConfiguration(
 			ISourceViewerConfiguration defaultSourceViewerConfiguration,
 			ISourceViewerConfiguration primarySourceViewerConfiguration) {
 		super();
@@ -78,7 +78,7 @@ public abstract class CombinedSourceViewerConfiguration extends SourceViewerConf
 	@Override
 	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return TextUtils.combine(new String[][] {
-				CombinedSwitchingPartitionScanner.SWITCHING_CONTENT_TYPES,
+				CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
 				defaultSourceViewerConfiguration.getContentTypes(),
 				defaultSourceViewerConfiguration.getContentTypes()
 		});
@@ -92,10 +92,10 @@ public abstract class CombinedSourceViewerConfiguration extends SourceViewerConf
 		PresentationReconciler reconciler = (PresentationReconciler)  super.getPresentationReconciler(sourceViewer);
 	
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getStartEndTokenScanner());
-		reconciler.setDamager(dr, CombinedSwitchingPartitionScanner.START_SWITCH_TAG);
-		reconciler.setRepairer(dr, CombinedSwitchingPartitionScanner.START_SWITCH_TAG);
-		reconciler.setDamager(dr, CombinedSwitchingPartitionScanner.END_SWITCH_TAG);
-		reconciler.setRepairer(dr, CombinedSwitchingPartitionScanner.END_SWITCH_TAG);
+		reconciler.setDamager(dr, CompositePartitionScanner.START_SWITCH_TAG);
+		reconciler.setRepairer(dr, CompositePartitionScanner.START_SWITCH_TAG);
+		reconciler.setDamager(dr, CompositePartitionScanner.END_SWITCH_TAG);
+		reconciler.setRepairer(dr, CompositePartitionScanner.END_SWITCH_TAG);
 		
 		defaultSourceViewerConfiguration.setupPresentationReconciler(reconciler, sourceViewer);
 		primarySourceViewerConfiguration.setupPresentationReconciler(reconciler, sourceViewer);

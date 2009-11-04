@@ -44,7 +44,7 @@ import org.eclipse.ui.editors.text.FileDocumentProvider;
  * @author Max Stepanov
  *
  */
-public class CombinedDocumentProvider extends FileDocumentProvider {
+public class CompositeDocumentProvider extends FileDocumentProvider {
 
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
 	private IPartitioningConfiguration primaryPartitioningConfiguration;
@@ -55,7 +55,7 @@ public class CombinedDocumentProvider extends FileDocumentProvider {
 	 * @param primaryPartitioningConfiguration
 	 * @param partitionerSwitchStrategy
 	 */
-	protected CombinedDocumentProvider(
+	protected CompositeDocumentProvider(
 			IPartitioningConfiguration defaultPartitioningConfiguration,
 			IPartitioningConfiguration primaryPartitioningConfiguration,
 			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
@@ -71,18 +71,16 @@ public class CombinedDocumentProvider extends FileDocumentProvider {
 	@Override
 	protected IDocument createDocument(Object element) throws CoreException {
 		IDocument document = super.createDocument(element);
-		if (document != null) {
-			String[] defaultContentTypes = defaultPartitioningConfiguration.getContentTypes();
-			String[] primaryContentTypes = primaryPartitioningConfiguration.getContentTypes();
-			CombinedSwitchingPartitionScanner partitionScanner = new CombinedSwitchingPartitionScanner(
-					defaultPartitioningConfiguration.getPartitioningRules(), primaryPartitioningConfiguration.getPartitioningRules(),
-					defaultContentTypes, primaryContentTypes,
+		if (document != null) {			
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
+					defaultPartitioningConfiguration.createSubPartitionScanner(),
+					primaryPartitioningConfiguration.createSubPartitionScanner(),
 					partitionerSwitchStrategy);
 			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
 					TextUtils.combine(new String[][] {
-							CombinedSwitchingPartitionScanner.SWITCHING_CONTENT_TYPES,
-							defaultContentTypes,
-							primaryContentTypes
+							CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
+							defaultPartitioningConfiguration.getContentTypes(),
+							primaryPartitioningConfiguration.getContentTypes()
 					}));
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);

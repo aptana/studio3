@@ -52,6 +52,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
+import com.aptana.radrails.editor.common.ISubPartitionScanner;
+import com.aptana.radrails.editor.common.SubPartitionScanner;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
@@ -165,6 +167,13 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public IPredicateRule[] getPartitioningRules() {
 		return partitioningRules;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
+	 */
+	public ISubPartitionScanner createSubPartitionScanner() {
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES);
 	}
 
 	/* (non-Javadoc)
