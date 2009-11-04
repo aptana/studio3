@@ -113,6 +113,13 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#doResetRules()
+	 */
+	public boolean doResetRules() {
+		return false;
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
 	 */
 	public boolean hasContentType(String contentType) {

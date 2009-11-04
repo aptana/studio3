@@ -139,20 +139,26 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		
 		IToken token;
 
-		for (IPredicateRule rule : currentPartitionScanner.getRules()) {
-			token = rule.getSuccessToken();
-			if (fContentType.equals(token.getData())) {
-				token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
-				if (!token.isUndefined()) {
-					fContentType = null;
-					currentPartitionScanner.setLastToken(token);
-					return token;
-				}
-				if (hasSwitchingSequence()) {
-					return currentPartitionScanner.getDefaultToken();
+		boolean doResetRules = false;
+		do {
+			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
+				token = rule.getSuccessToken();
+				if (fContentType.equals(token.getData())) {
+					token = rule.evaluate(currentPartitionScanner.getCharacterScanner(), resume);
+					if (!token.isUndefined()) {
+						fContentType = null;
+						currentPartitionScanner.setLastToken(token);
+						return token;
+					}
+					if (doResetRules = currentPartitionScanner.doResetRules()) {
+						break;
+					}
+					if (hasSwitchingSequence()) {
+						return currentPartitionScanner.getDefaultToken();
+					}
 				}
 			}
-		}
+		} while (doResetRules);
 
 		// haven't found any rule for this type of partition
 		fContentType = null;
@@ -177,16 +183,22 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				}
 			}
 		} else {
-			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
-				IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
-				if (!token.isUndefined()) {
-					currentPartitionScanner.setLastToken(token);
-					return token;
+			boolean doResetRules = false;
+			do {
+				for (IPredicateRule rule : currentPartitionScanner.getRules()) {
+					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
+					if (!token.isUndefined()) {
+						currentPartitionScanner.setLastToken(token);
+						return token;
+					}
+					if (doResetRules = currentPartitionScanner.doResetRules()) {
+						break;
+					}
+					if (hasSwitchingSequence()) {
+						return currentPartitionScanner.getDefaultToken();
+					}
 				}
-				if (hasSwitchingSequence()) {
-					return currentPartitionScanner.getDefaultToken();
-				}
-			}
+			} while (doResetRules);
 		}
 
 		if (read() == EOF) {

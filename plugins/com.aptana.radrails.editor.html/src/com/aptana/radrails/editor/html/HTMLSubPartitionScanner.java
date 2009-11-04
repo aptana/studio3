@@ -38,7 +38,9 @@ package com.aptana.radrails.editor.html;
 import org.eclipse.jface.text.rules.IToken;
 
 import com.aptana.radrails.editor.common.CompositeSubPartitionScanner;
+import com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
+import com.aptana.radrails.editor.common.PartitionScannerSwitchStrategy;
 import com.aptana.radrails.editor.common.SubPartitionScanner;
 import com.aptana.radrails.editor.css.CSSSourceConfiguration;
 import com.aptana.radrails.editor.js.JSSourceConfiguration;
@@ -49,10 +51,18 @@ import com.aptana.radrails.editor.js.JSSourceConfiguration;
  */
 public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 
-	private static final int TYPE_HTML = 0;
 	private static final int TYPE_JS = 1;
 	private static final int TYPE_CSS = 2;
 	
+	private static final String[] JS_SWITCH_SEQUENCES = new String[] {
+		"</script>"
+	};
+	private static final String[] CSS_SWITCH_SEQUENCES = new String[] {
+		"</style>"
+	};
+
+	private static final String[][] EMPTY = new String[0][];
+
 	/**
 	 *
 	 */
@@ -61,7 +71,10 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 				new SubPartitionScanner(HTMLSourceConfiguration.getDefault().getPartitioningRules(), HTMLSourceConfiguration.CONTENT_TYPES),
 				JSSourceConfiguration.getDefault().createSubPartitionScanner(),
 				CSSSourceConfiguration.getDefault().createSubPartitionScanner()
-		});
+			}, new IPartitionScannerSwitchStrategy[] {
+				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES, EMPTY),
+				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES, EMPTY)
+			});
 	}
 
 	/* (non-Javadoc)

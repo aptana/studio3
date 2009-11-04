@@ -47,22 +47,32 @@ import org.eclipse.jface.text.rules.IToken;
  */
 public abstract class CompositeSubPartitionScanner implements ISubPartitionScanner {
 
-	private ISubPartitionScanner[] subPartitionScanners;
-	private SequenceCharacterScanner sequenceCharacterScanner;
+	protected static final int TYPE_DEFAULT = 0;
+
+	protected ISubPartitionScanner[] subPartitionScanners;
+	protected IPartitionScannerSwitchStrategy[] switchStrategies;
+	protected SequenceCharacterScanner[] sequenceCharacterScanners;
+	protected SequenceCharacterScanner parentSequenceCharacterScanner;
 	protected int current = 0;
 	
 	/**
 	 * 
 	 */
-	protected CompositeSubPartitionScanner(ISubPartitionScanner[] subPartitionScanners) {
+	protected CompositeSubPartitionScanner(ISubPartitionScanner[] subPartitionScanners, IPartitionScannerSwitchStrategy[] switchStrategies) {
 		this.subPartitionScanners = subPartitionScanners;
+		this.switchStrategies = switchStrategies;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy)
 	 */
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
-		sequenceCharacterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
+		parentSequenceCharacterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
+		sequenceCharacterScanners = new SequenceCharacterScanner[subPartitionScanners.length];
+		sequenceCharacterScanners[0] = parentSequenceCharacterScanner;
+		for (int i = 0; i < switchStrategies.length; ++i) {
+			sequenceCharacterScanners[1+i] = new SequenceCharacterScanner(parentSequenceCharacterScanner, switchStrategies[i]);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -83,14 +93,25 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getCharacterScanner()
 	 */
 	public ICharacterScanner getCharacterScanner() {
-		return sequenceCharacterScanner;
+		return sequenceCharacterScanners[current];
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#foundSequence()
 	 */
 	public boolean foundSequence() {
-		return sequenceCharacterScanner.foundSequence();
+		return parentSequenceCharacterScanner.foundSequence();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#doResetRules()
+	 */
+	public boolean doResetRules() {
+		if (current != TYPE_DEFAULT && sequenceCharacterScanners[current].foundSequence()) {
+			current = TYPE_DEFAULT;
+			return true;
+		}
+		return false;
 	}
 
 	/* (non-Javadoc)

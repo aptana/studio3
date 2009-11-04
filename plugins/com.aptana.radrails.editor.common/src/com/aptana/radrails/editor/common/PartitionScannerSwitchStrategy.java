@@ -35,24 +35,41 @@
 
 package com.aptana.radrails.editor.common;
 
-import java.util.Collection;
+/**
+ * @author Max Stepanov
+ *
+ */
+public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchStrategy {
 
-import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
+	private char[][] switchSequences;
+	private char[][][] escapeSequences;
+	
+	/**
+	 * 
+	 */
+	public PartitionScannerSwitchStrategy(String[] switchSequences, String[][] escapeSequences) {
+		this.switchSequences = new char[switchSequences.length][];
+		for (int i = 0 ; i < switchSequences.length; ++i) {
+			this.switchSequences[i] = switchSequences[i].toCharArray();
+		}
+		this.escapeSequences = new char[escapeSequences.length][][];
+		for (int i = 0 ; i < escapeSequences.length; ++i) {
+			this.escapeSequences[i] = new char[][] { escapeSequences[i][0].toCharArray(), escapeSequences[i][1].toCharArray()};
+		}
+	}
 
-public interface ISubPartitionScanner {
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy#getEscapeSequences()
+	 */
+	public char[][][] getEscapeSequences() {
+		return escapeSequences;
+	}
 
-	public Collection<IPredicateRule> getRules();
-	public IToken getDefaultToken();
-	
-	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy);
-	public ICharacterScanner getCharacterScanner();
-	public boolean foundSequence();
-	public boolean doResetRules();
-	
-	public boolean hasContentType(String contentType);
-	
-	public void setLastToken(IToken token);
-	
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy#getSwitchSequences()
+	 */
+	public char[][] getSwitchSequences() {
+		return switchSequences;
+	}
+
 }
