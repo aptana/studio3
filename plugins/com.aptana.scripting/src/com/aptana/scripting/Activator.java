@@ -1,5 +1,7 @@
 package com.aptana.scripting;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -15,6 +17,56 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	
 	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	}
+
+	/**
+	 * logInfo
+	 * 
+	 * @param string
+	 */
+	public static void logInfo(String string)
+	{
+		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+	}
+
+	/**
+	 * logWarning
+	 * 
+	 * @param msg
+	 */
+	public static void logWarning(String msg)
+	{
+		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
+	}
+
+	/**
+	 * trace
+	 * 
+	 * @param string
+	 */
+	public static void trace(String string)
+	{
+		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
+	}
+
+	/**
 	 * The constructor
 	 */
 	public Activator() {
@@ -28,7 +80,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
@@ -37,14 +89,4 @@ public class Activator extends AbstractUIPlugin {
 		plugin = null;
 		super.stop(context);
 	}
-
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
-
 }
