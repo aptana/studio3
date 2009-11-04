@@ -39,10 +39,12 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -58,35 +60,124 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  *
  */
 public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+	
+	private static class DocTypeRule extends MultiLineRule {
+	    private int fEmbeddedStart= 0;
 
-	public final static String HTML_DOCTYPE = "__html_doctype";
+		public DocTypeRule(IToken token) {
+	        super("<!DOCTYPE", ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+	    }
+
+	    /*
+	     * (non-Javadoc)
+	     * 
+	     * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
+	     */
+	    protected boolean endSequenceDetected(ICharacterScanner scanner) {
+	        int c;
+	        while ((c = scanner.read()) != ICharacterScanner.EOF) {
+	            if (c == fEscapeCharacter) {
+	                // Skip the escaped character.
+	                scanner.read();
+	            } else if (c == '<') {
+	            	fEmbeddedStart++;
+	            } else if (c == '>') {
+	            	if (fEmbeddedStart == 0) {
+	            		return true;
+	            	}
+	            	fEmbeddedStart--;
+	            }
+	        }
+	        
+	        scanner.unread();
+	        return false;
+	    }
+	}
+	
+	private static class TagRule extends MultiLineRule {
+
+		public TagRule(IToken token) {
+			this("", token);
+		}
+
+		public TagRule(String tag, IToken token) {
+	        super("<"+tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+	    }
+
+	    /*
+	     * (non-Javadoc)
+	     * 
+	     * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
+	     */
+	    protected boolean endSequenceDetected(ICharacterScanner scanner) {
+		    boolean inSingleQuotedString = false;
+		    boolean inDoubleQuotedString = false;
+		    
+		    int c;
+	        while ((c = scanner.read()) != ICharacterScanner.EOF) {
+	        	if (c == '>') {
+	            	if (!(inSingleQuotedString) && !(inDoubleQuotedString)) {
+	            		return true;
+	            	}
+	            } else if (c == '\\') {
+	            	if (inSingleQuotedString || inDoubleQuotedString) {
+	            		// Skip the escaped character.
+	            		scanner.read();
+	            	}
+	            } else if (c == '"') {
+	            	if (inDoubleQuotedString) {
+	            		inDoubleQuotedString = false;
+	            	} else if (inSingleQuotedString) {
+	            		// continue
+	            	} else {
+	            		inDoubleQuotedString = true;
+	            	}
+	            } else if (c == '\'') {
+	            	if (inDoubleQuotedString) {
+	            		// continue
+	            	} else if (inSingleQuotedString) {
+	            		inSingleQuotedString = false;
+	            	} else {
+	            		inSingleQuotedString = true;
+	            	}
+	            }
+	        }
+	        
+	        scanner.unread();
+	        return false;
+	    }
+	}
+	
 	public final static String HTML_COMMENT = "__html_comment";
-	public final static String HTML_TAG = "__html_tag";
+	public final static String CDATA = "__xml_cdata";
+	public final static String HTML_DOCTYPE = "__html_doctype";
 	public final static String HTML_SCRIPT = "__html_script";
 	public final static String HTML_STYLE = "__html_style";
+	public final static String HTML_TAG = "__html_tag";
 
 	public static final String[] CONTENT_TYPES = new String[] {
-		HTML_DOCTYPE,
-		HTML_COMMENT,
-		HTML_TAG
+		HTML_COMMENT
+		,CDATA
+		,HTML_DOCTYPE
+		,HTML_SCRIPT
+		,HTML_STYLE
+		,HTML_TAG
 	};
 
-	private IToken htmlDoctypeToken = new Token(HTML_DOCTYPE);
-	private IToken htmlCommentToken = new Token(HTML_COMMENT);
-	private IToken htmlScriptToken = new Token(HTML_SCRIPT);
-	private IToken htmlStyleToken = new Token(HTML_STYLE);
-	private IToken tagToken = new Token(HTML_TAG);
-	
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!DOCTYPE ", ">", htmlDoctypeToken),
-			new MultiLineRule("<script", ">", htmlScriptToken),
-			new MultiLineRule("<style", ">", htmlStyleToken),
-			new MultiLineRule("<!--", "-->", htmlCommentToken),
-			new TagRule(tagToken)
+			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)),
+			new DocTypeRule(new Token(CDATA)),
+			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)),
+			new TagRule("script", new Token(HTML_SCRIPT)),
+			new TagRule("style", new Token(HTML_STYLE)),
+			new TagRule(new Token(HTML_TAG)),
 	};
 
-	private HTMLTagScanner tagScanner;
 	private HTMLScanner htmlScanner;
+	private HTMLTagScanner tagScanner;
+	private RuleBasedScanner doubleQuotedStringScanner;
+	private RuleBasedScanner singleQuotedStringScanner;
+	private RuleBasedScanner cdataScanner;
 
 	private static HTMLSourceConfiguration instance;
 	
@@ -122,17 +213,27 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLTagScanner());
-		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
-		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
-
-		dr = new DefaultDamagerRepairer(getHTMLScanner());
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-
+		
+		dr = new DefaultDamagerRepairer(getHTMLTagScanner());		
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_SCRIPT);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_SCRIPT);
+		
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_STYLE);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_STYLE);
+		
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
+		
 		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html"));
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
+		
+		dr = new DefaultDamagerRepairer(getCDATAScanner());
+		reconciler.setDamager(dr, CDATA);
+		reconciler.setRepairer(dr, CDATA);
 	}
 
 	protected ITokenScanner getHTMLScanner() {
@@ -142,6 +243,16 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 					CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.DEFAULT))));
 		}
 		return htmlScanner;
+	}
+	
+	private ITokenScanner getCDATAScanner()
+	{
+		if (cdataScanner == null)
+		{
+			cdataScanner = new RuleBasedScanner();
+			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml"));
+		}
+		return cdataScanner;
 	}
 	
 	protected ITokenScanner getHTMLTagScanner() {
