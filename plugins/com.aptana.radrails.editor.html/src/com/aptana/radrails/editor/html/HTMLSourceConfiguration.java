@@ -62,6 +62,8 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_DOCTYPE = "__html_doctype";
 	public final static String HTML_COMMENT = "__html_comment";
 	public final static String HTML_TAG = "__html_tag";
+	public final static String HTML_SCRIPT = "__html_script";
+	public final static String HTML_STYLE = "__html_style";
 
 	public static final String[] CONTENT_TYPES = new String[] {
 		HTML_DOCTYPE,
@@ -69,12 +71,16 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		HTML_TAG
 	};
 
-	private IToken htmlDoctypeToken = new Token(HTML_COMMENT);
+	private IToken htmlDoctypeToken = new Token(HTML_DOCTYPE);
 	private IToken htmlCommentToken = new Token(HTML_COMMENT);
+	private IToken htmlScriptToken = new Token(HTML_SCRIPT);
+	private IToken htmlStyleToken = new Token(HTML_STYLE);
 	private IToken tagToken = new Token(HTML_TAG);
 	
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!DOCTYPE ", ">", htmlCommentToken),
+			new MultiLineRule("<!DOCTYPE ", ">", htmlDoctypeToken),
+			new MultiLineRule("<script", ">", htmlScriptToken),
+			new MultiLineRule("<style", ">", htmlStyleToken),
 			new MultiLineRule("<!--", "-->", htmlCommentToken),
 			new TagRule(tagToken)
 	};
