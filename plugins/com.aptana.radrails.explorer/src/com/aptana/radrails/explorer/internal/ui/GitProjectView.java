@@ -1,5 +1,8 @@
 package com.aptana.radrails.explorer.internal.ui;
 
+import java.util.ArrayList;
+
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -16,8 +19,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -50,6 +56,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.navigator.framelist.FrameList;
+import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -77,6 +88,15 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	 * Property we assign to a project to make it the active one that this view is filtered to.
 	 */
 	private static final String ACTIVE_PROJECT = "activeProject"; //$NON-NLS-1$
+
+	/**
+	 * Memento names for saving state of view and restoring it across launches.
+	 */
+	private static final String TAG_SELECTION = "selection"; //$NON-NLS-1$
+	private static final String TAG_EXPANDED = "expanded"; //$NON-NLS-1$
+	private static final String TAG_ELEMENT = "element"; //$NON-NLS-1$
+	private static final String TAG_PATH = "path"; //$NON-NLS-1$
+	private static final String TAG_CURRENT_FRAME = "currentFrame"; //$NON-NLS-1$
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
@@ -112,12 +132,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private boolean narrowingDown;
 	private WorkbenchJob refreshJob;
 
-	private Button filter;
+	private Button gitFilter;
 
+	/**
+	 * Fields for the focus/eyeball filtering
+	 */
 	protected TreeItem hoveredItem;
-
 	protected int lastDrawnX;
-
 	protected Object[] fExpandedElements;
 
 	@Override
@@ -169,6 +190,19 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		// Add eyeball hover
 		addFocusHover();
+
+		if (memento != null)
+		{
+			restoreState(memento);
+		}
+		memento = null;
+	}
+
+	@Override
+	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
+	{
+		this.memento = aMemento;
+		super.init(aSite, aMemento);
 	}
 
 	private void addFocusHover()
@@ -513,11 +547,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private void createFilterButton(Composite parent)
 	{
-		filter = new Button(parent, SWT.FLAT | SWT.TOGGLE | SWT.CENTER);
-		filter.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		filter.setImage(ExplorerPlugin.getImage("icons/full/elcl16/filter.png")); //$NON-NLS-1$
-		filter.setToolTipText(Messages.GitProjectView_ChangedFilesFilterTooltip);
-		filter.addSelectionListener(new SelectionAdapter()
+		gitFilter = new Button(parent, SWT.FLAT | SWT.TOGGLE | SWT.CENTER);
+		gitFilter.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		gitFilter.setImage(ExplorerPlugin.getImage("icons/full/elcl16/filter.png")); //$NON-NLS-1$
+		gitFilter.setToolTipText(Messages.GitProjectView_ChangedFilesFilterTooltip);
+		gitFilter.addSelectionListener(new SelectionAdapter()
 		{
 			private GitChangedFilesFilter fChangedFilesFilter;
 
@@ -624,6 +658,136 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
 		GitRepository.removeListener(this);
 		super.dispose();
+	}
+
+	@Override
+	public void saveState(IMemento memento)
+	{
+		// TODO Auto-generated method stub
+		super.saveState(memento);
+		TreeViewer viewer = getCommonViewer();
+		if (viewer == null)
+		{
+			if (this.memento != null)
+			{
+				memento.putMemento(this.memento);
+			}
+			return;
+		}
+
+		FrameList frameList = getCommonViewer().getFrameList();
+		if (frameList.getCurrentIndex() > 0)
+		{
+			// save frame, it's not the "home"/workspace frame
+			TreeFrame currentFrame = (TreeFrame) frameList.getCurrentFrame();
+			IMemento frameMemento = memento.createChild(TAG_CURRENT_FRAME);
+			currentFrame.saveState(frameMemento);
+		}
+		else
+		{
+			// save visible expanded elements
+			Object expandedElements[] = viewer.getVisibleExpandedElements();
+			if (expandedElements.length > 0)
+			{
+				IMemento expandedMem = memento.createChild(TAG_EXPANDED);
+				for (int i = 0; i < expandedElements.length; i++)
+				{
+					if (expandedElements[i] instanceof IResource)
+					{
+						IMemento elementMem = expandedMem.createChild(TAG_ELEMENT);
+						elementMem.putString(TAG_PATH, ((IResource) expandedElements[i]).getFullPath().toString());
+					}
+				}
+			}
+			// save selection
+			Object elements[] = ((IStructuredSelection) viewer.getSelection()).toArray();
+			if (elements.length > 0)
+			{
+				IMemento selectionMem = memento.createChild(TAG_SELECTION);
+				for (int i = 0; i < elements.length; i++)
+				{
+					if (elements[i] instanceof IResource)
+					{
+						IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
+						elementMem.putString(TAG_PATH, ((IResource) elements[i]).getFullPath().toString());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Restores the state of the receiver to the state described in the specified memento.
+	 * 
+	 * @param memento
+	 *            the memento
+	 * @since 2.0
+	 */
+	protected void restoreState(IMemento memento)
+	{
+		TreeViewer viewer = getCommonViewer();
+		IMemento frameMemento = memento.getChild(TAG_CURRENT_FRAME);
+
+		if (frameMemento != null)
+		{
+			TreeFrame frame = new TreeFrame(viewer);
+			frame.restoreState(frameMemento);
+			frame.setName(getFrameName(frame.getInput()));
+			frame.setToolTipText(getFrameToolTipText(frame.getInput()));
+			viewer.setSelection(new StructuredSelection(frame.getInput()));
+			getCommonViewer().getFrameList().gotoFrame(frame);
+		}
+		else
+		{
+			IContainer container = ResourcesPlugin.getWorkspace().getRoot();
+			IMemento childMem = memento.getChild(TAG_EXPANDED);
+			if (childMem != null)
+			{
+				ArrayList elements = new ArrayList();
+				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+				for (int i = 0; i < elementMem.length; i++)
+				{
+					Object element = container.findMember(elementMem[i].getString(TAG_PATH));
+					if (element != null)
+					{
+						elements.add(element);
+					}
+				}
+				viewer.setExpandedElements(elements.toArray());
+			}
+			childMem = memento.getChild(TAG_SELECTION);
+			if (childMem != null)
+			{
+				ArrayList list = new ArrayList();
+				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+				for (int i = 0; i < elementMem.length; i++)
+				{
+					Object element = container.findMember(elementMem[i].getString(TAG_PATH));
+					if (element != null)
+					{
+						list.add(element);
+					}
+				}
+				viewer.setSelection(new StructuredSelection(list));
+			}
+		}
+	}
+
+	/**
+	 * Returns the name for the given element. Used as the name for the current frame.
+	 */
+	String getFrameName(Object element)
+	{
+		if (element instanceof IResource)
+		{
+			return ((IResource) element).getName();
+		}
+		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
+		if (text == null)
+		{
+			return "";//$NON-NLS-1$
+		}
+		return text;
 	}
 
 	protected void reloadProjects()
@@ -837,13 +1001,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					pull.setEnabled(false);
 					stash.setEnabled(false);
 					commit.setEnabled(false);
-					filter.setEnabled(false);
+					gitFilter.setEnabled(false);
 					push.setVisible(false);
 					pull.setVisible(false);
 					commit.setVisible(false);
 					stash.setVisible(false);
 					unstash.setVisible(false);
-					filter.setVisible(false);
+					gitFilter.setVisible(false);
 					branchCombo.setVisible(false);
 					summary.setVisible(false);
 					gitDetails.setLayoutData(hideGitDetailsData);
@@ -861,14 +1025,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					unstash.setEnabled(true);
 					// TODO Disable commit unless there are changes to commit
 					commit.setEnabled(true);
-					filter.setEnabled(gitFilterEnabled(repository));
+					gitFilter.setEnabled(gitFilterEnabled(repository));
 					push.setVisible(true);
 					pull.setVisible(true);
 					commit.setVisible(true);
 					stash.setVisible(true);
 					unstash.setVisible(true);
 					summary.setVisible(true);
-					filter.setVisible(true);
+					gitFilter.setVisible(true);
 					branchCombo.setVisible(true);
 					gitDetails.setLayoutData(showGitDetailsData);
 					// Make the summary as wide as the project combo, and as tall as the 3 icons
