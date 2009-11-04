@@ -54,6 +54,8 @@ import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
 import com.aptana.radrails.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.radrails.editor.css.CSSSourceConfiguration;
+import com.aptana.radrails.editor.js.JSSourceConfiguration;
 
 /**
  * @author Max Stepanov
@@ -234,6 +236,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		dr = new DefaultDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
+		
+		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 	}
 
 	protected ITokenScanner getHTMLScanner() {
