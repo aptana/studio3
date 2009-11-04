@@ -309,7 +309,8 @@ public class CommitDialog extends StatusDialog
 
 	protected void updateDiff(String diff)
 	{
-		diffArea.setText(DiffFormatter.toHTML(diff));
+		if (diffArea != null && !diffArea.isDisposed())
+			diffArea.setText(DiffFormatter.toHTML(diff));
 	}
 
 	protected ChangedFile findChangedFile(String path)
