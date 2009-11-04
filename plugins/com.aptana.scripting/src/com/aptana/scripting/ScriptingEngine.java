@@ -64,6 +64,9 @@ public class ScriptingEngine
 			provider.setLoadPaths(loadPaths);
 		}
 		
+		// TODO: $0 should work, but until then, we'll use this hack so script
+		// can't get its full path
+		container.put("$fullpath", fullPath);
 		container.runScriptlet(PathType.ABSOLUTE, fullPath);
 	}
 }
