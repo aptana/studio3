@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
@@ -22,10 +23,16 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -36,8 +43,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.progress.UIJob;
@@ -103,6 +114,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private Button filter;
 
+	protected TreeItem hoveredItem;
+
+	protected int lastDrawnX;
+
+	protected Object[] fExpandedElements;
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -149,6 +166,139 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
+
+		// Add eyeball hover
+		addFocusHover();
+	}
+
+	private void addFocusHover()
+	{
+		final Image eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png");
+		final int IMAGE_MARGIN = 2;
+		final Tree tree = getCommonViewer().getTree();
+
+		/*
+		 * NOTE: MeasureItem and PaintItem are called repeatedly. Therefore it is critical for performance that these
+		 * methods be as efficient as possible.
+		 */
+		tree.addListener(SWT.MeasureItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				TreeItem item = (TreeItem) event.item;
+				if (hoveredItem == null || !hoveredItem.equals(item))
+					return;
+				if (eyeball != null)
+				{
+					event.width += eyeball.getBounds().width + IMAGE_MARGIN;
+				}
+			}
+		});
+		tree.addListener(SWT.PaintItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				TreeItem item = (TreeItem) event.item;
+				if (hoveredItem == null || !hoveredItem.equals(item))
+					return;
+				if (eyeball != null)
+				{
+					lastDrawnX = event.x + event.width + IMAGE_MARGIN;
+					int itemHeight = tree.getItemHeight();
+					int imageHeight = eyeball.getBounds().height;
+					int y = event.y + (itemHeight - imageHeight) / 2;
+					event.gc.drawImage(eyeball, lastDrawnX, y);
+				}
+			}
+		});
+
+		getCommonViewer().getControl().addMouseTrackListener(new MouseTrackAdapter()
+		{
+			@Override
+			public void mouseExit(MouseEvent e)
+			{
+				super.mouseExit(e);
+				if (hoveredItem != null)
+				{
+					final Rectangle bounds = hoveredItem.getBounds();
+					hoveredItem = null;
+					Display.getDefault().asyncExec(new Runnable()
+					{
+
+						public void run()
+						{
+							getCommonViewer().getTree().redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+						}
+					});
+				}
+			}
+
+			@Override
+			public void mouseHover(MouseEvent e)
+			{
+				super.mouseHover(e);
+				// TODO If the filter is already on, we shouldn't do this stuff
+				if (getFilterString() != null && getFilterString().trim().length() > 0)
+					return;
+				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
+				if (hoveredItem != null && hoveredItem.equals(t))
+					return;
+				final Rectangle oldBounds = hoveredItem == null ? null : hoveredItem.getBounds();
+				hoveredItem = t;
+				final Rectangle newBounds = hoveredItem == null ? null : hoveredItem.getBounds();
+				Display.getDefault().asyncExec(new Runnable()
+				{
+					public void run()
+					{
+						if (oldBounds != null)
+							getCommonViewer().getTree().redraw(oldBounds.x, oldBounds.y, oldBounds.width,
+									oldBounds.height, true);
+						if (newBounds != null)
+							getCommonViewer().getTree().redraw(newBounds.x, newBounds.y, newBounds.width,
+									newBounds.height, true);
+					}
+				});
+			}
+		});
+
+		getCommonViewer().getTree().addMouseListener(new MouseListener()
+		{
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				if (hoveredItem == null)
+					return;
+				// If user clicks on the eyeball, we need to turn on the focus filter!
+				Tree tree = (Tree) e.widget;
+				TreeItem t = tree.getItem(new Point(e.x, e.y));
+				if (t == null)
+					return;
+				if (!t.equals(hoveredItem))
+					return;
+				if (e.x >= lastDrawnX && e.x <= lastDrawnX + eyeball.getBounds().width)
+				{
+					// Ok, now we need to turn on the filter!
+					String text = getResourceNameToFilterBy();
+					if (text != null)
+					{
+						// TODO We need to store the expansion state of the tree here and restore it when we clear the
+						// filter!
+						fExpandedElements = getCommonViewer().getExpandedElements();
+						hoveredItem = null;
+						setFilterText(text);
+						textChanged();
+					}
+				}
+			}
+
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+		});
 	}
 
 	private Composite createFocusComposite(Composite myComposite, Composite top)
@@ -519,7 +669,9 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// If user selected "Create New..." then pop a dialog to generate a new branch
 		if (branchName.equals(CREATE_NEW_BRANCH_TEXT))
 		{
-			InputDialog dialog = new InputDialog(getSite().getShell(), Messages.GitProjectView_CreateBranchDialog_Title, Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-3$
+			InputDialog dialog = new InputDialog(getSite().getShell(),
+					Messages.GitProjectView_CreateBranchDialog_Title,
+					Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-3$
 					new IInputValidator()
 					{
 
@@ -980,11 +1132,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 						{
 							cancel = true;
 						}
-
-						// enabled toolbar - there is text to clear
-						// and the list is currently being filtered
-						// updateToolbar(true);
-
 						if (cancel)
 						{
 							return Status.CANCEL_STATUS;
@@ -992,9 +1139,13 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					}
 					else
 					{
-						// disabled toolbar - there is no text to clear
-						// and the list is currently not filtered
-						// updateToolbar(false);
+						// to reset our expansion state back to what it was before user used the eyeball/focus filter!
+						if (fExpandedElements != null)
+						{
+							getCommonViewer().collapseAll();
+							getCommonViewer().setExpandedElements(fExpandedElements);
+							fExpandedElements = null;
+						}
 					}
 				}
 				finally
@@ -1065,6 +1216,70 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	{
 		// TODO The files also have to be children of the active project!
 		return !repository.index().changedFiles().isEmpty();
+	}
+
+	private String getResourceNameToFilterBy()
+	{
+		String text = hoveredItem.getText();
+		// Try and strip filename down to the resource name!
+		if (text.endsWith("_controller.rb"))
+		{
+			text = text.substring(0, text.indexOf("_controller"));
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_controller_test.rb"))
+		{
+			text = text.substring(0, text.indexOf("_controller_test.rb"));
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper.rb"))
+		{
+			text = text.substring(0, text.indexOf("_helper"));
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_helper_test.rb"))
+		{
+			text = text.substring(0, text.indexOf("_helper_test.rb"));
+			text = Inflector.singularize(text);
+		}
+		else if (text.endsWith("_test.rb"))
+		{
+			text = text.substring(0, text.indexOf("_test.rb"));
+		}
+		else if (text.endsWith(".yml"))
+		{
+			Object data = hoveredItem.getData();
+			if (data instanceof IResource)
+			{
+				IResource resource = (IResource) data;
+				IPath path = resource.getProjectRelativePath();
+				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures"))
+				{
+					text = text.substring(0, text.indexOf(".yml"));
+					text = Inflector.singularize(text);
+				}
+			}
+		}
+		else if (text.endsWith(".rb"))
+		{
+			text = text.substring(0, text.indexOf(".rb"));
+		}
+		else
+		{
+			// We need to grab the full path, so we can determine the resource name!
+			Object data = hoveredItem.getData();
+			if (data instanceof IResource)
+			{
+				IResource resource = (IResource) data;
+				IPath path = resource.getProjectRelativePath();
+				if (path.segmentCount() >= 3 && path.segment(1).equals("views"))
+				{
+					text = path.segment(2);
+					text = Inflector.singularize(text);
+				}
+			}
+		}
+		return text;
 	}
 
 }
