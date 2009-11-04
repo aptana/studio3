@@ -24,6 +24,10 @@ module RadRails
       @jobj.invoke = invoke
     end
     
+    def java_object
+      @jobj
+    end
+    
     def key_binding
       @jobj.key_binding
     end
@@ -74,6 +78,11 @@ module RadRails
         block.call(command) if block_given?
         
         # add command to bundle
+        bundle = BundleManager.bundle_from_path(command.path)
+        
+        if bundle.nil? == false
+          bundle.add_command(command)
+        end
       end
     end
   end
