@@ -1,0 +1,55 @@
+package com.aptana.util;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
+public abstract class IOUtil
+{
+
+	/**
+	 * Reads an InputStream into a String. Safely closes the stream after reading, or if any exceptions occur. Returns
+	 * null if the stream is null or an exception occurs reading in the stream.
+	 * 
+	 * @param stream
+	 * @return
+	 */
+	public static String read(InputStream stream)
+	{
+		if (stream == null)
+			return null;
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			StringBuilder template = new StringBuilder();
+			String line = null;
+			while ((line = reader.readLine()) != null)
+			{
+				template.append(line);
+			}
+			return template.toString();
+		}
+		catch (IOException e)
+		{
+			UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
+		}
+		finally
+		{
+			try
+			{
+				if (stream != null)
+					stream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
+		return null;
+	}
+
+}

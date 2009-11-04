@@ -32,6 +32,7 @@ import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.Diff;
 import com.aptana.git.core.model.GitCommit;
+import com.aptana.git.ui.GitUIPlugin;
 
 class CommitFileDiffViewer extends TableViewer
 {
@@ -120,11 +121,22 @@ class CommitFileDiffViewer extends TableViewer
 	}
 
 	private static class SingleCommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
-	{
+	{		
 
 		public Image getColumnImage(Object element, int columnIndex)
 		{
-			return null;
+			Diff diff = (Diff) element;
+			switch (columnIndex)
+			{
+				case 0:
+					if (diff.fileCreated())
+						return GitUIPlugin.getImage("icons/obj16/empty_file.png"); //$NON-NLS-1$
+					if (diff.fileDeleted())
+						return GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
+					return GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
+				default:
+					return null;
+			}
 		}
 
 		public String getColumnText(Object element, int columnIndex)
