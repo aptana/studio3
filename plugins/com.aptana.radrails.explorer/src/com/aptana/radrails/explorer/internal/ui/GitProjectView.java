@@ -149,7 +149,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		Composite customComposite = new Composite(aParent, SWT.NONE);
 		customComposite.setLayout(new FormLayout());
 		// TODO Each composite we're hanging off here should probably be defined in it's own class and attached to this
-		// view using an extension or something. tht way we can mix and match and dynamically turn on and off the
+		// view using an extension or something. that way we can mix and match and dynamically turn on and off the
 		// various components (like filter, git actions, single project focus, etc)
 
 		// Create our special git stuff
@@ -567,6 +567,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				{
 					fChangedFilesFilter = new GitChangedFilesFilter();
 					getCommonViewer().addFilter(fChangedFilesFilter);
+					getCommonViewer().expandAll();
 				}
 				else
 				{
