@@ -600,4 +600,32 @@ public class GitRepository
 				"refs/heads/" + branchName);
 		return result.keySet().iterator().next() == 0;
 	}
+        
+        public boolean deleteFile(String filePath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean deleteFolder(String folderPath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r",
+				folderPath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean moveFile(String source, String dest)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
 }
