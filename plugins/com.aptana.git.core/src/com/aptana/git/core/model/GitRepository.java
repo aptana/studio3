@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
@@ -47,8 +47,7 @@ public class GitRepository
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
-	private static Map<String, WeakReference<GitRepository>> cachedRepos = new HashMap<String, WeakReference<GitRepository>>(
-			3);
+	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
 
 	public static void addListener(IGitRepositoryListener listener)
 	{
@@ -95,14 +94,18 @@ public class GitRepository
 		if (GitExecutable.instance().path() == null)
 			return null;
 
-		WeakReference<GitRepository> ref = cachedRepos.get(path.getPath());
+		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
 		if (ref == null || ref.get() == null)
 		{
+			if (ref != null)
+			{
+				cachedRepos.remove(ref);
+			}
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
 
-			ref = new WeakReference<GitRepository>(new GitRepository(gitDirURL));
+			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
 		return ref.get();
