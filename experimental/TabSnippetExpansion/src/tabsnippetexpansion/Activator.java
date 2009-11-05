@@ -1,5 +1,7 @@
 package tabsnippetexpansion;
 
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -47,4 +49,15 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	
+	public static final String SNIPPET = "/icons/snippet.png";
+	
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg) {
+		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
+	}
+	
+	public Image getImage(String imageID) {
+		return getImageRegistry().get(imageID);
+	}
 }
