@@ -1,5 +1,6 @@
 package com.aptana.git.ui;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -74,6 +75,11 @@ public class GitUIPlugin extends AbstractUIPlugin
 	public static void logError(String msg, Throwable e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
+	}
+
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
 	}
 
 	public static void logWarning(String msg)
