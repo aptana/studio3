@@ -64,6 +64,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String STRING = "__rb_string";
 
 	public static final String[] CONTENT_TYPES = new String[] {
+		DEFAULT,
 		WORD,
 		STRING
 	};

@@ -66,8 +66,14 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	public final static String CDATA = "__xml_cdata";
 	public final static String PRE_PROCESSOR = "__xml_pre_processor";
 
-	public static final String[] CONTENT_TYPES = new String[] { XML_COMMENT, STRING_SINGLE, STRING_DOUBLE,
-			CDATA, PRE_PROCESSOR };
+	public static final String[] CONTENT_TYPES = new String[] {
+			DEFAULT,
+			XML_COMMENT,
+			STRING_SINGLE,
+			STRING_DOUBLE,
+			CDATA,
+			PRE_PROCESSOR
+		};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)),

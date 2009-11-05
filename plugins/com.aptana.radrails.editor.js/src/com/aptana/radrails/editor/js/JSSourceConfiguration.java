@@ -67,11 +67,16 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public final static String STRING_DOUBLE = "__js_string_double";
 	public final static String STRING_SINGLE = "__js_string_single";
 	public final static String JS_REGEXP = "__js_regexp";
-	public final static String[] JS_PARTITION_TYPES = new String[] { JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
-			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
 
-	public static final String[] CONTENT_TYPES = new String[] { JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT, JS_DOC,
-			STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
+	public static final String[] CONTENT_TYPES = new String[] {
+			DEFAULT,
+			JS_MULTILINE_COMMENT,
+			JS_SINGLELINE_COMMENT,
+			JS_DOC,
+			STRING_DOUBLE,
+			STRING_SINGLE,
+			JS_REGEXP
+		};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)),

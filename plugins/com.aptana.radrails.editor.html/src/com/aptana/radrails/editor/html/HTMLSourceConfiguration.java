@@ -159,12 +159,13 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_TAG = "__html_tag";
 
 	public static final String[] CONTENT_TYPES = new String[] {
-		HTML_COMMENT
-		,CDATA
-		,HTML_DOCTYPE
-		,HTML_SCRIPT
-		,HTML_STYLE
-		,HTML_TAG
+		DEFAULT,
+		HTML_COMMENT,
+		CDATA,
+		HTML_DOCTYPE,
+		HTML_SCRIPT,
+		HTML_STYLE,
+		HTML_TAG
 	};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
