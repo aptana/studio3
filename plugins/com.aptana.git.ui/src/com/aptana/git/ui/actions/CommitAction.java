@@ -67,7 +67,6 @@ public class CommitAction extends GitAction
 			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			if (repo == null)
 				return false;
-
 			// TODO check that repo actually has changed files? Probably not, since we want to allow amending
 		}
 		return true;

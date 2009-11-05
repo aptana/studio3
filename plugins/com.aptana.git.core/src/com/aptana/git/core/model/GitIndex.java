@@ -565,8 +565,6 @@ public class GitIndex
 		userInfo.put("description", description);
 		userInfo.put("sha", commit);
 
-		// [[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexFinishedCommit object:self
-		// userInfo:userInfo];
 		if (!success)
 			return;
 
@@ -577,18 +575,14 @@ public class GitIndex
 			this.amend = false;
 		else
 			refresh();
-
 	}
 
 	private void postCommitFailure(String string)
 	{
-		// TODO Auto-generated method stub
 	}
 
 	private void postCommitUpdate(String string)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/**

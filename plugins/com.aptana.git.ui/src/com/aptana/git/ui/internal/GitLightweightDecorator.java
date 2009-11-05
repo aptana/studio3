@@ -344,6 +344,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				child = parent;
 			}
 		}
+		// we also need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
+		// the branch +/- status)
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			GitRepository other = GitRepository.getAttached(project);
+			if (other != null && other.equals(repo))
+				files.add(project);
+		}
 		postLabelEvent(new LabelProviderChangedEvent(this, files.toArray()));
 	}
 
