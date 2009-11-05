@@ -10,6 +10,10 @@ import java.util.Map;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -22,7 +26,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.team.ui.history.HistoryPage;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -128,9 +134,34 @@ public class GitHistoryPage extends HistoryPage
 
 		// finishContextMenu();
 		// attachContextMenu(graph.getControl());
-		// attachContextMenu(commentViewer.getControl());
+		hookContextMenu(commentViewer);
 		// attachContextMenu(fileViewer.getControl());
 		layout();
+	}
+	
+	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu(Control browserControl)
+	{
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener()
+		{
+			public void menuAboutToShow(IMenuManager manager)
+			{
+				fillContextMenu(manager);
+			}
+		});
+		
+		Menu menu = menuMgr.createContextMenu(browserControl);
+		browserControl.setMenu(menu);
+	}
+	
+	private void fillContextMenu(IMenuManager manager)
+	{
+		// Other plug-ins can contribute there actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private TableViewer createCommitTable(Composite parent)
