@@ -322,7 +322,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// We get a list of the files whose status just changed. We need to refresh those and any 
+		// We get a list of the files whose status just changed. We need to refresh those and any
 		// parents/ancestors of those.
 		GitRepository repo = e.getRepository();
 		String workingDirectory = repo.workingDirectory();
@@ -338,7 +338,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			// Need to add all parents up to project!
 			IContainer parent = null;
 			IResource child = file;
-			while((parent = child.getParent()) != null)
+			while ((parent = child.getParent()) != null)
 			{
 				files.add(parent);
 				child = parent;
@@ -349,8 +349,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// FIXME Grab the repo and only refresh the projects attached to it (and their children)
-//		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
 	/**
@@ -369,6 +367,5 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
-//		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 }
