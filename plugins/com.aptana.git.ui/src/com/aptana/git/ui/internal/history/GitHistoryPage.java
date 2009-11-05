@@ -236,22 +236,22 @@ public class GitHistoryPage extends HistoryPage
 	protected String commitToHTML(GitCommit commit)
 	{
 		Map<String, String> variables = new HashMap<String, String>();
-		variables.put("sha", commit.sha()); //$NON-NLS-1$
-		variables.put("date", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
-		variables.put("author", commit.getAuthor()); //$NON-NLS-1$
-		variables.put("subject", commit.getSubject()); //$NON-NLS-1$
+		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
+		variables.put("\\{date\\}", TIMESTAMP_FORMAT.format(commit.date())); //$NON-NLS-1$
+		variables.put("\\{author\\}", commit.getAuthor()); //$NON-NLS-1$
+		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
 		String comment = commit.getComment();
 		// Auto convert references to URLs into links
 		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); 
 		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads
-		variables.put("comment", comment); //$NON-NLS-1$
+		variables.put("\\{comment\\}", comment); //$NON-NLS-1$
 		
 		String avatar = ""; //$NON-NLS-1$
 		if (commit.getAuthorEmail() != null)
 		{
 			avatar = StringUtil.md5(commit.getAuthorEmail().toLowerCase());
 		}
-		variables.put("avatar", avatar); //$NON-NLS-1$
+		variables.put("\\{avatar\\}", avatar); //$NON-NLS-1$
 		
 		StringBuilder parents = new StringBuilder();
 		if (commit.parents() != null && !commit.parents().isEmpty())
@@ -261,7 +261,7 @@ public class GitHistoryPage extends HistoryPage
 				parents.append(parentSha).append("<br />"); //$NON-NLS-1$
 			}
 		}
-		variables.put("parent", parents.toString()); //$NON-NLS-1$
+		variables.put("\\{parent\\}", parents.toString()); //$NON-NLS-1$
 		return StringUtil.replaceAll(loadTemplate(), variables);
 	}
 

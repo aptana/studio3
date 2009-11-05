@@ -22,8 +22,6 @@ public abstract class StringUtil
 	 */
 	public static String replaceAll(String template, Map<String, String> variables)
 	{
-		// TODO Point here from GitHistoryPage lines 274-281
-		// TODO Point here from DiffFormatter lines 112-113?
 		if (variables == null || variables.isEmpty())
 			return template;
 		for (Map.Entry<String, String> entry : variables.entrySet())
