@@ -19,7 +19,6 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
-import com.aptana.git.ui.internal.actions.Messages;
 
 public class GitProjectRefresher implements IGitRepositoryListener
 {
@@ -51,7 +50,7 @@ public class GitProjectRefresher implements IGitRepositoryListener
 				affectedProjects.add(project);
 		}
 
-		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
+		WorkspaceJob job = new WorkspaceJob("Refresh projects")
 		{
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
