@@ -324,8 +324,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					String text = getResourceNameToFilterBy();
 					if (text != null)
 					{
-						// TODO We need to store the expansion state of the tree here and restore it when we clear the
-						// filter!
 						fExpandedElements = getCommonViewer().getExpandedElements();
 						hoveredItem = null;
 						setFilterText(text);
@@ -1041,12 +1039,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					gitDetails.setLayoutData(showGitDetailsData);
 					// Make the summary as wide as the project combo, and as tall as the 3 icons
 					GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
-					summaryData.verticalSpan = 3;
+					summaryData.verticalSpan = 2;
 					summaryData.widthHint = projectCombo.getBounds().width;
-					// Minimum height should be to bottom of push, pull, stash icons ((3 * icon height) + (2 * space
+					// Minimum height should be to bottom of push, pull, stash icons ((2 * icon height) + (1 * space
 					// between icons))
-					summaryData.minimumHeight = (commit.getBounds().height * 3)
-							+ ((GridLayout) gitDetails.getLayout()).verticalSpacing * 2;
+					summaryData.minimumHeight = (commit.getBounds().height * 2)
+							+ ((GridLayout) gitDetails.getLayout()).verticalSpacing * 1;
 					summary.setLayoutData(summaryData);
 				}
 				gitStuff.getParent().layout();
@@ -1388,6 +1386,12 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private String getResourceNameToFilterBy()
 	{
 		String text = hoveredItem.getText();
+		Object data = hoveredItem.getData();
+		if (data instanceof IResource)
+		{
+			IResource resource = (IResource) data;
+			text = resource.getName(); // if we can, use the raw filename so we don't pick up decorators added
+		}
 		// Try and strip filename down to the resource name!
 		if (text.endsWith("_controller.rb"))
 		{
@@ -1415,7 +1419,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 		else if (text.endsWith(".yml"))
 		{
-			Object data = hoveredItem.getData();
 			if (data instanceof IResource)
 			{
 				IResource resource = (IResource) data;
@@ -1434,7 +1437,6 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		else
 		{
 			// We need to grab the full path, so we can determine the resource name!
-			Object data = hoveredItem.getData();
 			if (data instanceof IResource)
 			{
 				IResource resource = (IResource) data;
