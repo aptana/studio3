@@ -115,7 +115,7 @@ class GitGrapher
 			GitLane newLane = new GitLane(commit.parents().get(0));
 			currentLanes.add(newLane);
 			newPos = currentLanes.size();
-			lines.add(new GitGraphLine(true, newPos, newPos, newLane.index()));
+			lines.add(new GitGraphLine(false, newPos, newPos, newLane.index())); // upper
 		}
 
 		// Add all other parents
@@ -135,7 +135,7 @@ class GitGrapher
 					GitLane lane = currentLanes.get(x);
 					if (lane.isCommit(parent))
 					{
-						lines.add(new GitGraphLine(false, x + 1, newPos, lane.index()));
+						lines.add(new GitGraphLine(false, x + 1, newPos, lane.index())); // lower
 						was_displayed = true;
 						break;
 					}
