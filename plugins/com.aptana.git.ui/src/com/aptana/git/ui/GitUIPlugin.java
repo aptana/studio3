@@ -7,9 +7,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.GitProjectRefresher;
-
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -21,8 +18,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static GitUIPlugin plugin;
-
-	private GitProjectRefresher fRepoListener;
 
 	/**
 	 * The constructor
@@ -39,8 +34,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		fRepoListener = new GitProjectRefresher();
-		GitRepository.addListener(fRepoListener);
 	}
 
 	/*
@@ -49,7 +42,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		GitRepository.removeListener(fRepoListener);
 		plugin = null;
 		super.stop(context);
 	}

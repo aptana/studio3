@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal;
+package com.aptana.git.core;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,12 @@ import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 
-public class GitProjectRefresher implements IGitRepositoryListener
+/**
+ * Listens to repository changes and forces the relevant resources in the workspace to refresh.
+ * 
+ * @author cwilliams
+ */
+class GitProjectRefresher implements IGitRepositoryListener
 {
 
 	public void branchChanged(BranchChangedEvent e)
@@ -31,13 +36,11 @@ public class GitProjectRefresher implements IGitRepositoryListener
 	public void indexChanged(IndexChangedEvent e)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	protected void refreshAffectedProjects(GitRepository repo)
