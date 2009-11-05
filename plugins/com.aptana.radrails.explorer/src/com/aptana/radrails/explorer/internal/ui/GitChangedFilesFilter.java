@@ -44,9 +44,9 @@ class GitChangedFilesFilter extends ViewerFilter
 			return false;
 
 		String workingDirectory = repo.workingDirectory();
-		if (!workingDirectory.endsWith("/"))
+		if (!workingDirectory.endsWith("/")) //$NON-NLS-1$
 		{
-			workingDirectory += "/";
+			workingDirectory += "/"; //$NON-NLS-1$
 		}
 
 		for (ChangedFile changedFile : changedFiles)

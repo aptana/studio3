@@ -208,7 +208,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private void addFocusHover()
 	{
-		final Image eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png");
+		final Image eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
 		final int IMAGE_MARGIN = 2;
 		final Tree tree = getCommonViewer().getTree();
 
@@ -839,7 +839,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		{
 			InputDialog dialog = new InputDialog(getSite().getShell(),
 					Messages.GitProjectView_CreateBranchDialog_Title,
-					Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-3$
+					Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-1$
 					new IInputValidator()
 					{
 
@@ -1393,46 +1393,46 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			text = resource.getName(); // if we can, use the raw filename so we don't pick up decorators added
 		}
 		// Try and strip filename down to the resource name!
-		if (text.endsWith("_controller.rb"))
+		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf("_controller"));
+			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
 			text = Inflector.singularize(text);
 		}
-		else if (text.endsWith("_controller_test.rb"))
+		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf("_controller_test.rb"));
+			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
 			text = Inflector.singularize(text);
 		}
-		else if (text.endsWith("_helper.rb"))
+		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf("_helper"));
+			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
 			text = Inflector.singularize(text);
 		}
-		else if (text.endsWith("_helper_test.rb"))
+		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf("_helper_test.rb"));
+			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
 			text = Inflector.singularize(text);
 		}
-		else if (text.endsWith("_test.rb"))
+		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf("_test.rb"));
+			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
 		}
-		else if (text.endsWith(".yml"))
+		else if (text.endsWith(".yml")) //$NON-NLS-1$
 		{
 			if (data instanceof IResource)
 			{
 				IResource resource = (IResource) data;
 				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures"))
+				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
 				{
-					text = text.substring(0, text.indexOf(".yml"));
+					text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
 					text = Inflector.singularize(text);
 				}
 			}
 		}
-		else if (text.endsWith(".rb"))
+		else if (text.endsWith(".rb")) //$NON-NLS-1$
 		{
-			text = text.substring(0, text.indexOf(".rb"));
+			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
 		}
 		else
 		{
@@ -1441,7 +1441,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 			{
 				IResource resource = (IResource) data;
 				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("views"))
+				if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
 				{
 					text = path.segment(2);
 					text = Inflector.singularize(text);

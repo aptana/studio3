@@ -127,7 +127,7 @@ class PathFilter extends ViewerFilter
 		else
 		{
 			singularMatcher = new StringMatcher("*" + patternString + "*", true, false); //$NON-NLS-1$ //$NON-NLS-2$
-			if (patternString.contains("?") || patternString.contains("*"))
+			if (patternString.contains("?") || patternString.contains("*")) //$NON-NLS-1$ //$NON-NLS-2$
 				return;
 			// TODO Generate a matcher for the singular and plural forms of the pattern unless singular is prefix of
 			// plural!
