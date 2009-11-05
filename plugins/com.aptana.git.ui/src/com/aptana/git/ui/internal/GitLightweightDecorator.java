@@ -1,5 +1,8 @@
 package com.aptana.git.ui.internal;
 
+import java.io.File;
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -26,6 +29,7 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
+	private static final String DIRTY_PREFIX = "> ";
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
 	/**
@@ -105,10 +109,36 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			case IResource.PROJECT:
 				decorateProject(decoration, resource);
+				// fall through intentionally!
+			case IResource.FOLDER:
+				decorateFolder(decoration, resource);
 				break;
 			case IResource.FILE:
 				decorateFile(decoration, resource);
 				break;
+		}
+	}
+
+	private void decorateFolder(IDecoration decoration, IResource resource)
+	{
+		GitRepository repo = getRepo(resource);
+		if (repo == null)
+			return;
+
+		List<ChangedFile> changedFiles = repo.index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+		{
+			return;
+		}
+		String workingDirectory = repo.workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String fullPath = workingDirectory + File.separator + changedFile.getPath();
+			if (fullPath.startsWith(resource.getLocationURI().getPath()))
+			{
+				decoration.addPrefix(DIRTY_PREFIX);
+				return;
+			}
 		}
 	}
 
@@ -149,6 +179,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				overlay = untrackedImage;
 			}
 		}
+		decoration.addPrefix(DIRTY_PREFIX);
 		decoration.addOverlay(overlay);
 	}
 
