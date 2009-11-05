@@ -119,23 +119,13 @@ public class GitHistoryPage extends HistoryPage
 		graph = createCommitTable(graphDetailSplit);
 		revInfoSplit = new SashForm(graphDetailSplit, SWT.HORIZONTAL);
 		commentViewer = new Browser(revInfoSplit, SWT.READ_ONLY);
-		fileViewer = new CommitFileDiffViewer(revInfoSplit);
+		fileViewer = new CommitFileDiffViewer(revInfoSplit, this);
 
 		graphDetailSplit.setWeights(new int[] { 500, 500 });
 		revInfoSplit.setWeights(new int[] { 700, 300 });
 
-		// revObjectSelectionProvider = new RevObjectSelectionProvider();
-		// popupMgr = new MenuManager(null, POPUP_ID);
 		attachCommitSelectionChanged();
-		// createLocalToolbarActions();
-		// createResourceFilterActions();
-		// createStandardActions();
-		// createViewMenu();
-
-		// finishContextMenu();
-		// attachContextMenu(graph.getControl());
 		hookContextMenu(commentViewer);
-		// attachContextMenu(fileViewer.getControl());
 		layout();
 	}
 	
@@ -150,18 +140,13 @@ public class GitHistoryPage extends HistoryPage
 		{
 			public void menuAboutToShow(IMenuManager manager)
 			{
-				fillContextMenu(manager);
+				// Other plug-ins can contribute there actions here
+				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			}
 		});
 		
 		Menu menu = menuMgr.createContextMenu(browserControl);
 		browserControl.setMenu(menu);
-	}
-	
-	private void fillContextMenu(IMenuManager manager)
-	{
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private TableViewer createCommitTable(Composite parent)

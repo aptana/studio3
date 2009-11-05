@@ -58,6 +58,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		super(new CompareConfiguration(), page);
 		this.left = left;
 		this.right = right;
+		setTitle(left.getName());
 	}
 
 	FileRevisionTypedElement getRightRevision() {

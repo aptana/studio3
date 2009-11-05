@@ -10,6 +10,10 @@ package com.aptana.git.ui.internal.history;
 
 import org.eclipse.compare.CompareUI;
 import org.eclipse.compare.ITypedElement;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IOpenListener;
@@ -24,10 +28,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.Diff;
@@ -37,7 +43,7 @@ import com.aptana.git.ui.GitUIPlugin;
 class CommitFileDiffViewer extends TableViewer
 {
 
-	CommitFileDiffViewer(final Composite parent)
+	CommitFileDiffViewer(final Composite parent, final GitHistoryPage historyPage)
 	{
 		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 
@@ -64,6 +70,21 @@ class CommitFileDiffViewer extends TableViewer
 				showTwoWayFileDiff(d);
 			}
 		});
+
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener()
+		{
+			public void menuAboutToShow(IMenuManager manager)
+			{
+				manager.add(new OpenRevisionAction(historyPage.getSite().getPage(), getTable()));
+				// Other plug-ins can contribute there actions here
+				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			}
+		});
+
+		Menu menu = menuMgr.createContextMenu(getControl());
+		getControl().setMenu(menu);
 	}
 
 	void showTwoWayFileDiff(final Diff d)
@@ -121,7 +142,7 @@ class CommitFileDiffViewer extends TableViewer
 	}
 
 	private static class SingleCommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
-	{		
+	{
 
 		public Image getColumnImage(Object element, int columnIndex)
 		{
