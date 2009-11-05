@@ -331,7 +331,7 @@ public class GitRepository
 		File hook = new File(hookPath);
 		if (!hook.exists() || !hook.isFile())
 			return true;
-		
+
 		try
 		{
 			Method method = File.class.getMethod("canExecute", null);
@@ -521,5 +521,33 @@ public class GitRepository
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
 		}
 		return repo;
+	}
+
+	public boolean deleteFile(String filePath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean deleteFolder(String folderPath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r",
+				folderPath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean moveFile(String source, String dest)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
 	}
 }
