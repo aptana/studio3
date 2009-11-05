@@ -252,9 +252,17 @@ class CommitGraphTable extends TableViewer
 					y2 = height;
 				}
 				if (info.getLines().size() == 1)
-				{
-					y1 = 0;
-					y2 = height;
+				{ // FIXME Fix this when generating the lines, since it looks like the upper/lower is getting messed up for the first and last commit!
+					if (commit.hasParent())
+					{
+						y1 = height / 2;
+						y2 = height;
+					}
+					else
+					{
+						y1 = 0;
+						y2 = height / 2;
+					}
 				}
 				int x1 = (line.getFrom() * LANE_WIDTH) + (LANE_WIDTH / 2);
 				int x2 = (line.getTo() * LANE_WIDTH) + (LANE_WIDTH / 2);
