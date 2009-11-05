@@ -350,7 +350,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
 		// FIXME Grab the repo and only refresh the projects attached to it (and their children)
-		postLabelEvent(new LabelProviderChangedEvent(this));
+//		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
 	/**
@@ -369,6 +369,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
-		postLabelEvent(new LabelProviderChangedEvent(this));
+//		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 }
