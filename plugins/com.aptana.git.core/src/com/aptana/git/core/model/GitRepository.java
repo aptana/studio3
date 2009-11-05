@@ -8,6 +8,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -339,9 +340,9 @@ public class GitRepository
 			listener.branchChanged(e);
 	}
 
-	void fireIndexChangeEvent()
+	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
 	{
-		IndexChangedEvent e = new IndexChangedEvent(this);
+		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
 	}

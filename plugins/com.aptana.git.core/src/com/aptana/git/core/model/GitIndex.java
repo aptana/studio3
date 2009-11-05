@@ -358,6 +358,7 @@ public class GitIndex
 		// We need to find all files that don't have either
 		// staged or unstaged files, and delete them
 
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);		
 		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
 		for (ChangedFile file : this.files)
 		{
@@ -372,7 +373,7 @@ public class GitIndex
 				files.remove(file);
 			didChangeValueForKey("indexChanges");
 		}
-		postIndexChange();
+		postIndexChange(toRefresh);
 	}
 
 	private void didChangeValueForKey(String string)
@@ -387,10 +388,10 @@ public class GitIndex
 
 	}
 
-	private void postIndexChange()
+	private void postIndexChange(Collection<ChangedFile> changedFiles)
 	{
 		if (this.notify)
-			this.repository.fireIndexChangeEvent();
+			this.repository.fireIndexChangeEvent(changedFiles);
 		else
 			this.notify = true;
 	}
@@ -426,7 +427,7 @@ public class GitIndex
 			file.hasStagedChanges = true;
 		}
 
-		postIndexChange();
+		postIndexChange(stageFiles);
 		return true;
 	}
 
@@ -453,7 +454,7 @@ public class GitIndex
 			file.hasStagedChanges = false;
 		}
 
-		postIndexChange();
+		postIndexChange(unstageFiles);
 		return true;
 	}
 
@@ -481,7 +482,7 @@ public class GitIndex
 		for (ChangedFile file : discardFiles)
 			file.hasUnstagedChanges = false;
 
-		postIndexChange();
+		postIndexChange(discardFiles);
 	}
 
 	public void commit(String commitMessage)
