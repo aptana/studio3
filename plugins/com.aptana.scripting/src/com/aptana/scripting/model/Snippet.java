@@ -1,5 +1,8 @@
 package com.aptana.scripting.model;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.jruby.anno.JRubyMethod;
 
 public class Snippet
@@ -98,6 +101,16 @@ public class Snippet
 	}
 
 	/**
+	 * setPath
+	 * 
+	 * @param path
+	 */
+	void setPath(String path)
+	{
+		this._path = path;
+	}
+	
+	/**
 	 * setScope
 	 * 
 	 * @param scope
@@ -117,5 +130,26 @@ public class Snippet
 	public void setTrigger(String trigger)
 	{
 		this._trigger = trigger;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		StringWriter sw = new StringWriter();
+		PrintWriter writer = new PrintWriter(sw);
+		
+		// open snippet
+		writer.append("  snippet \"").append(this._displayName).println("\" {");
+		
+		// show body
+		writer.append("    path: ").println(this._path);
+		
+		// close snippet
+		writer.append("  }").append(this._displayName).println("\" {");
+		
+		return sw.toString();
 	}
 }
