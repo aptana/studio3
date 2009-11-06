@@ -108,17 +108,60 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	@Override
 	public void setPartialRange(IDocument document, int offset, int length, String contentType, int partitionOffset) {
+		defaultTokenState = null;
 		currentPartitionScanner = defaultPartitionScanner;
+		currentPartitionScanner.setLastToken(new Token(contentType));
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) && partitioner != null) {
 			TypedPosition partition = partitioner.findClosestPosition(offset);
 			if (partition != null) {
-				String type = partition.getType();
-				if (primaryPartitionScanner.hasContentType(type) || START_SWITCH_TAG.equals(type)) {
-					currentPartitionScanner = primaryPartitionScanner;
+				if (partition.overlapsWith(offset, length)) {
+					partition = partitioner.findClosestPosition(offset-1);
 				}
+			}
+			if (partition != null) {
+				String type = partition.getType();
+				if (primaryPartitionScanner.hasContentType(type)) {
+					currentPartitionScanner = primaryPartitionScanner;
+				} else if (START_SWITCH_TAG.equals(type)) {
+					hasSwitch = true;
+				}
+				currentPartitionScanner.setLastToken(new Token(type));
 			}
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenOffset()
+	 */
+	@Override
+	public int getTokenOffset() {
+		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+			return defaultTokenState.offset;
+		}
+		return super.getTokenOffset();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getTokenLength()
+	 */
+	@Override
+	public int getTokenLength() {
+		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+			return defaultTokenState.length;
+		}
+		return super.getTokenLength();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.RuleBasedScanner#getColumn()
+	 */
+	@Override
+	public int getColumn() {
+		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+			return defaultTokenState.column;
+		}
+		return super.getColumn();
 	}
 
 	/* (non-Javadoc)
@@ -126,6 +169,12 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	 */
 	@Override
 	public IToken nextToken() {
+		if (defaultTokenState != null && defaultTokenState.hasToken()) {
+			IToken token = defaultTokenState.token;
+			defaultTokenState = null;
+			System.out.println("> "+token.getData());
+			return token;
+		}
 		if (fContentType == null || hasSwitch) {
 			//don't try to resume
 			return baseNextToken();

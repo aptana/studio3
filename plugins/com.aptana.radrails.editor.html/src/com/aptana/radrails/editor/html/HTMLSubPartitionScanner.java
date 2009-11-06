@@ -35,6 +35,7 @@
 
 package com.aptana.radrails.editor.html;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
@@ -83,11 +84,24 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	 */
 	@Override
 	public void setLastToken(IToken token) {
-		Object contentType = token.getData();
+		if (!(token.getData() instanceof String)) {
+			return;
+		}
+		String contentType = (String) token.getData();
 		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType)) {
 			current = TYPE_JS;
 		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)) {
 			current = TYPE_CSS;
+		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
+				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
+			current = TYPE_DEFAULT;
+		} else if (contentType instanceof String) {
+			for (int i = 0; i < subPartitionScanners.length; ++i) {
+				if (subPartitionScanners[i].hasContentType(contentType)) {
+					current = i;
+					break;
+				}
+			}
 		}
 	}
 
