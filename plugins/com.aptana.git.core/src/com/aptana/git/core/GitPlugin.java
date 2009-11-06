@@ -11,6 +11,7 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.git.core.model.GitCommit;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.internal.core.storage.CommitFileRevision;
 
 /**
@@ -24,6 +25,8 @@ public class GitPlugin extends Plugin
 
 	// The shared instance
 	private static GitPlugin plugin;
+
+	private com.aptana.git.core.GitProjectRefresher fRepoListener;
 
 	/**
 	 * The constructor
@@ -53,6 +56,8 @@ public class GitPlugin extends Plugin
 		};
 		job.setSystem(true);
 		job.schedule();
+		fRepoListener = new GitProjectRefresher();
+		GitRepository.addListener(fRepoListener);
 	}
 
 	/*
@@ -61,6 +66,7 @@ public class GitPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		GitRepository.removeListener(fRepoListener);
 		plugin = null;
 		super.stop(context);
 	}
@@ -97,6 +103,7 @@ public class GitPlugin extends Plugin
 
 	/**
 	 * FIXME This doesn't seem like the best place to stick this.
+	 * 
 	 * @param commit
 	 * @param fileName
 	 * @return

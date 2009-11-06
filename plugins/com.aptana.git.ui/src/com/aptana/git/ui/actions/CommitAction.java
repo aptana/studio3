@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -10,6 +10,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.internal.actions.CommitDialog;
+import com.aptana.git.ui.internal.actions.GitAction;
+import com.aptana.git.ui.internal.actions.Messages;
 
 public class CommitAction extends GitAction
 {
@@ -48,9 +51,9 @@ public class CommitAction extends GitAction
 	}
 
 	@Override
-	protected String getCommand()
+	protected String[] getCommand()
 	{
-		return COMMAND;
+		return new String[] { COMMAND };
 	}
 
 	@Override
@@ -64,7 +67,6 @@ public class CommitAction extends GitAction
 			GitRepository repo = GitRepository.getAttached(resource.getProject());
 			if (repo == null)
 				return false;
-
 			// TODO check that repo actually has changed files? Probably not, since we want to allow amending
 		}
 		return true;

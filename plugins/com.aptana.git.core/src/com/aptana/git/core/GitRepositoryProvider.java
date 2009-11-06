@@ -3,6 +3,7 @@ package com.aptana.git.core;
 import java.net.URI;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.team.IMoveDeleteHook;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 
@@ -46,12 +47,19 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 	{
 		// nothing
 	}
-	
-	public synchronized IFileHistoryProvider getFileHistoryProvider() {
-		if (historyProvider == null) {
+
+	public synchronized IFileHistoryProvider getFileHistoryProvider()
+	{
+		if (historyProvider == null)
+		{
 			historyProvider = new GitFileHistoryProvider();
 		}
 		return historyProvider;
 	}
 
+	@Override
+	public IMoveDeleteHook getMoveDeleteHook()
+	{
+		return new GitMoveDeleteHook();
+	}
 }

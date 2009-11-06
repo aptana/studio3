@@ -1,9 +1,17 @@
 package com.aptana.git.ui.internal;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -16,6 +24,7 @@ import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -26,6 +35,7 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
+	private static final String DIRTY_PREFIX = "> ";
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
 	/**
@@ -105,10 +115,36 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			case IResource.PROJECT:
 				decorateProject(decoration, resource);
+				// fall through intentionally!
+			case IResource.FOLDER:
+				decorateFolder(decoration, resource);
 				break;
 			case IResource.FILE:
 				decorateFile(decoration, resource);
 				break;
+		}
+	}
+
+	private void decorateFolder(IDecoration decoration, IResource resource)
+	{
+		GitRepository repo = getRepo(resource);
+		if (repo == null)
+			return;
+
+		List<ChangedFile> changedFiles = repo.index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+		{
+			return;
+		}
+		String workingDirectory = repo.workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String fullPath = workingDirectory + File.separator + changedFile.getPath();
+			if (fullPath.startsWith(resource.getLocationURI().getPath()))
+			{
+				decoration.addPrefix(DIRTY_PREFIX);
+				return;
+			}
 		}
 	}
 
@@ -149,6 +185,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				overlay = untrackedImage;
 			}
 		}
+		decoration.addPrefix(DIRTY_PREFIX);
 		decoration.addOverlay(overlay);
 	}
 
@@ -285,16 +322,41 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// FIXME We need to walk the project and pass all files into the event, or we need to get the diff of updated
-		// files from the event and force refreshes of just those! just grabbing the "changedFiles" after the index
-		// change isn't sufficient!
-		postLabelEvent(new LabelProviderChangedEvent(this));
+		// We get a list of the files whose status just changed. We need to refresh those and any
+		// parents/ancestors of those.
+		GitRepository repo = e.getRepository();
+		String workingDirectory = repo.workingDirectory();
+		Collection<ChangedFile> changedFiles = e.changedFiles();
+		List<IResource> files = new ArrayList<IResource>();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String path = workingDirectory + File.separator + changedFile.getPath();
+			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
+			if (file == null)
+				continue;
+			files.add(file);
+			// Need to add all parents up to project!
+			IContainer parent = null;
+			IResource child = file;
+			while ((parent = child.getParent()) != null)
+			{
+				files.add(parent);
+				child = parent;
+			}
+		}
+		// we also need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
+		// the branch +/- status)
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			GitRepository other = GitRepository.getAttached(project);
+			if (other != null && other.equals(repo))
+				files.add(project);
+		}
+		postLabelEvent(new LabelProviderChangedEvent(this, files.toArray()));
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// FIXME Grab the repo and only refresh the project's attached to it (and their children)
-		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
 	/**
@@ -309,5 +371,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
 			}
 		});
+	}
+
+	public void branchChanged(BranchChangedEvent e)
+	{
 	}
 }

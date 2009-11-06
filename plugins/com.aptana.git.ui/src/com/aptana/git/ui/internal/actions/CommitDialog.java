@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
@@ -60,25 +59,13 @@ public class CommitDialog extends StatusDialog
 	private Image emptyFileImage;
 	private Browser diffArea;
 
-	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
+	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
 		this.gitRepository = gitRepository;
-		newFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/new_file.png")).createImage(); //$NON-NLS-1$
-		deletedFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/deleted_file.png")).createImage(); //$NON-NLS-1$
-		emptyFileImage = ImageDescriptor.createFromURL(
-				GitUIPlugin.getDefault().getBundle().getEntry("icons/obj16/empty_file.png")).createImage(); //$NON-NLS-1$
-	}
-
-	@Override
-	public boolean close()
-	{
-		newFileImage.dispose();
-		deletedFileImage.dispose();
-		emptyFileImage.dispose();
-		return super.close();
+		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
+		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
+		emptyFileImage = GitUIPlugin.getImage("icons/obj16/empty_file.png"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -293,6 +280,7 @@ public class CommitDialog extends StatusDialog
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				super.widgetSelected(e);
 				if (e.item == null)
 					return;
 				String path = ((TableItem) e.item).getText(1);
@@ -300,8 +288,7 @@ public class CommitDialog extends StatusDialog
 				if (file == null)
 					return;
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				updateDiff(diff);
-				super.widgetSelected(e);
+				updateDiff(diff);				
 			}
 		});
 		return table;
@@ -309,7 +296,8 @@ public class CommitDialog extends StatusDialog
 
 	protected void updateDiff(String diff)
 	{
-		diffArea.setText(DiffFormatter.toHTML(diff));
+		if (diffArea != null && !diffArea.isDisposed())
+			diffArea.setText(DiffFormatter.toHTML(diff));
 	}
 
 	protected ChangedFile findChangedFile(String path)

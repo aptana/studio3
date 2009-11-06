@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.ui"
+            class="com.aptana.radrails.explorer.internal.ui.GitProjectView"
+            icon="icons/full/cview16/filenav_nav.gif"
+            id="org.eclipse.ui.examples.navigator.view"
+            name="Git View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="org.eclipse.ui.examples.navigator.view">
+      </viewer>
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.examples.navigator.view">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.radrails.explorer.filters.hideNonRailsProjects">
+            </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.radrails.explorer.filters.hideNonActiveProjects">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="org.eclipse.ui.examples.navigator.view">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonFilter
+            id="com.aptana.radrails.explorer.filters.hideNonRailsProjects"
+            name="Hide non-Rails Projects">
+         <filterExpression>
+            <not>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+                  <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.radrails.rails.core.railsnature">
+                  </test>
+               </adapt>
+            </not>
+         </filterExpression>
+      </commonFilter>
+      <commonFilter
+            activeByDefault="true"
+            id="com.aptana.radrails.explorer.filters.hideNonActiveProjects"
+            name="Hide non-active projects">
+             <filterExpression>
+            <not>
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        args="com.aptana.radrails.explorer.activeProject,true"
+                        property="org.eclipse.core.resources.projectPersistentProperty"
+                        value="true">
+                  </test>
+               </adapt>
+            </not>
+         </filterExpression>
+      </commonFilter>
+   </extension>
+
+</plugin>
