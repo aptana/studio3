@@ -39,12 +39,14 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -98,9 +100,16 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	}
 	
 	private static class TagRule extends MultiLineRule {
+		private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
+		private static final IPredicateRule singleQuoteStringRule = new SingleLineRule("'", "'", singleQuoteStringTOKEN); //$NON-NLS-1$ //$NON-NLS-2$
+		private static final IPredicateRule singleQuoteStringEOLRule = new EndOfLineRule("'",  singleQuoteStringTOKEN); //$NON-NLS-1$
+		
+		private static final IToken doubleQuoteStringTOKEN = new Token("DQS"); //$NON-NLS-1$
+		private static final IPredicateRule doubleQuoteStringRule = new SingleLineRule("\"", "\"", doubleQuoteStringTOKEN); //$NON-NLS-1$ //$NON-NLS-2$
+		private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN); //$NON-NLS-1$
 
 		public TagRule(IToken token) {
-			this("", token);
+			this("", token); //$NON-NLS-1$
 		}
 
 		public TagRule(String tag, IToken token) {
@@ -126,43 +135,30 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			}
 		}
 		
+		
 	    /*
 	     * (non-Javadoc)
 	     * 
 	     * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
 	     */
 	    protected boolean endSequenceDetected(ICharacterScanner scanner) {
-		    boolean inSingleQuotedString = false;
-		    boolean inDoubleQuotedString = false;
-		    
 		    int c;
 	        while ((c = scanner.read()) != ICharacterScanner.EOF) {
-	        	if (c == '>') {
-	            	if (!(inSingleQuotedString) && !(inDoubleQuotedString)) {
-	            		return true;
-	            	}
-	            } else if (c == '\\') {
-	            	if (inSingleQuotedString || inDoubleQuotedString) {
-	            		// Skip the escaped character.
-	            		scanner.read();
-	            	}
+	        	if (c == '\'') {
+	        		scanner.unread();
+	        		IToken token = singleQuoteStringRule.evaluate(scanner);
+	        		if (token.isUndefined()) {
+	        			token = singleQuoteStringEOLRule.evaluate(scanner);
+	        		}
 	            } else if (c == '"') {
-	            	if (inDoubleQuotedString) {
-	            		inDoubleQuotedString = false;
-	            	} else if (inSingleQuotedString) {
-	            		// continue
-	            	} else {
-	            		inDoubleQuotedString = true;
-	            	}
-	            } else if (c == '\'') {
-	            	if (inDoubleQuotedString) {
-	            		// continue
-	            	} else if (inSingleQuotedString) {
-	            		inSingleQuotedString = false;
-	            	} else {
-	            		inSingleQuotedString = true;
-	            	}
-	            }
+	            	scanner.unread();
+	        		IToken token = doubleQuoteStringRule.evaluate(scanner);
+	        		if (token.isUndefined()) {
+	        			token = doubleQuoteStringEOLRule.evaluate(scanner);
+	        		} 
+	    		} else if (c == '>') {
+	    			return true;
+	    		}
 	        }
 	        
 	        scanner.unread();
