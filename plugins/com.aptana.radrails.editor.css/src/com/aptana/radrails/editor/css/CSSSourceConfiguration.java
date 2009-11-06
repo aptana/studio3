@@ -67,6 +67,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	public final static String MULTILINE_COMMENT = "__css_multiline_comment";
 
 	public static final String[] CONTENT_TYPES = new String[] {
+		DEFAULT,
 		MULTILINE_COMMENT,
 		STRING
 	};

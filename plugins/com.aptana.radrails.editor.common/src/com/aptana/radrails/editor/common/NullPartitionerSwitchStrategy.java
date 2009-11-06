@@ -32,34 +32,49 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+package com.aptana.radrails.editor.common;
 
-import com.aptana.radrails.editor.common.CompositePartitionScanner;
-import com.aptana.radrails.editor.common.ExtendedFastPartitioner;
-import com.aptana.radrails.editor.common.IExtendedPartitioner;
-import com.aptana.radrails.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.common.NullSubPartitionScanner;
+/**
+ * @author Max Stepanov
+ *
+ */
+public class NullPartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
 
-public class HTMLDocumentProvider extends FileDocumentProvider {
+	private static final String[][] EMPTY = new String[0][];
+	private static final char[][][] EMPTY_ESCAPES = new char[0][][];
+	private static final char[][] EMPTY_SWITCHES = new char[0][];
+	
+	private static final IPartitionScannerSwitchStrategy EMPTY_STRATEGY = new IPartitionScannerSwitchStrategy() {
 
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-					HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
-					new NullSubPartitionScanner(),
-					new NullPartitionerSwitchStrategy());
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
-						HTMLSourceConfiguration.getDefault().getContentTypes());
-			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
+		public char[][][] getEscapeSequences() {
+			return EMPTY_ESCAPES;
 		}
-		return document;
+
+		public char[][] getSwitchSequences() {
+			return EMPTY_SWITCHES;
+		}
+	};
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
+	 */
+	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy() {
+		return EMPTY_STRATEGY;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
+	 */
+	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy() {
+		return EMPTY_STRATEGY;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
+	 */
+	public String[][] getSwitchTagPairs() {
+		return EMPTY;
+	}
+
 }

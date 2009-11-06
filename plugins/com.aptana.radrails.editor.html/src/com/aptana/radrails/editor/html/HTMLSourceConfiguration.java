@@ -53,6 +53,7 @@ import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
 import com.aptana.radrails.editor.common.NonRuleBasedDamagerRepairer;
+import com.aptana.radrails.editor.common.TextUtils;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 import com.aptana.radrails.editor.css.CSSSourceConfiguration;
 import com.aptana.radrails.editor.js.JSSourceConfiguration;
@@ -104,8 +105,27 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		public TagRule(String tag, IToken token) {
 	        super("<"+tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+	        
 	    }
 
+		@Override
+		protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
+			boolean detected = super.sequenceDetected(scanner, sequence, eofAllowed);
+			if (!detected) {
+				return detected;
+			}
+			if ((sequence.length == 1 && sequence[0] == '<') || (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/')){
+				int nextChar = scanner.read();
+				if (nextChar == ICharacterScanner.EOF) {
+					return false;
+				}
+				scanner.unread();
+				return Character.isJavaIdentifierStart(nextChar);
+			} else {
+				return detected;
+			}
+		}
+		
 	    /*
 	     * (non-Javadoc)
 	     * 
@@ -158,13 +178,14 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_STYLE = "__html_style";
 	public final static String HTML_TAG = "__html_tag";
 
-	public static final String[] CONTENT_TYPES = new String[] {
-		HTML_COMMENT
-		,CDATA
-		,HTML_DOCTYPE
-		,HTML_SCRIPT
-		,HTML_STYLE
-		,HTML_TAG
+	protected static final String[] CONTENT_TYPES = new String[] {
+		DEFAULT,
+		HTML_COMMENT,
+		CDATA,
+		HTML_DOCTYPE,
+		HTML_SCRIPT,
+		HTML_STYLE,
+		HTML_TAG
 	};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
@@ -173,13 +194,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)),
 			new TagRule("script", new Token(HTML_SCRIPT)),
 			new TagRule("style", new Token(HTML_STYLE)),
+			new TagRule("/", new Token(HTML_TAG)),
 			new TagRule(new Token(HTML_TAG)),
 	};
 
 	private HTMLScanner htmlScanner;
 	private HTMLTagScanner tagScanner;
-	private RuleBasedScanner doubleQuotedStringScanner;
-	private RuleBasedScanner singleQuotedStringScanner;
 	private RuleBasedScanner cdataScanner;
 
 	private static HTMLSourceConfiguration instance;
@@ -195,7 +215,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
 	public String[] getContentTypes() {
-		return CONTENT_TYPES;
+		return TextUtils.combine(new String[][] {
+				CONTENT_TYPES,
+				JSSourceConfiguration.CONTENT_TYPES,
+				CSSSourceConfiguration.CONTENT_TYPES
+		});
 	}
 
 	/* (non-Javadoc)

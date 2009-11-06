@@ -70,8 +70,14 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     public static final String COMMAND = "__rb_command"; //$NON-NLS-1$
     public final static String STRING = "__rb_string"; //$NON-NLS-1$
 
-    public static final String[] CONTENT_TYPES = new String[] { SINGLE_LINE_COMMENT,
-            MULTI_LINE_COMMENT, REGULAR_EXPRESSION, COMMAND, STRING };
+    public static final String[] CONTENT_TYPES = new String[] {
+    		DEFAULT,
+    		SINGLE_LINE_COMMENT,
+    		MULTI_LINE_COMMENT,
+    		REGULAR_EXPRESSION,
+    		COMMAND,
+    		STRING
+    	};
 
     private IToken stringToken = new Token(STRING);
 
