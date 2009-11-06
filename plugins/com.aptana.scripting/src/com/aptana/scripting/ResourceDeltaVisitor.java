@@ -4,9 +4,12 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 
 import com.aptana.scripting.model.BundleManager;
 
@@ -121,15 +124,25 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 				case IResourceDelta.CHANGED:
 					if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
 					{
-						//manager.removeSnippetOrCommand(delta.getMovedFromPath());
-						//manager.processSnippetOrCommand(file);
-						System.out.println("Moved from not supported for snippets and commands");
+						IPath movedFromPath = delta.getMovedFromPath();
+						IResource movedFrom = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(movedFromPath);
+						
+						if (movedFrom != null && movedFrom instanceof IFile)
+						{
+							manager.removeSnippetOrCommand((IFile) movedFrom);
+							manager.processSnippetOrCommand(file);
+						}
 					}
 					if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
 					{
-						//manager.removeSnippetOrCommand(file);
-						//manager.processSnippetOrCommand(delta.getMovedToPath());
-						System.out.println("Moved to not supported for snippets and commands");
+						IPath movedToPath = delta.getMovedToPath();
+						IResource movedTo = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(movedToPath);
+						
+						if (movedTo != null && movedTo instanceof IFile)
+						{
+							manager.removeSnippetOrCommand(file);
+							manager.processSnippetOrCommand((IFile) movedTo);
+						}
 					}
 					if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 					{
