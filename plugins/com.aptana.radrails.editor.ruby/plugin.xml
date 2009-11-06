@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.ruby.RubySourceEditor"
+            default="true"
+            extensions="rb"
+            id="com.aptana.radrails.editor.ruby"
+            name="Ruby Source Editor">
+      </editor>
+   </extension>
+
+</plugin>

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.radrails.editor.erb;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.radrails.editor.erb.Activator
+Bundle-Vendor: %providerName
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui,
+ org.eclipse.ui.editors,
+ com.aptana.radrails.editor.common,
+ com.aptana.radrails.editor.xml,
+ com.aptana.radrails.editor.ruby,
+ com.aptana.radrails.editor.html
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy

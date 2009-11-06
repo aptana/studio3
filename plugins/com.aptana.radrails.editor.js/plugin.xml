@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.js.JSSourceEditor"
+            default="true"
+            extensions="js"
+            icon="icons/js.gif"
+            id="com.aptana.radrails.editor.js"
+            name="JavaScript Source Editor (Aptana)">
+      </editor>
+   </extension>
+
+</plugin>

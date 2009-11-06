@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
+            default="true"
+            extensions="rhtml,erb"
+            id="com.aptana.radrails.editor.erb.html"
+            name="RHTML Editor">
+      </editor>
+      <editor
+            class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
+            extensions="rxml,erb"
+            id="com.aptana.radrails.editor.erb.xml"
+            name="RXML Editor">
+      </editor>
+   </extension>
+
+</plugin>
