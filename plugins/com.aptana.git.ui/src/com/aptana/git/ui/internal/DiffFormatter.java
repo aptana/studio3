@@ -37,7 +37,7 @@ public abstract class DiffFormatter
 		}
 		if (!diff.startsWith("diff"))
 		{
-			return "<pre>" + diff + "</pre>";
+			return "<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>";
 		}
 		String title = ""; // FIXME Grab the filename!
 		StringBuilder html = new StringBuilder();
