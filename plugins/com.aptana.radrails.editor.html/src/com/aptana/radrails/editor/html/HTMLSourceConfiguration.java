@@ -53,6 +53,7 @@ import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
 import com.aptana.radrails.editor.common.NonRuleBasedDamagerRepairer;
+import com.aptana.radrails.editor.common.TextUtils;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 import com.aptana.radrails.editor.css.CSSSourceConfiguration;
 import com.aptana.radrails.editor.js.JSSourceConfiguration;
@@ -196,7 +197,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
 	public String[] getContentTypes() {
-		return CONTENT_TYPES;
+		return TextUtils.combine(new String[][] {
+				CONTENT_TYPES,
+				JSSourceConfiguration.CONTENT_TYPES,
+				CSSSourceConfiguration.CONTENT_TYPES
+		});
 	}
 
 	/* (non-Javadoc)
