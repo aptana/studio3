@@ -39,9 +39,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
@@ -52,92 +54,148 @@ import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
 import com.aptana.radrails.editor.common.SubPartitionScanner;
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
-public class RubySourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class RubySourceConfiguration implements IPartitioningConfiguration,
+        ISourceViewerConfiguration {
 
-	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String WORD = "__rb_word";
-	public final static String STRING = "__rb_string";
+    public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE;
+    public static final String SINGLE_LINE_COMMENT = "__rb_singleline_comment"; //$NON-NLS-1$
+    public static final String MULTI_LINE_COMMENT = "__rb_multiline_comment"; //$NON-NLS-1$
+    public static final String REGULAR_EXPRESSION = "__rb_regular_expression"; //$NON-NLS-1$
+    public static final String COMMAND = "__rb_command"; //$NON-NLS-1$
+    public final static String STRING = "__rb_string"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] {
-		WORD,
-		STRING
-	};
+    public static final String[] CONTENT_TYPES = new String[] { SINGLE_LINE_COMMENT,
+            MULTI_LINE_COMMENT, REGULAR_EXPRESSION, COMMAND, STRING };
 
-	private IToken wordToken = new Token(WORD);
-	private IToken stringToken = new Token(STRING);
-	
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new SingleLineRule("\"", "\"", stringToken, '\\'),
-			new SingleLineRule("\'", "\'", stringToken, '\\')
-	};
+    private IToken stringToken = new Token(STRING);
 
-	private RuleBasedScanner wordScanner;
-	private RuleBasedScanner stringScanner;
+    private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+            new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)),
+            new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true),
+            new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'),
+            new SingleLineRule("\"", "\"", stringToken, '\\'),
+            new SingleLineRule("\'", "\'", stringToken, '\\') };
 
-	private static RubySourceConfiguration instance;
-	
-	public static RubySourceConfiguration getDefault() {
-		if (instance == null) {
-			instance = new RubySourceConfiguration();
-		}
-		return instance;
-	}
+    private RubyCodeScanner codeScanner;
+    private RuleBasedScanner singleLineCommentScanner;
+    private RuleBasedScanner multiLineCommentScanner;
+    private RubyRegexpScanner regexpScanner;
+    private RuleBasedScanner commandScanner;
+    private RuleBasedScanner stringScanner;
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
-	 */
-	public String[] getContentTypes() {
-		return CONTENT_TYPES;
-	}
+    private static RubySourceConfiguration instance;
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getPartitioningRules()
-	 */
-	public IPredicateRule[] getPartitioningRules() {
-		return partitioningRules;
-	}
+    public static RubySourceConfiguration getDefault() {
+        if (instance == null) {
+            instance = new RubySourceConfiguration();
+        }
+        return instance;
+    }
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
-	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
-		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
-	}
+    /**
+     * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
+     */
+    public String[] getContentTypes() {
+        return CONTENT_TYPES;
+    }
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getWordScanner());
-		reconciler.setDamager(dr, RubySourceConfiguration.WORD);
-		reconciler.setRepairer(dr, RubySourceConfiguration.WORD);
+    /**
+     * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getPartitioningRules()
+     */
+    public IPredicateRule[] getPartitioningRules() {
+        return partitioningRules;
+    }
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
-		reconciler.setDamager(dr, RubySourceConfiguration.STRING);
-		reconciler.setRepairer(dr, RubySourceConfiguration.STRING);
-	}
+    /**
+     * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
+     */
+    public ISubPartitionScanner createSubPartitionScanner() {
+        return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+    }
 
-	protected ITokenScanner getWordScanner() {
-		if (wordScanner == null) {
-			wordScanner = new RuleBasedScanner();
-			wordScanner.setDefaultReturnToken(new Token(new TextAttribute(
-						CommonEditorPlugin.getDefault().getColorManager().getColor(IRubyColorConstants.WORD))));
-		}
-		return wordScanner;
-	}
-	
-	protected ITokenScanner getStringScanner() {
-		if (stringScanner == null) {
-			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IRubyColorConstants.STRING))));
-		}
-		return stringScanner;
-	}
+    /**
+     * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler,
+     *      org.eclipse.jface.text.source.ISourceViewer)
+     */
+    public void setupPresentationReconciler(PresentationReconciler reconciler,
+            ISourceViewer sourceViewer) {
+        DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+        reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+        reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
+        dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+        reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
+        reconciler.setRepairer(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
+
+        dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+        reconciler.setDamager(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
+        reconciler.setRepairer(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
+
+        dr = new DefaultDamagerRepairer(getRegexpScanner());
+        reconciler.setDamager(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
+        reconciler.setRepairer(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
+
+        dr = new DefaultDamagerRepairer(getCommandScanner());
+        reconciler.setDamager(dr, RubySourceConfiguration.COMMAND);
+        reconciler.setRepairer(dr, RubySourceConfiguration.COMMAND);
+
+        dr = new DefaultDamagerRepairer(getStringScanner());
+        reconciler.setDamager(dr, RubySourceConfiguration.STRING);
+        reconciler.setRepairer(dr, RubySourceConfiguration.STRING);
+    }
+
+    private ITokenScanner getCodeScanner() {
+        if (codeScanner == null) {
+            codeScanner = new RubyCodeScanner();
+        }
+        return codeScanner;
+    }
+
+    private ITokenScanner getMultiLineCommentScanner() {
+        if (multiLineCommentScanner == null) {
+            multiLineCommentScanner = new RuleBasedScanner();
+            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.rb")); //$NON-NLS-1$
+        }
+        return multiLineCommentScanner;
+    }
+
+    private ITokenScanner getSingleLineCommentScanner() {
+        if (singleLineCommentScanner == null) {
+            singleLineCommentScanner = new RuleBasedScanner();
+            singleLineCommentScanner.setDefaultReturnToken(ThemeUtil
+                    .getToken("comment.line.double-slash.rb")); //$NON-NLS-1$
+        }
+        return singleLineCommentScanner;
+    }
+
+    private ITokenScanner getRegexpScanner() {
+        if (regexpScanner == null) {
+            regexpScanner = new RubyRegexpScanner();
+        }
+        return regexpScanner;
+    }
+
+    private ITokenScanner getCommandScanner() {
+        if (commandScanner == null) {
+            commandScanner = new RuleBasedScanner();
+            commandScanner.setDefaultReturnToken(new Token(new TextAttribute(CommonEditorPlugin
+                    .getDefault().getColorManager().getColor(IRubyColorConstants.WORD))));
+        }
+        return commandScanner;
+    }
+
+    private ITokenScanner getStringScanner() {
+        if (stringScanner == null) {
+            stringScanner = new RuleBasedScanner();
+            stringScanner.setDefaultReturnToken(new Token(new TextAttribute(CommonEditorPlugin
+                    .getDefault().getColorManager().getColor(IRubyColorConstants.STRING))));
+        }
+        return stringScanner;
+    }
 }
