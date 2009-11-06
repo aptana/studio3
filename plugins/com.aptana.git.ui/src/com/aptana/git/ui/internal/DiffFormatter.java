@@ -1,6 +1,8 @@
 package com.aptana.git.ui.internal;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,9 +108,9 @@ public abstract class DiffFormatter
 			stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates")
 					.append("diff.html"), false);
 			String template = IOUtil.read(stream);
-			// Sanitize to remove $ so Java doesn't think I'm referring to groups for our replacement here
-			String sanitizedHTML = html.toString().replace('$', (char) 1);
-			return template.toString().replaceFirst("\\{diff\\}", sanitizedHTML).replace((char) 1, '$');
+			Map<String, String> variables = new HashMap<String, String>();
+			variables.put("\\{diff\\}", html.toString());
+			return StringUtil.replaceAll(template, variables);
 		}
 		catch (Exception e)
 		{

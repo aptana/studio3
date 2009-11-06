@@ -29,7 +29,9 @@ public abstract class StringUtil
 			String value = entry.getValue();
 			if (value == null)
 				value = "";
-			template = template.replaceAll(entry.getKey(), value);
+			else
+				value = value.replace('$', (char) 1); // To avoid illegal group reference issues if the text has dollars!
+			template = template.replaceAll(entry.getKey(), value).replace((char) 1, '$');
 		}
 		return template;
 	}
