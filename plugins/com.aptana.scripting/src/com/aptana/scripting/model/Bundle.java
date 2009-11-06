@@ -3,7 +3,9 @@ package com.aptana.scripting.model;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jruby.anno.JRubyMethod;
 
@@ -19,8 +21,11 @@ public class Bundle
 	private String _license;
 	private String _licenseUrl;
 	private String _gitRepo;
+	
 	private List<Snippet> _snippets;
 	private List<Command> _commands;
+	private Map<String,Snippet> _snippetsByPath;
+	private Map<String,Command> _commandsByPath;
 
 	/**
 	 * Bundle
@@ -46,8 +51,14 @@ public class Bundle
 			{
 				this._commands = new ArrayList<Command>();
 			}
+			
+			if (this._commandsByPath == null)
+			{
+				this._commandsByPath = new HashMap<String, Command>();
+			}
 
 			this._commands.add(command);
+			this._commandsByPath.put(command.getPath(), command);
 		}
 	}
 
@@ -65,8 +76,14 @@ public class Bundle
 			{
 				this._snippets = new ArrayList<Snippet>();
 			}
+			
+			if (this._snippetsByPath == null)
+			{
+				this._snippetsByPath = new HashMap<String, Snippet>();
+			}
 
 			this._snippets.add(snippet);
+			this._snippetsByPath.put(snippet.getPath(), snippet);
 		}
 	}
 
@@ -200,7 +217,9 @@ public class Bundle
 			{
 				String newCommandPath = path + command.getPath().substring(oldPathLength);
 
+				this._commandsByPath.remove(command.getPath());
 				command.setPath(newCommandPath);
+				this._commandsByPath.put(newCommandPath, command);
 			}
 		}
 
@@ -211,11 +230,47 @@ public class Bundle
 			{
 				String newSnippetPath = path + snippet.getPath().substring(oldPathLength);
 
+				this._snippetsByPath.remove(snippet.getPath());
 				snippet.setPath(newSnippetPath);
+				this._snippetsByPath.put(newSnippetPath, snippet);
 			}
 		}
 	}
 
+	/**
+	 * removeCommand
+	 * 
+	 * @param path
+	 */
+	@JRubyMethod(name = "remove_command")
+	public void removeCommand(String path)
+	{
+		Command command = this._commandsByPath.get(path);
+		
+		if (command != null)
+		{
+			this._commandsByPath.remove(path);
+			this._commands.remove(command);
+		}
+	}
+	
+	/**
+	 * removeSnippet
+	 * 
+	 * @param path
+	 */
+	@JRubyMethod(name = "remove_snippet")
+	public void removeSnippet(String path)
+	{
+		Snippet snippet = this._snippetsByPath.get(path);
+		
+		if (snippet != null)
+		{
+			this._snippetsByPath.remove(path);
+			this._snippets.remove(snippet);
+		}
+	}
+	
 	/**
 	 * setAuthor
 	 * 
@@ -316,7 +371,7 @@ public class Bundle
 		}
 		
 		// close bundle
-		writer.println("}");
+		writer.print("}");
 		
 		return sw.toString();
 	}

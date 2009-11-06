@@ -30,39 +30,39 @@ public class BundleManager
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
-	
+
+	private List<Bundle> _bundles;
+	private Map<String, Bundle> _bundlesByPath;
+
 	/**
 	 * getInstance
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name="instance")
+	@JRubyMethod(name = "instance")
 	public static BundleManager getInstance()
 	{
 		if (INSTANCE == null)
 		{
 			INSTANCE = new BundleManager();
 		}
-		
+
 		return INSTANCE;
 	}
-	private List<Bundle> _bundles;
-	
-	private Map<String,Bundle> _bundlesByPath;
-	
+
 	/**
 	 * BundleManager
 	 */
 	private BundleManager()
 	{
 	}
-	
+
 	/**
 	 * addBundle
 	 * 
 	 * @param bundle
 	 */
-	@JRubyMethod(name="add_bundle")
+	@JRubyMethod(name = "add_bundle")
 	public void addBundle(Bundle bundle)
 	{
 		if (bundle != null)
@@ -71,20 +71,21 @@ public class BundleManager
 			{
 				this._bundles = new ArrayList<Bundle>();
 			}
-			
+
 			this._bundles.add(bundle);
-			
+
 			if (this._bundlesByPath == null)
 			{
 				this._bundlesByPath = new HashMap<String, Bundle>();
 			}
-			
+
 			this._bundlesByPath.put(bundle.getPath(), bundle);
 		}
 	}
-	
+
 	/**
 	 * getBuildtinsLoadPath
+	 * 
 	 * @return
 	 */
 	private String getBuiltinsLoadPath()
@@ -96,7 +97,7 @@ public class BundleManager
 		{
 			URL fileURL = FileLocator.toFileURL(url);
 			File file = new File(fileURL.toURI());
-			
+
 			result = file.getAbsolutePath();
 		}
 		catch (IOException e)
@@ -105,7 +106,7 @@ public class BundleManager
 				"Error locating built-ins directory",
 				new Object[] { url.toString() }
 			);
-			
+
 			Activator.logError(message, e);
 		}
 		catch (URISyntaxException e)
@@ -114,29 +115,29 @@ public class BundleManager
 				"Malformed built-ins directory URI",
 				new Object[] { url.toString() }
 			);
-			
+
 			Activator.logError(message, e);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getBundleFromPath
 	 * 
 	 * @param path
 	 * @return
 	 */
-	@JRubyMethod(name="bundle_from_path")
+	@JRubyMethod(name = "bundle_from_path")
 	public Bundle getBundleFromPath(String path)
 	{
 		Bundle result = null;
-		
+
 		if (this._bundlesByPath != null)
 		{
 			result = this._bundlesByPath.get(path);
 		}
-		
+
 		return result;
 	}
 
@@ -149,17 +150,17 @@ public class BundleManager
 	public Command[] getCommandsFromScope(String scope)
 	{
 		List<Command> result = new ArrayList<Command>();
-		
+
 		for (Bundle bundle : this._bundles)
 		{
 			Command[] commands = bundle.getCommands();
-			
+
 			result.addAll(Arrays.asList(commands));
 		}
-		
+
 		return result.toArray(new Command[result.size()]);
 	}
-	
+
 	/**
 	 * getLoadPaths
 	 * 
@@ -172,15 +173,15 @@ public class BundleManager
 		List<String> loadPaths = new ArrayList<String>();
 		IFolder bundleFolder = (IFolder) folder.getParent();
 		IFolder bundlesFolder = (IFolder) bundleFolder.getParent();
-		
+
 		loadPaths.add(this.getBuiltinsLoadPath());
 		loadPaths.add(bundlesFolder.getLocation().toPortableString());
 		loadPaths.add(bundleFolder.getLocation().toPortableString());
 		loadPaths.add(".");
-		
+
 		return loadPaths;
 	}
-	
+
 	/**
 	 * getSnippetsFromScope
 	 * 
@@ -190,17 +191,17 @@ public class BundleManager
 	public Snippet[] getSnippetsFromScope(String scope)
 	{
 		List<Snippet> result = new ArrayList<Snippet>();
-		
+
 		for (Bundle bundle : this._bundles)
 		{
 			Snippet[] snippets = bundle.getSnippets();
-			
+
 			result.addAll(Arrays.asList(snippets));
 		}
-		
+
 		return result.toArray(new Snippet[result.size()]);
 	}
-	
+
 	/**
 	 * loadProjectBundles
 	 */
@@ -213,7 +214,7 @@ public class BundleManager
 			this.processProject(project);
 		}
 	}
-	
+
 	/**
 	 * moveBundle
 	 * 
@@ -225,21 +226,21 @@ public class BundleManager
 		if (newFolder != null && newFolder.length() > 0)
 		{
 			Bundle bundle = this.getBundleFromPath(oldFolder);
-			
+
 			if (bundle != null)
 			{
 				// remove bundle path reference
 				this._bundlesByPath.remove(oldFolder);
-				
-				// update bundle path 
+
+				// update bundle path
 				bundle.moveTo(newFolder);
-				
+
 				// add new path reference
 				this._bundlesByPath.put(newFolder, bundle);
 			}
 		}
 	}
-	
+
 	/**
 	 * processBundle
 	 * 
@@ -249,7 +250,7 @@ public class BundleManager
 	{
 		this.processBundle(bundleRoot, true);
 	}
-	
+
 	/**
 	 * processBundle
 	 * 
@@ -265,12 +266,12 @@ public class BundleManager
 		{
 			String fullPath = bundleFile.getLocation().toPortableString();
 			List<String> loadPaths = new ArrayList<String>();
-			
+
 			loadPaths.add(this.getBuiltinsLoadPath());
 			loadPaths.add(".");
-			
+
 			ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-			
+
 			if (processChildren)
 			{
 				// process snippets and command folders
@@ -289,21 +290,21 @@ public class BundleManager
 	 * 
 	 * @param file
 	 */
-	public void processFile(IFile file)
+	public void processSnippetOrCommand(IFile file)
 	{
 		if (file != null)
 		{
 			List<String> loadPaths = getLoadPaths(file);
-			
+
 			if (file.getName().toLowerCase().endsWith(".rb"))
 			{
 				String fullPath = file.getLocation().toPortableString();
-				
+
 				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
 			}
 		}
 	}
-	
+
 	/**
 	 * processFolder
 	 * 
@@ -314,7 +315,7 @@ public class BundleManager
 		if (folder != null)
 		{
 			List<String> loadPaths = getLoadPaths(folder);
-			
+
 			try
 			{
 				for (IResource resource : folder.members())
@@ -322,7 +323,7 @@ public class BundleManager
 					if (resource.getName().toLowerCase().endsWith(".rb"))
 					{
 						String fullPath = resource.getLocation().toPortableString();
-						
+
 						ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
 					}
 				}
@@ -333,7 +334,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * processProject
 	 * 
@@ -360,7 +361,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * removeBundle
 	 * 
@@ -376,7 +377,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * removeBundle
 	 * 
@@ -392,6 +393,37 @@ public class BundleManager
 		}
 	}
 
+	/**
+	 * removeFile
+	 * 
+	 * @param file
+	 */
+	public void removeSnippetOrCommand(IFile file)
+	{
+		if (file != null)
+		{
+			IFolder parentFolder = (IFolder) file.getParent();
+			IFolder bundleFolder = (IFolder) parentFolder.getParent();
+			Bundle bundle = this.getBundleFromPath(bundleFolder.getLocation().toPortableString());
+			
+			if (bundle != null)
+			{
+				if (parentFolder.getName().equals(SNIPPETS_FOLDER_NAME))
+				{
+					bundle.removeSnippet(file.getLocation().toPortableString());
+				}
+				else if (parentFolder.getName().equals(COMMANDS_FOLDER_NAME))
+				{
+					bundle.removeCommand(file.getLocation().toPortableString());
+				}
+				else
+				{
+					// do nothing
+				}
+			}
+		}
+	}
+	
 	/**
 	 * showBundles
 	 */

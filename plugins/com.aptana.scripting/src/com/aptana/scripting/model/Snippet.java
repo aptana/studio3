@@ -148,7 +148,7 @@ public class Snippet
 		writer.append("    path: ").println(this._path);
 		
 		// close snippet
-		writer.append("  }").append(this._displayName).println("\" {");
+		writer.println("  }");
 		
 		return sw.toString();
 	}

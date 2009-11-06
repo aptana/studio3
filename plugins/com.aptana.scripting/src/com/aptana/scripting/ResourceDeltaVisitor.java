@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.scripting.model.Bundle;
 import com.aptana.scripting.model.BundleManager;
 
 /**
@@ -28,20 +27,12 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 		String fullPath = delta.getFullPath().toString().toLowerCase();
 		boolean visitChildren = true;
 		
-		System.out.println("Visiting " + delta.getFullPath());
-
 		if (BUNDLE_PATTERN.matcher(fullPath).matches())
 		{
-			System.out.println("process bundle");
-			
 			visitChildren = this.processBundle(delta);
-			
-			BundleManager.getInstance().showBundles();
 		}
 		else if (FILE_PATTERN.matcher(fullPath).matches())
 		{
-			System.out.println("process command or snippet");
-			
 			visitChildren = this.processFile(delta);
 		}
 
@@ -66,12 +57,10 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 			switch (delta.getKind())
 			{
 				case IResourceDelta.ADDED:
-					System.out.println("add bundle " + bundleFolderPath);
 					BundleManager.getInstance().processBundle(bundleFolder, false);
 					break;
 
 				case IResourceDelta.REMOVED:
-					System.out.println("remove bundle " + bundleFolderPath);
 					BundleManager.getInstance().removeBundle(bundleFolderPath);
 					break;
 
@@ -81,26 +70,20 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 						String oldPath = delta.getMovedFromPath().toPortableString();
 						
 						BundleManager.getInstance().moveBundle(oldPath, bundleFolderPath);
-						
-						System.out.println("Moved from " + oldPath + " to " + bundleFolderPath);
 					}
 					if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
 					{
 						String newPath = delta.getMovedToPath().toString();
 						
 						BundleManager.getInstance().moveBundle(bundleFolderPath, newPath);
-						
-						System.out.println("Moved from " + bundleFolderPath + " to " + newPath);
 					}
 					if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 					{
-						System.out.println("Replacing " + bundleFolderPath);
 						BundleManager.getInstance().removeBundle(bundleFolderPath);
 						BundleManager.getInstance().processBundle(bundleFolder, false);
 					}
 					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
 					{
-						System.out.println("Updating content " + bundleFolderPath);
 						BundleManager.getInstance().removeBundle(bundleFolderPath);
 						BundleManager.getInstance().processBundle(bundleFolder, false);
 					}
@@ -123,44 +106,40 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 
 		if (file != null && file.getLocation() != null)
 		{
-			IFolder bundleFolder = (IFolder) file.getParent().getParent();
-			String bundleFolderPath = bundleFolder.getLocation().toPortableString();
-			String fullPath = file.getLocation().toPortableString();
-			Bundle bundle;
+			BundleManager manager = BundleManager.getInstance();
 
 			switch (delta.getKind())
 			{
 				case IResourceDelta.ADDED:
-					BundleManager.getInstance().processFile(file);
+					BundleManager.getInstance().processSnippetOrCommand(file);
 					break;
 
 				case IResourceDelta.REMOVED:
-					// process removed script
-					System.out.println("removed " + fullPath);
+					BundleManager.getInstance().removeSnippetOrCommand(file);
 					break;
 
 				case IResourceDelta.CHANGED:
 					if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
 					{
-						// remove script
-						// process new script
-						System.out.println("moved from " + fullPath);
+						//manager.removeSnippetOrCommand(delta.getMovedFromPath());
+						//manager.processSnippetOrCommand(file);
+						System.out.println("Moved from not supported for snippets and commands");
 					}
 					if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
 					{
-						// remove script
-						// process new script
-						System.out.println("moved to " + fullPath);
+						//manager.removeSnippetOrCommand(file);
+						//manager.processSnippetOrCommand(delta.getMovedToPath());
+						System.out.println("Moved to not supported for snippets and commands");
 					}
 					if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 					{
-						// process new script
-						System.out.println("replaced " + fullPath);
+						manager.removeSnippetOrCommand(file);
+						manager.processSnippetOrCommand(file);
 					}
 					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
 					{
-						// process new script
-						System.out.println("new content " + fullPath);
+						manager.removeSnippetOrCommand(file);
+						manager.processSnippetOrCommand(file);
 					}
 					break;
 			}
