@@ -21,6 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.osgi.util.NLS;
+
+import com.aptana.git.core.GitPlugin;
 
 public class GitIndex
 {
@@ -640,5 +643,34 @@ public class GitIndex
 		}
 
 		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
+	}
+	
+	/**
+	 * Used to stage/unstage/discard 'hunks' on files with changes. See http://tomayko.com/writings/the-thing-about-git
+	 * @param hunk
+	 * @param stage
+	 * @param reverse
+	 * @return
+	 */
+	public boolean applyPatch(String hunk, boolean stage, boolean reverse)
+	{
+		List<String> array = new ArrayList<String>();
+		array.add("apply");
+		if (stage)
+			array.add("--cached");
+		if (reverse)
+			array.add("--reverse");
+
+		int ret = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null, array.toArray(new String[array.size()]));
+
+		if (ret != 0) {
+			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values().iterator().next()), null);
+			return false;
+		}
+
+		// TODO: Try to be smarter about what to refresh
+		refresh();
+		return true;
 	}
 }
