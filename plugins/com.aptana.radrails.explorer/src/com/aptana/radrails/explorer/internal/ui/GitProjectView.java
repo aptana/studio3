@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -143,6 +144,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	protected int lastDrawnX;
 	protected Object[] fExpandedElements;
 
+	private Label expandCollapse;
+
+	private Composite focus;
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -166,7 +171,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// composite
 		createGitDetailsComposite(gitStuff);
 		// TODO Add a button/arrow to allow expanding/hiding the stuff below branch/commit widgets
-		createGitBranchCombo(gitDetails);// FIXME fix layout now that I added the filter button
+		createExpandCollapseButton(gitDetails);
+		createGitBranchCombo(gitDetails);
 		createFilterButton(gitDetails);
 		createCommitButton(gitDetails);
 		createSummaryLabel(gitDetails);
@@ -176,7 +182,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		createUnstashButton(gitDetails);
 
 		// focus filter stuff, attach top to bottom of 'gitStuff'
-		Composite focus = createFocusComposite(customComposite, gitStuff);
+		focus = createFocusComposite(customComposite, gitStuff);
 
 		// Now create the typical stuff for the navigator, attach top to bottom of 'focus'
 		createNavigator(customComposite, focus);
@@ -406,6 +412,54 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		super.createPartControl(viewer);
 	}
 
+	private void createExpandCollapseButton(Composite parent)
+	{
+		expandCollapse = new Label(parent, SWT.FLAT | SWT.CENTER);
+		expandCollapse.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_minus.png")); //$NON-NLS-1$
+		expandCollapse.setToolTipText("Collapse");
+		expandCollapse.addMouseListener(new MouseListener()
+		{
+			private boolean expanded = true;
+
+			public void mouseUp(MouseEvent e)
+			{
+			}
+
+			public void mouseDown(MouseEvent e)
+			{
+				expanded = !expanded;
+				summary.setVisible(expanded);
+				stash.setVisible(expanded);
+				push.setVisible(expanded);
+				pull.setVisible(expanded);
+				unstash.setVisible(expanded);
+
+				if (!expanded)
+				{
+					expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_plus.png")); //$NON-NLS-1$
+					expandCollapse.setToolTipText("Expand");
+					FormData data = (FormData) gitDetails.getLayoutData();
+					data.height = branchCombo.getBounds().height + 3; // margin of 3
+					gitDetails.setLayoutData(data);
+				}
+				else
+				{
+					expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_minus.png")); //$NON-NLS-1$
+					expandCollapse.setToolTipText("Collapse");
+					FormData data = (FormData) gitDetails.getLayoutData();
+					data.height = SWT.DEFAULT;
+					gitDetails.setLayoutData(data);
+				}
+				gitStuff.getParent().layout();
+			}
+
+			public void mouseDoubleClick(MouseEvent e)
+			{
+			}
+		});
+	}
+
 	private void createStashButton(Composite parent)
 	{
 		stash = new Button(parent, SWT.FLAT | SWT.PUSH | SWT.CENTER);
@@ -537,7 +591,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		summary.setEnabled(false);
 		summary.setBackground(parent.getBackground());
 		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
-		summaryData.verticalSpan = 3;
+		summaryData.verticalSpan = 2;
+		summaryData.horizontalSpan = 2;
 		summary.setLayoutData(summaryData);
 	}
 
@@ -606,7 +661,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private void createGitDetailsComposite(Composite parent)
 	{
 		gitDetails = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(3, false);
+		GridLayout layout = new GridLayout(4, false);
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		gitDetails.setLayout(layout);
@@ -1033,7 +1088,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					// Make the summary as wide as the project combo, and as tall as the 3 icons
 					GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 					summaryData.verticalSpan = 2;
-					summaryData.widthHint = projectCombo.getBounds().width;
+					summaryData.horizontalSpan = 2;
+					summaryData.widthHint = projectCombo.getBounds().width + expandCollapse.getBounds().width;
 					// Minimum height should be to bottom of push, pull, stash icons ((2 * icon height) + (1 * space
 					// between icons))
 					summaryData.minimumHeight = (commit.getBounds().height * 2)
