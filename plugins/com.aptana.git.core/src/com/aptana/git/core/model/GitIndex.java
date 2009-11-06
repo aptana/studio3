@@ -103,8 +103,9 @@ public class GitIndex
 			}
 		});
 
-		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that shouldn't be there anymore (especially unstaged ones)
-		
+		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that
+		// shouldn't be there anymore (especially unstaged ones)
+
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
 		{
@@ -360,7 +361,7 @@ public class GitIndex
 		// We need to find all files that don't have either
 		// staged or unstaged files, and delete them
 
-		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);		
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
 		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
 		for (ChangedFile file : this.files)
 		{
@@ -618,6 +619,9 @@ public class GitIndex
 	 */
 	public String diffForFile(ChangedFile file, boolean staged, int contextLines)
 	{
+		if (hasBinaryAttributes(file))
+			return "Appears to be a binary file";
+
 		String parameter = "-U" + contextLines;
 		if (staged)
 		{
@@ -645,9 +649,32 @@ public class GitIndex
 
 		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
 	}
-	
+
+	private boolean hasBinaryAttributes(ChangedFile file)
+	{
+		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary",
+				file.getPath());
+		output = output.trim();
+		if (output.endsWith("binary: set"))
+			return true;
+		if (output.endsWith("binary: unset"))
+			return false;
+		if (output.endsWith("binary: unspecified"))
+		{
+			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar" };
+			// try common filename-extensions
+			for (String extension : extensions)
+			{
+				if (file.getPath().endsWith(extension))
+					return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Used to stage/unstage/discard 'hunks' on files with changes. See http://tomayko.com/writings/the-thing-about-git
+	 * 
 	 * @param hunk
 	 * @param stage
 	 * @param reverse
@@ -663,10 +690,13 @@ public class GitIndex
 			array.add("--reverse");
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null, array.toArray(new String[array.size()]));
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null,
+				array.toArray(new String[array.size()]));
 
-		if (ret != 0) {
-			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values().iterator().next()), null);
+		if (ret != 0)
+		{
+			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values()
+					.iterator().next()), null);
 			return false;
 		}
 
