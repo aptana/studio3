@@ -1,6 +1,8 @@
 package com.aptana.radrails.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +29,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -35,8 +39,6 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -52,7 +54,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -102,7 +103,7 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 	private Combo projectCombo;
 	protected IProject selectedProject;
 	private Combo branchCombo;
-	private Label summary;
+	private StyledText summary;
 	private Button pull;
 	private Button push;
 	private Button commit;
@@ -530,19 +531,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 
 	private void createSummaryLabel(Composite parent)
 	{
-		summary = new Label(parent, SWT.WRAP);
+		summary = new StyledText(parent, SWT.WRAP);
 		summary.setText(""); //$NON-NLS-1$
-		Font font = summary.getFont();
-		FontData[] oldData = font.getFontData();
-		FontData[] newData = new FontData[oldData.length];
-		System.arraycopy(oldData, 0, newData, 0, oldData.length);
-		for (int i = 0; i < newData.length; i++)
-		{
-			FontData data = newData[i];
-			data.setStyle(data.getStyle() | SWT.ITALIC);
-		}
-		Font newFont = new Font(font.getDevice(), newData);
-		summary.setFont(newFont);
+		summary.setEditable(false);
+		summary.setEnabled(false);
+		summary.setBackground(parent.getBackground());
 		GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 		summaryData.verticalSpan = 3;
 		summary.setLayoutData(summaryData);
@@ -1061,17 +1054,16 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		if (repo == null)
 		{
 			summary.setText(""); //$NON-NLS-1$
+			summary.setStyleRanges(new StyleRange[0]);
 			return;
 		}
+		Set<StyleRange> ranges = new HashSet<StyleRange>();
 		StringBuilder builder = new StringBuilder();
 		if (repo.hasMerges())
 		{
 			builder.append(Messages.GitProjectView_UnresolvedMerges_msg);
-			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
-		}
-		else
-		{
-			summary.setForeground(getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+			ranges.add(new StyleRange(0, builder.length(), getSite().getShell().getDisplay().getSystemColor(
+					SWT.COLOR_RED), null));
 		}
 		int stagedCount = 0;
 		int addedCount = 0;
@@ -1105,8 +1097,14 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		}
 		builder.append(NLS.bind(Messages.GitProjectView_FileCounts, new Object[] { stagedCount, unstagedCount,
 				addedCount }));
+		int legendStart = builder.length();
 		builder.append(Messages.GitProjectView_FileCountsLabel);
+		ranges.add(new StyleRange(legendStart, builder.length() - legendStart, null, null, SWT.ITALIC));
 		summary.setText(builder.toString());
+		for (StyleRange range : ranges)
+		{
+			summary.setStyleRange(range);
+		}
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
