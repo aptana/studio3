@@ -2,12 +2,21 @@ package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -27,7 +36,7 @@ import com.aptana.git.core.model.GitRepository;
  * 
  * @author cwilliams
  */
-abstract class GitAction extends TeamAction
+public abstract class GitAction extends TeamAction
 {
 
 	@Override
@@ -37,10 +46,10 @@ abstract class GitAction extends TeamAction
 		String working = null;
 		if (workingDir != null)
 			working = workingDir.toString();
-		run(GitExecutable.instance().path(), working, getCommand());
+		launch(GitExecutable.instance().path(), working, getCommand());
 	}
 
-	protected abstract String getCommand();
+	protected abstract String[] getCommand();
 
 	private File getWorkingDir()
 	{
@@ -73,7 +82,7 @@ abstract class GitAction extends TeamAction
 	 * @param args
 	 * @return
 	 */
-	public static ILaunch run(String command, String workingDir, String... args)
+	private static ILaunch launch(String command, String workingDir, String... args)
 	{
 		try
 		{
@@ -120,5 +129,56 @@ abstract class GitAction extends TeamAction
 		}
 		builder.delete(builder.length() - delimiter.length(), builder.length());
 		return builder.toString();
+	}
+	
+	protected void refreshAffectedProjects()
+	{
+		final Set<IProject> affectedProjects = new HashSet<IProject>();
+		for (IResource resource : getSelectedResources())
+		{
+			if (resource == null)
+				continue;
+			affectedProjects.add(resource.getProject());
+			GitRepository repo = GitRepository.getAttached(resource.getProject());
+			if (repo != null)
+			{
+				affectedProjects.addAll(getAssociatedProjects(repo));
+			}
+		}
+
+		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
+		{
+			@Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+			{
+				int work = 100 * affectedProjects.size();
+				SubMonitor sub = SubMonitor.convert(monitor, work);
+				for (IProject resource : affectedProjects)
+				{
+					if (sub.isCanceled())
+						return Status.CANCEL_STATUS;
+					resource.refreshLocal(IResource.DEPTH_INFINITE, sub.newChild(100));
+				}
+				sub.done();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setRule(ResourcesPlugin.getWorkspace().getRoot());
+		job.setUser(true);
+		job.schedule();
+	}
+
+	private Collection<? extends IProject> getAssociatedProjects(GitRepository repo)
+	{
+		Set<IProject> projects = new HashSet<IProject>();
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			GitRepository other = GitRepository.getAttached(project);
+			if (other != null && other.equals(repo))
+			{
+				projects.add(project);
+			}
+		}
+		return projects;
 	}
 }

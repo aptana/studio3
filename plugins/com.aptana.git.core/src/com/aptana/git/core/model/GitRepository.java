@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,8 +48,7 @@ public class GitRepository
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
-	private static Map<String, WeakReference<GitRepository>> cachedRepos = new HashMap<String, WeakReference<GitRepository>>(
-			3);
+	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
 
 	public static void addListener(IGitRepositoryListener listener)
 	{
@@ -95,14 +95,30 @@ public class GitRepository
 		if (GitExecutable.instance().path() == null)
 			return null;
 
-		WeakReference<GitRepository> ref = cachedRepos.get(path.getPath());
+		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
 		if (ref == null || ref.get() == null)
 		{
+			if (ref != null)
+			{
+				cachedRepos.remove(ref);
+			}
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
-
-			ref = new WeakReference<GitRepository>(new GitRepository(gitDirURL));
+			for (SoftReference<GitRepository> reference : cachedRepos.values())
+			{
+				if (reference == null)
+					continue;
+				GitRepository cachedRepo = reference.get();
+				if (cachedRepo == null)
+					continue;
+				if (cachedRepo.fileURL.getPath().equals(path.getPath()))
+				{
+					cachedRepos.put(path.getPath(), reference);
+					return cachedRepo;
+				}
+			}
+			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
 		return ref.get();
@@ -145,6 +161,35 @@ public class GitRepository
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
 		return null;
+	}
+
+	public Set<String> localBranches()
+	{
+		// TODO Cache/memoize
+		Set<String> localBranches = new HashSet<String>();
+		for (GitRevSpecifier revSpec : branches)
+		{
+			if (!revSpec.isSimpleRef())
+				continue;
+			GitRef ref = revSpec.simpleRef();
+			if (ref == null || ref.type() == null || !ref.type().equals(GitRef.HEAD_TYPE))
+				continue;
+			localBranches.add(ref.shortName());
+		}
+		return localBranches;
+	}
+
+	public boolean switchBranch(String branchName)
+	{
+		String oldBranchName = currentBranch.simpleRef().shortName();
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
+				branchName);
+		if (result.keySet().iterator().next().intValue() != 0)
+			return false;
+		_headRef = null;
+		readCurrentBranch();
+		fireBranchChangeEvent(oldBranchName, branchName);
+		return true;
 	}
 
 	private void readCurrentBranch()
@@ -267,22 +312,15 @@ public class GitRepository
 	}
 
 	/**
-	 * get the name of the current branch as a string FIXME How does this relate to the current branch object?!
+	 * get the name of the current branch as a string
 	 * 
 	 * @return
 	 */
 	public String currentBranch()
 	{
-		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "branch", "--no-color");
-		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
-		for (String line : lines)
-		{
-			if (line.trim().startsWith("*"))
-			{
-				return line.substring(1).trim();
-			}
-		}
-		return null;
+		if (currentBranch == null)
+			return null;
+		return currentBranch.simpleRef().shortName();
 	}
 
 	public synchronized GitIndex index()
@@ -295,9 +333,16 @@ public class GitRepository
 		return index;
 	}
 
-	void fireIndexChangeEvent()
+	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
-		IndexChangedEvent e = new IndexChangedEvent(this);
+		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
+		for (IGitRepositoryListener listener : listeners)
+			listener.branchChanged(e);
+	}
+
+	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
+	{
+		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
 	}
@@ -328,7 +373,7 @@ public class GitRepository
 		File hook = new File(hookPath);
 		if (!hook.exists() || !hook.isFile())
 			return true;
-		
+
 		try
 		{
 			Method method = File.class.getMethod("canExecute", null);
@@ -424,14 +469,10 @@ public class GitRepository
 	 */
 	public String[] commitsAhead(String branchName)
 	{
-		String local = GitRef.REFS_HEADS + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
-				"^branch\\." + branchName + "\\.remote");
-		if (output == null || output.trim().length() == 0)
+		GitRef remote = remoteTrackingBranch(branchName);
+		if (remote == null)
 			return null;
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
-		return index().commitsBetween(remote, local);
+		return index().commitsBetween(remote.ref(), GitRef.REFS_HEADS + branchName);
 	}
 
 	public ChangedFile getChangedFileForResource(IResource resource)
@@ -460,15 +501,10 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
-		// TODO Refactor with commitsAhead
-		String local = GitRef.REFS_HEADS + branchName;
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
-				"^branch\\." + branchName + "\\.remote");
-		if (output == null || output.trim().length() == 0)
+		GitRef remote = remoteTrackingBranch(branchName);
+		if (remote == null)
 			return null;
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		String remote = GitRef.REFS_REMOTES + remoteSubname + "/" + branchName;
-		return index().commitsBetween(local, remote);
+		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
 	/**
@@ -518,5 +554,79 @@ public class GitRepository
 			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
 		}
 		return repo;
+	}
+
+	public boolean isDirty()
+	{
+		return !index().changedFiles().isEmpty();
+	}
+
+	/**
+	 * Determine if the passed in branch has a remote tracking branch.
+	 * 
+	 * @param branchName
+	 * @return
+	 */
+	public boolean trackingRemote(String branchName)
+	{
+		return remoteTrackingBranch(branchName) != null;
+	}
+
+	/**
+	 * Returns the remote tracking branch name for the branch passed in. Returns null if there is none.
+	 * 
+	 * @param branchName
+	 * @return
+	 */
+	public GitRef remoteTrackingBranch(String branchName)
+	{
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
+				"^branch\\." + branchName + "\\.remote");
+		if (output == null || output.trim().length() == 0)
+			return null;
+		String remoteSubname = output.substring(14 + branchName.length()).trim();
+		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
+	}
+
+	public boolean createBranch(String branchName)
+	{
+		Map<Integer, String> result = GitExecutable.instance()
+				.runInBackground(workingDirectory(), "branch", branchName);
+		return result.keySet().iterator().next() == 0;
+	}
+
+	public boolean validBranchName(String branchName)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format",
+				"refs/heads/" + branchName);
+		return result.keySet().iterator().next() == 0;
+	}
+        
+        public boolean deleteFile(String filePath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean deleteFolder(String folderPath)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r",
+				folderPath);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
+	}
+
+	public boolean moveFile(String source, String dest)
+	{
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest);
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		index().refresh();
+		return true;
 	}
 }

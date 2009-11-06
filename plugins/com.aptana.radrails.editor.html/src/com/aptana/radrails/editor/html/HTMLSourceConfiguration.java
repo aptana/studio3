@@ -105,8 +105,27 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		public TagRule(String tag, IToken token) {
 	        super("<"+tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+	        
 	    }
 
+		@Override
+		protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
+			boolean detected = super.sequenceDetected(scanner, sequence, eofAllowed);
+			if (!detected) {
+				return detected;
+			}
+			if ((sequence.length == 1 && sequence[0] == '<') || (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/')){
+				int nextChar = scanner.read();
+				if (nextChar == ICharacterScanner.EOF) {
+					return false;
+				}
+				scanner.unread();
+				return Character.isJavaIdentifierStart(nextChar);
+			} else {
+				return detected;
+			}
+		}
+		
 	    /*
 	     * (non-Javadoc)
 	     * 
@@ -175,13 +194,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)),
 			new TagRule("script", new Token(HTML_SCRIPT)),
 			new TagRule("style", new Token(HTML_STYLE)),
+			new TagRule("/", new Token(HTML_TAG)),
 			new TagRule(new Token(HTML_TAG)),
 	};
 
 	private HTMLScanner htmlScanner;
 	private HTMLTagScanner tagScanner;
-	private RuleBasedScanner doubleQuotedStringScanner;
-	private RuleBasedScanner singleQuotedStringScanner;
 	private RuleBasedScanner cdataScanner;
 
 	private static HTMLSourceConfiguration instance;

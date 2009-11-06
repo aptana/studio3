@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +43,7 @@ public class GitIndex
 
 		this.repository = repository;
 		this.workingDirectory = workingDirectory;
-		this.files = new ArrayList<ChangedFile>();
+		this.files = new Vector<ChangedFile>();
 	}
 
 	public void refresh()
@@ -246,58 +247,63 @@ public class GitIndex
 	private void addFilesFromDictionary(Map<String, List<String>> dictionary, boolean staged, boolean tracked)
 	{
 		// Iterate over all existing files
-		for (ChangedFile file : this.files)
+		synchronized (this.files)
 		{
-			List<String> fileStatus = dictionary.get(file.path);
-			// Object found, this is still a cached / uncached thing
-			if (fileStatus != null)
+			for (ChangedFile file : this.files)
 			{
-				if (tracked)
+				synchronized (dictionary)
 				{
-					String mode = fileStatus.get(0).substring(1);
-					String sha = fileStatus.get(2);
-					file.commitBlobSHA = sha;
-					file.commitBlobMode = mode;
+					List<String> fileStatus = dictionary.get(file.path);
+					// Object found, this is still a cached / uncached thing
+					if (fileStatus != null)
+					{
+						if (tracked)
+						{
+							String mode = fileStatus.get(0).substring(1);
+							String sha = fileStatus.get(2);
+							file.commitBlobSHA = sha;
+							file.commitBlobMode = mode;
 
-					if (staged)
-						file.hasStagedChanges = true;
+							if (staged)
+								file.hasStagedChanges = true;
+							else
+								file.hasUnstagedChanges = true;
+							if (fileStatus.get(4).equals("D"))
+								file.status = ChangedFile.Status.DELETED;
+						}
+						else
+						{
+							// Untracked file, set status to NEW, only unstaged changes
+							file.hasStagedChanges = false;
+							file.hasUnstagedChanges = true;
+							file.status = ChangedFile.Status.NEW;
+						}
+
+						// We handled this file, remove it from the dictionary
+						dictionary.remove(file.path);
+					}
 					else
-						file.hasUnstagedChanges = true;
-					if (fileStatus.get(4).equals("D"))
-						file.status = ChangedFile.Status.DELETED;
-				}
-				else
-				{
-					// Untracked file, set status to NEW, only unstaged changes
-					file.hasStagedChanges = false;
-					file.hasUnstagedChanges = true;
-					file.status = ChangedFile.Status.NEW;
-				}
+					{
+						// Object not found in the dictionary, so let's reset its appropriate
+						// change (stage or untracked) if necessary.
 
-				// We handled this file, remove it from the dictionary
-				dictionary.remove(file.path);
-			}
-			else
-			{
-				// Object not found in the dictionary, so let's reset its appropriate
-				// change (stage or untracked) if necessary.
-
-				// Staged dictionary, so file does not have staged changes
-				if (staged)
-					file.hasStagedChanges = false;
-				// Tracked file does not have unstaged changes, file is not new,
-				// so we can set it to No. (If it would be new, it would not
-				// be in this dictionary, but in the "other dictionary").
-				else if (tracked && file.status != ChangedFile.Status.NEW)
-					file.hasUnstagedChanges = false;
-				// Unstaged, untracked dictionary ("Other" files), and file
-				// is indicated as new (which would be untracked), so let's
-				// remove it
-				else if (!tracked && file.status == ChangedFile.Status.NEW)
-					file.hasUnstagedChanges = false;
+						// Staged dictionary, so file does not have staged changes
+						if (staged)
+							file.hasStagedChanges = false;
+						// Tracked file does not have unstaged changes, file is not new,
+						// so we can set it to No. (If it would be new, it would not
+						// be in this dictionary, but in the "other dictionary").
+						else if (tracked && file.status != ChangedFile.Status.NEW)
+							file.hasUnstagedChanges = false;
+						// Unstaged, untracked dictionary ("Other" files), and file
+						// is indicated as new (which would be untracked), so let's
+						// remove it
+						else if (!tracked && file.status == ChangedFile.Status.NEW)
+							file.hasUnstagedChanges = false;
+					}
+				}
 			}
 		}
-
 		// Do new files only if necessary
 		if (dictionary.isEmpty())
 			return;
@@ -305,28 +311,33 @@ public class GitIndex
 		// All entries left in the dictionary haven't been accounted for
 		// above, so we need to add them to the "files" array
 		willChangeValueForKey("indexChanges");
-		for (String path : dictionary.keySet())
+		synchronized (dictionary)
 		{
-			List<String> fileStatus = dictionary.get(path);
-
-			ChangedFile file = new ChangedFile(path);
-			if (fileStatus.get(4).equals("D"))
-				file.status = ChangedFile.Status.DELETED;
-			else if (fileStatus.get(0).equals(":000000"))
-				file.status = ChangedFile.Status.NEW;
-			else
-				file.status = ChangedFile.Status.MODIFIED;
-
-			if (tracked)
+			for (String path : dictionary.keySet())
 			{
-				file.commitBlobMode = fileStatus.get(0).substring(1);
-				file.commitBlobSHA = fileStatus.get(2);
+				List<String> fileStatus = dictionary.get(path);
+
+				ChangedFile file = new ChangedFile(path);
+				if (fileStatus.get(4).equals("D"))
+					file.status = ChangedFile.Status.DELETED;
+				else if (fileStatus.get(0).equals(":000000"))
+					file.status = ChangedFile.Status.NEW;
+				else
+					file.status = ChangedFile.Status.MODIFIED;
+
+				if (tracked)
+				{
+					file.commitBlobMode = fileStatus.get(0).substring(1);
+					file.commitBlobSHA = fileStatus.get(2);
+				}
+
+				file.hasStagedChanges = staged;
+				file.hasUnstagedChanges = !staged;
+				synchronized (this.files)
+				{
+					this.files.add(file);
+				}
 			}
-
-			file.hasStagedChanges = staged;
-			file.hasUnstagedChanges = !staged;
-
-			this.files.add(file);
 		}
 		didChangeValueForKey("indexChanges");
 	}
@@ -347,6 +358,7 @@ public class GitIndex
 		// We need to find all files that don't have either
 		// staged or unstaged files, and delete them
 
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);		
 		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
 		for (ChangedFile file : this.files)
 		{
@@ -361,7 +373,7 @@ public class GitIndex
 				files.remove(file);
 			didChangeValueForKey("indexChanges");
 		}
-		postIndexChange();
+		postIndexChange(toRefresh);
 	}
 
 	private void didChangeValueForKey(String string)
@@ -376,10 +388,10 @@ public class GitIndex
 
 	}
 
-	private void postIndexChange()
+	private void postIndexChange(Collection<ChangedFile> changedFiles)
 	{
 		if (this.notify)
-			this.repository.fireIndexChangeEvent();
+			this.repository.fireIndexChangeEvent(changedFiles);
 		else
 			this.notify = true;
 	}
@@ -415,7 +427,7 @@ public class GitIndex
 			file.hasStagedChanges = true;
 		}
 
-		postIndexChange();
+		postIndexChange(stageFiles);
 		return true;
 	}
 
@@ -442,7 +454,7 @@ public class GitIndex
 			file.hasStagedChanges = false;
 		}
 
-		postIndexChange();
+		postIndexChange(unstageFiles);
 		return true;
 	}
 
@@ -470,7 +482,7 @@ public class GitIndex
 		for (ChangedFile file : discardFiles)
 			file.hasUnstagedChanges = false;
 
-		postIndexChange();
+		postIndexChange(discardFiles);
 	}
 
 	public void commit(String commitMessage)
@@ -553,8 +565,6 @@ public class GitIndex
 		userInfo.put("description", description);
 		userInfo.put("sha", commit);
 
-		// [[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexFinishedCommit object:self
-		// userInfo:userInfo];
 		if (!success)
 			return;
 
@@ -565,18 +575,14 @@ public class GitIndex
 			this.amend = false;
 		else
 			refresh();
-
 	}
 
 	private void postCommitFailure(String string)
 	{
-		// TODO Auto-generated method stub
 	}
 
 	private void postCommitUpdate(String string)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/**

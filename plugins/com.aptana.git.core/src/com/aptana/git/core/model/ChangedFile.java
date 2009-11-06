@@ -60,4 +60,10 @@ public class ChangedFile
 		else
 			return commitBlobMode + " " + commitBlobSHA + "\t" + path + "\0";
 	}
+	
+	@Override
+	public String toString()
+	{
+		return getStatus() + " " + getPath();
+	}
 }

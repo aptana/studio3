@@ -1,17 +1,22 @@
 package com.aptana.git.core.model;
 
-public class IndexChangedEvent
+import java.util.Collection;
+import java.util.Collections;
+
+public class IndexChangedEvent extends RepositoryEvent
 {
 
-	private GitRepository repository;
+	private Collection<ChangedFile> changedFiles;
 
-	public IndexChangedEvent(GitRepository repository)
+	IndexChangedEvent(GitRepository repository, Collection<ChangedFile> changedFiles)
 	{
-		this.repository = repository;
+		super(repository);
+		this.changedFiles = changedFiles;
 	}
 
-	public GitRepository getRepository()
+	public Collection<ChangedFile> changedFiles()
 	{
-		return repository;
+		return Collections.unmodifiableCollection(changedFiles);
 	}
+
 }

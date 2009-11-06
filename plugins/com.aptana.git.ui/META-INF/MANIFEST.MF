@@ -21,4 +21,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.git.ui
+Export-Package: com.aptana.git.ui,
+ com.aptana.git.ui.actions

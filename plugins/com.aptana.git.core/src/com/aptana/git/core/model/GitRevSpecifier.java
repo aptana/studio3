@@ -32,7 +32,7 @@ public class GitRevSpecifier
 	{
 		return workingDirectory;
 	}
-	
+
 	static GitRevSpecifier allBranchesRevSpec()
 	{
 		GitRevSpecifier revspec = new GitRevSpecifier("--all");
@@ -47,23 +47,60 @@ public class GitRevSpecifier
 		return revspec;
 	}
 
-	public boolean isSimpleRef()
+	boolean isSimpleRef()
 	{
 		return parameters.size() == 1 && !parameters.get(0).startsWith("-");
 	}
 
-	public String simpleRef()
+	GitRef simpleRef()
 	{
 		if (!isSimpleRef())
 			return null;
-		return parameters.get(0);
+		return GitRef.refFromString(parameters.get(0));
 	}
 
-	public boolean hasLeftRight()
+	boolean hasLeftRight()
 	{
 		for (String param : parameters)
 			if (param.equals("--left-right"))
 				return true;
 		return false;
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		for (String param : parameters)
+		{
+			builder.append(param).append(" ");
+		}
+		if (builder.length() > 0)
+			builder.deleteCharAt(builder.length() - 1);
+		return builder.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof GitRevSpecifier))
+			return false;
+		
+		GitRevSpecifier other = (GitRevSpecifier) obj;
+		if (other.parameters.size() != parameters.size())
+			return false;
+		for (int i = 0; i < parameters.size(); i++)
+		{
+			String param = parameters.get(i);
+			if (!other.parameters.get(i).equals(param))
+				return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
 	}
 }
