@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add the --platform option to the option parser.
+full_name: Gem::VersionOption#add_platform_option
+params: (task = command, *wrap)
+name: add_platform_option
+is_singleton: false
+aliases: []
+

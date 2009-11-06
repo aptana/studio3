@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+class_methods: []
+
+full_name: Gem::RemoteInstallationSkipped
+constants: []
+
+superclass: Gem::Exception
+name: RemoteInstallationSkipped

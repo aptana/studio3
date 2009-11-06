@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: DisableCommand
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::DisableCommand
+superclass: Command
+class_methods: []
+

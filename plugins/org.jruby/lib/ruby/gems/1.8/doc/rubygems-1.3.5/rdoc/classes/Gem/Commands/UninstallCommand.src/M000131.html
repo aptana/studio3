@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::UninstallCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/uninstall_command.rb, line 14</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'uninstall'</span>, <span class="ruby-value str">'Uninstall gems from the local repository'</span>,
+          <span class="ruby-identifier">:version</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>, <span class="ruby-identifier">:user_install</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-a'</span>, <span class="ruby-value str">'--[no-]all'</span>,
+      <span class="ruby-value str">'Uninstall all matching versions'</span>
+      ) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-I'</span>, <span class="ruby-value str">'--[no-]ignore-dependencies'</span>,
+               <span class="ruby-value str">'Ignore dependency requirements while'</span>,
+               <span class="ruby-value str">'uninstalling'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ignore</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-x'</span>, <span class="ruby-value str">'--[no-]executables'</span>,
+                 <span class="ruby-value str">'Uninstall applicable executables without'</span>,
+                 <span class="ruby-value str">'confirmation'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:executables</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-i'</span>, <span class="ruby-value str">'--install-dir DIR'</span>,
+               <span class="ruby-value str">'Directory to uninstall gem from'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">value</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-n'</span>, <span class="ruby-value str">'--bindir DIR'</span>,
+               <span class="ruby-value str">'Directory to remove binaries from'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:bin_dir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">value</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'--[no-]user-install'</span>,
+               <span class="ruby-value str">'Uninstall from user\'s home directory'</span>,
+               <span class="ruby-value str">'in addition to GEM_HOME.'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:user_install</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_version_option</span>
+    <span class="ruby-identifier">add_platform_option</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

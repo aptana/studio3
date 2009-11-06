@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 437</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">gem_dir</span>, <span class="ruby-identifier">port</span>, <span class="ruby-identifier">daemon</span>)
+    <span class="ruby-constant">Socket</span>.<span class="ruby-identifier">do_not_reverse_lookup</span> = <span class="ruby-keyword kw">true</span>
+
+    <span class="ruby-ivar">@gem_dir</span> = <span class="ruby-identifier">gem_dir</span>
+    <span class="ruby-ivar">@port</span> = <span class="ruby-identifier">port</span>
+    <span class="ruby-ivar">@daemon</span> = <span class="ruby-identifier">daemon</span>
+    <span class="ruby-identifier">logger</span> = <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">Log</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">BasicLog</span><span class="ruby-operator">::</span><span class="ruby-constant">FATAL</span>
+    <span class="ruby-ivar">@server</span> = <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPServer</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">:DoNotListen</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:Logger</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">logger</span>
+
+    <span class="ruby-ivar">@spec_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_dir</span>, <span class="ruby-value str">'specifications'</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-ivar">@spec_dir</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;#{@gem_dir} does not appear to be a gem repository&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@source_index</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_gems_in</span> <span class="ruby-ivar">@spec_dir</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

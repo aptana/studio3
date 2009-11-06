@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>shebang (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 394</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">shebang</span>(<span class="ruby-identifier">bin_file_name</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@env_shebang</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-value str">&quot;#!/usr/bin/env &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_install_name</span>]
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_dir</span>, <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">bin_file_name</span>
+
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-value str">&quot;rb&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">first_line</span> = <span class="ruby-identifier">file</span>.<span class="ruby-identifier">gets</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">first_line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^#!/</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-comment cmt"># Preserve extra words on shebang line, like &quot;-w&quot;.  Thanks RPA.</span>
+          <span class="ruby-identifier">shebang</span> = <span class="ruby-identifier">first_line</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/\A\#!.*?ruby\S*/</span>, <span class="ruby-node">&quot;#!#{Gem.ruby}&quot;</span>)
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-comment cmt"># Create a plain shebang line.</span>
+          <span class="ruby-identifier">shebang</span> = <span class="ruby-node">&quot;#!#{Gem.ruby}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">shebang</span>.<span class="ruby-identifier">strip</span> <span class="ruby-comment cmt"># Avoid nasty ^M issues.</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

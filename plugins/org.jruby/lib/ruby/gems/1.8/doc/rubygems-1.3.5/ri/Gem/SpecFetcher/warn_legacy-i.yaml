@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: ""
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Warn about legacy repositories if <tt>exception</tt> indicates only legacy
+    repositories are available, and yield to the block. Returns false if the exception
+    indicates some other FetchError.
+full_name: Gem::SpecFetcher#warn_legacy
+params: (exception) {|| ...}
+name: warn_legacy
+is_singleton: false
+aliases: []
+

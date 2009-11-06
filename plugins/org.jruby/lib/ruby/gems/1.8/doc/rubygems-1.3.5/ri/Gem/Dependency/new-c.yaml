@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Constructs a dependency with <tt>name</tt> and <tt>requirements</tt>.
+full_name: Gem::Dependency::new
+params: (name, version_requirements, type=:runtime)
+name: new
+is_singleton: true
+aliases: []
+

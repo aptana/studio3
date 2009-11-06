@@ -1,0 +1,19 @@
+instructions.install = \
+    chmod(targetDir:@artifact,targetFile:bin/ast,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/autospec,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/gem,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jgem,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jirb,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jirb_swing,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jruby,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jruby-ng,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jruby-ng-server,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/jrubyc,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/rake,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/rdoc,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/ri,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/spec,permissions:755);\
+    chmod(targetDir:@artifact,targetFile:bin/testrb,permissions:755);
+    
+    
+    

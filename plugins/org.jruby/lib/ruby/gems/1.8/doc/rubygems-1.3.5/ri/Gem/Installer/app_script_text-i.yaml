@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return the text for an application file.
+full_name: Gem::Installer#app_script_text
+params: (bin_file_name)
+name: app_script_text
+is_singleton: false
+aliases: []
+

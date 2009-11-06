@@ -1,0 +1,21 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: load_gemspecs
+- !ruby/object:RI::MethodSummary 
+  name: yaml?
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Commands::BuildCommand
+constants: []
+
+superclass: Gem::Command
+name: BuildCommand

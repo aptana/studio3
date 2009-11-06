@@ -1,0 +1,33 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Allows writing of tar files
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_file
+- !ruby/object:RI::MethodSummary 
+  name: add_file_simple
+- !ruby/object:RI::MethodSummary 
+  name: check_closed
+- !ruby/object:RI::MethodSummary 
+  name: close
+- !ruby/object:RI::MethodSummary 
+  name: closed?
+- !ruby/object:RI::MethodSummary 
+  name: flush
+- !ruby/object:RI::MethodSummary 
+  name: mkdir
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Package::TarWriter
+constants: []
+
+superclass: Object
+name: TarWriter

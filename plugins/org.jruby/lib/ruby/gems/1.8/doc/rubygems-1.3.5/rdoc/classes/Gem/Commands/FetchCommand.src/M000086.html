@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::FetchCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/fetch_command.rb, line 11</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'fetch'</span>, <span class="ruby-value str">'Download a gem and place it in the current directory'</span>
+
+    <span class="ruby-identifier">add_bulk_threshold_option</span>
+    <span class="ruby-identifier">add_proxy_option</span>
+    <span class="ruby-identifier">add_source_option</span>
+
+    <span class="ruby-identifier">add_version_option</span>
+    <span class="ruby-identifier">add_platform_option</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

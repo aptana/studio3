@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>default_exec_format (Gem)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/defaults.rb, line 55</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">default_exec_format</span>
+    <span class="ruby-identifier">exec_format</span> = <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_install_name</span>].<span class="ruby-identifier">sub</span>(<span class="ruby-value str">'ruby'</span>, <span class="ruby-value str">'%s'</span>) <span class="ruby-keyword kw">rescue</span> <span class="ruby-value str">'%s'</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">exec_format</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/%s/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>,
+        <span class="ruby-node">&quot;[BUG] invalid exec_format #{exec_format.inspect}, no %s&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">exec_format</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

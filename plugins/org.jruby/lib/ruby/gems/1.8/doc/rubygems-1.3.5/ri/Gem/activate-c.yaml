@@ -1,0 +1,24 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Activates an installed gem matching <tt>gem</tt>. The gem must satisfy <tt>version_requirements</tt>.
+- !ruby/struct:SM::Flow::P 
+  body: Returns true if the gem is activated, false if it is already loaded, or an
+    exception otherwise.
+- !ruby/struct:SM::Flow::P 
+  body: Gem#activate adds the library paths in <tt>gem</tt> to $LOAD_PATH. Before
+    a Gem is activated its required Gems are activated. If the version information
+    is omitted, the highest version Gem of the supplied name is loaded. If a Gem is
+    not found that meets the version requirements or a required Gem is not found,
+    a Gem::LoadError is raised.
+- !ruby/struct:SM::Flow::P 
+  body: More information on version requirements can be found in the Gem::Requirement
+    and Gem::Version documentation.
+full_name: Gem::activate
+params: (gem, *version_requirements)
+name: activate
+is_singleton: true
+aliases: []
+

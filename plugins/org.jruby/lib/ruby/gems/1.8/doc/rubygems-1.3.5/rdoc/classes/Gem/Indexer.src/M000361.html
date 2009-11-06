@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>update_specs_index (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 700</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update_specs_index</span>(<span class="ruby-identifier">index</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">dest</span>)
+    <span class="ruby-identifier">specs_index</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">read_binary</span>(<span class="ruby-identifier">source</span>)
+
+    <span class="ruby-identifier">index</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">platform</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_platform</span>
+      <span class="ruby-identifier">platform</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">platform</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">platform</span>.<span class="ruby-identifier">empty?</span>
+      <span class="ruby-identifier">specs_index</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>, <span class="ruby-identifier">platform</span>]
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">specs_index</span> = <span class="ruby-identifier">compact_specs</span> <span class="ruby-identifier">specs_index</span>.<span class="ruby-identifier">uniq</span>.<span class="ruby-identifier">sort</span>
+
+    <span class="ruby-identifier">open</span> <span class="ruby-identifier">dest</span>, <span class="ruby-value str">'wb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span> <span class="ruby-identifier">specs_index</span>, <span class="ruby-identifier">io</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

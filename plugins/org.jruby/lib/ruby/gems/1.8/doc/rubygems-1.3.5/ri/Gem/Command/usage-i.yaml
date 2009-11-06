@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Override to display the usage for an individual gem command.
+- !ruby/struct:SM::Flow::P 
+  body: The text &quot;[options]&quot; is automatically appended to the usage text.
+full_name: Gem::Command#usage
+params: ()
+name: usage
+is_singleton: false
+aliases: []
+

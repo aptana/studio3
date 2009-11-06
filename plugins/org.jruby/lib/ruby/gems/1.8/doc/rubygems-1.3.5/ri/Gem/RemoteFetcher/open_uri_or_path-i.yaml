@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Read the data from the (source based) URI, but if it is a file:// URI, read
+    from the filesystem instead.
+full_name: Gem::RemoteFetcher#open_uri_or_path
+params: (uri, last_modified = nil, head = false, depth = 0)
+name: open_uri_or_path
+is_singleton: false
+aliases: []
+

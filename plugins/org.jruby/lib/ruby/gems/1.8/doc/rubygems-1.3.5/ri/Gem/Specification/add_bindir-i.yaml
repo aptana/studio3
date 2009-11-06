@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns an array with bindir attached to each executable in the executables
+    list
+full_name: Gem::Specification#add_bindir
+params: (executables)
+name: add_bindir
+is_singleton: false
+aliases: []
+

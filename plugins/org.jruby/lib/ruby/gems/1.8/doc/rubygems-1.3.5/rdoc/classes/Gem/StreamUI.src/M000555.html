@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>choose_from_list (Gem::StreamUI)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/user_interaction.rb, line 145</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">choose_from_list</span>(<span class="ruby-identifier">question</span>, <span class="ruby-identifier">list</span>)
+    <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">question</span>
+
+    <span class="ruby-identifier">list</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">item</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot; #{index+1}. #{item}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;&gt; &quot;</span>
+    <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">flush</span>
+
+    <span class="ruby-identifier">result</span> = <span class="ruby-ivar">@ins</span>.<span class="ruby-identifier">gets</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">result</span>
+
+    <span class="ruby-identifier">result</span> = <span class="ruby-identifier">result</span>.<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">list</span>[<span class="ruby-identifier">result</span>], <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

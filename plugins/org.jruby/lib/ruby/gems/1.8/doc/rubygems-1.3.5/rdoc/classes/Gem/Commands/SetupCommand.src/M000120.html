@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>make_destination_dirs (Gem::Commands::SetupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/setup_command.rb, line 263</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">make_destination_dirs</span>(<span class="ruby-identifier">install_destdir</span>)
+    <span class="ruby-identifier">lib_dir</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">bin_dir</span> = <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-identifier">prefix</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prefix</span>]
+    <span class="ruby-identifier">site_or_vendor</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:site_or_vendor</span>]
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">prefix</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">lib_dir</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">site_or_vendor</span>]
+      <span class="ruby-identifier">bin_dir</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:bindir</span>]
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-comment cmt"># Apple installed RubyGems into libdir, and RubyGems &lt;= 1.1.0 gets</span>
+      <span class="ruby-comment cmt"># confused about installation location, so switch back to</span>
+      <span class="ruby-comment cmt"># sitelibdir/vendorlibdir.</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span>(<span class="ruby-constant">APPLE_GEM_HOME</span>) <span class="ruby-keyword kw">and</span>
+        <span class="ruby-comment cmt"># just in case Apple and RubyGems don't get this patched up proper.</span>
+        (<span class="ruby-identifier">prefix</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:libdir</span>] <span class="ruby-keyword kw">or</span>
+         <span class="ruby-comment cmt"># this one is important</span>
+         <span class="ruby-identifier">prefix</span> <span class="ruby-operator">==</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:libdir</span>], <span class="ruby-value str">'ruby'</span>)) <span class="ruby-keyword kw">then</span>
+         <span class="ruby-identifier">lib_dir</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">site_or_vendor</span>]
+         <span class="ruby-identifier">bin_dir</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:bindir</span>]
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">lib_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">prefix</span>, <span class="ruby-value str">'lib'</span>
+        <span class="ruby-identifier">bin_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">prefix</span>, <span class="ruby-value str">'bin'</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">install_destdir</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">lib_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">install_destdir</span>, <span class="ruby-identifier">lib_dir</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^[a-zA-Z]:/</span>, <span class="ruby-value str">''</span>)
+      <span class="ruby-identifier">bin_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">install_destdir</span>, <span class="ruby-identifier">bin_dir</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^[a-zA-Z]:/</span>, <span class="ruby-value str">''</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">mkdir_p</span> <span class="ruby-identifier">lib_dir</span>
+    <span class="ruby-identifier">mkdir_p</span> <span class="ruby-identifier">bin_dir</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">lib_dir</span>, <span class="ruby-identifier">bin_dir</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

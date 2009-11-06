@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns an Array specifications for the latest released versions of each gem
+    in this index.
+full_name: Gem::SourceIndex#latest_specs
+params: ()
+name: latest_specs
+is_singleton: false
+aliases: []
+

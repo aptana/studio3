@@ -1,0 +1,20 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::LocalRemoteOptions
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: defaults_str
+- !ruby/object:RI::MethodSummary 
+  name: execute
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Commands::SourcesCommand
+constants: []
+
+superclass: Gem::Command
+name: SourcesCommand

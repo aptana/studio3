@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::LockCommand#spec_path
+params: (gem_full_name)
+name: spec_path
+is_singleton: false
+aliases: []
+

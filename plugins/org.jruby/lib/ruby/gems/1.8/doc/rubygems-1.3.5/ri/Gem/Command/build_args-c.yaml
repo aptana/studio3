@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Arguments used when building gems
+full_name: Gem::Command::build_args
+params: ()
+name: build_args
+is_singleton: true
+aliases: []
+

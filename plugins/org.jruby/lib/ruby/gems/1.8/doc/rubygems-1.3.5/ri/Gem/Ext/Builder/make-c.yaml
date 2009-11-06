@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Ext::Builder::make
+params: (dest_path, results)
+name: make
+is_singleton: true
+aliases: []
+

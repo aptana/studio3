@@ -1,0 +1,146 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Store the gem command options specified in the configuration file. The config
+    file object acts much like a hash.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: List of arguments supplied to the config file object.
+  rw: R
+  name: args
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: True if we print backtraces on errors.
+  rw: W
+  name: backtrace
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: True if we are benchmarking this run.
+  rw: RW
+  name: benchmark
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Bulk threshold value. If the number of missing gems are above this threshold
+      value, then a bulk download technique is used.
+  rw: RW
+  name: bulk_threshold
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: hash
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: RW
+  name: home
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Where to look for gems
+  rw: RW
+  name: path
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: True if we want to update the SourceInfoCache every time, false otherwise
+  rw: RW
+  name: update_sources
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: 'Verbose level of output:'
+  - !ruby/object:SM::Flow::LIST 
+    type: :BULLET
+    contents: 
+    - !ruby/struct:SM::Flow::LI 
+      body: false -- No output
+      label: '*'
+    - !ruby/struct:SM::Flow::LI 
+      body: true -- Normal output
+      label: '*'
+    - !ruby/struct:SM::Flow::LI 
+      body: ":loud -- Extra output"
+      label: '*'
+  rw: RW
+  name: verbose
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: '[]'
+- !ruby/object:RI::MethodSummary 
+  name: '[]='
+- !ruby/object:RI::MethodSummary 
+  name: backtrace
+- !ruby/object:RI::MethodSummary 
+  name: config_file_name
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: handle_arguments
+- !ruby/object:RI::MethodSummary 
+  name: load_file
+- !ruby/object:RI::MethodSummary 
+  name: really_verbose
+- !ruby/object:RI::MethodSummary 
+  name: write
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::ConfigFile
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "false"
+  name: DEFAULT_BACKTRACE
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "false"
+  name: DEFAULT_BENCHMARK
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "1000"
+  name: DEFAULT_BULK_THRESHOLD
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "true"
+  name: DEFAULT_VERBOSITY
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "true"
+  name: DEFAULT_UPDATE_SOURCES
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: For Ruby packagers to set configuration defaults. Set in rubygems/defaults/operating_system.rb
+  value: '{}'
+  name: OPERATING_SYSTEM_DEFAULTS
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: For Ruby implementers to set configuration defaults. Set in rubygems/defaults/#{RUBY_ENGINE}.rb
+  value: '{}'
+  name: PLATFORM_DEFAULTS
+- !ruby/object:RI::Constant 
+  comment: 
+  value: "0x0023"
+  name: CSIDL_COMMON_APPDATA
+- !ruby/object:RI::Constant 
+  comment: 
+  value: Win32API.new 'shell32', 'SHGetFolderPath', 'PLPLP',                                        'L',
+    :stdcall
+  name: SHGetFolderPath
+- !ruby/object:RI::Constant 
+  comment: 
+  value: Win32API.new 'shell32', 'SHGetFolderPath', 'LLLLP',                                        'L'
+  name: SHGetFolderPath
+- !ruby/object:RI::Constant 
+  comment: 
+  value: File.join system_config_path, 'gemrc'
+  name: SYSTEM_WIDE_CONFIG_FILE
+superclass: Object
+name: ConfigFile

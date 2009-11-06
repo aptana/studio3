@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Ensure that SSL is available. Throw an exception if it is not.
+full_name: Gem::ensure_ssl_available
+params: ()
+name: ensure_ssl_available
+is_singleton: true
+aliases: []
+

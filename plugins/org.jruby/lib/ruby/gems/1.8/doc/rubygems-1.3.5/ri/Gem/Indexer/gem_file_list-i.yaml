@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: List of gem file names to index.
+full_name: Gem::Indexer#gem_file_list
+params: ()
+name: gem_file_list
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>latest_specs (Gem::SourceIndex)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/source_index.rb, line 165</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">latest_specs</span>
+    <span class="ruby-identifier">result</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">h</span>,<span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">k</span>] = [] }
+    <span class="ruby-identifier">latest</span> = {}
+
+    <span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">name</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>
+      <span class="ruby-identifier">curr_ver</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>
+      <span class="ruby-identifier">prev_ver</span> = <span class="ruby-identifier">latest</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">latest</span>[<span class="ruby-identifier">name</span>].<span class="ruby-identifier">version</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">curr_ver</span>.<span class="ruby-identifier">prerelease?</span>
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">prev_ver</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">curr_ver</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">prev_ver</span> <span class="ruby-keyword kw">or</span>
+                  <span class="ruby-identifier">latest</span>[<span class="ruby-identifier">name</span>].<span class="ruby-identifier">platform</span> <span class="ruby-operator">!=</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">prev_ver</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span>
+         (<span class="ruby-identifier">curr_ver</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">prev_ver</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">platform</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span>) <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">result</span>[<span class="ruby-identifier">name</span>].<span class="ruby-identifier">clear</span>
+        <span class="ruby-identifier">latest</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">spec</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">platform</span> <span class="ruby-operator">!=</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">result</span>[<span class="ruby-identifier">name</span>].<span class="ruby-identifier">delete_if</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result_spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">result_spec</span>.<span class="ruby-identifier">platform</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">platform</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">result</span>[<span class="ruby-identifier">name</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">spec</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># TODO: why is this a hash while @gems is an array? Seems like</span>
+    <span class="ruby-comment cmt"># structural similarity would be good.</span>
+    <span class="ruby-identifier">result</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">flatten</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

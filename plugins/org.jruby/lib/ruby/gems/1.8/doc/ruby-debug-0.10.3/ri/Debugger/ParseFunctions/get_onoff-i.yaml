@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+params: (arg, default=nil, print_error=true)
+is_singleton: false
+block_params: 
+name: get_onoff
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return true if arg is 'on' or 1 and false arg is 'off' or 0. Any other value
+    raises RuntimeError.
+full_name: Debugger::ParseFunctions#get_onoff
+visibility: public
+aliases: []
+

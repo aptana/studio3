@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::SourcesCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/sources_command.rb, line 12</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'sources'</span>,
+          <span class="ruby-value str">'Manage the sources and cache file RubyGems uses to search for gems'</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-a'</span>, <span class="ruby-value str">'--add SOURCE_URI'</span>, <span class="ruby-value str">'Add source'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:add</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-l'</span>, <span class="ruby-value str">'--list'</span>, <span class="ruby-value str">'List sources'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:list</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-r'</span>, <span class="ruby-value str">'--remove SOURCE_URI'</span>, <span class="ruby-value str">'Remove source'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:remove</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-c'</span>, <span class="ruby-value str">'--clear-all'</span>,
+               <span class="ruby-value str">'Remove all sources (clear the cache)'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:clear_all</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-u'</span>, <span class="ruby-value str">'--update'</span>, <span class="ruby-value str">'Update source cache'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:update</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_proxy_option</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

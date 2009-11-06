@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Update the RubyGems software to <tt>version</tt>.
+full_name: Gem::Commands::UpdateCommand#do_rubygems_update
+params: (version)
+name: do_rubygems_update
+is_singleton: false
+aliases: []
+

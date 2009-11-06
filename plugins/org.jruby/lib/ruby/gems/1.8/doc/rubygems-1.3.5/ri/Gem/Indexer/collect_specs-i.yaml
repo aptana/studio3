@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Collect specifications from .gem files from the gem directory.
+full_name: Gem::Indexer#collect_specs
+params: (gems = gem_file_list)
+name: collect_specs
+is_singleton: false
+aliases: []
+

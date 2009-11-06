@@ -1,0 +1,35 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: private
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Use Kernel#gem to activate a specific version of <tt>gem_name</tt>.
+- !ruby/struct:SM::Flow::P 
+  body: <tt>version_requirements</tt> is a list of version requirements that the specified
+    gem must match, most commonly &quot;= example.version.number&quot;. See Gem::Requirement
+    for how to specify a version requirement.
+- !ruby/struct:SM::Flow::P 
+  body: If you will be activating the latest version of a gem, there is no need to
+    call Kernel#gem, Kernel#require will do the right thing for you.
+- !ruby/struct:SM::Flow::P 
+  body: Kernel#gem returns true if the gem was activated, otherwise false. If the
+    gem could not be found, didn't match the version requirements, or a different
+    version was already activated, an exception will be raised.
+- !ruby/struct:SM::Flow::P 
+  body: Kernel#gem should be called <b>before</b> any require statements (otherwise
+    RubyGems may load a conflicting library version).
+- !ruby/struct:SM::Flow::P 
+  body: In older RubyGems versions, the environment variable GEM_SKIP could be used
+    to skip activation of specified gems, for example to test out changes that haven't
+    been installed yet. Now RubyGems defers to -I and the RUBYLIB environment variable
+    to skip activation of a gem.
+- !ruby/struct:SM::Flow::P 
+  body: 'Example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  GEM_SKIP=libA:libB ruby -I../libA -I../libB ./mycode.rb\n"
+full_name: Kernel#gem
+params: (gem_name, *version_requirements)
+name: gem
+is_singleton: false
+aliases: []
+

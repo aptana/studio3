@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Is <tt>other</tt> equal to this platform? Two platforms are equal if they
+    have the same CPU, OS and version.
+full_name: Gem::Platform#==
+params: (other)
+name: ==
+is_singleton: false
+aliases: []
+

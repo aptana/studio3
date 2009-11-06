@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: VarConstantCommand
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::VarConstantCommand
+superclass: Command
+class_methods: []
+

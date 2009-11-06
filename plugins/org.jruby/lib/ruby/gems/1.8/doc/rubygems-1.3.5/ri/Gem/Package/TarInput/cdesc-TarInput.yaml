@@ -1,0 +1,38 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::Package::FSyncDir
+- !ruby/object:RI::IncludedModule 
+  name: Enumerable
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: ++
+- !ruby/struct:SM::Flow::VERB 
+  body: " Copyright (C) 2004 Mauricio Julio Fern\xe1ndez Pradier\n See LICENSE.txt \
+    for additional licensing information.\n"
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: metadata
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: close
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: extract_entry
+- !ruby/object:RI::MethodSummary 
+  name: load_gemspec
+- !ruby/object:RI::MethodSummary 
+  name: zipped_stream
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: open
+full_name: Gem::Package::TarInput
+constants: []
+
+superclass: Object
+name: TarInput

@@ -1,0 +1,48 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Gem::StreamUI implements a simple stream based user interface.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: errs
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: ins
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: outs
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: alert
+- !ruby/object:RI::MethodSummary 
+  name: alert_error
+- !ruby/object:RI::MethodSummary 
+  name: alert_warning
+- !ruby/object:RI::MethodSummary 
+  name: ask
+- !ruby/object:RI::MethodSummary 
+  name: ask_yes_no
+- !ruby/object:RI::MethodSummary 
+  name: choose_from_list
+- !ruby/object:RI::MethodSummary 
+  name: debug
+- !ruby/object:RI::MethodSummary 
+  name: progress_reporter
+- !ruby/object:RI::MethodSummary 
+  name: say
+- !ruby/object:RI::MethodSummary 
+  name: terminate_interaction
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::StreamUI
+constants: []
+
+superclass: Object
+name: StreamUI

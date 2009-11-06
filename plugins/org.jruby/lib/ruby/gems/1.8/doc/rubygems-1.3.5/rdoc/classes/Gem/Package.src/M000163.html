@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>pack (Gem::Package)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package.rb, line 59</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">pack</span>(<span class="ruby-identifier">src</span>, <span class="ruby-identifier">destname</span>, <span class="ruby-identifier">signer</span> = <span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-constant">TarOutput</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">destname</span>, <span class="ruby-identifier">signer</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">outp</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">dir_class</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">src</span>) <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">outp</span>.<span class="ruby-identifier">metadata</span> = (<span class="ruby-identifier">file_class</span>.<span class="ruby-identifier">read</span>(<span class="ruby-value str">&quot;RPA/metadata&quot;</span>) <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">nil</span>)
+        <span class="ruby-identifier">find_class</span>.<span class="ruby-identifier">find</span>(<span class="ruby-value str">'.'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span><span class="ruby-operator">|</span>
+          <span class="ruby-keyword kw">case</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">file_class</span>.<span class="ruby-identifier">file?</span>(<span class="ruby-identifier">entry</span>)
+            <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp re">%r{\./}</span>, <span class="ruby-value str">&quot;&quot;</span>)
+            <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">entry</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/\ARPA\//</span>
+            <span class="ruby-identifier">stat</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-identifier">entry</span>)
+            <span class="ruby-identifier">outp</span>.<span class="ruby-identifier">add_file_simple</span>(<span class="ruby-identifier">entry</span>, <span class="ruby-identifier">stat</span>.<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">stat</span>.<span class="ruby-identifier">size</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">os</span><span class="ruby-operator">|</span>
+              <span class="ruby-identifier">file_class</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">entry</span>, <span class="ruby-value str">&quot;rb&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+                <span class="ruby-identifier">os</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>(<span class="ruby-value">4096</span>)) <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">eof?</span>
+              <span class="ruby-keyword kw">end</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">file_class</span>.<span class="ruby-identifier">dir?</span>(<span class="ruby-identifier">entry</span>)
+            <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">sub!</span>(<span class="ruby-regexp re">%r{\./}</span>, <span class="ruby-value str">&quot;&quot;</span>)
+            <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">entry</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;RPA&quot;</span>
+            <span class="ruby-identifier">outp</span>.<span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">entry</span>, <span class="ruby-identifier">file_class</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-identifier">entry</span>).<span class="ruby-identifier">mode</span>)
+          <span class="ruby-keyword kw">else</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;Don't know how to pack this yet!&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::RemoteFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/remote_fetcher.rb, line 58</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">proxy</span> = <span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-constant">Socket</span>.<span class="ruby-identifier">do_not_reverse_lookup</span> = <span class="ruby-keyword kw">true</span>
+
+    <span class="ruby-ivar">@connections</span> = {}
+    <span class="ruby-ivar">@requests</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> <span class="ruby-value">0</span>
+    <span class="ruby-ivar">@proxy_uri</span> =
+      <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">proxy</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:no_proxy</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">get_proxy_from_env</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-constant">URI</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">proxy</span>
+      <span class="ruby-keyword kw">else</span> <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">proxy</span>)
+      <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

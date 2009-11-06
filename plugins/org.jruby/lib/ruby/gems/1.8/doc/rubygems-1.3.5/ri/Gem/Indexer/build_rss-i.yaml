@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Builds an RSS feed for past two days gem releases according to the gem's date.
+full_name: Gem::Indexer#build_rss
+params: (index)
+name: build_rss
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Perform an in-place update of the repository from newly added gems. Only
+    works for modern indicies, and sets #build_legacy to false when run.'
+full_name: Gem::Indexer#update_index
+params: ()
+name: update_index
+is_singleton: false
+aliases: []
+

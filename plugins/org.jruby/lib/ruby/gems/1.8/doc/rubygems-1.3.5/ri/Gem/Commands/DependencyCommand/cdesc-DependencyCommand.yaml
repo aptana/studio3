@@ -1,0 +1,26 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::LocalRemoteOptions
+- !ruby/object:RI::IncludedModule 
+  name: Gem::VersionOption
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: find_gems
+- !ruby/object:RI::MethodSummary 
+  name: find_reverse_dependencies
+- !ruby/object:RI::MethodSummary 
+  name: print_dependencies
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Commands::DependencyCommand
+constants: []
+
+superclass: Gem::Command
+name: DependencyCommand

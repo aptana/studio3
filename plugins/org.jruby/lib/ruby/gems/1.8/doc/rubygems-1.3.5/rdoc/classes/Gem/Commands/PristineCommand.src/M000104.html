@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::PristineCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/pristine_command.rb, line 11</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'pristine'</span>,
+          <span class="ruby-value str">'Restores installed gems to pristine condition from files located in the gem cache'</span>,
+          <span class="ruby-identifier">:version</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'--all'</span>,
+               <span class="ruby-value str">'Restore all installed gems to pristine'</span>,
+               <span class="ruby-value str">'condition'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_version_option</span>(<span class="ruby-value str">'restore to'</span>, <span class="ruby-value str">'pristine condition'</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

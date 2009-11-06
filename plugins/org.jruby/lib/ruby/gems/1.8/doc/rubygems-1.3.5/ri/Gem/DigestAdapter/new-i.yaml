@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return a new digester. Since we are only implementing the stateless methods,
+    we will return ourself as the instance.
+full_name: Gem::DigestAdapter#new
+params: ()
+name: new
+is_singleton: false
+aliases: []
+

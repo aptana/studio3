@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>download (Gem::RemoteFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/remote_fetcher.rb, line 77</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">download</span>(<span class="ruby-identifier">spec</span>, <span class="ruby-identifier">source_uri</span>, <span class="ruby-identifier">install_dir</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span>(<span class="ruby-identifier">install_dir</span>)
+      <span class="ruby-identifier">cache_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">install_dir</span>, <span class="ruby-value str">'cache'</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">cache_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Gem</span>.<span class="ruby-identifier">user_dir</span>, <span class="ruby-value str">'cache'</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gem_file_name</span> = <span class="ruby-node">&quot;#{spec.full_name}.gem&quot;</span>
+    <span class="ruby-identifier">local_gem_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">cache_dir</span>, <span class="ruby-identifier">gem_file_name</span>
+
+    <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-identifier">cache_dir</span> <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">cache_dir</span>
+
+   <span class="ruby-comment cmt"># Always escape URI's to deal with potential spaces and such</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">URI</span><span class="ruby-operator">::</span><span class="ruby-constant">Generic</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">source_uri</span>
+      <span class="ruby-identifier">source_uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-constant">URI</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">source_uri</span>))
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">scheme</span> = <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">scheme</span>
+
+    <span class="ruby-comment cmt"># URI.parse gets confused by MS Windows paths with forward slashes.</span>
+    <span class="ruby-identifier">scheme</span> = <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">scheme</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^[a-z]$/i</span>
+
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">scheme</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'http'</span>, <span class="ruby-value str">'https'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">local_gem_path</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Downloading gem #{gem_file_name}&quot;</span> <span class="ruby-keyword kw">if</span>
+            <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+          <span class="ruby-identifier">remote_gem_path</span> = <span class="ruby-identifier">source_uri</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;gems/#{gem_file_name}&quot;</span>
+
+          <span class="ruby-identifier">gem</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">fetch_path</span> <span class="ruby-identifier">remote_gem_path</span>
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_platform</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">platform</span>
+
+          <span class="ruby-identifier">alternate_name</span> = <span class="ruby-node">&quot;#{spec.original_name}.gem&quot;</span>
+
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Failed, downloading gem #{alternate_name}&quot;</span> <span class="ruby-keyword kw">if</span>
+            <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+          <span class="ruby-identifier">remote_gem_path</span> = <span class="ruby-identifier">source_uri</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;gems/#{alternate_name}&quot;</span>
+
+          <span class="ruby-identifier">gem</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">fetch_path</span> <span class="ruby-identifier">remote_gem_path</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span> <span class="ruby-identifier">local_gem_path</span>, <span class="ruby-value str">'wb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fp</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">fp</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">gem</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'file'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">path</span> = <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">path</span>
+        <span class="ruby-identifier">path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">path</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">extname</span>(<span class="ruby-identifier">path</span>) <span class="ruby-operator">==</span> <span class="ruby-value str">'.gem'</span>
+
+        <span class="ruby-identifier">remote_gem_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">path</span>, <span class="ruby-value str">'gems'</span>, <span class="ruby-identifier">gem_file_name</span>)
+
+        <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">cp</span>(<span class="ruby-identifier">remote_gem_path</span>, <span class="ruby-identifier">local_gem_path</span>)
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EACCES</span>
+        <span class="ruby-identifier">local_gem_path</span> = <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">to_s</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Using local gem #{local_gem_path}&quot;</span> <span class="ruby-keyword kw">if</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># TODO test for local overriding cache</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">win_platform?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">scheme</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">path</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value str">':'</span>)
+          <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">cp</span> <span class="ruby-constant">URI</span>.<span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">scheme</span> <span class="ruby-operator">+</span> <span class="ruby-value str">':'</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">path</span>), <span class="ruby-identifier">local_gem_path</span>
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">cp</span> <span class="ruby-constant">URI</span>.<span class="ruby-identifier">unescape</span>(<span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">path</span>), <span class="ruby-identifier">local_gem_path</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EACCES</span>
+        <span class="ruby-identifier">local_gem_path</span> = <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">to_s</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Using local gem #{local_gem_path}&quot;</span> <span class="ruby-keyword kw">if</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;unsupported URI scheme #{source_uri.scheme}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">local_gem_path</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

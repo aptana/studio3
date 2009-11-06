@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Fri Sep 18 10:55:02 -0700 2009</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>RubyGems</h1>
+<ul>
+<li><a href="http://rubygems.rubyforge.org">rubygems.rubyforge.org</a>/
+
+</li>
+<li><a
+href="http://rubyforge.org/projects/rubygems">rubyforge.org/projects/rubygems</a>
+
+</li>
+<li><a href="http://rubygems.org">rubygems.org</a>/
+
+</li>
+</ul>
+<h2>DESCRIPTION</h2>
+<p>
+RubyGems is a package management framework for Ruby.
+</p>
+<p>
+This gem is an update for the RubyGems software. You must have an
+installation of RubyGems before this update can be applied.
+</p>
+<p>
+See <a href="../classes/Gem.html">Gem</a> for information on RubyGems (or
+`ri <a href="../classes/Gem.html">Gem</a>`)
+</p>
+<p>
+To upgrade to the latest RubyGems, run:
+</p>
+<pre>
+  $ gem install --system  # you might need to be an administrator or root
+</pre>
+<p>
+NOTE: RubyGems 1.1 and 1.2 have problems upgrading when there is no
+rubygems-update installed. You will need to use the following instructions
+if you see &quot;Nothing to update&quot;.
+</p>
+<p>
+If you have an older version of RubyGems installed, then you can still do
+it in two steps:
+</p>
+<pre>
+  $ gem install rubygems-update  # again, might need to be admin/root
+  $ update_rubygems              # ... here too
+</pre>
+<p>
+If you don&#8216;t have any RubyGems install, there is still the pre-gem
+approach to getting software, doing it manually:
+</p>
+<ol>
+<li>Download from: <a
+href="http://rubyforge.org/frs/?group_id=126">rubyforge.org/frs/?group_id=126</a>
+
+</li>
+<li>Unpack into a directory and cd there
+
+</li>
+<li>Install with: ruby setup.rb # you may need admin/root privilege
+
+</li>
+</ol>
+<p>
+For more details and other options, see:
+</p>
+<pre>
+  ruby setup.rb --help
+</pre>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

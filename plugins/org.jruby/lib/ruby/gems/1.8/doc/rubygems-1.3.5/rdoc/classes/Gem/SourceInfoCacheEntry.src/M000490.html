@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>refresh (Gem::SourceInfoCacheEntry)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/source_info_cache_entry.rb, line 30</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">refresh</span>(<span class="ruby-identifier">source_uri</span>, <span class="ruby-identifier">all</span>)
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-identifier">marshal_uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-node">&quot;Marshal.#{Gem.marshal_version}&quot;</span>
+      <span class="ruby-identifier">remote_size</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">fetch_size</span> <span class="ruby-identifier">marshal_uri</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteSourceException</span>
+      <span class="ruby-identifier">yaml_uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">source_uri</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-value str">'yaml'</span>
+      <span class="ruby-identifier">remote_size</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">fetch_size</span> <span class="ruby-identifier">yaml_uri</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># TODO Use index_signature instead of size?</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@size</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">remote_size</span> <span class="ruby-keyword kw">and</span> <span class="ruby-ivar">@all</span>
+
+    <span class="ruby-identifier">updated</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">update</span> <span class="ruby-identifier">source_uri</span>, <span class="ruby-identifier">all</span>
+    <span class="ruby-ivar">@size</span> = <span class="ruby-identifier">remote_size</span>
+    <span class="ruby-ivar">@all</span> = <span class="ruby-identifier">all</span>
+
+    <span class="ruby-identifier">updated</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

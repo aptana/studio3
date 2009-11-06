@@ -1,0 +1,30 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Validator performs various gem file and gem database validation
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: alien
+- !ruby/object:RI::MethodSummary 
+  name: remove_leading_dot_dir
+- !ruby/object:RI::MethodSummary 
+  name: unit_test
+- !ruby/object:RI::MethodSummary 
+  name: verify_gem
+- !ruby/object:RI::MethodSummary 
+  name: verify_gem_file
+class_methods: []
+
+full_name: Gem::Validator
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: Struct.new :path, :problem
+  name: ErrorData
+superclass: Object
+name: Validator

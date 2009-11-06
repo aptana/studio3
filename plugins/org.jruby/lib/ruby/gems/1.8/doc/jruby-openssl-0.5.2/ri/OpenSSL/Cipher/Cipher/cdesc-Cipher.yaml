@@ -1,0 +1,18 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: random_iv
+- !ruby/object:RI::MethodSummary 
+  name: random_key
+class_methods: []
+
+full_name: OpenSSL::Cipher::Cipher
+constants: []
+
+superclass: Object
+name: Cipher

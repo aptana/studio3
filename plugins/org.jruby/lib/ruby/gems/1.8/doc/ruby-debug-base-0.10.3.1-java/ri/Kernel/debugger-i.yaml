@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+params: (steps = 1)
+is_singleton: false
+block_params: 
+name: debugger
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Enters the debugger in the current thread after a number of <em>steps</em>
+    made.
+full_name: Kernel#debugger
+visibility: public
+aliases: 
+- !ruby/object:RI::AliasName 
+  name: breakpoint

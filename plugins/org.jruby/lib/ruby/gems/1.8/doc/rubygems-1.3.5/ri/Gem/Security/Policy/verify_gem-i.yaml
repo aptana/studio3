@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Verify that the gem data with the given signature and signing chain matched
+    this security policy at the specified time.
+full_name: Gem::Security::Policy#verify_gem
+params: (signature, data, chain, time = Time.now)
+name: verify_gem
+is_singleton: false
+aliases: []
+

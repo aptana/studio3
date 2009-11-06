@@ -1,0 +1,30 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Initialize a remote fetcher using the source URI and possible proxy information.
+- !ruby/struct:SM::Flow::P 
+  body: <tt>proxy</tt>
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '[String]: explicit specification of proxy; overrides any environment'
+    label: '*'
+  - !ruby/struct:SM::Flow::VERB 
+    body: "          variable setting\n"
+  - !ruby/struct:SM::Flow::LI 
+    body: 'nil: respect environment variables (HTTP_PROXY, HTTP_PROXY_USER,'
+    label: '*'
+  - !ruby/struct:SM::Flow::VERB 
+    body: "     HTTP_PROXY_PASS)\n"
+  - !ruby/struct:SM::Flow::LI 
+    body: '<tt>:no_proxy</tt>: ignore environment variables and _don''t_ use a proxy'
+    label: '*'
+full_name: Gem::RemoteFetcher::new
+params: (proxy = nil)
+name: new
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>run_rdoc (Gem::DocManager)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/doc_manager.rb, line 155</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run_rdoc</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">rdoc_options</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">configured_args</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'--quiet'</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">clone</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">extra_rdoc_files</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'--title'</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{@spec.full_name} Documentation&quot;</span>
+    <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">rdoc_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'2.4.0'</span>) <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">args</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'--inline-source'</span>
+      <span class="ruby-identifier">args</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'--promiscuous'</span>
+      <span class="ruby-identifier">args</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'-p'</span>
+      <span class="ruby-identifier">args</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'--one-file'</span>
+      <span class="ruby-comment cmt"># HACK more</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">r</span> = <span class="ruby-constant">RDoc</span><span class="ruby-operator">::</span><span class="ruby-constant">RDoc</span>.<span class="ruby-identifier">new</span>
+
+    <span class="ruby-identifier">old_pwd</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">full_gem_path</span>)
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">document</span> <span class="ruby-identifier">args</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EACCES</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+      <span class="ruby-identifier">dirname</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;-&quot;</span>)[<span class="ruby-value">1</span>].<span class="ruby-identifier">strip</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">FilePermissionError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">dirname</span>)
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">RuntimeError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">ex</span>
+      <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;While generating documentation for #{@spec.full_name}&quot;</span>
+      <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">errs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;... MESSAGE:   #{ex}&quot;</span>
+      <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">errs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;... RDOC args: #{args.join(' ')}&quot;</span>
+      <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">errs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;\t#{ex.backtrace.join &quot;\n\t&quot;}&quot;</span> <span class="ruby-keyword kw">if</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">backtrace</span>
+      <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">errs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;(continuing with the rest of the installation)&quot;</span>
+    <span class="ruby-keyword kw">ensure</span>
+      <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">old_pwd</span>)
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

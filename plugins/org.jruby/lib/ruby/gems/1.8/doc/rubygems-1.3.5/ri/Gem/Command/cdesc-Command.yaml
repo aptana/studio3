@@ -1,0 +1,107 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Base class for all Gem commands. When creating a new gem command, define
+    #new, #execute, #arguments, #defaults_str, #description and #usage (as appropriate).
+    See the above mentioned methods for details.'
+- !ruby/struct:SM::Flow::P 
+  body: A very good example to look at is Gem::Commands::ContentsCommand
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The name of the command.
+  rw: R
+  name: command
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The default options for the command.
+  rw: RW
+  name: defaults
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The options for the command.
+  rw: R
+  name: options
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The name of the command for command-line invocation.
+  rw: RW
+  name: program_name
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: A short description of the command.
+  rw: RW
+  name: summary
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_extra_args
+- !ruby/object:RI::MethodSummary 
+  name: add_option
+- !ruby/object:RI::MethodSummary 
+  name: arguments
+- !ruby/object:RI::MethodSummary 
+  name: begins?
+- !ruby/object:RI::MethodSummary 
+  name: defaults_str
+- !ruby/object:RI::MethodSummary 
+  name: description
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: get_all_gem_names
+- !ruby/object:RI::MethodSummary 
+  name: get_one_gem_name
+- !ruby/object:RI::MethodSummary 
+  name: get_one_optional_argument
+- !ruby/object:RI::MethodSummary 
+  name: handle_options
+- !ruby/object:RI::MethodSummary 
+  name: handles?
+- !ruby/object:RI::MethodSummary 
+  name: invoke
+- !ruby/object:RI::MethodSummary 
+  name: merge_options
+- !ruby/object:RI::MethodSummary 
+  name: remove_option
+- !ruby/object:RI::MethodSummary 
+  name: show_help
+- !ruby/object:RI::MethodSummary 
+  name: usage
+- !ruby/object:RI::MethodSummary 
+  name: when_invoked
+- !ruby/object:RI::MethodSummary 
+  name: wrap
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_common_option
+- !ruby/object:RI::MethodSummary 
+  name: add_specific_extra_args
+- !ruby/object:RI::MethodSummary 
+  name: build_args
+- !ruby/object:RI::MethodSummary 
+  name: build_args=
+- !ruby/object:RI::MethodSummary 
+  name: common_options
+- !ruby/object:RI::MethodSummary 
+  name: extra_args
+- !ruby/object:RI::MethodSummary 
+  name: extra_args=
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: specific_extra_args
+- !ruby/object:RI::MethodSummary 
+  name: specific_extra_args_hash
+full_name: Gem::Command
+constants: []
+
+superclass: Object
+name: Command

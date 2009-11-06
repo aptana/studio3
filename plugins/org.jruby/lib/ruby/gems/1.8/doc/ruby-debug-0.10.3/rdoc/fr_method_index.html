@@ -1,0 +1,133 @@
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!--
+
+    Methods
+
+  -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Methods</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="rdoc-style.css" type="text/css" />
+  <base target="docwin" />
+</head>
+<body>
+<div id="index">
+  <h1 class="section-bar">Methods</h1>
+  <div id="index-entries">
+    <a href="classes/Debugger/Processor.html#M000102">afmt (Debugger::Processor)</a><br />
+    <a href="classes/Debugger/Processor.html#M000103">aprint (Debugger::Processor)</a><br />
+    <a href="classes/Kernel.html#M000107">breakpoint (Kernel)</a><br />
+    <a href="classes/Kernel.html#M000106">debugger (Kernel)</a><br />
+    <a href="classes/Debugger/Processor.html#M000104">errmsg (Debugger::Processor)</a><br />
+    <a href="classes/Debugger.html#M000003">execute (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000021">execute (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000025">execute (Debugger)</a><br />
+    <a href="classes/Debugger/AddBreakpoint.html#M000037">execute (Debugger::AddBreakpoint)</a><br />
+    <a href="classes/Debugger/DeleteBreakpointCommand.html#M000041">execute (Debugger::DeleteBreakpointCommand)</a><br />
+    <a href="classes/Debugger/ContinueCommand.html#M000045">execute (Debugger::ContinueCommand)</a><br />
+    <a href="classes/Debugger/FinishCommand.html#M000049">execute (Debugger::FinishCommand)</a><br />
+    <a href="classes/Debugger/WhereCommand.html#M000053">execute (Debugger::WhereCommand)</a><br />
+    <a href="classes/Debugger/HelpCommand.html#M000057">execute (Debugger::HelpCommand)</a><br />
+    <a href="classes/Debugger/IRBCommand.html#M000061">execute (Debugger::IRBCommand)</a><br />
+    <a href="classes/Debugger/ListCommand.html#M000065">execute (Debugger::ListCommand)</a><br />
+    <a href="classes/Debugger/MethodSigCommand.html#M000069">execute (Debugger::MethodSigCommand)</a><br />
+    <a href="classes/Debugger/MethodCommand.html#M000073">execute (Debugger::MethodCommand)</a><br />
+    <a href="classes/Debugger/QuitCommand.html#M000077">execute (Debugger::QuitCommand)</a><br />
+    <a href="classes/Debugger/ReloadCommand.html#M000081">execute (Debugger::ReloadCommand)</a><br />
+    <a href="classes/Debugger/NextCommand.html#M000083">execute (Debugger::NextCommand)</a><br />
+    <a href="classes/Debugger/StepCommand.html#M000087">execute (Debugger::StepCommand)</a><br />
+    <a href="classes/Debugger/VarClassVarCommand.html#M000091">execute (Debugger::VarClassVarCommand)</a><br />
+    <a href="classes/Debugger/VarLocalCommand.html#M000095">execute (Debugger::VarLocalCommand)</a><br />
+    <a href="classes/Debugger/VarInheritCommand.html#M000099">execute (Debugger::VarInheritCommand)</a><br />
+    <a href="classes/Debugger/ParseFunctions.html#M000032">get_int (Debugger::ParseFunctions)</a><br />
+    <a href="classes/Debugger/ParseFunctions.html#M000033">get_onoff (Debugger::ParseFunctions)</a><br />
+    <a href="classes/Debugger.html#M000019">help (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000023">help (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000027">help (Debugger)</a><br />
+    <a href="classes/Debugger/AddBreakpoint.html#M000039">help (Debugger::AddBreakpoint)</a><br />
+    <a href="classes/Debugger/DeleteBreakpointCommand.html#M000043">help (Debugger::DeleteBreakpointCommand)</a><br />
+    <a href="classes/Debugger/ContinueCommand.html#M000047">help (Debugger::ContinueCommand)</a><br />
+    <a href="classes/Debugger/FinishCommand.html#M000051">help (Debugger::FinishCommand)</a><br />
+    <a href="classes/Debugger/WhereCommand.html#M000055">help (Debugger::WhereCommand)</a><br />
+    <a href="classes/Debugger/HelpCommand.html#M000059">help (Debugger::HelpCommand)</a><br />
+    <a href="classes/Debugger/IRBCommand.html#M000063">help (Debugger::IRBCommand)</a><br />
+    <a href="classes/Debugger/ListCommand.html#M000067">help (Debugger::ListCommand)</a><br />
+    <a href="classes/Debugger/MethodSigCommand.html#M000071">help (Debugger::MethodSigCommand)</a><br />
+    <a href="classes/Debugger/MethodCommand.html#M000075">help (Debugger::MethodCommand)</a><br />
+    <a href="classes/Debugger/QuitCommand.html#M000079">help (Debugger::QuitCommand)</a><br />
+    <a href="classes/Debugger/NextCommand.html#M000085">help (Debugger::NextCommand)</a><br />
+    <a href="classes/Debugger/StepCommand.html#M000089">help (Debugger::StepCommand)</a><br />
+    <a href="classes/Debugger/VarClassVarCommand.html#M000093">help (Debugger::VarClassVarCommand)</a><br />
+    <a href="classes/Debugger/VarLocalCommand.html#M000097">help (Debugger::VarLocalCommand)</a><br />
+    <a href="classes/Debugger/VarInheritCommand.html#M000101">help (Debugger::VarInheritCommand)</a><br />
+    <a href="classes/Debugger.html#M000018">help_command (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000022">help_command (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000026">help_command (Debugger)</a><br />
+    <a href="classes/Debugger/AddBreakpoint.html#M000038">help_command (Debugger::AddBreakpoint)</a><br />
+    <a href="classes/Debugger/DeleteBreakpointCommand.html#M000042">help_command (Debugger::DeleteBreakpointCommand)</a><br />
+    <a href="classes/Debugger/ContinueCommand.html#M000046">help_command (Debugger::ContinueCommand)</a><br />
+    <a href="classes/Debugger/FinishCommand.html#M000050">help_command (Debugger::FinishCommand)</a><br />
+    <a href="classes/Debugger/WhereCommand.html#M000054">help_command (Debugger::WhereCommand)</a><br />
+    <a href="classes/Debugger/HelpCommand.html#M000058">help_command (Debugger::HelpCommand)</a><br />
+    <a href="classes/Debugger/IRBCommand.html#M000062">help_command (Debugger::IRBCommand)</a><br />
+    <a href="classes/Debugger/ListCommand.html#M000066">help_command (Debugger::ListCommand)</a><br />
+    <a href="classes/Debugger/MethodSigCommand.html#M000070">help_command (Debugger::MethodSigCommand)</a><br />
+    <a href="classes/Debugger/MethodCommand.html#M000074">help_command (Debugger::MethodCommand)</a><br />
+    <a href="classes/Debugger/QuitCommand.html#M000078">help_command (Debugger::QuitCommand)</a><br />
+    <a href="classes/Debugger/NextCommand.html#M000084">help_command (Debugger::NextCommand)</a><br />
+    <a href="classes/Debugger/StepCommand.html#M000088">help_command (Debugger::StepCommand)</a><br />
+    <a href="classes/Debugger/VarClassVarCommand.html#M000092">help_command (Debugger::VarClassVarCommand)</a><br />
+    <a href="classes/Debugger/VarLocalCommand.html#M000096">help_command (Debugger::VarLocalCommand)</a><br />
+    <a href="classes/Debugger/VarInheritCommand.html#M000100">help_command (Debugger::VarInheritCommand)</a><br />
+    <a href="classes/Debugger.html#M000004">info_args (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000005">info_breakpoints (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000006">info_display (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000007">info_file (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000008">info_files (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000016">info_global_variables (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000009">info_instance_variables (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000010">info_line (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000011">info_locals (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000012">info_program (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000013">info_stack (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000015">info_thread (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000014">info_threads (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000017">info_variables (Debugger)</a><br />
+    <a href="classes/Debugger/Processor.html#M000105">print (Debugger::Processor)</a><br />
+    <a href="classes/Debugger.html#M000002">regexp (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000020">regexp (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000024">regexp (Debugger)</a><br />
+    <a href="classes/Debugger/AddBreakpoint.html#M000036">regexp (Debugger::AddBreakpoint)</a><br />
+    <a href="classes/Debugger/DeleteBreakpointCommand.html#M000040">regexp (Debugger::DeleteBreakpointCommand)</a><br />
+    <a href="classes/Debugger/ContinueCommand.html#M000044">regexp (Debugger::ContinueCommand)</a><br />
+    <a href="classes/Debugger/FinishCommand.html#M000048">regexp (Debugger::FinishCommand)</a><br />
+    <a href="classes/Debugger/WhereCommand.html#M000052">regexp (Debugger::WhereCommand)</a><br />
+    <a href="classes/Debugger/HelpCommand.html#M000056">regexp (Debugger::HelpCommand)</a><br />
+    <a href="classes/Debugger/IRBCommand.html#M000060">regexp (Debugger::IRBCommand)</a><br />
+    <a href="classes/Debugger/ListCommand.html#M000064">regexp (Debugger::ListCommand)</a><br />
+    <a href="classes/Debugger/MethodSigCommand.html#M000068">regexp (Debugger::MethodSigCommand)</a><br />
+    <a href="classes/Debugger/MethodCommand.html#M000072">regexp (Debugger::MethodCommand)</a><br />
+    <a href="classes/Debugger/QuitCommand.html#M000076">regexp (Debugger::QuitCommand)</a><br />
+    <a href="classes/Debugger/ReloadCommand.html#M000080">regexp (Debugger::ReloadCommand)</a><br />
+    <a href="classes/Debugger/NextCommand.html#M000082">regexp (Debugger::NextCommand)</a><br />
+    <a href="classes/Debugger/StepCommand.html#M000086">regexp (Debugger::StepCommand)</a><br />
+    <a href="classes/Debugger/VarClassVarCommand.html#M000090">regexp (Debugger::VarClassVarCommand)</a><br />
+    <a href="classes/Debugger/VarLocalCommand.html#M000094">regexp (Debugger::VarLocalCommand)</a><br />
+    <a href="classes/Debugger/VarInheritCommand.html#M000098">regexp (Debugger::VarInheritCommand)</a><br />
+    <a href="classes/Debugger.html#M000030">run_init_script (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000031">run_script (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000001">settings (Debugger)</a><br />
+    <a href="classes/Debugger/ParseFunctions.html#M000034">show_onoff (Debugger::ParseFunctions)</a><br />
+    <a href="classes/Debugger.html#M000029">start_client (Debugger)</a><br />
+    <a href="classes/Debugger.html#M000028">start_remote (Debugger)</a><br />
+    <a href="classes/Debugger/ParseFunctions.html#M000035">syntax_valid? (Debugger::ParseFunctions)</a><br />
+  </div>
+</div>
+</body>
+</html>

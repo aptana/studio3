@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::SourceInfoCache::cache_data
+params: ()
+name: cache_data
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,18 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: parse_openssl
+- !ruby/object:RI::MethodSummary 
+  name: parse_rfc2253
+full_name: OpenSSL::X509::Name
+constants: []
+
+superclass: Object
+name: Name

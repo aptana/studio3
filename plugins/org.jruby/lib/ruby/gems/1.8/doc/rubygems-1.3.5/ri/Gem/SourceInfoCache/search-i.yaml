@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Searches all source indexes. See Gem::SourceIndex#search for details on <tt>pattern</tt>
+    and <tt>platform_only</tt>. If <tt>all</tt> is set to true, the full index will
+    be loaded before searching.
+full_name: Gem::SourceInfoCache#search
+params: (pattern, platform_only = false, all = false)
+name: search
+is_singleton: false
+aliases: []
+

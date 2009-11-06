@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::RequirePathsBuilder#write_require_paths_file_if_needed
+params: (spec = @spec, gem_home = @gem_home)
+name: write_require_paths_file_if_needed
+is_singleton: false
+aliases: []
+

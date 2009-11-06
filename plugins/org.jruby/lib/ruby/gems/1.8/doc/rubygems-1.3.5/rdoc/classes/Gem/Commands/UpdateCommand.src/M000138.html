@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>do_rubygems_update (Gem::Commands::UpdateCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/update_command.rb, line 137</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">do_rubygems_update</span>(<span class="ruby-identifier">version</span>)
+    <span class="ruby-identifier">args</span> = []
+    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">push</span> <span class="ruby-value str">'--prefix'</span>, <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">prefix</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">prefix</span>.<span class="ruby-identifier">nil?</span>
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'--no-rdoc'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_rdoc</span>]
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'--no-ri'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_ri</span>]
+    <span class="ruby-identifier">args</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'--no-format-executable'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:no_format_executable</span>]
+
+    <span class="ruby-identifier">update_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>, <span class="ruby-value str">'gems'</span>, <span class="ruby-node">&quot;rubygems-update-#{version}&quot;</span>
+
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span> <span class="ruby-identifier">update_dir</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Installing RubyGems #{version}&quot;</span>
+      <span class="ruby-identifier">setup_cmd</span> = <span class="ruby-node">&quot;#{Gem.ruby} setup.rb #{args.join ' '}&quot;</span>
+
+      <span class="ruby-comment cmt"># Make sure old rubygems isn't loaded</span>
+      <span class="ruby-identifier">old</span> = <span class="ruby-constant">ENV</span>[<span class="ruby-value str">&quot;RUBYOPT&quot;</span>]
+      <span class="ruby-constant">ENV</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value str">&quot;RUBYOPT&quot;</span>)
+      <span class="ruby-identifier">system</span> <span class="ruby-identifier">setup_cmd</span>
+      <span class="ruby-constant">ENV</span>[<span class="ruby-value str">&quot;RUBYOPT&quot;</span>] = <span class="ruby-identifier">old</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">old</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Updates this SourceIndex from <tt>source_uri</tt>. If <tt>all</tt> is false,
+    only the latest gems are fetched.
+full_name: Gem::SourceIndex#update
+params: (source_uri, all)
+name: update
+is_singleton: false
+aliases: []
+

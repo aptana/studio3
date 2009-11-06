@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Normalize the URI by adding &quot;http://&quot; if it is missing.
+full_name: Gem::RemoteFetcher#normalize_uri
+params: (uri)
+name: normalize_uri
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::ContentsCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/contents_command.rb, line 8</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'contents'</span>, <span class="ruby-value str">'Display the contents of the installed gems'</span>,
+          <span class="ruby-identifier">:specdirs</span> =<span class="ruby-operator">&gt;</span> [], <span class="ruby-identifier">:lib_only</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">add_version_option</span>
+
+    <span class="ruby-identifier">add_option</span>(      <span class="ruby-value str">'--all'</span>,
+               <span class="ruby-value str">&quot;Contents for all gems&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">all</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] = <span class="ruby-identifier">all</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-s'</span>, <span class="ruby-value str">'--spec-dir a,b,c'</span>, <span class="ruby-constant">Array</span>,
+               <span class="ruby-value str">&quot;Search for gems under specific paths&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec_dirs</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:specdirs</span>] = <span class="ruby-identifier">spec_dirs</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-l'</span>, <span class="ruby-value str">'--[no-]lib-only'</span>,
+               <span class="ruby-value str">&quot;Only return files in the Gem's lib_dirs&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">lib_only</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:lib_only</span>] = <span class="ruby-identifier">lib_only</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(      <span class="ruby-value str">'--[no-]prefix'</span>,
+               <span class="ruby-value str">&quot;Don't include installed path prefix&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">prefix</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prefix</span>] = <span class="ruby-identifier">prefix</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

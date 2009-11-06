@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Factory method to create a Gem::Requirement object. Input may be a Version,
+    a String, or nil. Intended to simplify client code.
+- !ruby/struct:SM::Flow::P 
+  body: If the input is &quot;weird&quot;, the default version requirement is returned.
+full_name: Gem::Requirement::create
+params: (input)
+name: create
+is_singleton: true
+aliases: []
+

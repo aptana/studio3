@@ -1,0 +1,341 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: RubyGems is the Ruby standard for publishing and managing third party libraries.
+- !ruby/struct:SM::Flow::P 
+  body: 'For user documentation, see:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: <tt>gem help</tt> and <tt>gem help [command]</tt>
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '{RubyGems User Guide}[http://docs.rubygems.org/read/book/1]'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '{Frequently Asked Questions}[http://docs.rubygems.org/read/book/3]'
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: 'For gem developer documentation see:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '{Creating Gems}[http://docs.rubygems.org/read/chapter/5]'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Gem::Specification
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: 'Further RubyGems documentation can be found at:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '{RubyGems API}[http://rubygems.rubyforge.org/rdoc] (also available from
+      <tt>gem server</tt>)'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '{RubyGems Bookshelf}[http://rubygem.org]'
+    label: '*'
+- !ruby/struct:SM::Flow::H 
+  text: RubyGems Plugins
+  level: 2
+- !ruby/struct:SM::Flow::P 
+  body: As of RubyGems 1.3.2, RubyGems will load plugins installed in gems or $LOAD_PATH.
+    Plugins must be named 'rubygems_plugin' are discovered via Gem::find_files then
+    loaded. Take care when implementing a plugin as your plugin file may be loaded
+    multiple times if multiple versions of your gem are installed.
+- !ruby/struct:SM::Flow::P 
+  body: For an example plugin, see the graph gem which adds a `gem graph` command.
+- !ruby/struct:SM::Flow::H 
+  text: RubyGems Defaults, Packaging
+  level: 2
+- !ruby/struct:SM::Flow::P 
+  body: RubyGems defaults are stored in rubygems/defaults.rb. If you're packaging
+    RubyGems or implementing Ruby you can change RubyGems' defaults.
+- !ruby/struct:SM::Flow::P 
+  body: For RubyGems packagers, provide lib/rubygems/operating_system.rb and override
+    any defaults from lib/rubygems/defaults.rb.
+- !ruby/struct:SM::Flow::P 
+  body: For Ruby implementers, provide lib/rubygems/#{RUBY_ENGINE}.rb and override
+    any defaults from lib/rubygems/defaults.rb.
+- !ruby/struct:SM::Flow::P 
+  body: If you need RubyGems to perform extra work on install or uninstall, your defaults
+    override file can set pre and post install and uninstall hooks. See Gem::pre_install,
+    Gem::pre_uninstall, Gem::post_install, Gem::post_uninstall.
+- !ruby/struct:SM::Flow::H 
+  text: Bugs
+  level: 2
+- !ruby/struct:SM::Flow::P 
+  body: You can submit bugs to the {RubyGems bug tracker}[http://rubyforge.org/tracker/?atid=575&amp;group_id=126&amp;func=browse]
+    on RubyForge
+- !ruby/struct:SM::Flow::H 
+  text: Credits
+  level: 2
+- !ruby/struct:SM::Flow::P 
+  body: RubyGems is currently maintained by Eric Hodel.
+- !ruby/struct:SM::Flow::P 
+  body: 'RubyGems was originally developed at RubyConf 2003 by:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: Rich Kilmer -- rich(at)infoether.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Chad Fowler -- chad(at)chadfowler.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: David Black -- dblack(at)wobblini.net
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Paul Brannan -- paul(at)atdesk.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Jim Weirch -- {jim(at)weirichhouse.org}[mailto:jim@weirichhouse.org]
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: 'Contributors:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: Gavin Sinclair -- gsinclair(at)soyabean.com.au
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: George Marrows -- george.marrows(at)ntlworld.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Dick Davies -- rasputnik(at)hellooperator.net
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Mauricio Fernandez -- batsman.geo(at)yahoo.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Simon Strandgaard -- neoneye(at)adslhome.dk
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Dave Glasser -- glasser(at)mit.edu
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Paul Duncan -- pabs(at)pablotron.org
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Ville Aine -- vaine(at)cs.helsinki.fi
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Eric Hodel -- drbrain(at)segment7.net
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Daniel Berger -- djberg96(at)gmail.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Phil Hagelberg -- technomancy(at)gmail.com
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Ryan Davis
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: (If your name is missing, PLEASE let us know!)
+- !ruby/struct:SM::Flow::P 
+  body: Thanks!
+- !ruby/struct:SM::Flow::P 
+  body: -The RubyGems Team
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Hash of loaded Gem::Specification keyed by name
+  rw: R
+  name: loaded_specs
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The list of hooks to be run before Gem::Install#install does any work
+  rw: R
+  name: post_install_hooks
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The list of hooks to be run before Gem::Uninstall#uninstall does any work
+  rw: R
+  name: post_uninstall_hooks
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The list of hooks to be run after Gem::Install#install is finished
+  rw: R
+  name: pre_install_hooks
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The list of hooks to be run after Gem::Uninstall#uninstall is finished
+  rw: R
+  name: pre_uninstall_hooks
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Is SSL available?
+  rw: W
+  name: ssl_available
+instance_methods: []
+
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: activate
+- !ruby/object:RI::MethodSummary 
+  name: all_load_paths
+- !ruby/object:RI::MethodSummary 
+  name: available?
+- !ruby/object:RI::MethodSummary 
+  name: bin_path
+- !ruby/object:RI::MethodSummary 
+  name: binary_mode
+- !ruby/object:RI::MethodSummary 
+  name: bindir
+- !ruby/object:RI::MethodSummary 
+  name: clear_paths
+- !ruby/object:RI::MethodSummary 
+  name: config_file
+- !ruby/object:RI::MethodSummary 
+  name: configuration
+- !ruby/object:RI::MethodSummary 
+  name: configuration=
+- !ruby/object:RI::MethodSummary 
+  name: datadir
+- !ruby/object:RI::MethodSummary 
+  name: default_bindir
+- !ruby/object:RI::MethodSummary 
+  name: default_dir
+- !ruby/object:RI::MethodSummary 
+  name: default_exec_format
+- !ruby/object:RI::MethodSummary 
+  name: default_path
+- !ruby/object:RI::MethodSummary 
+  name: default_sources
+- !ruby/object:RI::MethodSummary 
+  name: default_system_source_cache_dir
+- !ruby/object:RI::MethodSummary 
+  name: default_user_source_cache_dir
+- !ruby/object:RI::MethodSummary 
+  name: deflate
+- !ruby/object:RI::MethodSummary 
+  name: dir
+- !ruby/object:RI::MethodSummary 
+  name: ensure_gem_subdirectories
+- !ruby/object:RI::MethodSummary 
+  name: ensure_ssl_available
+- !ruby/object:RI::MethodSummary 
+  name: find_files
+- !ruby/object:RI::MethodSummary 
+  name: gunzip
+- !ruby/object:RI::MethodSummary 
+  name: gzip
+- !ruby/object:RI::MethodSummary 
+  name: inflate
+- !ruby/object:RI::MethodSummary 
+  name: latest_load_paths
+- !ruby/object:RI::MethodSummary 
+  name: load_path_insert_index
+- !ruby/object:RI::MethodSummary 
+  name: location_of_caller
+- !ruby/object:RI::MethodSummary 
+  name: marshal_version
+- !ruby/object:RI::MethodSummary 
+  name: path
+- !ruby/object:RI::MethodSummary 
+  name: platforms
+- !ruby/object:RI::MethodSummary 
+  name: platforms=
+- !ruby/object:RI::MethodSummary 
+  name: post_install
+- !ruby/object:RI::MethodSummary 
+  name: post_uninstall
+- !ruby/object:RI::MethodSummary 
+  name: pre_install
+- !ruby/object:RI::MethodSummary 
+  name: pre_uninstall
+- !ruby/object:RI::MethodSummary 
+  name: prefix
+- !ruby/object:RI::MethodSummary 
+  name: promote_load_path
+- !ruby/object:RI::MethodSummary 
+  name: read_binary
+- !ruby/object:RI::MethodSummary 
+  name: refresh
+- !ruby/object:RI::MethodSummary 
+  name: required_location
+- !ruby/object:RI::MethodSummary 
+  name: ruby
+- !ruby/object:RI::MethodSummary 
+  name: ruby_engine
+- !ruby/object:RI::MethodSummary 
+  name: ruby_version
+- !ruby/object:RI::MethodSummary 
+  name: searcher
+- !ruby/object:RI::MethodSummary 
+  name: source_index
+- !ruby/object:RI::MethodSummary 
+  name: sources
+- !ruby/object:RI::MethodSummary 
+  name: sources=
+- !ruby/object:RI::MethodSummary 
+  name: ssl_available?
+- !ruby/object:RI::MethodSummary 
+  name: suffix_pattern
+- !ruby/object:RI::MethodSummary 
+  name: suffixes
+- !ruby/object:RI::MethodSummary 
+  name: time
+- !ruby/object:RI::MethodSummary 
+  name: ui
+- !ruby/object:RI::MethodSummary 
+  name: use_paths
+- !ruby/object:RI::MethodSummary 
+  name: user_dir
+- !ruby/object:RI::MethodSummary 
+  name: user_home
+- !ruby/object:RI::MethodSummary 
+  name: win_platform?
+full_name: Gem
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: VERSION = '1.3.5'
+  name: RubyGemsVersion
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Configuration settings from ::RbConfig
+  value: '{} unless defined?(ConfigMap)'
+  name: ConfigMap
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Default directories in a gem repository
+  value: '%w[cache doc gems specifications] unless defined?(DIRECTORIES)'
+  name: DIRECTORIES
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: An Array of Regexps that match windows ruby platforms.
+  value: '[     /bccwin/i,     /cygwin/i,     /djgpp/i,     /mingw/i,     /mswin/i,     /wince/i,   ]'
+  name: WIN_PATTERNS
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Location of Marshal quick gemspecs on remote repositories
+  value: '"quick/Marshal.#{Gem.marshal_version}/"'
+  name: MARSHAL_SPEC_DIR
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Location of legacy YAML quick gemspecs on remote repositories
+  value: '''quick/'''
+  name: YAML_SPEC_DIR
+superclass: 
+name: Gem

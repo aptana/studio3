@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: A Zlib::Deflate.deflate wrapper
+full_name: Gem::deflate
+params: (data)
+name: deflate
+is_singleton: true
+aliases: []
+

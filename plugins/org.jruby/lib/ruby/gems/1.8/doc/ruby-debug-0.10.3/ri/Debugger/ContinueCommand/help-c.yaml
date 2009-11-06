@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (cmd)
+is_singleton: true
+block_params: 
+name: help
+comment: 
+full_name: Debugger::ContinueCommand::help
+visibility: public
+aliases: []
+

@@ -1,0 +1,18 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Constructs an instance of a Format object, representing the gem's data structure.
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '[String] The file name of the gem'
+    label: 'gem:'
+full_name: Gem::Format::new
+params: (gem_path)
+name: new
+is_singleton: true
+aliases: []
+

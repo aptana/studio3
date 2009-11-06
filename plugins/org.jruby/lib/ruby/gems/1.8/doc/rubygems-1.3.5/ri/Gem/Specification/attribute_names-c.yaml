@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Names of all specification attributes
+full_name: Gem::Specification::attribute_names
+params: ()
+name: attribute_names
+is_singleton: true
+aliases: []
+

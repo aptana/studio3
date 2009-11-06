@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>run (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 723</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run</span>
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">listen</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-ivar">@port</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Starting gem server on http://localhost:#{@port}/&quot;</span>
+
+    <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">Daemon</span>.<span class="ruby-identifier">start</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@daemon</span>
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-value str">&quot;/yaml&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:yaml</span>)
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-value str">&quot;/yaml.Z&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:yaml</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/Marshal.#{Gem.marshal_version}&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:Marshal</span>)
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/Marshal.#{Gem.marshal_version}.Z&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:Marshal</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/specs.#{Gem.marshal_version}&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:specs</span>)
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/specs.#{Gem.marshal_version}.gz&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:specs</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/latest_specs.#{Gem.marshal_version}&quot;</span>,
+                       <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:latest_specs</span>)
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-node">&quot;/latest_specs.#{Gem.marshal_version}.gz&quot;</span>,
+                       <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:latest_specs</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-value str">&quot;/quick/&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:quick</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span>(<span class="ruby-value str">&quot;/gem-server-rdoc-style.css&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">req</span>, <span class="ruby-identifier">res</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'text/css'</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'date'</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-ivar">@spec_dir</span>).<span class="ruby-identifier">mtime</span>
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">RDOC_CSS</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-value str">&quot;/&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:root</span>)
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount_proc</span> <span class="ruby-value str">&quot;/rdoc&quot;</span>, <span class="ruby-identifier">method</span>(<span class="ruby-identifier">:rdoc</span>)
+
+    <span class="ruby-identifier">paths</span> = { <span class="ruby-value str">&quot;/gems&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;/cache/&quot;</span>, <span class="ruby-value str">&quot;/doc_root&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;/doc/&quot;</span> }
+    <span class="ruby-identifier">paths</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mount_point</span>, <span class="ruby-identifier">mount_dir</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">mount</span>(<span class="ruby-identifier">mount_point</span>, <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPServlet</span><span class="ruby-operator">::</span><span class="ruby-constant">FileHandler</span>,
+                    <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@gem_dir</span>, <span class="ruby-identifier">mount_dir</span>), <span class="ruby-keyword kw">true</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">trap</span>(<span class="ruby-value str">&quot;INT&quot;</span>) { <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">shutdown</span>; <span class="ruby-identifier">exit!</span> }
+    <span class="ruby-identifier">trap</span>(<span class="ruby-value str">&quot;TERM&quot;</span>) { <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">shutdown</span>; <span class="ruby-identifier">exit!</span> }
+
+    <span class="ruby-ivar">@server</span>.<span class="ruby-identifier">start</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

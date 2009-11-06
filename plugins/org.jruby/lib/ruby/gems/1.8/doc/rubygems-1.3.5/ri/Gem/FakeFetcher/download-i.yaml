@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::FakeFetcher#download
+params: (spec, source_uri, install_dir = Gem.dir)
+name: download
+is_singleton: false
+aliases: []
+

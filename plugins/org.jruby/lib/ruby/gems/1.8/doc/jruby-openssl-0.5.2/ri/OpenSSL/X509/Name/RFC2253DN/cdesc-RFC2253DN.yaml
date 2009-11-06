@@ -1,0 +1,61 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: expand_hexstring
+- !ruby/object:RI::MethodSummary 
+  name: expand_pair
+- !ruby/object:RI::MethodSummary 
+  name: expand_value
+- !ruby/object:RI::MethodSummary 
+  name: scan
+class_methods: []
+
+full_name: OpenSSL::X509::Name::RFC2253DN
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: ''',=+<>#;'''
+  name: Special
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /[0-9a-fA-F]/
+  name: HexChar
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /#{HexChar}#{HexChar}/
+  name: HexPair
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /#{HexPair}+/
+  name: HexString
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /\\(?:[#{Special}]|\\|"|#{HexPair})/
+  name: Pair
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /[^#{Special}\\"]/
+  name: StringChar
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /[^\\"]/
+  name: QuoteChar
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /[a-zA-Z][0-9a-zA-Z]*|[0-9]+(?:\.[0-9]+)*/
+  name: AttributeType
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /           (?!["#])((?:#{StringChar}|#{Pair})*)|           \#(#{HexString})|           "((?:#{QuoteChar}|#{Pair})*)"         /x
+  name: AttributeValue
+- !ruby/object:RI::Constant 
+  comment: 
+  value: /\A(#{AttributeType})=#{AttributeValue}/
+  name: TypeAndValue
+superclass: 
+name: RFC2253DN

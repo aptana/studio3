@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Display a warning in a location expected to get error messages. Will ask <tt>question</tt>
+    if it is not nil.
+full_name: Gem::StreamUI#alert_warning
+params: (statement, question=nil)
+name: alert_warning
+is_singleton: false
+aliases: []
+

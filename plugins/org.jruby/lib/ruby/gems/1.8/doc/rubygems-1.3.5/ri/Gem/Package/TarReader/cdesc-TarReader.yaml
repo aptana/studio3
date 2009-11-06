@@ -1,0 +1,28 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::Package
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: TarReader reads tar files and allows iteration over their items
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: close
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: each_entry
+- !ruby/object:RI::MethodSummary 
+  name: rewind
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Package::TarReader
+constants: []
+
+superclass: Object
+name: TarReader

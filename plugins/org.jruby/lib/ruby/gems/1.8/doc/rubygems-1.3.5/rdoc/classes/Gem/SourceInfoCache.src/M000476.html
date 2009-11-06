@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>read_cache_data (Gem::SourceInfoCache)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/source_info_cache.rb, line 204</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read_cache_data</span>(<span class="ruby-identifier">file</span>)
+    <span class="ruby-comment cmt"># Marshal loads 30-40% faster from a String, and 2MB on 20061116 is small</span>
+    <span class="ruby-identifier">data</span> = <span class="ruby-identifier">open</span> <span class="ruby-identifier">file</span>, <span class="ruby-value str">'rb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fp</span><span class="ruby-operator">|</span> <span class="ruby-identifier">fp</span>.<span class="ruby-identifier">read</span> <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">cache_data</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">data</span>
+
+    <span class="ruby-identifier">cache_data</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">url</span>, <span class="ruby-identifier">sice</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">sice</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+      <span class="ruby-identifier">update</span>
+
+      <span class="ruby-identifier">cache</span> = <span class="ruby-identifier">sice</span>[<span class="ruby-value str">'cache'</span>]
+      <span class="ruby-identifier">size</span>  = <span class="ruby-identifier">sice</span>[<span class="ruby-value str">'size'</span>]
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">cache</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>) <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">size</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Numeric</span>) <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">new_sice</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCacheEntry</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">cache</span>, <span class="ruby-identifier">size</span>
+        <span class="ruby-identifier">cache_data</span>[<span class="ruby-identifier">url</span>] = <span class="ruby-identifier">new_sice</span>
+      <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># irreperable, force refetch.</span>
+        <span class="ruby-identifier">reset_cache_for</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">cache_data</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">cache_data</span>
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">ENOENT</span>
+    {}
+  <span class="ruby-keyword kw">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Exception during cache_data handling: #{e.class} - #{e}&quot;</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Cache file was: #{file}&quot;</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;\t#{e.backtrace.join &quot;\n\t&quot;}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    {}
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

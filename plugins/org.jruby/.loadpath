@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<loadpath>
+	<pathentry path="" type="src"/>
+	<pathentry path="GEM_LIB/sources-0.0.1/lib" type="var"/>
+	<pathentry path="GEM_LIB/rails-1.2.5/lib" type="var"/>
+</loadpath>

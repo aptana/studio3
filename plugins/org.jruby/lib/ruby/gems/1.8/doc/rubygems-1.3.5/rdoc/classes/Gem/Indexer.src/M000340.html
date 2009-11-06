@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 59</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">directory</span>, <span class="ruby-identifier">options</span> = {})
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-value str">''</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:to_xs</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">fail</span> <span class="ruby-value str">&quot;Gem::Indexer requires that the XML Builder library be installed:&quot;</span> \
+           <span class="ruby-value str">&quot;\n\tgem install builder&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">options</span> = { <span class="ruby-identifier">:build_legacy</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:build_modern</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span> }.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">options</span>
+
+    <span class="ruby-ivar">@build_legacy</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_legacy</span>]
+    <span class="ruby-ivar">@build_modern</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_modern</span>]
+
+    <span class="ruby-ivar">@rss_title</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_title</span>]
+    <span class="ruby-ivar">@rss_host</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_host</span>]
+    <span class="ruby-ivar">@rss_gems_host</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_gems_host</span>]
+
+    <span class="ruby-ivar">@dest_directory</span> = <span class="ruby-identifier">directory</span>
+    <span class="ruby-ivar">@directory</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">tmpdir</span>, <span class="ruby-node">&quot;gem_generate_index_#{$$}&quot;</span>
+
+    <span class="ruby-identifier">marshal_name</span> = <span class="ruby-node">&quot;Marshal.#{Gem.marshal_version}&quot;</span>
+
+    <span class="ruby-ivar">@master_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-value str">'yaml'</span>
+    <span class="ruby-ivar">@marshal_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-identifier">marshal_name</span>
+
+    <span class="ruby-ivar">@quick_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-value str">'quick'</span>
+
+    <span class="ruby-ivar">@quick_marshal_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@quick_dir</span>, <span class="ruby-identifier">marshal_name</span>
+
+    <span class="ruby-ivar">@quick_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@quick_dir</span>, <span class="ruby-value str">'index'</span>
+    <span class="ruby-ivar">@latest_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@quick_dir</span>, <span class="ruby-value str">'latest_index'</span>
+
+    <span class="ruby-ivar">@specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-node">&quot;specs.#{Gem.marshal_version}&quot;</span>
+    <span class="ruby-ivar">@latest_specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>,
+                                    <span class="ruby-node">&quot;latest_specs.#{Gem.marshal_version}&quot;</span>
+    <span class="ruby-ivar">@prerelease_specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@directory</span>,
+                                        <span class="ruby-node">&quot;prerelease_specs.#{Gem.marshal_version}&quot;</span>)
+
+    <span class="ruby-ivar">@dest_specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@dest_directory</span>,
+                                  <span class="ruby-node">&quot;specs.#{Gem.marshal_version}&quot;</span>
+    <span class="ruby-ivar">@dest_latest_specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@dest_directory</span>,
+                                         <span class="ruby-node">&quot;latest_specs.#{Gem.marshal_version}&quot;</span>
+    <span class="ruby-ivar">@dest_prerelease_specs_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@dest_directory</span>,
+                                            <span class="ruby-node">&quot;prerelease_specs.#{Gem.marshal_version}&quot;</span>
+
+    <span class="ruby-ivar">@rss_index</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-value str">'index.rss'</span>
+
+    <span class="ruby-ivar">@files</span> = []
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

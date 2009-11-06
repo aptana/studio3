@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Find the full path to the executable for gem <tt>name</tt>. If the <tt>exec_name</tt>
+    is not given, the gem's default_executable is chosen, otherwise the specifed executable's
+    path is returned. <tt>version_requirements</tt> allows you to specify specific
+    gem versions.
+full_name: Gem::bin_path
+params: (name, exec_name = nil, *version_requirements)
+name: bin_path
+is_singleton: true
+aliases: []
+

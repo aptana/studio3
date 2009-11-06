@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: Exception
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Exception
+superclass: Object
+class_methods: []
+

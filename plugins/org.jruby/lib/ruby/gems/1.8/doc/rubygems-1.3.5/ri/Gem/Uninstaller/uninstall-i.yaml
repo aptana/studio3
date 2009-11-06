@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Performs the uninstall of the gem. This removes the spec, the Gem directory,
+    and the cached .gem file.
+full_name: Gem::Uninstaller#uninstall
+params: ()
+name: uninstall
+is_singleton: false
+aliases: []
+

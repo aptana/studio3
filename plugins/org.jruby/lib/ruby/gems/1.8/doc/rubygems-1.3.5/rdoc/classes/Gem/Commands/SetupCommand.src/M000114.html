@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::SetupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/setup_command.rb, line 13</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'setup'</span>, <span class="ruby-value str">'Install RubyGems'</span>,
+          <span class="ruby-identifier">:format_executable</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:rdoc</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:ri</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+          <span class="ruby-identifier">:site_or_vendor</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:sitelibdir</span>,
+          <span class="ruby-identifier">:destdir</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">''</span>, <span class="ruby-identifier">:prefix</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">''</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--prefix=PREFIX'</span>,
+               <span class="ruby-value str">'Prefix path for installing RubyGems'</span>,
+               <span class="ruby-value str">'Will not affect gem repository location'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">prefix</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prefix</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">prefix</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--destdir=DESTDIR'</span>,
+               <span class="ruby-value str">'Root directory to install RubyGems into'</span>,
+               <span class="ruby-value str">'Mainly used for packaging RubyGems'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">destdir</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:destdir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">destdir</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]vendor'</span>,
+               <span class="ruby-value str">'Install into vendorlibdir not sitelibdir'</span>,
+               <span class="ruby-value str">'(Requires Ruby 1.8.7)'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">vendor</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">vendor</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ruby_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'1.8.7'</span>) <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidOption</span>,
+              <span class="ruby-node">&quot;requires ruby 1.8.7+ (you have #{Gem.ruby_version})&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:site_or_vendor</span>] = <span class="ruby-identifier">vendor</span> <span class="ruby-value">? </span><span class="ruby-operator">:</span><span class="ruby-identifier">vendorlibdir</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">:sitelibdir</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]format-executable'</span>,
+               <span class="ruby-value str">'Makes `gem` match ruby'</span>,
+               <span class="ruby-value str">'If ruby is ruby18, gem will be gem18'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:format_executable</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]rdoc'</span>,
+               <span class="ruby-value str">'Generate RDoc documentation for RubyGems'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rdoc</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]ri'</span>,
+               <span class="ruby-value str">'Generate RI documentation for RubyGems'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ri</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

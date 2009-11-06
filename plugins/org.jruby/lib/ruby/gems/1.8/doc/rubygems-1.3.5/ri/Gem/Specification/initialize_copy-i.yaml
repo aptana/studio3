@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Duplicates array_attributes from <tt>other_spec</tt> so state isn't shared.
+full_name: Gem::Specification#initialize_copy
+params: (other_spec)
+name: initialize_copy
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Replaces the gems in the source index from specifications in the directories
+    this source index was created from. Raises an exception if this source index wasn't
+    created from a directory (via from_gems_in or from_installed_gems, or having spec_dirs
+    set).
+full_name: Gem::SourceIndex#refresh!
+params: ()
+name: refresh!
+is_singleton: false
+aliases: []
+

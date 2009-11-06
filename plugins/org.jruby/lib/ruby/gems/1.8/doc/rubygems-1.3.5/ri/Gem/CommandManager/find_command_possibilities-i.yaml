@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::CommandManager#find_command_possibilities
+params: (cmd_name)
+name: find_command_possibilities
+is_singleton: false
+aliases: []
+

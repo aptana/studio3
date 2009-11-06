@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Moves the gem <tt>spec</tt> from <tt>source_uri</tt> to the cache dir unless
+    it is already there. If the source_uri is local the gem cache dir copy is always
+    replaced.
+full_name: Gem::RemoteFetcher#download
+params: (spec, source_uri, install_dir = Gem.dir)
+name: download
+is_singleton: false
+aliases: []
+

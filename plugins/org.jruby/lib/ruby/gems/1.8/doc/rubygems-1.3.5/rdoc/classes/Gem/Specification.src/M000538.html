@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>validate (Gem::Specification)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/specification.rb, line 788</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">validate</span>
+    <span class="ruby-identifier">extend</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">UserInteraction</span>
+    <span class="ruby-identifier">normalize</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">rubygems_version</span> <span class="ruby-operator">!=</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RubyGemsVersion</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-node">&quot;expected RubyGems version #{Gem::RubyGemsVersion}, was #{rubygems_version}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@@required_attributes</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">symbol</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">send</span> <span class="ruby-identifier">symbol</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+              <span class="ruby-node">&quot;missing value for attribute #{symbol}&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-node">&quot;invalid value for attribute name: \&quot;#{name.inspect}\&quot;&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'specification must have at least one require_path'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@files</span>.<span class="ruby-identifier">delete_if</span>            <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">file</span> <span class="ruby-keyword kw">end</span>
+    <span class="ruby-ivar">@test_files</span>.<span class="ruby-identifier">delete_if</span>       <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">file</span> <span class="ruby-keyword kw">end</span>
+    <span class="ruby-ivar">@executables</span>.<span class="ruby-identifier">delete_if</span>      <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">file</span>)
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-ivar">@extra_rdoc_files</span>.<span class="ruby-identifier">delete_if</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">file</span> <span class="ruby-keyword kw">end</span>
+    <span class="ruby-ivar">@extensions</span>.<span class="ruby-identifier">delete_if</span>       <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">file</span> <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">non_files</span> = <span class="ruby-identifier">files</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+      <span class="ruby-operator">!</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span> <span class="ruby-identifier">file</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">non_files</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">non_files</span> = <span class="ruby-identifier">non_files</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">inspect</span> }
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-node">&quot;[#{non_files.join &quot;, &quot;}] are not files&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">specification_version</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Fixnum</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'specification_version must be a Fixnum (did you mean version?)'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">platform</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span>, <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># ok</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-node">&quot;invalid platform #{platform.inspect}, see Gem::Platform&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Array</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">authors</span> <span class="ruby-keyword kw">and</span>
+           <span class="ruby-identifier">authors</span>.<span class="ruby-identifier">all?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">author</span><span class="ruby-operator">|</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">author</span> } <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'authors must be Array of Strings'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">licenses</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">license</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">license</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">64</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+          <span class="ruby-value str">&quot;each license must be 64 characters or less&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    }
+
+    <span class="ruby-comment cmt"># reject FIXME and TODO</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">authors</span>.<span class="ruby-identifier">grep</span>(<span class="ruby-regexp re">/FIXME|TODO/</span>).<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'&quot;FIXME&quot; or &quot;TODO&quot; is not an author'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">email</span>).<span class="ruby-identifier">grep</span>(<span class="ruby-regexp re">/FIXME|TODO/</span>).<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'&quot;FIXME&quot; or &quot;TODO&quot; is not an email address'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">description</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/FIXME|TODO/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'&quot;FIXME&quot; or &quot;TODO&quot; is not a description'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">summary</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/FIXME|TODO/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-value str">'&quot;FIXME&quot; or &quot;TODO&quot; is not a summary'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">homepage</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">homepage</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span>
+       <span class="ruby-identifier">homepage</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/\A[a-z][a-z\d+.-]*:/i</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidSpecificationException</span>,
+            <span class="ruby-node">&quot;\&quot;#{homepage}\&quot; is not a URI&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># Warnings</span>
+
+    <span class="ruby-node">%w[author description email homepage rubyforge_project summary]</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attribute</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">value</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">send</span> <span class="ruby-identifier">attribute</span>
+      <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;no #{attribute} specified&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">summary</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">summary</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">description</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">summary</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">alert_warning</span> <span class="ruby-value str">'description and summary are identical'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">alert_warning</span> <span class="ruby-value str">&quot;deprecated autorequire specified&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">autorequire</span>
+
+    <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">executable</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">executable_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">executable</span>
+      <span class="ruby-identifier">shebang</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">executable_path</span>, <span class="ruby-value">2</span>) <span class="ruby-operator">==</span> <span class="ruby-value str">'#!'</span>
+
+      <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;#{executable_path} is missing #! line&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">shebang</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">true</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

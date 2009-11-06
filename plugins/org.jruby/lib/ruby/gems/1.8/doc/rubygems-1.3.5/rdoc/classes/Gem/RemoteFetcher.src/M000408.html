@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>open_uri_or_path (Gem::RemoteFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/remote_fetcher.rb, line 255</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">open_uri_or_path</span>(<span class="ruby-identifier">uri</span>, <span class="ruby-identifier">last_modified</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">head</span> = <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">depth</span> = <span class="ruby-value">0</span>)
+    <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;block is dead&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+
+    <span class="ruby-identifier">uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span> <span class="ruby-identifier">uri</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">URI</span><span class="ruby-operator">::</span><span class="ruby-constant">Generic</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">uri</span>
+
+    <span class="ruby-comment cmt"># This check is redundant unless Gem::RemoteFetcher is likely</span>
+    <span class="ruby-comment cmt"># to be used directly, since the scheme is checked elsewhere.</span>
+    <span class="ruby-comment cmt"># - Daniel Berger</span>
+    <span class="ruby-keyword kw">unless</span> [<span class="ruby-value str">'http'</span>, <span class="ruby-value str">'https'</span>, <span class="ruby-value str">'file'</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">uri</span>.<span class="ruby-identifier">scheme</span>)
+     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">'uri scheme is invalid'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'file'</span>
+      <span class="ruby-identifier">path</span> = <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">path</span>
+
+      <span class="ruby-comment cmt"># Deal with leading slash on Windows paths</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">path</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">chr</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'/'</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">path</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">chr</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/[a-zA-Z]/</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">path</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">chr</span> <span class="ruby-operator">==</span> <span class="ruby-value str">':'</span>
+         <span class="ruby-identifier">path</span> = <span class="ruby-identifier">path</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">read_binary</span>(<span class="ruby-identifier">path</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">fetch_type</span> = <span class="ruby-identifier">head</span> <span class="ruby-value">? </span><span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span><span class="ruby-operator">::</span><span class="ruby-constant">Head</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span><span class="ruby-operator">::</span><span class="ruby-constant">Get</span>
+    <span class="ruby-identifier">response</span>   = <span class="ruby-identifier">request</span> <span class="ruby-identifier">uri</span>, <span class="ruby-identifier">fetch_type</span>, <span class="ruby-identifier">last_modified</span>
+
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">response</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPOK</span>, <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPNotModified</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">head</span> <span class="ruby-value">? </span><span class="ruby-identifier">response</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">body</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPMovedPermanently</span>, <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPFound</span>, <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPSeeOther</span>,
+         <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPTemporaryRedirect</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'too many redirects'</span>, <span class="ruby-identifier">uri</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">depth</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>
+
+      <span class="ruby-identifier">open_uri_or_path</span>(<span class="ruby-identifier">response</span>[<span class="ruby-value str">'Location'</span>], <span class="ruby-identifier">last_modified</span>, <span class="ruby-identifier">head</span>, <span class="ruby-identifier">depth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;bad response #{response.message} #{response.code}&quot;</span>, <span class="ruby-identifier">uri</span>)
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

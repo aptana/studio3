@@ -1,0 +1,18 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: gem
+- !ruby/object:RI::MethodSummary 
+  name: require
+class_methods: []
+
+full_name: Kernel
+constants: []
+
+superclass: 
+name: Kernel

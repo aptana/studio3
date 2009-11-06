@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Creates the scripts to run the applications in the gem.
+full_name: Gem::Installer#generate_bin_script
+params: (filename, bindir)
+name: generate_bin_script
+is_singleton: false
+aliases: []
+

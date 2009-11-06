@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>load_rdoc (Gem::DocManager)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/doc_manager.rb, line 35</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">load_rdoc</span>
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-identifier">gem</span> <span class="ruby-value str">'rdoc'</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">LoadError</span>
+      <span class="ruby-comment cmt"># use built-in RDoc</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-identifier">require</span> <span class="ruby-value str">'rdoc/rdoc'</span>
+
+      <span class="ruby-ivar">@rdoc_version</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">RDoc</span><span class="ruby-operator">::</span><span class="ruby-constant">VERSION</span> <span class="ruby-keyword kw">then</span>
+                        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">new</span> <span class="ruby-constant">RDoc</span><span class="ruby-operator">::</span><span class="ruby-constant">VERSION</span>
+                      <span class="ruby-keyword kw">else</span>
+                        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">new</span> <span class="ruby-value str">'1.0.1'</span> <span class="ruby-comment cmt"># HACK parsing is hard</span>
+                      <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">LoadError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DocumentError</span>,
+          <span class="ruby-node">&quot;ERROR: RDoc documentation generator not installed: #{e}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

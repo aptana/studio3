@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Integer#to_bn
+params: ()
+name: to_bn
+is_singleton: false
+aliases: []
+

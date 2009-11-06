@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::MirrorCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/mirror_command.rb, line 28</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">config_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">user_home</span>, <span class="ruby-value str">'.gemmirrorrc'</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Config file #{config_file} not found&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">config_file</span>
+
+    <span class="ruby-identifier">mirrors</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load_file</span> <span class="ruby-identifier">config_file</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Invalid config file #{config_file}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mirrors</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:each</span>
+
+    <span class="ruby-identifier">mirrors</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mir</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;mirror missing 'from' field&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mir</span>.<span class="ruby-identifier">has_key?</span> <span class="ruby-value str">'from'</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;mirror missing 'to' field&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mir</span>.<span class="ruby-identifier">has_key?</span> <span class="ruby-value str">'to'</span>
+
+      <span class="ruby-identifier">get_from</span> = <span class="ruby-identifier">mir</span>[<span class="ruby-value str">'from'</span>]
+      <span class="ruby-identifier">save_to</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">mir</span>[<span class="ruby-value str">'to'</span>]
+
+      <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Directory not found: #{save_to}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">save_to</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Not a directory: #{save_to}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">save_to</span>
+
+      <span class="ruby-identifier">gems_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">save_to</span>, <span class="ruby-value str">&quot;gems&quot;</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">gems_dir</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Not a directory: #{gems_dir}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">gems_dir</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">mkdir</span> <span class="ruby-identifier">gems_dir</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">sourceindex_data</span> = <span class="ruby-value str">''</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;fetching: #{get_from}/Marshal.#{Gem.marshal_version}.Z&quot;</span>
+
+      <span class="ruby-identifier">get_from</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span> <span class="ruby-identifier">get_from</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">get_from</span>.<span class="ruby-identifier">scheme</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">get_from</span> = <span class="ruby-identifier">get_from</span>.<span class="ruby-identifier">to_s</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">get_from</span>.<span class="ruby-identifier">scheme</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'file'</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-comment cmt"># check if specified URI contains a drive letter (file:/D:/Temp)</span>
+        <span class="ruby-identifier">get_from</span> = <span class="ruby-identifier">get_from</span>.<span class="ruby-identifier">to_s</span>
+        <span class="ruby-identifier">get_from</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">get_from</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^file:.*[a-z]:/i</span> <span class="ruby-keyword kw">then</span>
+                     <span class="ruby-identifier">get_from</span>[<span class="ruby-value">6</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+                   <span class="ruby-keyword kw">else</span>
+                     <span class="ruby-identifier">get_from</span>[<span class="ruby-value">5</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+                   <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">open</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">get_from</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-node">&quot;Marshal.#{Gem.marshal_version}.Z&quot;</span>), <span class="ruby-value str">&quot;rb&quot;</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">y</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">sourceindex_data</span> = <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">Inflate</span>.<span class="ruby-identifier">inflate</span> <span class="ruby-identifier">y</span>.<span class="ruby-identifier">read</span>
+        <span class="ruby-identifier">open</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">save_to</span>, <span class="ruby-node">&quot;Marshal.#{Gem.marshal_version}&quot;</span>), <span class="ruby-value str">&quot;wb&quot;</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">out</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">out</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">sourceindex_data</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">sourceindex</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">sourceindex_data</span>)
+
+      <span class="ruby-identifier">progress</span> = <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">progress_reporter</span> <span class="ruby-identifier">sourceindex</span>.<span class="ruby-identifier">size</span>,
+                                      <span class="ruby-node">&quot;Fetching #{sourceindex.size} gems&quot;</span>
+      <span class="ruby-identifier">sourceindex</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fullname</span>, <span class="ruby-identifier">gem</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">gem_file</span> = <span class="ruby-node">&quot;#{fullname}.gem&quot;</span>
+        <span class="ruby-identifier">gem_dest</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">gems_dir</span>, <span class="ruby-identifier">gem_file</span>
+
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">gem_dest</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-keyword kw">begin</span>
+            <span class="ruby-identifier">open</span> <span class="ruby-node">&quot;#{get_from}/gems/#{gem_file}&quot;</span>, <span class="ruby-value str">&quot;rb&quot;</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">g</span><span class="ruby-operator">|</span>
+              <span class="ruby-identifier">contents</span> = <span class="ruby-identifier">g</span>.<span class="ruby-identifier">read</span>
+              <span class="ruby-identifier">open</span> <span class="ruby-identifier">gem_dest</span>, <span class="ruby-value str">&quot;wb&quot;</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">out</span><span class="ruby-operator">|</span>
+                <span class="ruby-identifier">out</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">contents</span>
+              <span class="ruby-keyword kw">end</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">rescue</span>
+            <span class="ruby-identifier">old_gf</span> = <span class="ruby-identifier">gem_file</span>
+            <span class="ruby-identifier">gem_file</span> = <span class="ruby-identifier">gem_file</span>.<span class="ruby-identifier">downcase</span>
+            <span class="ruby-keyword kw">retry</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">old_gf</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">gem_file</span>
+            <span class="ruby-identifier">alert_error</span> <span class="ruby-identifier">$!</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">updated</span> <span class="ruby-identifier">gem_file</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">done</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

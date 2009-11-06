@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: OpenSSL::Cipher::Cipher#random_key
+params: ()
+name: random_key
+is_singleton: false
+aliases: []
+

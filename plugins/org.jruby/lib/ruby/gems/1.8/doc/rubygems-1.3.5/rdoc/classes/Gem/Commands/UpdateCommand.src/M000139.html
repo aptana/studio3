@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>which_to_update (Gem::Commands::UpdateCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/update_command.rb, line 158</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">which_to_update</span>(<span class="ruby-identifier">highest_installed_gems</span>, <span class="ruby-identifier">gem_names</span>)
+    <span class="ruby-identifier">result</span> = []
+
+    <span class="ruby-identifier">highest_installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">l_name</span>, <span class="ruby-identifier">l_spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">gem_names</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span>
+              <span class="ruby-identifier">gem_names</span>.<span class="ruby-identifier">all?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">/#{name}/</span> <span class="ruby-operator">!~</span> <span class="ruby-identifier">l_spec</span>.<span class="ruby-identifier">name</span> }
+
+      <span class="ruby-identifier">dependency</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">l_spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-node">&quot;&gt; #{l_spec.version}&quot;</span>
+
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">fetcher</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>
+        <span class="ruby-identifier">spec_tuples</span> = <span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">find_matching</span> <span class="ruby-identifier">dependency</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">warn_legacy</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">require</span> <span class="ruby-value str">'rubygems/source_info_cache'</span>
+
+          <span class="ruby-identifier">dependency</span>.<span class="ruby-identifier">name</span> = <span class="ruby-value str">''</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dependency</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-regexp re">//</span>
+
+          <span class="ruby-identifier">specs</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCache</span>.<span class="ruby-identifier">search_with_source</span> <span class="ruby-identifier">dependency</span>
+
+          <span class="ruby-identifier">spec_tuples</span> = <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span>, <span class="ruby-identifier">source_uri</span><span class="ruby-operator">|</span>
+            [[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_platform</span>], <span class="ruby-identifier">source_uri</span>]
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">matching_gems</span> = <span class="ruby-identifier">spec_tuples</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">version</span>, <span class="ruby-identifier">platform</span>),<span class="ruby-operator">|</span>
+        <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">l_name</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span>.<span class="ruby-identifier">match</span> <span class="ruby-identifier">platform</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">highest_remote_gem</span> = <span class="ruby-identifier">matching_gems</span>.<span class="ruby-identifier">sort_by</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">version</span>),<span class="ruby-operator">|</span>
+        <span class="ruby-identifier">version</span>
+      <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">last</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">highest_remote_gem</span> <span class="ruby-keyword kw">and</span>
+         <span class="ruby-identifier">l_spec</span>.<span class="ruby-identifier">version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">highest_remote_gem</span>.<span class="ruby-identifier">first</span>[<span class="ruby-value">1</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">l_name</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_install_update_options (Gem::InstallUpdateOptions)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/install_update_options.rb, line 18</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_install_update_options</span>
+    <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">accept</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policy</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">value</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policies</span>[<span class="ruby-identifier">value</span>]
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidArgument</span>, <span class="ruby-identifier">value</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-i'</span>, <span class="ruby-value str">'--install-dir DIR'</span>,
+               <span class="ruby-value str">'Gem repository directory to get installed'</span>,
+               <span class="ruby-value str">'gems'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">value</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-n'</span>, <span class="ruby-value str">'--bindir DIR'</span>,
+               <span class="ruby-value str">'Directory where binary files are'</span>,
+               <span class="ruby-value str">'located'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:bin_dir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">value</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-d'</span>, <span class="ruby-value str">'--[no-]rdoc'</span>,
+               <span class="ruby-value str">'Generate RDoc documentation for the gem on'</span>,
+               <span class="ruby-value str">'install'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_rdoc</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'--[no-]ri'</span>,
+               <span class="ruby-value str">'Generate RI documentation for the gem on'</span>,
+               <span class="ruby-value str">'install'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_ri</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-E'</span>, <span class="ruby-value str">'--[no-]env-shebang'</span>,
+               <span class="ruby-value str">&quot;Rewrite the shebang line on installed&quot;</span>,
+               <span class="ruby-value str">&quot;scripts to use /usr/bin/env&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:env_shebang</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-f'</span>, <span class="ruby-value str">'--[no-]force'</span>,
+               <span class="ruby-value str">'Force gem to install, bypassing dependency'</span>,
+               <span class="ruby-value str">'checks'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:force</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-t'</span>, <span class="ruby-value str">'--[no-]test'</span>,
+               <span class="ruby-value str">'Run unit tests prior to installation'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:test</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-w'</span>, <span class="ruby-value str">'--[no-]wrappers'</span>,
+               <span class="ruby-value str">'Use bin wrappers for executables'</span>,
+               <span class="ruby-value str">'Not available on dosish platforms'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:wrappers</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-P'</span>, <span class="ruby-value str">'--trust-policy POLICY'</span>,
+               <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policy</span>,
+               <span class="ruby-value str">'Specify gem trust policy'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:security_policy</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'--ignore-dependencies'</span>,
+               <span class="ruby-value str">'Do not install any required dependent gems'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ignore_dependencies</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">'-y'</span>, <span class="ruby-value str">'--include-dependencies'</span>,
+               <span class="ruby-value str">'Unconditionally install the required'</span>,
+               <span class="ruby-value str">'dependent gems'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:include_dependencies</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>,       <span class="ruby-value str">'--[no-]format-executable'</span>,
+               <span class="ruby-value str">'Make installed executable names match ruby.'</span>,
+               <span class="ruby-value str">'If ruby is ruby18, foo_exec will be'</span>,
+               <span class="ruby-value str">'foo_exec18'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:format_executable</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>,       <span class="ruby-value str">'--[no-]user-install'</span>,
+               <span class="ruby-value str">'Install in user\'s home directory instead'</span>,
+               <span class="ruby-value str">'of GEM_HOME. Defaults to using home'</span>,
+               <span class="ruby-value str">'only if GEM_HOME is not writable.'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:user_install</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">&quot;--development&quot;</span>,
+                <span class="ruby-value str">&quot;Install any additional development&quot;</span>,
+                <span class="ruby-value str">&quot;dependencies&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:development</span>] = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Install/Update&quot;</span><span class="ruby-value str">&quot;Install/Update&quot;</span>, <span class="ruby-value str">&quot;--prerelease&quot;</span>,
+               <span class="ruby-value str">&quot;Install prerelease versions of a gem if&quot;</span>,
+               <span class="ruby-value str">&quot;available. Defaults to skipping&quot;</span>,
+               <span class="ruby-value str">&quot;prereleases.&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prerelease</span>] = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: TempIO#respond_to?
+params: (meth)
+name: respond_to?
+is_singleton: false
+aliases: []
+

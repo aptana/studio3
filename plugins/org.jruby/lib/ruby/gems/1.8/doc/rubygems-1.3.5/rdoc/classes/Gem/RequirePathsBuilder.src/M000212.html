@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>write_require_paths_file_if_needed (Gem::RequirePathsBuilder)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/require_paths_builder.rb, line 4</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">write_require_paths_file_if_needed</span>(<span class="ruby-identifier">spec</span> = <span class="ruby-ivar">@spec</span>, <span class="ruby-identifier">gem_home</span> = <span class="ruby-ivar">@gem_home</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">require_paths</span> <span class="ruby-operator">==</span> [<span class="ruby-value str">&quot;lib&quot;</span>] <span class="ruby-operator">&amp;&amp;</span>
+              (<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;bin&quot;</span>)
+    <span class="ruby-identifier">file_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">gem_home</span>, <span class="ruby-value str">'gems'</span>, <span class="ruby-node">&quot;#{@spec.full_name}&quot;</span>, <span class="ruby-value str">&quot;.require_paths&quot;</span>)
+    <span class="ruby-identifier">file_name</span>.<span class="ruby-identifier">untaint</span>
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file_name</span>, <span class="ruby-value str">&quot;w&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">path</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">file</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

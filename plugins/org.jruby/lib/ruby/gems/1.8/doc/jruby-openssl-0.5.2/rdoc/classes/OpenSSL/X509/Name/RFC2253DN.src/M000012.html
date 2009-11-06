@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>scan (OpenSSL::X509::Name::RFC2253DN)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/openssl/x509.rb, line 108</span>
+        <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scan</span>(<span class="ruby-identifier">dn</span>)
+          <span class="ruby-identifier">str</span> = <span class="ruby-identifier">dn</span>
+          <span class="ruby-identifier">ary</span> = []
+          <span class="ruby-keyword kw">while</span> <span class="ruby-keyword kw">true</span>
+            <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">md</span> = <span class="ruby-constant">TypeAndValue</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">str</span>)
+              <span class="ruby-identifier">matched</span> = <span class="ruby-identifier">md</span>.<span class="ruby-identifier">to_s</span>
+              <span class="ruby-identifier">remain</span> = <span class="ruby-identifier">md</span>.<span class="ruby-identifier">post_match</span>
+              <span class="ruby-identifier">type</span> = <span class="ruby-identifier">md</span>[<span class="ruby-value">1</span>]
+              <span class="ruby-identifier">value</span>, <span class="ruby-identifier">tag</span> = <span class="ruby-identifier">expand_value</span>(<span class="ruby-identifier">md</span>[<span class="ruby-value">2</span>], <span class="ruby-identifier">md</span>[<span class="ruby-value">3</span>], <span class="ruby-identifier">md</span>[<span class="ruby-value">4</span>]) <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">nil</span>
+              <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">value</span>
+                <span class="ruby-identifier">type_and_value</span> = [<span class="ruby-identifier">type</span>, <span class="ruby-identifier">value</span>]
+                <span class="ruby-identifier">type_and_value</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">tag</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">tag</span>
+                <span class="ruby-identifier">ary</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">type_and_value</span>)
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">remain</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">remain</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">==</span> <span class="ruby-value">?,</span>
+                  <span class="ruby-identifier">str</span> = <span class="ruby-identifier">remain</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+                  <span class="ruby-keyword kw">next</span>
+                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">remain</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">remain</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">==</span> <span class="ruby-value">?+</span>
+                  <span class="ruby-identifier">raise</span> <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">X509</span><span class="ruby-operator">::</span><span class="ruby-constant">NameError</span>,
+                    <span class="ruby-node">&quot;multi-valued RDN is not supported: #{dn}&quot;</span>
+                <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">remain</span>.<span class="ruby-identifier">empty?</span>
+                  <span class="ruby-keyword kw">break</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">end</span>
+            <span class="ruby-keyword kw">end</span>
+            <span class="ruby-identifier">msg_dn</span> = <span class="ruby-identifier">dn</span>[<span class="ruby-value">0</span>, <span class="ruby-identifier">dn</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span>] <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; =&gt;&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">str</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">X509</span><span class="ruby-operator">::</span><span class="ruby-constant">NameError</span>, <span class="ruby-node">&quot;malformed RDN: #{msg_dn}&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">ary</span>
+        <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

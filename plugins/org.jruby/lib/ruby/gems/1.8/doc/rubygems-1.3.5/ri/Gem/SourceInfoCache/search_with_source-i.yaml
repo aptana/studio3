@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Searches all source indexes for <tt>pattern</tt>. If <tt>only_platform</tt>
+    is true, only gems matching Gem.platforms will be selected. Returns an Array of
+    pairs containing the Gem::Specification found and the source_uri it was found
+    at.
+full_name: Gem::SourceInfoCache#search_with_source
+params: (pattern, only_platform = false, all = false)
+name: search_with_source
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,19 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Initializes a generic gem command named <tt>command</tt>. <tt>summary</tt>
+    is a short description displayed in `gem help commands`. <tt>defaults</tt> are
+    the default options. Defaults should be mirrored in #defaults_str, unless there
+    are none.'
+- !ruby/struct:SM::Flow::P 
+  body: When defining a new command subclass, use add_option to add command-line switches.
+- !ruby/struct:SM::Flow::P 
+  body: Unhandled arguments (gem names, files, etc.) are left in <tt>options[:args]</tt>.
+full_name: Gem::Command::new
+params: (command, summary=nil, defaults={})
+name: new
+is_singleton: true
+aliases: []
+

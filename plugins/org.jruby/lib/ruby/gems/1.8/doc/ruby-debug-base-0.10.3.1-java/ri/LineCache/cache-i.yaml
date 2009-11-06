@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+params: (filename, reload_on_change=false)
+is_singleton: false
+block_params: 
+name: cache
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Cache filename if it's not already cached. Return the expanded filename for
+    it in the cache or nil if we can't find the file.
+full_name: LineCache#cache
+visibility: public
+aliases: []
+

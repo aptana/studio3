@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Security::Policy)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/security.rb, line 381</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">policy</span> = {}, <span class="ruby-identifier">opt</span> = {})
+      <span class="ruby-comment cmt"># set options</span>
+      <span class="ruby-ivar">@opt</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">OPT</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opt</span>)
+
+      <span class="ruby-comment cmt"># build policy</span>
+      <span class="ruby-identifier">policy</span>.<span class="ruby-identifier">each_pair</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
+        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">key</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:verify_data</span>   <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@verify_data</span>   = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:verify_signer</span> <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@verify_signer</span> = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:verify_chain</span>  <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@verify_chain</span>  = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:verify_root</span>   <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@verify_root</span>   = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:only_trusted</span>  <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@only_trusted</span>  = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:only_signed</span>   <span class="ruby-keyword kw">then</span> <span class="ruby-ivar">@only_signed</span>   = <span class="ruby-identifier">val</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

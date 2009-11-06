@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+params: (filename)
+is_singleton: false
+block_params: 
+name: path
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return full filename path for filename
+full_name: LineCache#path
+visibility: public
+aliases: []
+

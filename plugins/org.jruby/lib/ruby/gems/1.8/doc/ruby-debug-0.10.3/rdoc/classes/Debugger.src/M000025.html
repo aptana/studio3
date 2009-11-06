@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Debugger)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File cli/ruby-debug/commands/show.rb, line 200</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@match</span>[<span class="ruby-value">1</span>]
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;\&quot;show\&quot; must be followed by the name of an show command:\n&quot;</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;List of show subcommands:\n\n&quot;</span>
+        <span class="ruby-keyword kw">for</span> <span class="ruby-identifier">subcmd</span> <span class="ruby-keyword kw">in</span> <span class="ruby-constant">Subcommands</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;show #{subcmd.name} -- #{subcmd.short_help}\n&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">args</span> = <span class="ruby-ivar">@match</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/[ \t]+/</span>)
+        <span class="ruby-identifier">param</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>
+        <span class="ruby-identifier">subcmd</span> = <span class="ruby-identifier">find</span>(<span class="ruby-constant">Subcommands</span>, <span class="ruby-identifier">param</span>)
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">subcmd</span>
+          <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;%s\n&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">show_setting</span>(<span class="ruby-identifier">subcmd</span>.<span class="ruby-identifier">name</span>)
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Unknown show command #{param}\n&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

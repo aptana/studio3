@@ -1,0 +1,17 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Classes for building C extensions live here.
+attributes: []
+
+instance_methods: []
+
+class_methods: []
+
+full_name: Gem::Ext
+constants: []
+
+superclass: 
+name: Ext

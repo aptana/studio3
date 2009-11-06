@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (file)
+is_singleton: false
+block_params: 
+name: unmap_file
+comment: 
+full_name: LineCache#unmap_file
+visibility: public
+aliases: []
+

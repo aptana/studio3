@@ -58,12 +58,12 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
- * 
+ * @author Michael Xia
  */
 public class RubySourceConfiguration implements IPartitioningConfiguration,
         ISourceViewerConfiguration {
 
-    public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE;
+    public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
     public static final String SINGLE_LINE_COMMENT = "__rb_singleline_comment"; //$NON-NLS-1$
     public static final String MULTI_LINE_COMMENT = "__rb_multiline_comment"; //$NON-NLS-1$
     public static final String REGULAR_EXPRESSION = "__rb_regular_expression"; //$NON-NLS-1$
@@ -76,11 +76,11 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private IToken stringToken = new Token(STRING);
 
     private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-            new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)),
-            new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true),
-            new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'),
-            new SingleLineRule("\"", "\"", stringToken, '\\'),
-            new SingleLineRule("\'", "\'", stringToken, '\\') };
+            new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
+            new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+            new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+            new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+            new SingleLineRule("\'", "\'", stringToken, '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
 
     private RubyCodeScanner codeScanner;
     private RuleBasedScanner singleLineCommentScanner;
@@ -160,7 +160,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getMultiLineCommentScanner() {
         if (multiLineCommentScanner == null) {
             multiLineCommentScanner = new RuleBasedScanner();
-            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.rb")); //$NON-NLS-1$
+            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.ruby")); //$NON-NLS-1$
         }
         return multiLineCommentScanner;
     }
@@ -169,7 +169,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         if (singleLineCommentScanner == null) {
             singleLineCommentScanner = new RuleBasedScanner();
             singleLineCommentScanner.setDefaultReturnToken(ThemeUtil
-                    .getToken("comment.line.double-slash.rb")); //$NON-NLS-1$
+                    .getToken("comment.line.double-slash.ruby")); //$NON-NLS-1$
         }
         return singleLineCommentScanner;
     }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>build_marshal_gemspecs (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 216</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_marshal_gemspecs</span>(<span class="ruby-identifier">index</span>)
+    <span class="ruby-identifier">progress</span> = <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">progress_reporter</span> <span class="ruby-identifier">index</span>.<span class="ruby-identifier">size</span>,
+                                    <span class="ruby-node">&quot;Generating Marshal quick index gemspecs for #{index.size} gems&quot;</span>,
+                                    <span class="ruby-value str">&quot;Complete&quot;</span>
+
+    <span class="ruby-identifier">files</span> = []
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">time</span> <span class="ruby-value str">'Generated Marshal quick index gemspecs'</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">index</span>.<span class="ruby-identifier">gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">original_name</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">spec_file_name</span> = <span class="ruby-node">&quot;#{original_name}.gemspec.rz&quot;</span>
+        <span class="ruby-identifier">marshal_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@quick_marshal_dir</span>, <span class="ruby-identifier">spec_file_name</span>
+
+        <span class="ruby-identifier">marshal_zipped</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">spec</span>)
+        <span class="ruby-identifier">open</span> <span class="ruby-identifier">marshal_name</span>, <span class="ruby-value str">'wb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span> <span class="ruby-identifier">io</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">marshal_zipped</span> <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">marshal_name</span>
+
+        <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">updated</span> <span class="ruby-identifier">original_name</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">done</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@quick_marshal_dir</span>
+
+    <span class="ruby-identifier">files</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

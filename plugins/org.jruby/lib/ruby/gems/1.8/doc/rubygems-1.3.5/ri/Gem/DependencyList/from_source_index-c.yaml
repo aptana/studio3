@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::DependencyList::from_source_index
+params: (src_index)
+name: from_source_index
+is_singleton: true
+aliases: []
+

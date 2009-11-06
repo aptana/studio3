@@ -1,0 +1,22 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: create_ext_from_array
+- !ruby/object:RI::MethodSummary 
+  name: create_ext_from_hash
+- !ruby/object:RI::MethodSummary 
+  name: create_ext_from_string
+- !ruby/object:RI::MethodSummary 
+  name: create_extension
+class_methods: []
+
+full_name: OpenSSL::X509::ExtensionFactory
+constants: []
+
+superclass: Object
+name: ExtensionFactory

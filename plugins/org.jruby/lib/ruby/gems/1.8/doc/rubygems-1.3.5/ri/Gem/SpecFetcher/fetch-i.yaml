@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Fetch specs matching <tt>dependency</tt>. If <tt>all</tt> is true, all matching
+    (released) versions are returned. If <tt>matching_platform</tt> is false, all
+    platforms are returned. If <tt>prerelease</tt> is true, prerelease versions are
+    included.
+full_name: Gem::SpecFetcher#fetch
+params: (dependency, all = false, matching_platform = true, prerelease = false)
+name: fetch
+is_singleton: false
+aliases: []
+

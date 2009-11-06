@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: True if the command handles the given argument list.
+full_name: Gem::Command#handles?
+params: (args)
+name: handles?
+is_singleton: false
+aliases: []
+

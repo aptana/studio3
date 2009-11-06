@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>verify_gem_file (Gem::Validator)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/validator.rb, line 53</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">verify_gem_file</span>(<span class="ruby-identifier">gem_path</span>)
+    <span class="ruby-identifier">open</span> <span class="ruby-identifier">gem_path</span>, <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">binary_mode</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">gem_data</span> = <span class="ruby-identifier">file</span>.<span class="ruby-identifier">read</span>
+      <span class="ruby-identifier">verify_gem</span> <span class="ruby-identifier">gem_data</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">ENOENT</span>, <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EINVAL</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">VerificationError</span>, <span class="ruby-node">&quot;missing gem file #{gem_path}&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

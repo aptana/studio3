@@ -1,0 +1,16 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The index to insert activated gem paths into the $LOAD_PATH.
+- !ruby/struct:SM::Flow::P 
+  body: Defaults to the site lib directory unless gem_prelude.rb has loaded paths,
+    then it inserts the activated gem's paths before the gem_prelude.rb paths so you
+    can override the gem_prelude.rb default $LOAD_PATH paths.
+full_name: Gem::load_path_insert_index
+params: ()
+name: load_path_insert_index
+is_singleton: true
+aliases: []
+

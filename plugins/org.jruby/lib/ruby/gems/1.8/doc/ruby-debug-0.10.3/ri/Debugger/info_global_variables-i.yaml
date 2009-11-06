@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (*args)
+is_singleton: false
+block_params: 
+name: info_global_variables
+comment: 
+full_name: Debugger#info_global_variables
+visibility: public
+aliases: []
+
