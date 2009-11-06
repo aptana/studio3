@@ -629,4 +629,22 @@ public class GitRepository
 		index().refresh();
 		return true;
 	}
+
+	public String relativePath(IResource theResource)
+	{
+		String workingDirectory = workingDirectory();
+		String resourcePath = theResource.getLocationURI().getPath();
+		if (resourcePath.startsWith(workingDirectory))
+		{
+			resourcePath = resourcePath.substring(workingDirectory.length());
+			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
+				resourcePath = resourcePath.substring(1);
+		}
+		// What if we have some trailing slash or something?
+		if (resourcePath.length() == 0)
+		{
+			resourcePath = currentBranch();
+		}
+		return resourcePath;
+	}
 }

@@ -9,7 +9,12 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -26,9 +31,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.team.ui.history.HistoryPage;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
@@ -73,28 +82,66 @@ public class GitHistoryPage extends HistoryPage
 		if (resource == null)
 			return false;
 
-		// Generate the commit list and set the components up with it!
-		GitRepository repo = GitRepository.getAttached(resource.getProject());
-		GitRevList revList = new GitRevList(repo);
-		// Need the repo relative path
-		String workingDirectory = repo.workingDirectory();
-		String resourcePath = resource.getLocationURI().getPath();
-		if (resourcePath.startsWith(workingDirectory))
+		final IResource theResource = resource;
+		Job job = new Job("Collecting commit history...")
 		{
-			resourcePath = resourcePath.substring(workingDirectory.length());
-			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
-				resourcePath = resourcePath.substring(1);
-		}
-		// What if we have some trailing slash or something?
-		if (resourcePath.length() == 0)
-		{
-			resourcePath = repo.currentBranch();
-		}
-		repo.lazyReload();
-		revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath));
-		List<GitCommit> commits = revList.getCommits();
-		graph.setInput(commits);
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+				// Generate the commit list and set the components up with it!
+				GitRepository repo = GitRepository.getAttached(theResource.getProject());
+				if (repo == null)
+					return Status.OK_STATUS;
+				GitRevList revList = new GitRevList(repo);
+				// Need the repo relative path
+				String resourcePath = repo.relativePath(theResource);
+				if (subMonitor.isCanceled())
+					return Status.CANCEL_STATUS;
+				repo.lazyReload();
+				subMonitor.worked(5);
+				revList.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), subMonitor.newChild(95));
+				final List<GitCommit> commits = revList.getCommits();
+				Display.getDefault().asyncExec(new Runnable()
+				{
+
+					public void run()
+					{
+						graph.setInput(commits);
+					}
+				});
+				subMonitor.done();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setUser(true);
+		job.setPriority(Job.SHORT);
+		schedule(job);
 		return true;
+	}
+
+	private IWorkbenchPartSite getWorkbenchSite()
+	{
+		final IWorkbenchPart part = getHistoryPageSite().getPart();
+		return part != null ? part.getSite() : null;
+	}
+
+	private void schedule(final Job j)
+	{
+		final IWorkbenchPartSite site = getWorkbenchSite();
+		if (site == null)
+		{
+			j.schedule();
+			return;
+		}
+		final IWorkbenchSiteProgressService p = (IWorkbenchSiteProgressService) site
+				.getAdapter(IWorkbenchSiteProgressService.class);
+		if (p != null)
+		{
+			p.schedule(j, 0, true /* use half-busy cursor */);
+			return;
+		}
+		j.schedule();
 	}
 
 	@Override
@@ -128,7 +175,7 @@ public class GitHistoryPage extends HistoryPage
 		hookContextMenu(commentViewer);
 		layout();
 	}
-	
+
 	/**
 	 * hookContextMenu
 	 */
@@ -144,7 +191,7 @@ public class GitHistoryPage extends HistoryPage
 				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			}
 		});
-		
+
 		Menu menu = menuMgr.createContextMenu(browserControl);
 		browserControl.setMenu(menu);
 	}
@@ -170,7 +217,8 @@ public class GitHistoryPage extends HistoryPage
 
 				final IStructuredSelection sel = ((IStructuredSelection) s);
 				GitCommit commit = (GitCommit) sel.getFirstElement();
-				// TODO If we know the user's github project URL, we can point them to the GitHub URL for this instead of generating our own!
+				// TODO If we know the user's github project URL, we can point them to the GitHub URL for this instead
+				// of generating our own!
 				commentViewer.setText(commitToHTML(commit));
 				fileViewer.setInput(commit);
 			}
@@ -258,17 +306,17 @@ public class GitHistoryPage extends HistoryPage
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
 		String comment = commit.getComment();
 		// Auto convert references to URLs into links
-		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); 
+		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>");
 		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads
 		variables.put("\\{comment\\}", comment); //$NON-NLS-1$
-		
+
 		String avatar = ""; //$NON-NLS-1$
 		if (commit.getAuthorEmail() != null)
 		{
 			avatar = StringUtil.md5(commit.getAuthorEmail().toLowerCase());
 		}
 		variables.put("\\{avatar\\}", avatar); //$NON-NLS-1$
-		
+
 		StringBuilder parents = new StringBuilder();
 		if (commit.parents() != null && !commit.parents().isEmpty())
 		{
@@ -285,7 +333,8 @@ public class GitHistoryPage extends HistoryPage
 	{
 		try
 		{
-			InputStream stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(), new Path("templates").append("commit_details.html"), false); //$NON-NLS-1$ //$NON-NLS-2$
+			InputStream stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(),
+					new Path("templates").append("commit_details.html"), false); //$NON-NLS-1$ //$NON-NLS-2$
 			return IOUtil.read(stream);
 		}
 		catch (IOException e)

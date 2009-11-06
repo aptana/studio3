@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
@@ -29,37 +30,33 @@ public class GitFileHistory extends FileHistory implements IFileHistory
 
 	private IFileRevision[] buildRevisions(int flags, IProgressMonitor monitor)
 	{
-		GitRepository repo = GitRepository.getAttached(this.resource.getProject());
-		if (repo == null)
-			return new IFileRevision[0];		
-		// Need the repo relative path TODO Refactor this common code with the stuff in GitHistoryPage, lines 64-77
-		String workingDirectory = repo.workingDirectory();
-		String resourcePath = resource.getLocationURI().getPath();
-		if (resourcePath.startsWith(workingDirectory))
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+		try
 		{
-			resourcePath = resourcePath.substring(workingDirectory.length());
-			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\"))
-				resourcePath = resourcePath.substring(1);
+			GitRepository repo = GitRepository.getAttached(this.resource.getProject());
+			if (repo == null)
+				return new IFileRevision[0];
+			// Need the repo relative path
+			String resourcePath = repo.relativePath(resource);
+			List<IFileRevision> revisions = new ArrayList<IFileRevision>();
+			GitRevList list = new GitRevList(repo);
+			int max = -1;
+			if ((flags & IFileHistoryProvider.SINGLE_REVISION) == IFileHistoryProvider.SINGLE_REVISION)
+			{
+				max = 1;
+			}
+			list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), max, subMonitor.newChild(95));
+			List<GitCommit> commits = list.getCommits();
+			for (GitCommit gitCommit : commits)
+			{
+				revisions.add(new CommitFileRevision(gitCommit, resource.getProjectRelativePath().toPortableString()));
+			}
+			return revisions.toArray(new IFileRevision[revisions.size()]);
 		}
-		// What if we have some trailing slash or something?
-		if (resourcePath.length() == 0)
+		finally
 		{
-			resourcePath = repo.currentBranch();
-		}		
-		List<IFileRevision> revisions = new ArrayList<IFileRevision>();
-		GitRevList list = new GitRevList(repo);
-		int max = -1;
-		if ((flags & IFileHistoryProvider.SINGLE_REVISION) == IFileHistoryProvider.SINGLE_REVISION)
-		{
-			max = 1;
+			subMonitor.done();
 		}
-		list.walkRevisionListWithSpecifier(new GitRevSpecifier(resourcePath), max);
-		List<GitCommit> commits = list.getCommits();
-		for (GitCommit gitCommit : commits)
-		{
-			revisions.add(new CommitFileRevision(gitCommit, resource.getProjectRelativePath().toPortableString()));
-		}
-		return revisions.toArray(new IFileRevision[revisions.size()]);
 	}
 
 	public IFileRevision[] getContributors(IFileRevision revision)

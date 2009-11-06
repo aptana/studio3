@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+
 import com.aptana.git.core.GitPlugin;
 
 public class GitRevList
@@ -21,16 +26,15 @@ public class GitRevList
 		repository = repo;
 	}
 
-	// TODO This seems an odd model. Maybe we hide it and hang a method off the repo? Maybe we just return the commits
-	// as the return of the walk method calls? Should we take in progress monitors?
+	// TODO This seems an odd model. Maybe we hide it and hang a method off the repo?
 	/**
 	 * Walks a revision to collect all the commits in reverse chronological order.
 	 * 
 	 * @param gitRevSpecifier
 	 */
-	public void walkRevisionListWithSpecifier(GitRevSpecifier gitRevSpecifier)
+	public IStatus walkRevisionListWithSpecifier(GitRevSpecifier gitRevSpecifier, IProgressMonitor monitor)
 	{
-		walkRevisionListWithSpecifier(gitRevSpecifier, NO_LIMIT);
+		return walkRevisionListWithSpecifier(gitRevSpecifier, NO_LIMIT, monitor);
 	}
 
 	/**
@@ -40,8 +44,15 @@ public class GitRevList
 	 * @param max
 	 *            Maximum number of results to return. {@link #NO_LIMIT} represent no limit.
 	 */
-	public void walkRevisionListWithSpecifier(GitRevSpecifier rev, int max)
+	public IStatus walkRevisionListWithSpecifier(GitRevSpecifier rev, int max, IProgressMonitor monitor)
 	{
+		int units = max;
+		if (units == -1)
+		{
+			// If unknown, just use some huge fake number so that some progress is shown...
+			units = 100000;
+		}
+		SubMonitor subMonitor = SubMonitor.convert(monitor, units);
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
@@ -68,6 +79,8 @@ public class GitRevList
 		String directory = rev.getWorkingDirectory() != null ? rev.getWorkingDirectory() : repository
 				.workingDirectory();
 
+		if (subMonitor.isCanceled())
+			return Status.CANCEL_STATUS;
 		try
 		{
 			Process p = GitExecutable.instance().run(directory, arguments.toArray(new String[arguments.size()]));
@@ -76,6 +89,9 @@ public class GitRevList
 			int num = 0;
 			while (true)
 			{
+				if (subMonitor.isCanceled())
+					return Status.CANCEL_STATUS;
+				
 				String sha = getline(stream, '\1');
 				if (sha == null)
 					break;
@@ -142,10 +158,12 @@ public class GitRevList
 
 				int read = stream.read();
 				if (read != 0 && read != -1)
-					System.out.println("Error");
+					GitPlugin.logError("Error", null);
 
 				revisions.add(newCommit);
-
+				
+				subMonitor.worked(1);
+				
 				if (read == -1)
 					break;
 
@@ -153,7 +171,6 @@ public class GitRevList
 				{
 					setCommits(revisions);
 				}
-
 			}
 
 			long duration = System.currentTimeMillis() - start;
@@ -164,9 +181,13 @@ public class GitRevList
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e);
 		}
+		finally
+		{
+			subMonitor.done();
+		}
+		return Status.OK_STATUS;
 	}
 
 	private void logInfo(String string)
