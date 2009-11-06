@@ -103,6 +103,8 @@ public class GitIndex
 			}
 		});
 
+		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that shouldn't be there anymore (especially unstaged ones)
+		
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
 		{
@@ -166,9 +168,6 @@ public class GitIndex
 		if (r != -1)
 		{
 			String commitMessage = message.substring(r + 2);
-			// [[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexAmendMessageAvailable
-			// object: self
-			// userInfo:[NSDictionary dictionaryWithObject:commitMessage forKey:@"message"]];
 		}
 	}
 
@@ -582,10 +581,12 @@ public class GitIndex
 
 	private void postCommitFailure(String string)
 	{
+		GitPlugin.logError(string, null);
 	}
 
 	private void postCommitUpdate(String string)
 	{
+		GitPlugin.logInfo(string);
 	}
 
 	/**
