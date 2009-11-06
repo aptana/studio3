@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
@@ -55,7 +54,7 @@ public class GitHistoryPage extends HistoryPage
 	private Composite ourControl;
 	private SashForm graphDetailSplit;
 	private SashForm revInfoSplit;
-	private TableViewer graph;
+	private CommitGraphTable graph;
 	private Browser commentViewer;
 	private CommitFileDiffViewer fileViewer;
 
@@ -107,7 +106,7 @@ public class GitHistoryPage extends HistoryPage
 
 					public void run()
 					{
-						graph.setInput(commits);
+						graph.setCommits(commits);
 					}
 				});
 				subMonitor.done();
@@ -196,7 +195,7 @@ public class GitHistoryPage extends HistoryPage
 		browserControl.setMenu(menu);
 	}
 
-	private TableViewer createCommitTable(Composite parent)
+	private CommitGraphTable createCommitTable(Composite parent)
 	{
 		return new CommitGraphTable(parent);
 	}

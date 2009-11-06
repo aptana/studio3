@@ -39,14 +39,15 @@ class CommitGraphTable extends TableViewer
 
 	private BranchPainter renderer;
 	private Map<GitCommit, GraphCellInfo> decorations;
+	private List<GitCommit> commits;
 
 	CommitGraphTable(Composite parent)
 	{
-		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.VIRTUAL);
 
 		renderer = new BranchPainter(parent.getDisplay());
 
-		Table table = getTable();
+		final Table table = getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
 		final TableLayout layout = new TableLayout();
@@ -76,12 +77,31 @@ class CommitGraphTable extends TableViewer
 		createPaintListener(table);
 		table.addDisposeListener(new DisposeListener()
 		{
-			
+
 			public void widgetDisposed(DisposeEvent e)
 			{
-				renderer.dispose();				
+				renderer.dispose();
 			}
 		});
+
+		table.addListener(SWT.SetData, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				if (commits == null)
+					return;
+				TableItem item = (TableItem) event.item;
+				int index = table.indexOf(item);
+				item.setData(commits.get(index));
+			}
+		});
+	}
+
+	void setCommits(final List<GitCommit> commits)
+	{
+		this.commits = commits;
+		decorations = new GitGrapher().decorateCommits(commits);
+		getTable().setItemCount(commits.size());
 	}
 
 	/**
@@ -126,16 +146,6 @@ class CommitGraphTable extends TableViewer
 		event.gc.drawString(txt, event.x, event.y + texty, true);
 	}
 
-	@Override
-	protected void inputChanged(Object input, Object oldInput)
-	{
-		super.inputChanged(input, oldInput);
-
-		List<GitCommit> commits = (List<GitCommit>) input;
-		GitGrapher grapher = new GitGrapher();
-		decorations = grapher.decorateCommits(commits);
-	}
-
 	static class CommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
 	{
 
@@ -149,6 +159,8 @@ class CommitGraphTable extends TableViewer
 		public String getColumnText(Object element, int columnIndex)
 		{
 			GitCommit commit = (GitCommit) element;
+			if (commit == null)
+				return ""; //$NON-NLS-1$
 			switch (columnIndex)
 			{
 				case 0:
@@ -170,7 +182,7 @@ class CommitGraphTable extends TableViewer
 		private static final int HORIZONTAL_PADDING = 8;
 		private static final int LANE_WIDTH = 10;
 		private static final int LINE_WIDTH = 2;
-		
+
 		private GC g;
 		private int cellX;
 		private int cellY;
@@ -203,12 +215,12 @@ class CommitGraphTable extends TableViewer
 			purple = new Color(d, 112, 72, 121);
 			orange = new Color(d, 216, 112, 0);
 			laneColors = new Color[] { green, blue, yellow, purple, red, orange };
-			
+
 			refOrange = new Color(d, 253, 180, 97);
 			refBlue = new Color(d, 190, 229, 254);
 			refYellow = new Color(d, 252, 237, 96);
 			refColors = new Color[] { refOrange, refBlue, refYellow };
-			
+
 			sys_black = d.getSystemColor(SWT.COLOR_BLACK);
 			sys_white = d.getSystemColor(SWT.COLOR_WHITE);
 		}
@@ -239,31 +251,36 @@ class CommitGraphTable extends TableViewer
 
 		private void paintCommit(GitCommit commit, int height)
 		{
-			GraphCellInfo info = decorations.get(commit);
+			if (commit == null)
+				return;
+			GraphCellInfo info = (decorations == null ? null : decorations.get(commit));
 			int myLaneX = LANE_WIDTH + (LANE_WIDTH / 2);
 			int maxCenter = myLaneX;
-			for (GitGraphLine line : info.getLines())
+			if (info != null)
 			{
-				int y1 = 0;
-				int y2 = height / 2;
-				if (!line.isUpper())
+				for (GitGraphLine line : info.getLines())
 				{
-					y1 = height / 2;
-					y2 = height;
-				}
-				int x1 = (line.getFrom() * LANE_WIDTH) + (LANE_WIDTH / 2);
-				int x2 = (line.getTo() * LANE_WIDTH) + (LANE_WIDTH / 2);
-				maxCenter = Math.max(maxCenter, Math.max(x1, x2));
-				if (line.getTo() == info.getPosition())
-				{
-					if (x1 == x2)
-						myLaneX = x1 + (LINE_WIDTH / 2);
-					else
+					int y1 = 0;
+					int y2 = height / 2;
+					if (!line.isUpper())
 					{
-						myLaneX = Math.min(x1, x2) + (LINE_WIDTH / 2);
+						y1 = height / 2;
+						y2 = height;
 					}
+					int x1 = (line.getFrom() * LANE_WIDTH) + (LANE_WIDTH / 2);
+					int x2 = (line.getTo() * LANE_WIDTH) + (LANE_WIDTH / 2);
+					maxCenter = Math.max(maxCenter, Math.max(x1, x2));
+					if (line.getTo() == info.getPosition())
+					{
+						if (x1 == x2)
+							myLaneX = x1 + (LINE_WIDTH / 2);
+						else
+						{
+							myLaneX = Math.min(x1, x2) + (LINE_WIDTH / 2);
+						}
+					}
+					drawLine(color(line.getIndex()), x1, y1, x2, y2, LINE_WIDTH);
 				}
-				drawLine(color(line.getIndex()), x1, y1, x2, y2, LINE_WIDTH);
 			}
 			final int dotSize = computeDotSize(height);
 			final int dotX = myLaneX - dotSize / 2 - 1;
@@ -285,7 +302,7 @@ class CommitGraphTable extends TableViewer
 
 		protected int drawLabel(int x, int y, GitRef ref)
 		{
-			y+= 1;
+			y += 1;
 			String txt = ref.shortName();
 			if (ref.type().equals(GitRef.HEAD_TYPE))
 			{
