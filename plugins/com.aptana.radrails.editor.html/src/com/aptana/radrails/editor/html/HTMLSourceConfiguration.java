@@ -178,7 +178,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_STYLE = "__html_style";
 	public final static String HTML_TAG = "__html_tag";
 
-	public static final String[] CONTENT_TYPES = new String[] {
+	protected static final String[] CONTENT_TYPES = new String[] {
 		DEFAULT,
 		HTML_COMMENT,
 		CDATA,
