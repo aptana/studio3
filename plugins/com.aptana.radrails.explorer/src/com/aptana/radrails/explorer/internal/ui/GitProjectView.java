@@ -1415,6 +1415,10 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		{
 			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
 		}
+		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
+		{
+			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
+		}
 		else if (text.endsWith(".yml")) //$NON-NLS-1$
 		{
 			if (data instanceof IResource)
