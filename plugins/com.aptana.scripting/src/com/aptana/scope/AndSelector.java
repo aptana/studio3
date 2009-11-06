@@ -39,16 +39,20 @@ public class AndSelector implements ISelectorNode
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scope.ISelectorNode#matches(java.lang.String)
+	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
 	 */
-	public boolean matches(String scope)
+	public boolean matches(MatchContext context)
 	{
 		boolean result = false;
 		
+		context.pushCurrentStep();
+		
 		if (this._left != null && this._right != null)
 		{
-			result = this._left.matches(scope) && this._right.matches(scope);
+			result = this._right.matches(context) && this._left.matches(context);
 		}
+		
+		context.popCurrentStep(!result);
 		
 		return result;
 	}

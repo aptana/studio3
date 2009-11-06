@@ -39,13 +39,33 @@ public class OrSelector implements ISelectorNode
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scope.ISelectorNode#matches(java.lang.String)
+	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
 	 */
-	public boolean matches(String scope)
+	public boolean matches(MatchContext context)
 	{
-		return this._left.matches(scope) || this._right.matches(scope);
+		boolean result = false;
+		
+		context.pushCurrentStep();
+		
+		if (this._right != null)
+		{
+			result = this._right.matches(context);
+			
+			if (result == false && this._left != null)
+			{
+				result = this._left.matches(context);
+			}
+		}
+		
+		context.popCurrentStep(!result);
+		
+		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString()
 	{
