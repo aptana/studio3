@@ -1,5 +1,6 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -287,8 +288,22 @@ public class CommitDialog extends StatusDialog
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
 					return;
+				if (gitRepository.index().hasBinaryAttributes(file))
+				{
+					// Special code to draw the image if the binary file is an image
+					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg"};
+					for (String extension : imageExtensions)
+					{
+						if (file.getPath().endsWith(extension))
+						{
+							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
+							updateDiff("<img src=\"" + fullPath + "\" />");
+							return;
+						}
+					}
+				}
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				updateDiff(diff);				
+				updateDiff(diff);
 			}
 		});
 		return table;

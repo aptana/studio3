@@ -650,7 +650,7 @@ public class GitIndex
 		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
 	}
 
-	private boolean hasBinaryAttributes(ChangedFile file)
+	public boolean hasBinaryAttributes(ChangedFile file)
 	{
 		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary",
 				file.getPath());
