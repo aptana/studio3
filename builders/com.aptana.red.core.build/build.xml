@@ -166,15 +166,28 @@
 					<arg value="${git.executable} log --max-count=1 --pretty=format:'%ct' ." />
 				</exec>
 				<echo message="Replacing qualifier for @{file} with ${@{file}.committed.max}" />
-				<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+				<exec executable="grep" dir="@{file}" outputproperty="@{file}.hasQualifierLine" logerror="false" failifexecutionfails="false" failonerror="false">
+					<arg line="qualifier ./build.properties" />
+				</exec>
+				<if>
+					<equals arg1="${@{file}.hasQualifierLine}" arg2="" />
+					<then>
+						<echo message="no qualifier property, adding one" />
+						<concat append="true" destfile="@{file}/build.properties">qualifier = ${@{file}.committed.max}</concat>
+					</then>
+					<else>
+						<echo message="replacing qualifier value" />
+						<replaceregexp file="@{file}/build.properties" match="qualifier\s*=\s*context" replace="qualifier = ${@{file}.committed.max}" byline="true" />
+					</else>
+				</if>
 			</sequential>
 		</for>
 	</target>
-	
+
 	<target name="create-artifact-symlink">
 		<exec executable="unlink">
 			<arg value="${env.WORKSPACE}/build-artifacts" />
 		</exec>
-		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false"/>
+		<symlink link="${env.WORKSPACE}/build-artifacts" resource="${deploy.dir}" failonerror="false" />
 	</target>
 </project>
