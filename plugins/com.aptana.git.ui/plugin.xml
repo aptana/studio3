@@ -86,6 +86,18 @@
       </objectContribution>
    </extension>
    
+   <extension point="org.eclipse.ui.importWizards">
+      <category name="%Git_clone_category"
+	    id="com.aptana.git.ui.clone.category"/>
+      <wizard name="%Git_clone_wizard"
+	    icon="icons/obj16/import_obj.gif"
+	    class="com.aptana.git.ui.internal.wizards.CloneWizard"
+	    id="com.aptana.git.ui.wizards.CloneWizard"
+	    category="com.aptana.git.ui.clone.category">
+	    <description>%Git_clone_description</description>
+      </wizard>
+   </extension>
+   
    <extension point="org.eclipse.team.ui.configurationWizards">
       <wizard name="%SharingWizard_name"
 	    icon="icons/etool16/newconnect_wiz.gif"
