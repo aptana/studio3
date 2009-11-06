@@ -5,6 +5,8 @@ import java.io.StringWriter;
 
 import org.jruby.anno.JRubyMethod;
 
+import com.aptana.scope.ScopeSelector;
+
 public class Snippet
 {
 	private String _path;
@@ -65,6 +67,17 @@ public class Snippet
 	public String getScope()
 	{
 		return this._scope;
+	}
+	
+	/**
+	 * getScopeSelector
+	 * 
+	 * @return
+	 */
+	public ScopeSelector getScopeSelector()
+	{
+		// TODO: cache this
+		return new ScopeSelector(this._scope);
 	}
 	
 	/**
