@@ -55,7 +55,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			START_SWITCH_TAG,
 			END_SWITCH_TAG
 		};
-		
+			
 	private ISubPartitionScanner defaultPartitionScanner;
 	private ISubPartitionScanner primaryPartitionScanner;
 	
@@ -66,6 +66,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	private IExtendedPartitioner partitioner;
 	
 	private boolean hasSwitch = false;
+	
+	private DefaultTokenState defaultTokenState;
 		
 
 	/**
@@ -75,9 +77,10 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
 		this.defaultPartitionScanner = defaultPartitionScanner;
 		this.primaryPartitionScanner = primaryPartitionScanner;
+
 		defaultPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getDefaultSwitchStrategy());
 		primaryPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getPrimarySwitchStrategy());
-				
+					
 		String[][] pairs = partitionerSwitchStrategy.getSwitchTagPairs();
 		switchRules = new IPredicateRule[pairs.length*2];
 		for (int i = 0; i < pairs.length; ++i) {
@@ -86,12 +89,13 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		}
 				
 		currentPartitionScanner = defaultPartitionScanner;
+		setDefaultReturnToken(new Token(IDocument.DEFAULT_CONTENT_TYPE));
 	}
 
 	/**
 	 * @param partitioner the partitioner to set
 	 */
-	/* package */ void setPartitioner(IExtendedPartitioner partitioner) {
+	public /* package */ void setPartitioner(IExtendedPartitioner partitioner) {
 		this.partitioner = partitioner;
 	}
 
@@ -196,13 +200,13 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 					if (!token.isUndefined()) {
 						fContentType = null;
 						currentPartitionScanner.setLastToken(token);
-						return token;
+						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
 						break;
 					}
 					if (hasSwitchingSequence()) {
-						return currentPartitionScanner.getDefaultToken();
+						return getDefaultToken();
 					}
 				}
 			}
@@ -227,7 +231,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				IToken token = (switchRules[i].evaluate(this));
 				if (!token.isUndefined()) {
 					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
-					return token;
+					return returnToken(token);
 				}
 			}
 		} else {
@@ -237,22 +241,41 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 					if (!token.isUndefined()) {
 						currentPartitionScanner.setLastToken(token);
-						return token;
+						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
 						break;
 					}
 					if (hasSwitchingSequence()) {
-						return currentPartitionScanner.getDefaultToken();
+						return getDefaultToken();
 					}
 				}
 			} while (doResetRules);
 		}
 
 		if (read() == EOF) {
-			return Token.EOF;
+			return returnToken(Token.EOF);
 		}
-		return currentPartitionScanner.getDefaultToken();
+		return getDefaultToken();
+	}
+	
+	private IToken getDefaultToken() {
+		if (defaultTokenState == null) {
+			//defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
+		}
+		return fDefaultReturnToken;
+	}
+	
+	private IToken returnToken(IToken token) {
+		if (defaultTokenState != null) {
+			if (defaultTokenState.saveToken(token)) {
+				token = defaultTokenState.defaultToken;
+			} else {
+				defaultTokenState = null;
+			}
+		}
+		System.out.println("> "+token.getData() + " "+getTokenOffset()+":"+getTokenLength()); // XXX
+		return token;
 	}
 	
 	private boolean hasSwitchingSequence() {
@@ -261,6 +284,34 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			return true;
 		}
 		return false;
+	}
+	
+	private class DefaultTokenState {
+		private int offset;
+		private int length;
+		private int column;
+		private IToken defaultToken;
+		private IToken token;
+
+		public DefaultTokenState(IToken defaultToken) {
+			this.defaultToken = defaultToken;
+			this.offset = fTokenOffset;
+			this.column = getColumn();
+		}
+		
+		public boolean saveToken(IToken token) {
+			length = fTokenOffset - offset;
+			if (length == 0) {
+				return false;
+			}
+			this.token = token;
+			return true;
+		}
+		
+		public boolean hasToken() {
+			return token != null;
+		}
+				
 	}
 
 }
