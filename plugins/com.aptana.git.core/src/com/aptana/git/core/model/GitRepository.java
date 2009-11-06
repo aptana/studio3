@@ -48,7 +48,8 @@ public class GitRepository
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
-	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
+	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(
+			3);
 
 	public static void addListener(IGitRepositoryListener listener)
 	{
@@ -98,26 +99,23 @@ public class GitRepository
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
 		if (ref == null || ref.get() == null)
 		{
-			if (ref != null)
-			{
-				cachedRepos.remove(ref);
-			}
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
+			// Check to see if any cached repo has the same git dir
 			for (SoftReference<GitRepository> reference : cachedRepos.values())
 			{
-				if (reference == null)
+				if (reference == null || reference.get() == null)
 					continue;
 				GitRepository cachedRepo = reference.get();
-				if (cachedRepo == null)
-					continue;
 				if (cachedRepo.fileURL.getPath().equals(path.getPath()))
 				{
+					// Same git dir, so cache under our new path as well
 					cachedRepos.put(path.getPath(), reference);
 					return cachedRepo;
 				}
 			}
+			// no cache for this repo or any repo sharing same git dir
 			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
@@ -601,8 +599,8 @@ public class GitRepository
 				"refs/heads/" + branchName);
 		return result.keySet().iterator().next() == 0;
 	}
-        
-        public boolean deleteFile(String filePath)
+
+	public boolean deleteFile(String filePath)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
 		if (result.keySet().iterator().next() != 0)
