@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,9 +152,13 @@ public class BundleManager
 
 		for (Bundle bundle : this._bundles)
 		{
-			Command[] commands = bundle.getCommands();
-
-			result.addAll(Arrays.asList(commands));
+			for (Command command : bundle.getCommands())
+			{
+				if (command.getScopeSelector().matches(scope))
+				{
+					result.add(command);
+				}
+			}
 		}
 
 		return result.toArray(new Command[result.size()]);
@@ -194,9 +197,13 @@ public class BundleManager
 
 		for (Bundle bundle : this._bundles)
 		{
-			Snippet[] snippets = bundle.getSnippets();
-
-			result.addAll(Arrays.asList(snippets));
+			for (Snippet snippet : bundle.getSnippets())
+			{
+				if (snippet.getScopeSelector().matches(scope))
+				{
+					result.add(snippet);
+				}
+			}
 		}
 
 		return result.toArray(new Snippet[result.size()]);
