@@ -36,7 +36,9 @@
 package com.aptana.radrails.editor.common;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -61,6 +63,19 @@ public final class TextUtils {
 			}			
 		}
 		return list.toArray(new String[list.size()]);
+	}
+	
+	public static char[][] removeDuplicates(char[][] arrays) {
+		List<char[]> list = new ArrayList<char[]>();
+		Set<String> strings = new HashSet<String>();
+		for (char[] i : arrays) {
+			String string = String.valueOf(i);
+			if (!strings.contains(string)) {
+				list.add(i);
+				strings.add(string);
+			}
+		}
+		return list.toArray(new char[list.size()][]);
 	}
 	
 }

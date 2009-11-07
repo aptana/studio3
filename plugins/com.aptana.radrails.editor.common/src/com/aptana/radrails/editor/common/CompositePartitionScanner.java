@@ -61,7 +61,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	
 	private ISubPartitionScanner currentPartitionScanner;
 	
-	private IPredicateRule[] switchRules;
+	private IPredicateRule[][] switchRules;
 		
 	private IExtendedPartitioner partitioner;
 	
@@ -82,10 +82,12 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		primaryPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getPrimarySwitchStrategy());
 					
 		String[][] pairs = partitionerSwitchStrategy.getSwitchTagPairs();
-		switchRules = new IPredicateRule[pairs.length*2];
+		switchRules = new IPredicateRule[pairs.length][];
 		for (int i = 0; i < pairs.length; ++i) {
-			switchRules[2*i] = new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG));
-			switchRules[2*i+1] = new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG));
+			switchRules[i] = new IPredicateRule[] {
+					new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG)),
+					new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG))
+			};
 		}
 				
 		currentPartitionScanner = defaultPartitionScanner;
@@ -230,7 +232,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			hasSwitch = false;
 			boolean toPrimary = (currentPartitionScanner == defaultPartitionScanner);
 			for (int i = 0; i < switchRules.length; ++i) {
-				IToken token = (switchRules[i].evaluate(this));
+				IToken token = (switchRules[i][toPrimary ? 0 : 1].evaluate(this));
 				if (!token.isUndefined()) {
 					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
 					return returnToken(token);

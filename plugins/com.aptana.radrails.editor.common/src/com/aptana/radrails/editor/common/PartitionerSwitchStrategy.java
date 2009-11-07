@@ -54,7 +54,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 			endSequences[i] = switchSequencePairs[i][1].toCharArray();
 		}
 
-		switchSequences = new char[][][] { startSequences, endSequences };
+		switchSequences = new char[][][] { TextUtils.removeDuplicates(startSequences), TextUtils.removeDuplicates(endSequences) };
 		escapeSequences = new char[escapeSequencePairs.length][][];
 		for (int i = 0; i < escapeSequencePairs.length; ++i) {
 			escapeSequences[i] = new char[][] {
