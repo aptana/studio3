@@ -1,6 +1,11 @@
 package com.aptana.scripting.model;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.jruby.anno.JRubyMethod;
+
+import com.aptana.scope.ScopeSelector;
 
 public class Command
 {
@@ -88,6 +93,17 @@ public class Command
 	}
 	
 	/**
+	 * getScopeSelector
+	 * 
+	 * @return
+	 */
+	public ScopeSelector getScopeSelector()
+	{
+		// TODO: cache this
+		return new ScopeSelector(this._scope);
+	}
+	
+	/**
 	 * setDisplayName
 	 * 
 	 * @param displayName
@@ -132,6 +148,16 @@ public class Command
 	}
 
 	/**
+	 * setPath
+	 * 
+	 * @param path
+	 */
+	void setPath(String path)
+	{
+		this._path = path;
+	}
+	
+	/**
 	 * setScope
 	 * 
 	 * @param scope
@@ -140,5 +166,26 @@ public class Command
 	public void setScope(String scope)
 	{
 		this._scope = scope;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString()
+	{
+		StringWriter sw = new StringWriter();
+		PrintWriter writer = new PrintWriter(sw);
+		
+		// open snippet
+		writer.append("  command \"").append(this._displayName).println("\" {");
+		
+		// show body
+		writer.append("    path: ").println(this._path);
+		
+		// close snippet
+		writer.println("  }");
+		
+		return sw.toString();
 	}
 }

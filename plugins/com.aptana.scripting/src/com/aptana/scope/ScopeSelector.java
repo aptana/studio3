@@ -11,63 +11,23 @@ public class ScopeSelector
 	private ISelectorNode _root;
 	
 	/**
-	 * parse
+	 * ScopeSelector
 	 * 
-	 * @param selector
-	 * @return
+	 * @param root
 	 */
-	public static ScopeSelector parse(String selector)
+	ScopeSelector(ISelectorNode root)
 	{
-		Stack<ISelectorNode> stack = new Stack<ISelectorNode>();
-		ScopeSelector result = null;
-		
-		// simple parser for "and" and "or"
-		String[] ors = or_split.split(selector);
-		
-		for (String or : ors)
-		{
-			// process ands
-			String[] ands = and_split.split(or);
-			int currentSize = stack.size();
-			
-			for (String and : ands)
-			{
-				stack.push(new NameSelector(and));
-				
-				if (stack.size() > currentSize + 1)
-				{
-					ISelectorNode right = stack.pop();
-					ISelectorNode left = stack.pop();
-					
-					stack.push(new AndSelector(left, right));
-				}
-			}
-			
-			if (stack.size() > 1)
-			{
-				ISelectorNode right = stack.pop();
-				ISelectorNode left = stack.pop();
-				
-				stack.push(new OrSelector(left, right));
-			}
-		}
-		
-		if (stack.size() > 0)
-		{
-			result = new ScopeSelector(stack.pop());
-		}
-		
-		return result;
+		this._root = root;
 	}
 	
 	/**
 	 * ScopeSelector
 	 * 
-	 * @param root
+	 * @param selector
 	 */
-	public ScopeSelector(ISelectorNode root)
+	public ScopeSelector(String selector)
 	{
-		this._root = root;
+		this.parse(selector);
 	}
 	
 	/**
@@ -75,7 +35,7 @@ public class ScopeSelector
 	 * 
 	 * @return
 	 */
-	public ISelectorNode getRoot()
+	ISelectorNode getRoot()
 	{
 		return this._root;
 	}
@@ -90,12 +50,61 @@ public class ScopeSelector
 	{
 		boolean result = false;
 		
-		if (scope != null)
+		if (this._root != null && scope != null)
 		{
-			result = this._root.matches(scope);
+			MatchContext context = new MatchContext(scope);
+			
+			result = this._root.matches(context);
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * parse
+	 * 
+	 * @param selector
+	 * @return
+	 */
+	private void parse(String selector)
+	{
+		Stack<ISelectorNode> stack = new Stack<ISelectorNode>();
+		
+		if (selector != null)
+		{
+			// simple parser for "and" and "or"
+			String[] ors = or_split.split(selector);
+			
+			for (String or : ors)
+			{
+				// process ands
+				String[] ands = and_split.split(or);
+				int currentSize = stack.size();
+				
+				for (String and : ands)
+				{
+					stack.push(new NameSelector(and));
+					
+					if (stack.size() > currentSize + 1)
+					{
+						ISelectorNode right = stack.pop();
+						ISelectorNode left = stack.pop();
+						
+						stack.push(new AndSelector(left, right));
+					}
+				}
+				
+				if (stack.size() > 1)
+				{
+					ISelectorNode right = stack.pop();
+					ISelectorNode left = stack.pop();
+					
+					stack.push(new OrSelector(left, right));
+				}
+			}
+		}
+		
+		this._root = (stack.size() > 0) ? stack.pop() : null;
 	}
 
 	/*

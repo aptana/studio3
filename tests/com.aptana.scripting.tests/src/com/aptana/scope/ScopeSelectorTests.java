@@ -12,7 +12,7 @@ public class ScopeSelectorTests
 	public void parseSimpleName()
 	{
 		String scope = "source.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
@@ -29,7 +29,7 @@ public class ScopeSelectorTests
 	public void parseSimpleAndSelector()
 	{
 		String scope = "text.html source.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
@@ -51,7 +51,7 @@ public class ScopeSelectorTests
 	public void parseSimpleOrSelector()
 	{
 		String scope = "text.html, source.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 		
 		// make sure we parsed successfully
 		assertNotNull(selector);
@@ -73,7 +73,7 @@ public class ScopeSelectorTests
 	public void parseMultiAndSelector()
 	{
 		String scope = "text.html source.ruby string.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
@@ -95,7 +95,7 @@ public class ScopeSelectorTests
 	public void parseMultiOrSelector()
 	{
 		String scope = "text.html, source.ruby, string.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 		
 		// make sure we parsed successfully
 		assertNotNull(selector);
@@ -118,7 +118,7 @@ public class ScopeSelectorTests
 	public void parseMultiMixedSelector()
 	{
 		String scope = "text.html source.ruby, text.erb source.ruby, source.ruby string.ruby";
-		ScopeSelector selector = ScopeSelector.parse(scope);
+		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);

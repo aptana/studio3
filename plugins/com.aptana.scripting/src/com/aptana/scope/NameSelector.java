@@ -14,22 +14,35 @@ public class NameSelector implements ISelectorNode
 		this._name = name;
 	}
 	
-	/**
-	 * matches
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.ISelectorNode#matches(com.aptana.scope.MatchContext)
 	 */
-	public boolean matches(String scope)
+	public boolean matches(MatchContext context)
 	{
 		boolean result = false;
 		
 		if (this._name != null)
 		{
-			if (scope.startsWith(this._name))
+			String step = context.getCurrentStep();
+			
+			if (step != null)
 			{
-				int nameLength = this._name.length();
-				int scopeLength = scope.length();
-				
-				result = (scopeLength == nameLength || scope.charAt(nameLength) == '.');
+				if (step.startsWith(this._name))
+				{
+					// step matches as a prefix, now make sure we matched the whole step
+					// or up to a period
+					int nameLength = this._name.length();
+					int scopeLength = step.length();
+					
+					result = (scopeLength == nameLength || step.charAt(nameLength) == '.');
+				}
 			}
+		}
+		
+		if (result)
+		{
+			context.advance();
 		}
 		
 		return result;

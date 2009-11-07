@@ -5,7 +5,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.IStartup;
 
-import com.aptana.scripting.model.BundleLoader;
+import com.aptana.scripting.model.BundleManager;
 
 /**
  * EarlyStartup
@@ -31,6 +31,6 @@ public class EarlyStartup implements IStartup
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 
 		// go ahead and process the workspace now to process bundles that exist already
-		BundleLoader.getInstance().loadProjectBundles();
+		BundleManager.getInstance().loadProjectBundles();
 	}
 }
