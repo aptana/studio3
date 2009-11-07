@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Editor Scripting
+Bundle-SymbolicName: com.aptana.editor.scripting;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: com.aptana.editor.scripting.Activator
+Bundle-Vendor: Aptana Inc.
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy; exclude:="com.aptana.editor.scripting.startup, com.aptana.editor.scripting.actions"

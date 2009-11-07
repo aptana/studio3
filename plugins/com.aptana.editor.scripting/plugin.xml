@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.editor.scripting.startup.EditorScriptingStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            description="Expand the snippets specified by the prefix"
+            id="com.aptana.editor.scripting.command.ExpandSnippet"
+            name="Expand Snippet Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.editor.scripting.command.ExpandSnippet"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="TAB">
+      </key>
+   </extension>
+</plugin>
