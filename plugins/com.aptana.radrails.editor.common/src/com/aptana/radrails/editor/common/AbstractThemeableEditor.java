@@ -15,6 +15,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
 {
 

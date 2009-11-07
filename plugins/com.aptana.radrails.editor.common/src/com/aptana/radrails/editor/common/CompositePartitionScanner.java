@@ -176,7 +176,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			System.out.println("> "+token.getData());
+			System.out.println("> "+token.getData() + " "+getTokenOffset()+":"+getTokenLength()); // XXX
 			return token;
 		}
 		if (fContentType == null || hasSwitch) {
@@ -191,8 +191,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		
 		IToken token;
 
-		boolean doResetRules = false;
+		boolean doResetRules;
 		do {
+			doResetRules = false;
 			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 				token = rule.getSuccessToken();
 				if (fContentType.equals(token.getData())) {
@@ -200,6 +201,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 					if (!token.isUndefined()) {
 						fContentType = null;
 						currentPartitionScanner.setLastToken(token);
+						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
@@ -235,12 +237,14 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				}
 			}
 		} else {
-			boolean doResetRules = false;
+			boolean doResetRules;
 			do {
+				doResetRules = false;
 				for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 					if (!token.isUndefined()) {
 						currentPartitionScanner.setLastToken(token);
+						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
@@ -261,7 +265,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	
 	private IToken getDefaultToken() {
 		if (defaultTokenState == null) {
-			//defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
+			defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
 		}
 		return fDefaultReturnToken;
 	}
