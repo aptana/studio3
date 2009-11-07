@@ -10,7 +10,7 @@
             name="Expand Snippet">
       </command>
    </extension>
-   <extension
+   <!-- extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="TabSnippetExpansion.command"
@@ -21,69 +21,9 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors.templates">
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="1st tab stop"
-            name="1"
-            type="1">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="2nd tab stop"
-            name="2"
-            type="2">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="3rd tab stop"
-            name="3"
-            type="3">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="4th tab stop"
-            name="4"
-            type="4">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="5th tab stop"
-            name="5"
-            type="5">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="6th tab stop"
-            name="6"
-            type="6">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="7th tab stop"
-            name="7"
-            type="7">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="8th tab stop"
-            name="8"
-            type="8">
-      </resolver>
-      <resolver
-            class="tabstops.TabStopVariableResolver"
-            contextTypeId="snippets"
-            description="9th tab stop"
-            name="9"
-            type="9">
-      </resolver>
-
-  </extension>
+      <contextType
+            class="tabsnippetexpansion.SnippetTemplateContextType"
+            id="snippets">
+      </contextType>
+  </extension -->
 </plugin>
