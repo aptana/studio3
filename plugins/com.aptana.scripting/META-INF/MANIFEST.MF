@@ -12,3 +12,6 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/jruby.jar,
  .
+Export-Package: com.aptana.scope,
+ com.aptana.scripting,
+ com.aptana.scripting.model
