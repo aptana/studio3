@@ -3,6 +3,11 @@
  */
 package com.aptana.editor.scripting.actions;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -14,6 +19,8 @@ import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.scripting.Activator;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.Snippet;
 
 class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
@@ -34,21 +41,54 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	protected Image getImage(Template template) {
 		return Activator.getDefault().getImage(Activator.SNIPPET);
 	}
-
-	private static Template[] templates = new Template[] {
-		new SnippetTemplate("contact", "Insert Contact", "snippets", 
+	
+	@Override
+	protected Template[] getTemplates(String contextTypeId) {
+		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope("source.ruby.rails");
+		List<Template> templates = new LinkedList<Template>();
+		templates.add(new SnippetTemplate("contact",
+				"Insert Contact",
+				"snippets", 
 				  "----------------------------\n"
 				+ "First Name : ${firstName:2}\n"
 				+ "Last Name  : ${lastName:1}\n"
 				+ "Full Name  : Mr./Mrs./Ms. ${firstName}, ${lastName}\n"
-				+ "Description: ${cursor}\n"
+				+ "Description: ${0}\n"
 				+ "----------------------------\n"
-				,true)
-	};
+				,true));
+		for (Snippet snippet : snippetsFromScope) {
+			String expansion = snippet.getExpansion();
+			
+			templates.add(new SnippetTemplate(
+					snippet.getTrigger(),
+					snippet.getDisplayName(),
+					"snippets", 
+					processExpansion(expansion),
+					true));
+		}
+		return templates.toArray(new Template[0]);
+	}
 	
-	@Override
-	protected Template[] getTemplates(String contextTypeId) {
-		return templates;
+	private static final String SPACES= "\\s*+"; //$NON-NLS-1$
+	
+	// Transform Textmate variable syntax into Eclipse variable syntax
+	private static String processExpansion(String expansion) {
+		// cursor $ or ${0} to ${cursor}
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}"));
+		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}"));
+		
+		// transform ${n:default value} to ${default value:n} where n is a digit
+		expansion = expansion.replaceAll(
+				  "\\$\\{" 
+				+ SPACES
+				+ "(\\d)"
+				+ SPACES
+				+ ":"
+				+ SPACES
+				+ "(\\w+)"
+				+ "\\}"
+				,"\\${$2:$1}");
+		return expansion;
 	}
 	
 	@Override

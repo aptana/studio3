@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -29,14 +27,9 @@ public class DocumentSnippetTemplateContext extends DocumentTemplateContext {
 	
 	static final String TAB_STOP_TYPES = "123456789";
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public TemplateBuffer evaluate(Template template)
 			throws BadLocationException, TemplateException {
-		String pattern = template.getPattern();
-		if (pattern.contains("${0}")) {
-			template.setPattern(pattern.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")));
-		}
 		TemplateBuffer templateBuffer = super.evaluate(template);
 		// Sort tab stop variable if any
 		TemplateVariable[] variables = templateBuffer.getVariables();
