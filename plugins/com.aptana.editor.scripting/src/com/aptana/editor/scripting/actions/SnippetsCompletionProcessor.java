@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -104,5 +105,26 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 			return new DocumentSnippetTemplateContext(contextType, document, region.getOffset(), region.getLength());
 		}
 		return null;
+	}
+	
+	// Allow any non-whitespace as a prefix.
+	protected String extractPrefix(ITextViewer viewer, int offset) {
+		int i= offset;
+		IDocument document= viewer.getDocument();
+		if (i > document.getLength())
+			return ""; //$NON-NLS-1$
+
+		try {
+			while (i > 0) {
+				char ch= document.getChar(i - 1);
+				if (Character.isWhitespace(ch))
+					break;
+				i--;
+			}
+
+			return document.get(i, offset - i);
+		} catch (BadLocationException e) {
+			return ""; //$NON-NLS-1$
+		}
 	}
 }

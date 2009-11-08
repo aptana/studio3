@@ -81,7 +81,7 @@ public class ExpandSnippetAction extends TextEditorAction {
 			int caretOffset = textWidget.getCaretOffset();
 			if (caretOffset > 0) {
 				String text = textWidget.getText(caretOffset-1, caretOffset-1);
-				if (Character.isJavaIdentifierPart(text.charAt(0))) {
+				if (!Character.isWhitespace(text.charAt(0))) {
 					activate();
 					return;
 				}
