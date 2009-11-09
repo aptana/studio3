@@ -290,7 +290,11 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 				if (hoveredItem != null && hoveredItem.equals(t))
 					return;
 				final Rectangle oldBounds = hoveredItem == null ? null : hoveredItem.getBounds();
-				hoveredItem = t;
+				IResource data = (IResource) t.getData();
+				if (data.getType() == IResource.FILE)
+					hoveredItem = t;
+				else
+					hoveredItem = null;
 				final Rectangle newBounds = hoveredItem == null ? null : hoveredItem.getBounds();
 				Display.getDefault().asyncExec(new Runnable()
 				{
