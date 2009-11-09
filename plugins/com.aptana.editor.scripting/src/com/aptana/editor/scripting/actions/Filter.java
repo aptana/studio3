@@ -39,7 +39,7 @@ import com.aptana.editor.scripting.Activator;
 
 @SuppressWarnings("deprecation")
 public class Filter {
-	static final String DEFAULT_CONSOLE_NAME = "Eclipse Mate";
+	static final String DEFAULT_CONSOLE_NAME = "Command Ouput";
 
 	public static Map<String, String> computeEnvironment(IWorkbenchWindow workbenchWindow, IEditorPart editorPart) {
 		Map<String, String> environment = new TreeMap<String, String>();
