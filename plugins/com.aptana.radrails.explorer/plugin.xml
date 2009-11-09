@@ -9,7 +9,7 @@
             class="com.aptana.radrails.explorer.internal.ui.GitProjectView"
             icon="icons/full/cview16/filenav_nav.gif"
             id="org.eclipse.ui.examples.navigator.view"
-            name="Git View"
+            name="%view.name"
             restorable="true">
       </view>
    </extension>
@@ -48,7 +48,7 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonFilter
             id="com.aptana.radrails.explorer.filters.hideNonRailsProjects"
-            name="Hide non-Rails Projects">
+            name="%commonFilter.name">
          <filterExpression>
             <not>
                <adapt
@@ -64,7 +64,7 @@
       <commonFilter
             activeByDefault="true"
             id="com.aptana.radrails.explorer.filters.hideNonActiveProjects"
-            name="Hide non-active projects">
+            name="%commonFilter.name.0">
              <filterExpression>
             <not>
                <adapt
