@@ -25,6 +25,7 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
+	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String BUNDLES_FOLDER_NAME = "bundles"; //$NON-NLS-1$
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
@@ -303,7 +304,7 @@ public class BundleManager
 		{
 			List<String> loadPaths = getLoadPaths(file);
 
-			if (file.getName().toLowerCase().endsWith(".rb")) //$NON-NLS-1$
+			if (file.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
 			{
 				String fullPath = file.getLocation().toPortableString();
 
@@ -327,7 +328,7 @@ public class BundleManager
 			{
 				for (IResource resource : folder.members())
 				{
-					if (resource.getName().toLowerCase().endsWith(".rb")) //$NON-NLS-1$
+					if (resource.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
 					{
 						String fullPath = resource.getLocation().toPortableString();
 
@@ -417,15 +418,21 @@ public class BundleManager
 			{
 				if (parentFolder.getName().equals(SNIPPETS_FOLDER_NAME))
 				{
-					bundle.removeSnippet(file.getLocation().toPortableString());
+					Snippet[] snippets = bundle.findSnippetsFromPath(file.getLocation().toPortableString());
+					
+					for (Snippet snippet : snippets)
+					{
+						bundle.removeSnippet(snippet);
+					}
 				}
 				else if (parentFolder.getName().equals(COMMANDS_FOLDER_NAME))
 				{
-					bundle.removeCommand(file.getLocation().toPortableString());
-				}
-				else
-				{
-					// do nothing
+					Command[] commands = bundle.findCommandsFromPath(file.getLocation().toPortableString());
+					
+					for (Command command : commands)
+					{
+						bundle.removeCommand(command);
+					}
 				}
 			}
 		}
