@@ -263,7 +263,7 @@ public class GitRepository
 		return rev;
 	}
 
-	private GitRevSpecifier headRef()
+	public GitRevSpecifier headRef()
 	{
 		if (_headRef != null)
 			return _headRef;
@@ -586,10 +586,27 @@ public class GitRepository
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
 	}
 
-	public boolean createBranch(String branchName)
+	/**
+	 * @param branchName
+	 *            Name of the new branch
+	 * @param track
+	 *            Whether this branch should track the start point
+	 * @param startPoint
+	 *            branch name, commit id, or ref/tag to create the branch off of. Null/empty assumes "HEAD"
+	 * @return
+	 */
+	public boolean createBranch(String branchName, boolean track, String startPoint)
 	{
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(workingDirectory(), "branch", branchName);
+		List<String> args = new ArrayList<String>();
+		args.add("branch");
+		if (track)
+			args.add("--track");
+		args.add(branchName);
+		if (startPoint != null && startPoint.trim().length() > 0)
+			args.add(startPoint);
+
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				args.toArray(new String[args.size()]));
 		return result.keySet().iterator().next() == 0;
 	}
 
@@ -644,5 +661,25 @@ public class GitRepository
 			resourcePath = currentBranch();
 		}
 		return resourcePath;
+	}
+
+	/**
+	 * Returns the set of short names for all simple refs that are local or remote branches or tags.
+	 * 
+	 * @return
+	 */
+	public Set<String> allSimpleRefs()
+	{
+		Set<String> allRefs = new HashSet<String>();
+		for (GitRevSpecifier revSpec : branches)
+		{
+			if (!revSpec.isSimpleRef())
+				continue;
+			GitRef ref = revSpec.simpleRef();
+			if (ref == null || ref.type() == null)
+				continue;
+			allRefs.add(ref.shortName());
+		}
+		return allRefs;
 	}
 }

@@ -885,32 +885,16 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 		// If user selected "Create New..." then pop a dialog to generate a new branch
 		if (branchName.equals(CREATE_NEW_BRANCH_TEXT))
 		{
-			InputDialog dialog = new InputDialog(getSite().getShell(),
-					Messages.GitProjectView_CreateBranchDialog_Title,
-					Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-1$
-					new IInputValidator()
-					{
-
-						public String isValid(String newText)
-						{
-							if (newText == null || newText.trim().length() == 0)
-								return Messages.GitProjectView_NonEmptyBranchNameMessage;
-							if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
-								return Messages.GitProjectView_NoWhitespaceBranchNameMessage;
-							if (repo.localBranches().contains(newText.trim()))
-								return Messages.GitProjectView_BranchAlreadyExistsMessage;
-							if (!repo.validBranchName(newText.trim()))
-								return Messages.GitProjectView_InvalidBranchNameMessage;
-							return null;
-						}
-					});
+			CreateBranchDialog dialog = new CreateBranchDialog(getSite().getShell(), repo);
 			if (dialog.open() != Window.OK)
 			{
 				revertToCurrentBranch(repo);
 				return false;
 			}
 			branchName = dialog.getValue().trim();
-			if (!repo.createBranch(branchName))
+			boolean track = dialog.track();
+			String startPoint = dialog.getStartPoint();
+			if (!repo.createBranch(branchName, track, startPoint))
 			{
 				revertToCurrentBranch(repo);
 				return false;
