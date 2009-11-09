@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -245,7 +243,8 @@ public class GitProjectView extends CommonNavigator implements IGitRepositoryLis
 					return;
 				if (eyeball != null)
 				{
-					lastDrawnX = event.x + event.width + IMAGE_MARGIN;
+					int itemWidth = item.getBounds().width;					
+					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
 					int imageHeight = eyeball.getBounds().height;
 					int y = event.y + (itemHeight - imageHeight) / 2;
