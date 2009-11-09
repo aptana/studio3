@@ -9,4 +9,22 @@
             name="Themes">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.textEditor"
+            description="Show the scopes at caret offset."
+            id="com.aptana.radrails.editor.common.showscopes"
+            name="Show scopes">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.radrails.editor.common.showscopes"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Shift+P">
+      </key>
+   </extension>
 </plugin>
