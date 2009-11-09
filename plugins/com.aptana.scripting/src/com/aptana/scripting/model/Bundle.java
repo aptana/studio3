@@ -347,10 +347,10 @@ public class Bundle
 		PrintWriter writer = new PrintWriter(sw);
 		
 		// open bundle
-		writer.append("bundle \"").append(this._displayName).println("\" {");
+		writer.append("bundle \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
-		writer.append("  path: ").println(this._path);
+		writer.append("  path: ").println(this._path); //$NON-NLS-1$
 		
 		// output commands
 		if (this._commands != null)
@@ -371,7 +371,7 @@ public class Bundle
 		}
 		
 		// close bundle
-		writer.print("}");
+		writer.print("}"); //$NON-NLS-1$
 		
 		return sw.toString();
 	}

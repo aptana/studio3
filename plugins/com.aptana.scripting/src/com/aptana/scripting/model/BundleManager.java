@@ -102,7 +102,7 @@ public class BundleManager
 		catch (IOException e)
 		{
 			String message = MessageFormat.format(
-				"Error locating built-ins directory",
+				Messages.BundleManager_Cannot_Locate_Built_Ins_Directory,
 				new Object[] { url.toString() }
 			);
 
@@ -111,7 +111,7 @@ public class BundleManager
 		catch (URISyntaxException e)
 		{
 			String message = MessageFormat.format(
-				"Malformed built-ins directory URI",
+				Messages.BundleManager_Malformed_Built_Ins_URI,
 				new Object[] { url.toString() }
 			);
 
@@ -180,7 +180,7 @@ public class BundleManager
 		loadPaths.add(this.getBuiltinsLoadPath());
 		loadPaths.add(bundlesFolder.getLocation().toPortableString());
 		loadPaths.add(bundleFolder.getLocation().toPortableString());
-		loadPaths.add(".");
+		loadPaths.add("."); //$NON-NLS-1$
 
 		return loadPaths;
 	}
@@ -266,7 +266,7 @@ public class BundleManager
 	 */
 	public void processBundle(IFolder bundleRoot, boolean processChildren)
 	{
-		IFile bundleFile = bundleRoot.getFile("bundle.rb");
+		IFile bundleFile = bundleRoot.getFile("bundle.rb"); //$NON-NLS-1$
 		String bundlePath = bundleRoot.getLocation().toPortableString();
 
 		if (bundleFile.exists())
@@ -275,7 +275,7 @@ public class BundleManager
 			List<String> loadPaths = new ArrayList<String>();
 
 			loadPaths.add(this.getBuiltinsLoadPath());
-			loadPaths.add(".");
+			loadPaths.add("."); //$NON-NLS-1$
 
 			ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
 
@@ -288,7 +288,7 @@ public class BundleManager
 		}
 		else
 		{
-			System.out.println("No bundle.rb for " + bundlePath);
+			System.out.println(Messages.BundleManager_Missing_Bundle_File + bundlePath);
 		}
 	}
 
@@ -303,7 +303,7 @@ public class BundleManager
 		{
 			List<String> loadPaths = getLoadPaths(file);
 
-			if (file.getName().toLowerCase().endsWith(".rb"))
+			if (file.getName().toLowerCase().endsWith(".rb")) //$NON-NLS-1$
 			{
 				String fullPath = file.getLocation().toPortableString();
 
@@ -327,7 +327,7 @@ public class BundleManager
 			{
 				for (IResource resource : folder.members())
 				{
-					if (resource.getName().toLowerCase().endsWith(".rb"))
+					if (resource.getName().toLowerCase().endsWith(".rb")) //$NON-NLS-1$
 					{
 						String fullPath = resource.getLocation().toPortableString();
 

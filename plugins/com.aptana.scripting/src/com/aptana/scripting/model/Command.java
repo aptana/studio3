@@ -178,13 +178,13 @@ public class Command
 		PrintWriter writer = new PrintWriter(sw);
 		
 		// open snippet
-		writer.append("  command \"").append(this._displayName).println("\" {");
+		writer.append("  command \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
-		writer.append("    path: ").println(this._path);
+		writer.append("    path: ").println(this._path); //$NON-NLS-1$
 		
 		// close snippet
-		writer.println("  }");
+		writer.println("  }"); //$NON-NLS-1$
 		
 		return sw.toString();
 	}

@@ -66,7 +66,7 @@ public class ScriptingEngine
 		
 		// TODO: $0 should work, but until then, we'll use this hack so script
 		// can't get its full path
-		container.put("$fullpath", fullPath);
+		container.put("$fullpath", fullPath); //$NON-NLS-1$
 		container.runScriptlet(PathType.ABSOLUTE, fullPath);
 	}
 }
