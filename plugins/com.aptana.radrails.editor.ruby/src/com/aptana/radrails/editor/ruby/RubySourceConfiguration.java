@@ -134,6 +134,9 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
         reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
         reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+        
+        reconciler.setDamager(dr, DEFAULT);
+        reconciler.setRepairer(dr, DEFAULT);
 
         dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
         reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
