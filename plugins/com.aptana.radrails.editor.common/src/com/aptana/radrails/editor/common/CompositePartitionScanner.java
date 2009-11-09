@@ -133,6 +133,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				}
 				currentPartitionScanner.setLastToken(new Token(type));
 			}
+		} else if (primaryPartitionScanner.hasContentType(contentType)) {
+			currentPartitionScanner = primaryPartitionScanner;
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
 	}
