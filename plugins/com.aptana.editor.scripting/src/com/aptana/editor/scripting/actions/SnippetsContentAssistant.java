@@ -14,6 +14,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		enableAutoActivation(false);
 //		enableAutoInsert(true);
 		enablePrefixCompletion(true);
+		setInformationControlCreator(null);
 	}
 	
 	@Override
@@ -24,4 +25,5 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		}
 		return contentAssistProcessor;
 	}
+	
 }

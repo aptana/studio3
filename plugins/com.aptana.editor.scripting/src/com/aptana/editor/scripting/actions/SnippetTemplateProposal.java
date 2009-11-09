@@ -58,5 +58,5 @@ public class SnippetTemplateProposal extends TemplateProposal {
 			document.removeDocumentListener(documentListener);			
 		}
 	}
-
+	
 }

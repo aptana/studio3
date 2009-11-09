@@ -18,7 +18,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.scripting.actions.ExecuteLineInsertingResultAction;
 import com.aptana.editor.scripting.actions.ExpandSnippetAction;
+import com.aptana.editor.scripting.actions.FilterThroughCommandAction;
 
 public class EditorScriptingStartup implements IStartup {
 	private static IPartListener partListener = new IPartListener() {
@@ -120,8 +122,11 @@ public class EditorScriptingStartup implements IStartup {
 	private static void addAction(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor) {
 			ITextEditor textEditor = (ITextEditor) editorPart;
-			// TODO Check in editable
-			textEditor.setAction(ExpandSnippetAction.COMMAND_ID, ExpandSnippetAction.create(textEditor));
+			if (textEditor.isEditable()) {
+				textEditor.setAction(ExpandSnippetAction.COMMAND_ID, ExpandSnippetAction.create(textEditor));
+				textEditor.setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(textEditor));
+				textEditor.setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(textEditor));
+			}
 		}
 	}
 }

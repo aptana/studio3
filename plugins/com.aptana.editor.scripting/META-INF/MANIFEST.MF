@@ -7,8 +7,12 @@ Bundle-Activator: com.aptana.editor.scripting.Activator
 Bundle-Vendor: Aptana Inc.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.filesystem,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
+ org.eclipse.ui.console,
+ org.eclipse.ui.ide,
  com.aptana.scripting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy; exclude:="com.aptana.editor.scripting.startup, com.aptana.editor.scripting.actions"
