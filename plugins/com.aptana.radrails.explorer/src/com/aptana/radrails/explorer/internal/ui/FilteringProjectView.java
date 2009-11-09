@@ -22,6 +22,7 @@ import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -89,6 +90,8 @@ public class FilteringProjectView extends GitProjectView
 	protected Object[] fExpandedElements;
 
 	private Composite focus;
+	private Color fHoverBGColor;
+	protected Color fLastBGColor;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -154,7 +157,7 @@ public class FilteringProjectView extends GitProjectView
 					return;
 				if (eyeball != null)
 				{
-					int itemWidth = item.getBounds().width;
+					int itemWidth = item.getParent().getClientArea().width;
 					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
 					int imageHeight = eyeball.getBounds().height;
@@ -202,9 +205,15 @@ public class FilteringProjectView extends GitProjectView
 				final Rectangle oldBounds = hoveredItem == null ? null : hoveredItem.getBounds();
 				IResource data = (IResource) t.getData();
 				if (data.getType() == IResource.FILE)
+				{
 					hoveredItem = t;
+					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
+						fLastBGColor = hoveredItem.getBackground();
+					hoveredItem.setBackground(getHoverBackgroundColor());
+				}
 				else
 					hoveredItem = null;
+
 				final Rectangle newBounds = hoveredItem == null ? null : hoveredItem.getBounds();
 				Display.getDefault().asyncExec(new Runnable()
 				{
@@ -735,6 +744,7 @@ public class FilteringProjectView extends GitProjectView
 	private void removeHoveredItem()
 	{
 		final Rectangle bounds = hoveredItem.getBounds();
+		hoveredItem.setBackground(fLastBGColor);
 		hoveredItem = null;
 		Display.getDefault().asyncExec(new Runnable()
 		{
@@ -746,4 +756,20 @@ public class FilteringProjectView extends GitProjectView
 		});
 	}
 
+	protected Color getHoverBackgroundColor()
+	{
+		if (fHoverBGColor == null)
+		{
+			fHoverBGColor = new Color(Display.getDefault(), 240, 250, 255);
+		}
+		return fHoverBGColor;
+	}
+
+	@Override
+	public void dispose()
+	{
+		if (fHoverBGColor != null)
+			fHoverBGColor.dispose();
+		super.dispose();
+	}
 }
