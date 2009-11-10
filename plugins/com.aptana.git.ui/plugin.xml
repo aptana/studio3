@@ -52,7 +52,14 @@
                label="%CommitAction_label"
                menubarPath="team.main/targetGroup"
                tooltip="%CommitAction_tooltip">
-         </action>      
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
+               id="com.aptana.git.ui.internal.actions.SwitchBranchAction"
+               label="%SwitchBranchAction_label"
+               menubarPath="team.main/projectGroup"
+               tooltip="%SwitchBranchAction_tooltip">
+         </action>    
       </objectContribution>
       <objectContribution
             adaptable="true"
