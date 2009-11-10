@@ -61,6 +61,7 @@
                class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
                enablesFor="+"
                id="com.aptana.git.ui.internal.actions.SwitchBranchAction"
+               definitionId="com.aptana.git.ui.command.switch_branch"
                label="%SwitchBranchAction_label"
                menubarPath="team.main/group2"
                style="pulldown"
@@ -69,6 +70,7 @@
          <action
                class="com.aptana.git.ui.internal.actions.CreateBranchAction"
                id="com.aptana.git.ui.internal.actions.CreateBranchAction"
+               definitionId="com.aptana.git.ui.command.create_branch"
                label="%CreateBranchAction_label"
                menubarPath="team.main/group2"
                tooltip="%CreateBranchAction_tooltip">
@@ -213,6 +215,16 @@
             id="com.aptana.git.ui.command.unstage"
             name="%UnstageAction_tooltip">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.create_branch"
+            name="%CreateBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.switch_branch"
+            name="%SwitchBranchAction_tooltip">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -254,6 +266,18 @@
       </key>
       <key
             commandId="com.aptana.git.ui.command.stage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.create_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.switch_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+G">

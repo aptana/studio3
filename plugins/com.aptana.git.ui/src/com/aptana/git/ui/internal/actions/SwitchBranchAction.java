@@ -8,18 +8,21 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
 public class SwitchBranchAction implements IObjectActionDelegate, IMenuCreator
 {
@@ -166,7 +169,18 @@ public class SwitchBranchAction implements IObjectActionDelegate, IMenuCreator
 
 	public void run(IAction action)
 	{
-		// Never called because we're a menu
+		// Called when keybinding is used
+		IResource resource = getSelectedResource();
+		if (resource == null)
+			return;
+
+		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		if (repo == null)
+			return;
+
+		BranchDialog dialog = new BranchDialog(Display.getDefault().getActiveShell(), repo);
+		if (dialog.open() == Window.OK)
+			repo.switchBranch(dialog.getBranch());
 	}
 
 }
