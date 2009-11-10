@@ -65,7 +65,7 @@ class GitProjectRefresher implements IGitRepositoryListener
 				child = parent;
 			}
 		}
-		refreshResources(files);
+		refreshResources(files, IResource.DEPTH_ONE);
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
@@ -83,10 +83,10 @@ class GitProjectRefresher implements IGitRepositoryListener
 				affectedProjects.add(project);
 		}
 
-		refreshResources(affectedProjects);
+		refreshResources(affectedProjects, IResource.DEPTH_INFINITE);
 	}
 
-	private void refreshResources(final Collection<? extends IResource> resources)
+	private void refreshResources(final Collection<? extends IResource> resources, final int depth)
 	{
 		WorkspaceJob job = new WorkspaceJob("Refresh projects")
 		{
@@ -99,7 +99,7 @@ class GitProjectRefresher implements IGitRepositoryListener
 				{
 					if (sub.isCanceled())
 						return Status.CANCEL_STATUS;
-					resource.refreshLocal(IResource.DEPTH_INFINITE, sub.newChild(100));
+					resource.refreshLocal(depth, sub.newChild(100));
 				}
 				sub.done();
 				return Status.OK_STATUS;
