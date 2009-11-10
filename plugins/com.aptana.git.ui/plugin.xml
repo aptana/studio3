@@ -57,16 +57,16 @@
                class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
                id="com.aptana.git.ui.internal.actions.SwitchBranchAction"
                label="%SwitchBranchAction_label"
-               menubarPath="team.main/projectGroup"
+               menubarPath="team.main/group2"
                tooltip="%SwitchBranchAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.internal.actions.CreateBranchAction"
                id="com.aptana.git.ui.internal.actions.CreateBranchAction"
                label="%CreateBranchAction_label"
-               menubarPath="team.main/projectGroup"
+               menubarPath="team.main/group2"
                tooltip="%CreateBranchAction_tooltip">
-         </action>    
+         </action>
       </objectContribution>
       <objectContribution
             adaptable="true"
