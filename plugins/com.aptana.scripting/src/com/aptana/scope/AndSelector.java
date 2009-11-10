@@ -64,6 +64,6 @@ public class AndSelector implements ISelectorNode
 	@Override
 	public String toString()
 	{
-		return this._left.toString() + " " + this._right.toString();
+		return this._left.toString() + " " + this._right.toString(); //$NON-NLS-1$
 	}
 }

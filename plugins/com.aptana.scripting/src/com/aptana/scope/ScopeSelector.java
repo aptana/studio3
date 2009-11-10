@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 
 public class ScopeSelector
 {
-	private static final Pattern or_split = Pattern.compile("\\s*,\\s*");
-	private static final Pattern and_split = Pattern.compile("\\s+");
+	private static final Pattern or_split = Pattern.compile("\\s*,\\s*"); //$NON-NLS-1$
+	private static final Pattern and_split = Pattern.compile("\\s+"); //$NON-NLS-1$
 	
 	private ISelectorNode _root;
 	

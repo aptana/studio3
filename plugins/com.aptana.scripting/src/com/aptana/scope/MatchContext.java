@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class MatchContext
 {
-	private static final Pattern spaces = Pattern.compile("\\s+");
+	private static final Pattern spaces = Pattern.compile("\\s+"); //$NON-NLS-1$
 	private String[] _steps;
 	private int _currentIndex;
 	private Stack<Integer> _savedPositions;

@@ -110,14 +110,16 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 		if (file != null && file.getLocation() != null)
 		{
 			BundleManager manager = BundleManager.getInstance();
-
+			
 			switch (delta.getKind())
 			{
 				case IResourceDelta.ADDED:
+					System.out.println("Added");
 					BundleManager.getInstance().processSnippetOrCommand(file);
 					break;
 
 				case IResourceDelta.REMOVED:
+					System.out.println("Removed");
 					BundleManager.getInstance().removeSnippetOrCommand(file);
 					break;
 
@@ -133,7 +135,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 							manager.processSnippetOrCommand(file);
 						}
 					}
-					if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
+					else if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
 					{
 						IPath movedToPath = delta.getMovedToPath();
 						IResource movedTo = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(movedToPath);
@@ -144,12 +146,12 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 							manager.processSnippetOrCommand((IFile) movedTo);
 						}
 					}
-					if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
+					else if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 					{
 						manager.removeSnippetOrCommand(file);
 						manager.processSnippetOrCommand(file);
 					}
-					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
+					else if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
 					{
 						manager.removeSnippetOrCommand(file);
 						manager.processSnippetOrCommand(file);
@@ -157,6 +159,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 					break;
 			}
 		}
+		
 
 		return visitChildren;
 	}

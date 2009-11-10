@@ -1,5 +1,6 @@
 require "java"
 require "radrails/bundle_manager"
+require "radrails/scope_selector"
 
 module RadRails
   
@@ -46,7 +47,7 @@ module RadRails
     end
     
     def scope=(scope)
-      @jobj.scope = scope
+      @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
     end
     
     def to_s

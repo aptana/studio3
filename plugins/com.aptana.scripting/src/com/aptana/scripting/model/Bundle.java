@@ -3,9 +3,7 @@ package com.aptana.scripting.model;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jruby.anno.JRubyMethod;
 
@@ -24,8 +22,6 @@ public class Bundle
 	
 	private List<Snippet> _snippets;
 	private List<Command> _commands;
-	private Map<String,Snippet> _snippetsByPath;
-	private Map<String,Command> _commandsByPath;
 
 	/**
 	 * Bundle
@@ -51,14 +47,8 @@ public class Bundle
 			{
 				this._commands = new ArrayList<Command>();
 			}
-			
-			if (this._commandsByPath == null)
-			{
-				this._commandsByPath = new HashMap<String, Command>();
-			}
 
 			this._commands.add(command);
-			this._commandsByPath.put(command.getPath(), command);
 		}
 	}
 
@@ -76,17 +66,59 @@ public class Bundle
 			{
 				this._snippets = new ArrayList<Snippet>();
 			}
-			
-			if (this._snippetsByPath == null)
-			{
-				this._snippetsByPath = new HashMap<String, Snippet>();
-			}
 
 			this._snippets.add(snippet);
-			this._snippetsByPath.put(snippet.getPath(), snippet);
 		}
 	}
 
+	/**
+	 * findCommandsFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public Command[] findCommandsFromPath(String path)
+	{
+		List<Command> result = new ArrayList<Command>();
+		
+		if (path != null && path.length() > 0 && this._commands != null)
+		{
+			for (Command command : this._commands)
+			{
+				if (path.equals(command.getPath()))
+				{
+					result.add(command);
+				}
+			}
+		}
+		
+		return result.toArray(new Command[result.size()]);
+	}
+	
+	/**
+	 * findSnippetsFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public Snippet[] findSnippetsFromPath(String path)
+	{
+		List<Snippet> result = new ArrayList<Snippet>();
+		
+		if (path != null && path.length() > 0 && this._snippets != null)
+		{
+			for (Snippet snippet : this._snippets)
+			{
+				if (path.equals(snippet.getPath()))
+				{
+					result.add(snippet);
+				}
+			}
+		}
+		
+		return result.toArray(new Snippet[result.size()]);
+	}
+	
 	/**
 	 * getAuthor
 	 * 
@@ -217,9 +249,7 @@ public class Bundle
 			{
 				String newCommandPath = path + command.getPath().substring(oldPathLength);
 
-				this._commandsByPath.remove(command.getPath());
 				command.setPath(newCommandPath);
-				this._commandsByPath.put(newCommandPath, command);
 			}
 		}
 
@@ -230,9 +260,7 @@ public class Bundle
 			{
 				String newSnippetPath = path + snippet.getPath().substring(oldPathLength);
 
-				this._snippetsByPath.remove(snippet.getPath());
 				snippet.setPath(newSnippetPath);
-				this._snippetsByPath.put(newSnippetPath, snippet);
 			}
 		}
 	}
@@ -240,16 +268,13 @@ public class Bundle
 	/**
 	 * removeCommand
 	 * 
-	 * @param path
+	 * @param command
 	 */
 	@JRubyMethod(name = "remove_command")
-	public void removeCommand(String path)
+	public void removeCommand(Command command)
 	{
-		Command command = this._commandsByPath.get(path);
-		
-		if (command != null)
+		if (this._commands != null)
 		{
-			this._commandsByPath.remove(path);
 			this._commands.remove(command);
 		}
 	}
@@ -257,16 +282,13 @@ public class Bundle
 	/**
 	 * removeSnippet
 	 * 
-	 * @param path
+	 * @param snippet
 	 */
 	@JRubyMethod(name = "remove_snippet")
-	public void removeSnippet(String path)
+	public void removeSnippet(Snippet snippet)
 	{
-		Snippet snippet = this._snippetsByPath.get(path);
-		
-		if (snippet != null)
+		if (this._snippets != null)
 		{
-			this._snippetsByPath.remove(path);
 			this._snippets.remove(snippet);
 		}
 	}
@@ -347,10 +369,10 @@ public class Bundle
 		PrintWriter writer = new PrintWriter(sw);
 		
 		// open bundle
-		writer.append("bundle \"").append(this._displayName).println("\" {");
+		writer.append("bundle \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
-		writer.append("  path: ").println(this._path);
+		writer.append("  path: ").println(this._path); //$NON-NLS-1$
 		
 		// output commands
 		if (this._commands != null)
@@ -371,7 +393,7 @@ public class Bundle
 		}
 		
 		// close bundle
-		writer.print("}");
+		writer.print("}"); //$NON-NLS-1$
 		
 		return sw.toString();
 	}
