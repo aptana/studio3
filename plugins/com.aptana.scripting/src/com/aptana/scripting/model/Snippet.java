@@ -158,7 +158,8 @@ public class Snippet
 		writer.append("  snippet \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
-		writer.append("    path: ").println(this._path); //$NON-NLS-1$
+		writer.append("    path:  ").println(this._path); //$NON-NLS-1$
+		writer.append("    scope: ").println(this._scope); //$NON-NLS-1$
 		
 		// close snippet
 		writer.println("  }"); //$NON-NLS-1$
