@@ -212,6 +212,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 						break;
 					}
 					if (hasSwitchingSequence()) {
+						fContentType = null;
 						return getDefaultToken();
 					}
 				}
