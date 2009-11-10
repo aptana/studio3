@@ -179,6 +179,8 @@ public class GitRepository
 
 	public boolean switchBranch(String branchName)
 	{
+		if (branchName == null)
+			return false;
 		String oldBranchName = currentBranch.simpleRef().shortName();
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
 				branchName);
@@ -613,7 +615,7 @@ public class GitRepository
 	public boolean validBranchName(String branchName)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format",
-				"refs/heads/" + branchName);
+				GitRef.REFS_HEADS + branchName);
 		return result.keySet().iterator().next() == 0;
 	}
 
