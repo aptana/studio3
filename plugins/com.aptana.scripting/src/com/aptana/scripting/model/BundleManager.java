@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -12,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -20,6 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.URIUtil;
 import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scripting.Activator;
@@ -34,6 +36,9 @@ public class BundleManager
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
 
+	private List<Bundle> _bundles;
+	private Map<String, Bundle> _bundlesByPath;
+	
 	/**
 	 * getInstance
 	 * 
@@ -49,9 +54,6 @@ public class BundleManager
 
 		return INSTANCE;
 	}
-	private List<Bundle> _bundles;
-
-	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * BundleManager
@@ -99,7 +101,8 @@ public class BundleManager
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
-			File file = new File(fileURL.toURI());
+			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
+			File file = new File(fileURI);
 
 			result = file.getAbsolutePath();
 		}
@@ -310,7 +313,7 @@ public class BundleManager
 	 * @param bundleRoot
 	 * @param processChildren
 	 */
-	public void processBundle(IFolder bundleRoot, boolean processChildren)
+	public void processBundle(IResource bundleRoot, boolean processChildren)
 	{
 		this.processBundle(bundleRoot.getLocation().toFile(), processChildren);
 	}
@@ -408,7 +411,7 @@ public class BundleManager
 	 * 
 	 * @param file
 	 */
-	public void processSnippetOrCommand(IFile file)
+	public void processSnippetOrCommand(IResource file)
 	{
 		if (file != null)
 		{
@@ -454,16 +457,16 @@ public class BundleManager
 	}
 
 	/**
-	 * removeFile
+	 * removeSnippetOrCommand
 	 * 
 	 * @param file
 	 */
-	public void removeSnippetOrCommand(IFile file)
+	public void removeSnippetOrCommand(IResource file)
 	{
 		if (file != null)
 		{
-			IFolder parentFolder = (IFolder) file.getParent();
-			IFolder bundleFolder = (IFolder) parentFolder.getParent();
+			IContainer parentFolder = file.getParent();
+			IContainer bundleFolder = parentFolder.getParent();
 			Bundle bundle = this.getBundleFromPath(bundleFolder.getLocation().toPortableString());
 			
 			if (bundle != null)

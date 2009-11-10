@@ -3,7 +3,6 @@ package com.aptana.scripting;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -49,12 +48,12 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 	 */
 	private boolean processBundle(IResourceDelta delta)
 	{
-		IFile file = (IFile) delta.getResource();
+		IResource file = delta.getResource();
 		boolean visitChildren = true;
 
 		if (file != null && file.getLocation() != null)
 		{
-			IFolder bundleFolder = (IFolder) file.getParent();
+			IResource bundleFolder = file.getParent();
 			String bundleFolderPath = bundleFolder.getLocation().toPortableString();
 
 			switch (delta.getKind())
@@ -104,7 +103,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 	 */
 	private boolean processFile(IResourceDelta delta)
 	{
-		IFile file = (IFile) delta.getResource();
+		IResource file = delta.getResource();
 		boolean visitChildren = true;
 
 		if (file != null && file.getLocation() != null)
@@ -131,7 +130,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 						
 						if (movedFrom != null && movedFrom instanceof IFile)
 						{
-							manager.removeSnippetOrCommand((IFile) movedFrom);
+							manager.removeSnippetOrCommand(movedFrom);
 							manager.processSnippetOrCommand(file);
 						}
 					}
@@ -143,7 +142,7 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 						if (movedTo != null && movedTo instanceof IFile)
 						{
 							manager.removeSnippetOrCommand(file);
-							manager.processSnippetOrCommand((IFile) movedTo);
+							manager.processSnippetOrCommand(movedTo);
 						}
 					}
 					else if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
@@ -159,7 +158,6 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 					break;
 			}
 		}
-		
 
 		return visitChildren;
 	}
