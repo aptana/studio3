@@ -49,8 +49,17 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 				StyledText styledText = (StyledText) textViewer.getTextWidget();
 				int caretOffset = styledText.getCaretOffset();
 				int lineAtCaret = styledText.getLineAtOffset(caretOffset);
-				int startOffsetOfLineAtCaret = styledText.getOffsetAtLine(lineAtCaret+1);
-				styledText.replaceTextRange(startOffsetOfLineAtCaret, 0, output);
+				int lineCount = styledText.getLineCount();
+				int startOffsetOfLineAtCaret = -1;
+				String prefix = "";
+				if (lineAtCaret == (lineCount - 1)) {
+					// We are on the last line
+					startOffsetOfLineAtCaret = styledText.getCharCount();
+					prefix = styledText.getLineDelimiter();
+				} else {
+					startOffsetOfLineAtCaret = styledText.getOffsetAtLine(lineAtCaret+1);					
+				}
+				styledText.replaceTextRange(startOffsetOfLineAtCaret, 0, prefix + output);
 			} catch (InterruptedException e) {
 				// TODO
 			}
