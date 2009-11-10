@@ -6,11 +6,23 @@
       <editor
             class="com.aptana.radrails.editor.html.HTMLEditor"
             default="true"
-            extensions="html, htm"
             icon="icons/html.png"
             id="com.aptana.radrails.editor.html"
             name="HTML Editor (Aptana)">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.html">
+         </contentTypeBinding>
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="html,htm"
+            id="com.aptana.radrails.contenttype.html"
+            name="HTML"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>
