@@ -55,6 +55,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
 	protected void createActions() {
 		super.createActions();
-		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this));
+		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 	}
 }
