@@ -25,6 +25,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
@@ -324,6 +325,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+	}
+
+	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 	}
 

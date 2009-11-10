@@ -27,6 +27,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 
 /**
  * Listens to repository changes and forces the relevant resources in the workspace to refresh.
@@ -70,7 +71,12 @@ class GitProjectRefresher implements IGitRepositoryListener
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// TODO Auto-generated method stub
+		// do nothing
+	}
+
+	public void repositoryRemoved(RepositoryRemovedEvent e)
+	{
+		// do nothing
 	}
 
 	protected void refreshAffectedProjects(GitRepository repo)

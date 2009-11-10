@@ -1,10 +1,12 @@
 package com.aptana.git.core.model;
 
-public class RepositoryAddedEvent extends RepositoryEvent
+import org.eclipse.core.resources.IProject;
+
+public class RepositoryAddedEvent extends ProjectRepositoryEvent
 {
 
-	RepositoryAddedEvent(GitRepository repository)
+	RepositoryAddedEvent(GitRepository repository, IProject p)
 	{
-		super(repository);
+		super(repository, p);
 	}
 }

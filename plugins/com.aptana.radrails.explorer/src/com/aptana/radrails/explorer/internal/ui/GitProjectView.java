@@ -4,9 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -27,6 +29,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.progress.UIJob;
 
@@ -36,6 +39,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
@@ -70,12 +74,17 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private FormData showGitDetailsData;
 	private FormData hideGitDetailsData;
 
+	private Composite initGit;
+
+	private Button createRepoButton;
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
 		super.createPartControl(aParent);
 
 		GitRepository.addListener(this);
+
 	}
 
 	@Override
@@ -93,6 +102,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
 		createGitDetailsComposite(gitStuff, bottom);
+		createInitGitComposite(gitStuff, bottom);
 		createExpandCollapseButton(gitDetails);
 		createGitBranchCombo(gitDetails);
 		createFilterButton(gitDetails);
@@ -374,6 +384,73 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		gitDetails.setLayoutData(hideGitDetailsData);
 	}
 
+	private void createInitGitComposite(Composite parent, Composite top)
+	{
+		initGit = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		initGit.setLayout(layout);
+
+		Label label = new Label(initGit, SWT.WRAP);
+		label.setText("Project has no git repository. Create one?");
+
+		createRepoButton = new Button(initGit, SWT.PUSH);
+		createRepoButton.setText("Initialize repo");
+		createRepoButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				createRepoButton.setEnabled(false);
+				Job job = new Job("Initializing repo")
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						SubMonitor sub = SubMonitor.convert(monitor, 100);
+						try
+						{
+							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
+							if (repo == null)
+							{
+								if (sub.isCanceled())
+									return Status.CANCEL_STATUS;
+								GitRepository.create(selectedProject.getLocationURI().getPath());
+							}
+							sub.worked(50);
+							if (sub.isCanceled())
+								return Status.CANCEL_STATUS;
+							GitRepository.attachExisting(selectedProject, sub.newChild(50));
+						}
+						catch (CoreException e)
+						{
+							return e.getStatus();
+						}
+						finally
+						{
+							sub.done();
+							Display.getDefault().asyncExec(new Runnable()
+							{
+
+								public void run()
+								{
+									createRepoButton.setEnabled(true);
+								}
+							});
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+
+		initGit.setLayoutData(hideGitDetailsData);
+	}
+
 	@Override
 	public void dispose()
 	{
@@ -509,10 +586,9 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					branchCombo.setVisible(false);
 					summary.setVisible(false);
 					gitDetails.setLayoutData(hideGitDetailsData);
-
-					FormData gitStuffLayoutData = (FormData) gitStuff.getLayoutData();
-					gitStuffLayoutData.height = 0;
-					gitStuff.setLayoutData(gitStuffLayoutData);
+					// TODO We need to detect if the project really has no repo or is just unattached to it's existing
+					// one!
+					initGit.setLayoutData(showGitDetailsData);
 				}
 				else
 				{
@@ -537,9 +613,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					gitFilter.setVisible(true);
 					branchCombo.setVisible(true);
 					gitDetails.setLayoutData(showGitDetailsData);
-					FormData gitStuffLayoutData = (FormData) gitStuff.getLayoutData();
-					gitStuffLayoutData.height = SWT.DEFAULT;
-					gitStuff.setLayoutData(gitStuffLayoutData);
+					initGit.setLayoutData(hideGitDetailsData);
 					// Make the summary as wide as the project combo, and as tall as the 3 icons
 					GridData summaryData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true);
 					summaryData.verticalSpan = 2;
@@ -621,10 +695,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// TODO Someone may have just attached the current project to a repo! We need to update our UI if they did
-		GitRepository repo = e.getRepository();
-		GitRepository selectedRepo = GitRepository.getAttached(selectedProject);
-		if (selectedRepo != null && selectedRepo.equals(repo))
+		IProject changed = e.getProject();
+		if (changed != null && changed.equals(selectedProject))
 			refreshUI(e.getRepository());
 	}
 
@@ -640,5 +712,12 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	{
 		// TODO The files also have to be children of the active project!
 		return !repository.index().changedFiles().isEmpty();
+	}
+
+	public void repositoryRemoved(RepositoryRemovedEvent e)
+	{
+		IProject changed = e.getProject();
+		if (changed != null && changed.equals(selectedProject))
+			refreshUI(null);
 	}
 }

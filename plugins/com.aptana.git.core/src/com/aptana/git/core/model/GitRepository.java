@@ -119,6 +119,7 @@ public class GitRepository
 			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
+		// TODO What if the underlying .git dir was wiped while we still had the object cached?
 		return ref.get();
 	}
 
@@ -347,9 +348,9 @@ public class GitRepository
 			listener.indexChanged(e);
 	}
 
-	private static void fireRepositoryAddedEvent(GitRepository repo)
+	private static void fireRepositoryAddedEvent(GitRepository repo, IProject project)
 	{
-		RepositoryAddedEvent e = new RepositoryAddedEvent(repo);
+		RepositoryAddedEvent e = new RepositoryAddedEvent(repo, project);
 		for (IGitRepositoryListener listener : listeners)
 			listener.repositoryAdded(e);
 	}
@@ -546,7 +547,7 @@ public class GitRepository
 		{
 			RepositoryProvider.map(project, GitRepositoryProvider.ID);
 			m.worked(10);
-			fireRepositoryAddedEvent(repo);
+			fireRepositoryAddedEvent(repo, project);
 			m.worked(50);
 		}
 		catch (TeamException e)
@@ -683,5 +684,22 @@ public class GitRepository
 			allRefs.add(ref.shortName());
 		}
 		return allRefs;
+	}
+
+	/**
+	 * Used when the user disconnects the project from the repository. We should notify listeners that the repo has been
+	 * unattached. We should also flush the cached copy.
+	 * 
+	 * @param p
+	 */
+	public static void removeRepository(IProject p)
+	{
+		GitRepository repo = getUnattachedExisting(p.getLocationURI());
+		if (repo != null)
+			cachedRepos.remove(p.getLocationURI().getPath());
+
+		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
+		for (IGitRepositoryListener listener : listeners)
+			listener.repositoryRemoved(e);
 	}
 }

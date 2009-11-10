@@ -23,4 +23,11 @@ public interface IGitRepositoryListener
 	 * @param e
 	 */
 	public void branchChanged(BranchChangedEvent e);
+
+	/**
+	 * Called when a repository is unmapped from a project
+	 * 
+	 * @param e
+	 */
+	public void repositoryRemoved(RepositoryRemovedEvent e);
 }
