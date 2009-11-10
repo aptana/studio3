@@ -108,7 +108,7 @@ public class GitRepository
 				if (reference == null || reference.get() == null)
 					continue;
 				GitRepository cachedRepo = reference.get();
-				if (cachedRepo.fileURL.getPath().equals(path.getPath()))
+				if (cachedRepo.fileURL.getPath().equals(gitDirURL.getPath()))
 				{
 					// Same git dir, so cache under our new path as well
 					cachedRepos.put(path.getPath(), reference);
@@ -155,7 +155,7 @@ public class GitRepository
 	{
 		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse --is-inside-work-tree")
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse", "--is-inside-work-tree")
 				.equals("true"))
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
