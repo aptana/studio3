@@ -20,6 +20,7 @@
          </action>
          <action
                class="com.aptana.git.ui.actions.PushAction"
+               definitionId="com.aptana.git.ui.command.push"
                id="com.aptana.git.ui.internal.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
@@ -27,6 +28,7 @@
          </action>
          <action
                class="com.aptana.git.ui.actions.PullAction"
+               definitionId="com.aptana.git.ui.command.pull"
                id="com.aptana.git.ui.internal.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
@@ -34,6 +36,7 @@
          </action>
          <action
                class="com.aptana.git.ui.internal.actions.StatusAction"
+               definitionId="com.aptana.git.ui.command.status"
                id="com.aptana.git.ui.internal.actions.StatusAction"
                label="%StatusAction_label"
                menubarPath="team.main/projectGroup"
@@ -48,6 +51,7 @@
          </action>
          <action
                class="com.aptana.git.ui.actions.CommitAction"
+               definitionId="com.aptana.git.ui.command.commit"
                id="com.aptana.git.ui.internal.actions.CommitAction"
                label="%CommitAction_label"
                menubarPath="team.main/targetGroup"
@@ -79,25 +83,28 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
-               label="%RevertAction_label"
-               tooltip="%RevertAction_tooltip"
                class="com.aptana.git.ui.internal.actions.RevertAction"
+               definitionId="com.aptana.git.ui.command.revert"
                id="com.aptana.git.ui.internal.actions.RevertAction"
-               menubarPath="team.main/targetGroup">
+               label="%RevertAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%RevertAction_tooltip">
          </action>
          <action
-               label="%UnstageAction_label"
-               tooltip="%UnstageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.UnstageAction"
+               definitionId="com.aptana.git.ui.command.unstage"
                id="com.aptana.git.ui.internal.actions.UnstageAction"
-               menubarPath="team.main/targetGroup">
+               label="%UnstageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%UnstageAction_tooltip">
          </action>
          <action
-               label="%StageAction_label"
-               tooltip="%StageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.StageAction"
+               definitionId="com.aptana.git.ui.command.stage"
                id="com.aptana.git.ui.internal.actions.StageAction"
-               menubarPath="team.main/targetGroup">
+               label="%StageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%StageAction_tooltip">
          </action>
       </objectContribution>
    </extension>
@@ -164,5 +171,92 @@
                   type="org.eclipse.team.ui.history.IHistoryPageSource">
             </adapter>
          </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.aptana.git.ui.category"
+            name="%Git_command_category">
+      </category>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.push"
+            name="%PushAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.pull"
+            name="%PullAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.commit"
+            name="%CommitAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.status"
+            name="%StatusAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.revert"
+            name="%RevertAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.stage"
+            name="%StageAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.unstage"
+            name="%UnstageAction_tooltip">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.pull"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.status"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.commit"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.revert"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
    </extension>
 </plugin>
