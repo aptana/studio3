@@ -18,6 +18,7 @@ import com.aptana.git.core.model.GitRepository;
  * Dialog to pick a local branch.
  * 
  * @author cwilliams
+ * @deprecated Unused now that we generate a submenu for switching branches.
  */
 public class BranchDialog extends Dialog
 {
