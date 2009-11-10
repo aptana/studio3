@@ -41,6 +41,7 @@ import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.git.ui.actions.UnstashAction;
+import com.aptana.git.ui.dialogs.CreateBranchDialog;
 import com.aptana.radrails.explorer.ExplorerPlugin;
 
 /**

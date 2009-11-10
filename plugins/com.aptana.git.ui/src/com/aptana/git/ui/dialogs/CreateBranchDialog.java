@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.git.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
