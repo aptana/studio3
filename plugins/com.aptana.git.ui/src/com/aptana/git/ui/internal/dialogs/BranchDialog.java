@@ -24,6 +24,7 @@ public class BranchDialog extends Dialog
 
 	private GitRepository repository;
 	private String branchName;
+	private Combo combo;
 
 	public BranchDialog(Shell parentShell, GitRepository repository)
 	{
@@ -37,26 +38,28 @@ public class BranchDialog extends Dialog
 		super.configureShell(newShell);
 		newShell.setText("Choose branch");
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite composite = (Composite) super.createDialogArea(parent);
-		
+
 		Label label = new Label(composite, SWT.WRAP);
 		label.setText("Choose the local branch you'd like to use as your working tree.");
-		
-		Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.DROP_DOWN);
+
+		combo = new Combo(composite, SWT.READ_ONLY | SWT.DROP_DOWN);
 		Set<String> localBranches = repository.localBranches();
 		localBranches.remove(repository.currentBranch());
 		combo.setItems(localBranches.toArray(new String[localBranches.size()]));
-		combo.setText(localBranches.iterator().next());
+		String first = localBranches.iterator().next();
+		branchName = first;
+		combo.setText(first);
 		combo.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				branchName = e.text;
+				branchName = combo.getText();
 			}
 		});
 		return composite;
