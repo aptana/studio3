@@ -1,76 +1,172 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
-public class SwitchBranchAction extends GitAction
+public class SwitchBranchAction implements IObjectActionDelegate, IMenuCreator
 {
 
-	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	private ISelection selection;
+	private Menu fCreatedMenu;
+	private IAction fDelegateAction;
+	private boolean fFillMenu;
+
+	/*
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 * org.eclipse.jface.viewers.ISelection)
+	 */
+	public void selectionChanged(IAction action, ISelection selection)
 	{
-		IResource[] resources = getSelectedResources();
-		Set<GitRepository> repos = new HashSet<GitRepository>();
-		for (IResource resource : resources)
+		this.selection = selection;
+		// if the selection is an IResource, save it and enable our action
+		if (selection instanceof IStructuredSelection)
 		{
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
-			if (repo != null)
-				repos.add(repo);
-		}
-		if (repos.isEmpty())
-		{
-			MessageDialog.openError(getShell(), Messages.CommitAction_NoRepo_Title,
-					Messages.CommitAction_NoRepo_Message);
+			fFillMenu = true;
+			if (fDelegateAction != action)
+			{
+				fDelegateAction = action;
+				fDelegateAction.setMenuCreator(this);
+			}
+			// enable our menu
+			action.setEnabled(true);
 			return;
 		}
-		if (repos.size() > 1)
+		action.setEnabled(false);
+	}
+
+	private IResource getSelectedResource()
+	{
+		if (this.selection == null)
+			return null;
+		if (!(this.selection instanceof IStructuredSelection))
+			return null;
+
+		IStructuredSelection structured = (IStructuredSelection) this.selection;
+		Object element = structured.getFirstElement();
+		if (element == null)
+			return null;
+
+		if (element instanceof IResource)
+			return (IResource) element;
+
+		if (element instanceof IAdaptable)
 		{
-			MessageDialog.openError(getShell(), Messages.CommitAction_MultipleRepos_Title,
-					Messages.CommitAction_MultipleRepos_Message);
-			return;
+			IAdaptable adapt = (IAdaptable) element;
+			return (IResource) adapt.getAdapter(IResource.class);
 		}
-		GitRepository theRepo = repos.iterator().next();
-		BranchDialog dialog = new BranchDialog(getTargetPart().getSite().getShell(), theRepo);
-		if (dialog.open() == Window.OK)
+		return null;
+	}
+
+	public Menu getMenu(Control parent)
+	{
+		return null;
+	}
+
+	public Menu getMenu(Menu parent)
+	{
+		if (fCreatedMenu != null)
 		{
-			theRepo.switchBranch(dialog.getBranch());
+			fCreatedMenu.dispose();
+		}
+		fCreatedMenu = new Menu(parent);
+		initMenu();
+		return fCreatedMenu;
+	}
+
+	/**
+	 * Creates the menu for the action
+	 */
+	private void initMenu()
+	{
+		// Add listener to re-populate the menu each time
+		// it is shown to reflect changes in selection or active perspective
+		fCreatedMenu.addMenuListener(new MenuAdapter()
+		{
+			public void menuShown(MenuEvent e)
+			{
+				if (fFillMenu)
+				{
+					Menu m = (Menu) e.widget;
+					MenuItem[] items = m.getItems();
+					for (int i = 0; i < items.length; i++)
+					{
+						items[i].dispose();
+					}
+					fillMenu();
+					fFillMenu = false;
+				}
+			}
+		});
+	}
+
+	/**
+	 * Fills the fly-out menu
+	 */
+	private void fillMenu()
+	{
+		IResource resource = getSelectedResource();
+		if (resource == null)
+			return;
+
+		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		if (repo == null)
+			return;
+
+		Set<String> localBranches = repo.localBranches();
+		int index = 0;
+		for (final String branchName : localBranches)
+		{
+			MenuItem menuItem = new MenuItem(fCreatedMenu, SWT.PUSH, index++);
+			menuItem.setText(branchName);
+			menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
+			menuItem.addSelectionListener(new SelectionAdapter()
+			{
+				public void widgetSelected(SelectionEvent e)
+				{
+					// what to do when menu is subsequently selected.
+					repo.switchBranch(branchName);
+				}
+			});
 		}
 	}
 
-	@Override
-	protected String[] getCommand()
+	/**
+	 * @see IMenuCreator#dispose()
+	 */
+	public void dispose()
 	{
-		return new String[] { "checkout" };
+		if (fCreatedMenu != null)
+		{
+			fCreatedMenu.dispose();
+		}
 	}
 
-	@Override
-	public boolean isEnabled()
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
-		IResource[] resources = getSelectedResources();
-		Set<GitRepository> repos = new HashSet<GitRepository>();
-		for (IResource resource : resources)
-		{
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
-			if (repo != null)
-				repos.add(repo);
-		}
-		if (repos.isEmpty())
-			return false;
+		// do nothing
+	}
 
-		if (repos.size() > 1)
-			return false;
-
-		GitRepository theRepo = repos.iterator().next();
-		return theRepo.localBranches().size() > 1;
+	public void run(IAction action)
+	{
+		// Never called because we're a menu
 	}
 
 }

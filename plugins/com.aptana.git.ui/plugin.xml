@@ -55,9 +55,11 @@
          </action>
          <action
                class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
+               enablesFor="+"
                id="com.aptana.git.ui.internal.actions.SwitchBranchAction"
                label="%SwitchBranchAction_label"
                menubarPath="team.main/group2"
+               style="pulldown"
                tooltip="%SwitchBranchAction_tooltip">
          </action>
          <action
