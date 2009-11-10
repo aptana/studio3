@@ -392,11 +392,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		layout.marginHeight = 0;
 		initGit.setLayout(layout);
 
-		Label label = new Label(initGit, SWT.WRAP);
-		label.setText("Project has no git repository. Create one?");
-
 		createRepoButton = new Button(initGit, SWT.PUSH);
-		createRepoButton.setText("Initialize repo");
+		createRepoButton.setText("Attach Git repository");
 		createRepoButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
