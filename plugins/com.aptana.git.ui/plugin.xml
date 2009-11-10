@@ -283,4 +283,13 @@
             sequence="M1+M2+G">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.team.ui.TeamPreferences"
+            class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
+            id="com.aptana.git.ui.GitExecutableLocationPage"
+            name="Git">
+      </page>
+   </extension>
 </plugin>
