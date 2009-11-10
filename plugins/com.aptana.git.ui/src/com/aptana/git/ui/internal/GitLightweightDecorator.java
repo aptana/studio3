@@ -1,17 +1,15 @@
 package com.aptana.git.ui.internal;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -322,29 +320,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// We get a list of the files whose status just changed. We need to refresh those and any
-		// parents/ancestors of those.
 		GitRepository repo = e.getRepository();
-		String workingDirectory = repo.workingDirectory();
-		Collection<ChangedFile> changedFiles = e.changedFiles();
-		List<IResource> files = new ArrayList<IResource>();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String path = workingDirectory + File.separator + changedFile.getPath();
-			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
-			if (file == null)
-				continue;
-			files.add(file);
-			// Need to add all parents up to project!
-			IContainer parent = null;
-			IResource child = file;
-			while ((parent = child.getParent()) != null)
-			{
-				files.add(parent);
-				child = parent;
-			}
-		}
-		// we also need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
+		Set<IResource> files = new HashSet<IResource>();
+		// we need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
 		// the branch +/- status)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
