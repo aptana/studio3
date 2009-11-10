@@ -31,6 +31,6 @@ public class EarlyStartup implements IStartup
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 
 		// go ahead and process the workspace now to process bundles that exist already
-		BundleManager.getInstance().loadProjectBundles();
+		BundleManager.getInstance().loadBundles();
 	}
 }

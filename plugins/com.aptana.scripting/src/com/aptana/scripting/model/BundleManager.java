@@ -1,6 +1,8 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,14 +27,12 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
+	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String BUNDLES_FOLDER_NAME = "bundles"; //$NON-NLS-1$
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
-
-	private List<Bundle> _bundles;
-	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * getInstance
@@ -49,6 +49,9 @@ public class BundleManager
 
 		return INSTANCE;
 	}
+	private List<Bundle> _bundles;
+
+	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * BundleManager
@@ -164,26 +167,37 @@ public class BundleManager
 
 		return result.toArray(new Command[result.size()]);
 	}
+	
+	/**
+	 * getLoadPaths
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	private List<String> getLoadPaths(File resource)
+	{
+		File folder = (resource != null && resource.isDirectory()) ? resource : resource.getParentFile();
+		List<String> loadPaths = new ArrayList<String>();
+		File bundleFolder = folder.getParentFile();
+		File bundlesFolder = bundleFolder.getParentFile();
+		
+		loadPaths.add(this.getBuiltinsLoadPath());
+		loadPaths.add(bundlesFolder.getAbsolutePath());
+		loadPaths.add(bundleFolder.getAbsolutePath());
+		loadPaths.add("."); //$NON-NLS-1$
+		
+		return loadPaths;
+	}
 
 	/**
 	 * getLoadPaths
 	 * 
-	 * @param folder
+	 * @param resource
 	 * @return
 	 */
 	private List<String> getLoadPaths(IResource resource)
 	{
-		IFolder folder = (resource instanceof IFolder) ? (IFolder) resource : (IFolder) resource.getParent();
-		List<String> loadPaths = new ArrayList<String>();
-		IFolder bundleFolder = (IFolder) folder.getParent();
-		IFolder bundlesFolder = (IFolder) bundleFolder.getParent();
-
-		loadPaths.add(this.getBuiltinsLoadPath());
-		loadPaths.add(bundlesFolder.getLocation().toPortableString());
-		loadPaths.add(bundleFolder.getLocation().toPortableString());
-		loadPaths.add("."); //$NON-NLS-1$
-
-		return loadPaths;
+		return this.getLoadPaths(resource.getLocation().toFile());
 	}
 
 	/**
@@ -211,15 +225,56 @@ public class BundleManager
 	}
 
 	/**
+	 * loadBundles
+	 */
+	public void loadBundles()
+	{
+		this.loadProjectBundles();
+		this.loadUserBundles();
+	}
+	
+	/**
 	 * loadProjectBundles
 	 */
-	public void loadProjectBundles()
+	private void loadProjectBundles()
 	{
-		// possibly clear current scripts here
-
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
 			this.processProject(project);
+		}
+	}
+	
+	/**
+	 * loadUserBundles
+	 */
+	private void loadUserBundles()
+	{
+		String userHomePath = System.getProperty("user.home");
+		
+		if (userHomePath != null && userHomePath.length() > 0)
+		{
+			File userHome = new File(userHomePath);
+			
+			if (userHome.exists() && userHome.isDirectory() && userHome.canRead())
+			{
+				File bundlesFolder = new File(userHome.getAbsoluteFile() + File.separator + BUNDLES_FOLDER_NAME);
+				
+				if (bundlesFolder.exists() && bundlesFolder.canRead())
+				{
+					File[] bundles = bundlesFolder.listFiles(new FileFilter()
+					{
+						public boolean accept(File pathname)
+						{
+							return pathname.isDirectory() && pathname.canRead();
+						}
+					});
+					
+					for (File bundle : bundles)
+					{
+						this.processBundle(bundle, true);
+					}
+				}
+			}
 		}
 	}
 
@@ -253,38 +308,39 @@ public class BundleManager
 	 * processBundle
 	 * 
 	 * @param bundleRoot
+	 * @param processChildren
 	 */
-	public void processBundle(IFolder bundleRoot)
+	public void processBundle(IFolder bundleRoot, boolean processChildren)
 	{
-		this.processBundle(bundleRoot, true);
+		this.processBundle(bundleRoot.getLocation().toFile(), processChildren);
 	}
-
+	
 	/**
 	 * processBundle
 	 * 
 	 * @param bundleRoot
 	 * @param processChildren
 	 */
-	public void processBundle(IFolder bundleRoot, boolean processChildren)
+	public void processBundle(File bundleRoot, boolean processChildren)
 	{
-		IFile bundleFile = bundleRoot.getFile("bundle.rb"); //$NON-NLS-1$
-		String bundlePath = bundleRoot.getLocation().toPortableString();
-
-		if (bundleFile.exists())
+		String bundlePath = bundleRoot.getAbsolutePath();
+		File bundleFile = new File(bundlePath + File.separator + BUNDLE_FILE);
+		
+		if (bundleFile.exists() && bundleFile.canRead())
 		{
-			String fullPath = bundleFile.getLocation().toPortableString();
+			String fullPath = bundleFile.getAbsolutePath();
 			List<String> loadPaths = new ArrayList<String>();
-
+			
 			loadPaths.add(this.getBuiltinsLoadPath());
 			loadPaths.add("."); //$NON-NLS-1$
-
+			
 			ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-
+			
 			if (processChildren)
 			{
 				// process snippets and command folders
-				this.processFolder(bundleRoot.getFolder(SNIPPETS_FOLDER_NAME));
-				this.processFolder(bundleRoot.getFolder(COMMANDS_FOLDER_NAME));
+				this.processFolder(new File(bundlePath + File.separator + SNIPPETS_FOLDER_NAME));
+				this.processFolder(new File(bundlePath + File.separator + COMMANDS_FOLDER_NAME));
 			}
 		}
 		else
@@ -292,53 +348,30 @@ public class BundleManager
 			System.out.println(Messages.BundleManager_Missing_Bundle_File + bundlePath);
 		}
 	}
-
-	/**
-	 * processFile
-	 * 
-	 * @param file
-	 */
-	public void processSnippetOrCommand(IFile file)
-	{
-		if (file != null)
-		{
-			List<String> loadPaths = getLoadPaths(file);
-
-			if (file.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
-			{
-				String fullPath = file.getLocation().toPortableString();
-
-				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-			}
-		}
-	}
-
+	
 	/**
 	 * processFolder
 	 * 
-	 * @param bundleRoot
+	 * @param folder
 	 */
-	private void processFolder(IFolder folder)
+	private void processFolder(File folder)
 	{
-		if (folder != null)
+		if (folder != null && folder.isDirectory() && folder.canRead())
 		{
-			List<String> loadPaths = getLoadPaths(folder);
-
-			try
+			List<String> loadPaths = this.getLoadPaths(folder);
+			File[] files = folder.listFiles(new FilenameFilter()
 			{
-				for (IResource resource : folder.members())
+				public boolean accept(File dir, String name)
 				{
-					if (resource.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
-					{
-						String fullPath = resource.getLocation().toPortableString();
-
-						ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-					}
+					return name.toLowerCase().endsWith(RUBY_FILE_EXTENSION);
 				}
-			}
-			catch (CoreException e)
+			});
+			
+			for (File file: files)
 			{
-				e.printStackTrace();
+				String fullPath = file.getAbsolutePath();
+				
+				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
 			}
 		}
 	}
@@ -360,12 +393,31 @@ public class BundleManager
 				{
 					if (resource instanceof IFolder)
 					{
-						this.processBundle((IFolder) resource);
+						this.processBundle((IFolder) resource, true);
 					}
 				}
 			}
 			catch (CoreException e)
 			{
+			}
+		}
+	}
+
+	/**
+	 * processFile
+	 * 
+	 * @param file
+	 */
+	public void processSnippetOrCommand(IFile file)
+	{
+		if (file != null)
+		{
+			if (file.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
+			{
+				List<String> loadPaths = this.getLoadPaths(file);
+				String fullPath = file.getLocation().toPortableString();
+
+				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
 			}
 		}
 	}
@@ -449,6 +501,10 @@ public class BundleManager
 			{
 				System.out.println(bundle);
 			}
+		}
+		else
+		{
+			System.out.println("No bundles loaded");
 		}
 	}
 }
