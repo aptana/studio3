@@ -1,14 +1,11 @@
 package com.aptana.git.ui.internal;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -320,17 +317,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		GitRepository repo = e.getRepository();
-		Set<IResource> files = new HashSet<IResource>();
-		// we need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
-		// the branch +/- status)
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
-		{
-			GitRepository other = GitRepository.getAttached(project);
-			if (other != null && other.equals(repo))
-				files.add(project);
-		}
-		postLabelEvent(new LabelProviderChangedEvent(this, files.toArray()));
+		// This is very ugly performance-wise, but seems to be necessary. If we just try to collect the IResources for
+		// changed files and the related projects the labels won't get redrawn for views that use adapted IResources
+		// (like JDT's package explorer). So we just tell the decorator to refresh for everything.
+		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
