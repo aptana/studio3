@@ -4,9 +4,7 @@ import java.util.ResourceBundle;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.ITextOperationTarget;
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
@@ -27,17 +25,12 @@ public class ShowScopesAction extends TextEditorAction {
 	@Override
 	public void run() {
         ITextEditor textEditor = getTextEditor();
-        if (textEditor instanceof AbstractTextEditor) {
-        	AbstractTextEditor abstractTextEditor = (AbstractTextEditor) textEditor;
-        	Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
-			if (adapter instanceof ITextViewer) {
-				ITextViewer textViewer = (ITextViewer) adapter;
-				try {
-					System.out.println(textViewer.getDocument().getContentType(textViewer.getTextWidget().getCaretOffset()));
-				} catch (BadLocationException e) {
-					System.err.println(e.getMessage());
-				}
-			}
+        try {
+        	ITextSelection textSelection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+        	// Assume a forward selection i.e. offset+length == caret position.
+			System.out.println(textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getContentType(textSelection.getOffset()+textSelection.getLength()));
+        } catch (BadLocationException e) {
+        	System.err.println(e.getMessage());
         }
 	}
 
