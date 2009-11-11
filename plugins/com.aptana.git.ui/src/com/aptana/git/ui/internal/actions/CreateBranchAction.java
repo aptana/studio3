@@ -8,6 +8,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.actions.GitAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 public class CreateBranchAction extends GitAction

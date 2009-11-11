@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.Launcher;
+import com.aptana.git.ui.internal.actions.Messages;
 
 /**
  * Base class for actions that simple call out to actions/commands on the Git executable to be run inside the Eclipse

@@ -5,7 +5,6 @@ import org.eclipse.core.resources.IResource;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
-import com.aptana.git.ui.internal.actions.GitAction;
 
 public class PushAction extends GitAction
 {

@@ -9,7 +9,6 @@ import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.actions.CommitDialog;
-import com.aptana.git.ui.internal.actions.GitAction;
 import com.aptana.git.ui.internal.actions.Messages;
 
 public class CommitAction extends GitAction

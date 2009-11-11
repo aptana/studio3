@@ -1,6 +1,5 @@
 package com.aptana.git.ui.actions;
 
-import com.aptana.git.ui.internal.actions.GitAction;
 
 public class UnstashAction extends GitAction
 {
