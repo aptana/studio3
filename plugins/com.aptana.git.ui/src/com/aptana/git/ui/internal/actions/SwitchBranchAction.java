@@ -178,7 +178,7 @@ public class SwitchBranchAction implements IObjectActionDelegate, IMenuCreator
 		if (repo == null)
 			return;
 
-		BranchDialog dialog = new BranchDialog(Display.getDefault().getActiveShell(), repo);
+		BranchDialog dialog = new BranchDialog(Display.getDefault().getActiveShell(), repo, true, false);
 		if (dialog.open() == Window.OK)
 			repo.switchBranch(dialog.getBranch());
 	}
