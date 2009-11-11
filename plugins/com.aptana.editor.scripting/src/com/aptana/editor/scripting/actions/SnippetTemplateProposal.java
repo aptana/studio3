@@ -59,4 +59,10 @@ public class SnippetTemplateProposal extends TemplateProposal {
 		}
 	}
 	
+	@Override
+	public String getDisplayString() {
+		Template template = getTemplate();
+		return template.getDescription() + " (" + template.getName() + "\u21E5)";
+	}
+	
 }
