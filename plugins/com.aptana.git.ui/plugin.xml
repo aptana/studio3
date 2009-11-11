@@ -15,44 +15,74 @@
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
                 class="com.aptana.git.ui.internal.actions.DisconnectAction"
-               id="com.aptana.git.ui.internal.actions.DisconnectAction"
+               id="com.aptana.git.ui.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
          </action>
          <action
                class="com.aptana.git.ui.actions.PushAction"
-               id="com.aptana.git.ui.internal.actions.PushAction"
+               definitionId="com.aptana.git.ui.command.push"
+               id="com.aptana.git.ui.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%PushAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.actions.PullAction"
-               id="com.aptana.git.ui.internal.actions.PullAction"
+               definitionId="com.aptana.git.ui.command.pull"
+               id="com.aptana.git.ui.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%PullAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.internal.actions.StatusAction"
-               id="com.aptana.git.ui.internal.actions.StatusAction"
+               definitionId="com.aptana.git.ui.command.status"
+               id="com.aptana.git.ui.actions.StatusAction"
                label="%StatusAction_label"
                menubarPath="team.main/projectGroup"
                tooltip="%StatusAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
-               id="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                label="%ShowResourceInHistoryAction_label"
                menubarPath="team.main/group1"
                tooltip="%ShowResourceInHistoryAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.actions.CommitAction"
-               id="com.aptana.git.ui.internal.actions.CommitAction"
+               definitionId="com.aptana.git.ui.command.commit"
+               id="com.aptana.git.ui.actions.CommitAction"
                label="%CommitAction_label"
                menubarPath="team.main/targetGroup"
                tooltip="%CommitAction_tooltip">
-         </action>      
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.MergeBranchAction"
+               id="com.aptana.git.ui.actions.MergeBranchAction"
+               definitionId="com.aptana.git.ui.command.merge_branch"
+               label="%MergeBranchAction_label"
+               menubarPath="team.main/group2"
+               tooltip="%MergeBranchAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.SwitchBranchAction"
+               definitionId="com.aptana.git.ui.command.switch_branch"
+               label="%SwitchBranchAction_label"
+               menubarPath="team.main/group2"
+               style="pulldown"
+               tooltip="%SwitchBranchAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.CreateBranchAction"
+               id="com.aptana.git.ui.actions.CreateBranchAction"
+               definitionId="com.aptana.git.ui.command.create_branch"
+               label="%CreateBranchAction_label"
+               menubarPath="team.main/group2"
+               tooltip="%CreateBranchAction_tooltip">
+         </action>         
       </objectContribution>
       <objectContribution
             adaptable="true"
@@ -63,27 +93,51 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
-               label="%RevertAction_label"
-               tooltip="%RevertAction_tooltip"
                class="com.aptana.git.ui.internal.actions.RevertAction"
-               id="com.aptana.git.ui.internal.actions.RevertAction"
-               menubarPath="team.main/targetGroup">
+               definitionId="com.aptana.git.ui.command.revert"
+               id="com.aptana.git.ui.actions.RevertAction"
+               label="%RevertAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%RevertAction_tooltip">
          </action>
          <action
-               label="%UnstageAction_label"
-               tooltip="%UnstageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.UnstageAction"
-               id="com.aptana.git.ui.internal.actions.UnstageAction"
-               menubarPath="team.main/targetGroup">
+               definitionId="com.aptana.git.ui.command.unstage"
+               id="com.aptana.git.ui.actions.UnstageAction"
+               label="%UnstageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%UnstageAction_tooltip">
          </action>
          <action
-               label="%StageAction_label"
-               tooltip="%StageAction_tooltip"
                class="com.aptana.git.ui.internal.actions.StageAction"
-               id="com.aptana.git.ui.internal.actions.StageAction"
-               menubarPath="team.main/targetGroup">
+               definitionId="com.aptana.git.ui.command.stage"
+               id="com.aptana.git.ui.actions.StageAction"
+               label="%StageAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%StageAction_tooltip">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.MergeConflictsAction"
+               definitionId="com.aptana.git.ui.command.merge_conflicts"
+               enablesFor="+"
+               id="com.aptana.git.ui.actions.MergeConflictsAction"
+               label="%MergeConflictsAction_label"
+               menubarPath="team.main/targetGroup"
+               tooltip="%MergeConflictsAction_tooltip">
          </action>
       </objectContribution>
+   </extension>
+   
+   <extension point="org.eclipse.ui.importWizards">
+      <category name="%Git_clone_category"
+	    id="com.aptana.git.ui.clone.category"/>
+      <wizard name="%Git_clone_wizard"
+	    icon="icons/obj16/import_obj.gif"
+	    class="com.aptana.git.ui.internal.wizards.CloneWizard"
+	    id="com.aptana.git.ui.wizards.CloneWizard"
+	    category="com.aptana.git.ui.clone.category">
+	    <description>%Git_clone_description</description>
+      </wizard>
    </extension>
    
    <extension point="org.eclipse.team.ui.configurationWizards">
@@ -136,5 +190,145 @@
                   type="org.eclipse.team.ui.history.IHistoryPageSource">
             </adapter>
          </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="com.aptana.git.ui.category"
+            name="%Git_command_category">
+      </category>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.push"
+            name="%PushAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.pull"
+            name="%PullAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.commit"
+            name="%CommitAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.status"
+            name="%StatusAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.revert"
+            name="%RevertAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.stage"
+            name="%StageAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.unstage"
+            name="%UnstageAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.create_branch"
+            name="%CreateBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.switch_branch"
+            name="%SwitchBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.merge_branch"
+            name="%MergeBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.merge_conflicts"
+            name="%MergeConflictsAction_tooltip">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.pull"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.status"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.commit"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.revert"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.create_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.switch_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+       <key
+            commandId="com.aptana.git.ui.command.merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.merge_conflicts"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+G">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.team.ui.TeamPreferences"
+            class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
+            id="com.aptana.git.ui.GitExecutableLocationPage"
+            name="Git">
+      </page>
    </extension>
 </plugin>

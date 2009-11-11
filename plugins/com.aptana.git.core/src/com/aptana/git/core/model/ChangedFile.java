@@ -4,17 +4,17 @@ import org.eclipse.core.runtime.Assert;
 
 public class ChangedFile
 {
-	
+
 	public enum Status
 	{
-		NEW, DELETED, MODIFIED
+		NEW, DELETED, MODIFIED, UNMERGED
 	}
 
 	public ChangedFile(String path)
 	{
 		this.path = path;
 	}
-	
+
 	String path;
 	Status status;
 	boolean hasStagedChanges;
@@ -51,19 +51,25 @@ public class ChangedFile
 	{
 		return commitBlobMode;
 	}
-	
+
 	public String indexInfo()
 	{
-		Assert.isTrue(status == Status.NEW || commitBlobSHA != null, "File is not new, but doesn't have an index entry!");
+		Assert.isTrue(status == Status.NEW || commitBlobSHA != null,
+				"File is not new, but doesn't have an index entry!");
 		if (commitBlobSHA == null)
 			return "0 0000000000000000000000000000000000000000\t" + path + "\0";
 		else
 			return commitBlobMode + " " + commitBlobSHA + "\t" + path + "\0";
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return getStatus() + " " + getPath();
+	}
+
+	public boolean hasUnmergedChanges()
+	{
+		return getStatus().equals(Status.UNMERGED);
 	}
 }

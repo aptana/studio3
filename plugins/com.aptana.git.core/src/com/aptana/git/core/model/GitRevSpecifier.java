@@ -52,7 +52,7 @@ public class GitRevSpecifier
 		return parameters.size() == 1 && !parameters.get(0).startsWith("-");
 	}
 
-	GitRef simpleRef()
+	public GitRef simpleRef()
 	{
 		if (!isSimpleRef())
 			return null;

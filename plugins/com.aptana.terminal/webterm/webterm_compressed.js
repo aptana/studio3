@@ -42,8 +42,8 @@ var _7=new f();
 _7.$parent=_6;
 return _7;
 };
-Attribute.DEFAULT_BACKGROUND="n";
-Attribute.DEFAULT_FOREGROUND="n";
+Attribute.DEFAULT_BACKGROUND="b";
+Attribute.DEFAULT_FOREGROUND="f";
 function Attribute(){
 this.reset();
 };

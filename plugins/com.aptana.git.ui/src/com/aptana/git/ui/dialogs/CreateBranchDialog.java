@@ -1,0 +1,116 @@
+package com.aptana.git.ui.dialogs;
+
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.fieldassist.AutoCompleteField;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+
+import com.aptana.git.core.model.GitRepository;
+
+public class CreateBranchDialog extends InputDialog
+{
+
+	private GitRepository repo;
+	private Text startPointText;
+	private Button trackButton;
+	protected boolean track;
+	protected String startPoint;
+
+	public CreateBranchDialog(final Shell parentShell, final GitRepository repo)
+	{
+		super(parentShell, Messages.GitProjectView_CreateBranchDialog_Title,
+				Messages.GitProjectView_CreateBranchDialog_Message, "", //$NON-NLS-1$
+				new IInputValidator()
+				{
+
+					public String isValid(String newText)
+					{
+						if (newText == null || newText.trim().length() == 0)
+							return Messages.GitProjectView_NonEmptyBranchNameMessage;
+						if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
+							return Messages.GitProjectView_NoWhitespaceBranchNameMessage;
+						if (repo.localBranches().contains(newText.trim()))
+							return Messages.GitProjectView_BranchAlreadyExistsMessage;
+						if (!repo.validBranchName(newText.trim()))
+							return Messages.GitProjectView_InvalidBranchNameMessage;
+						return null;
+					}
+				});
+		this.repo = repo;
+	}
+
+	@Override
+	protected Control createDialogArea(Composite parent)
+	{
+		// Add an advanced section so users can specify a start point ref (so they can create a branch that
+		// tracks a remote branch!)
+		Composite composite = (Composite) super.createDialogArea(parent);
+
+		// TODO Add a minimize/maximize button for the advanced section
+		Group group = new Group(composite, SWT.BORDER);
+		group.setText("Advanced");
+		group.setLayout(new GridLayout(1, false));
+		group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
+
+		Label label = new Label(group, SWT.NONE);
+		label.setText("Start point: ");
+
+		startPointText = new Text(group, getInputTextStyle());
+		startPointText.setText(repo.headRef().simpleRef().shortName());
+		startPointText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
+		startPointText.addModifyListener(new ModifyListener()
+		{
+			public void modifyText(ModifyEvent e)
+			{
+				startPoint = startPointText.getText();
+				// TODO Validate the start point. Must be branch name, commit id or tag ref
+				// TODO If name is a remote branch, turn on track by default?
+			}
+		});
+
+		String[] proposals = repo.allSimpleRefs().toArray(new String[0]);
+		new AutoCompleteField(startPointText, new TextContentAdapter(), proposals);
+		ControlDecoration decoration = new ControlDecoration(startPointText, SWT.LEFT);
+		decoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(
+				FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+
+		trackButton = new Button(group, SWT.CHECK);
+		trackButton.setText("Track");
+		trackButton.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				track = trackButton.getSelection();
+			}
+		});
+		return composite;
+	}
+
+	public boolean track()
+	{
+		return track;
+	}
+
+	public String getStartPoint()
+	{
+		return startPoint;
+	}
+}

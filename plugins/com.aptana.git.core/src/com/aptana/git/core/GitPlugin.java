@@ -51,13 +51,13 @@ public class GitPlugin extends Plugin
 			{
 				ResourcesPlugin.getWorkspace().addResourceChangeListener(new GitResourceListener(),
 						IResourceChangeEvent.POST_CHANGE);
+				fRepoListener = new GitProjectRefresher();
+				GitRepository.addListener(fRepoListener);
 				return Status.OK_STATUS;
 			}
 		};
 		job.setSystem(true);
-		job.schedule();
-		fRepoListener = new GitProjectRefresher();
-		GitRepository.addListener(fRepoListener);
+		job.schedule();		
 	}
 
 	/*

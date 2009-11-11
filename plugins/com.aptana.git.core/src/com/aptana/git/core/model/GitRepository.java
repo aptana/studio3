@@ -8,7 +8,9 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +50,8 @@ public class GitRepository
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
-	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
+	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(
+			3);
 
 	public static void addListener(IGitRepositoryListener listener)
 	{
@@ -98,29 +101,27 @@ public class GitRepository
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
 		if (ref == null || ref.get() == null)
 		{
-			if (ref != null)
-			{
-				cachedRepos.remove(ref);
-			}
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
+			// Check to see if any cached repo has the same git dir
 			for (SoftReference<GitRepository> reference : cachedRepos.values())
 			{
-				if (reference == null)
+				if (reference == null || reference.get() == null)
 					continue;
 				GitRepository cachedRepo = reference.get();
-				if (cachedRepo == null)
-					continue;
-				if (cachedRepo.fileURL.getPath().equals(path.getPath()))
+				if (cachedRepo.fileURL.getPath().equals(gitDirURL.getPath()))
 				{
+					// Same git dir, so cache under our new path as well
 					cachedRepos.put(path.getPath(), reference);
 					return cachedRepo;
 				}
 			}
+			// no cache for this repo or any repo sharing same git dir
 			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
 			cachedRepos.put(path.getPath(), ref);
 		}
+		// TODO What if the underlying .git dir was wiped while we still had the object cached?
 		return ref.get();
 	}
 
@@ -156,7 +157,7 @@ public class GitRepository
 	{
 		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse --is-inside-work-tree")
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse", "--is-inside-work-tree")
 				.equals("true"))
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
@@ -165,22 +166,48 @@ public class GitRepository
 
 	public Set<String> localBranches()
 	{
-		// TODO Cache/memoize
-		Set<String> localBranches = new HashSet<String>();
+		return branches(GitRef.HEAD_TYPE);
+	}
+
+	public Set<String> remoteBranches()
+	{
+		return branches(GitRef.REMOTE_TYPE);
+	}
+
+	public Set<String> allBranches()
+	{
+		return branches(GitRef.HEAD_TYPE, GitRef.REMOTE_TYPE);
+	}
+
+	private Set<String> branches(String... types)
+	{
+		if (types == null || types.length == 0)
+			return Collections.emptySet();
+		Set<String> validTypes = new HashSet<String>(Arrays.asList(types));
+		Set<String> allBranches = new HashSet<String>();
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
 				continue;
 			GitRef ref = revSpec.simpleRef();
-			if (ref == null || ref.type() == null || !ref.type().equals(GitRef.HEAD_TYPE))
+			if (ref == null || ref.type() == null)
 				continue;
-			localBranches.add(ref.shortName());
+			for (String string : types)
+			{
+				if (ref.type().equals(string))
+					break;
+			}
+			if (!validTypes.contains(ref.type()))
+				continue;
+			allBranches.add(ref.shortName());
 		}
-		return localBranches;
+		return allBranches;
 	}
 
 	public boolean switchBranch(String branchName)
 	{
+		if (branchName == null)
+			return false;
 		String oldBranchName = currentBranch.simpleRef().shortName();
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
 				branchName);
@@ -265,7 +292,7 @@ public class GitRepository
 		return rev;
 	}
 
-	private GitRevSpecifier headRef()
+	public GitRevSpecifier headRef()
 	{
 		if (_headRef != null)
 			return _headRef;
@@ -347,9 +374,9 @@ public class GitRepository
 			listener.indexChanged(e);
 	}
 
-	private static void fireRepositoryAddedEvent(GitRepository repo)
+	private static void fireRepositoryAddedEvent(GitRepository repo, IProject project)
 	{
-		RepositoryAddedEvent e = new RepositoryAddedEvent(repo);
+		RepositoryAddedEvent e = new RepositoryAddedEvent(repo, project);
 		for (IGitRepositoryListener listener : listeners)
 			listener.repositoryAdded(e);
 	}
@@ -546,7 +573,7 @@ public class GitRepository
 		{
 			RepositoryProvider.map(project, GitRepositoryProvider.ID);
 			m.worked(10);
-			fireRepositoryAddedEvent(repo);
+			fireRepositoryAddedEvent(repo, project);
 			m.worked(50);
 		}
 		catch (TeamException e)
@@ -588,21 +615,38 @@ public class GitRepository
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
 	}
 
-	public boolean createBranch(String branchName)
+	/**
+	 * @param branchName
+	 *            Name of the new branch
+	 * @param track
+	 *            Whether this branch should track the start point
+	 * @param startPoint
+	 *            branch name, commit id, or ref/tag to create the branch off of. Null/empty assumes "HEAD"
+	 * @return
+	 */
+	public boolean createBranch(String branchName, boolean track, String startPoint)
 	{
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(workingDirectory(), "branch", branchName);
+		List<String> args = new ArrayList<String>();
+		args.add("branch");
+		if (track)
+			args.add("--track");
+		args.add(branchName);
+		if (startPoint != null && startPoint.trim().length() > 0)
+			args.add(startPoint);
+
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				args.toArray(new String[args.size()]));
 		return result.keySet().iterator().next() == 0;
 	}
 
 	public boolean validBranchName(String branchName)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format",
-				"refs/heads/" + branchName);
+				GitRef.REFS_HEADS + branchName);
 		return result.keySet().iterator().next() == 0;
 	}
-        
-        public boolean deleteFile(String filePath)
+
+	public boolean deleteFile(String filePath)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
 		if (result.keySet().iterator().next() != 0)
@@ -628,5 +672,73 @@ public class GitRepository
 			return false;
 		index().refresh();
 		return true;
+	}
+
+	public String relativePath(IResource theResource)
+	{
+		String workingDirectory = workingDirectory();
+		String resourcePath = theResource.getLocationURI().getPath();
+		if (resourcePath.startsWith(workingDirectory))
+		{
+			resourcePath = resourcePath.substring(workingDirectory.length());
+			if (resourcePath.startsWith("/") || resourcePath.startsWith("\\")) //$NON-NLS-1$ //$NON-NLS-2$
+				resourcePath = resourcePath.substring(1);
+		}
+		// What if we have some trailing slash or something?
+		if (resourcePath.length() == 0)
+		{
+			resourcePath = currentBranch();
+		}
+		return resourcePath;
+	}
+
+	/**
+	 * Returns the set of short names for all simple refs that are local or remote branches or tags.
+	 * 
+	 * @return
+	 */
+	public Set<String> allSimpleRefs()
+	{
+		Set<String> allRefs = new HashSet<String>();
+		for (GitRevSpecifier revSpec : branches)
+		{
+			if (!revSpec.isSimpleRef())
+				continue;
+			GitRef ref = revSpec.simpleRef();
+			if (ref == null || ref.type() == null)
+				continue;
+			allRefs.add(ref.shortName());
+		}
+		return allRefs;
+	}
+
+	/**
+	 * Used when the user disconnects the project from the repository. We should notify listeners that the repo has been
+	 * unattached. We should also flush the cached copy.
+	 * 
+	 * @param p
+	 */
+	public static void removeRepository(IProject p)
+	{
+		GitRepository repo = getUnattachedExisting(p.getLocationURI());
+		if (repo != null)
+			cachedRepos.remove(p.getLocationURI().getPath());
+
+		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
+		for (IGitRepositoryListener listener : listeners)
+			listener.repositoryRemoved(e);
+	}
+
+	public boolean hasUnresolvedMergeConflicts()
+	{
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles.isEmpty())
+			return false;
+		for (ChangedFile changedFile : changedFiles)
+		{
+			if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+				return true;
+		}
+		return false;
 	}
 }

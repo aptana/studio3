@@ -2,6 +2,7 @@ package com.aptana.terminal.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -13,6 +14,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.terminal.Activator;
 
@@ -73,8 +75,9 @@ public class ProcessWrapper
 			try
 			{
 				URL fileURL = FileLocator.toFileURL(url);
+				URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
 				
-				file = new File(fileURL.toURI());
+				file = new File(fileURI);
 				
 				result = file.getAbsolutePath();
 			}

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="tabsnippetexpansion.ExpandSnippet"
+            description="Expand the snippets specified by the prefix"
+            id="TabSnippetExpansion.command"
+            name="Expand Snippet">
+      </command>
+   </extension>
+   <!-- extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="TabSnippetExpansion.command"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="TAB">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <contextType
+            class="tabsnippetexpansion.SnippetTemplateContextType"
+            id="snippets">
+      </contextType>
+  </extension -->
+</plugin>

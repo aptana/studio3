@@ -1,17 +1,12 @@
 package com.aptana.git.ui.internal;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -30,6 +25,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
@@ -63,6 +59,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	}
 
 	private static ImageDescriptor trackedImage;
+	private static ImageDescriptor conflictImage;
 	private static ImageDescriptor untrackedImage;
 	private static ImageDescriptor stagedAddedImage;
 	private static ImageDescriptor stagedRemovedImage;
@@ -70,6 +67,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	static
 	{
 		trackedImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CHECKEDIN_OVR));
+		conflictImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CONFLICT_OVR));
 		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/untracked.gif"))); //$NON-NLS-1$
 		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
@@ -163,7 +161,21 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 
 		ImageDescriptor overlay = trackedImage;
-		if (changed.hasStagedChanges())
+		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
+		if (changed.hasUnstagedChanges())
+		{
+			decoration.setForegroundColor(redFG());
+			decoration.setBackgroundColor(redBG());
+			if (changed.getStatus() == ChangedFile.Status.NEW)
+			{
+				overlay = untrackedImage;
+			}
+			else if (changed.getStatus() == ChangedFile.Status.UNMERGED)
+			{
+				overlay = conflictImage;
+			}
+		}
+		else if (changed.hasStagedChanges())
 		{
 			decoration.setForegroundColor(greenFG());
 			decoration.setBackgroundColor(greenBG());
@@ -174,15 +186,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			else if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = stagedAddedImage;
-			}
-		}
-		else if (changed.hasUnstagedChanges())
-		{
-			decoration.setForegroundColor(redFG());
-			decoration.setBackgroundColor(redBG());
-			if (changed.getStatus() == ChangedFile.Status.NEW)
-			{
-				overlay = untrackedImage;
 			}
 		}
 		decoration.addPrefix(DIRTY_PREFIX);
@@ -322,40 +325,17 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// We get a list of the files whose status just changed. We need to refresh those and any
-		// parents/ancestors of those.
-		GitRepository repo = e.getRepository();
-		String workingDirectory = repo.workingDirectory();
-		Collection<ChangedFile> changedFiles = e.changedFiles();
-		List<IResource> files = new ArrayList<IResource>();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String path = workingDirectory + File.separator + changedFile.getPath();
-			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
-			if (file == null)
-				continue;
-			files.add(file);
-			// Need to add all parents up to project!
-			IContainer parent = null;
-			IResource child = file;
-			while ((parent = child.getParent()) != null)
-			{
-				files.add(parent);
-				child = parent;
-			}
-		}
-		// we also need to refresh the labels of any projects attached to this repo! (So if we committed, it can update
-		// the branch +/- status)
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
-		{
-			GitRepository other = GitRepository.getAttached(project);
-			if (other != null && other.equals(repo))
-				files.add(project);
-		}
-		postLabelEvent(new LabelProviderChangedEvent(this, files.toArray()));
+		// This is very ugly performance-wise, but seems to be necessary. If we just try to collect the IResources for
+		// changed files and the related projects the labels won't get redrawn for views that use adapted IResources
+		// (like JDT's package explorer). So we just tell the decorator to refresh for everything.
+		postLabelEvent(new LabelProviderChangedEvent(this));
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+	}
+
+	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 	}
 

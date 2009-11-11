@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -14,11 +17,12 @@ import com.aptana.git.core.IPreferenceConstants;
 public class GitExecutable
 {
 
-	private static final String MIN_GIT_VERSION = "1.6.0";
+	public static final String MIN_GIT_VERSION = "1.6.0";
 	private static ArrayList<String> fgLocations;
 	private String gitPath;
 
 	private static GitExecutable fgExecutable;
+	private static boolean fgAddedPrefListener;
 
 	private GitExecutable(String gitPath)
 	{
@@ -28,25 +32,41 @@ public class GitExecutable
 	public static GitExecutable instance()
 	{
 		if (fgExecutable == null)
+		{
 			fgExecutable = GitExecutable.find();
+			if (!fgAddedPrefListener)
+			{
+				new InstanceScope().getNode(GitPlugin.getPluginId()).addPreferenceChangeListener(
+						new IEclipsePreferences.IPreferenceChangeListener()
+						{
+
+							public void preferenceChange(PreferenceChangeEvent event)
+							{
+								if (!event.getKey().equals(IPreferenceConstants.GIT_EXECUTABLE_PATH))
+									return;
+								fgExecutable = null;
+							}
+						});
+				fgAddedPrefListener = true;
+			}
+		}
 		return fgExecutable;
 	}
 
 	private static GitExecutable find()
 	{
-
-//		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
-//		if (prefPath != null && prefPath.length() > 0)
-//		{
-//			if (acceptBinary(prefPath))
-//			{
-//				return new GitExecutable(prefPath);
-//			}
-//			GitPlugin.logError(
-//					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
-//							+ MIN_GIT_VERSION
-//							+ " or higher binary. We're going to use the default search paths instead", null);
-//		}
+		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
+		if (prefPath != null && prefPath.length() > 0)
+		{
+			if (acceptBinary(prefPath))
+			{
+				return new GitExecutable(prefPath);
+			}
+			GitPlugin.logError(
+					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
+							+ MIN_GIT_VERSION
+							+ " or higher binary. We're going to use the default search paths instead", null);
+		}
 
 		// Try to find the path of the Git binary
 		String gitPath = System.getenv(GitEnv.GIT_PATH);
@@ -111,7 +131,7 @@ public class GitExecutable
 		return null;
 	}
 
-	private static boolean acceptBinary(String path)
+	public static boolean acceptBinary(String path)
 	{
 		if (path == null || path.length() == 0)
 			return false;
@@ -186,5 +206,4 @@ public class GitExecutable
 	{
 		return ProcessUtil.run(gitPath, directory, arguments);
 	}
-
 }

@@ -42,11 +42,24 @@
          id="com.aptana.terminal"
          download-size="0"
          install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.radrails.explorer"
+         download-size="0"
+         install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.explorer"
+         id="com.aptana.scripting"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.scripting"
          download-size="0"
          install-size="0"
          version="0.0.0"

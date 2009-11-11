@@ -21,6 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.osgi.util.NLS;
+
+import com.aptana.git.core.GitPlugin;
 
 public class GitIndex
 {
@@ -100,6 +103,9 @@ public class GitIndex
 			}
 		});
 
+		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that
+		// shouldn't be there anymore (especially unstaged ones)
+
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
 		{
@@ -163,9 +169,6 @@ public class GitIndex
 		if (r != -1)
 		{
 			String commitMessage = message.substring(r + 2);
-			// [[NSNotificationCenter defaultCenter] postNotificationName:PBGitIndexAmendMessageAvailable
-			// object: self
-			// userInfo:[NSDictionary dictionaryWithObject:commitMessage forKey:@"message"]];
 		}
 	}
 
@@ -270,6 +273,8 @@ public class GitIndex
 								file.hasUnstagedChanges = true;
 							if (fileStatus.get(4).equals("D"))
 								file.status = ChangedFile.Status.DELETED;
+							else if (fileStatus.get(4).equals("U"))
+								file.status = ChangedFile.Status.UNMERGED;
 						}
 						else
 						{
@@ -320,6 +325,8 @@ public class GitIndex
 				ChangedFile file = new ChangedFile(path);
 				if (fileStatus.get(4).equals("D"))
 					file.status = ChangedFile.Status.DELETED;
+				else if (fileStatus.get(4).equals("U"))
+					file.status = ChangedFile.Status.UNMERGED;
 				else if (fileStatus.get(0).equals(":000000"))
 					file.status = ChangedFile.Status.NEW;
 				else
@@ -358,7 +365,7 @@ public class GitIndex
 		// We need to find all files that don't have either
 		// staged or unstaged files, and delete them
 
-		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);		
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
 		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
 		for (ChangedFile file : this.files)
 		{
@@ -579,10 +586,12 @@ public class GitIndex
 
 	private void postCommitFailure(String string)
 	{
+		GitPlugin.logError(string, null);
 	}
 
 	private void postCommitUpdate(String string)
 	{
+		GitPlugin.logInfo(string);
 	}
 
 	/**
@@ -614,6 +623,9 @@ public class GitIndex
 	 */
 	public String diffForFile(ChangedFile file, boolean staged, int contextLines)
 	{
+		if (hasBinaryAttributes(file))
+			return "Appears to be a binary file";
+
 		String parameter = "-U" + contextLines;
 		if (staged)
 		{
@@ -640,5 +652,60 @@ public class GitIndex
 		}
 
 		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
+	}
+
+	public boolean hasBinaryAttributes(ChangedFile file)
+	{
+		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary",
+				file.getPath());
+		output = output.trim();
+		if (output.endsWith("binary: set"))
+			return true;
+		if (output.endsWith("binary: unset"))
+			return false;
+		if (output.endsWith("binary: unspecified"))
+		{
+			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar" };
+			// try common filename-extensions
+			for (String extension : extensions)
+			{
+				if (file.getPath().endsWith(extension))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Used to stage/unstage/discard 'hunks' on files with changes. See http://tomayko.com/writings/the-thing-about-git
+	 * 
+	 * @param hunk
+	 * @param stage
+	 * @param reverse
+	 * @return
+	 */
+	public boolean applyPatch(String hunk, boolean stage, boolean reverse)
+	{
+		List<String> array = new ArrayList<String>();
+		array.add("apply");
+		if (stage)
+			array.add("--cached");
+		if (reverse)
+			array.add("--reverse");
+
+		int ret = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null,
+				array.toArray(new String[array.size()]));
+
+		if (ret != 0)
+		{
+			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values()
+					.iterator().next()), null);
+			return false;
+		}
+
+		// TODO: Try to be smarter about what to refresh
+		refresh();
+		return true;
 	}
 }

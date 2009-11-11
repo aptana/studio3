@@ -6,20 +6,20 @@
       <view
             allowMultiple="false"
             category="org.eclipse.ui"
-            class="com.aptana.radrails.explorer.internal.ui.GitProjectView"
+            class="com.aptana.radrails.explorer.internal.ui.FilteringProjectView"
             icon="icons/full/cview16/filenav_nav.gif"
-            id="org.eclipse.ui.examples.navigator.view"
-            name="Git View"
+            id="com.aptana.radrails.explorer.view"
+            name="%view.name"
             restorable="true">
       </view>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
       <viewer
-            viewerId="org.eclipse.ui.examples.navigator.view">
+            viewerId="com.aptana.radrails.explorer.view">
       </viewer>
       <viewerContentBinding
-            viewerId="org.eclipse.ui.examples.navigator.view">
+            viewerId="com.aptana.radrails.explorer.view">
          <includes>
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resourceContent">
@@ -36,7 +36,7 @@
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
-            viewerId="org.eclipse.ui.examples.navigator.view">
+            viewerId="com.aptana.radrails.explorer.view">
          <includes>
             <actionExtension
                   pattern="org.eclipse.ui.navigator.resources.*">
@@ -48,7 +48,7 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonFilter
             id="com.aptana.radrails.explorer.filters.hideNonRailsProjects"
-            name="Hide non-Rails Projects">
+            name="%commonFilter.name">
          <filterExpression>
             <not>
                <adapt
@@ -64,7 +64,7 @@
       <commonFilter
             activeByDefault="true"
             id="com.aptana.radrails.explorer.filters.hideNonActiveProjects"
-            name="Hide non-active projects">
+            name="%commonFilter.name.0">
              <filterExpression>
             <not>
                <adapt

@@ -29,7 +29,10 @@ public abstract class StringUtil
 			String value = entry.getValue();
 			if (value == null)
 				value = "";
-			template = template.replaceAll(entry.getKey(), value);
+			else
+				value = value.replace('$', (char) 1); // To avoid illegal group reference issues if the text has
+														// dollars!
+			template = template.replaceAll(entry.getKey(), value).replace((char) 1, '$');
 		}
 		return template;
 	}
@@ -59,7 +62,8 @@ public abstract class StringUtil
 	 */
 	public static String md5(String lowerCase)
 	{
-		// TODO point here from GitHistoryPage lines 317 - 344
+		if (lowerCase == null)
+			return null;
 		try
 		{
 			byte[] bytesOfMessage = lowerCase.getBytes("UTF-8"); //$NON-NLS-1$
@@ -81,7 +85,7 @@ public abstract class StringUtil
 		return null;
 	}
 
-	/**
+/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * @param raw
 	 * @return
