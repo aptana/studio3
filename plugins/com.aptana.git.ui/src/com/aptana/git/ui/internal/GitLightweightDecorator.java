@@ -59,6 +59,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	}
 
 	private static ImageDescriptor trackedImage;
+	private static ImageDescriptor conflictImage;
 	private static ImageDescriptor untrackedImage;
 	private static ImageDescriptor stagedAddedImage;
 	private static ImageDescriptor stagedRemovedImage;
@@ -66,6 +67,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	static
 	{
 		trackedImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CHECKEDIN_OVR));
+		conflictImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CONFLICT_OVR));
 		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/untracked.gif"))); //$NON-NLS-1$
 		stagedAddedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
@@ -179,6 +181,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = untrackedImage;
+			}
+			else if (changed.getStatus() == ChangedFile.Status.UNMERGED)
+			{
+				overlay = conflictImage;
 			}
 		}
 		decoration.addPrefix(DIRTY_PREFIX);

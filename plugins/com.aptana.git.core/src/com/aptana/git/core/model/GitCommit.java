@@ -23,7 +23,7 @@ public class GitCommit
 	private String comment;
 	private List<Diff> diffs;
 
-	GitCommit(GitRepository repository, String sha)
+	public GitCommit(GitRepository repository, String sha)
 	{
 		this.repository = repository;
 		this.sha = sha;

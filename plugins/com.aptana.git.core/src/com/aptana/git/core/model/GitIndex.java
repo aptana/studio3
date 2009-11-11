@@ -273,6 +273,8 @@ public class GitIndex
 								file.hasUnstagedChanges = true;
 							if (fileStatus.get(4).equals("D"))
 								file.status = ChangedFile.Status.DELETED;
+							else if (fileStatus.get(4).equals("U"))
+								file.status = ChangedFile.Status.UNMERGED;
 						}
 						else
 						{
@@ -323,6 +325,8 @@ public class GitIndex
 				ChangedFile file = new ChangedFile(path);
 				if (fileStatus.get(4).equals("D"))
 					file.status = ChangedFile.Status.DELETED;
+				else if (fileStatus.get(4).equals("U"))
+					file.status = ChangedFile.Status.UNMERGED;
 				else if (fileStatus.get(0).equals(":000000"))
 					file.status = ChangedFile.Status.NEW;
 				else
