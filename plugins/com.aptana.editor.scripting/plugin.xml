@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.editor.scripting.startup.EditorScriptingStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+      	categoryId="org.eclipse.ui.category.edit"
+            description="Expand the snippets specified by the prefix"
+            id="com.aptana.editor.scripting.command.ExpandSnippet"
+            name="Expand Snippet Command">
+      </command>
+       <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="Execute Line Inserting Result"
+            id="com.aptana.editor.scripting.command.ExecuteLineInsertingResult"
+            name="Execute Line Inserting Result">
+      </command>
+       <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="Filter Through Command..."
+            id="com.aptana.editor.scripting.command.FilterThroughCommand"
+            name="Filter Through Command...">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.editor.scripting.command.ExpandSnippet"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="TAB">
+      </key>
+      <key
+            commandId="com.aptana.editor.scripting.command.ExecuteLineInsertingResult"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+R">
+      </key>
+      <key
+            commandId="com.aptana.editor.scripting.command.FilterThroughCommand"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Shift+R">
+      </key>
+   </extension>
+</plugin>
