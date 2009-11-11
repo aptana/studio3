@@ -1,9 +1,5 @@
 package com.aptana.git.ui.actions;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.jface.action.IAction;
-
 import com.aptana.git.ui.internal.actions.GitAction;
 
 public class StashAction extends GitAction
@@ -18,13 +14,11 @@ public class StashAction extends GitAction
 	}
 
 	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	public void run()
 	{
-		super.execute(action);
-
+		super.run();
 		refreshAffectedProjects();
 	}
-
 	// TODO Only enable if there are staged or unstaged files (but not untracked/new ones!)
-	
+
 }

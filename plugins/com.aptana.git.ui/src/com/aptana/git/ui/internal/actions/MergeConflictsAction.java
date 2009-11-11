@@ -27,6 +27,8 @@ import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 public class MergeConflictsAction extends TeamAction
 {
 
+	// TODO Extend GitAction?
+
 	@Override
 	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
 	{

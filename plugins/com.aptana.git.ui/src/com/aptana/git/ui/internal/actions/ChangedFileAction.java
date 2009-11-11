@@ -9,7 +9,7 @@ import com.aptana.git.core.model.GitRepository;
 
 abstract class ChangedFileAction extends TeamAction
 {
-
+	// TODO Extend GitAction?
 	protected ChangedFile getChangedFile(IResource resource)
 	{
 		if (!(resource instanceof IFile))
