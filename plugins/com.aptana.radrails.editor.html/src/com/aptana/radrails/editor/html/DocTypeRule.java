@@ -32,29 +32,43 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+package com.aptana.radrails.editor.html;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
 
-public class XMLDocumentProvider extends FileDocumentProvider {
+/* package */ class DocTypeRule extends MultiLineRule {
+	
+    private int fEmbeddedStart= 0;
 
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new XMLPartitionScanner(),
-					XMLSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IXMLConstants.CONTENT_TYPE_XML, XMLSourceConfiguration.getDefault());
-		}
-		return document;
-	}
+	public DocTypeRule(IToken token) {
+        super("<!DOCTYPE", ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
+     */
+    protected boolean endSequenceDetected(ICharacterScanner scanner) {
+        int c;
+        while ((c = scanner.read()) != ICharacterScanner.EOF) {
+            if (c == fEscapeCharacter) {
+                // Skip the escaped character.
+                scanner.read();
+            } else if (c == '<') {
+            	fEmbeddedStart++;
+            } else if (c == '>') {
+            	if (fEmbeddedStart == 0) {
+            		return true;
+            	}
+            	fEmbeddedStart--;
+            }
+        }
+        
+        scanner.unread();
+        return false;
+    }
 }

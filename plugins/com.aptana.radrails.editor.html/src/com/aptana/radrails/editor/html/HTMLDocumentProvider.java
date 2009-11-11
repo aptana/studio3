@@ -40,6 +40,7 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 import com.aptana.radrails.editor.common.CompositePartitionScanner;
+import com.aptana.radrails.editor.common.DocumentContentTypeManager;
 import com.aptana.radrails.editor.common.ExtendedFastPartitioner;
 import com.aptana.radrails.editor.common.IExtendedPartitioner;
 import com.aptana.radrails.editor.common.NullPartitionerSwitchStrategy;
@@ -59,6 +60,8 @@ public class HTMLDocumentProvider extends FileDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
+					IHTMLConstants.CONTENT_TYPE_HTML, HTMLSourceConfiguration.getDefault());
 		}
 		return document;
 	}

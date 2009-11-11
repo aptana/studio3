@@ -7,6 +7,7 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.SWT;
@@ -21,6 +22,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
+
+import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+import com.aptana.radrails.editor.common.QualifiedContentType;
 
 public class ShowScopesAction extends TextEditorAction {
 	
@@ -52,7 +56,7 @@ public class ShowScopesAction extends TextEditorAction {
         	Shell shell = textEditor.getEditorSite().getShell();
 			StyledText textWidget = textViewer.getTextWidget();
 			int caretOffset = textWidget.getCaretOffset();
-			String contentType = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).getContentType(caretOffset);
+			String contentType = getContentTypeAtOffset(textEditor, caretOffset);
 			System.out.println(contentType);
 			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 			locationAtOffset.y += textWidget.getLineHeight(caretOffset) + 2;
@@ -61,6 +65,15 @@ public class ShowScopesAction extends TextEditorAction {
         } catch (BadLocationException e) {
         	System.err.println(e.getMessage());
         }
+	}
+	
+	private String getContentTypeAtOffset(ITextEditor textEditor, int offset) throws BadLocationException {
+		IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
+		if (contentType != null) {
+			return contentType.toString();
+		}
+		return document.getContentType(offset);
 	}
 	
 	private void popup(Shell shell, final String description, final Point location) {

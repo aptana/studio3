@@ -32,29 +32,14 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+package com.aptana.radrails.editor.js;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+/**
+ * @author Max Stepanov
+ *
+ */
+public interface IJSConstants {
 
-public class XMLDocumentProvider extends FileDocumentProvider {
-
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new XMLPartitionScanner(),
-					XMLSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IXMLConstants.CONTENT_TYPE_XML, XMLSourceConfiguration.getDefault());
-		}
-		return document;
-	}
+	public String CONTENT_TYPE_JS = "com.aptana.radrails.contenttype.js";
 }

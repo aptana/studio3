@@ -125,7 +125,14 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
     }
 
-    /**
+    /* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 */
+	public String getDocumentDefaultContentType() {
+		return DEFAULT;
+	}
+
+	/**
      * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler,
      *      org.eclipse.jface.text.source.ISourceViewer)
      */

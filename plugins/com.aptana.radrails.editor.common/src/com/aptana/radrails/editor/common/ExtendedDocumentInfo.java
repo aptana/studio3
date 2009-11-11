@@ -32,29 +32,36 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
 
-import org.eclipse.core.runtime.CoreException;
+package com.aptana.radrails.editor.common;
+
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
 
-public class XMLDocumentProvider extends FileDocumentProvider {
-
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new XMLPartitionScanner(),
-					XMLSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IXMLConstants.CONTENT_TYPE_XML, XMLSourceConfiguration.getDefault());
-		}
-		return document;
+/**
+ * @author Max Stepanov
+ *
+ */
+/* package */ class ExtendedDocumentInfo {
+	
+	private QualifiedContentType documentContentType;
+	private QualifiedContentType defaultContentType;
+	
+	/**
+	 * 
+	 */
+	protected ExtendedDocumentInfo(String documentContentType, String defaultContentType) {
+		this.documentContentType = new QualifiedContentType(documentContentType);
+		this.defaultContentType = this.documentContentType.subtype(defaultContentType);
 	}
+		
+	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException {
+		String contentType = document.getContentType(offset);
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
+			return defaultContentType;
+		}
+		return documentContentType.subtype(contentType);
+	}
+	
 }
