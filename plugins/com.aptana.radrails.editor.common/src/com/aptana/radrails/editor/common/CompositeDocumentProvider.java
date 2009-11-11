@@ -46,20 +46,24 @@ import org.eclipse.ui.editors.text.FileDocumentProvider;
  */
 public class CompositeDocumentProvider extends FileDocumentProvider {
 
+	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
 	private IPartitioningConfiguration primaryPartitioningConfiguration;
 	private IPartitionerSwitchStrategy partitionerSwitchStrategy;
 	
 	/**
+	 * @param documentContentType
 	 * @param defaultPartitioningConfiguration
 	 * @param primaryPartitioningConfiguration
 	 * @param partitionerSwitchStrategy
 	 */
 	protected CompositeDocumentProvider(
+			String documentContentType,
 			IPartitioningConfiguration defaultPartitioningConfiguration,
 			IPartitioningConfiguration primaryPartitioningConfiguration,
 			IPartitionerSwitchStrategy partitionerSwitchStrategy) {
 		super();
+		this.documentContentType = documentContentType;
 		this.defaultPartitioningConfiguration = defaultPartitioningConfiguration;
 		this.primaryPartitioningConfiguration = primaryPartitioningConfiguration;
 		this.partitionerSwitchStrategy = partitionerSwitchStrategy;
@@ -85,6 +89,8 @@ public class CompositeDocumentProvider extends FileDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, documentContentType, defaultPartitioningConfiguration);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, primaryPartitioningConfiguration);
 		}
 		return document;
 	}

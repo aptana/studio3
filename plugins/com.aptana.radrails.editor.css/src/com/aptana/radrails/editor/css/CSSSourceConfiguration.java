@@ -180,6 +180,13 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 */
+	public String getDocumentDefaultContentType() {
+		return DEFAULT;
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {

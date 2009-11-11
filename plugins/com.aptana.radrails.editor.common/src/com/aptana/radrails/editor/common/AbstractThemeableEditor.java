@@ -7,6 +7,7 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.radrails.editor.common.actions.ShowScopesAction;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 /**
@@ -15,6 +16,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
 {
 
@@ -48,5 +50,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		{
 			getSourceViewer().invalidateTextPresentation();
 		}
+	}
+	
+	@Override
+	protected void createActions() {
+		super.createActions();
+		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 	}
 }

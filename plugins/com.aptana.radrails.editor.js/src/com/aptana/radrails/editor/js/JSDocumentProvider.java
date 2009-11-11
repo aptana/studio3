@@ -40,6 +40,8 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
+import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+
 public class JSDocumentProvider extends FileDocumentProvider {
 
 	protected IDocument createDocument(Object element) throws CoreException {
@@ -50,6 +52,9 @@ public class JSDocumentProvider extends FileDocumentProvider {
 					JSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
+					IJSConstants.CONTENT_TYPE_JS,
+					JSSourceConfiguration.getDefault());
 		}
 		return document;
 	}

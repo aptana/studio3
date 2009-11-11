@@ -48,8 +48,8 @@ import org.eclipse.jface.text.rules.Token;
  */
 public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
-	public final static String START_SWITCH_TAG = "__cl_start_switch_tag";
-	public final static String END_SWITCH_TAG = "__cl_end_switch_tag";
+	public final static String START_SWITCH_TAG = "__common_start_switch_tag";
+	public final static String END_SWITCH_TAG = "__common_end_switch_tag";
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] {
 			START_SWITCH_TAG,
@@ -61,7 +61,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	
 	private ISubPartitionScanner currentPartitionScanner;
 	
-	private IPredicateRule[] switchRules;
+	private IPredicateRule[][] switchRules;
 		
 	private IExtendedPartitioner partitioner;
 	
@@ -82,10 +82,12 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		primaryPartitionScanner.initCharacterScanner(this, partitionerSwitchStrategy.getPrimarySwitchStrategy());
 					
 		String[][] pairs = partitionerSwitchStrategy.getSwitchTagPairs();
-		switchRules = new IPredicateRule[pairs.length*2];
+		switchRules = new IPredicateRule[pairs.length][];
 		for (int i = 0; i < pairs.length; ++i) {
-			switchRules[2*i] = new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG));
-			switchRules[2*i+1] = new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG));
+			switchRules[i] = new IPredicateRule[] {
+					new SingleTagRule(pairs[i][0], new Token(START_SWITCH_TAG)),
+					new SingleTagRule(pairs[i][1], new Token(END_SWITCH_TAG))
+			};
 		}
 				
 		currentPartitionScanner = defaultPartitionScanner;
@@ -131,6 +133,8 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				}
 				currentPartitionScanner.setLastToken(new Token(type));
 			}
+		} else if (primaryPartitionScanner.hasContentType(contentType)) {
+			currentPartitionScanner = primaryPartitionScanner;
 		}
 		super.setPartialRange(document, offset, length, contentType, partitionOffset);
 	}
@@ -176,7 +180,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			System.out.println("> "+token.getData());
+			System.out.println("> "+token.getData() + " "+getTokenOffset()+":"+getTokenLength()); // XXX
 			return token;
 		}
 		if (fContentType == null || hasSwitch) {
@@ -191,8 +195,9 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		
 		IToken token;
 
-		boolean doResetRules = false;
+		boolean doResetRules;
 		do {
+			doResetRules = false;
 			for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 				token = rule.getSuccessToken();
 				if (fContentType.equals(token.getData())) {
@@ -200,12 +205,14 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 					if (!token.isUndefined()) {
 						fContentType = null;
 						currentPartitionScanner.setLastToken(token);
+						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
 						break;
 					}
 					if (hasSwitchingSequence()) {
+						fContentType = null;
 						return getDefaultToken();
 					}
 				}
@@ -228,19 +235,21 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 			hasSwitch = false;
 			boolean toPrimary = (currentPartitionScanner == defaultPartitionScanner);
 			for (int i = 0; i < switchRules.length; ++i) {
-				IToken token = (switchRules[i].evaluate(this));
+				IToken token = (switchRules[i][toPrimary ? 0 : 1].evaluate(this));
 				if (!token.isUndefined()) {
 					currentPartitionScanner = toPrimary ? primaryPartitionScanner : defaultPartitionScanner;
 					return returnToken(token);
 				}
 			}
 		} else {
-			boolean doResetRules = false;
+			boolean doResetRules;
 			do {
+				doResetRules = false;
 				for (IPredicateRule rule : currentPartitionScanner.getRules()) {
 					IToken token = rule.evaluate(currentPartitionScanner.getCharacterScanner());
 					if (!token.isUndefined()) {
 						currentPartitionScanner.setLastToken(token);
+						currentPartitionScanner.doResetRules();
 						return returnToken(token);
 					}
 					if (doResetRules = currentPartitionScanner.doResetRules()) {
@@ -261,7 +270,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 	
 	private IToken getDefaultToken() {
 		if (defaultTokenState == null) {
-			//defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
+			defaultTokenState = new DefaultTokenState(currentPartitionScanner.getDefaultToken());
 		}
 		return fDefaultReturnToken;
 	}

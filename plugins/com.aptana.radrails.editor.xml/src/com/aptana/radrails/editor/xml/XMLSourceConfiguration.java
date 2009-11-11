@@ -124,6 +124,13 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 */
+	public String getDocumentDefaultContentType() {
+		return DEFAULT;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see

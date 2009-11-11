@@ -85,6 +85,7 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	@Override
 	public void setLastToken(IToken token) {
 		if (!(token.getData() instanceof String)) {
+			current = TYPE_DEFAULT;
 			return;
 		}
 		String contentType = (String) token.getData();

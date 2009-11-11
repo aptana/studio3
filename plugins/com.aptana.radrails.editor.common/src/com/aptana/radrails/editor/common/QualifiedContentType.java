@@ -35,63 +35,92 @@
 
 package com.aptana.radrails.editor.common;
 
+import java.util.Arrays;
+
 /**
  * @author Max Stepanov
  *
  */
-public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
+public final class QualifiedContentType {
 
-	private static final char[][][] EMPTY = new char[][][] {};
+	private final String[] contentTypes;
 	
-	private char[][][] switchSequences;
-	private char[][][] escapeSequences;
-	
-	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, String[][] escapeSequencePairs) {
-		char[][] startSequences = new char[switchSequencePairs.length][];
-		char[][] endSequences = new char[switchSequencePairs.length][];
-		for (int i = 0; i < switchSequencePairs.length; ++i) {
-			startSequences[i] = switchSequencePairs[i][0].toCharArray();
-			endSequences[i] = switchSequencePairs[i][1].toCharArray();
-		}
+	/**
+	 * 
+	 */
+	public QualifiedContentType(String contentType) {
+		this(new String[] { contentType });
+	}
 
-		switchSequences = new char[][][] { TextUtils.removeDuplicates(startSequences), TextUtils.removeDuplicates(endSequences) };
-		escapeSequences = new char[escapeSequencePairs.length][][];
-		for (int i = 0; i < escapeSequencePairs.length; ++i) {
-			escapeSequences[i] = new char[][] {
-					escapeSequencePairs[i][0].toCharArray(),
-					escapeSequencePairs[i][1] != null ? escapeSequencePairs[i][1].toCharArray() : null
-			};
+	/**
+	 * 
+	 */
+	public QualifiedContentType(String[] contentTypes) {
+		this.contentTypes = contentTypes;
+	}
+
+	public QualifiedContentType subtype(String appendContentType) {
+		String[] array = new String[contentTypes.length+1];
+		System.arraycopy(contentTypes, 0, array, 0, contentTypes.length);
+		array[array.length-1] = appendContentType;
+		return new QualifiedContentType(array);		
+	}
+
+	public QualifiedContentType subtype(String[] appendContentTypes) {
+		String[] array = new String[contentTypes.length+appendContentTypes.length];
+		System.arraycopy(contentTypes, 0, array, 0, contentTypes.length);
+		System.arraycopy(appendContentTypes, 0, array, contentTypes.length, appendContentTypes.length);
+		return new QualifiedContentType(array);
+	}
+	
+	public boolean contains(String contentType) {
+		// TODO: possible speed optimization with HashSet
+		for (String i : contentTypes) {
+			if (i.equals(contentType)) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
+	 * @see java.lang.Object#hashCode()
 	 */
-	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy() {
-		return new IPartitionScannerSwitchStrategy() {
-			public char[][] getSwitchSequences() {
-				return switchSequences[0];
-			}
-			
-			public char[][][] getEscapeSequences() {
-				return EMPTY;
-			}
-		};
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(contentTypes);
+		return result;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy() {
-		return new IPartitionScannerSwitchStrategy() {
-			public char[][] getSwitchSequences() {
-				return switchSequences[1];
-			}
-			
-			public char[][][] getEscapeSequences() {
-				return escapeSequences;
-			}
-		};
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof QualifiedContentType)) {
+			return false;
+		}
+		QualifiedContentType other = (QualifiedContentType) obj;
+		if (!Arrays.equals(contentTypes, other.contentTypes)) {
+			return false;
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return Arrays.toString(contentTypes);
 	}
 
 }

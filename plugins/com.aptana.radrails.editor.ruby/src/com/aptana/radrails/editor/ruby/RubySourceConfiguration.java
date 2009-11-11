@@ -125,7 +125,14 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
     }
 
-    /**
+    /* (non-Javadoc)
+	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 */
+	public String getDocumentDefaultContentType() {
+		return DEFAULT;
+	}
+
+	/**
      * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler,
      *      org.eclipse.jface.text.source.ISourceViewer)
      */
@@ -134,6 +141,9 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
         reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
         reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+        
+        reconciler.setDamager(dr, DEFAULT);
+        reconciler.setRepairer(dr, DEFAULT);
 
         dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
         reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);

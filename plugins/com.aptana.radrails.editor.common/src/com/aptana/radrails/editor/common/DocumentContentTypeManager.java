@@ -32,29 +32,54 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
 
-import org.eclipse.core.runtime.CoreException;
+package com.aptana.radrails.editor.common;
+
+import java.util.WeakHashMap;
+
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+/**
+ * @author Max Stepanov
+ *
+ */
+public final class DocumentContentTypeManager {
 
-public class XMLDocumentProvider extends FileDocumentProvider {
-
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new XMLPartitionScanner(),
-					XMLSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IXMLConstants.CONTENT_TYPE_XML, XMLSourceConfiguration.getDefault());
-		}
-		return document;
+	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
+	
+	private static DocumentContentTypeManager instance;
+	
+	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
+	
+	/**
+	 * 
+	 */
+	private DocumentContentTypeManager() {
 	}
+	
+	public static DocumentContentTypeManager getInstance() {
+		if (instance == null) {
+			instance = new DocumentContentTypeManager();
+		}
+		return instance;
+	}
+	
+	public void setDocumentContentType(IDocument document, String documenContentType, IPartitioningConfiguration defaultConfiguration) {
+		infos.put(document, new ExtendedDocumentInfo(documenContentType, defaultConfiguration.getDocumentDefaultContentType()));
+		registerConfiguration(document, defaultConfiguration);
+	}
+
+	public void registerConfiguration(IDocument document, IPartitioningConfiguration configuration) {
+		
+	}
+
+	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException {
+		ExtendedDocumentInfo info = infos.get(document);
+		if (info != null) {
+			return info.getContentType(document, offset);
+		}
+		return UNKNOWN.subtype(document.getContentType(offset));
+	}
+
 }

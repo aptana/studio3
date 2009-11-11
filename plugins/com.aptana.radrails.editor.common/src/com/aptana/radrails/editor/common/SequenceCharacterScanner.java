@@ -47,6 +47,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	private char[][] sequences;
 	private char[][][] escapes;
 	private boolean found = false;
+	private boolean eof = false;
 	
 	/**
 	 * @param baseCharacterScanner
@@ -75,11 +76,14 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	 * @see org.eclipse.jface.text.rules.ICharacterScanner#read()
 	 */
 	public int read() {
+		eof = false;
 		int c = characterScanner.read();
 		if (c != ICharacterScanner.EOF) {
 			for (char[] sequence : sequences) {
 				if (c == sequence[0] && sequenceDetected(sequence)) {
 					found = true;
+					eof = true;
+					characterScanner.unread();
 					return ICharacterScanner.EOF;
 				}
 			}
@@ -91,6 +95,10 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	 * @see org.eclipse.jface.text.rules.ICharacterScanner#unread()
 	 */
 	public void unread() {
+		if (eof) {
+			eof = false;
+			return;
+		}
 		characterScanner.unread();
 	}
 		

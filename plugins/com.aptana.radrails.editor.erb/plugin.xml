@@ -6,16 +6,37 @@
       <editor
             class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
             default="true"
-            extensions="rhtml,erb"
             id="com.aptana.radrails.editor.erb.html"
             name="RHTML Editor">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.html.erb">
+         </contentTypeBinding>
       </editor>
       <editor
             class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
-            extensions="rxml,erb"
             id="com.aptana.radrails.editor.erb.xml"
             name="RXML Editor">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.xml.erb">
+         </contentTypeBinding>
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="com.aptana.radrails.contenttype.html"
+            file-extensions="rhtml,html.erb"
+            id="com.aptana.radrails.contenttype.html.erb"
+            name="HTML.ERB"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="rxml,xml.erb"
+            id="com.aptana.radrails.contenttype.xml.erb"
+            name="XML.ERB"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>

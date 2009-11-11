@@ -6,11 +6,23 @@
       <editor
             class="com.aptana.radrails.editor.js.JSSourceEditor"
             default="true"
-            extensions="js"
             icon="icons/js.gif"
             id="com.aptana.radrails.editor.js"
             name="JavaScript Source Editor (Aptana)">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.js">
+         </contentTypeBinding>
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="js"
+            id="com.aptana.radrails.contenttype.js"
+            name="JavaScript Source"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>
