@@ -1,5 +1,7 @@
 package com.aptana.git.ui.internal.actions;
 
+import com.aptana.git.ui.actions.SimpleGitCommandAction;
+
 
 public class StatusAction extends SimpleGitCommandAction
 {

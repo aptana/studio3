@@ -1,7 +1,6 @@
 package com.aptana.git.ui.actions;
 
 import com.aptana.git.ui.internal.GitLightweightDecorator;
-import com.aptana.git.ui.internal.actions.SimpleGitCommandAction;
 
 public class PullAction extends SimpleGitCommandAction
 {
