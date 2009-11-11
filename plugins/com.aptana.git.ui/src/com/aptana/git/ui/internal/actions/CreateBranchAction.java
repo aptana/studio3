@@ -49,13 +49,7 @@ public class CreateBranchAction extends GitAction
 				// Do we want to always switch to the newly created branch?
 				theRepo.switchBranch(branchName);
 			}
-		}		
-	}
-
-	@Override
-	protected String[] getCommand()
-	{
-		return new String[] { "branch" };
+		}
 	}
 
 	@Override

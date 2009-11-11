@@ -6,7 +6,7 @@ import org.eclipse.core.resources.IResource;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
 
-public class PushAction extends GitAction
+public class PushAction extends SimpleGitCommandAction
 {
 
 	private static final String COMMAND = "push"; //$NON-NLS-1$
@@ -17,10 +17,9 @@ public class PushAction extends GitAction
 		return new String[] { COMMAND };
 	}
 
-	public void run()
+	@Override
+	protected void postLaunch()
 	{
-		super.run();
-
 		// TODO It'd be nice if we could just tell it to update the labels of the projects attached to the repo (and
 		// only the project, not it's children)!
 		GitLightweightDecorator.refresh();

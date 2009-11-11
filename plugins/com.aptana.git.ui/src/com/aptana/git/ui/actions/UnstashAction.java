@@ -1,7 +1,6 @@
 package com.aptana.git.ui.actions;
 
-
-public class UnstashAction extends GitAction
+public class UnstashAction extends SimpleGitCommandAction
 {
 
 	@Override
@@ -11,9 +10,8 @@ public class UnstashAction extends GitAction
 	}
 
 	@Override
-	public void run()
+	protected void postLaunch()
 	{
-		super.run();
 		refreshAffectedProjects();
 	}
 	// TODO Only enable if there's a "ref/stash" ref!

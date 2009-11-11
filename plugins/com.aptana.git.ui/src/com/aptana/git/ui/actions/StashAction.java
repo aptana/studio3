@@ -1,7 +1,6 @@
 package com.aptana.git.ui.actions;
 
-
-public class StashAction extends GitAction
+public class StashAction extends SimpleGitCommandAction
 {
 
 	private static final String COMMAND = "stash"; //$NON-NLS-1$
@@ -13,9 +12,8 @@ public class StashAction extends GitAction
 	}
 
 	@Override
-	public void run()
+	protected void postLaunch()
 	{
-		super.run();
 		refreshAffectedProjects();
 	}
 	// TODO Only enable if there are staged or unstaged files (but not untracked/new ones!)

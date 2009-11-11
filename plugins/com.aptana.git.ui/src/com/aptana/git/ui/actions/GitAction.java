@@ -1,6 +1,5 @@
 package com.aptana.git.ui.actions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,9 +28,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.actions.Messages;
 
 /**
@@ -47,33 +44,11 @@ public abstract class GitAction extends Action implements IObjectActionDelegate
 	private Shell shell;
 	private IWorkbenchPart targetPart;
 
-	@Override
-	public void run()
-	{
-		File workingDir = getWorkingDir();
-		String working = null;
-		if (workingDir != null)
-			working = workingDir.toString();
-		Launcher.launch(GitExecutable.instance().path(), working, getCommand());
-	}
+	public abstract void run();
 
 	public void run(IAction action)
 	{
 		run();
-	}
-
-	protected abstract String[] getCommand();
-
-	private File getWorkingDir()
-	{
-		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length == 0)
-			return null;
-		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
-		if (repo == null)
-			return null;
-		return new File(repo.workingDirectory());
 	}
 
 	public void selectionChanged(IAction action, ISelection selection)

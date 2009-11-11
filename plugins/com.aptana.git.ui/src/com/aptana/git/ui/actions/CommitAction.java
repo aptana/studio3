@@ -14,8 +14,6 @@ import com.aptana.git.ui.internal.actions.Messages;
 public class CommitAction extends GitAction
 {
 
-	private static final String COMMAND = "commit"; //$NON-NLS-1$
-
 	@Override
 	public void run()
 	{
@@ -45,12 +43,6 @@ public class CommitAction extends GitAction
 		{
 			theRepo.index().commit(dialog.getCommitMessage());
 		}
-	}
-
-	@Override
-	protected String[] getCommand()
-	{
-		return new String[] { COMMAND };
 	}
 
 	@Override

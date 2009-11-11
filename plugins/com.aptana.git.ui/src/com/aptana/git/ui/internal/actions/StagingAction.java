@@ -1,13 +1,11 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.action.IAction;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -16,7 +14,7 @@ abstract class StagingAction extends ChangedFileAction
 {
 
 	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	public void run()
 	{
 		Map<GitRepository, List<ChangedFile>> repoToChangedFiles = new HashMap<GitRepository, List<ChangedFile>>();
 		IResource[] resources = getSelectedResources();
