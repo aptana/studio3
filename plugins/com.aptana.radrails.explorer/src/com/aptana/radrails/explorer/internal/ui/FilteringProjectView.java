@@ -200,6 +200,8 @@ public class FilteringProjectView extends GitProjectView
 						&& !getFilterString().equals(initialText))
 					return;
 				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
+				if (t == null)
+					return;
 				if (hoveredItem != null && hoveredItem.equals(t))
 					return;
 				final Rectangle oldBounds = hoveredItem == null ? null : hoveredItem.getBounds();
