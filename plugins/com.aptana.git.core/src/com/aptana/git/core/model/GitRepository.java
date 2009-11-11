@@ -8,7 +8,9 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -164,18 +166,42 @@ public class GitRepository
 
 	public Set<String> localBranches()
 	{
-		// TODO Cache/memoize
-		Set<String> localBranches = new HashSet<String>();
+		return branches(GitRef.HEAD_TYPE);
+	}
+
+	public Set<String> remoteBranches()
+	{
+		return branches(GitRef.REMOTE_TYPE);
+	}
+
+	public Set<String> allBranches()
+	{
+		return branches(GitRef.HEAD_TYPE, GitRef.REMOTE_TYPE);
+	}
+
+	private Set<String> branches(String... types)
+	{
+		if (types == null || types.length == 0)
+			return Collections.emptySet();
+		Set<String> validTypes = new HashSet<String>(Arrays.asList(types));
+		Set<String> allBranches = new HashSet<String>();
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
 				continue;
 			GitRef ref = revSpec.simpleRef();
-			if (ref == null || ref.type() == null || !ref.type().equals(GitRef.HEAD_TYPE))
+			if (ref == null || ref.type() == null)
 				continue;
-			localBranches.add(ref.shortName());
+			for (String string : types)
+			{
+				if (ref.type().equals(string))
+					break;
+			}
+			if (!validTypes.contains(ref.type()))
+				continue;
+			allBranches.add(ref.shortName());
 		}
-		return localBranches;
+		return allBranches;
 	}
 
 	public boolean switchBranch(String branchName)
@@ -701,5 +727,18 @@ public class GitRepository
 		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
 		for (IGitRepositoryListener listener : listeners)
 			listener.repositoryRemoved(e);
+	}
+
+	public boolean hasUnresolvedMergeConflicts()
+	{
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles.isEmpty())
+			return false;
+		for (ChangedFile changedFile : changedFiles)
+		{
+			if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+				return true;
+		}
+		return false;
 	}
 }
