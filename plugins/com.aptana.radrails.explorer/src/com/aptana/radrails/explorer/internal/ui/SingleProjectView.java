@@ -142,7 +142,17 @@ public class SingleProjectView extends CommonNavigator
 				{
 					projectCombo.add(iProject.getName());
 				}
-				projectCombo.setText(selectedProject.getName());
+				if (selectedProject == null)
+				{
+					if (projects.length > 0)
+					{
+						setActiveProject(projects[0].getName());
+					}
+				}
+				else
+				{
+					projectCombo.setText(selectedProject.getName());
+				}
 				return Status.OK_STATUS;
 			}
 		};
