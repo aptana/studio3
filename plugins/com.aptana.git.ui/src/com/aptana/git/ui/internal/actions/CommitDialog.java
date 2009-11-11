@@ -375,7 +375,7 @@ public class CommitDialog extends StatusDialog
 					Messages.CommitDialog_StageFilesFirst_Error));
 			return;
 		}
-		if (gitRepository.hasMerges())
+		if (gitRepository.hasUnresolvedMergeConflicts())
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_CannotMerge_Error));
 			return;
