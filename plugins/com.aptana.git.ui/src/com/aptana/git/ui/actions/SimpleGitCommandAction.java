@@ -43,6 +43,7 @@ public abstract class SimpleGitCommandAction extends GitAction
 					if (monitor.isCanceled())
 						return Status.CANCEL_STATUS;
 				}
+				postLaunch();
 				return Status.OK_STATUS;
 			}
 		};
@@ -53,6 +54,9 @@ public abstract class SimpleGitCommandAction extends GitAction
 
 	protected abstract String[] getCommand();
 
+	/**
+	 * Hook for running code after the launch has terminated.
+	 */
 	protected abstract void postLaunch();
 
 	private File getWorkingDir()
