@@ -161,20 +161,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 
 		ImageDescriptor overlay = trackedImage;
-		if (changed.hasStagedChanges())
-		{
-			decoration.setForegroundColor(greenFG());
-			decoration.setBackgroundColor(greenBG());
-			if (changed.getStatus() == ChangedFile.Status.DELETED)
-			{
-				overlay = stagedRemovedImage;
-			}
-			else if (changed.getStatus() == ChangedFile.Status.NEW)
-			{
-				overlay = stagedAddedImage;
-			}
-		}
-		else if (changed.hasUnstagedChanges())
+		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
+		if (changed.hasUnstagedChanges())
 		{
 			decoration.setForegroundColor(redFG());
 			decoration.setBackgroundColor(redBG());
@@ -185,6 +173,19 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			else if (changed.getStatus() == ChangedFile.Status.UNMERGED)
 			{
 				overlay = conflictImage;
+			}
+		}
+		else if (changed.hasStagedChanges())
+		{
+			decoration.setForegroundColor(greenFG());
+			decoration.setBackgroundColor(greenBG());
+			if (changed.getStatus() == ChangedFile.Status.DELETED)
+			{
+				overlay = stagedRemovedImage;
+			}
+			else if (changed.getStatus() == ChangedFile.Status.NEW)
+			{
+				overlay = stagedAddedImage;
 			}
 		}
 		decoration.addPrefix(DIRTY_PREFIX);
