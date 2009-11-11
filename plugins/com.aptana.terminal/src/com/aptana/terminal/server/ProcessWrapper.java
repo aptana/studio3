@@ -70,14 +70,11 @@ public class ProcessWrapper
 		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
-			File file = null;
-	
 			try
 			{
 				URL fileURL = FileLocator.toFileURL(url);
-				URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
 				
-				file = new File(fileURI);
+				File file = new File(new Path(fileURL.getPath()).toOSString());
 				
 				result = file.getAbsolutePath();
 			}
@@ -85,15 +82,6 @@ public class ProcessWrapper
 			{
 				String message = MessageFormat.format(
 					Messages.ProcessWrapper_Error_Locating_Terminal_Executable,
-					new Object[] { url.toString() }
-				);
-				
-				Activator.logError(message, e);
-			}
-			catch (URISyntaxException e)
-			{
-				String message = MessageFormat.format(
-					Messages.ProcessWrapper_Malformed_Terminal_Executable_URI,
 					new Object[] { url.toString() }
 				);
 				
