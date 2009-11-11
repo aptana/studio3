@@ -1,4 +1,4 @@
-package com.aptana.git.ui.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
 
@@ -12,6 +12,7 @@ import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.actions.GitAction;
 import com.aptana.git.ui.internal.Launcher;
 
 public abstract class SimpleGitCommandAction extends GitAction

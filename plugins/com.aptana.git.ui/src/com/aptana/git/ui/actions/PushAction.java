@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IResource;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
+import com.aptana.git.ui.internal.actions.SimpleGitCommandAction;
 
 public class PushAction extends SimpleGitCommandAction
 {
