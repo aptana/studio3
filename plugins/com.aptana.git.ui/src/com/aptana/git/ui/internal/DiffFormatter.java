@@ -70,6 +70,8 @@ public abstract class DiffFormatter
 					break;
 
 				case '+':
+					if (line.equals("+++ /dev/null"))
+						continue;
 					// Highlight trailing whitespace
 					line = StringUtil.sanitizeHTML(line);
 					line = line.replaceFirst("\\s+$", "<span class=\"whitespace\">$0</span>");
