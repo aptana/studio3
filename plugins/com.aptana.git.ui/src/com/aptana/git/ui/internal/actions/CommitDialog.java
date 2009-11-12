@@ -288,10 +288,10 @@ public class CommitDialog extends StatusDialog
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
 					return;
-				if (gitRepository.index().hasBinaryAttributes(file))
+				if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
 				{
 					// Special code to draw the image if the binary file is an image
-					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg"};
+					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg", ".ico"};
 					for (String extension : imageExtensions)
 					{
 						if (file.getPath().endsWith(extension))
@@ -303,7 +303,7 @@ public class CommitDialog extends StatusDialog
 					}
 				}
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				updateDiff(diff);
+				updateDiff(DiffFormatter.toHTML(diff));
 			}
 		});
 		return table;
@@ -312,7 +312,7 @@ public class CommitDialog extends StatusDialog
 	protected void updateDiff(String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
-			diffArea.setText(DiffFormatter.toHTML(diff));
+			diffArea.setText(diff);
 	}
 
 	protected ChangedFile findChangedFile(String path)
