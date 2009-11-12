@@ -71,10 +71,10 @@ public abstract class Inflector
 
 	private static void irregular(String singular, String plural)
 	{
-		plural(Pattern.compile("(" + singular.charAt(0) + ")" + singular.substring(1) + "$", Pattern.CASE_INSENSITIVE),
-				"$1" + plural.substring(1));
-		singular(Pattern.compile("(" + plural.charAt(0) + ")" + plural.substring(1) + "$", Pattern.CASE_INSENSITIVE),
-				"$1" + singular.substring(1));
+		plural(Pattern.compile("(" + singular.charAt(0) + ")" + singular.substring(1) + "$", Pattern.CASE_INSENSITIVE), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"$1" + plural.substring(1)); //$NON-NLS-1$
+		singular(Pattern.compile("(" + plural.charAt(0) + ")" + plural.substring(1) + "$", Pattern.CASE_INSENSITIVE), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				"$1" + singular.substring(1)); //$NON-NLS-1$
 	}
 
 	private static void uncountable(String[] words)
@@ -87,57 +87,57 @@ public abstract class Inflector
 
 	static
 	{
-		Inflector.plural(Pattern.compile("$"), "s");
-		Inflector.plural(Pattern.compile("s$", Pattern.CASE_INSENSITIVE), "s");
-		Inflector.plural(Pattern.compile("(ax|test)is$", Pattern.CASE_INSENSITIVE), "$1es");
-		Inflector.plural(Pattern.compile("(octop|vir)us$", Pattern.CASE_INSENSITIVE), "$1i");
-		Inflector.plural(Pattern.compile("(alias|status)$", Pattern.CASE_INSENSITIVE), "$1es");
-		Inflector.plural(Pattern.compile("(bu)s$", Pattern.CASE_INSENSITIVE), "$1ses");
-		Inflector.plural(Pattern.compile("(buffal|tomat)o$", Pattern.CASE_INSENSITIVE), "$1oes");
-		Inflector.plural(Pattern.compile("([ti])um$", Pattern.CASE_INSENSITIVE), "$1a");
-		Inflector.plural(Pattern.compile("sis$", Pattern.CASE_INSENSITIVE), "ses");
-		Inflector.plural(Pattern.compile("(?:([^f])fe|([lr])f)$", Pattern.CASE_INSENSITIVE), "$1$2ves");
-		Inflector.plural(Pattern.compile("(hive)$", Pattern.CASE_INSENSITIVE), "$1s");
-		Inflector.plural(Pattern.compile("([^aeiouy]|qu)y$", Pattern.CASE_INSENSITIVE), "$1ies");
-		Inflector.plural(Pattern.compile("(x|ch|ss|sh)$", Pattern.CASE_INSENSITIVE), "$1es");
-		Inflector.plural(Pattern.compile("(matr|vert|ind)ix|ex$", Pattern.CASE_INSENSITIVE), "$1ices");
-		Inflector.plural(Pattern.compile("([m|l])ouse$", Pattern.CASE_INSENSITIVE), "$1ice");
-		Inflector.plural(Pattern.compile("^(ox)$", Pattern.CASE_INSENSITIVE), "$1en");
-		Inflector.plural(Pattern.compile("(quiz)$", Pattern.CASE_INSENSITIVE), "$1zes");
+		Inflector.plural(Pattern.compile("$"), "s"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("s$", Pattern.CASE_INSENSITIVE), "s"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(ax|test)is$", Pattern.CASE_INSENSITIVE), "$1es"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(octop|vir)us$", Pattern.CASE_INSENSITIVE), "$1i"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(alias|status)$", Pattern.CASE_INSENSITIVE), "$1es"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(bu)s$", Pattern.CASE_INSENSITIVE), "$1ses"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(buffal|tomat)o$", Pattern.CASE_INSENSITIVE), "$1oes"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("([ti])um$", Pattern.CASE_INSENSITIVE), "$1a"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("sis$", Pattern.CASE_INSENSITIVE), "ses"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(?:([^f])fe|([lr])f)$", Pattern.CASE_INSENSITIVE), "$1$2ves"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(hive)$", Pattern.CASE_INSENSITIVE), "$1s"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("([^aeiouy]|qu)y$", Pattern.CASE_INSENSITIVE), "$1ies"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(x|ch|ss|sh)$", Pattern.CASE_INSENSITIVE), "$1es"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(matr|vert|ind)ix|ex$", Pattern.CASE_INSENSITIVE), "$1ices"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("([m|l])ouse$", Pattern.CASE_INSENSITIVE), "$1ice"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("^(ox)$", Pattern.CASE_INSENSITIVE), "$1en"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.plural(Pattern.compile("(quiz)$", Pattern.CASE_INSENSITIVE), "$1zes"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		Inflector.singular(Pattern.compile("s$", Pattern.CASE_INSENSITIVE), "");
-		Inflector.singular(Pattern.compile("(n)ews$", Pattern.CASE_INSENSITIVE), "$1ews");
-		Inflector.singular(Pattern.compile("([ti])a$", Pattern.CASE_INSENSITIVE), "$1um");
-		Inflector.singular(Pattern.compile("((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$",
-				Pattern.CASE_INSENSITIVE), "$1$2sis");
-		Inflector.singular(Pattern.compile("(^analy)ses$", Pattern.CASE_INSENSITIVE), "$1sis");
-		Inflector.singular(Pattern.compile("([^f])ves$", Pattern.CASE_INSENSITIVE), "$1fe");
-		Inflector.singular(Pattern.compile("(hive)s$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("(tive)s$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("([lr])ves$", Pattern.CASE_INSENSITIVE), "$1f");
-		Inflector.singular(Pattern.compile("([^aeiouy]|qu)ies$", Pattern.CASE_INSENSITIVE), "$1y");
-		Inflector.singular(Pattern.compile("(s)eries$", Pattern.CASE_INSENSITIVE), "$1eries");
-		Inflector.singular(Pattern.compile("(m)ovies$", Pattern.CASE_INSENSITIVE), "$1ovie");
-		Inflector.singular(Pattern.compile("(x|ch|ss|sh)es$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("([m|l])ice$", Pattern.CASE_INSENSITIVE), "$1ouse");
-		Inflector.singular(Pattern.compile("(bus)es$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("(o)es$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("(shoe)s$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("(cris|ax|test)es$", Pattern.CASE_INSENSITIVE), "$1is");
-		Inflector.singular(Pattern.compile("(octop|vir)i$", Pattern.CASE_INSENSITIVE), "$1us");
-		Inflector.singular(Pattern.compile("(alias|status)es$", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("^(ox)en", Pattern.CASE_INSENSITIVE), "$1");
-		Inflector.singular(Pattern.compile("(vert|ind)ices$", Pattern.CASE_INSENSITIVE), "$1ex");
-		Inflector.singular(Pattern.compile("(matr)ices$", Pattern.CASE_INSENSITIVE), "$1ix");
-		Inflector.singular(Pattern.compile("(quiz)zes$", Pattern.CASE_INSENSITIVE), "$1");
+		Inflector.singular(Pattern.compile("s$", Pattern.CASE_INSENSITIVE), ""); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(n)ews$", Pattern.CASE_INSENSITIVE), "$1ews"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("([ti])a$", Pattern.CASE_INSENSITIVE), "$1um"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$", //$NON-NLS-1$
+				Pattern.CASE_INSENSITIVE), "$1$2sis"); //$NON-NLS-1$
+		Inflector.singular(Pattern.compile("(^analy)ses$", Pattern.CASE_INSENSITIVE), "$1sis"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("([^f])ves$", Pattern.CASE_INSENSITIVE), "$1fe"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(hive)s$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(tive)s$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("([lr])ves$", Pattern.CASE_INSENSITIVE), "$1f"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("([^aeiouy]|qu)ies$", Pattern.CASE_INSENSITIVE), "$1y"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(s)eries$", Pattern.CASE_INSENSITIVE), "$1eries"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(m)ovies$", Pattern.CASE_INSENSITIVE), "$1ovie"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(x|ch|ss|sh)es$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("([m|l])ice$", Pattern.CASE_INSENSITIVE), "$1ouse"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(bus)es$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(o)es$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(shoe)s$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(cris|ax|test)es$", Pattern.CASE_INSENSITIVE), "$1is"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(octop|vir)i$", Pattern.CASE_INSENSITIVE), "$1us"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(alias|status)es$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("^(ox)en", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(vert|ind)ices$", Pattern.CASE_INSENSITIVE), "$1ex"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(matr)ices$", Pattern.CASE_INSENSITIVE), "$1ix"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.singular(Pattern.compile("(quiz)zes$", Pattern.CASE_INSENSITIVE), "$1"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		Inflector.irregular("person", "people");
-		Inflector.irregular("man", "men");
-		Inflector.irregular("child", "children");
-		Inflector.irregular("sex", "sexes");
-		Inflector.irregular("move", "moves");
+		Inflector.irregular("person", "people"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.irregular("man", "men"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.irregular("child", "children"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.irregular("sex", "sexes"); //$NON-NLS-1$ //$NON-NLS-2$
+		Inflector.irregular("move", "moves"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		Inflector.uncountable(new String[] { "equipment", "information", "rice", "money", "species", "series", "fish",
-				"sheep" });
+		Inflector.uncountable(new String[] { "equipment", "information", "rice", "money", "species", "series", "fish", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+				"sheep" }); //$NON-NLS-1$
 	}
 }

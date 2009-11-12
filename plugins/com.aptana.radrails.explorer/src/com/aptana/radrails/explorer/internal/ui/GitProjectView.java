@@ -102,7 +102,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		gitStuff.setLayoutData(gitStuffLayoutData);
 
 		createGitDetailsComposite(gitStuff, bottom);
-		createInitGitComposite(gitStuff, bottom);
+		createInitGitComposite(gitStuff);
 		createExpandCollapseButton(gitDetails);
 		createGitBranchCombo(gitDetails);
 		createFilterButton(gitDetails);
@@ -384,7 +384,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		gitDetails.setLayoutData(hideGitDetailsData);
 	}
 
-	private void createInitGitComposite(Composite parent, Composite top)
+	private void createInitGitComposite(Composite parent)
 	{
 		initGit = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);
@@ -494,11 +494,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			refreshViewer();
 			return true;
 		}
-		else
-		{
-			revertToCurrentBranch(repo);
-			return false;
-		}
+		revertToCurrentBranch(repo);
+		return false;
 	}
 
 	private void revertToCurrentBranch(final GitRepository repo)
