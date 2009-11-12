@@ -121,7 +121,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		expandCollapse = new Label(parent, SWT.FLAT | SWT.CENTER);
 		expandCollapse.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_minus.png")); //$NON-NLS-1$
-		expandCollapse.setToolTipText("Collapse");
+		expandCollapse.setToolTipText(Messages.GitProjectView_Collapse_tooltip);
 		expandCollapse.addMouseListener(new MouseListener()
 		{
 			private boolean expanded = true;
@@ -142,7 +142,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				if (!expanded)
 				{
 					expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_plus.png")); //$NON-NLS-1$
-					expandCollapse.setToolTipText("Expand");
+					expandCollapse.setToolTipText(Messages.GitProjectView_Expand_tooltip);
 					FormData data = (FormData) gitDetails.getLayoutData();
 					data.height = branchCombo.getBounds().height + 3; // margin of 3
 					gitDetails.setLayoutData(data);
@@ -150,7 +150,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				else
 				{
 					expandCollapse.setImage(ExplorerPlugin.getImage("icons/full/obj16/bullet_toggle_minus.png")); //$NON-NLS-1$
-					expandCollapse.setToolTipText("Collapse");
+					expandCollapse.setToolTipText(Messages.GitProjectView_Collapse_tooltip);
 					FormData data = (FormData) gitDetails.getLayoutData();
 					data.height = SWT.DEFAULT;
 					gitDetails.setLayoutData(data);
@@ -393,14 +393,14 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		initGit.setLayout(layout);
 
 		createRepoButton = new Button(initGit, SWT.PUSH);
-		createRepoButton.setText("Attach Git repository");
+		createRepoButton.setText(Messages.GitProjectView_AttachGitRepo_button);
 		createRepoButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				createRepoButton.setEnabled(false);
-				Job job = new Job("Initializing repo")
+				Job job = new Job(Messages.GitProjectView_AttachGitRepo_jobTitle)
 				{
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
