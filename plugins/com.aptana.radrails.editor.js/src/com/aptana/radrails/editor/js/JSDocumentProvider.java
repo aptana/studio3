@@ -52,9 +52,8 @@ public class JSDocumentProvider extends FileDocumentProvider {
 					JSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IJSConstants.CONTENT_TYPE_JS,
-					JSSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IJSConstants.CONTENT_TYPE_JS);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, JSSourceConfiguration.getDefault());
 		}
 		return document;
 	}

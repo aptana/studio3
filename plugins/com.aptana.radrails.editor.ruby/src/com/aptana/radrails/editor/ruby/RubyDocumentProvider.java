@@ -52,8 +52,8 @@ public class RubyDocumentProvider extends FileDocumentProvider {
 					RubySourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IRubyConstants.CONTENT_TYPE_RUBY, RubySourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IRubyConstants.CONTENT_TYPE_RUBY);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, RubySourceConfiguration.getDefault());
 		}
 		return document;
 	}

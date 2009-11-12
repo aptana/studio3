@@ -60,8 +60,8 @@ public class HTMLDocumentProvider extends FileDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IHTMLConstants.CONTENT_TYPE_HTML, HTMLSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IHTMLConstants.CONTENT_TYPE_HTML);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, HTMLSourceConfiguration.getDefault());
 		}
 		return document;
 	}

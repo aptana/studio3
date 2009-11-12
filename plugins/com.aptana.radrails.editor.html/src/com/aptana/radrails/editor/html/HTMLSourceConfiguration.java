@@ -62,9 +62,10 @@ import com.aptana.radrails.editor.js.JSSourceConfiguration;
  */
 public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 	
+	public final static String PREFIX = "__html_";
 	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String HTML_COMMENT = "__html_comment";
-	public final static String CDATA = "__xml_cdata";
+	public final static String CDATA = "__html_cdata";
 	public final static String HTML_DOCTYPE = "__html_doctype";
 	public final static String HTML_SCRIPT = "__html_script";
 	public final static String HTML_STYLE = "__html_style";
@@ -131,8 +132,19 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentDefaultContentType() {
-		return DEFAULT;
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
+			return IHTMLConstants.CONTENT_TYPE_HTML;
+		}
+		String result = JSSourceConfiguration.getDefault().getDocumentContentType(contentType);
+		if (result != null) {
+			return result;
+		}
+		result = CSSSourceConfiguration.getDefault().getDocumentContentType(contentType);
+		if (result != null) {
+			return result;
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)

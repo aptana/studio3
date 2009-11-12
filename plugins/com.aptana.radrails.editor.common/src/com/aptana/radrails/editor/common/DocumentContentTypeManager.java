@@ -65,13 +65,23 @@ public final class DocumentContentTypeManager {
 		return instance;
 	}
 	
-	public void setDocumentContentType(IDocument document, String documenContentType, IPartitioningConfiguration defaultConfiguration) {
-		infos.put(document, new ExtendedDocumentInfo(documenContentType, defaultConfiguration.getDocumentDefaultContentType()));
-		registerConfiguration(document, defaultConfiguration);
+	public void setDocumentContentType(IDocument document, String documenContentType) {
+		infos.put(document, new ExtendedDocumentInfo(documenContentType));
+	}
+
+	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations) {
+		for (IPartitioningConfiguration i : configurations) {
+			registerConfiguration(document, i);
+		}
 	}
 
 	public void registerConfiguration(IDocument document, IPartitioningConfiguration configuration) {
-		
+		ExtendedDocumentInfo info = infos.get(document);
+		if (info != null) {
+			for (String i : configuration.getContentTypes()) {
+				info.associateContentType(i, configuration.getDocumentContentType(i));
+			}
+		}
 	}
 
 	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException {

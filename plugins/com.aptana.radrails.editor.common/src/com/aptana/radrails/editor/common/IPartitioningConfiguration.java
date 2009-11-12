@@ -49,6 +49,6 @@ public interface IPartitioningConfiguration {
 	
 	public ISubPartitionScanner createSubPartitionScanner();
 	
-	public String getDocumentDefaultContentType();
+	public String getDocumentContentType(String contentType);
 	
 }
