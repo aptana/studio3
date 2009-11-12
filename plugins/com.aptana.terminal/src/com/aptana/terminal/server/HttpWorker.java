@@ -56,8 +56,7 @@ public class HttpWorker implements Runnable
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
-			File file = new File(fileURI);
+			File file = new File(new Path(fileURL.getPath()).toOSString());
 			
 			if (file.exists() && file.canRead())
 			{
@@ -77,15 +76,6 @@ public class HttpWorker implements Runnable
 		{
 			String message = MessageFormat.format(
 				Messages.HttpWorker_Error_Locating_File,
-				new Object[] { url.toString() }
-			);
-			
-			Activator.logError(message, e);
-		}
-		catch (URISyntaxException e)
-		{
-			String message = MessageFormat.format(
-				Messages.HttpWorker_Malformed_URI,
 				new Object[] { url.toString() }
 			);
 			

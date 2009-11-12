@@ -1,26 +1,21 @@
 package com.aptana.git.ui.actions;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.actions.CommitDialog;
-import com.aptana.git.ui.internal.actions.GitAction;
 import com.aptana.git.ui.internal.actions.Messages;
 
 public class CommitAction extends GitAction
 {
 
-	private static final String COMMAND = "commit"; //$NON-NLS-1$
-
 	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	public void run()
 	{
 		IResource[] resources = getSelectedResources();
 		Set<GitRepository> repos = new HashSet<GitRepository>();
@@ -48,12 +43,6 @@ public class CommitAction extends GitAction
 		{
 			theRepo.index().commit(dialog.getCommitMessage());
 		}
-	}
-
-	@Override
-	protected String[] getCommand()
-	{
-		return new String[] { COMMAND };
 	}
 
 	@Override

@@ -2,14 +2,13 @@ package com.aptana.git.ui.internal.actions;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.team.internal.ui.actions.TeamAction;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.actions.GitAction;
 
-abstract class ChangedFileAction extends TeamAction
+abstract class ChangedFileAction extends GitAction
 {
-
 	protected ChangedFile getChangedFile(IResource resource)
 	{
 		if (!(resource instanceof IFile))

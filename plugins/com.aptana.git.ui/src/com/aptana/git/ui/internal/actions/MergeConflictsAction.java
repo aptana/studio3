@@ -1,7 +1,5 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.eclipse.compare.CompareUI;
 import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.resources.IFile;
@@ -11,9 +9,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.team.core.history.IFileRevision;
-import org.eclipse.team.internal.ui.actions.TeamAction;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
 
@@ -22,13 +18,14 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.git.ui.actions.GitAction;
 import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 
-public class MergeConflictsAction extends TeamAction
+public class MergeConflictsAction extends GitAction
 {
 
 	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	public void run()
 	{
 		IResource[] resources = getSelectedResources();
 		if (resources == null || resources.length != 1)
