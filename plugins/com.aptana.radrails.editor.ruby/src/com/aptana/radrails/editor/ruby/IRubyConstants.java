@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.ruby;
  */
 public interface IRubyConstants {
 
-	public String CONTENT_TYPE_RUBY = "com.aptana.radrails.contenttype.ruby";
+	public String CONTENT_TYPE_RUBY = "com.aptana.radrails.contenttype.ruby"; //$NON-NLS-1$
 }

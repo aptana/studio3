@@ -91,7 +91,13 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
 
         @Override
         public String toString() {
-            return getToken().getData() + ": offset: " + getOffset() + ", length: " + getLength();
+            StringBuilder text = new StringBuilder();
+            text.append(getToken().getData());
+            text.append(": offset: "); //$NON-NLS-1$
+            text.append(getOffset());
+            text.append(", length: "); //$NON-NLS-1$
+            text.append(getLength());
+            return text.toString();
         }
     }
 
@@ -216,7 +222,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
                 return popTokenOffQueue();
             }
         } catch (SyntaxException se) {
-            if (se.getMessage().equals("embedded document meets end of file")) {
+            if (se.getMessage().equals("embedded document meets end of file")) { //$NON-NLS-1$
                 // Add to the queue (at end), then try to just do the rest of
                 // the file...
                 // TODO recover somehow by removing this chunk out of the
@@ -240,7 +246,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
                 push(qtoken);
                 push(new QueuedToken(Token.EOF, start + origOffset + length, 0));
                 return popTokenOffQueue();
-            } else if (se.getMessage().equals("unterminated string meets end of file")) {
+            } else if (se.getMessage().equals("unterminated string meets end of file")) { //$NON-NLS-1$
                 // Add to the queue (at end), then try to just do the rest of
                 // the file...
                 // TODO recover somehow by removing this chunk out of the
