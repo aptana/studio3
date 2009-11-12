@@ -20,7 +20,7 @@ public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner
 		rules.add(new RegexpRule("\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", ThemeUtil.getToken("constant.character.escape.js")));
 		setRules(rules.toArray(new IRule[rules.size()]));
 
-		setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.js"));
+		setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.js")); //$NON-NLS-1$
 	}
 
 }

@@ -155,8 +155,10 @@ public class BundleManager
 	 */
 	public Command[] getCommandsFromScope(String scope)
 	{
+		if (this._bundles == null)
+			return new Command[0];
+		
 		List<Command> result = new ArrayList<Command>();
-
 		for (Bundle bundle : this._bundles)
 		{
 			for (Command command : bundle.getCommands())
@@ -167,7 +169,6 @@ public class BundleManager
 				}
 			}
 		}
-
 		return result.toArray(new Command[result.size()]);
 	}
 	
@@ -211,8 +212,10 @@ public class BundleManager
 	 */
 	public Snippet[] getSnippetsFromScope(String scope)
 	{
+		if (this._bundles == null)
+			return new Snippet[0];
+		
 		List<Snippet> result = new ArrayList<Snippet>();
-
 		for (Bundle bundle : this._bundles)
 		{
 			for (Snippet snippet : bundle.getSnippets())

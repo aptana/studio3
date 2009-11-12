@@ -57,10 +57,10 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	private static final int TYPE_CSS = 2;
 	
 	private static final String[] JS_SWITCH_SEQUENCES = new String[] {
-		"</script>"
+		"</script>" //$NON-NLS-1$
 	};
 	private static final String[] CSS_SWITCH_SEQUENCES = new String[] {
-		"</style>"
+		"</style>" //$NON-NLS-1$
 	};
 
 	private static final String[][] EMPTY = new String[0][];
@@ -96,7 +96,7 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
 				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
-		} else if (contentType instanceof String) {
+		} else {
 			for (int i = 0; i < subPartitionScanners.length; ++i) {
 				if (subPartitionScanners[i].hasContentType(contentType)) {
 					current = i;

@@ -55,6 +55,12 @@ class GitGraphLine
 		GitGraphLine other = (GitGraphLine) obj;
 		return upper == other.upper && from == other.from && to == other.to; // FIXME What about index?
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return (upper + "," + from + "," + to).hashCode(); //$NON-NLS-1$ //$NON-NLS-2$
+	}
 
 	boolean isUpper()
 	{

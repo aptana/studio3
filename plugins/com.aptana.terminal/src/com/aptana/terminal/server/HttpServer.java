@@ -31,11 +31,8 @@ public class HttpServer extends Thread
 	{
 		if (instance == null)
 		{
-			// TODO: add logic to try a range of ports, in case
-			// a port is already being used
-			instance = new HttpServer(8181);
+			instance = new HttpServer();
 		}
-
 		return instance;
 	}
 
@@ -44,9 +41,8 @@ public class HttpServer extends Thread
 	 * 
 	 * @param s
 	 */
-	public HttpServer(int port)
+	public HttpServer()
 	{
-		this.port = port;
 		this.threadPool = Executors.newFixedThreadPool(5);
 		this.isRunning = true;
 		this.processById = new HashMap<String, ProcessWrapper>();
@@ -73,16 +69,6 @@ public class HttpServer extends Thread
 		{
 			throw new RuntimeException(Messages.HttpServer_Process_ID_Already_In_Use + id);
 		}
-	}
-
-	/**
-	 * getPort
-	 * 
-	 * @return
-	 */
-	public int getPort()
-	{
-		return this.port;
 	}
 
 	/**
@@ -153,11 +139,26 @@ public class HttpServer extends Thread
 	{
 		try
 		{
-			this.serverSocket = new ServerSocket(this.port);
+			this.serverSocket = new ServerSocket(0);
+			this.serverSocket.setReuseAddress(true);
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port + this.port, e);
+			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port, e);
 		}
+	}
+
+	public String getHost()
+	{
+		if (this.serverSocket == null)
+			return "127.0.0.1";
+		return this.serverSocket.getInetAddress().getHostAddress();
+	}
+
+	public int getPort()
+	{
+		if (this.serverSocket == null)
+			return 8181;
+		return this.serverSocket.getLocalPort();
 	}
 }

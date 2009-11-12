@@ -41,7 +41,7 @@ package com.aptana.radrails.editor.erb;
  */
 public interface IERBConstants {
 
-	public String CONTENT_TYPE_HTML_ERB = "com.aptana.radrails.contenttype.html.erb";
-	public String CONTENT_TYPE_XML_ERB = "com.aptana.radrails.contenttype.xml.erb";
+	public String CONTENT_TYPE_HTML_ERB = "com.aptana.radrails.contenttype.html.erb"; //$NON-NLS-1$
+	public String CONTENT_TYPE_XML_ERB = "com.aptana.radrails.contenttype.xml.erb"; //$NON-NLS-1$
 	
 }

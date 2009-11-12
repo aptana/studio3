@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.jface.bindings.Scheme;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +23,7 @@ import com.aptana.terminal.server.HttpServer;
 public class TerminalBrowser
 {
 	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme"; //$NON-NLS-1$
-	private static final String TERMINAL_URL = "http://127.0.0.1:8181/webterm/"; //$NON-NLS-1$
+	private static final String TERMINAL_URL = "http://{0}:{1}/webterm/"; //$NON-NLS-1$
 	
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
@@ -51,8 +52,8 @@ public class TerminalBrowser
 		this._browser = new Browser(parent, SWT.NONE);
 		
 		HttpServer.getInstance().createProcess(this._id);
-		
-		this.setUrl(TERMINAL_URL + "?id=" + this._id); //$NON-NLS-1$
+		String url = NLS.bind(TERMINAL_URL, new Object[] {HttpServer.getInstance().getHost(), HttpServer.getInstance().getPort()}) + "?id=" + this._id;  //$NON-NLS-1$
+		this.setUrl(url);
 		
 		IPartService service = (IPartService) this._owningPart.getSite().getService(IPartService.class);
 		service.addPartListener(new IPartListener()
@@ -67,14 +68,23 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Activating shell scheme");
+//					System.out.println("Activating shell scheme");
 					
 					try
 					{
 						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-						oldScheme = bindingService.getBindingManager().getActiveScheme();
-						
+						Scheme currentScheme = bindingService.getBindingManager().getActiveScheme();
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
+						
+						// NOTE: During debugging I saw two activation events in a row with no
+						// interleaved deactivate. That could cause oldScheme to be overwritten
+						// with our shell scheme, so we now only save the old scheme if we don't
+						// have one defined already.
+						if (oldScheme == null)
+						{
+							oldScheme = currentScheme;
+						}
+						
 						bindingService.getBindingManager().setActiveScheme(scheme);
 					}
 					catch (NotDefinedException e)
@@ -117,15 +127,19 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Deactivating shell scheme");
+//					System.out.println("Deactivating shell scheme");
 					
 					try
 					{
-						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-						
-						if (oldScheme != null) {
+						if (oldScheme != null)
+						{
+							BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
+							
+							// re-activate original key binding scheme
 							bindingService.getBindingManager().setActiveScheme(oldScheme);
+							
+							// erase reference to scheme
+							oldScheme = null;
 						}
 					}
 					catch (NotDefinedException e)

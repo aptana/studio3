@@ -665,7 +665,7 @@ public class GitIndex
 			return false;
 		if (output.endsWith("binary: unspecified"))
 		{
-			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar" };
+			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so" };
 			// try common filename-extensions
 			for (String extension : extensions)
 			{

@@ -23,7 +23,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	private ICompletionProposal[] templateProposals;
 	private char triggerChar;
 	private char[] triggerChars;
-	private String triggerCharSuffix = "";
+	private StyledString styledDisplayString;
 
 	public SnippetTemplateProposal(Template template, TemplateContext context,
 			IRegion region, Image image, int relevance, ExpandSnippetAction expandSnippet) {
@@ -87,15 +87,19 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	}
 
 	public StyledString getStyledDisplayString() {
-		Template template = getTemplate();
-		return new StyledString(template.getDescription())
-					.append(new StyledString("[ " + template.getName() + "\u21E5 ]",
-							StyledString.COUNTER_STYLER)).append(triggerCharSuffix);
+		return styledDisplayString;
+	}
+	
+	Template getTemplateSuper() {
+		return super.getTemplate();
+	}
+	
+	void setStyledDisplayString(StyledString styledDisplayString) {
+		this.styledDisplayString = styledDisplayString;
 	}
 
 	void setTriggerChar(char triggerChar) {
 		this.triggerChar = triggerChar;
-		triggerCharSuffix = "    " + String.valueOf(triggerChar);
 	}
 	
 	private static final String TRIGGER_CHARS = "123456789";

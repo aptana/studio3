@@ -86,7 +86,7 @@ class ExistingOrNewPage extends WizardPage
 			if (gitDir == null)
 				treeItem.setText(2, ""); //$NON-NLS-1$
 			else
-				treeItem.setText(2, gitDir.getPath()); //$NON-NLS-1$
+				treeItem.setText(2, gitDir.getPath());
 		}
 
 		button = new Button(g, SWT.PUSH);
@@ -96,7 +96,7 @@ class ExistingOrNewPage extends WizardPage
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR); //$NON-NLS-1$
+				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR);
 				try
 				{
 					GitRepository.create(gitDir.getParentFile().getAbsolutePath());
