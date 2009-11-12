@@ -183,7 +183,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						action.run(null);
+						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
@@ -214,7 +214,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						action.run(null);
+						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
@@ -245,7 +245,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						action.run(null);
+						action.run();
 						return Status.OK_STATUS;
 					}
 				};
@@ -275,7 +275,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						action.run(null);
+						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
@@ -342,7 +342,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				CommitAction action = new CommitAction();
 				ISelection selection = new StructuredSelection(selectedProject);
 				action.selectionChanged(null, selection);
-				action.run(null);
+				action.run();
 			}
 		});
 	}

@@ -89,7 +89,7 @@ public class BundleManager
 	}
 
 	/**
-	 * getBuildtinsLoadPath
+	 * getBuiltinsLoadPath
 	 * 
 	 * @return
 	 */

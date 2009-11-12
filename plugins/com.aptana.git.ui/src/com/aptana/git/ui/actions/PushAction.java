@@ -1,13 +1,12 @@
 package com.aptana.git.ui.actions;
 
-import java.lang.reflect.InvocationTargetException;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 
-import org.eclipse.jface.action.IAction;
-
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.GitLightweightDecorator;
-import com.aptana.git.ui.internal.actions.GitAction;
 
-public class PushAction extends GitAction
+public class PushAction extends SimpleGitCommandAction
 {
 
 	private static final String COMMAND = "push"; //$NON-NLS-1$
@@ -19,14 +18,24 @@ public class PushAction extends GitAction
 	}
 
 	@Override
-	protected void execute(IAction action) throws InvocationTargetException, InterruptedException
+	protected void postLaunch()
 	{
-		super.execute(action);
-
 		// TODO It'd be nice if we could just tell it to update the labels of the projects attached to the repo (and
 		// only the project, not it's children)!
 		GitLightweightDecorator.refresh();
 	}
 
-	// TODO Only enable if there are commits in local repo?
+	@Override
+	public boolean isEnabled()
+	{
+		IResource[] resources = getSelectedResources();
+		if (resources == null || resources.length != 1)
+			return false;
+		IProject project = resources[0].getProject();
+		GitRepository repo = GitRepository.getAttached(project);
+		if (repo == null)
+			return false;
+		String[] commits = repo.commitsAhead(repo.currentBranch());
+		return commits != null && commits.length > 0;
+	}
 }

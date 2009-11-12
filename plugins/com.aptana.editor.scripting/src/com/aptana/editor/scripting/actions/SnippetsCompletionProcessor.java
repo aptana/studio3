@@ -93,6 +93,22 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	}
 	
 	@Override
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer,
+			int offset) {
+		ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, offset);
+		for (int i = 0; i < completionProposals.length; i++) {
+			if (completionProposals[i] instanceof SnippetTemplateProposal) {
+				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
+				snippetTemplateProposal.setTemplateProposals(completionProposals);
+				if (i < 9) {
+					snippetTemplateProposal.setTriggerChar((char)('1'+i));
+				}
+			}
+		}
+		return completionProposals;
+	}
+	
+	@Override
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
 		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance, expandSnippet);
 	}
