@@ -6,6 +6,7 @@
       <editor
             class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
             default="true"
+            extensions="rhtml,erb"
             id="com.aptana.radrails.editor.erb.html"
             name="RHTML Editor">
          <contentTypeBinding
@@ -14,6 +15,7 @@
       </editor>
       <editor
             class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
+            extensions="rxml,erb"
             id="com.aptana.radrails.editor.erb.xml"
             name="RXML Editor">
          <contentTypeBinding
