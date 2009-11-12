@@ -25,6 +25,7 @@ import org.eclipse.ui.texteditor.TextEditorAction;
 
 import com.aptana.radrails.editor.common.DocumentContentTypeManager;
 import com.aptana.radrails.editor.common.QualifiedContentType;
+import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
 
 public class ShowScopesAction extends TextEditorAction {
 	
@@ -71,7 +72,7 @@ public class ShowScopesAction extends TextEditorAction {
 		IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
 		if (contentType != null) {
-			return contentType.toString();
+			return ContentTypeTranslation.getDefault().translate(contentType).toString();
 		}
 		return document.getContentType(offset);
 	}
