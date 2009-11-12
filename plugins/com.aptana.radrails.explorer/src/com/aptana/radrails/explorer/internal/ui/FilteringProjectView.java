@@ -1,6 +1,7 @@
 package com.aptana.radrails.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -26,7 +27,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
@@ -324,19 +324,6 @@ public class FilteringProjectView extends GitProjectView
 		return focus;
 	}
 
-	private void createNavigator(Composite myComposite, Composite top)
-	{
-		Composite viewer = new Composite(myComposite, SWT.NONE);
-		viewer.setLayout(new FillLayout());
-		FormData data2 = new FormData();
-		data2.top = new FormAttachment(top);
-		data2.bottom = new FormAttachment(100, 0);
-		data2.right = new FormAttachment(100, 0);
-		data2.left = new FormAttachment(0, 0);
-		viewer.setLayoutData(data2);
-		super.createPartControl(viewer);
-	}
-
 	@Override
 	public void saveState(IMemento memento)
 	{
@@ -419,11 +406,11 @@ public class FilteringProjectView extends GitProjectView
 			IMemento childMem = memento.getChild(TAG_EXPANDED);
 			if (childMem != null)
 			{
-				ArrayList elements = new ArrayList();
+				List<IResource> elements = new ArrayList<IResource>();
 				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
 				for (int i = 0; i < elementMem.length; i++)
 				{
-					Object element = container.findMember(elementMem[i].getString(TAG_PATH));
+					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
 					if (element != null)
 					{
 						elements.add(element);
@@ -434,11 +421,11 @@ public class FilteringProjectView extends GitProjectView
 			childMem = memento.getChild(TAG_SELECTION);
 			if (childMem != null)
 			{
-				ArrayList list = new ArrayList();
+				List<IResource> list = new ArrayList<IResource>();
 				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
 				for (int i = 0; i < elementMem.length; i++)
 				{
-					Object element = container.findMember(elementMem[i].getString(TAG_PATH));
+					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
 					if (element != null)
 					{
 						list.add(element);
@@ -546,7 +533,7 @@ public class FilteringProjectView extends GitProjectView
 				{
 					patternFilter.setPattern(null);
 				}
-				else if (text != null)
+				else
 				{
 					patternFilter.setPattern(text);
 				}

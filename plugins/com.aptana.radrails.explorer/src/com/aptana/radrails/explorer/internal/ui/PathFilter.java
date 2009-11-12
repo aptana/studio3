@@ -52,10 +52,7 @@ class PathFilter extends ViewerFilter
 		{
 			return isEnclosed(viewer, resource);
 		}
-		else
-		{
-			// TODO Just try matching on the label like PatternFilter does
-		}
+		// TODO Try matching on the label like PatternFilter does
 		return true;
 	}
 
@@ -174,7 +171,7 @@ class PathFilter extends ViewerFilter
 	 */
 	private String[] getWords(String text)
 	{
-		List words = new ArrayList();
+		List<String> words = new ArrayList<String>();
 		// Break the text up into words, separating based on whitespace and
 		// common punctuation.
 		// Previously used String.split(..., "\\W"), where "\W" is a regular
@@ -201,6 +198,6 @@ class PathFilter extends ViewerFilter
 			}
 			i = j;
 		}
-		return (String[]) words.toArray(new String[words.size()]);
+		return words.toArray(new String[words.size()]);
 	}
 }

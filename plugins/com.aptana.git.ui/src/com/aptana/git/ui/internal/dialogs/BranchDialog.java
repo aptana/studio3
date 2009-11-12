@@ -41,7 +41,7 @@ public class BranchDialog extends Dialog
 	protected void configureShell(Shell newShell)
 	{
 		super.configureShell(newShell);
-		newShell.setText("Choose branch");
+		newShell.setText(Messages.BranchDialog_title);
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class BranchDialog extends Dialog
 		Composite composite = (Composite) super.createDialogArea(parent);
 
 		Label label = new Label(composite, SWT.WRAP);
-		label.setText("Choose the branch.");
+		label.setText(Messages.BranchDialog_msg);
 
 		combo = new Combo(composite, SWT.READ_ONLY | SWT.DROP_DOWN);
 		Set<String> branchNames = new HashSet<String>();

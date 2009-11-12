@@ -28,9 +28,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.core.history.LocalFileRevision;
-import org.eclipse.team.internal.ui.TeamUIMessages;
-import org.eclipse.team.internal.ui.TeamUIPlugin;
 import org.eclipse.team.internal.ui.Utils;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.internal.ui.synchronize.LocalResourceTypedElement;
@@ -81,14 +80,14 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			try {
 				left.cacheContents(monitor);
 			} catch (CoreException e) {
-				TeamUIPlugin.log(e);
+				GitUIPlugin.logError(e);
 			}
 		}
 		if (right != null) {
 			try {
 				right.cacheContents(monitor);
 			} catch (CoreException e) {
-				TeamUIPlugin.log(e);
+				GitUIPlugin.logError(e);
 			}
 		}
 	}
@@ -194,9 +193,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				++ri;
 			}
 			return diffNode;
-		} else {
-			return new DiffNode(left, right);
 		}
+		return new DiffNode(left, right);
 	}
 
 	private DiffNode addDirectoryFiles(ITypedElement elem, int diffType) {
@@ -216,9 +214,8 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				diffNode.add(addDirectoryFiles(child, diffType));
 			}
 			return diffNode;
-		} else {
-			return new DiffNode(diffType, null, l, r);
 		}
+		return new DiffNode(diffType, null, l, r);
 	}
 
 	private void initLabels(ICompareInput input) {
@@ -227,7 +224,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			String leftLabel = getFileRevisionLabel(getLeftRevision());
 			cc.setLeftLabel(leftLabel);
 		} else if (getResource(input) != null) {
-			String label = NLS.bind("", new Object[]{ input.getLeft().getName() });
+			String label = NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_workspace, new Object[]{ input.getLeft().getName() });
 			cc.setLeftLabel(label);
 		}
 		if (getRightRevision() != null) {
@@ -237,12 +234,11 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 	}
 
 	private String getFileRevisionLabel(FileRevisionTypedElement element) {
-		Object fileObject = element.getFileRevision();
+		IFileRevision fileObject = element.getFileRevision();
 		if (fileObject instanceof LocalFileRevision){
-			return NLS.bind("", new Object[]{element.getName(), element.getTimestamp()});
-		} else {
-			return NLS.bind("", new Object[]{ element.getName(), element.getContentIdentifier()});
+			return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_localRevision, new Object[]{element.getName(), element.getTimestamp()});
 		}
+		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_repository, new Object[]{ element.getName(), element.getContentIdentifier()});
 	}
 
 	/* (non-Javadoc)
@@ -253,7 +249,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		titleObject[0] = getLongName(left);
 		titleObject[1] = getContentIdentifier(getLeftRevision());
 		titleObject[2] = getContentIdentifier(getRightRevision());
-		return NLS.bind("", titleObject);
+		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
 	}
 
 	/* (non-Javadoc)
@@ -264,7 +260,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		titleObject[0] = getShortName(left);
 		titleObject[1] = getContentIdentifier(getLeftRevision());
 		titleObject[2] = getContentIdentifier(getRightRevision());
-		return NLS.bind("", titleObject);
+		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
 	}
 
 	/* (non-Javadoc)
@@ -313,10 +309,10 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 					IStorage storage = ((LocalFileRevision) fileObject).getStorage(new NullProgressMonitor());
 					if (Utils.getAdapter(storage, IFileState.class) != null){
 						//local revision
-						return "";
+						return TeamUIMessages.GitCompareFileRevisionEditorInput_0;
 					} else if (Utils.getAdapter(storage, IFile.class) != null) {
 						//current revision
-						return "";
+						return TeamUIMessages.GitCompareFileRevisionEditorInput_1;
 					}
 				} catch (CoreException e) {
 					GitUIPlugin.logError(com.aptana.git.ui.internal.history.TeamUIMessages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e);
@@ -325,7 +321,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				return fileRevisionElement.getContentIdentifier();
 			}
 		}
-		return "";
+		return TeamUIMessages.GitCompareFileRevisionEditorInput_2;
 	}
 
 	@Override
@@ -366,7 +362,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		getCompareConfiguration().setRightEditable(isRightEditable(input));
 		ensureContentsCached(getLeftRevision(), getRightRevision(), monitor);
 		initLabels(input);
-		setTitle(NLS.bind("", new String[] { input.getName() }));
+		setTitle(NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareInputTitle, new String[] { input.getName() }));
 
 		// The compare editor (Structure Compare) will show the diff filenames
 		// with their project relative path. So, no need to also show directory entries.
