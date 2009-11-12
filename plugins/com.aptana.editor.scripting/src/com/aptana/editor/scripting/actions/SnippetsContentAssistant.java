@@ -24,6 +24,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		this.expandSnippetAction = expandSnippet;
 		enableAutoActivation(false);
 		enablePrefixCompletion(true);
+		enableAutoInsert(true);
 		enableColoredLabels(true);
 		setStatusLineVisible(true);
 		setStatusMessage("Type 1..9 to select nth snippet");
