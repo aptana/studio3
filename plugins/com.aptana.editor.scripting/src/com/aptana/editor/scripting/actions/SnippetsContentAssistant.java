@@ -14,7 +14,8 @@ public class SnippetsContentAssistant extends ContentAssistant {
 	
 	protected static class DefaultInformationControlCreator extends AbstractReusableInformationControlCreator {
 		public IInformationControl doCreateInformationControl(Shell shell) {
-			return new DefaultInformationControl(shell, true);
+			DefaultInformationControl defaultInformationControl = new DefaultInformationControl(shell, true);
+			return defaultInformationControl;
 		}
 	}
 
@@ -22,11 +23,11 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		super();
 		this.expandSnippetAction = expandSnippet;
 		enableAutoActivation(false);
-//		enableAutoInsert(true);
 		enablePrefixCompletion(true);
 		enableColoredLabels(true);
+		setStatusLineVisible(true);
+		setStatusMessage("Type 1..9 to select nth snippet");
 		setInformationControlCreator(new DefaultInformationControlCreator());
-		
 	}
 	
 	@Override
