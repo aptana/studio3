@@ -36,7 +36,6 @@
 package com.aptana.radrails.editor.ruby;
 
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
@@ -49,7 +48,6 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
@@ -204,8 +202,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getCommandScanner() {
         if (commandScanner == null) {
             commandScanner = new RuleBasedScanner();
-            commandScanner.setDefaultReturnToken(new Token(new TextAttribute(CommonEditorPlugin
-                    .getDefault().getColorManager().getColor(IRubyColorConstants.WORD))));
+            commandScanner.setDefaultReturnToken(ThemeUtil.getToken("string.interpolated.rb")); //$NON-NLS-1$
         }
         return commandScanner;
     }
@@ -213,8 +210,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getStringScanner() {
         if (stringScanner == null) {
             stringScanner = new RuleBasedScanner();
-            stringScanner.setDefaultReturnToken(new Token(new TextAttribute(CommonEditorPlugin
-                    .getDefault().getColorManager().getColor(IRubyColorConstants.STRING))));
+            stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.rb")); //$NON-NLS-1$
         }
         return stringScanner;
     }

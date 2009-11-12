@@ -25,7 +25,11 @@ import com.aptana.radrails.editor.common.CommonEditorPlugin;
 
 public abstract class ThemeUtil
 {
-	public static final String ACTIVE_THEME = "ACTIVE_THEME";
+	/**
+	 * Preference key used to save the active theme.
+	 */
+	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
+	
 	private static Theme fgTheme;
 	private static HashMap<String, Theme> fgThemeMap;
 	private static Map<WeakReference<Token>, String> fgTokens = new HashMap<WeakReference<Token>, String>();
@@ -109,7 +113,7 @@ public abstract class ThemeUtil
 	private static String toString(RGB selection)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(",").append(selection.green).append(",").append(selection.blue);
+		builder.append(selection.red).append(",").append(selection.green).append(",").append(selection.blue); //$NON-NLS-1$ //$NON-NLS-2$
 		return builder.toString();
 	}
 
@@ -132,10 +136,13 @@ public abstract class ThemeUtil
 		return getThemeMap().keySet();
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void loadThemes()
 	{
 		fgThemeMap = new HashMap<String, Theme>();
-		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle().findEntries("themes", "*.properties", false);
+		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle().findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
+		if (urls == null)
+			return;
 		while (urls.hasMoreElements())
 		{
 			URL url = urls.nextElement();
@@ -149,8 +156,7 @@ public abstract class ThemeUtil
 			}
 			catch (Exception e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				CommonEditorPlugin.logError(e);
 			}
 		}
 	}
