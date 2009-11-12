@@ -59,6 +59,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	public final static String PREFIX = "__xml_";
 	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String XML_COMMENT = "__xml_comment";
 	public final static String STRING_DOUBLE = "__xml_string_double";
@@ -127,8 +128,11 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentDefaultContentType() {
-		return DEFAULT;
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
+			return IXMLConstants.CONTENT_TYPE_XML;
+		}
+		return null;
 	}
 
 	/*

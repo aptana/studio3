@@ -60,6 +60,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
+	public final static String PREFIX = "__js_";
 	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment";
 	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment";
@@ -133,8 +134,11 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentDefaultContentType() {
-		return DEFAULT;
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
+			return IJSConstants.CONTENT_TYPE_JS;
+		}
+		return null;
 	}
 
 	/*

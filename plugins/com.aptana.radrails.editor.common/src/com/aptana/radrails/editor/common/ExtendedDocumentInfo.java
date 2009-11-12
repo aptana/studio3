@@ -35,6 +35,9 @@
 
 package com.aptana.radrails.editor.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
@@ -46,22 +49,27 @@ import org.eclipse.jface.text.IDocument;
 /* package */ class ExtendedDocumentInfo {
 	
 	private QualifiedContentType documentContentType;
-	private QualifiedContentType defaultContentType;
+	private Map<String, String> contentTypesAssociation = new HashMap<String, String>();
 	
 	/**
 	 * 
 	 */
-	protected ExtendedDocumentInfo(String documentContentType, String defaultContentType) {
+	protected ExtendedDocumentInfo(String documentContentType) {
 		this.documentContentType = new QualifiedContentType(documentContentType);
-		this.defaultContentType = this.documentContentType.subtype(defaultContentType);
 	}
 		
 	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException {
+		QualifiedContentType result = documentContentType;
 		String contentType = document.getContentType(offset);
-		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
-			return defaultContentType;
+		String subdocContentType = contentTypesAssociation.get(contentType);
+		if (subdocContentType != null && !subdocContentType.equals(documentContentType.getLastPart())) {
+			result = result.subtype(subdocContentType);
 		}
-		return documentContentType.subtype(contentType);
+		return result.subtype(contentType);
+	}
+
+	public void associateContentType(String contentType, String documentContentType) {
+		contentTypesAssociation.put(contentType, documentContentType);
 	}
 	
 }

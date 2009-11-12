@@ -62,6 +62,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  */
 public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
+	public final static String PREFIX = "__css_";
 	public final static String DEFAULT = "__css" + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String STRING = "__css_string";
 	public final static String MULTILINE_COMMENT = "__css_multiline_comment";
@@ -182,8 +183,11 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	/* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentDefaultContentType() {
-		return DEFAULT;
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
+			return ICSSConstants.CONTENT_TYPE_CSS;
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)

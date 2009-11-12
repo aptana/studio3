@@ -52,8 +52,8 @@ public class XMLDocumentProvider extends FileDocumentProvider {
 					XMLSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					IXMLConstants.CONTENT_TYPE_XML, XMLSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IXMLConstants.CONTENT_TYPE_XML);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, XMLSourceConfiguration.getDefault());
 		}
 		return document;
 	}

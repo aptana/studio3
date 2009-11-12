@@ -63,6 +63,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class RubySourceConfiguration implements IPartitioningConfiguration,
         ISourceViewerConfiguration {
 
+    public final static String PREFIX = "__rb_"; //$NON-NLS-1$
     public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
     public static final String SINGLE_LINE_COMMENT = "__rb_singleline_comment"; //$NON-NLS-1$
     public static final String MULTI_LINE_COMMENT = "__rb_multiline_comment"; //$NON-NLS-1$
@@ -128,8 +129,11 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     /* (non-Javadoc)
 	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentDefaultContentType() {
-		return DEFAULT;
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
+			return IRubyConstants.CONTENT_TYPE_RUBY;
+		}
+		return null;
 	}
 
 	/**

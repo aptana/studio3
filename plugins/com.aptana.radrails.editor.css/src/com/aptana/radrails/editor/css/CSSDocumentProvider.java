@@ -52,8 +52,8 @@ public class CSSDocumentProvider extends FileDocumentProvider {
 					CSSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document,
-					ICSSConstants.CONTENT_TYPE_CSS, CSSSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ICSSConstants.CONTENT_TYPE_CSS);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document, CSSSourceConfiguration.getDefault());
 		}
 		return document;
 	}

@@ -89,8 +89,9 @@ public class CompositeDocumentProvider extends FileDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, documentContentType, defaultPartitioningConfiguration);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, primaryPartitioningConfiguration);
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, documentContentType);
+			DocumentContentTypeManager.getInstance().registerConfigurations(document,
+					new IPartitioningConfiguration[] { defaultPartitioningConfiguration, primaryPartitioningConfiguration });
 		}
 		return document;
 	}

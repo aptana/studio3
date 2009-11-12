@@ -44,12 +44,27 @@ import java.util.Arrays;
 public final class QualifiedContentType {
 
 	private final String[] contentTypes;
+	private String toString;
 	
 	/**
 	 * 
 	 */
 	public QualifiedContentType(String contentType) {
 		this(new String[] { contentType });
+	}
+
+	/**
+	 * 
+	 */
+	public QualifiedContentType(String contentType1, String contentType2) {
+		this(new String[] { contentType1, contentType2 });
+	}
+
+	/**
+	 * 
+	 */
+	public QualifiedContentType(String contentType1, String contentType2, String contentType3) {
+		this(new String[] { contentType1, contentType2, contentType3 });
 	}
 
 	/**
@@ -73,6 +88,25 @@ public final class QualifiedContentType {
 		return new QualifiedContentType(array);
 	}
 	
+	public QualifiedContentType supertype() {
+		String[] array = new String[contentTypes.length-1];
+		System.arraycopy(contentTypes, 0, array, 0, array.length);
+		return new QualifiedContentType(array);		
+		
+	}
+	
+	public int getPartCount() {
+		return contentTypes.length;
+	}
+	
+	public String getLastPart() {
+		return contentTypes[contentTypes.length-1];
+	}
+
+	public String[] getParts() {
+		return contentTypes;
+	}
+
 	public boolean contains(String contentType) {
 		// TODO: possible speed optimization with HashSet
 		for (String i : contentTypes) {
@@ -120,7 +154,14 @@ public final class QualifiedContentType {
 	 */
 	@Override
 	public String toString() {
-		return Arrays.toString(contentTypes);
+		if (toString == null) {
+			StringBuilder sb = new StringBuilder();
+			for (String i : contentTypes) {
+				sb.append(i).append(' ');
+			}
+			toString = sb.delete(sb.length()-1, sb.length()).toString();
+		}
+		return toString;
 	}
 
 }
