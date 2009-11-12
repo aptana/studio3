@@ -102,8 +102,8 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	
 	void setTemplateProposals(ICompletionProposal[] templateProposals) {
 		this.templateProposals = templateProposals;
-		triggerChars = new char[Math.max(templateProposals.length, TRIGGER_CHARS.length())];
-		TRIGGER_CHARS.getChars(0, triggerChars.length-1, triggerChars, 0);
+		triggerChars = new char[Math.min(templateProposals.length, TRIGGER_CHARS.length())];
+		TRIGGER_CHARS.getChars(0, triggerChars.length, triggerChars, 0);
 	}
 	
 	private static boolean contains(char[] characters, char c) {
