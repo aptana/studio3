@@ -24,7 +24,9 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		enableAutoActivation(false);
 //		enableAutoInsert(true);
 		enablePrefixCompletion(true);
+		enableColoredLabels(true);
 		setInformationControlCreator(new DefaultInformationControlCreator());
+		
 	}
 	
 	@Override
@@ -35,4 +37,5 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		}
 		return contentAssistProcessor;
 	}
+	
 }
