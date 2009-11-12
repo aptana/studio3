@@ -68,14 +68,23 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Activating shell scheme");
+//					System.out.println("Activating shell scheme");
 					
 					try
 					{
 						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-						oldScheme = bindingService.getBindingManager().getActiveScheme();
-						
+						Scheme currentScheme = bindingService.getBindingManager().getActiveScheme();
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
+						
+						// NOTE: During debugging I saw two activation events in a row with no
+						// interleaved deactivate. That could cause oldScheme to be overwritten
+						// with our shell scheme, so we now only save the old scheme if we don't
+						// have one defined already.
+						if (oldScheme == null)
+						{
+							oldScheme = currentScheme;
+						}
+						
 						bindingService.getBindingManager().setActiveScheme(scheme);
 					}
 					catch (NotDefinedException e)
@@ -118,15 +127,19 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Deactivating shell scheme");
+//					System.out.println("Deactivating shell scheme");
 					
 					try
 					{
-						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-						
-						if (oldScheme != null) {
+						if (oldScheme != null)
+						{
+							BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
+							
+							// re-activate original key binding scheme
 							bindingService.getBindingManager().setActiveScheme(oldScheme);
+							
+							// erase reference to scheme
+							oldScheme = null;
 						}
 					}
 					catch (NotDefinedException e)
