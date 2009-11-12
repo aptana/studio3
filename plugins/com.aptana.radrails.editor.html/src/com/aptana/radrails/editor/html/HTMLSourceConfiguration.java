@@ -36,7 +36,6 @@
 package com.aptana.radrails.editor.html;
 
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -46,7 +45,6 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.IPartitioningConfiguration;
 import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
 import com.aptana.radrails.editor.common.ISubPartitionScanner;
@@ -171,7 +169,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
 		
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html"));
+		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		
@@ -184,8 +182,6 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	protected ITokenScanner getHTMLScanner() {
 		if (htmlScanner == null) {
 			htmlScanner = new HTMLScanner();
-			htmlScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.DEFAULT))));
 		}
 		return htmlScanner;
 	}
@@ -195,7 +191,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (cdataScanner == null)
 		{
 			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml"));
+			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}
@@ -203,8 +199,6 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	protected ITokenScanner getHTMLTagScanner() {
 		if (tagScanner == null) {
 			tagScanner = new HTMLTagScanner();
-			tagScanner.setDefaultReturnToken(new Token(new TextAttribute(
-					CommonEditorPlugin.getDefault().getColorManager().getColor(IHTMLColorConstants.TAG))));
 		}
 		return tagScanner;
 	}
