@@ -14,6 +14,5 @@ instructions.install = \
     chmod(targetDir:@artifact,targetFile:bin/ri,permissions:755);\
     chmod(targetDir:@artifact,targetFile:bin/spec,permissions:755);\
     chmod(targetDir:@artifact,targetFile:bin/testrb,permissions:755);
-    
-    
-    
+instructions.install.import= \
+    org.eclipse.equinox.p2.touchpoint.natives.chmod
