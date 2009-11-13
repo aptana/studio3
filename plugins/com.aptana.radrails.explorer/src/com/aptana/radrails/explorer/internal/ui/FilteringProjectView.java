@@ -172,12 +172,34 @@ public class FilteringProjectView extends GitProjectView
 
 			public void mouseMove(MouseEvent e)
 			{
-				if (hoveredItem == null)
+				// If the filter is already on, we shouldn't do this stuff
+				if (filterOn())
 					return;
-
 				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
-				if (!hoveredItem.equals(t))
-					removeHoveredItem();
+				// hovered item didn't change
+				if (hoveredItem != null && hoveredItem.equals(t))
+					return;
+				// remove old hover
+				removeHoveredItem();
+
+				if (t == null)
+					return;
+				IResource data = (IResource) t.getData();
+				if (data.getType() == IResource.FILE)
+				{
+					hoveredItem = t;
+					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
+						fLastBGColor = hoveredItem.getBackground();
+					hoveredItem.setBackground(getHoverBackgroundColor());
+					Display.getDefault().asyncExec(new Runnable()
+					{
+						public void run()
+						{
+							getCommonViewer().getTree().redraw(hoveredItem.getBounds().x, hoveredItem.getBounds().y,
+									hoveredItem.getBounds().width, hoveredItem.getBounds().height, true);
+						}
+					});
+				}
 			}
 		});
 		getCommonViewer().getControl().addMouseTrackListener(new MouseTrackAdapter()
@@ -189,46 +211,6 @@ public class FilteringProjectView extends GitProjectView
 				if (hoveredItem == null)
 					return;
 				removeHoveredItem();
-			}
-
-			@Override
-			public void mouseHover(MouseEvent e)
-			{
-				super.mouseHover(e);
-				// If the filter is already on, we shouldn't do this stuff
-				if (getFilterString() != null && getFilterString().trim().length() > 0
-						&& !getFilterString().equals(initialText))
-					return;
-				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
-				if (t == null)
-					return;
-				if (hoveredItem != null && hoveredItem.equals(t))
-					return;
-				final Rectangle oldBounds = hoveredItem == null ? null : hoveredItem.getBounds();
-				IResource data = (IResource) t.getData();
-				if (data.getType() == IResource.FILE)
-				{
-					hoveredItem = t;
-					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
-						fLastBGColor = hoveredItem.getBackground();
-					hoveredItem.setBackground(getHoverBackgroundColor());
-				}
-				else
-					hoveredItem = null;
-
-				final Rectangle newBounds = hoveredItem == null ? null : hoveredItem.getBounds();
-				Display.getDefault().asyncExec(new Runnable()
-				{
-					public void run()
-					{
-						if (oldBounds != null)
-							getCommonViewer().getTree().redraw(oldBounds.x, oldBounds.y, oldBounds.width,
-									oldBounds.height, true);
-						if (newBounds != null)
-							getCommonViewer().getTree().redraw(newBounds.x, newBounds.y, newBounds.width,
-									newBounds.height, true);
-					}
-				});
 			}
 		});
 
@@ -732,6 +714,8 @@ public class FilteringProjectView extends GitProjectView
 
 	private void removeHoveredItem()
 	{
+		if (hoveredItem == null)
+			return;
 		final Rectangle bounds = hoveredItem.getBounds();
 		hoveredItem.setBackground(fLastBGColor);
 		hoveredItem = null;
@@ -760,5 +744,11 @@ public class FilteringProjectView extends GitProjectView
 		if (fHoverBGColor != null)
 			fHoverBGColor.dispose();
 		super.dispose();
+	}
+
+	private boolean filterOn()
+	{
+		return getFilterString() != null && getFilterString().trim().length() > 0
+				&& !getFilterString().equals(initialText);
 	}
 }
