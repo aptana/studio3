@@ -160,6 +160,7 @@ public class Snippet
 		// show body
 		writer.append("    path:  ").println(this._path); //$NON-NLS-1$
 		writer.append("    scope: ").println(this._scope); //$NON-NLS-1$
+		writer.append("    trigger: ").println(this._trigger); //$NON-NLS-1$
 		
 		// close snippet
 		writer.println("  }"); //$NON-NLS-1$
