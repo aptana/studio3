@@ -256,10 +256,15 @@ public class SingleProjectView extends CommonNavigator
 			watcher = FileWatcher.addWatch(newProject.getLocationURI().getPath(), FileWatcher.FILE_ANY, true,
 					new JNotifyAdapter()
 					{
+						private WorkspaceJob job;
+
 						private void refresh(File file)
 						{
 							// TODO Only refresh the file/dir one level deep?
-							WorkspaceJob job = new WorkspaceJob("Refresh")
+							if (job != null)
+								job.cancel();
+							
+							job = new WorkspaceJob("Refresh")
 							{
 
 								@Override
