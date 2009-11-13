@@ -65,7 +65,7 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.js"),
 				new QualifiedContentType("text.html.basic", "source.js.embedded.html"));
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby"));
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby.rails"));
 		
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb"), new QualifiedContentType("text.html.ruby"));
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.html"),
