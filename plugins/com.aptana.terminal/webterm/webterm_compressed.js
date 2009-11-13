@@ -1097,7 +1097,6 @@ TermComm.POLLING_INTERVAL_MAX=2000;
 TermComm.POLLING_GROWTH_RATE=2;
 TermComm.DEFAULT_REQUEST_URL="/stream";
 TermComm.DEFAULT_GET_UNIQUE_ID_URL="/id";
-TermComm.DEFAULT_CHARACTER_SIZE_URL="/size";
 function TermComm(_c5,_c6){
 var _c7=this;
 this.terminal=_c5;
@@ -1111,7 +1110,6 @@ this.growthRate=2;
 this.timeoutInterval=5000;
 this.requestURL=TermComm.DEFAULT_REQUEST_URL;
 this.getUniqueIdURL=TermComm.DEFAULT_GET_UNIQUE_ID_URL;
-this.getCharacterSizeURL=TermComm.DEFAULT_CHARACTER_SIZE_URL;
 if(isDefined(_c6)){
 if(_c6.hasOwnProperty("minInterval")&&isNumber(_c6.minInterval)){
 this.minInterval=_c6.minInterval;
@@ -1131,21 +1129,12 @@ this.requestURL=_c6.requestURL;
 if(_c6.hasOwnProperty("getUniqueIdURL")&&isString(_c6.getUniqueIdURL)&&_c6.getUniqueIdURL.length>0){
 this.getUniqueIdURL=_c6.getUniqueIdURL;
 }
-if(_c6.hasOwnProperty("getCharacterSizeURL")&&isString(_c6.getCharacterSizeURL)&&_c6.getCharacterSizeURL.length>0){
-this.getCharacterSizeURL=_c6.getCharacterSizeURL;
-}
 }
 this.pollingInterval=this.minInterval;
 this.watchdogID=null;
 this.requestID=null;
 this.running=false;
 this.ie=(window.ActiveXObject)?true:false;
-};
-TermComm.prototype.getCharacterSize=function(){
-var req=createXHR();
-req.open("GET",this.getCharacterSizeURL,false);
-req.send();
-return req.responseText;
 };
 TermComm.prototype.getUniqueID=function(){
 var req=createXHR();

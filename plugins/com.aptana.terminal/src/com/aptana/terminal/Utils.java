@@ -97,30 +97,4 @@ public class Utils
 		
 		return buffer.toString();
 	}
-	
-	/**
-	 * getCharacterWidth
-	 * 
-	 * @return
-	 */
-	public static Size getCharacterWidth()
-	{
-		Display display = Display.getCurrent();
-		Image canvas = new Image(display, 100,100);
-		GC gc = new GC(canvas);
-		Font font = new Font(display, "Courier", SWT.NORMAL, 9); //$NON-NLS-1$
-		
-		gc.setFont(font);
-		
-		Point size = gc.textExtent(SAMPLE_TEXT);
-		Size result = new Size(
-			(double) size.x / SAMPLE_TEXT.length(),
-			(double) size.y
-		);
-		
-	    gc.dispose();
-	    canvas.dispose();
-	    
-	    return result;
-	}
 }
