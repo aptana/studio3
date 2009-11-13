@@ -56,45 +56,45 @@ public class ContentTypeTranslation {
 	 * 
 	 */
 	private ContentTypeTranslation() {
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.js"), new QualifiedContentType("source.js"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.css"), new QualifiedContentType("source.css"));
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.js"), new QualifiedContentType("source.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.css"), new QualifiedContentType("source.css")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html"), new QualifiedContentType("text.html.basic"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.css"),
-						new QualifiedContentType("text.html.basic", "source.css.embedded.html"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.js"),
-				new QualifiedContentType("text.html.basic", "source.js.embedded.html"));
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html"), new QualifiedContentType("text.html.basic")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
+						new QualifiedContentType("text.html.basic", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.basic", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby.rails"));
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby.rails")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb"), new QualifiedContentType("text.html.ruby"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.html"),
-				new QualifiedContentType("text.html.ruby"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.css"),
-				new QualifiedContentType("text.html.ruby", "source.css.embedded.html"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.js"),
-				new QualifiedContentType("text.html.ruby", "source.js.embedded.html"));
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.ruby"),
-				new QualifiedContentType("text.html.ruby", "source.ruby.embedded.html"));
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.html"), //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.ruby", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.ruby", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.ruby", "source.ruby.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("__html_comment"), new QualifiedContentType("comment.block.html"));
-		addTranslation(new QualifiedContentType("__html_tag"), new QualifiedContentType("meta.tag.block.any.html"));
-		addTranslation(new QualifiedContentType("__html_script"), new QualifiedContentType("meta.tag.block.any.html"));
-		addTranslation(new QualifiedContentType("__html_style"), new QualifiedContentType("meta.tag.block.any.html"));
+		addTranslation(new QualifiedContentType("__html_comment"), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__html_tag"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__html_script"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__html_style"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("__css_multiline_comment"), new QualifiedContentType("comment.block.css"));
+		addTranslation(new QualifiedContentType("__css_multiline_comment"), new QualifiedContentType("comment.block.css")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("__js_string_double"), new QualifiedContentType("string.quoted.double.js"));
-		addTranslation(new QualifiedContentType("__js_string_single"), new QualifiedContentType("string.quoted.single.js"));
-		addTranslation(new QualifiedContentType("__js_regexp"), new QualifiedContentType("string.regexp.js"));
-		addTranslation(new QualifiedContentType("__js_singleline_comment"), new QualifiedContentType("comment.line.double-slash.js"));
-		addTranslation(new QualifiedContentType("__js_multiline_comment"), new QualifiedContentType("comment.block.js"));
-		addTranslation(new QualifiedContentType("__js_sdoc"), new QualifiedContentType("comment.block.js"));
+		addTranslation(new QualifiedContentType("__js_string_double"), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__js_string_single"), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__js_regexp"), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__js_singleline_comment"), new QualifiedContentType("comment.line.double-slash.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__js_multiline_comment"), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__js_sdoc"), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("__rb_string"), new QualifiedContentType("string.quoted.double.ruby"));
-		addTranslation(new QualifiedContentType("__rb_singleline_comment"), new QualifiedContentType("comment.line.number-sign.ruby"));
-		addTranslation(new QualifiedContentType("__rb_multiline_comment"), new QualifiedContentType("comment.block.documentation.ruby"));
-		addTranslation(new QualifiedContentType("__rb_regular_expression"), new QualifiedContentType("string.regexp.classic.ruby"));
+		addTranslation(new QualifiedContentType("__rb_string"), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__rb_singleline_comment"), new QualifiedContentType("comment.line.number-sign.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__rb_multiline_comment"), new QualifiedContentType("comment.block.documentation.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("__rb_regular_expression"), new QualifiedContentType("string.regexp.classic.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 
 	}
 	

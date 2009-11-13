@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
 Export-Package: com.aptana.radrails.editor.common,
  com.aptana.radrails.editor.common.theme,
  com.aptana.radrails.editor.common.tmp

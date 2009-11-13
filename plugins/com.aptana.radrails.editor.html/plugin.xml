@@ -8,7 +8,7 @@
             default="true"
             icon="icons/html.png"
             id="com.aptana.radrails.editor.html"
-            name="HTML Editor (Aptana)">
+            name="%editor.html.name">
          <contentTypeBinding
                contentTypeId="com.aptana.radrails.contenttype.html">
          </contentTypeBinding>
@@ -20,7 +20,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="html,htm"
             id="com.aptana.radrails.contenttype.html"
-            name="HTML"
+            name="%content-type.html.name"
             priority="normal">
       </content-type>
    </extension>

@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.css;
  */
 public interface ICSSConstants {
 
-	public String CONTENT_TYPE_CSS = "com.aptana.radrails.contenttype.css";
+	public String CONTENT_TYPE_CSS = "com.aptana.radrails.contenttype.css"; //$NON-NLS-1$
 }

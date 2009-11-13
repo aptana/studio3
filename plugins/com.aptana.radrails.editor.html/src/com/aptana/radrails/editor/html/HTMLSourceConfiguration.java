@@ -60,14 +60,14 @@ import com.aptana.radrails.editor.js.JSSourceConfiguration;
  */
 public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 	
-	public final static String PREFIX = "__html_";
-	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String HTML_COMMENT = "__html_comment";
-	public final static String CDATA = "__html_cdata";
-	public final static String HTML_DOCTYPE = "__html_doctype";
-	public final static String HTML_SCRIPT = "__html_script";
-	public final static String HTML_STYLE = "__html_style";
-	public final static String HTML_TAG = "__html_tag";
+	public final static String PREFIX = "__html_"; //$NON-NLS-1$
+	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public final static String HTML_COMMENT = "__html_comment"; //$NON-NLS-1$
+	public final static String CDATA = "__html_cdata"; //$NON-NLS-1$
+	public final static String HTML_DOCTYPE = "__html_doctype"; //$NON-NLS-1$
+	public final static String HTML_SCRIPT = "__html_script"; //$NON-NLS-1$
+	public final static String HTML_STYLE = "__html_style"; //$NON-NLS-1$
+	public final static String HTML_TAG = "__html_tag"; //$NON-NLS-1$
 
 	protected static final String[] CONTENT_TYPES = new String[] {
 		DEFAULT,
@@ -80,12 +80,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)),
+			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
 			new DocTypeRule(new Token(CDATA)),
-			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)),
-			new TagRule("script", new Token(HTML_SCRIPT)),
-			new TagRule("style", new Token(HTML_STYLE)),
-			new TagRule("/", new Token(HTML_TAG)),
+			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new TagRule("script", new Token(HTML_SCRIPT)), //$NON-NLS-1$
+			new TagRule("style", new Token(HTML_STYLE)), //$NON-NLS-1$
+			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(HTML_TAG)),
 	};
 

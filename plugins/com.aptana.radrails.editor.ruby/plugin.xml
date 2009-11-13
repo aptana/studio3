@@ -8,7 +8,7 @@
             default="true"
             icon="icons/rb.gif"
             id="com.aptana.radrails.editor.ruby"
-            name="Ruby Source Editor">
+            name="%editor.rb.name">
          <contentTypeBinding
                contentTypeId="com.aptana.radrails.contenttype.ruby">
          </contentTypeBinding>
@@ -20,7 +20,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="rb"
             id="com.aptana.radrails.contenttype.ruby"
-            name="Ruby Source"
+            name="%content-type.rb.name"
             priority="normal">
       </content-type>
    </extension>
