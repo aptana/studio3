@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.red.filewatcher.DirectoryChangeListener;
+import com.aptana.red.filewatcher.FileWatcherPlugin;
 
 class DirectoryWatcher
 {
@@ -69,9 +70,9 @@ class DirectoryWatcher
 
 	private static final long DEFAULT_POLL_FREQUENCY = 2000;
 
-	public static void log(String string, Throwable e)
+	private static void log(String string, Throwable e)
 	{
-		// UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, string, e));
+		FileWatcherPlugin.log(e);
 	}
 
 	final File[] directories;
@@ -81,7 +82,7 @@ class DirectoryWatcher
 	private WatcherThread watcher;
 	private boolean watchSubdirs;
 
-	public DirectoryWatcher(File directory, boolean watchSubtree)
+	DirectoryWatcher(File directory, boolean watchSubtree)
 	{
 		if (directory == null)
 			throw new IllegalArgumentException(Messages.null_folder);
@@ -90,29 +91,29 @@ class DirectoryWatcher
 		this.watchSubdirs = watchSubtree;
 	}
 
-	public synchronized void addListener(DirectoryChangeListener listener)
+	synchronized void addListener(DirectoryChangeListener listener)
 	{
 		listeners.add(listener);
 	}
 
-	public synchronized void removeListener(DirectoryChangeListener listener)
+	synchronized void removeListener(DirectoryChangeListener listener)
 	{
 		listeners.remove(listener);
 	}
 
-	public void start()
+	void start()
 	{
 		start(DEFAULT_POLL_FREQUENCY);
 	}
 
-	public synchronized void poll()
+	synchronized void poll()
 	{
 		startPoll();
 		scanDirectories();
 		stopPoll();
 	}
 
-	public synchronized void start(final long pollFrequency)
+	synchronized void start(final long pollFrequency)
 	{
 		if (watcher != null)
 			throw new IllegalStateException(Messages.thread_started);
@@ -121,7 +122,7 @@ class DirectoryWatcher
 		watcher.start();
 	}
 
-	public synchronized void stop()
+	synchronized void stop()
 	{
 		if (watcher == null)
 			throw new IllegalStateException(Messages.thread_not_started);
@@ -130,7 +131,7 @@ class DirectoryWatcher
 		watcher = null;
 	}
 
-	public File[] getDirectories()
+	File[] getDirectories()
 	{
 		return directories;
 	}

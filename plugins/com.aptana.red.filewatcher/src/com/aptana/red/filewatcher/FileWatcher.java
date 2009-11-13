@@ -17,48 +17,52 @@ public class FileWatcher
 
 	private static IJNotify _instance;
 
-	static
+	private synchronized static IJNotify instance()
 	{
-		String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
-		if (osName.equals("linux")) //$NON-NLS-1$
+		if (_instance == null)
 		{
-			try
+			String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
+			if (osName.equals("linux")) //$NON-NLS-1$
 			{
-				_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.linux.JNotifyAdapterLinux") //$NON-NLS-1$
-						.newInstance();
+				try
+				{
+					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.linux.JNotifyAdapterLinux") //$NON-NLS-1$
+							.newInstance();
+				}
+				catch (Exception e)
+				{
+					FileWatcherPlugin.log(e);
+				}
 			}
-			catch (Exception e)
+			else if (osName.startsWith("windows")) //$NON-NLS-1$
 			{
-				throw new RuntimeException(e);
+				try
+				{
+					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.win32.JNotifyAdapterWin32") //$NON-NLS-1$
+							.newInstance();
+				}
+				catch (Exception e)
+				{
+					FileWatcherPlugin.log(e);
+				}
+			}
+			if (_instance == null)
+			{
+				_instance = new PollingNotifier();
 			}
 		}
-		else if (osName.startsWith("windows")) //$NON-NLS-1$
-		{
-			try
-			{
-				_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.win32.JNotifyAdapterWin32") //$NON-NLS-1$
-						.newInstance();
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-		else
-		{
-			_instance = new PollingNotifier();
-		}
+		return _instance;
 	}
 
 	public static int addWatch(String path, int mask, boolean watchSubtree, final JNotifyListener listener)
 			throws JNotifyException
 	{
-		return _instance.addWatch(path, mask, watchSubtree, listener);
+		return instance().addWatch(path, mask, watchSubtree, listener);
 	}
 
 	public static boolean removeWatch(int watchId) throws JNotifyException
 	{
-		return _instance.removeWatch(watchId);
+		return instance().removeWatch(watchId);
 	}
 
 }
