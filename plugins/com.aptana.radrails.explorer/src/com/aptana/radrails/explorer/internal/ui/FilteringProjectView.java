@@ -419,9 +419,9 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	@Override
-	protected void projectChanged(IProject newSelectedProject)
+	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		super.projectChanged(newSelectedProject);
+		super.projectChanged(oldProject, newProject);
 		clearText();
 	}
 

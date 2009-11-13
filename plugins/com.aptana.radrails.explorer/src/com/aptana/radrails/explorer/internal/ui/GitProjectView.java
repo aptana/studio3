@@ -518,12 +518,12 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
-
+	
 	@Override
-	protected void projectChanged(IProject newSelectedProject)
+	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		super.projectChanged(newSelectedProject);
-		refreshUI(GitRepository.getAttached(newSelectedProject));
+		super.projectChanged(oldProject, newProject);
+		refreshUI(GitRepository.getAttached(newProject));
 	}
 
 	private void populateBranches(GitRepository repo)
