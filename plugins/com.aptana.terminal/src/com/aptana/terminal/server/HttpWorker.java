@@ -157,9 +157,9 @@ public class HttpWorker implements Runnable
 				
 				if (wrapper != null)
 				{
-					if (content.equals("\r") && IS_WINDOWS)
+					if (content.equals("\r") && IS_WINDOWS) //$NON-NLS-1$
 					{
-						content += "\n";
+						content += "\n"; //$NON-NLS-1$
 					}
 					
 					wrapper.sendText(content);
