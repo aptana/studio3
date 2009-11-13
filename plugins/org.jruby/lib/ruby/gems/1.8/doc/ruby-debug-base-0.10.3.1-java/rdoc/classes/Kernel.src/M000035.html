@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>start (Kernel)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/ruby-debug-base.rb, line 204</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+    <span class="ruby-identifier">options</span> = <span class="ruby-constant">Debugger</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_START_SETTINGS</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:init</span>]
+      <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-value str">'ARGV'</span>, <span class="ruby-constant">ARGV</span>.<span class="ruby-identifier">clone</span>) <span class="ruby-keyword kw">unless</span> 
+        <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">Debugger</span><span class="ruby-operator">::</span><span class="ruby-constant">ARGV</span>
+      <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-value str">'PROG_SCRIPT'</span>, <span class="ruby-identifier">$0</span>) <span class="ruby-keyword kw">unless</span> 
+        <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">Debugger</span><span class="ruby-operator">::</span><span class="ruby-constant">PROG_SCRIPT</span>
+      <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">const_set</span>(<span class="ruby-value str">'INITIAL_DIR'</span>, <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>) <span class="ruby-keyword kw">unless</span> 
+        <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">Debugger</span><span class="ruby-operator">::</span><span class="ruby-constant">INITIAL_DIR</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">retval</span> = <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">started?</span> <span class="ruby-value">? </span><span class="ruby-keyword kw">nil</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">start_</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) 
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:post_mortem</span>]
+      <span class="ruby-identifier">post_mortem</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">retval</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,19 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Installs the gem and returns a loaded Gem::Specification for the installed
+    gem.
+- !ruby/struct:SM::Flow::P 
+  body: 'The gem will be installed with the following structure:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  @gem_home/\n    cache/&lt;gem-version&gt;.gem #=&gt; a cached copy of the \
+    installed gem\n    gems/&lt;gem-version&gt;/... #=&gt; extracted files\n    specifications/&lt;gem-version&gt;.gemspec \
+    #=&gt; the Gem::Specification\n"
+full_name: Gem::Installer#install
+params: ()
+name: install
+is_singleton: false
+aliases: []
+

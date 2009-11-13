@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Make sure the YAML specification is properly formatted with dashes
+full_name: Gem::Specification::normalize_yaml_input
+params: (input)
+name: normalize_yaml_input
+is_singleton: true
+aliases: []
+

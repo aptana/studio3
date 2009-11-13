@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Safely read a file in binary mode on all platforms.
+full_name: Gem::read_binary
+params: (path)
+name: read_binary
+is_singleton: true
+aliases: []
+

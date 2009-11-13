@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Uses this dependency as a pattern to compare to <tt>other</tt>. This dependency
+    will match if the name matches the other's name, and other has only an equal version
+    requirement that satisfies this dependency.
+full_name: Gem::Dependency#=~
+params: (other)
+name: =~
+is_singleton: false
+aliases: []
+

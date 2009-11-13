@@ -25,7 +25,7 @@ public class DocumentSnippetTemplateContext extends DocumentTemplateContext {
 		super( type, document, position);
 	}
 	
-	static final String TAB_STOP_TYPES = "123456789";
+	static final String TAB_STOP_TYPES = "123456789"; //$NON-NLS-1$
 	
 	@Override
 	public TemplateBuffer evaluate(Template template)

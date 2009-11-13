@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Adds metadata.gz to the gem-format tar file which was saved from a previous
+    #add_gem_contents call.'
+full_name: Gem::Package::TarOutput#add_metadata
+params: ()
+name: add_metadata
+is_singleton: false
+aliases: []
+

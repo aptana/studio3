@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Search all source indexes. See Gem::SourceInfoCache#search.
+full_name: Gem::SourceInfoCache::search
+params: (*args)
+name: search
+is_singleton: true
+aliases: []
+

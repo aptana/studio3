@@ -1,0 +1,28 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: private
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: When RubyGems is required, Kernel#require is replaced with our own which is
+    capable of loading gems on demand.
+- !ruby/struct:SM::Flow::P 
+  body: 'When you call <tt>require ''x''</tt>, this is what happens:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: If the file can be loaded from the existing Ruby loadpath, it is.
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Otherwise, installed gems are searched for a file that matches. If it's
+      found in gem 'y', that gem is activated (added to the loadpath).
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: The normal <tt>require</tt> functionality of returning false if that file
+    has already been loaded is preserved.
+full_name: Kernel#require
+params: (path)
+name: require
+is_singleton: false
+aliases: []
+

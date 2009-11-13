@@ -1,0 +1,11 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: line
+comment: 
+full_name: Buffering#each
+params: (eol=$/) {|line| ...}
+name: each
+is_singleton: false
+aliases: 
+- !ruby/object:RI::AliasName 
+  name: each_line

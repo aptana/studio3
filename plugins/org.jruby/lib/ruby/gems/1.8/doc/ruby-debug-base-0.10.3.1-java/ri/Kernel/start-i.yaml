@@ -1,0 +1,26 @@
+--- !ruby/object:RI::MethodDescription 
+params: (options={}, &block)
+is_singleton: false
+block_params: 
+name: start
+comment: 
+- !ruby/struct:SM::Flow::VERB 
+  body: " Debugger.start(options) -&gt; bool\n Debugger.start(options) { ... } -&gt; \
+    obj\n\n This method is internal and activates the debugger. Use\n Debugger.start \
+    (from ruby-debug-base.rb) instead.\n\n If it's called without a block it returns \
+    <tt>true</tt>, unless debugger\n was already started.  If a block is given, it \
+    starts debugger and\n yields to block. When the block is finished executing it \
+    stops\n the debugger with Debugger.stop method.\n\n &lt;i&gt;Note that if you \
+    want to stop debugger, you must call\n Debugger.stop as many time as you called \
+    Debugger.start\n method.&lt;/i&gt;\n"
+- !ruby/struct:SM::Flow::P 
+  body: <tt>options</tt> is a hash used to set various debugging options. Set :init
+    true if you want to save ARGV and some variables which make a debugger restart
+    possible. Only the first time :init is set true will values get set. Since ARGV
+    is saved, you should make sure it hasn't been changed before the (first) call.
+    Set :post_mortem true if you want to enter post-mortem debugging on an uncaught
+    exception. Once post-mortem debugging is set, it can't be unset.
+full_name: Kernel#start
+visibility: public
+aliases: []
+

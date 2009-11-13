@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Gem::Security</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Gem::Security</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/security_rb.html">
+                lib/rubygems/security.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>Signed Gems README</h1>
+<h2>Table of Contents</h2>
+<ul>
+<li>Overview
+
+</li>
+<li>Walkthrough
+
+</li>
+<li><a href="Command.html">Command</a>-Line Options
+
+</li>
+<li><a href="../OpenSSL.html">OpenSSL</a> Reference
+
+</li>
+<li>Bugs/TODO
+
+</li>
+<li>About the Author
+
+</li>
+</ul>
+<h2>Overview</h2>
+<p>
+<a href="Security.html">Gem::Security</a> implements cryptographic
+signatures in RubyGems. The section below is a step-by-step guide to using
+signed gems and generating your own.
+</p>
+<h2>Walkthrough</h2>
+<p>
+In order to start signing your gems, you&#8216;ll need to build a private
+key and a self-signed certificate. Here&#8216;s how:
+</p>
+<pre>
+  # build a private key and certificate for gemmaster@example.com
+  $ gem cert --build gemmaster@example.com
+</pre>
+<p>
+This could take anywhere from 5 seconds to 10 minutes, depending on the
+speed of your computer (public key algorithms aren&#8216;t exactly the
+speediest crypto algorithms in the world). When it&#8216;s finished,
+you&#8216;ll see the files &quot;gem-private_key.pem&quot; and
+&quot;gem-public_cert.pem&quot; in the current directory.
+</p>
+<p>
+First things first: take the &quot;gem-private_key.pem&quot; file and move
+it somewhere private, preferably a directory only you have access to, a
+floppy (yuck!), a CD-ROM, or something comparably secure. Keep your private
+key hidden; if it&#8216;s compromised, someone can sign packages as you
+(note: PKI has ways of mitigating the risk of stolen keys; more on that
+later).
+</p>
+<p>
+Now, let&#8216;s sign an existing gem. I&#8216;ll be using my Imlib2-Ruby
+bindings, but you can use whatever gem you&#8216;d like. Open up your
+existing gemspec file and add the following lines:
+</p>
+<pre>
+  # signing key and certificate chain
+  s.signing_key = '/mnt/floppy/gem-private_key.pem'
+  s.cert_chain  = ['gem-public_cert.pem']
+</pre>
+<p>
+(Be sure to replace &quot;/mnt/floppy&quot; with the ultra-secret path to
+your private key).
+</p>
+<p>
+After that, go ahead and build your gem as usual. Congratulations,
+you&#8216;ve just built your first signed gem! If you peek inside your gem
+file, you&#8216;ll see a couple of new files have been added:
+</p>
+<pre>
+  $ tar tf tar tf Imlib2-Ruby-0.5.0.gem
+  data.tar.gz
+  data.tar.gz.sig
+  metadata.gz
+  metadata.gz.sig
+</pre>
+<p>
+Now let&#8216;s verify the signature. Go ahead and install the gem, but add
+the following options: &quot;-P HighSecurity&quot;, like this:
+</p>
+<pre>
+  # install the gem with using the security policy &quot;HighSecurity&quot;
+  $ sudo gem install Imlib2-Ruby-0.5.0.gem -P HighSecurity
+</pre>
+<p>
+The -P option sets your security policy &#8212; we&#8216;ll talk about that
+in just a minute. Eh, what&#8216;s this?
+</p>
+<pre>
+  Attempting local installation of 'Imlib2-Ruby-0.5.0.gem'
+  ERROR:  Error installing gem Imlib2-Ruby-0.5.0.gem[.gem]: Couldn't
+  verify data signature: Untrusted Signing Chain Root: cert =
+  '/CN=gemmaster/DC=example/DC=com', error = 'path
+  &quot;/root/.rubygems/trust/cert-15dbb43a6edf6a70a85d4e784e2e45312cff7030.pem&quot;
+  does not exist'
+</pre>
+<p>
+The culprit here is the security policy. RubyGems has several different
+security policies. Let&#8216;s take a short break and go over the security
+policies. Here&#8216;s a list of the available security policies, and a
+brief description of each one:
+</p>
+<ul>
+<li>NoSecurity - Well, no security at all. Signed packages are treated like
+unsigned packages.
+
+</li>
+<li>LowSecurity - Pretty much no security. If a package is signed then RubyGems
+will make sure the signature matches the signing certificate, and that the
+signing certificate hasn&#8216;t expired, but that&#8216;s it. A malicious
+user could easily circumvent this kind of security.
+
+</li>
+<li>MediumSecurity - Better than LowSecurity and NoSecurity, but still
+fallible. <a href="Package.html">Package</a> contents are verified against
+the signing certificate, and the signing certificate is checked for
+validity, and checked against the rest of the certificate chain (if you
+don&#8216;t know what a certificate chain is, stay tuned, we&#8216;ll get
+to that). The biggest improvement over LowSecurity is that MediumSecurity
+won&#8216;t install packages that are signed by untrusted sources.
+Unfortunately, MediumSecurity still isn&#8216;t totally secure &#8212; a
+malicious user can still unpack the gem, strip the signatures, and
+distribute the gem unsigned.
+
+</li>
+<li>HighSecurity - Here&#8216;s the bugger that got us into this mess. The
+HighSecurity policy is identical to the MediumSecurity policy, except that
+it does not allow unsigned gems. A malicious user doesn&#8216;t have a
+whole lot of options here; he can&#8216;t modify the package contents
+without invalidating the signature, and he can&#8216;t modify or remove
+signature or the signing certificate chain, or RubyGems will simply refuse
+to install the package. Oh well, maybe he&#8216;ll have better luck causing
+problems for CPAN users instead :).
+
+</li>
+</ul>
+<p>
+So, the reason RubyGems refused to install our shiny new signed gem was
+because it was from an untrusted source. Well, my code is infallible
+(hah!), so I&#8216;m going to add myself as a trusted source.
+</p>
+<p>
+Here&#8216;s how:
+</p>
+<pre>
+    # add trusted certificate
+    gem cert --add gem-public_cert.pem
+</pre>
+<p>
+I&#8216;ve added my public certificate as a trusted source. Now I can
+install packages signed my private key without any hassle. Let&#8216;s try
+the install command above again:
+</p>
+<pre>
+  # install the gem with using the HighSecurity policy (and this time
+  # without any shenanigans)
+  $ sudo gem install Imlib2-Ruby-0.5.0.gem -P HighSecurity
+</pre>
+<p>
+This time RubyGems should accept your signed package and begin installing.
+While you&#8216;re waiting for RubyGems to work it&#8216;s magic, have a
+look at some of the other security commands:
+</p>
+<pre>
+  Usage: gem cert [options]
+
+  Options:
+    -a, --add CERT          Add a trusted certificate.
+    -l, --list              List trusted certificates.
+    -r, --remove STRING     Remove trusted certificates containing STRING.
+    -b, --build EMAIL_ADDR  Build private key and self-signed certificate
+                            for EMAIL_ADDR.
+    -C, --certificate CERT  Certificate for --sign command.
+    -K, --private-key KEY   Private key for --sign command.
+    -s, --sign NEWCERT      Sign a certificate with my key and certificate.
+</pre>
+<p>
+(By the way, you can pull up this list any time you&#8216;d like by typing
+&quot;gem cert &#8212;help&quot;)
+</p>
+<p>
+Hmm. We&#8216;ve already covered the &quot;&#8212;build&quot; option, and
+the &quot;&#8212;add&quot;, &quot;&#8212;list&quot;, and
+&quot;&#8212;remove&quot; commands seem fairly straightforward; they allow
+you to add, list, and remove the certificates in your trusted certificate
+list. But what&#8216;s with this &quot;&#8212;sign&quot; option?
+</p>
+<p>
+To answer that question, let&#8216;s take a look at &quot;certificate
+chains&quot;, a concept I mentioned earlier. There are a couple of problems
+with self-signed certificates: first of all, self-signed certificates
+don&#8216;t offer a whole lot of security. Sure, the certificate says
+Yukihiro Matsumoto, but how do I know it was actually generated and signed
+by matz himself unless he gave me the certificate in person?
+</p>
+<p>
+The second problem is scalability. Sure, if there are 50 gem authors, then
+I have 50 trusted certificates, no problem. What if there are 500 gem
+authors? 1000? Having to constantly add new trusted certificates is a pain,
+and it actually makes the trust system less secure by encouraging RubyGems
+users to blindly trust new certificates.
+</p>
+<p>
+Here&#8216;s where certificate chains come in. A certificate chain
+establishes an arbitrarily long chain of trust between an issuing
+certificate and a child certificate. So instead of trusting certificates on
+a per-developer basis, we use the PKI concept of certificate chains to
+build a logical hierarchy of trust. Here&#8216;s a hypothetical example of
+a trust hierarchy based (roughly) on geography:
+</p>
+<pre>
+                        --------------------------
+                        | rubygems@rubyforge.org |
+                        --------------------------
+                                    |
+                  -----------------------------------
+                  |                                 |
+      ----------------------------    -----------------------------
+      | seattle.rb@zenspider.com |    | dcrubyists@richkilmer.com |
+      ----------------------------    -----------------------------
+           |                |                 |             |
+    ---------------   ----------------   -----------   --------------
+    | alf@seattle |   | bob@portland |   | pabs@dc |   | tomcope@dc |
+    ---------------   ----------------   -----------   --------------
+</pre>
+<p>
+Now, rather than having 4 trusted certificates (one for alf@seattle,
+bob@portland, pabs@dc, and tomecope@dc), a user could actually get by with
+1 certificate: the &quot;rubygems@rubyforge.org&quot; certificate.
+Here&#8216;s how it works:
+</p>
+<p>
+I install &quot;Alf2000-Ruby-0.1.0.gem&quot;, a package signed by
+&quot;alf@seattle&quot;. I&#8216;ve never heard of &quot;alf@seattle&quot;,
+but his certificate has a valid signature from the
+&quot;seattle.rb@zenspider.com&quot; certificate, which in turn has a valid
+signature from the &quot;rubygems@rubyforge.org&quot; certificate. Voila!
+At this point, it&#8216;s much more reasonable for me to trust a package
+signed by &quot;alf@seattle&quot;, because I can establish a chain to
+&quot;rubygems@rubyforge.org&quot;, which I do trust.
+</p>
+<p>
+And the &quot;&#8212;sign&quot; option allows all this to happen. A
+developer creates their build certificate with the &quot;&#8212;build&quot;
+option, then has their certificate signed by taking it with them to their
+next regional Ruby meetup (in our hypothetical example), and it&#8216;s
+signed there by the person holding the regional RubyGems signing
+certificate, which is signed at the next RubyConf by the holder of the
+top-level RubyGems certificate. At each point the issuer runs the same
+command:
+</p>
+<pre>
+  # sign a certificate with the specified key and certificate
+  # (note that this modifies client_cert.pem!)
+  $ gem cert -K /mnt/floppy/issuer-priv_key.pem -C issuer-pub_cert.pem
+     --sign client_cert.pem
+</pre>
+<p>
+Then the holder of issued certificate (in this case, our buddy
+&quot;alf@seattle&quot;), can start using this signed certificate to sign
+RubyGems. By the way, in order to let everyone else know about his new
+fancy signed certificate, &quot;alf@seattle&quot; would change his gemspec
+file to look like this:
+</p>
+<pre>
+  # signing key (still kept in an undisclosed location!)
+  s.signing_key = '/mnt/floppy/alf-private_key.pem'
+
+  # certificate chain (includes the issuer certificate now too)
+  s.cert_chain  = ['/home/alf/doc/seattlerb-public_cert.pem',
+                   '/home/alf/doc/alf_at_seattle-public_cert.pem']
+</pre>
+<p>
+Obviously, this RubyGems trust infrastructure doesn&#8216;t exist yet.
+Also, in the &quot;real world&quot; issuers actually generate the child
+certificate from a certificate request, rather than sign an existing
+certificate. And our hypothetical infrastructure is missing a certificate
+revocation system. These are that can be fixed in the future&#8230;
+</p>
+<p>
+I&#8216;m sure your new signed gem has finished installing by now (unless
+you&#8216;re installing rails and all it&#8216;s dependencies, that is ;D).
+At this point you should know how to do all of these new and interesting
+things:
+</p>
+<ul>
+<li>build a gem signing key and certificate
+
+</li>
+<li>modify your existing gems to support signing
+
+</li>
+<li>adjust your security policy
+
+</li>
+<li>modify your trusted certificate list
+
+</li>
+<li>sign a certificate
+
+</li>
+</ul>
+<p>
+If you&#8216;ve got any questions, feel free to contact me at the email
+address below. The next couple of sections
+</p>
+<h2><a href="Command.html">Command</a>-Line Options</h2>
+<p>
+Here&#8216;s a brief summary of the certificate-related command line
+options:
+</p>
+<pre>
+  gem install
+    -P, --trust-policy POLICY        Specify gem trust policy.
+
+  gem cert
+    -a, --add CERT                   Add a trusted certificate.
+    -l, --list                       List trusted certificates.
+    -r, --remove STRING              Remove trusted certificates containing
+                                     STRING.
+    -b, --build EMAIL_ADDR           Build private key and self-signed
+                                     certificate for EMAIL_ADDR.
+    -C, --certificate CERT           Certificate for --sign command.
+    -K, --private-key KEY            Private key for --sign command.
+    -s, --sign NEWCERT               Sign a certificate with my key and
+                                     certificate.
+</pre>
+<p>
+A more detailed description of each options is available in the walkthrough
+above.
+</p>
+<h2><a href="../OpenSSL.html">OpenSSL</a> Reference</h2>
+<p>
+The .pem files generated by &#8212;build and &#8212;sign are just basic <a
+href="../OpenSSL.html">OpenSSL</a> PEM files. Here&#8216;s a couple of
+useful commands for manipulating them:
+</p>
+<pre>
+  # convert a PEM format X509 certificate into DER format:
+  # (note: Windows .cer files are X509 certificates in DER format)
+  $ openssl x509 -in input.pem -outform der -out output.der
+
+  # print out the certificate in a human-readable format:
+  $ openssl x509 -in input.pem -noout -text
+</pre>
+<p>
+And you can do the same thing with the private key file as well:
+</p>
+<pre>
+  # convert a PEM format RSA key into DER format:
+  $ openssl rsa -in input_key.pem -outform der -out output_key.der
+
+  # print out the key in a human readable format:
+  $ openssl rsa -in input_key.pem -noout -text
+</pre>
+<h2>Bugs/TODO</h2>
+<ul>
+<li>There&#8216;s no way to define a system-wide trust list.
+
+</li>
+<li>custom security policies (from a YAML file, etc)
+
+</li>
+<li>Simple method to generate a signed certificate request
+
+</li>
+<li>Support for OCSP, SCVP, CRLs, or some other form of cert status check (list
+is in order of preference)
+
+</li>
+<li>Support for encrypted private keys
+
+</li>
+<li>Some sort of semi-formal trust hierarchy (see long-winded explanation
+above)
+
+</li>
+<li>Path discovery (for gem certificate chains that don&#8216;t have a
+self-signed root) &#8212; by the way, since we don&#8216;t have this, THE
+ROOT OF THE CERTIFICATE CHAIN MUST BE SELF SIGNED if Policy#verify_root is
+true (and it is for the MediumSecurity and HighSecurity policies)
+
+</li>
+<li>Better explanation of X509 naming (ie, we don&#8216;t have to use email
+addresses)
+
+</li>
+<li>Possible alternate signing mechanisms (eg, via PGP). this could be done
+pretty easily by adding a :signing_type attribute to the gemspec, then add
+the necessary support in other places
+
+</li>
+<li>Honor AIA field (see note about OCSP above)
+
+</li>
+<li>Maybe honor restriction extensions?
+
+</li>
+<li>Might be better to store the certificate chain as a PKCS#7 or PKCS#12 file,
+instead of an array embedded in the metadata. ideas?
+
+</li>
+<li>Possibly embed signature and key algorithms into metadata (right now
+they&#8216;re assumed to be the same as what&#8216;s set in
+Gem::Security::OPT)
+
+</li>
+</ul>
+<h2>About the Author</h2>
+<p>
+Paul Duncan &lt;pabs@pablotron.org&gt; <a
+href="http://pablotron.org">pablotron.org</a>/
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000217">add_trusted_cert</a>&nbsp;&nbsp;
+      <a href="#M000215">build_cert</a>&nbsp;&nbsp;
+      <a href="#M000216">build_self_signed_cert</a>&nbsp;&nbsp;
+      <a href="#M000213">sign_cert</a>&nbsp;&nbsp;
+      <a href="#M000214">verify_trust_dir</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Class <a href="Security/Exception.html" class="link">Gem::Security::Exception</a><br />
+Class <a href="Security/Policy.html" class="link">Gem::Security::Policy</a><br />
+Class <a href="Security/Signer.html" class="link">Gem::Security::Signer</a><br />
+
+    </div>
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">OPT</td>
+          <td>=</td>
+          <td class="context-item-value">{     # private key options     :key_algo   =&gt; Gem::SSL::PKEY_RSA,     :key_size   =&gt; 2048,      # public cert options     :cert_age   =&gt; 365 * 24 * 3600, # 1 year     :dgst_algo  =&gt; Gem::SSL::DIGEST_SHA1,      # x509 certificate extensions     :cert_exts  =&gt; {       'basicConstraints'      =&gt; 'CA:FALSE',       'subjectKeyIdentifier'  =&gt; 'hash',       'keyUsage'              =&gt; 'keyEncipherment,dataEncipherment,digitalSignature',   },    # save the key and cert to a file in build_self_signed_cert()?   :save_key   =&gt; true,   :save_cert  =&gt; true,    # if you define either of these, then they'll be used instead of   # the output_fmt macro below   :save_key_path =&gt; nil,   :save_cert_path =&gt; nil,    # output name format for self-signed certs   :output_fmt =&gt; 'gem-%s.pem',   :munge_re   =&gt; Regexp.new(/[^a-z0-9_.-]+/),    # output directory for trusted certificate checksums   :trust_dir =&gt; File::join(Gem.user_home, '.gem', 'trust'),    # default permissions for trust directory and certs   :perms =&gt; {     :trust_dir      =&gt; 0700,     :trusted_cert   =&gt; 0600,     :signing_cert   =&gt; 0600,     :signing_key    =&gt; 0600,   },   }</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+default options for most of the methods below
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">NoSecurity</td>
+          <td>=</td>
+          <td class="context-item-value">Policy.new(     :verify_data      =&gt; false,     :verify_signer    =&gt; false,     :verify_chain     =&gt; false,     :verify_root      =&gt; false,     :only_trusted     =&gt; false,     :only_signed      =&gt; false</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+No security policy: all package signature checks are disabled.
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">AlmostNoSecurity</td>
+          <td>=</td>
+          <td class="context-item-value">Policy.new(     :verify_data      =&gt; true,     :verify_signer    =&gt; false,     :verify_chain     =&gt; false,     :verify_root      =&gt; false,     :only_trusted     =&gt; false,     :only_signed      =&gt; false</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+AlmostNo security policy: only verify that the signing certificate is the
+one that actually signed the data. Make no attempt to verify the signing
+certificate chain.
+
+<p>
+This policy is basically useless. better than nothing, but can still be
+easily spoofed, and is not recommended.
+</p>
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">LowSecurity</td>
+          <td>=</td>
+          <td class="context-item-value">Policy.new(     :verify_data      =&gt; true,     :verify_signer    =&gt; true,     :verify_chain     =&gt; false,     :verify_root      =&gt; false,     :only_trusted     =&gt; false,     :only_signed      =&gt; false</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+Low security policy: only verify that the signing certificate is actually
+the gem signer, and that the signing certificate is valid.
+
+<p>
+This policy is better than nothing, but can still be easily spoofed, and is
+not recommended.
+</p>
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">MediumSecurity</td>
+          <td>=</td>
+          <td class="context-item-value">Policy.new(     :verify_data      =&gt; true,     :verify_signer    =&gt; true,     :verify_chain     =&gt; true,     :verify_root      =&gt; true,     :only_trusted     =&gt; true,     :only_signed      =&gt; false</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+Medium security policy: verify the signing certificate, verify the signing
+certificate chain all the way to the root certificate, and only trust root
+certificates that we have explicitly allowed trust for.
+
+<p>
+This security policy is reasonable, but it allows unsigned packages, so a
+malicious person could simply delete the package signature and pass the gem
+off as unsigned.
+</p>
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">HighSecurity</td>
+          <td>=</td>
+          <td class="context-item-value">Policy.new(     :verify_data      =&gt; true,     :verify_signer    =&gt; true,     :verify_chain     =&gt; true,     :verify_root      =&gt; true,     :only_trusted     =&gt; true,     :only_signed      =&gt; true</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+High security policy: only allow signed gems to be installed, verify the
+signing certificate, verify the signing certificate chain all the way to
+the root certificate, and only trust root certificates that we have
+explicitly allowed trust for.
+
+<p>
+This security policy is significantly more difficult to bypass, and offers
+a reasonable guarantee that the contents of the gem have not been altered.
+</p>
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Policies</td>
+          <td>=</td>
+          <td class="context-item-value">{     'NoSecurity'       =&gt; NoSecurity,     'AlmostNoSecurity' =&gt; AlmostNoSecurity,     'LowSecurity'      =&gt; LowSecurity,     'MediumSecurity'   =&gt; MediumSecurity,     'HighSecurity'     =&gt; HighSecurity,   }</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+Hash of configured security policies
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000217" class="method-detail">
+        <a name="M000217"></a>
+
+        <div class="method-heading">
+          <a href="Security.src/M000217.html" target="Code" class="method-signature"
+            onclick="popupCode('Security.src/M000217.html');return false;">
+          <span class="method-name">add_trusted_cert</span><span class="method-args">(cert, opt = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Add certificate to trusted cert list.
+</p>
+<p>
+Note: At the moment these are stored in OPT[:trust_dir], although that
+directory may change in the future.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000215" class="method-detail">
+        <a name="M000215"></a>
+
+        <div class="method-heading">
+          <a href="Security.src/M000215.html" target="Code" class="method-signature"
+            onclick="popupCode('Security.src/M000215.html');return false;">
+          <span class="method-name">build_cert</span><span class="method-args">(name, key, opt = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Build a certificate from the given DN and private key.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000216" class="method-detail">
+        <a name="M000216"></a>
+
+        <div class="method-heading">
+          <a href="Security.src/M000216.html" target="Code" class="method-signature"
+            onclick="popupCode('Security.src/M000216.html');return false;">
+          <span class="method-name">build_self_signed_cert</span><span class="method-args">(email_addr, opt = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Build a self-signed certificate for the given email address.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000213" class="method-detail">
+        <a name="M000213"></a>
+
+        <div class="method-heading">
+          <a href="Security.src/M000213.html" target="Code" class="method-signature"
+            onclick="popupCode('Security.src/M000213.html');return false;">
+          <span class="method-name">sign_cert</span><span class="method-args">(cert, signing_key, signing_cert, opt = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sign the cert cert with @signing_key and @signing_cert, using the digest
+algorithm opt[:dgst_algo]. Returns the newly signed certificate.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000214" class="method-detail">
+        <a name="M000214"></a>
+
+        <div class="method-heading">
+          <a href="Security.src/M000214.html" target="Code" class="method-signature"
+            onclick="popupCode('Security.src/M000214.html');return false;">
+          <span class="method-name">verify_trust_dir</span><span class="method-args">(path, perms)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Make sure the trust directory exists. If it does exist, make sure
+it&#8216;s actually a directory. If not, then create it with the
+appropriate permissions.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

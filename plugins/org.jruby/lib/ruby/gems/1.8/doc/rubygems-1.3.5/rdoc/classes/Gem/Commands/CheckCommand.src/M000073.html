@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::CheckCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/check_command.rb, line 9</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'check'</span>, <span class="ruby-value str">'Check installed gems'</span>,
+          <span class="ruby-identifier">:verify</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">:alien</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">add_option</span>(      <span class="ruby-value str">'--verify FILE'</span>,
+               <span class="ruby-value str">'Verify gem file against its internal'</span>,
+               <span class="ruby-value str">'checksum'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verify</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-a'</span>, <span class="ruby-value str">'--alien'</span>, <span class="ruby-value str">&quot;Report 'unmanaged' or rogue files in the&quot;</span>,
+               <span class="ruby-value str">&quot;gem repository&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:alien</span>] = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-v'</span>, <span class="ruby-value str">'--verbose'</span>, <span class="ruby-value str">&quot;Spew more words&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>] = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-t'</span>, <span class="ruby-value str">'--test'</span>, <span class="ruby-value str">&quot;Run unit tests for gem&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:test</span>] = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_version_option</span> <span class="ruby-value str">'run tests for'</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

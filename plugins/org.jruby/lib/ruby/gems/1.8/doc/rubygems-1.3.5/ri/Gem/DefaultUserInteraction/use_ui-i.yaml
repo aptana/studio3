@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: See DefaultUserInteraction::use_ui
+full_name: Gem::DefaultUserInteraction#use_ui
+params: (new_ui, &block)
+name: use_ui
+is_singleton: false
+aliases: []
+

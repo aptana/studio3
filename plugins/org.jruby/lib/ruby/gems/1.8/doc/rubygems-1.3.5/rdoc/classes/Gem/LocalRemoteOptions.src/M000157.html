@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_source_option (Gem::LocalRemoteOptions)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/local_remote_options.rb, line 87</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_source_option</span>
+    <span class="ruby-identifier">accept_uri_http</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">&quot;Local/Remote&quot;</span><span class="ruby-value str">&quot;Local/Remote&quot;</span>, <span class="ruby-value str">'--source URL'</span>, <span class="ruby-constant">URI</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTP</span>,
+               <span class="ruby-value str">'Use URL as the remote source for gems'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">source</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'/'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">source</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/\/\z/</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:added_source</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">source</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">source</span>)
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:added_source</span>] = <span class="ruby-keyword kw">true</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">replace</span> [<span class="ruby-identifier">source</span>]
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

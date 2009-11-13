@@ -1,0 +1,44 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The documentation manager generates RDoc and RI for RubyGems.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: generate_rdoc
+- !ruby/object:RI::MethodSummary 
+  name: generate_ri
+- !ruby/object:RI::MethodSummary 
+  name: install_rdoc
+- !ruby/object:RI::MethodSummary 
+  name: install_ri
+- !ruby/object:RI::MethodSummary 
+  name: rdoc_installed?
+- !ruby/object:RI::MethodSummary 
+  name: run_rdoc
+- !ruby/object:RI::MethodSummary 
+  name: setup_rdoc
+- !ruby/object:RI::MethodSummary 
+  name: uninstall_doc
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: configured_args
+- !ruby/object:RI::MethodSummary 
+  name: configured_args=
+- !ruby/object:RI::MethodSummary 
+  name: load_rdoc
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: rdoc_version
+- !ruby/object:RI::MethodSummary 
+  name: update_ri_cache
+full_name: Gem::DocManager
+constants: []
+
+superclass: Object
+name: DocManager

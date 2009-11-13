@@ -1,0 +1,25 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Defines a <em>singular</em> version of an existing <em>plural</em> attribute
+    (i.e. one whose value is expected to be an array). This means just creating a
+    helper method that takes a single value and appends it to the array. These are
+    created for convenience, so that in a spec, one can write
+- !ruby/struct:SM::Flow::VERB 
+  body: "  s.require_path = 'mylib'\n"
+- !ruby/struct:SM::Flow::P 
+  body: 'instead of:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  s.require_paths = ['mylib']\n"
+- !ruby/struct:SM::Flow::P 
+  body: 'That above convenience is available courtesy of:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  attribute_alias_singular :require_path, :require_paths\n"
+full_name: Gem::Specification::attribute_alias_singular
+params: (singular, plural)
+name: attribute_alias_singular
+is_singleton: true
+aliases: []
+

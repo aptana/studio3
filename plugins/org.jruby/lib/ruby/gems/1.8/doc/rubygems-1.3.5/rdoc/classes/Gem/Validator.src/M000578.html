@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>alien (Gem::Validator)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/validator.rb, line 89</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">alien</span>(<span class="ruby-identifier">gems</span>=[])
+    <span class="ruby-identifier">errors</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">h</span>,<span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">k</span>] = {} }
+
+    <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem_name</span>, <span class="ruby-identifier">gem_spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gems</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gems</span>.<span class="ruby-identifier">empty?</span>
+
+      <span class="ruby-identifier">install_dir</span> = <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">installation_path</span>
+      <span class="ruby-identifier">gem_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">install_dir</span>, <span class="ruby-value str">&quot;cache&quot;</span>, <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;.gem&quot;</span>
+      <span class="ruby-identifier">spec_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">install_dir</span>, <span class="ruby-value str">&quot;specifications&quot;</span>,
+                            <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_name</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;.gemspec&quot;</span>
+      <span class="ruby-identifier">gem_directory</span> = <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_gem_path</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">gem_directory</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_name</span>] =
+          <span class="ruby-node">&quot;Gem registered but doesn't exist at #{gem_directory}&quot;</span>
+        <span class="ruby-keyword kw">next</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">spec_path</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">spec_path</span>] = <span class="ruby-value str">&quot;Spec file missing for installed gem&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">verify_gem_file</span>(<span class="ruby-identifier">gem_path</span>)
+
+        <span class="ruby-identifier">good</span>, <span class="ruby-identifier">gone</span>, <span class="ruby-identifier">unreadable</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>
+
+        <span class="ruby-identifier">open</span> <span class="ruby-identifier">gem_path</span>, <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">binary_mode</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">format</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Format</span>.<span class="ruby-identifier">from_file_by_path</span>(<span class="ruby-identifier">gem_path</span>)
+
+          <span class="ruby-identifier">good</span>, <span class="ruby-identifier">gone</span> = <span class="ruby-identifier">format</span>.<span class="ruby-identifier">file_entries</span>.<span class="ruby-identifier">partition</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span>
+            <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">gem_directory</span>, <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>])
+          }
+
+          <span class="ruby-identifier">gone</span>.<span class="ruby-identifier">map!</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>] }
+          <span class="ruby-identifier">gone</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">path</span>] = <span class="ruby-value str">&quot;Missing file&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">good</span>, <span class="ruby-identifier">unreadable</span> = <span class="ruby-identifier">good</span>.<span class="ruby-identifier">partition</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span>
+            <span class="ruby-constant">File</span>.<span class="ruby-identifier">readable?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">gem_directory</span>, <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>])
+          }
+
+          <span class="ruby-identifier">unreadable</span>.<span class="ruby-identifier">map!</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>] }
+          <span class="ruby-identifier">unreadable</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">path</span>] = <span class="ruby-value str">&quot;Unreadable file&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">good</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">data</span><span class="ruby-operator">|</span>
+            <span class="ruby-keyword kw">begin</span>
+              <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">data</span> <span class="ruby-comment cmt"># HACK `gem check -a mkrf`</span>
+
+              <span class="ruby-identifier">open</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">gem_directory</span>, <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>]), <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">binary_mode</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+                <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-operator">==</span>
+                    <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">data</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">then</span>
+                  <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>]] = <span class="ruby-value str">&quot;Modified from original&quot;</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">end</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">installed_files</span> = <span class="ruby-identifier">find_files_for_gem</span>(<span class="ruby-identifier">gem_directory</span>)
+        <span class="ruby-identifier">good</span>.<span class="ruby-identifier">map!</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>] }
+        <span class="ruby-identifier">extras</span> = <span class="ruby-identifier">installed_files</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">good</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">unreadable</span>
+
+        <span class="ruby-identifier">extras</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">extra</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">extra</span>] = <span class="ruby-value str">&quot;Extra file&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">VerificationError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">gem_name</span>][<span class="ruby-identifier">gem_path</span>] = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">subhash</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">errors</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">subhash</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">path</span>, <span class="ruby-identifier">msg</span><span class="ruby-operator">|</span> <span class="ruby-constant">ErrorData</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">msg</span>) }
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">errors</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

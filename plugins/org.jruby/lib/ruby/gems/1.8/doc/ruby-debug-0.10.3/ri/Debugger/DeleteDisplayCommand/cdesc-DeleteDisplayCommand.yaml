@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: DeleteDisplayCommand
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::DeleteDisplayCommand
+superclass: Command
+class_methods: []
+

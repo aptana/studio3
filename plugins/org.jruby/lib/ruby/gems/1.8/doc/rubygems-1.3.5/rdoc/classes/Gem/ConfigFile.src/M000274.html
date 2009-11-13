@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>load_file (Gem::ConfigFile)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/config_file.rb, line 146</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load_file</span>(<span class="ruby-identifier">filename</span>)
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">filename</span>)) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">filename</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">filename</span>)
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">ArgumentError</span>
+      <span class="ruby-identifier">warn</span> <span class="ruby-node">&quot;Failed to load #{config_file_name}&quot;</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EACCES</span>
+      <span class="ruby-identifier">warn</span> <span class="ruby-node">&quot;Failed to load #{config_file_name} due to permissions problem.&quot;</span>
+    <span class="ruby-keyword kw">end</span> <span class="ruby-keyword kw">or</span> {}
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

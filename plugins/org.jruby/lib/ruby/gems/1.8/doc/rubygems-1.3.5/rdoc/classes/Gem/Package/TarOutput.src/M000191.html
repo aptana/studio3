@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_signatures (Gem::Package::TarOutput)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_output.rb, line 121</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_signatures</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@data_signature</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-ivar">@tar_writer</span>.<span class="ruby-identifier">add_file</span> <span class="ruby-value str">'data.tar.gz.sig'</span>, <span class="ruby-value">0644</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">io</span>.<span class="ruby-identifier">write</span> <span class="ruby-ivar">@data_signature</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@meta_signature</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-ivar">@tar_writer</span>.<span class="ruby-identifier">add_file</span> <span class="ruby-value str">'metadata.gz.sig'</span>, <span class="ruby-value">0644</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">io</span>.<span class="ruby-identifier">write</span> <span class="ruby-ivar">@meta_signature</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

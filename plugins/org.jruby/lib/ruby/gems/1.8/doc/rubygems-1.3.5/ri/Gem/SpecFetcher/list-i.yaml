@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns a list of gems available for each source in Gem::sources. If <tt>all</tt>
+    is true, all released versions are returned instead of only latest versions. If
+    <tt>prerelease</tt> is true, include prerelease versions.
+full_name: Gem::SpecFetcher#list
+params: (all = false, prerelease = false)
+name: list
+is_singleton: false
+aliases: []
+

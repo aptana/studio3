@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_metadata (Gem::Package::TarOutput)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_output.rb, line 94</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_metadata</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@metadata</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-ivar">@tar_writer</span>.<span class="ruby-identifier">add_file</span> <span class="ruby-value str">&quot;metadata.gz&quot;</span>, <span class="ruby-value">0644</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">sio</span> = <span class="ruby-ivar">@signer</span> <span class="ruby-operator">?</span> <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+        <span class="ruby-identifier">gzos</span> = <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">GzipWriter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sio</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">io</span>)
+        <span class="ruby-identifier">gzos</span>.<span class="ruby-identifier">write</span> <span class="ruby-ivar">@metadata</span>
+      <span class="ruby-keyword kw">ensure</span>
+        <span class="ruby-identifier">gzos</span>.<span class="ruby-identifier">flush</span>
+        <span class="ruby-identifier">gzos</span>.<span class="ruby-identifier">finish</span>
+
+        <span class="ruby-comment cmt"># if we have a signing key, then sign the metadata digest and return</span>
+        <span class="ruby-comment cmt"># the signature</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@signer</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">digest</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">OPT</span>[<span class="ruby-identifier">:dgst_algo</span>].<span class="ruby-identifier">digest</span> <span class="ruby-identifier">sio</span>.<span class="ruby-identifier">string</span>
+          <span class="ruby-ivar">@meta_signature</span> = <span class="ruby-ivar">@signer</span>.<span class="ruby-identifier">sign</span> <span class="ruby-identifier">digest</span>
+          <span class="ruby-identifier">io</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">sio</span>.<span class="ruby-identifier">string</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

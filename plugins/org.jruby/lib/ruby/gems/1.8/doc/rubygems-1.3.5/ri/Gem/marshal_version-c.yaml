@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The version of the Marshal format for your Ruby.
+full_name: Gem::marshal_version
+params: ()
+name: marshal_version
+is_singleton: true
+aliases: []
+

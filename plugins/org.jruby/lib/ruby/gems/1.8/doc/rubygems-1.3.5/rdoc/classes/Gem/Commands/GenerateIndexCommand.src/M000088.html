@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::GenerateIndexCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/generate_index_command.rb, line 11</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'generate_index'</span>,
+          <span class="ruby-value str">'Generates the index files for a gem server directory'</span>,
+          <span class="ruby-identifier">:directory</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'.'</span>, <span class="ruby-identifier">:build_legacy</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:build_modern</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-d'</span>, <span class="ruby-value str">'--directory=DIRNAME'</span>,
+               <span class="ruby-value str">'repository base dir containing gems subdir'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dir</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:directory</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">dir</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]legacy'</span>,
+               <span class="ruby-value str">'Generate indexes for RubyGems older than'</span>,
+               <span class="ruby-value str">'1.2.0'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_modern</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">value</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidOption</span>, <span class="ruby-value str">'no indicies will be built'</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_legacy</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]modern'</span>,
+               <span class="ruby-value str">'Generate indexes for RubyGems newer'</span>,
+               <span class="ruby-value str">'than 1.2.0'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_legacy</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">value</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidOption</span>, <span class="ruby-value str">'no indicies will be built'</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:build_modern</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--update'</span>,
+               <span class="ruby-value str">'Update modern indexes with gems added'</span>,
+               <span class="ruby-value str">'since the last update'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:update</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-identifier">:RSS</span>, <span class="ruby-value str">'--rss-gems-host=GEM_HOST'</span>,
+               <span class="ruby-value str">'Host name where gems are served from,'</span>,
+               <span class="ruby-value str">'used for GUID and enclosure values'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_gems_host</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-identifier">:RSS</span>, <span class="ruby-value str">'--rss-host=HOST'</span>,
+               <span class="ruby-value str">'Host name for more gems information,'</span>,
+               <span class="ruby-value str">'used for RSS feed link'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_host</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-identifier">:RSS</span>, <span class="ruby-value str">'--rss-title=TITLE'</span>,
+               <span class="ruby-value str">'Set title for RSS feed'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rss_title</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

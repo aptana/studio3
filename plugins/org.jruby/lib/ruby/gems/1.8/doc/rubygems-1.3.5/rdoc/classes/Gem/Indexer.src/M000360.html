@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>update_index (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 638</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update_index</span>
+    <span class="ruby-ivar">@build_legacy</span> = <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">make_temp_directories</span>
+
+    <span class="ruby-identifier">specs_mtime</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-ivar">@dest_specs_index</span>).<span class="ruby-identifier">mtime</span>
+    <span class="ruby-identifier">newest_mtime</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span> <span class="ruby-value">0</span>
+
+    <span class="ruby-identifier">updated_gems</span> = <span class="ruby-identifier">gem_file_list</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">gem_mtime</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-identifier">gem</span>).<span class="ruby-identifier">mtime</span>
+      <span class="ruby-identifier">newest_mtime</span> = <span class="ruby-identifier">gem_mtime</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gem_mtime</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">newest_mtime</span>
+      <span class="ruby-identifier">gem_mtime</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">specs_mtime</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">updated_gems</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">'No new gems'</span>
+      <span class="ruby-identifier">terminate_interaction</span> <span class="ruby-value">0</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">index</span> = <span class="ruby-identifier">collect_specs</span> <span class="ruby-identifier">updated_gems</span>
+
+    <span class="ruby-identifier">files</span> = <span class="ruby-identifier">build_marshal_gemspecs</span> <span class="ruby-identifier">index</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">time</span> <span class="ruby-value str">'Updated indexes'</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">update_specs_index</span> <span class="ruby-identifier">index</span>.<span class="ruby-identifier">released_gems</span>, <span class="ruby-ivar">@dest_specs_index</span>, <span class="ruby-ivar">@specs_index</span>
+      <span class="ruby-identifier">update_specs_index</span> <span class="ruby-identifier">index</span>.<span class="ruby-identifier">released_gems</span>, <span class="ruby-ivar">@dest_latest_specs_index</span>, <span class="ruby-ivar">@latest_specs_index</span>
+      <span class="ruby-identifier">update_specs_index</span>(<span class="ruby-identifier">index</span>.<span class="ruby-identifier">prerelease_gems</span>, <span class="ruby-ivar">@dest_prerelease_specs_index</span>,
+                         <span class="ruby-ivar">@prerelease_specs_index</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">compress_indicies</span>
+
+    <span class="ruby-identifier">verbose</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Updating production dir #{@dest_directory}&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">verbose</span>
+
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@specs_index</span>
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{@specs_index}.gz&quot;</span>
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@latest_specs_index</span>
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{@latest_specs_index}.gz&quot;</span>
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@prerelease_specs_index</span>
+    <span class="ruby-identifier">files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{@prerelease_specs_index}.gz&quot;</span>
+
+    <span class="ruby-identifier">files</span> = <span class="ruby-identifier">files</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">path</span>.<span class="ruby-identifier">sub</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-value str">''</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">src_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@directory</span>, <span class="ruby-identifier">file</span>
+      <span class="ruby-identifier">dst_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@dest_directory</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">file</span>)
+
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mv</span> <span class="ruby-identifier">src_name</span>, <span class="ruby-identifier">dst_name</span>, <span class="ruby-identifier">:verbose</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">verbose</span>,
+                   <span class="ruby-identifier">:force</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>
+
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">utime</span> <span class="ruby-identifier">newest_mtime</span>, <span class="ruby-identifier">newest_mtime</span>, <span class="ruby-identifier">dst_name</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

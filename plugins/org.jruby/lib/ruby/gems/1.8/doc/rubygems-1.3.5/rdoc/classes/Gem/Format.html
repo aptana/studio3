@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Format</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Format</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/format_rb.html">
+                lib/rubygems/format.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="Format.html">Gem::Format</a> knows the guts of the RubyGem .gem
+file format and provides the capability to read gem files
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000329">from_file_by_path</a>&nbsp;&nbsp;
+      <a href="#M000330">from_io</a>&nbsp;&nbsp;
+      <a href="#M000328">new</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">file_entries</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">gem_path</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">spec</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000329" class="method-detail">
+        <a name="M000329"></a>
+
+        <div class="method-heading">
+          <a href="Format.src/M000329.html" target="Code" class="method-signature"
+            onclick="popupCode('Format.src/M000329.html');return false;">
+          <span class="method-name">from_file_by_path</span><span class="method-args">(file_path, security_policy = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Reads the named gem file and returns a <a href="Format.html">Format</a>
+object, representing the data from the gem file
+</p>
+<table>
+<tr><td valign="top">file_path:</td><td>[String] Path to the gem file
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+      <div id="method-M000330" class="method-detail">
+        <a name="M000330"></a>
+
+        <div class="method-heading">
+          <a href="Format.src/M000330.html" target="Code" class="method-signature"
+            onclick="popupCode('Format.src/M000330.html');return false;">
+          <span class="method-name">from_io</span><span class="method-args">(io, gem_path=&quot;(io)&quot;, security_policy = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Reads a gem from an io stream and returns a <a
+href="Format.html">Format</a> object, representing the data from the gem
+file
+</p>
+<table>
+<tr><td valign="top">io:</td><td>[IO] Stream from which to read the gem
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+      <div id="method-M000328" class="method-detail">
+        <a name="M000328"></a>
+
+        <div class="method-heading">
+          <a href="Format.src/M000328.html" target="Code" class="method-signature"
+            onclick="popupCode('Format.src/M000328.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(gem_path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Constructs an instance of a <a href="Format.html">Format</a> object,
+representing the gem&#8216;s data structure.
+</p>
+<table>
+<tr><td valign="top">gem:</td><td>[String] The file name of the gem
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

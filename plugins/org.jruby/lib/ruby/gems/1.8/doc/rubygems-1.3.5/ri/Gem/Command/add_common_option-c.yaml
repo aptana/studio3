@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Command::add_common_option
+params: (*args, &handler)
+name: add_common_option
+is_singleton: true
+aliases: []
+

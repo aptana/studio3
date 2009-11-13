@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>info_thread (Debugger)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File cli/ruby-debug/commands/info.rb, line 367</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">info_thread</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+        <span class="ruby-identifier">info_threads</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">ok</span>, <span class="ruby-identifier">verbose</span> = <span class="ruby-identifier">info_thread_preamble</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">ok</span>
+      <span class="ruby-identifier">c</span> = <span class="ruby-identifier">parse_thread_num</span>(<span class="ruby-value str">&quot;info thread&quot;</span> , <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">c</span>
+      <span class="ruby-identifier">display_context</span>(<span class="ruby-identifier">c</span>, <span class="ruby-operator">!</span><span class="ruby-identifier">verbose</span>)
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">verbose</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">ignored?</span>
+        (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-identifier">c</span>.<span class="ruby-identifier">stack_size</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">idx</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;\t&quot;</span>
+          <span class="ruby-identifier">print_frame</span>(<span class="ruby-identifier">idx</span>, <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">c</span>) 
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

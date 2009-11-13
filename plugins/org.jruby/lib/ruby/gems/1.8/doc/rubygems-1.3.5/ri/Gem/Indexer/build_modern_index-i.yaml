@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Build a single index for RubyGems 1.2 and newer
+full_name: Gem::Indexer#build_modern_index
+params: (index, file, name)
+name: build_modern_index
+is_singleton: false
+aliases: []
+

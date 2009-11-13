@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The name of the configuration file.
+full_name: Gem::ConfigFile#config_file_name
+params: ()
+name: config_file_name
+is_singleton: false
+aliases: []
+

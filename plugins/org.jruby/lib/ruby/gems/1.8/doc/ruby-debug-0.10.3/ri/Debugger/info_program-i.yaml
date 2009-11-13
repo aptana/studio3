@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (*args)
+is_singleton: false
+block_params: 
+name: info_program
+comment: 
+full_name: Debugger#info_program
+visibility: public
+aliases: []
+

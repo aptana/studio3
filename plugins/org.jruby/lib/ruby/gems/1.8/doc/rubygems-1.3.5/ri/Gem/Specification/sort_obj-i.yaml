@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Returns an object you can use to sort specifications in #sort_by.'
+full_name: Gem::Specification#sort_obj
+params: ()
+name: sort_obj
+is_singleton: false
+aliases: []
+

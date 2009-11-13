@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>root (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 559</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">root</span>(<span class="ruby-identifier">req</span>, <span class="ruby-identifier">res</span>)
+    <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">refresh!</span>
+    <span class="ruby-identifier">res</span>[<span class="ruby-value str">'date'</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-ivar">@spec_dir</span>).<span class="ruby-identifier">mtime</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPStatus</span><span class="ruby-operator">::</span><span class="ruby-constant">NotFound</span>, <span class="ruby-node">&quot;`#{req.path}' not found.&quot;</span> <span class="ruby-keyword kw">unless</span>
+      <span class="ruby-identifier">req</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'/'</span>
+
+    <span class="ruby-identifier">specs</span> = []
+    <span class="ruby-identifier">total_file_count</span> = <span class="ruby-value">0</span>
+
+    <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">total_file_count</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">files</span>.<span class="ruby-identifier">size</span>
+      <span class="ruby-identifier">deps</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span>
+        { <span class="ruby-value str">&quot;name&quot;</span>    =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">name</span>,
+          <span class="ruby-value str">&quot;type&quot;</span>    =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">type</span>,
+          <span class="ruby-value str">&quot;version&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">to_s</span>, }
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">deps</span> = <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">dep</span>[<span class="ruby-value str">&quot;name&quot;</span>].<span class="ruby-identifier">downcase</span>, <span class="ruby-identifier">dep</span>[<span class="ruby-value str">&quot;version&quot;</span>]] }
+      <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">last</span>[<span class="ruby-value str">&quot;is_last&quot;</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">empty?</span>
+
+      <span class="ruby-comment cmt"># executables</span>
+      <span class="ruby-identifier">executables</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">collect</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">exec</span><span class="ruby-operator">|</span> {<span class="ruby-value str">&quot;executable&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">exec</span>} }
+      <span class="ruby-identifier">executables</span> = <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">empty?</span>
+      <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">last</span>[<span class="ruby-value str">&quot;is_last&quot;</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">executables</span>
+
+      <span class="ruby-identifier">specs</span> <span class="ruby-operator">&lt;&lt;</span> {
+        <span class="ruby-value str">&quot;authors&quot;</span>             =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">authors</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;, &quot;</span>),
+        <span class="ruby-value str">&quot;date&quot;</span>                =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">date</span>.<span class="ruby-identifier">to_s</span>,
+        <span class="ruby-value str">&quot;dependencies&quot;</span>        =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">deps</span>,
+        <span class="ruby-value str">&quot;doc_path&quot;</span>            =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;/doc_root/#{spec.full_name}/rdoc/index.html&quot;</span>,
+        <span class="ruby-value str">&quot;executables&quot;</span>         =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">executables</span>,
+        <span class="ruby-value str">&quot;only_one_executable&quot;</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">executables</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>),
+        <span class="ruby-value str">&quot;full_name&quot;</span>           =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span>,
+        <span class="ruby-value str">&quot;has_deps&quot;</span>            =<span class="ruby-operator">&gt;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">deps</span>.<span class="ruby-identifier">empty?</span>,
+        <span class="ruby-value str">&quot;homepage&quot;</span>            =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">homepage</span>,
+        <span class="ruby-value str">&quot;name&quot;</span>                =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>,
+        <span class="ruby-value str">&quot;rdoc_installed&quot;</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DocManager</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">spec</span>).<span class="ruby-identifier">rdoc_installed?</span>,
+        <span class="ruby-value str">&quot;summary&quot;</span>             =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">summary</span>,
+        <span class="ruby-value str">&quot;version&quot;</span>             =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>.<span class="ruby-identifier">to_s</span>,
+      }
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">specs</span> <span class="ruby-operator">&lt;&lt;</span> {
+      <span class="ruby-value str">&quot;authors&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;Chad Fowler, Rich Kilmer, Jim Weirich, Eric Hodel and others&quot;</span>,
+      <span class="ruby-value str">&quot;dependencies&quot;</span> =<span class="ruby-operator">&gt;</span> [],
+      <span class="ruby-value str">&quot;doc_path&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;/doc_root/rubygems-#{Gem::RubyGemsVersion}/rdoc/index.html&quot;</span>,
+      <span class="ruby-value str">&quot;executables&quot;</span> =<span class="ruby-operator">&gt;</span> [{<span class="ruby-value str">&quot;executable&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'gem'</span>, <span class="ruby-value str">&quot;is_last&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>}],
+      <span class="ruby-value str">&quot;only_one_executable&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+      <span class="ruby-value str">&quot;full_name&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;rubygems-#{Gem::RubyGemsVersion}&quot;</span>,
+      <span class="ruby-value str">&quot;has_deps&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>,
+      <span class="ruby-value str">&quot;homepage&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;http://rubygems.org/&quot;</span>,
+      <span class="ruby-value str">&quot;name&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'rubygems'</span>,
+      <span class="ruby-value str">&quot;rdoc_installed&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+      <span class="ruby-value str">&quot;summary&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;RubyGems itself&quot;</span>,
+      <span class="ruby-value str">&quot;version&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RubyGemsVersion</span>,
+    }
+
+    <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">spec</span>[<span class="ruby-value str">&quot;name&quot;</span>].<span class="ruby-identifier">downcase</span>, <span class="ruby-identifier">spec</span>[<span class="ruby-value str">&quot;version&quot;</span>]] }
+    <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">last</span>[<span class="ruby-value str">&quot;is_last&quot;</span>] = <span class="ruby-keyword kw">true</span>
+
+    <span class="ruby-comment cmt"># tag all specs with first_name_entry</span>
+    <span class="ruby-identifier">last_spec</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">is_first</span> = <span class="ruby-identifier">last_spec</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> (<span class="ruby-identifier">last_spec</span>[<span class="ruby-value str">&quot;name&quot;</span>].<span class="ruby-identifier">downcase</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">spec</span>[<span class="ruby-value str">&quot;name&quot;</span>].<span class="ruby-identifier">downcase</span>)
+      <span class="ruby-identifier">spec</span>[<span class="ruby-value str">&quot;first_name_entry&quot;</span>] = <span class="ruby-identifier">is_first</span>
+      <span class="ruby-identifier">last_spec</span> = <span class="ruby-identifier">spec</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># create page from template</span>
+    <span class="ruby-identifier">template</span> = <span class="ruby-constant">ERB</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DOC_TEMPLATE</span>)
+    <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'text/html'</span>
+
+    <span class="ruby-identifier">values</span> = { <span class="ruby-value str">&quot;gem_count&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">size</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-value str">&quot;specs&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">specs</span>,
+               <span class="ruby-value str">&quot;total_file_count&quot;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">total_file_count</span>.<span class="ruby-identifier">to_s</span> }
+
+    <span class="ruby-identifier">result</span> = <span class="ruby-identifier">template</span>.<span class="ruby-identifier">result</span> <span class="ruby-identifier">binding</span>
+    <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> = <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

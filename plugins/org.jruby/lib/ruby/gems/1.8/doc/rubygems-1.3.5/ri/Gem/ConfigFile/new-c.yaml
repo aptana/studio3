@@ -1,0 +1,31 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Create the config file object. <tt>args</tt> is the list of arguments from
+    the command line.
+- !ruby/struct:SM::Flow::P 
+  body: The following command line options are handled early here rather than later
+    at the time most command options are processed.
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: --config-file and --config-file==NAME -- Obviously these need to be handled
+      by the ConfigFile object to ensure we get the right config file.
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: --backtrace -- Backtrace needs to be turned on early so that errors before
+      normal option parsing can be properly handled.
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: --debug -- Enable Ruby level debug messages. Handled early for the same
+      reason as --backtrace.
+    label: '*'
+full_name: Gem::ConfigFile::new
+params: (arg_list)
+name: new
+is_singleton: true
+aliases: []
+

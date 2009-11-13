@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns the full name (name-version) of this Gem. Platform information is
+    included (name-version-platform) if it is specified and not the default Ruby platform.
+full_name: Gem::Specification#full_name
+params: ()
+name: full_name
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::SourcesCommand#defaults_str
+params: ()
+name: defaults_str
+is_singleton: false
+aliases: []
+

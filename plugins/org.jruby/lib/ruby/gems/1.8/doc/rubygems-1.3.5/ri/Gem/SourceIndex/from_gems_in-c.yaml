@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Creates a new SourceIndex from the ruby format gem specifications in <tt>spec_dirs</tt>.
+full_name: Gem::SourceIndex::from_gems_in
+params: (*spec_dirs)
+name: from_gems_in
+is_singleton: true
+aliases: []
+

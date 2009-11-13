@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Command::extra_args
+params: ()
+name: extra_args
+is_singleton: true
+aliases: []
+

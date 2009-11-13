@@ -1,0 +1,92 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: SourceInfoCache stores a copy of the gem index for each gem source.
+- !ruby/struct:SM::Flow::P 
+  body: 'There are two possible cache locations, the system cache and the user cache:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: The system cache is preferred if it is writable or can be created.
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: The user cache is used otherwise
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: Once a cache is selected, it will be used for all operations. SourceInfoCache
+    will not switch between cache files dynamically.
+- !ruby/struct:SM::Flow::P 
+  body: Cache data is a Hash mapping a source URI to a SourceInfoCacheEntry.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: cache_data
+- !ruby/object:RI::MethodSummary 
+  name: cache_file
+- !ruby/object:RI::MethodSummary 
+  name: flush
+- !ruby/object:RI::MethodSummary 
+  name: latest_cache_data
+- !ruby/object:RI::MethodSummary 
+  name: latest_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: latest_system_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: latest_user_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: read_all_cache_data
+- !ruby/object:RI::MethodSummary 
+  name: read_cache_data
+- !ruby/object:RI::MethodSummary 
+  name: refresh
+- !ruby/object:RI::MethodSummary 
+  name: reset_cache_data
+- !ruby/object:RI::MethodSummary 
+  name: reset_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: reset_cache_for
+- !ruby/object:RI::MethodSummary 
+  name: search
+- !ruby/object:RI::MethodSummary 
+  name: search_with_source
+- !ruby/object:RI::MethodSummary 
+  name: set_cache_data
+- !ruby/object:RI::MethodSummary 
+  name: system_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: try_file
+- !ruby/object:RI::MethodSummary 
+  name: update
+- !ruby/object:RI::MethodSummary 
+  name: user_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: write_cache
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: cache
+- !ruby/object:RI::MethodSummary 
+  name: cache_data
+- !ruby/object:RI::MethodSummary 
+  name: latest_system_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: latest_user_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: reset
+- !ruby/object:RI::MethodSummary 
+  name: search
+- !ruby/object:RI::MethodSummary 
+  name: search_with_source
+- !ruby/object:RI::MethodSummary 
+  name: system_cache_file
+- !ruby/object:RI::MethodSummary 
+  name: user_cache_file
+full_name: Gem::SourceInfoCache
+constants: []
+
+superclass: Object
+name: SourceInfoCache

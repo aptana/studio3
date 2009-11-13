@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: ""
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Prints the amount of time the supplied block takes to run using the debug
+    UI output.
+full_name: Gem::time
+params: (msg, width = 0, display = Gem.configuration.verbose) {|| ...}
+name: time
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Uninstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/uninstaller.rb, line 44</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-identifier">options</span> = {})
+    <span class="ruby-ivar">@gem</span> = <span class="ruby-identifier">gem</span>
+    <span class="ruby-ivar">@version</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:version</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+    <span class="ruby-identifier">gem_home</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>
+    <span class="ruby-ivar">@gem_home</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">gem_home</span>
+    <span class="ruby-ivar">@force_executables</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:executables</span>]
+    <span class="ruby-ivar">@force_all</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>]
+    <span class="ruby-ivar">@force_ignore</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ignore</span>]
+    <span class="ruby-ivar">@bin_dir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:bin_dir</span>]
+
+    <span class="ruby-comment cmt"># only add user directory if install_dir is not set</span>
+    <span class="ruby-ivar">@user_install</span> = <span class="ruby-keyword kw">false</span>
+    <span class="ruby-ivar">@user_install</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:user_install</span>] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>]
+
+    <span class="ruby-identifier">spec_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_home</span>, <span class="ruby-value str">'specifications'</span>
+    <span class="ruby-ivar">@source_index</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_gems_in</span> <span class="ruby-identifier">spec_dir</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@user_install</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">user_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">user_dir</span>, <span class="ruby-value str">'specifications'</span>
+      <span class="ruby-ivar">@user_index</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_gems_in</span> <span class="ruby-identifier">user_dir</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

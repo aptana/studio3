@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::SetupCommand#check_ruby_version
+params: ()
+name: check_ruby_version
+is_singleton: false
+aliases: []
+

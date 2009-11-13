@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>_load (Gem::Specification)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/specification.rb, line 288</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">_load</span>(<span class="ruby-identifier">str</span>)
+    <span class="ruby-identifier">array</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">str</span>
+
+    <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Specification</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@specification_version</span>, <span class="ruby-identifier">array</span>[<span class="ruby-value">1</span>]
+
+    <span class="ruby-identifier">current_version</span> = <span class="ruby-constant">CURRENT_SPECIFICATION_VERSION</span>
+
+    <span class="ruby-identifier">field_count</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">specification_version</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current_version</span> <span class="ruby-keyword kw">then</span>
+                    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@specification_version</span>,
+                                               <span class="ruby-identifier">current_version</span>
+                    <span class="ruby-constant">MARSHAL_FIELDS</span>[<span class="ruby-identifier">current_version</span>]
+                  <span class="ruby-keyword kw">else</span>
+                    <span class="ruby-constant">MARSHAL_FIELDS</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">specification_version</span>]
+                  <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">array</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">field_count</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">TypeError</span>, <span class="ruby-node">&quot;invalid Gem::Specification format #{array.inspect}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@rubygems_version</span>,          <span class="ruby-identifier">array</span>[<span class="ruby-value">0</span>]
+    <span class="ruby-comment cmt"># spec version</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@name</span>,                      <span class="ruby-identifier">array</span>[<span class="ruby-value">2</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@version</span>,                   <span class="ruby-identifier">array</span>[<span class="ruby-value">3</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@date</span>,                      <span class="ruby-identifier">array</span>[<span class="ruby-value">4</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@summary</span>,                   <span class="ruby-identifier">array</span>[<span class="ruby-value">5</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@required_ruby_version</span>,     <span class="ruby-identifier">array</span>[<span class="ruby-value">6</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@required_rubygems_version</span>, <span class="ruby-identifier">array</span>[<span class="ruby-value">7</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@original_platform</span>,         <span class="ruby-identifier">array</span>[<span class="ruby-value">8</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@dependencies</span>,              <span class="ruby-identifier">array</span>[<span class="ruby-value">9</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@rubyforge_project</span>,         <span class="ruby-identifier">array</span>[<span class="ruby-value">10</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@email</span>,                     <span class="ruby-identifier">array</span>[<span class="ruby-value">11</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@authors</span>,                   <span class="ruby-identifier">array</span>[<span class="ruby-value">12</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@description</span>,               <span class="ruby-identifier">array</span>[<span class="ruby-value">13</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@homepage</span>,                  <span class="ruby-identifier">array</span>[<span class="ruby-value">14</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@has_rdoc</span>,                  <span class="ruby-identifier">array</span>[<span class="ruby-value">15</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@new_platform</span>,              <span class="ruby-identifier">array</span>[<span class="ruby-value">16</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@platform</span>,                  <span class="ruby-identifier">array</span>[<span class="ruby-value">16</span>].<span class="ruby-identifier">to_s</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@license</span>,                   <span class="ruby-identifier">array</span>[<span class="ruby-value">17</span>]
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@loaded</span>,                    <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">spec</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

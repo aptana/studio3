@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: OpenSSL::SSL::SSLServer#accept
+params: ()
+name: accept
+is_singleton: false
+aliases: []
+

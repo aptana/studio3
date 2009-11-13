@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Performs a Net::HTTP request of type <tt>request_class</tt> on <tt>uri</tt>
+    returning a Net::HTTP response object. request maintains a table of persistent
+    connections to reduce connect overhead.
+full_name: Gem::RemoteFetcher#request
+params: (uri, request_class, last_modified = nil)
+name: request
+is_singleton: false
+aliases: []
+

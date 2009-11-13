@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::ConfigFile)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/config_file.rb, line 98</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">arg_list</span>)
+    <span class="ruby-ivar">@config_file_name</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">need_config_file_name</span> = <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">arg_list</span> = <span class="ruby-identifier">arg_list</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">need_config_file_name</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-ivar">@config_file_name</span> = <span class="ruby-identifier">arg</span>
+        <span class="ruby-identifier">need_config_file_name</span> = <span class="ruby-keyword kw">false</span>
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^--config-file=(.*)/</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-ivar">@config_file_name</span> = <span class="ruby-identifier">$1</span>
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^--config-file$/</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">need_config_file_name</span> = <span class="ruby-keyword kw">true</span>
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">arg</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">compact</span>
+
+    <span class="ruby-ivar">@backtrace</span> = <span class="ruby-constant">DEFAULT_BACKTRACE</span>
+    <span class="ruby-ivar">@benchmark</span> = <span class="ruby-constant">DEFAULT_BENCHMARK</span>
+    <span class="ruby-ivar">@bulk_threshold</span> = <span class="ruby-constant">DEFAULT_BULK_THRESHOLD</span>
+    <span class="ruby-ivar">@verbose</span> = <span class="ruby-constant">DEFAULT_VERBOSITY</span>
+    <span class="ruby-ivar">@update_sources</span> = <span class="ruby-constant">DEFAULT_UPDATE_SOURCES</span>
+
+    <span class="ruby-identifier">operating_system_config</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-constant">OPERATING_SYSTEM_DEFAULTS</span>)
+    <span class="ruby-identifier">platform_config</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-constant">PLATFORM_DEFAULTS</span>)
+    <span class="ruby-identifier">system_config</span> = <span class="ruby-identifier">load_file</span> <span class="ruby-constant">SYSTEM_WIDE_CONFIG_FILE</span>
+    <span class="ruby-identifier">user_config</span> = <span class="ruby-identifier">load_file</span> <span class="ruby-identifier">config_file_name</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">untaint</span>
+
+    <span class="ruby-ivar">@hash</span> = <span class="ruby-identifier">operating_system_config</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">platform_config</span>
+    <span class="ruby-ivar">@hash</span> = <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">system_config</span>
+    <span class="ruby-ivar">@hash</span> = <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">user_config</span>
+
+    <span class="ruby-comment cmt"># HACK these override command-line args, which is bad</span>
+    <span class="ruby-ivar">@backtrace</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:backtrace</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:backtrace</span>
+    <span class="ruby-ivar">@benchmark</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:benchmark</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:benchmark</span>
+    <span class="ruby-ivar">@bulk_threshold</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:bulk_threshold</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:bulk_threshold</span>
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:sources</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:sources</span>
+    <span class="ruby-ivar">@verbose</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:verbose</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:verbose</span>
+    <span class="ruby-ivar">@update_sources</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:update_sources</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:update_sources</span>
+    <span class="ruby-ivar">@path</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:gempath</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:gempath</span>
+    <span class="ruby-ivar">@home</span> = <span class="ruby-ivar">@hash</span>[<span class="ruby-identifier">:gemhome</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">:gemhome</span>
+
+    <span class="ruby-identifier">handle_arguments</span> <span class="ruby-identifier">arg_list</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

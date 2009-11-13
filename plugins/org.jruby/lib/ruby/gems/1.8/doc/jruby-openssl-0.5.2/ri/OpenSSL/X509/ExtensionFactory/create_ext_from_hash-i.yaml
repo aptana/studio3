@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: OpenSSL::X509::ExtensionFactory#create_ext_from_hash
+params: (hash)
+name: create_ext_from_hash
+is_singleton: false
+aliases: []
+

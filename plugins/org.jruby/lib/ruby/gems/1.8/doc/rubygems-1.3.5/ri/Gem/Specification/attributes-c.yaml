@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Shortcut for creating several attributes at once (each with a default value
+    of <tt>nil</tt>).
+full_name: Gem::Specification::attributes
+params: (*args)
+name: attributes
+is_singleton: true
+aliases: []
+

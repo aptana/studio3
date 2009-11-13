@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Buffering#puts
+params: (*args)
+name: puts
+is_singleton: false
+aliases: []
+

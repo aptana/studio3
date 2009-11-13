@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>=~ (Gem::Platform)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/platform.rb, line 142</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-operator">=~</span>(<span class="ruby-identifier">other</span>)
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">other</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># nop</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">String</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-comment cmt"># This data is from http://gems.rubyforge.org/gems/yaml on 19 Aug 2007</span>
+      <span class="ruby-identifier">other</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">other</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^i686-darwin(\d)/</span>     <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'x86'</span>,       <span class="ruby-value str">'darwin'</span>,  <span class="ruby-identifier">$1</span>    ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^i\d86-linux/</span>         <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'x86'</span>,       <span class="ruby-value str">'linux'</span>,   <span class="ruby-keyword kw">nil</span>   ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'java'</span>, <span class="ruby-value str">'jruby'</span>        <span class="ruby-keyword kw">then</span> [<span class="ruby-keyword kw">nil</span>,         <span class="ruby-value str">'java'</span>,    <span class="ruby-keyword kw">nil</span>   ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/mswin32(\_(\d+))?/</span>    <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'x86'</span>,       <span class="ruby-value str">'mswin32'</span>, <span class="ruby-identifier">$2</span>    ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'powerpc-darwin'</span>       <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'powerpc'</span>,   <span class="ruby-value str">'darwin'</span>,  <span class="ruby-keyword kw">nil</span>   ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/powerpc-darwin(\d)/</span>   <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'powerpc'</span>,   <span class="ruby-value str">'darwin'</span>,  <span class="ruby-identifier">$1</span>    ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/sparc-solaris2.8/</span>     <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'sparc'</span>,     <span class="ruby-value str">'solaris'</span>, <span class="ruby-value str">'2.8'</span> ]
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/universal-darwin(\d)/</span> <span class="ruby-keyword kw">then</span> [<span class="ruby-value str">'universal'</span>, <span class="ruby-value str">'darwin'</span>,  <span class="ruby-identifier">$1</span>    ]
+              <span class="ruby-keyword kw">else</span>                             <span class="ruby-identifier">other</span>
+              <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">other</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">other</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">self</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">other</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

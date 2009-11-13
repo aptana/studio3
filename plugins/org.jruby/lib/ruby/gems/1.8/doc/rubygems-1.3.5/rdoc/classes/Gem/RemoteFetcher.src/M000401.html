@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>fetch_path (Gem::RemoteFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/remote_fetcher.rb, line 163</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch_path</span>(<span class="ruby-identifier">uri</span>, <span class="ruby-identifier">mtime</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">head</span> = <span class="ruby-keyword kw">false</span>)
+    <span class="ruby-identifier">data</span> = <span class="ruby-identifier">open_uri_or_path</span> <span class="ruby-identifier">uri</span>, <span class="ruby-identifier">mtime</span>, <span class="ruby-identifier">head</span>
+    <span class="ruby-identifier">data</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">gunzip</span> <span class="ruby-identifier">data</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">data</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">head</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/gz$/</span>
+    <span class="ruby-identifier">data</span>
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">FetchError</span>
+    <span class="ruby-identifier">raise</span>
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Timeout</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'timed out'</span>, <span class="ruby-identifier">uri</span>)
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">IOError</span>, <span class="ruby-constant">SocketError</span>, <span class="ruby-constant">SystemCallError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{e.class}: #{e}&quot;</span>, <span class="ruby-identifier">uri</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: OpenSSL::X509::Name::RFC2253DN</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">OpenSSL::X509::Name::RFC2253DN</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../../files/lib/openssl/x509_rb.html">
+                lib/openssl/x509.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000010">expand_hexstring</a>&nbsp;&nbsp;
+      <a href="#M000009">expand_pair</a>&nbsp;&nbsp;
+      <a href="#M000011">expand_value</a>&nbsp;&nbsp;
+      <a href="#M000012">scan</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Special</td>
+          <td>=</td>
+          <td class="context-item-value">',=+&lt;&gt;#;'</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">HexChar</td>
+          <td>=</td>
+          <td class="context-item-value">/[0-9a-fA-F]/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">HexPair</td>
+          <td>=</td>
+          <td class="context-item-value">/#{HexChar}#{HexChar}/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">HexString</td>
+          <td>=</td>
+          <td class="context-item-value">/#{HexPair}+/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Pair</td>
+          <td>=</td>
+          <td class="context-item-value">/\\(?:[#{Special}]|\\|&quot;|#{HexPair})/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">StringChar</td>
+          <td>=</td>
+          <td class="context-item-value">/[^#{Special}\\&quot;]/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">QuoteChar</td>
+          <td>=</td>
+          <td class="context-item-value">/[^\\&quot;]/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">AttributeType</td>
+          <td>=</td>
+          <td class="context-item-value">/[a-zA-Z][0-9a-zA-Z]*|[0-9]+(?:\.[0-9]+)*/</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">AttributeValue</td>
+          <td>=</td>
+          <td class="context-item-value">/           (?![&quot;#])((?:#{StringChar}|#{Pair})*)|           \#(#{HexString})|           &quot;((?:#{QuoteChar}|#{Pair})*)&quot;         /x</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">TypeAndValue</td>
+          <td>=</td>
+          <td class="context-item-value">/\A(#{AttributeType})=#{AttributeValue}/</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000010" class="method-detail">
+        <a name="M000010"></a>
+
+        <div class="method-heading">
+          <a href="RFC2253DN.src/M000010.html" target="Code" class="method-signature"
+            onclick="popupCode('RFC2253DN.src/M000010.html');return false;">
+          <span class="method-name">expand_hexstring</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000009" class="method-detail">
+        <a name="M000009"></a>
+
+        <div class="method-heading">
+          <a href="RFC2253DN.src/M000009.html" target="Code" class="method-signature"
+            onclick="popupCode('RFC2253DN.src/M000009.html');return false;">
+          <span class="method-name">expand_pair</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
+
+        <div class="method-heading">
+          <a href="RFC2253DN.src/M000011.html" target="Code" class="method-signature"
+            onclick="popupCode('RFC2253DN.src/M000011.html');return false;">
+          <span class="method-name">expand_value</span><span class="method-args">(str1, str2, str3)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="RFC2253DN.src/M000012.html" target="Code" class="method-signature"
+            onclick="popupCode('RFC2253DN.src/M000012.html');return false;">
+          <span class="method-name">scan</span><span class="method-args">(dn)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return the full path to the cached gem file matching the given name and version
+    requirement. Returns 'nil' if no match.
+- !ruby/struct:SM::Flow::P 
+  body: 'Example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  get_path('rake', '&gt; 0.4')   # -&gt; '/usr/lib/ruby/gems/1.8/cache/rake-0.4.2.gem'\n\
+    \  get_path('rake', '&lt; 0.1')   # -&gt; nil\n  get_path('rak')             # \
+    -&gt; nil (exact name required)\n"
+full_name: Gem::Commands::UnpackCommand#get_path
+params: (gemname, version_req)
+name: get_path
+is_singleton: false
+aliases: []
+

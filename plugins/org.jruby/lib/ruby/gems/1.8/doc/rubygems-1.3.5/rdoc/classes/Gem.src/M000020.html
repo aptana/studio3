@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>activate (Gem)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems.rb, line 242</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">activate</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">version_requirements</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)
+      <span class="ruby-identifier">options</span> = <span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">pop</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">options</span> = {}
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">sources</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sources</span>] <span class="ruby-operator">||</span> []
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">version_requirements</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:name</span>) <span class="ruby-keyword kw">and</span>
+           <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:version_requirements</span>) <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">gem</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-identifier">version_requirements</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">matches</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">gem</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">version_requirements</span>)
+    <span class="ruby-identifier">report_activate_error</span>(<span class="ruby-identifier">gem</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">empty?</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@loaded_specs</span>[<span class="ruby-identifier">gem</span>.<span class="ruby-identifier">name</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-comment cmt"># This gem is already loaded.  If the currently loaded gem is not in the</span>
+      <span class="ruby-comment cmt"># list of candidate gems, then we have a version conflict.</span>
+      <span class="ruby-identifier">existing_spec</span> = <span class="ruby-ivar">@loaded_specs</span>[<span class="ruby-identifier">gem</span>.<span class="ruby-identifier">name</span>]
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">any?</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">existing_spec</span>.<span class="ruby-identifier">version</span> } <span class="ruby-keyword kw">then</span>
+         <span class="ruby-identifier">sources_message</span> = <span class="ruby-identifier">sources</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span> }
+         <span class="ruby-identifier">stack_message</span> = <span class="ruby-ivar">@loaded_stacks</span>[<span class="ruby-identifier">gem</span>.<span class="ruby-identifier">name</span>].<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span> }
+
+         <span class="ruby-identifier">msg</span> = <span class="ruby-node">&quot;can't activate #{gem} for #{sources_message.inspect}, &quot;</span>
+         <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;already activated #{existing_spec.full_name} for &quot;</span>
+         <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{stack_message.inspect}&quot;</span>
+
+         <span class="ruby-identifier">e</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">LoadError</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">msg</span>
+         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span> = <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">name</span>
+         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">version_requirement</span> = <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">version_requirements</span>
+
+         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># new load</span>
+    <span class="ruby-identifier">spec</span> = <span class="ruby-identifier">matches</span>.<span class="ruby-identifier">last</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">loaded?</span>
+
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">loaded</span> = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-ivar">@loaded_specs</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">spec</span>
+    <span class="ruby-ivar">@loaded_stacks</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">sources</span>.<span class="ruby-identifier">dup</span>
+
+    <span class="ruby-comment cmt"># Load dependent gems first</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">runtime_dependencies</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep_gem</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">activate</span> <span class="ruby-identifier">dep_gem</span>, <span class="ruby-identifier">:sources</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-identifier">spec</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">sources</span>]
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># bin directory must come before library directories</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">unshift</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span>
+
+    <span class="ruby-identifier">require_paths</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_gem_path</span>, <span class="ruby-identifier">path</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">sitelibdir</span> = <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:sitelibdir</span>]
+
+    <span class="ruby-comment cmt"># gem directories must come after -I and ENV['RUBYLIB']</span>
+    <span class="ruby-identifier">insert_index</span> = <span class="ruby-identifier">load_path_insert_index</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">insert_index</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-comment cmt"># gem directories must come after -I and ENV['RUBYLIB']</span>
+      <span class="ruby-identifier">$LOAD_PATH</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">insert_index</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">require_paths</span>)
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-comment cmt"># we are probably testing in core, -I and RUBYLIB don't apply</span>
+      <span class="ruby-identifier">$LOAD_PATH</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">require_paths</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

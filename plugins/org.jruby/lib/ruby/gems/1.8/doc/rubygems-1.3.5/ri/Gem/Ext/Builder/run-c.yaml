@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Ext::Builder::run
+params: (command, results)
+name: run
+is_singleton: true
+aliases: []
+

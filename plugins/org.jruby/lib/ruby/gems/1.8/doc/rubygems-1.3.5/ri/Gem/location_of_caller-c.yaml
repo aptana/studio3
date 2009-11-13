@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The file name and line number of the caller of the caller of this method.
+full_name: Gem::location_of_caller
+params: ()
+name: location_of_caller
+is_singleton: true
+aliases: []
+

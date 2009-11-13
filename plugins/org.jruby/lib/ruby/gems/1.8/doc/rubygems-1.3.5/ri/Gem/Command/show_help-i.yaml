@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Display the help message for the command.
+full_name: Gem::Command#show_help
+params: ()
+name: show_help
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::InstallCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/install_command.rb, line 104</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:include_dependencies</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">alert</span> <span class="ruby-value str">&quot;`gem install -y` is now default and will be removed&quot;</span>
+      <span class="ruby-identifier">alert</span> <span class="ruby-value str">&quot;use --ignore-dependencies to install only the gems you list&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">installed_gems</span> = []
+
+    <span class="ruby-constant">ENV</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'GEM_PATH'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value str">'1.9'</span>
+
+    <span class="ruby-identifier">exit_code</span> = <span class="ruby-value">0</span>
+
+    <span class="ruby-identifier">get_all_gem_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem_name</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">inst</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DependencyInstaller</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">options</span>
+        <span class="ruby-identifier">inst</span>.<span class="ruby-identifier">install</span> <span class="ruby-identifier">gem_name</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:version</span>]
+
+        <span class="ruby-identifier">inst</span>.<span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Successfully installed #{spec.full_name}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">inst</span>.<span class="ruby-identifier">installed_gems</span>)
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;Error installing #{gem_name}:\n\t#{e.message}&quot;</span>
+        <span class="ruby-identifier">exit_code</span> <span class="ruby-operator">|=</span> <span class="ruby-value">1</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">GemNotFoundException</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>
+        <span class="ruby-identifier">exit_code</span> <span class="ruby-operator">|=</span> <span class="ruby-value">2</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">gems</span> = <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-value str">'gem'</span> <span class="ruby-operator">:</span> <span class="ruby-value str">'gems'</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{installed_gems.length} #{gems} installed&quot;</span>
+
+      <span class="ruby-comment cmt"># NOTE: *All* of the RI documents must be generated first.  For some</span>
+      <span class="ruby-comment cmt"># reason, RI docs cannot be generated after any RDoc documents are</span>
+      <span class="ruby-comment cmt"># generated.</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_ri</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem</span><span class="ruby-operator">|</span>
+          <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DocManager</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rdoc_args</span>]).<span class="ruby-identifier">generate_ri</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DocManager</span>.<span class="ruby-identifier">update_ri_cache</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:generate_rdoc</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem</span><span class="ruby-operator">|</span>
+          <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DocManager</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rdoc_args</span>]).<span class="ruby-identifier">generate_rdoc</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:test</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">installed_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">gem_spec</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>.<span class="ruby-identifier">version</span>).<span class="ruby-identifier">first</span>
+          <span class="ruby-identifier">result</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Validator</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">unit_test</span>(<span class="ruby-identifier">gem_spec</span>)
+          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">result</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">passed?</span>
+            <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">ask_yes_no</span>(<span class="ruby-value str">&quot;...keep Gem?&quot;</span>, <span class="ruby-keyword kw">true</span>)
+              <span class="ruby-identifier">require</span> <span class="ruby-value str">'rubygems/uninstaller'</span>
+              <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Uninstaller</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">:version</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>.<span class="ruby-identifier">version</span>).<span class="ruby-identifier">uninstall</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SystemExitException</span>, <span class="ruby-identifier">exit_code</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,22 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::Text
+- !ruby/object:RI::IncludedModule 
+  name: Gem::LocalRemoteOptions
+- !ruby/object:RI::IncludedModule 
+  name: Gem::VersionOption
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Commands::QueryCommand
+constants: []
+
+superclass: Gem::Command
+name: QueryCommand

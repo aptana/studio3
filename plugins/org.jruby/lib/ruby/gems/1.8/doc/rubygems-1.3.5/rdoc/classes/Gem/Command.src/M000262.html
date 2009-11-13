@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_extra_args (Gem::Command)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/command.rb, line 334</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_extra_args</span>(<span class="ruby-identifier">args</span>)
+    <span class="ruby-identifier">result</span> = []
+
+    <span class="ruby-identifier">s_extra</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Command</span>.<span class="ruby-identifier">specific_extra_args</span>(<span class="ruby-ivar">@command</span>)
+    <span class="ruby-identifier">extra</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Command</span>.<span class="ruby-identifier">extra_args</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">s_extra</span>
+
+    <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">extra</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">ex</span> = []
+      <span class="ruby-identifier">ex</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">extra</span>.<span class="ruby-identifier">shift</span>
+      <span class="ruby-identifier">ex</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">extra</span>.<span class="ruby-identifier">shift</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">extra</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^[^-]/</span>
+      <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">ex</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">handles?</span>(<span class="ruby-identifier">ex</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span>.<span class="ruby-identifier">flatten!</span>
+    <span class="ruby-identifier">result</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)
+    <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

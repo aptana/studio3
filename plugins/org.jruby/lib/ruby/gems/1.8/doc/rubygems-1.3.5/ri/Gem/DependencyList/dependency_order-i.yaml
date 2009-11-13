@@ -1,0 +1,21 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return a list of the specifications in the dependency list, sorted in order
+    so that no spec in the list depends on a gem earlier in the list.
+- !ruby/struct:SM::Flow::P 
+  body: This is useful when removing gems from a set of installed gems. By removing
+    them in the returned order, you don't get into as many dependency issues.
+- !ruby/struct:SM::Flow::P 
+  body: If there are circular dependencies (yuck!), then gems will be returned in
+    order until only the circular dependents and anything they reference are left.
+    Then arbitrary gemspecs will be returned until the circular dependency is broken,
+    after which gems will be returned in dependency order again.
+full_name: Gem::DependencyList#dependency_order
+params: ()
+name: dependency_order
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,46 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: Debugger
+constants: 
+- !ruby/object:RI::Constant 
+  name: DEFAULT_START_SETTINGS
+  value: '{      :init        => true,  # Set $0 and save ARGV?      :post_mortem
+    => false'
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Default options to Debugger.start
+comment: 
+attributes: 
+- !ruby/object:RI::Attribute 
+  name: handler
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: interface modules provide <tt>handler</tt> object
+  rw: RW
+- !ruby/object:RI::Attribute 
+  name: last_exception
+  comment: 
+  rw: RW
+- !ruby/object:RI::Attribute 
+  name: reload_source_on_change
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: if <tt>true</tt>, checks the modification time of source files and reloads
+      if it was modified
+  rw: RW
+instance_methods: []
+
+full_name: Debugger
+superclass: 
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: handle_post_mortem
+- !ruby/object:RI::MethodSummary 
+  name: interrupt
+- !ruby/object:RI::MethodSummary 
+  name: interrupt_last
+- !ruby/object:RI::MethodSummary 
+  name: post_mortem
+- !ruby/object:RI::MethodSummary 
+  name: source_reload

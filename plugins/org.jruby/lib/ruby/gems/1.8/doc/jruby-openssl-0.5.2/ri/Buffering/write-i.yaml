@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Buffering#write
+params: (s)
+name: write
+is_singleton: false
+aliases: []
+

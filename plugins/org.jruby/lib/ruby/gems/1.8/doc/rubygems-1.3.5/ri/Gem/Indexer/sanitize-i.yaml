@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Sanitize the descriptive fields in the spec. Sometimes non-ASCII characters
+    will garble the site index. Non-ASCII characters will be replaced by their XML
+    entity equivalent.
+full_name: Gem::Indexer#sanitize
+params: (spec)
+name: sanitize
+is_singleton: false
+aliases: []
+

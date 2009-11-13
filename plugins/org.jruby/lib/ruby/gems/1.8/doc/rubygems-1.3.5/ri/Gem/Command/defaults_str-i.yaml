@@ -1,0 +1,17 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Override to display the default values of the command options. (similar to
+    <tt>arguments</tt>, but displays the default values).
+- !ruby/struct:SM::Flow::P 
+  body: 'For example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  def defaults_str\n    --no-gems-first --no-all\n  end\n"
+full_name: Gem::Command#defaults_str
+params: ()
+name: defaults_str
+is_singleton: false
+aliases: []
+

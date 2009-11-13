@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The singleton Gem::SourceInfoCache. If <tt>all</tt> is true, a full refresh
+    will be performed if the singleton instance is being initialized.
+full_name: Gem::SourceInfoCache::cache
+params: (all = false)
+name: cache
+is_singleton: true
+aliases: []
+

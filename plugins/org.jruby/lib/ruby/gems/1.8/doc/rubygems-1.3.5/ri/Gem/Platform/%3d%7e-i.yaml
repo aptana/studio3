@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Does <tt>other</tt> match this platform? If <tt>other</tt> is a String it
+    will be converted to a Gem::Platform first. See #=== for matching rules.'
+full_name: Gem::Platform#=~
+params: (other)
+name: =~
+is_singleton: false
+aliases: []
+

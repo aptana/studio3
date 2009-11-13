@@ -1,5 +1,8 @@
 package com.aptana.editor.scripting;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -11,7 +14,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.editor.scripting";
+	public static final String PLUGIN_ID = "com.aptana.editor.scripting"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
@@ -49,7 +52,7 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 	
-	public static final String SNIPPET = "/icons/snippet.png";
+	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	
 	@Override
 	protected void initializeImageRegistry(ImageRegistry reg) {
@@ -58,6 +61,26 @@ public class Activator extends AbstractUIPlugin {
 	
 	public Image getImage(String imageID) {
 		return getImageRegistry().get(imageID);
+	}
+	
+	public static String getPluginId()
+	{
+		return PLUGIN_ID;
+	}
+
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
+	}
+
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	public static void logWarning(String msg)
+	{
+		getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), msg));
 	}
 
 }

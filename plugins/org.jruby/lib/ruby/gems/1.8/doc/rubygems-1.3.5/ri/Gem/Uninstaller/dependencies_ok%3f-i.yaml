@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Uninstaller#dependencies_ok?
+params: (spec)
+name: dependencies_ok?
+is_singleton: false
+aliases: []
+

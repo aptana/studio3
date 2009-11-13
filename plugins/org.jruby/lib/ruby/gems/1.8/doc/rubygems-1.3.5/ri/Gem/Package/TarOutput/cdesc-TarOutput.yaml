@@ -1,0 +1,47 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: TarOutput is a wrapper to TarWriter that builds gem-format tar file.
+- !ruby/struct:SM::Flow::P 
+  body: 'Gem-format tar files contain the following files:'
+- !ruby/object:SM::Flow::LIST 
+  type: :LABELED
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: A gzipped tar file containing the files that compose the gem which will
+      be extracted into the gem/ dir on installation.
+    label: data.tar.gz
+  - !ruby/struct:SM::Flow::LI 
+    body: A YAML format Gem::Specification.
+    label: metadata.gz
+  - !ruby/struct:SM::Flow::LI 
+    body: A signature for the gem's data.tar.gz.
+    label: data.tar.gz.sig
+  - !ruby/struct:SM::Flow::LI 
+    body: A signature for the gem's metadata.gz.
+    label: metadata.gz.sig
+- !ruby/struct:SM::Flow::P 
+  body: See TarOutput::open for usage details.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_gem_contents
+- !ruby/object:RI::MethodSummary 
+  name: add_metadata
+- !ruby/object:RI::MethodSummary 
+  name: add_signatures
+- !ruby/object:RI::MethodSummary 
+  name: close
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: open
+full_name: Gem::Package::TarOutput
+constants: []
+
+superclass: Object
+name: TarOutput

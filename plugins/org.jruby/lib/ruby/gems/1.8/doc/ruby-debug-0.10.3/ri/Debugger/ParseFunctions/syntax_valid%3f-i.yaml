@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+params: (code)
+is_singleton: false
+block_params: 
+name: syntax_valid?
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return true if code is syntactically correct for Ruby.
+full_name: Debugger::ParseFunctions#syntax_valid?
+visibility: public
+aliases: []
+

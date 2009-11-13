@@ -1,0 +1,40 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: A fake Gem::RemoteFetcher for use in tests or to avoid real live HTTP requests
+    when testing code that uses RubyGems.
+- !ruby/struct:SM::Flow::P 
+  body: 'Example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  @fetcher = Gem::FakeFetcher.new\n  @fetcher.data['http://gems.example.com/yaml'] \
+    = source_index.to_yaml\n  Gem::RemoteFetcher.fetcher = @fetcher\n\n  # invoke \
+    RubyGems code\n\n  paths = @fetcher.paths\n  assert_equal 'http://gems.example.com/yaml', \
+    paths.shift\n  assert paths.empty?, paths.join(', ')\n"
+- !ruby/struct:SM::Flow::P 
+  body: See RubyGems' tests for more examples of FakeFetcher.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: data
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: RW
+  name: paths
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: download
+- !ruby/object:RI::MethodSummary 
+  name: fetch_path
+- !ruby/object:RI::MethodSummary 
+  name: fetch_size
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::FakeFetcher
+constants: []
+
+superclass: Object
+name: FakeFetcher

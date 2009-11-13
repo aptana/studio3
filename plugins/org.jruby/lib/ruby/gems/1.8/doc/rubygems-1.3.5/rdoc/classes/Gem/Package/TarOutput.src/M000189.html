@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_gem_contents (Gem::Package::TarOutput)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_output.rb, line 61</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_gem_contents</span>
+    <span class="ruby-ivar">@tar_writer</span>.<span class="ruby-identifier">add_file</span> <span class="ruby-value str">&quot;data.tar.gz&quot;</span>, <span class="ruby-value">0644</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">inner</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">sio</span> = <span class="ruby-ivar">@signer</span> <span class="ruby-operator">?</span> <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">GzipWriter</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-identifier">sio</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">inner</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">os</span><span class="ruby-operator">|</span>
+
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarWriter</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">os</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">data_tar_writer</span><span class="ruby-operator">|</span>
+          <span class="ruby-comment cmt"># :stopdoc:</span>
+          <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data_tar_writer</span>.<span class="ruby-identifier">metadata</span>() <span class="ruby-ivar">@metadata</span> <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data_tar_writer</span>.<span class="ruby-identifier">metadata</span>=(<span class="ruby-identifier">metadata</span>) <span class="ruby-ivar">@metadata</span> = <span class="ruby-identifier">metadata</span> <span class="ruby-keyword kw">end</span>
+          <span class="ruby-comment cmt"># :startdoc:</span>
+
+          <span class="ruby-keyword kw">yield</span> <span class="ruby-identifier">data_tar_writer</span>
+
+          <span class="ruby-ivar">@metadata</span> = <span class="ruby-identifier">data_tar_writer</span>.<span class="ruby-identifier">metadata</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-comment cmt"># if we have a signing key, then sign the data</span>
+      <span class="ruby-comment cmt"># digest and return the signature</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@signer</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">digest</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">OPT</span>[<span class="ruby-identifier">:dgst_algo</span>].<span class="ruby-identifier">digest</span> <span class="ruby-identifier">sio</span>.<span class="ruby-identifier">string</span>
+        <span class="ruby-ivar">@data_signature</span> = <span class="ruby-ivar">@signer</span>.<span class="ruby-identifier">sign</span> <span class="ruby-identifier">digest</span>
+        <span class="ruby-identifier">inner</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">sio</span>.<span class="ruby-identifier">string</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">self</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::GemPathSearcher</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::GemPathSearcher</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/gem_path_searcher_rb.html">
+                lib/rubygems/gem_path_searcher.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="GemPathSearcher.html">GemPathSearcher</a> has the capability to <a
+href="GemPathSearcher.html#M000332">find</a> loadable files inside gems. It
+generates data up front to speed up searches later.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000332">find</a>&nbsp;&nbsp;
+      <a href="#M000333">find_all</a>&nbsp;&nbsp;
+      <a href="#M000336">init_gemspecs</a>&nbsp;&nbsp;
+      <a href="#M000337">lib_dirs_for</a>&nbsp;&nbsp;
+      <a href="#M000334">matching_file?</a>&nbsp;&nbsp;
+      <a href="#M000335">matching_files</a>&nbsp;&nbsp;
+      <a href="#M000331">new</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000331" class="method-detail">
+        <a name="M000331"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000331.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000331.html');return false;">
+          <span class="method-name">new</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Initialise the data we need to make searches later.
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000332" class="method-detail">
+        <a name="M000332"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000332.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000332.html');return false;">
+          <span class="method-name">find</span><span class="method-args">(path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Look in all the installed gems until a matching <em>path</em> is found.
+Return the <em>gemspec</em> of the gem where it was found. If no match is
+found, return nil.
+</p>
+<p>
+The gems are searched in alphabetical order, and in reverse version order.
+</p>
+<p>
+For example:
+</p>
+<pre>
+  find('log4r')              # -&gt; (log4r-1.1 spec)
+  find('log4r.rb')           # -&gt; (log4r-1.1 spec)
+  find('rake/rdoctask')      # -&gt; (rake-0.4.12 spec)
+  find('foobarbaz')          # -&gt; nil
+</pre>
+<p>
+Matching paths can have various suffixes (&#8217;.rb&#8217;,
+&#8217;.so&#8217;, and others), which may or may not already be attached to
+<em>file</em>. This method doesn&#8216;t care about the full filename that
+matches; only that there is a match.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000333" class="method-detail">
+        <a name="M000333"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000333.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000333.html');return false;">
+          <span class="method-name">find_all</span><span class="method-args">(path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Works like <a href="GemPathSearcher.html#M000332">find</a>, but finds all
+gemspecs matching <tt>path</tt>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000336" class="method-detail">
+        <a name="M000336"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000336.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000336.html');return false;">
+          <span class="method-name">init_gemspecs</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Return a list of all installed gemspecs, sorted by alphabetical order and
+in reverse version order. (bar-2, bar-1, foo-2)
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000337" class="method-detail">
+        <a name="M000337"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000337.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000337.html');return false;">
+          <span class="method-name">lib_dirs_for</span><span class="method-args">(spec)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns library directories glob for a gemspec. For example,
+</p>
+<pre>
+  '/usr/local/lib/ruby/gems/1.8/gems/foobar-1.0/{lib,ext}'
+</pre>
+        </div>
+      </div>
+
+      <div id="method-M000334" class="method-detail">
+        <a name="M000334"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000334.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000334.html');return false;">
+          <span class="method-name">matching_file?</span><span class="method-args">(spec, path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Attempts to <a href="GemPathSearcher.html#M000332">find</a> a matching path
+using the require_paths of the given <tt>spec</tt>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000335" class="method-detail">
+        <a name="M000335"></a>
+
+        <div class="method-heading">
+          <a href="GemPathSearcher.src/M000335.html" target="Code" class="method-signature"
+            onclick="popupCode('GemPathSearcher.src/M000335.html');return false;">
+          <span class="method-name">matching_files</span><span class="method-args">(spec, path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns files matching <tt>path</tt> in <tt>spec</tt>.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

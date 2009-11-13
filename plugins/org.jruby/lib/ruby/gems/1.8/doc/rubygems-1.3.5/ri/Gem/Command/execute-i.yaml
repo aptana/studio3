@@ -1,0 +1,17 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Override to provide command handling.
+- !ruby/struct:SM::Flow::P 
+  body: '#options will be filled in with your parsed options, unparsed options will
+    be left in <tt>options[:args]</tt>.'
+- !ruby/struct:SM::Flow::P 
+  body: 'See also: #get_all_gem_names, #get_one_gem_name, #get_one_optional_argument'
+full_name: Gem::Command#execute
+params: ()
+name: execute
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>uninstall_gem (Gem::Uninstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/uninstaller.rb, line 102</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">uninstall_gem</span>(<span class="ruby-identifier">spec</span>, <span class="ruby-identifier">specs</span>)
+    <span class="ruby-ivar">@spec</span> = <span class="ruby-identifier">spec</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">pre_uninstall_hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">hook</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">remove_executables</span> <span class="ruby-ivar">@spec</span>
+    <span class="ruby-identifier">remove</span> <span class="ruby-ivar">@spec</span>, <span class="ruby-identifier">specs</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">post_uninstall_hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">hook</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@spec</span> = <span class="ruby-keyword kw">nil</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

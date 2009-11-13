@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>quick (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 506</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">quick</span>(<span class="ruby-identifier">req</span>, <span class="ruby-identifier">res</span>)
+    <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">refresh!</span>
+
+    <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'text/plain'</span>
+    <span class="ruby-identifier">res</span>[<span class="ruby-value str">'date'</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-ivar">@spec_dir</span>).<span class="ruby-identifier">mtime</span>
+
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">req</span>.<span class="ruby-identifier">request_uri</span>.<span class="ruby-identifier">path</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'/quick/index'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>,<span class="ruby-operator">|</span> <span class="ruby-identifier">name</span> }.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>)
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'/quick/index.rz'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">index</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>,<span class="ruby-operator">|</span> <span class="ruby-identifier">name</span> }.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>)
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'application/x-deflate'</span>
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span>(<span class="ruby-identifier">index</span>)
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'/quick/latest_index'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">index</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">latest_specs</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span> }
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">index</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>)
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'/quick/latest_index.rz'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">index</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">latest_specs</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span> }
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'application/x-deflate'</span>
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span>(<span class="ruby-identifier">index</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>))
+    <span class="ruby-keyword kw">when</span> <span class="ruby-node">%r|^/quick/(Marshal.#{Regexp.escape Gem.marshal_version}/)?(.*?)-([0-9.]+)(-.*?)?\.gemspec\.rz$|</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">dep</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">$2</span>, <span class="ruby-identifier">$3</span>
+      <span class="ruby-identifier">specs</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">search</span> <span class="ruby-identifier">dep</span>
+      <span class="ruby-identifier">marshal_format</span> = <span class="ruby-identifier">$1</span>
+
+      <span class="ruby-identifier">selector</span> = [<span class="ruby-identifier">$2</span>, <span class="ruby-identifier">$3</span>, <span class="ruby-identifier">$4</span>].<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">inspect</span> }.<span class="ruby-identifier">join</span> <span class="ruby-value str">' '</span>
+
+      <span class="ruby-identifier">platform</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">$4</span> <span class="ruby-keyword kw">then</span>
+                   <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">$4</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/^-/</span>, <span class="ruby-value str">''</span>)
+                 <span class="ruby-keyword kw">else</span>
+                   <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span>
+                 <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">platform</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">platform</span> }
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">status</span> = <span class="ruby-value">404</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> = <span class="ruby-node">&quot;No gems found matching #{selector}&quot;</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">status</span> = <span class="ruby-value">500</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> = <span class="ruby-node">&quot;Multiple gems found matching #{selector}&quot;</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">marshal_format</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'application/x-deflate'</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">specs</span>.<span class="ruby-identifier">first</span>))
+      <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># deprecated YAML format</span>
+        <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'application/x-deflate'</span>
+        <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span>(<span class="ruby-identifier">specs</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_yaml</span>)
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">WEBrick</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPStatus</span><span class="ruby-operator">::</span><span class="ruby-constant">NotFound</span>, <span class="ruby-node">&quot;`#{req.path}' not found.&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>verify_gem (Gem::Validator)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/validator.rb, line 31</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">verify_gem</span>(<span class="ruby-identifier">gem_data</span>)
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">VerificationError</span>, <span class="ruby-value str">'empty gem file'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gem_data</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gem_data</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/MD5SUM/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-comment cmt"># Don't worry about it...this sucks.  Need to fix MD5 stuff for</span>
+      <span class="ruby-comment cmt"># new format</span>
+      <span class="ruby-comment cmt"># FIXME</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">sum_data</span> = <span class="ruby-identifier">gem_data</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/MD5SUM = &quot;([a-z0-9]+)&quot;/</span>,
+                             <span class="ruby-node">&quot;MD5SUM = \&quot;#{&quot;F&quot; * 32}\&quot;&quot;</span>)
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">sum_data</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">$1</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">VerificationError</span>, <span class="ruby-value str">'invalid checksum for gem file'</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

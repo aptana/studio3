@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>collect_specs (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 413</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">collect_specs</span>(<span class="ruby-identifier">gems</span> = <span class="ruby-identifier">gem_file_list</span>)
+    <span class="ruby-identifier">index</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">new</span>
+
+    <span class="ruby-identifier">progress</span> = <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">progress_reporter</span> <span class="ruby-identifier">gems</span>.<span class="ruby-identifier">size</span>,
+                                    <span class="ruby-node">&quot;Loading #{gems.size} gems from #{@dest_directory}&quot;</span>,
+                                    <span class="ruby-value str">&quot;Loaded all gems&quot;</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">time</span> <span class="ruby-value str">'loaded'</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gemfile</span><span class="ruby-operator">|</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">size</span>(<span class="ruby-identifier">gemfile</span>.<span class="ruby-identifier">to_s</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Skipping zero-length gem: #{gemfile}&quot;</span>
+          <span class="ruby-keyword kw">next</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Format</span>.<span class="ruby-identifier">from_file_by_path</span>(<span class="ruby-identifier">gemfile</span>).<span class="ruby-identifier">spec</span>
+          <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">loaded_from</span> = <span class="ruby-identifier">gemfile</span>
+
+          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gemfile</span> <span class="ruby-operator">=~</span> <span class="ruby-node">/\/#{Regexp.escape spec.original_name}.*\.gem\z/i</span> <span class="ruby-keyword kw">then</span>
+            <span class="ruby-identifier">expected_name</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span>
+            <span class="ruby-identifier">expected_name</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; (#{spec.original_name})&quot;</span> <span class="ruby-keyword kw">if</span>
+              <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_name</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_name</span>
+            <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Skipping misnamed gem: #{gemfile} should be named #{expected_name}&quot;</span>
+            <span class="ruby-keyword kw">next</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">abbreviate</span> <span class="ruby-identifier">spec</span>
+          <span class="ruby-identifier">sanitize</span> <span class="ruby-identifier">spec</span>
+
+          <span class="ruby-identifier">index</span>.<span class="ruby-identifier">add_spec</span> <span class="ruby-identifier">spec</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_name</span>
+
+          <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">updated</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_name</span>
+
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SignalException</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">alert_error</span> <span class="ruby-value str">&quot;Received signal, exiting&quot;</span>
+          <span class="ruby-identifier">raise</span>
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;Unable to process #{gemfile}\n#{e.message} (#{e.class})\n\t#{e.backtrace.join &quot;\n\t&quot;}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">progress</span>.<span class="ruby-identifier">done</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">index</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Quietly ensure the named Gem directory contains all the proper subdirectories.
+    If we can't create a directory due to a permission problem, then we will silently
+    continue.
+full_name: Gem::ensure_gem_subdirectories
+params: (gemdir)
+name: ensure_gem_subdirectories
+is_singleton: true
+aliases: []
+

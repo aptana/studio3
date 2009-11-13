@@ -1,0 +1,23 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: MethodSigCommand
+constants: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Implements the debugger 'method sig' command.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: regexp
+full_name: Debugger::MethodSigCommand
+superclass: Command
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: help
+- !ruby/object:RI::MethodSummary 
+  name: help_command

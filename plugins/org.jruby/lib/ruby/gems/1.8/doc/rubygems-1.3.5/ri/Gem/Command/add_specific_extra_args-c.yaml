@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add a list of extra arguments for the given command. <tt>args</tt> may be
+    an array or a string to be split on white space.
+full_name: Gem::Command::add_specific_extra_args
+params: (cmd,args)
+name: add_specific_extra_args
+is_singleton: true
+aliases: []
+

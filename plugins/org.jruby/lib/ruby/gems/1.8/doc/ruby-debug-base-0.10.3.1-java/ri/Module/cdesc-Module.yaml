@@ -1,0 +1,18 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: Module
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: debug_method
+- !ruby/object:RI::MethodSummary 
+  name: post_mortem_method
+full_name: Module
+superclass: Object
+class_methods: []
+

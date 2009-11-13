@@ -1,0 +1,57 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Can be used for quick navigation to the rdoc documentation. You can then define
+    a search shortcut for your browser. E.g. in Firefox connect 'shortcut:rdoc' to
+    http://localhost:8808/rdoc?q=%s template. Then you can directly open the ActionPack
+    documentation by typing 'rdoc actionp'. If there are multiple hits for the search
+    term, they are presented as a list with links.
+- !ruby/struct:SM::Flow::P 
+  body: 'Search algorithm aims for an intuitive search:'
+- !ruby/object:SM::Flow::LIST 
+  type: :NUMBER
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: first try to find the gems and documentation folders which name starts with
+      the search term
+    label: "1."
+  - !ruby/struct:SM::Flow::LI 
+    body: search for entries, that <b>contain</b> the search term
+    label: "2."
+  - !ruby/struct:SM::Flow::LI 
+    body: show all the gems
+    label: "3."
+- !ruby/struct:SM::Flow::P 
+  body: If there is only one search hit, user is immediately redirected to the documentation
+    for the particular gem, otherwise a list with results is shown.
+- !ruby/struct:SM::Flow::H 
+  text: Additional trick - install documentation for ruby core
+  level: 3
+- !ruby/struct:SM::Flow::P 
+  body: 'Note: please adjust paths accordingly use for example ''locate yaml.rb''
+    and ''gem environment'' to identify directories, that are specific for your local
+    installation'
+- !ruby/object:SM::Flow::LIST 
+  type: :NUMBER
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: install ruby sources
+    label: "1."
+  - !ruby/struct:SM::Flow::VERB 
+    body: "  cd /usr/src\n  sudo apt-get source ruby\n"
+  - !ruby/struct:SM::Flow::LI 
+    body: generate documentation
+    label: "2."
+  - !ruby/struct:SM::Flow::VERB 
+    body: "  rdoc -o /usr/lib/ruby/gems/1.8/doc/core/rdoc    #        /usr/lib/ruby/1.8 \
+      ruby1.8-1.8.7.72\n"
+- !ruby/struct:SM::Flow::P 
+  body: By typing 'rdoc core' you can now access the core documentation
+full_name: Gem::Server#rdoc
+params: (req, res)
+name: rdoc
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Install generated indicies into the destination directory.
+full_name: Gem::Indexer#install_indicies
+params: ()
+name: install_indicies
+is_singleton: false
+aliases: []
+

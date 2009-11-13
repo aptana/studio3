@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::SetupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/setup_command.rb, line 91</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-ivar">@verbose</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+    <span class="ruby-identifier">install_destdir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:destdir</span>]
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">install_destdir</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">ENV</span>[<span class="ruby-value str">'GEM_HOME'</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">install_destdir</span>,
+                                    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">default_dir</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^[a-zA-Z]:/</span>, <span class="ruby-value str">''</span>))
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">check_ruby_version</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">extend</span> <span class="ruby-constant">FileUtils</span><span class="ruby-operator">::</span><span class="ruby-constant">Verbose</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">extend</span> <span class="ruby-constant">FileUtils</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">lib_dir</span>, <span class="ruby-identifier">bin_dir</span> = <span class="ruby-identifier">make_destination_dirs</span> <span class="ruby-identifier">install_destdir</span>
+
+    <span class="ruby-identifier">install_lib</span> <span class="ruby-identifier">lib_dir</span>
+
+    <span class="ruby-identifier">install_executables</span> <span class="ruby-identifier">bin_dir</span>
+
+    <span class="ruby-identifier">remove_old_bin_files</span> <span class="ruby-identifier">bin_dir</span>
+
+    <span class="ruby-identifier">remove_source_caches</span> <span class="ruby-identifier">install_destdir</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;RubyGems #{Gem::VERSION} installed&quot;</span>
+
+    <span class="ruby-identifier">install_rdoc</span>
+
+    <span class="ruby-identifier">say</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verbose</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">78</span>
+      <span class="ruby-identifier">say</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">release_notes</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-value str">'History.txt'</span>
+
+    <span class="ruby-identifier">release_notes</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">release_notes</span> <span class="ruby-keyword kw">then</span>
+                      <span class="ruby-identifier">open</span> <span class="ruby-identifier">release_notes</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+                        <span class="ruby-identifier">text</span> = <span class="ruby-identifier">io</span>.<span class="ruby-identifier">gets</span> <span class="ruby-value str">'==='</span>
+                        <span class="ruby-identifier">text</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">io</span>.<span class="ruby-identifier">gets</span>(<span class="ruby-value str">'==='</span>)
+                        <span class="ruby-identifier">text</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">-3</span>]
+                      <span class="ruby-keyword kw">end</span>
+                    <span class="ruby-keyword kw">else</span>
+                      <span class="ruby-value str">&quot;Oh-no! Unable to find release notes!&quot;</span>
+                    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-identifier">release_notes</span>
+
+    <span class="ruby-identifier">say</span>
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">78</span>
+    <span class="ruby-identifier">say</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;RubyGems installed the following executables:&quot;</span>
+    <span class="ruby-identifier">say</span> <span class="ruby-ivar">@bin_file_names</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\t#{name}\n&quot;</span> }
+    <span class="ruby-identifier">say</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@bin_file_names</span>.<span class="ruby-identifier">grep</span>(<span class="ruby-node">/#{File::SEPARATOR}gem$/</span>) <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;If `gem` was installed by a previous RubyGems installation, you may need&quot;</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;to remove it by hand.&quot;</span>
+      <span class="ruby-identifier">say</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

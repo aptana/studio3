@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::SourceIndex#released_gems
+params: ()
+name: released_gems
+is_singleton: false
+aliases: []
+

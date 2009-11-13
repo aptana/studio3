@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Package::TarReader::Entry</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Package::TarReader::Entry</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../../files/lib/rubygems/package/tar_reader/entry_rb.html">
+                lib/rubygems/package/tar_reader/entry.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Class for reading entries out of a tar file
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000165">bytes_read</a>&nbsp;&nbsp;
+      <a href="#M000166">close</a>&nbsp;&nbsp;
+      <a href="#M000167">closed?</a>&nbsp;&nbsp;
+      <a href="#M000171">directory?</a>&nbsp;&nbsp;
+      <a href="#M000168">eof?</a>&nbsp;&nbsp;
+      <a href="#M000172">file?</a>&nbsp;&nbsp;
+      <a href="#M000169">full_name</a>&nbsp;&nbsp;
+      <a href="#M000170">getc</a>&nbsp;&nbsp;
+      <a href="#M000164">new</a>&nbsp;&nbsp;
+      <a href="#M000173">pos</a>&nbsp;&nbsp;
+      <a href="#M000174">read</a>&nbsp;&nbsp;
+      <a href="#M000175">rewind</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">header</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Header for this tar entry
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000164" class="method-detail">
+        <a name="M000164"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000164.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000164.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(header, io)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Creates a <a href="Entry.html#M000164">new</a> tar entry for
+<tt>header</tt> that will be <a href="Entry.html#M000174">read</a> from
+<tt>io</tt>
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000165" class="method-detail">
+        <a name="M000165"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000165.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000165.html');return false;">
+          <span class="method-name">bytes_read</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Number of bytes <a href="Entry.html#M000174">read</a> out of the tar entry
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000166" class="method-detail">
+        <a name="M000166"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000166.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000166.html');return false;">
+          <span class="method-name">close</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Closes the tar entry
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000167" class="method-detail">
+        <a name="M000167"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000167.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000167.html');return false;">
+          <span class="method-name">closed?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is the tar entry <a href="Entry.html#M000167">closed?</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000171" class="method-detail">
+        <a name="M000171"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000171.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000171.html');return false;">
+          <span class="method-name">directory?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is this tar entry a <a href="Entry.html#M000171">directory?</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000168" class="method-detail">
+        <a name="M000168"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000168.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000168.html');return false;">
+          <span class="method-name">eof?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Are we at the end of the tar entry?
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000172" class="method-detail">
+        <a name="M000172"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000172.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000172.html');return false;">
+          <span class="method-name">file?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is this tar entry a <a href="Entry.html#M000172">file?</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000169" class="method-detail">
+        <a name="M000169"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000169.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000169.html');return false;">
+          <span class="method-name">full_name</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Full name of the tar entry
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000170" class="method-detail">
+        <a name="M000170"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000170.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000170.html');return false;">
+          <span class="method-name">getc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Read one byte from the tar entry
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000173" class="method-detail">
+        <a name="M000173"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000173.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000173.html');return false;">
+          <span class="method-name">pos</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The position in the tar entry
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000174" class="method-detail">
+        <a name="M000174"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000174.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000174.html');return false;">
+          <span class="method-name">read</span><span class="method-args">(len = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Reads <tt>len</tt> bytes from the tar file entry, or the rest of the entry
+if nil
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000175" class="method-detail">
+        <a name="M000175"></a>
+
+        <div class="method-heading">
+          <a href="Entry.src/M000175.html" target="Code" class="method-signature"
+            onclick="popupCode('Entry.src/M000175.html');return false;">
+          <span class="method-name">rewind</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Rewinds to the beginning of the tar file entry
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

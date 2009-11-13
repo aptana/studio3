@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The name of the latest system cache file.
+full_name: Gem::SourceInfoCache#latest_system_cache_file
+params: ()
+name: latest_system_cache_file
+is_singleton: false
+aliases: []
+

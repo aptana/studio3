@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>search (Gem::SourceIndex)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/source_index.rb, line 292</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search</span>(<span class="ruby-identifier">gem_pattern</span>, <span class="ruby-identifier">platform_only</span> = <span class="ruby-keyword kw">false</span>)
+    <span class="ruby-identifier">version_requirement</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">only_platform</span> = <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-comment cmt"># TODO - Remove support and warning for legacy arguments after 2008/11</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">gem_pattern</span>
+      <span class="ruby-identifier">warn</span> <span class="ruby-node">&quot;#{Gem.location_of_caller.join ':'}:Warning: Gem::SourceIndex#search support for #{gem_pattern.class} patterns is deprecated, use #find_name&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">gem_pattern</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Regexp</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">version_requirement</span> = <span class="ruby-identifier">platform_only</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">only_platform</span> = <span class="ruby-identifier">platform_only</span>
+      <span class="ruby-identifier">version_requirement</span> = <span class="ruby-identifier">gem_pattern</span>.<span class="ruby-identifier">version_requirements</span>
+      <span class="ruby-identifier">gem_pattern</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Regexp</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">gem_pattern</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword kw">then</span>
+                      <span class="ruby-identifier">gem_pattern</span>.<span class="ruby-identifier">name</span>
+                    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">gem_pattern</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+                      <span class="ruby-regexp re">//</span>
+                    <span class="ruby-keyword kw">else</span>
+                      <span class="ruby-node">/^#{Regexp.escape gem_pattern.name}$/</span>
+                    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">version_requirement</span> = <span class="ruby-identifier">platform_only</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+      <span class="ruby-identifier">gem_pattern</span> = <span class="ruby-node">/#{gem_pattern}/i</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">version_requirement</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">version_requirement</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">create</span> <span class="ruby-identifier">version_requirement</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">all_gems</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">gem_pattern</span> <span class="ruby-keyword kw">and</span>
+        <span class="ruby-identifier">version_requirement</span>.<span class="ruby-identifier">satisfied_by?</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">only_platform</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span>.<span class="ruby-identifier">match</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">platform</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">sort_obj</span> }
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

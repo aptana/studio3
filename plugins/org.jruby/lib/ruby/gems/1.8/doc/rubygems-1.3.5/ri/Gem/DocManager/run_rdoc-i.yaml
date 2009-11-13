@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Run RDoc with <tt>args</tt>, which is an ARGV style argument list
+full_name: Gem::DocManager#run_rdoc
+params: (*args)
+name: run_rdoc
+is_singleton: false
+aliases: []
+

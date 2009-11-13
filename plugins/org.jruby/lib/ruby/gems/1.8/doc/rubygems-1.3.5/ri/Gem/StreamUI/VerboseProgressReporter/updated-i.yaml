@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Prints out the position relative to the total and the <tt>message</tt>.
+full_name: Gem::StreamUI::VerboseProgressReporter#updated
+params: (message)
+name: updated
+is_singleton: false
+aliases: []
+

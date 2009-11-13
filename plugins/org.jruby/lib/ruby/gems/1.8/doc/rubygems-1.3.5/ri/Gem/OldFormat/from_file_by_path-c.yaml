@@ -1,0 +1,19 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Reads the named gem file and returns a Format object, representing the data
+    from the gem file
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '[String] Path to the gem file'
+    label: 'file_path:'
+full_name: Gem::OldFormat::from_file_by_path
+params: (file_path)
+name: from_file_by_path
+is_singleton: true
+aliases: []
+

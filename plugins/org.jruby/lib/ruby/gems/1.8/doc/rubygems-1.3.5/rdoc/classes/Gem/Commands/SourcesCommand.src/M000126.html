@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::SourcesCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/sources_command.rb, line 44</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:list</span>] = <span class="ruby-operator">!</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:add</span>] <span class="ruby-operator">||</span>
+                       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:clear_all</span>] <span class="ruby-operator">||</span>
+                       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:remove</span>] <span class="ruby-operator">||</span>
+                       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:update</span>])
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:clear_all</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">path</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">dir</span>
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">rm_rf</span> <span class="ruby-identifier">path</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">path</span>) <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;*** Removed specs cache ***&quot;</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-keyword kw">not</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span>(<span class="ruby-identifier">path</span>) <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;*** Unable to remove source cache (write protected) ***&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;*** Unable to remove source cache ***&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">sic</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCache</span>
+      <span class="ruby-identifier">remove_cache_file</span> <span class="ruby-value str">'user'</span>,          <span class="ruby-identifier">sic</span>.<span class="ruby-identifier">user_cache_file</span>
+      <span class="ruby-identifier">remove_cache_file</span> <span class="ruby-value str">'latest user'</span>,   <span class="ruby-identifier">sic</span>.<span class="ruby-identifier">latest_user_cache_file</span>
+      <span class="ruby-identifier">remove_cache_file</span> <span class="ruby-value str">'system'</span>,        <span class="ruby-identifier">sic</span>.<span class="ruby-identifier">system_cache_file</span>
+      <span class="ruby-identifier">remove_cache_file</span> <span class="ruby-value str">'latest system'</span>, <span class="ruby-identifier">sic</span>.<span class="ruby-identifier">latest_system_cache_file</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:add</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">source_uri</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:add</span>]
+      <span class="ruby-identifier">uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span> <span class="ruby-identifier">source_uri</span>
+
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">load_specs</span> <span class="ruby-identifier">uri</span>, <span class="ruby-value str">'specs'</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">source_uri</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">write</span>
+
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{source_uri} added to sources&quot;</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">URI</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-constant">ArgumentError</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{source_uri} is not a URI&quot;</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">yaml_uri</span> = <span class="ruby-identifier">uri</span> <span class="ruby-operator">+</span> <span class="ruby-value str">'yaml'</span>
+        <span class="ruby-identifier">gem_repo</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">fetch_size</span> <span class="ruby-identifier">yaml_uri</span> <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">false</span>
+
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">uri</span> <span class="ruby-operator">=~</span> <span class="ruby-node">/specs\.#{Regexp.escape Gem.marshal_version}\.gz$/</span> <span class="ruby-keyword kw">and</span>
+           <span class="ruby-identifier">gem_repo</span> <span class="ruby-keyword kw">then</span>
+
+          <span class="ruby-identifier">alert_warning</span> <span class="ruby-value str">&quot;RubyGems 1.2+ index not found for:\n\\t\#{source_uri}\n\nWill cause RubyGems to revert to legacy indexes, degrading performance.\n&quot;</span>
+
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{source_uri} added to sources&quot;</span>
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Error fetching #{source_uri}:\n\t#{e.message}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:remove</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">source_uri</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:remove</span>]
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">source_uri</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;source #{source_uri} not present in cache&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">source_uri</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">write</span>
+
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{source_uri} removed from sources&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:update</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">fetcher</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">legacy_repos</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">update_uri</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">update_uri</span> = <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span> <span class="ruby-identifier">update_uri</span>
+          <span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">load_specs</span> <span class="ruby-identifier">update_uri</span>, <span class="ruby-value str">'specs'</span>
+          <span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">load_specs</span> <span class="ruby-identifier">update_uri</span>, <span class="ruby-value str">'latest_specs'</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCache</span>.<span class="ruby-identifier">cache</span> <span class="ruby-keyword kw">true</span>
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCache</span>.<span class="ruby-identifier">cache</span>.<span class="ruby-identifier">flush</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;source cache successfully updated&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:list</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;*** CURRENT SOURCES ***&quot;</span>
+      <span class="ruby-identifier">say</span>
+
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">source</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-identifier">source</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

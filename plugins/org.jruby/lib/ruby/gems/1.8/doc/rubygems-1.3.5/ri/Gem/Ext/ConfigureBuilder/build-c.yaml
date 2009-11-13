@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Ext::ConfigureBuilder::build
+params: (extension, directory, dest_path, results)
+name: build
+is_singleton: true
+aliases: []
+

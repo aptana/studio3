@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>gather_dependencies (Gem::DependencyInstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/dependency_installer.rb, line 120</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">gather_dependencies</span>
+    <span class="ruby-identifier">specs</span> = <span class="ruby-ivar">@specs_and_sources</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span>,<span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span> }
+
+    <span class="ruby-identifier">dependency_list</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DependencyList</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-identifier">dependency_list</span>.<span class="ruby-identifier">add</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">specs</span>)
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@ignore_dependencies</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">to_do</span> = <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">dup</span>
+      <span class="ruby-identifier">seen</span> = {}
+
+      <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">to_do</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">spec</span> = <span class="ruby-identifier">to_do</span>.<span class="ruby-identifier">shift</span>
+        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">seen</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>]
+        <span class="ruby-identifier">seen</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>] = <span class="ruby-keyword kw">true</span>
+
+        <span class="ruby-identifier">deps</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">runtime_dependencies</span>
+        <span class="ruby-identifier">deps</span> <span class="ruby-operator">|=</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">development_dependencies</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@development</span>
+
+        <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">results</span> = <span class="ruby-identifier">find_gems_with_sources</span>(<span class="ruby-identifier">dep</span>).<span class="ruby-identifier">reverse</span>
+
+          <span class="ruby-identifier">results</span>.<span class="ruby-identifier">reject!</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep_spec</span>,<span class="ruby-operator">|</span>
+            <span class="ruby-identifier">to_do</span>.<span class="ruby-identifier">push</span> <span class="ruby-identifier">dep_spec</span>
+
+            <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">any?</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">installed_spec</span><span class="ruby-operator">|</span>
+              <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">installed_spec</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword kw">and</span>
+                <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">satisfied_by?</span> <span class="ruby-identifier">installed_spec</span>.<span class="ruby-identifier">version</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">results</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep_spec</span>, <span class="ruby-identifier">source_uri</span><span class="ruby-operator">|</span>
+            <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">seen</span>[<span class="ruby-identifier">dep_spec</span>.<span class="ruby-identifier">name</span>]
+            <span class="ruby-ivar">@specs_and_sources</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">dep_spec</span>, <span class="ruby-identifier">source_uri</span>]
+            <span class="ruby-identifier">dependency_list</span>.<span class="ruby-identifier">add</span> <span class="ruby-identifier">dep_spec</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@gems_to_install</span> = <span class="ruby-identifier">dependency_list</span>.<span class="ruby-identifier">dependency_order</span>.<span class="ruby-identifier">reverse</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

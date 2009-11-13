@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>from_file_by_path (Gem::Format)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/format.rb, line 37</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">from_file_by_path</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">security_policy</span> = <span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-identifier">format</span> = <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file_path</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-node">&quot;Cannot load gem at [#{file_path}] in #{Dir.pwd}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># check for old version gem</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file_path</span>, <span class="ruby-value">20</span>).<span class="ruby-identifier">include?</span>(<span class="ruby-value str">&quot;MD5SUM =&quot;</span>)
+      <span class="ruby-identifier">require</span> <span class="ruby-value str">'rubygems/old_format'</span>
+
+      <span class="ruby-identifier">format</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">OldFormat</span>.<span class="ruby-identifier">from_file_by_path</span>(<span class="ruby-identifier">file_path</span>)
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">open</span> <span class="ruby-identifier">file_path</span>, <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">binary_mode</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">format</span> = <span class="ruby-identifier">from_io</span> <span class="ruby-identifier">io</span>, <span class="ruby-identifier">file_path</span>, <span class="ruby-identifier">security_policy</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">format</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

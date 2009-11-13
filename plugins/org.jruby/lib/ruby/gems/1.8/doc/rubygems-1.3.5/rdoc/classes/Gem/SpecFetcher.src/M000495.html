@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>fetch_spec (Gem::SpecFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/spec_fetcher.rb, line 84</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch_spec</span>(<span class="ruby-identifier">spec</span>, <span class="ruby-identifier">source_uri</span>)
+    <span class="ruby-identifier">spec</span> = <span class="ruby-identifier">spec</span> <span class="ruby-operator">-</span> [<span class="ruby-keyword kw">nil</span>, <span class="ruby-value str">'ruby'</span>, <span class="ruby-value str">''</span>]
+    <span class="ruby-identifier">spec_file_name</span> = <span class="ruby-node">&quot;#{spec.join '-'}.gemspec&quot;</span>
+
+    <span class="ruby-identifier">uri</span> = <span class="ruby-identifier">source_uri</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;#{Gem::MARSHAL_SPEC_DIR}#{spec_file_name}&quot;</span>
+
+    <span class="ruby-identifier">cache_dir</span> = <span class="ruby-identifier">cache_dir</span> <span class="ruby-identifier">uri</span>
+
+    <span class="ruby-identifier">local_spec</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">cache_dir</span>, <span class="ruby-identifier">spec_file_name</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">local_spec</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">read_binary</span> <span class="ruby-identifier">local_spec</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'.rz'</span>
+
+      <span class="ruby-identifier">spec</span> = <span class="ruby-ivar">@fetcher</span>.<span class="ruby-identifier">fetch_path</span> <span class="ruby-identifier">uri</span>
+      <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">inflate</span> <span class="ruby-identifier">spec</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@update_cache</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-identifier">cache_dir</span>
+
+        <span class="ruby-identifier">open</span> <span class="ruby-identifier">local_spec</span>, <span class="ruby-value str">'wb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">io</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">spec</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># TODO: Investigate setting Gem::Specification#loaded_from to a URI</span>
+    <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">spec</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

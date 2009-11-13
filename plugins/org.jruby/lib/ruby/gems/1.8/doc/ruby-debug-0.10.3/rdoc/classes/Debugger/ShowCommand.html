@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Debugger::ShowCommand</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Debugger::ShowCommand</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/cli/ruby-debug/commands/show_rb.html">
+                cli/ruby-debug/commands/show.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Command
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Implements debugger &quot;show&quot; command.
+</p>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Subcommands</td>
+          <td>=</td>
+          <td class="context-item-value">[        ['annotate', 2, &quot;Show annotation level&quot;, &quot;0 == normal; 2 == output annotated suitably for use by programs that control  ruby-debug.&quot;],        ['args', 2,          &quot;Show argument list to give program being debugged when it is started&quot;, &quot;Follow this command with any number of args, to be passed to the program.&quot;],        ['autoeval',  4, &quot;Show if unrecognized command are evaluated&quot;],        ['autolist',  4, &quot;Show if 'list' commands is run on breakpoints&quot;],        ['autoirb',   4, &quot;Show if IRB is invoked on debugger stops&quot;],        ['autoreload', 4, &quot;Show if source code is reloaded when changed&quot;],        ['basename',  1, &quot;Show if basename used in reporting files&quot;],        ['callstyle', 2, &quot;Show paramater style used showing call frames&quot;],        ['commands',  2, &quot;Show the history of commands you typed&quot;, &quot;You can supply a command number to start with.&quot;],        ['forcestep', 1, &quot;Show if sure 'next/step' forces move to a new line&quot;],        ['fullpath',  2, &quot;Show if full file names are displayed in frames&quot;],        ['history', 2, &quot;Generic command for showing command history parameters&quot;, &quot;show history filename -- Show the filename in which to record the command history show history save -- Show saving of the history record on exit show history size -- Show the size of the command history&quot;],        ['keep-frame-bindings', 1, &quot;Save frame binding on each call&quot;],        ['linetrace', 3, &quot;Show line execution tracing&quot;],        ['linetrace+', 10,          &quot;Show if consecutive lines should be different are shown in tracing&quot;],        ['listsize', 3, &quot;Show number of source lines to list by default&quot;],        ['port', 3, &quot;Show server port&quot;],        ['post-mortem', 3, &quot;Show whether we go into post-mortem debugging on an uncaught exception&quot;],        ['trace', 1,          &quot;Show if a stack trace is displayed when 'eval' raises exception&quot;],        ['version', 1,          &quot;Show what version of the debugger this is&quot;],        ['width', 1,          &quot;Show the number of characters the debugger thinks are in a line&quot;],       ].map do |name, min, short_help, long_help|        SubcmdStruct.new(name, min, short_help, long_help)</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

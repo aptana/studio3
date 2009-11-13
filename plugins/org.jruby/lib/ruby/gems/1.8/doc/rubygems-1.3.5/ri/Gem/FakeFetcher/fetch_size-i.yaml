@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::FakeFetcher#fetch_size
+params: (path)
+name: fetch_size
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>fetch_path (Gem::FakeFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/test_utilities.rb, line 33</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch_path</span> <span class="ruby-identifier">path</span>, <span class="ruby-identifier">mtime</span> = <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">path</span> = <span class="ruby-identifier">path</span>.<span class="ruby-identifier">to_s</span>
+    <span class="ruby-ivar">@paths</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">path</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">'need full URI'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">path</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">%r'^http://'</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@data</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">path</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;no data for #{path}&quot;</span>, <span class="ruby-identifier">path</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">data</span> = <span class="ruby-ivar">@data</span>[<span class="ruby-identifier">path</span>]
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:call</span>) <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">data</span>.<span class="ruby-identifier">call</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">path</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/gz$/</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">data</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">data</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">gunzip</span> <span class="ruby-identifier">data</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">data</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>load_specification (Gem::SourceIndex)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/source_index.rb, line 85</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load_specification</span>(<span class="ruby-identifier">file_name</span>)
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">file_name</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">file_name</span>
+
+      <span class="ruby-identifier">spec_code</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value str">'1.9'</span> <span class="ruby-keyword kw">then</span>
+                    <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span> <span class="ruby-identifier">file_name</span>
+                  <span class="ruby-keyword kw">else</span>
+                    <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span> <span class="ruby-identifier">file_name</span>, <span class="ruby-identifier">:encoding</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'UTF-8'</span>
+                  <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">untaint</span>
+
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">gemspec</span> = <span class="ruby-identifier">eval</span> <span class="ruby-identifier">spec_code</span>, <span class="ruby-identifier">binding</span>, <span class="ruby-identifier">file_name</span>
+
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gemspec</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Specification</span>)
+          <span class="ruby-identifier">gemspec</span>.<span class="ruby-identifier">loaded_from</span> = <span class="ruby-identifier">file_name</span>
+          <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">gemspec</span>
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;File '#{file_name}' does not evaluate to a gem specification&quot;</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SignalException</span>, <span class="ruby-constant">SystemExit</span>
+        <span class="ruby-identifier">raise</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SyntaxError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-identifier">spec_code</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;#{e.inspect}\n#{spec_code}&quot;</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Invalid .gemspec format in '#{file_name}'&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

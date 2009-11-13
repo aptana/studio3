@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>default_dir (Gem)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/defaults.rb, line 19</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">default_dir</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">RUBY_FRAMEWORK_VERSION</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:sitedir</span>]), <span class="ruby-value str">'Gems'</span>,
+                <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_version</span>]
+    <span class="ruby-comment cmt"># 1.9.2dev reverted to 1.8 style path</span>
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value str">'1.9'</span> <span class="ruby-keyword kw">and</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value str">'1.9.2'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:libdir</span>], <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_install_name</span>], <span class="ruby-value str">'gems'</span>,
+                <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_version</span>])
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:libdir</span>], <span class="ruby-identifier">ruby_engine</span>, <span class="ruby-value str">'gems'</span>,
+                <span class="ruby-constant">ConfigMap</span>[<span class="ruby-identifier">:ruby_version</span>])
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

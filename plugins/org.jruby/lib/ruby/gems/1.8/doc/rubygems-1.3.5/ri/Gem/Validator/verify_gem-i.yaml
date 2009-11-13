@@ -1,0 +1,18 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Given a gem file's contents, validates against its own MD5 checksum
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '[String] Contents of the gem file'
+    label: 'gem_data:'
+full_name: Gem::Validator#verify_gem
+params: (gem_data)
+name: verify_gem
+is_singleton: false
+aliases: []
+

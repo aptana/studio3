@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Platform)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/platform.rb, line 38</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">arch</span>)
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">arch</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Array</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-ivar">@cpu</span>, <span class="ruby-ivar">@os</span>, <span class="ruby-ivar">@version</span> = <span class="ruby-identifier">arch</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">String</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">arch</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">split</span> <span class="ruby-value str">'-'</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/\d/</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># reassemble x86-linux-gnu</span>
+        <span class="ruby-identifier">extra</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">pop</span>
+        <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;-#{extra}&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">cpu</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">shift</span>
+
+      <span class="ruby-ivar">@cpu</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">cpu</span>
+             <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/i\d86/</span> <span class="ruby-keyword kw">then</span> <span class="ruby-value str">'x86'</span>
+             <span class="ruby-keyword kw">else</span> <span class="ruby-identifier">cpu</span>
+             <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^\d+(\.\d+)?$/</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># for command-line</span>
+        <span class="ruby-ivar">@os</span>, <span class="ruby-ivar">@version</span> = <span class="ruby-identifier">arch</span>
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">os</span>, = <span class="ruby-identifier">arch</span>
+      <span class="ruby-ivar">@cpu</span>, <span class="ruby-identifier">os</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">cpu</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">os</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment cmt"># legacy jruby</span>
+
+      <span class="ruby-ivar">@os</span>, <span class="ruby-ivar">@version</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">os</span>
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/aix(\d+)/</span> <span class="ruby-keyword kw">then</span>             [ <span class="ruby-value str">'aix'</span>,       <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/cygwin/</span> <span class="ruby-keyword kw">then</span>               [ <span class="ruby-value str">'cygwin'</span>,    <span class="ruby-keyword kw">nil</span> ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/darwin(\d+)?/</span> <span class="ruby-keyword kw">then</span>         [ <span class="ruby-value str">'darwin'</span>,    <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/freebsd(\d+)/</span> <span class="ruby-keyword kw">then</span>         [ <span class="ruby-value str">'freebsd'</span>,   <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/hpux(\d+)/</span> <span class="ruby-keyword kw">then</span>            [ <span class="ruby-value str">'hpux'</span>,      <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^java$/</span>, <span class="ruby-regexp re">/^jruby$/</span> <span class="ruby-keyword kw">then</span>    [ <span class="ruby-value str">'java'</span>,      <span class="ruby-keyword kw">nil</span> ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^java([\d.]*)/</span> <span class="ruby-keyword kw">then</span>        [ <span class="ruby-value str">'java'</span>,      <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/linux/</span> <span class="ruby-keyword kw">then</span>                [ <span class="ruby-value str">'linux'</span>,     <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/mingw32/</span> <span class="ruby-keyword kw">then</span>              [ <span class="ruby-value str">'mingw32'</span>,   <span class="ruby-keyword kw">nil</span> ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/(mswin\d+)(\_(\d+))?/</span> <span class="ruby-keyword kw">then</span>
+                        <span class="ruby-identifier">os</span>, <span class="ruby-identifier">version</span> = <span class="ruby-identifier">$1</span>, <span class="ruby-identifier">$3</span>
+                        <span class="ruby-ivar">@cpu</span> = <span class="ruby-value str">'x86'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@cpu</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">os</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/32$/</span>
+                        [<span class="ruby-identifier">os</span>, <span class="ruby-identifier">version</span>]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/netbsdelf/</span> <span class="ruby-keyword kw">then</span>            [ <span class="ruby-value str">'netbsdelf'</span>, <span class="ruby-keyword kw">nil</span> ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/openbsd(\d+\.\d+)/</span> <span class="ruby-keyword kw">then</span>    [ <span class="ruby-value str">'openbsd'</span>,   <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/solaris(\d+\.\d+)/</span> <span class="ruby-keyword kw">then</span>    [ <span class="ruby-value str">'solaris'</span>,   <span class="ruby-identifier">$1</span>  ]
+                      <span class="ruby-comment cmt"># test</span>
+                      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^(\w+_platform)(\d+)/</span> <span class="ruby-keyword kw">then</span> [ <span class="ruby-identifier">$1</span>,          <span class="ruby-identifier">$2</span>  ]
+                      <span class="ruby-keyword kw">else</span>                             [ <span class="ruby-value str">'unknown'</span>,   <span class="ruby-keyword kw">nil</span> ]
+                      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-ivar">@cpu</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">cpu</span>
+      <span class="ruby-ivar">@os</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">os</span>
+      <span class="ruby-ivar">@version</span> = <span class="ruby-identifier">arch</span>.<span class="ruby-identifier">version</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;invalid argument #{arch.inspect}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

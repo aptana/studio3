@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>install_executables (Gem::Commands::SetupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/setup_command.rb, line 158</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install_executables</span>(<span class="ruby-identifier">bin_dir</span>)
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Installing gem executable&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verbose</span>
+
+    <span class="ruby-ivar">@bin_file_names</span> = []
+
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span> <span class="ruby-value str">'bin'</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">bin_files</span> = <span class="ruby-constant">Dir</span>[<span class="ruby-value str">'*'</span>]
+
+      <span class="ruby-identifier">bin_files</span>.<span class="ruby-identifier">delete</span> <span class="ruby-value str">'update_rubygems'</span>
+
+      <span class="ruby-identifier">bin_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">bin_file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">bin_file_formatted</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:format_executable</span>] <span class="ruby-keyword kw">then</span>
+                               <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">default_exec_format</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">bin_file</span>
+                             <span class="ruby-keyword kw">else</span>
+                               <span class="ruby-identifier">bin_file</span>
+                             <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">dest_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">bin_dir</span>, <span class="ruby-identifier">bin_file_formatted</span>
+        <span class="ruby-identifier">bin_tmp_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">tmpdir</span>, <span class="ruby-identifier">bin_file</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">bin</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">readlines</span> <span class="ruby-identifier">bin_file</span>
+          <span class="ruby-identifier">bin</span>[<span class="ruby-value">0</span>] = <span class="ruby-node">&quot;#!#{Gem.ruby}\n&quot;</span>
+
+          <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span> <span class="ruby-identifier">bin_tmp_file</span>, <span class="ruby-value str">'w'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fp</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">fp</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">bin</span>.<span class="ruby-identifier">join</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">install</span> <span class="ruby-identifier">bin_tmp_file</span>, <span class="ruby-identifier">dest_file</span>, <span class="ruby-identifier">:mode</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0755</span>
+          <span class="ruby-ivar">@bin_file_names</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">dest_file</span>
+        <span class="ruby-keyword kw">ensure</span>
+          <span class="ruby-identifier">rm</span> <span class="ruby-identifier">bin_tmp_file</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">win_platform?</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">bin_cmd_file</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">tmpdir</span>, <span class="ruby-node">&quot;#{bin_file}.bat&quot;</span>
+
+          <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span> <span class="ruby-identifier">bin_cmd_file</span>, <span class="ruby-value str">'w'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">file</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;@ECHO OFF\nIF NOT \&quot;%~f0\&quot; == \&quot;~f0\&quot; GOTO :WinNT\n@\&quot;\#{File.basename(Gem.ruby).chomp('\&quot;')}\&quot; \&quot;\#{dest_file}\&quot; %1 %2 %3 %4 %5 %6 %7 %8 %9\nGOTO :EOF\n:WinNT\n@\&quot;\#{File.basename(Gem.ruby).chomp('\&quot;')}\&quot; \&quot;%~dpn0\&quot; %*\n&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">install</span> <span class="ruby-identifier">bin_cmd_file</span>, <span class="ruby-node">&quot;#{dest_file}.bat&quot;</span>, <span class="ruby-identifier">:mode</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0755</span>
+        <span class="ruby-keyword kw">ensure</span>
+          <span class="ruby-identifier">rm</span> <span class="ruby-identifier">bin_cmd_file</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

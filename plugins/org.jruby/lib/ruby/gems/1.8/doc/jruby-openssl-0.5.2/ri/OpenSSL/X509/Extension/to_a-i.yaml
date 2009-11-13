@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: OpenSSL::X509::Extension#to_a
+params: ()
+name: to_a
+is_singleton: false
+aliases: []
+

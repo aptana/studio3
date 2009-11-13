@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: A wrapper around RUBY_ENGINE const that may not be defined
+full_name: Gem::ruby_engine
+params: ()
+name: ruby_engine
+is_singleton: true
+aliases: []
+

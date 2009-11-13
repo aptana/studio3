@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::ServerCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/server_command.rb, line 6</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">super</span> <span class="ruby-value str">'server'</span>, <span class="ruby-value str">'Documentation and gem repository HTTP server'</span>,
+          <span class="ruby-identifier">:port</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">8808</span>, <span class="ruby-identifier">:gemdir</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>, <span class="ruby-identifier">:daemon</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">accept</span> <span class="ruby-identifier">:Port</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">port</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">port</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/\A\d+\z/</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">port</span> = <span class="ruby-constant">Integer</span> <span class="ruby-identifier">port</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidArgument</span>, <span class="ruby-node">&quot;#{port}: not a port number&quot;</span> <span class="ruby-keyword kw">if</span>
+          <span class="ruby-identifier">port</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">65535</span>
+
+        <span class="ruby-identifier">port</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-constant">Socket</span>.<span class="ruby-identifier">getservbyname</span> <span class="ruby-identifier">port</span>
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">SocketError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-constant">OptionParser</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidArgument</span>, <span class="ruby-node">&quot;#{port}: no such named service&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-p'</span>, <span class="ruby-value str">'--port=PORT'</span>, <span class="ruby-identifier">:Port</span>,
+               <span class="ruby-value str">'port to listen on'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">port</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:port</span>] = <span class="ruby-identifier">port</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'-d'</span>, <span class="ruby-value str">'--dir=GEMDIR'</span>,
+               <span class="ruby-value str">'directory from which to serve gems'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gemdir</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:gemdir</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-identifier">gemdir</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span> <span class="ruby-value str">'--[no-]daemon'</span>, <span class="ruby-value str">'run as a daemon'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">daemon</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:daemon</span>] = <span class="ruby-identifier">daemon</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

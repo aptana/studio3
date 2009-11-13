@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::PristineCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/pristine_command.rb, line 52</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">gem_name</span> = <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-identifier">specs</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] <span class="ruby-keyword kw">then</span>
+              <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+                <span class="ruby-identifier">spec</span>
+              <span class="ruby-keyword kw">end</span>
+            <span class="ruby-keyword kw">else</span>
+              <span class="ruby-identifier">gem_name</span> = <span class="ruby-identifier">get_one_gem_name</span>
+              <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">gem_name</span>,
+                                                          <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:version</span>])
+            <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>,
+            <span class="ruby-node">&quot;Failed to find gem #{gem_name} #{options[:version]}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">install_dir</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span> <span class="ruby-comment cmt"># TODO use installer option</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">FilePermissionError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">install_dir</span>) <span class="ruby-keyword kw">unless</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span>(<span class="ruby-identifier">install_dir</span>)
+
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Restoring gem(s) to pristine condition...&quot;</span>
+
+    <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">gem</span> = <span class="ruby-constant">Dir</span>[<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>, <span class="ruby-value str">'cache'</span>, <span class="ruby-node">&quot;#{spec.full_name}.gem&quot;</span>)].<span class="ruby-identifier">first</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;Cached gem for #{spec.full_name} not found, use `gem install` to restore&quot;</span>
+        <span class="ruby-keyword kw">next</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-comment cmt"># TODO use installer options</span>
+      <span class="ruby-identifier">installer</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Installer</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">gem</span>, <span class="ruby-identifier">:wrappers</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:force</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>
+      <span class="ruby-identifier">installer</span>.<span class="ruby-identifier">install</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Restored #{spec.full_name}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
