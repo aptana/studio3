@@ -57,9 +57,20 @@ public class HttpServer extends Thread
 	 */
 	public void createProcess(String id)
 	{
+		this.createProcess(id, null);
+	}
+	
+	/**
+	 * createProcess
+	 * 
+	 * @param id
+	 * @param startingDirectory
+	 */
+	public void createProcess(String id, String startingDirectory)
+	{
 		if (this.processById.containsKey(id) == false)
 		{
-			ProcessWrapper wrapper = new ProcessWrapper();
+			ProcessWrapper wrapper = new ProcessWrapper(startingDirectory);
 			
 			wrapper.start();
 			
@@ -151,7 +162,7 @@ public class HttpServer extends Thread
 	public String getHost()
 	{
 		if (this.serverSocket == null)
-			return "127.0.0.1";
+			return "127.0.0.1"; //$NON-NLS-1$
 		return this.serverSocket.getInetAddress().getHostAddress();
 	}
 

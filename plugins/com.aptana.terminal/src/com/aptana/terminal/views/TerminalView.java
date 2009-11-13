@@ -18,23 +18,36 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.IStartingDirectory;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.HttpServer;
 
-public class TerminalView extends ViewPart
+public class TerminalView extends ViewPart implements IStartingDirectory
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
 	
 	private TerminalBrowser browser;
 	private Action openEditor;
+	private String startingDirectory;
 
 	/**
 	 * The constructor.
 	 */
 	public TerminalView()
 	{
+		this(null);
+	}
+	
+	/**
+	 * TerminalView
+	 * 
+	 * @param startingDirectory
+	 */
+	public TerminalView(String startingDirectory)
+	{
+		this.startingDirectory = startingDirectory;
 	}
 
 	/**
@@ -115,6 +128,14 @@ public class TerminalView extends ViewPart
 	}
 
 	/**
+	 * getStartingDirectory
+	 */
+	public String getStartingDirectory()
+	{
+		return this.startingDirectory;
+	}
+	
+	/**
 	 * hookContextMenu
 	 */
 	private void hookContextMenu()
@@ -136,7 +157,6 @@ public class TerminalView extends ViewPart
 //		getSite().registerContextMenu(menuMgr, viewer);
 	}
 
-	
 	/**
 	 * init
 	 */

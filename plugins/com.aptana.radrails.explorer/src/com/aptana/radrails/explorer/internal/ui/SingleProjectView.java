@@ -1,5 +1,9 @@
 package com.aptana.radrails.explorer.internal.ui;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -7,13 +11,20 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -23,10 +34,13 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.progress.UIJob;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.radrails.explorer.ExplorerPlugin;
+import com.aptana.util.directorywatcher.DirectoryChangeListener;
+import com.aptana.util.directorywatcher.DirectoryWatcher;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -45,6 +59,10 @@ public class SingleProjectView extends CommonNavigator
 
 	private ResourceListener fResourceListener;
 
+	private ViewerFilter activeProjectFilter;
+
+	private DirectoryWatcher watcher;
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -58,6 +76,36 @@ public class SingleProjectView extends CommonNavigator
 		fResourceListener = new ResourceListener();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
 		detectSelectedProject();
+		activeProjectFilter = new ViewerFilter()
+		{
+
+			@Override
+			public boolean select(Viewer viewer, Object parentElement, Object element)
+			{
+				if (selectedProject == null)
+					return false;
+				IResource resource = null;
+				if (element instanceof IResource)
+				{
+					resource = (IResource) element;
+				}
+				if (resource == null)
+				{
+					if (element instanceof IAdaptable)
+					{
+						IAdaptable adapt = (IAdaptable) element;
+						resource = (IResource) adapt.getAdapter(IResource.class);
+					}
+				}
+
+				if (resource == null)
+					return false;
+
+				IProject project = resource.getProject();
+				return selectedProject.equals(project);
+			}
+		};
+		getCommonViewer().addFilter(activeProjectFilter);
 	}
 
 	protected Composite doCreatePartControl(Composite customComposite)
@@ -106,6 +154,7 @@ public class SingleProjectView extends CommonNavigator
 	@Override
 	public void dispose()
 	{
+		getCommonViewer().removeFilter(activeProjectFilter);
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
 		super.dispose();
 	}
@@ -127,92 +176,176 @@ public class SingleProjectView extends CommonNavigator
 		return text;
 	}
 
-	protected void reloadProjects()
-	{
-		Job job = new UIJob("Reload Projects") //$NON-NLS-1$
-		{
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
-			{
-				// FIXME What if the active project was deleted or renamed?
-				projectCombo.removeAll();
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				for (IProject iProject : projects)
-				{
-					projectCombo.add(iProject.getName());
-				}
-				if (selectedProject == null)
-				{
-					if (projects.length > 0)
-					{
-						setActiveProject(projects[0].getName());
-					}
-				}
-				else
-				{
-					projectCombo.setText(selectedProject.getName());
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
-	}
-
 	private void detectSelectedProject()
 	{
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		if (projects == null)
-			return;
-		for (IProject iProject : projects)
+		String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT, null, null);
+		IProject project = null;
+		if (value != null)
 		{
-			try
-			{
-				String value = iProject.getPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID,
-						ACTIVE_PROJECT));
-				if (value != null && value.equals(Boolean.TRUE.toString()))
-				{
-					projectCombo.setText(iProject.getName());
-					setActiveProject(iProject.getName());
-					return;
-				}
-			}
-			catch (CoreException e)
-			{
-				ExplorerPlugin.logError(e);
-			}
+			project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
+		}
+		if (project == null)
+		{
+			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+			if (projects == null || projects.length == 0)
+				return;
+			project = projects[0];
+		}
+		if (project != null)
+		{
+			projectCombo.setText(project.getName());
+			setActiveProject(project.getName());
+			return;
 		}
 	}
 
 	protected void setActiveProject(String projectName)
 	{
 		IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (newSelectedProject == null || (selectedProject != null && newSelectedProject.equals(selectedProject)))
+		if (selectedProject != null && selectedProject.equals(newSelectedProject))
 			return;
+
+		if (selectedProject != null)
+		{
+			unsetActiveProject();
+		}
+		IProject oldActiveProject = selectedProject;
+		selectedProject = newSelectedProject;
+		if (newSelectedProject != null)
+		{
+			setActiveProject();
+		}
+		projectChanged(oldActiveProject, newSelectedProject);
+		refreshViewer();
+	}
+
+	private void setActiveProject()
+	{
 		try
 		{
-			if (selectedProject != null)
-			{
-				selectedProject
-						.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT), null);
-			}
-			selectedProject = newSelectedProject;
-			selectedProject.setPersistentProperty(new QualifiedName(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT),
-					Boolean.TRUE.toString());
-			projectChanged(newSelectedProject);
-			refreshViewer();
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			prefs.put(ACTIVE_PROJECT, selectedProject.getName());
+			prefs.flush();
 		}
-		catch (CoreException e)
+		catch (BackingStoreException e)
 		{
-			ExplorerPlugin.logError(e);
+			ExplorerPlugin.logError(e.getMessage(), e);
 		}
 	}
 
-	protected void projectChanged(IProject newSelectedProject)
+	private void unsetActiveProject()
 	{
-		// Override in child classes
+		try
+		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			prefs.remove(ACTIVE_PROJECT);
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			ExplorerPlugin.logError(e.getMessage(), e);
+		}
+	}
+
+	protected void projectChanged(IProject oldProject, IProject newProject)
+	{
+		if (watcher != null)
+		{
+			watcher.stop();
+		}
+		watcher = new DirectoryWatcher(newProject.getLocation().toFile());
+		watcher.addListener(new DirectoryChangeListener()
+		{
+
+			private boolean shouldRefresh = false;
+			private Map<File, Long> files = new HashMap<File, Long>();
+
+			@Override
+			public void startPoll()
+			{
+				shouldRefresh = false;
+			}
+
+			@Override
+			public void stopPoll()
+			{
+				if (shouldRefresh)
+				{
+					WorkspaceJob job = new WorkspaceJob("Refresh")
+					{
+
+						@Override
+						public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+						{
+							selectedProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+							return Status.OK_STATUS;
+						}
+					};
+					job.schedule();
+				}
+			}
+
+			@Override
+			public boolean added(File file)
+			{
+				shouldRefresh = true;
+				files.put(file, file.lastModified());
+				return true;
+			}
+
+			@Override
+			public boolean removed(File file)
+			{
+				shouldRefresh = true;
+				files.remove(file);
+				return true;
+			}
+
+			@Override
+			public boolean changed(File file)
+			{
+				shouldRefresh = true;
+				files.put(file, file.lastModified());
+				return true;
+			}
+
+			@Override
+			public boolean isInterested(File file)
+			{
+				return true;
+			}
+
+			@Override
+			public Long getSeenFile(File file)
+			{
+				Long timestamp = files.get(file);
+				IResource resource = null;
+				IPath location = new Path(file.getAbsolutePath());
+				if (file.isDirectory())
+				{
+					resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(location);
+				}
+				else
+				{
+					resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
+				}
+				Long resourceTimestamp = null;
+				if (resource != null && resource.exists())
+					resourceTimestamp = resource.getLocalTimeStamp();
+				if (resourceTimestamp == null && timestamp == null)
+				{
+					return null;
+				}
+				if (resourceTimestamp != null && (timestamp == null || resourceTimestamp > timestamp))
+				{
+					files.put(file, resourceTimestamp);
+					return resourceTimestamp;
+				}
+				files.put(file, timestamp);
+				return timestamp;
+			}
+		});
+		watcher.start();
 	}
 
 	protected void refreshViewer()
@@ -245,7 +378,46 @@ public class SingleProjectView extends CommonNavigator
 						if (resource.getType() == IResource.PROJECT)
 						{
 							// a project was added, removed, or changed!
-							reloadProjects();
+							if (delta.getKind() == IResourceDelta.ADDED)
+							{
+								// Add to the combo and then switch to it!
+								final String projectName = resource.getName();
+								Display.getDefault().asyncExec(new Runnable()
+								{
+
+									public void run()
+									{
+										projectCombo.add(projectName);
+										projectCombo.setText(projectName);
+										setActiveProject(projectName);
+									}
+								});
+							}
+							else if (delta.getKind() == IResourceDelta.REMOVED)
+							{
+								// Remove from combo and if it was the active project, switch away from it!
+								final String projectName = resource.getName();
+								Display.getDefault().asyncExec(new Runnable()
+								{
+
+									public void run()
+									{
+										projectCombo.remove(projectName);
+										if (selectedProject != null && selectedProject.getName().equals(projectName))
+										{
+											IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
+													.getProjects();
+											String newActiveProject = ""; //$NON-NLS-1$
+											if (projects.length > 0)
+											{
+												newActiveProject = projects[0].getName();
+											}
+											projectCombo.setText(newActiveProject);
+											setActiveProject(newActiveProject);
+										}
+									}
+								});
+							}
 						}
 						return false;
 					}

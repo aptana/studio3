@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -17,11 +19,19 @@ import com.aptana.terminal.Activator;
 
 public class ProcessWrapper
 {
+	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
+	
+	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
+	// so as not to create a dependency on the two projects.
+	private static final String ACTIVE_PROJECT_PROPERTY = "activeProject"; //$NON-NLS-1$
+	public static final String EXPLORER_PLUGIN_ID = "com.aptana.radrails.explorer"; //$NON-NLS-1$
+	
 	private Process _process;
 	private ProcessReader _stdout;
 	private ProcessReader _stderr;
 	private ProcessWriter _stdin;
 	private StringBuffer _output;
+	private String _startingDirectory;
 	
 	/**
 	 * ProcessWrapper
@@ -30,8 +40,19 @@ public class ProcessWrapper
 	 */
 	public ProcessWrapper()
 	{
+		this(null);
 	}
 
+	/**
+	 * ProcessWrapper
+	 * 
+	 * @param startingDirectory
+	 */
+	public ProcessWrapper(String startingDirectory)
+	{
+		this._startingDirectory = startingDirectory;
+	}
+	
 	/**
 	 * getCommandLineArguments
 	 * 
@@ -44,7 +65,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = new String[] { "/K", "cd" };
+			result = new String[] { "/K", "cd" }; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		return result;
@@ -62,7 +83,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = "cmd.exe";
+			result = "cmd.exe"; //$NON-NLS-1$
 		}
 		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{
@@ -96,7 +117,24 @@ public class ProcessWrapper
 	 */
 	protected String getStartingDirectory()
 	{
-		return System.getProperty("user.home"); //$NON-NLS-1$
+		if (this._startingDirectory == null)
+		{
+			String value = Platform.getPreferencesService().getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_PROPERTY, null, null);
+			IProject project = null;
+			
+			if (value != null)
+			{
+				project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
+				
+				this._startingDirectory = project.getLocation().toPortableString();
+			}
+			else
+			{
+				this._startingDirectory = System.getProperty(USER_HOME_PROPERTY); //$NON-NLS-1$
+			}
+		}
+		
+		return this._startingDirectory;
 	}
 	
 	/**
@@ -140,14 +178,9 @@ public class ProcessWrapper
 		if (this._stdin != null)
 		{
 			this._stdin.sendText(text);
-			
-//			if (Platform.getOS().equals(Platform.OS_WIN32))
-//			{
-//				this._output.append(text);
-//			}
 		}
 	}
-
+	
 	/**
 	 * Set up environment variables for the new process
 	 * 
