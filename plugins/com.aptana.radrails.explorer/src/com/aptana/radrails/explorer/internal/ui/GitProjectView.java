@@ -705,7 +705,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private boolean gitFilterEnabled(final GitRepository repository)
 	{
 		// TODO The files also have to be children of the active project!
-		return !repository.index().changedFiles().isEmpty();
+		return gitFilter.getSelection() || !repository.index().changedFiles().isEmpty();
 	}
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
