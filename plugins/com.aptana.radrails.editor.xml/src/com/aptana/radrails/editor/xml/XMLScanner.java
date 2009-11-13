@@ -51,11 +51,11 @@ public class XMLScanner extends RuleBasedScanner
 	{
 		IRule[] rules = new IRule[4];
 		rules[0] = new WhitespaceRule(new WhitespaceDetector());
-		rules[1] = new RegexpRule("[a-zA-Z0-9]+=", ThemeUtil.getToken("entity.other.attribute-name.xml"));
-		rules[2] = new RegexpRule("<|>", ThemeUtil.getToken("punctuation.definition.tag.xml"));
-		rules[3] = new WordRule(new WordDetector(), ThemeUtil.getToken("entity.name.tag.xml"));
+		rules[1] = new RegexpRule("[a-zA-Z0-9]+=", ThemeUtil.getToken("entity.other.attribute-name.xml")); //$NON-NLS-1$ //$NON-NLS-2$
+		rules[2] = new RegexpRule("<|>", ThemeUtil.getToken("punctuation.definition.tag.xml")); //$NON-NLS-1$ //$NON-NLS-2$
+		rules[3] = new WordRule(new WordDetector(), ThemeUtil.getToken("entity.name.tag.xml")); //$NON-NLS-1$
 		setRules(rules);
-		setDefaultReturnToken(ThemeUtil.getToken("text"));
+		setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
 	}
 
 	/**

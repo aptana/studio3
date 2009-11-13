@@ -62,10 +62,10 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  */
 public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
-	public final static String PREFIX = "__css_";
-	public final static String DEFAULT = "__css" + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String STRING = "__css_string";
-	public final static String MULTILINE_COMMENT = "__css_multiline_comment";
+	public final static String PREFIX = "__css_"; //$NON-NLS-1$
+	public final static String DEFAULT = "__css" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public final static String STRING = "__css_string"; //$NON-NLS-1$
+	public final static String MULTILINE_COMMENT = "__css_multiline_comment"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] {
 		DEFAULT,
@@ -152,10 +152,10 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		IToken comment = new Token(MULTILINE_COMMENT);
 		
 		partitioningRules = new IPredicateRule[] {
-				new SingleLineRule("\"", "\"", stringToken, '\\'),
-				new SingleLineRule("\'", "\'", stringToken, '\\'),
+				new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new WordPredicateRule(comment),
-				new MultiLineRule("/*", "*/", comment, (char) 0, true)
+				new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 		};
 	}
 
@@ -194,7 +194,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -214,7 +213,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	protected ITokenScanner getWordScanner() {
 		if (multilineCommentScanner == null) {
 			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.css"));
+			multilineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.css")); //$NON-NLS-1$
 		}
 		return multilineCommentScanner;
 	}
@@ -222,7 +221,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	protected ITokenScanner getStringScanner() {
 		if (stringScanner == null) {
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.css"));
+			stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.css")); //$NON-NLS-1$
 		}
 		return stringScanner;
 	}

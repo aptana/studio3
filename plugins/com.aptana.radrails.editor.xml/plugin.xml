@@ -9,7 +9,7 @@
             default="true"
             extensions="xml"
             id="com.aptana.radrails.editor.xml"
-            name="XML Editor">
+            name="%editor.xml.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.xml">
          </contentTypeBinding>

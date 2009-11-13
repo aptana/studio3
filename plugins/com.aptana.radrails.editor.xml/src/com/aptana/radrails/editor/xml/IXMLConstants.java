@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.xml;
  */
 public interface IXMLConstants {
 
-	public String CONTENT_TYPE_XML = "com.aptana.radrails.contenttype.xml";
+	public String CONTENT_TYPE_XML = "com.aptana.radrails.contenttype.xml"; //$NON-NLS-1$
 }

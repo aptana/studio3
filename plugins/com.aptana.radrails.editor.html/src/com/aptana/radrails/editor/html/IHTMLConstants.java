@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.html;
  */
 public interface IHTMLConstants {
 
-	public String CONTENT_TYPE_HTML = "com.aptana.radrails.contenttype.html";
+	public String CONTENT_TYPE_HTML = "com.aptana.radrails.contenttype.html"; //$NON-NLS-1$
 }

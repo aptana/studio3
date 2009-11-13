@@ -8,7 +8,7 @@
             default="true"
             icon="icons/js.gif"
             id="com.aptana.radrails.editor.js"
-            name="JavaScript Source Editor (Aptana)">
+            name="%editor.js.name">
          <contentTypeBinding
                contentTypeId="com.aptana.radrails.contenttype.js">
          </contentTypeBinding>
@@ -20,7 +20,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="js"
             id="com.aptana.radrails.contenttype.js"
-            name="JavaScript Source"
+            name="%content-type.js.name"
             priority="normal">
       </content-type>
    </extension>

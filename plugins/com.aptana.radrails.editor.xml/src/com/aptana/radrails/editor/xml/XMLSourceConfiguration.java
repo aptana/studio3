@@ -59,13 +59,13 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class XMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
-	public final static String PREFIX = "__xml_";
-	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String XML_COMMENT = "__xml_comment";
-	public final static String STRING_DOUBLE = "__xml_string_double";
-	public final static String STRING_SINGLE = "__xml_string_single";
-	public final static String CDATA = "__xml_cdata";
-	public final static String PRE_PROCESSOR = "__xml_pre_processor";
+	public final static String PREFIX = "__xml_"; //$NON-NLS-1$
+	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public final static String XML_COMMENT = "__xml_comment"; //$NON-NLS-1$
+	public final static String STRING_DOUBLE = "__xml_string_double"; //$NON-NLS-1$
+	public final static String STRING_SINGLE = "__xml_string_single"; //$NON-NLS-1$
+	public final static String CDATA = "__xml_cdata"; //$NON-NLS-1$
+	public final static String PRE_PROCESSOR = "__xml_pre_processor"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] {
 			DEFAULT,
@@ -77,11 +77,11 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)),
-			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)),
-			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'),
-			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'),
-			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA))};
+			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA))}; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private XMLScanner xmlScanner;
 	private RuleBasedScanner doubleQuotedStringScanner;
@@ -166,7 +166,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.xml"));
+		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.xml")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, XMLSourceConfiguration.XML_COMMENT);
 		reconciler.setRepairer(ndr, XMLSourceConfiguration.XML_COMMENT);
 	}
@@ -176,7 +176,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (preProcessorScanner == null)
 		{
 			preProcessorScanner = new RuleBasedScanner();
-			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("meta.tag.preprocessor.xml"));
+			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		}
 		return preProcessorScanner;
 	}
@@ -186,7 +186,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (cdataScanner == null)
 		{
 			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml"));
+			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}
@@ -196,7 +196,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (doubleQuotedStringScanner == null)
 		{
 			doubleQuotedStringScanner = new RuleBasedScanner();
-			doubleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.xml"));
+			doubleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.xml")); //$NON-NLS-1$
 		}
 		return doubleQuotedStringScanner;
 	}
@@ -206,7 +206,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (singleQuotedStringScanner == null)
 		{
 			singleQuotedStringScanner = new RuleBasedScanner();
-			singleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.xml"));
+			singleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.xml")); //$NON-NLS-1$
 		}
 		return singleQuotedStringScanner;
 	}

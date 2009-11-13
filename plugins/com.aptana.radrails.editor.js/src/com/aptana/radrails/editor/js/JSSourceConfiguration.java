@@ -60,14 +60,14 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class JSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 
-	public final static String PREFIX = "__js_";
-	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE;
-	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment";
-	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment";
-	public final static String JS_DOC = "__js_sdoc";
-	public final static String STRING_DOUBLE = "__js_string_double";
-	public final static String STRING_SINGLE = "__js_string_single";
-	public final static String JS_REGEXP = "__js_regexp";
+	public final static String PREFIX = "__js_"; //$NON-NLS-1$
+	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment"; //$NON-NLS-1$
+	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment"; //$NON-NLS-1$
+	public final static String JS_DOC = "__js_sdoc"; //$NON-NLS-1$
+	public final static String STRING_DOUBLE = "__js_string_double"; //$NON-NLS-1$
+	public final static String STRING_SINGLE = "__js_string_single"; //$NON-NLS-1$
+	public final static String JS_REGEXP = "__js_regexp"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] {
 			DEFAULT,
@@ -80,12 +80,12 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)),
-			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'),
-			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'),
-			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true),
-			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true),
-			new SingleLineRule("/", "/", new Token(JS_REGEXP), '\\') };
+			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
+			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("/", "/", new Token(JS_REGEXP), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
@@ -186,7 +186,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (multiLineCommentScanner == null)
 		{
 			multiLineCommentScanner = new RuleBasedScanner();
-			multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.js"));
+			multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.js")); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -196,7 +196,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (singleLineCommentScanner == null)
 		{
 			singleLineCommentScanner = new RuleBasedScanner();
-			singleLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.line.double-slash.js"));
+			singleLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.line.double-slash.js")); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}

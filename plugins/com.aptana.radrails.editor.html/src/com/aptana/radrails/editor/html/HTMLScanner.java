@@ -47,6 +47,6 @@ public class HTMLScanner extends RuleBasedScanner {
 		IRule[] rules = new IRule[1];
 		rules[0] = new WhitespaceRule(new WhitespaceDetector());
 		setRules(rules);
-		setDefaultReturnToken(ThemeUtil.getToken("text"));
+		setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
 	}
 }

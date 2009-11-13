@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.js;
  */
 public interface IJSConstants {
 
-	public String CONTENT_TYPE_JS = "com.aptana.radrails.contenttype.js";
+	public String CONTENT_TYPE_JS = "com.aptana.radrails.contenttype.js"; //$NON-NLS-1$
 }
