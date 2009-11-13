@@ -46,6 +46,18 @@ public class FileWatcher
 					FileWatcherPlugin.log(e);
 				}
 			}
+			else if (osName.startsWith("mac os x")) //$NON-NLS-1$
+			{
+				try
+				{
+					_instance = (IJNotify) Class
+							.forName("net.contentobjects.jnotify.macosx.JNotifyAdapterMacOSX").newInstance(); //$NON-NLS-1$
+				}
+				catch (Exception e)
+				{
+					FileWatcherPlugin.log(e);
+				}
+			}
 			if (_instance == null)
 			{
 				_instance = new PollingNotifier();
