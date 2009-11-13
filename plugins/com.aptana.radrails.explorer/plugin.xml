@@ -27,12 +27,6 @@
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
             </contentExtension>
-            <contentExtension
-                  pattern="com.aptana.radrails.explorer.filters.hideNonRailsProjects">
-            </contentExtension>
-            <contentExtension
-                  pattern="com.aptana.radrails.explorer.filters.hideNonActiveProjects">
-            </contentExtension>
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -43,41 +37,6 @@
             </actionExtension>
          </includes>
       </viewerActionBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <commonFilter
-            id="com.aptana.radrails.explorer.filters.hideNonRailsProjects"
-            name="%commonFilter.name">
-         <filterExpression>
-            <not>
-               <adapt
-                     type="org.eclipse.core.resources.IProject">
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.radrails.rails.core.railsnature">
-                  </test>
-               </adapt>
-            </not>
-         </filterExpression>
-      </commonFilter>
-      <commonFilter
-            activeByDefault="true"
-            id="com.aptana.radrails.explorer.filters.hideNonActiveProjects"
-            name="%commonFilter.name.0">
-             <filterExpression>
-            <not>
-               <adapt
-                     type="org.eclipse.core.resources.IResource">
-                  <test
-                        args="com.aptana.radrails.explorer.activeProject,true"
-                        property="org.eclipse.core.resources.projectPersistentProperty"
-                        value="true">
-                  </test>
-               </adapt>
-            </not>
-         </filterExpression>
-      </commonFilter>
    </extension>
 
 </plugin>
