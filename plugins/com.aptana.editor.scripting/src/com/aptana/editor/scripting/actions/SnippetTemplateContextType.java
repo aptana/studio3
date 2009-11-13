@@ -7,8 +7,8 @@ import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.TemplateContextType;
 
 class SnippetTemplateContextType extends TemplateContextType {
-	SnippetTemplateContextType() {
-		super("snippets");
+	SnippetTemplateContextType(String scope) {
+		super(scope);
 		addGlobalResolvers();
 	}
 

@@ -24,12 +24,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.scripting.Activator;
+import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+import com.aptana.radrails.editor.common.QualifiedContentType;
+import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.Snippet;
 
 class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
-	private static final SnippetTemplateContextType SNIPPET_TEMPLATE_CONTEXT_TYPE = new SnippetTemplateContextType();
 	private final ExpandSnippetAction expandSnippet;
 
 	public SnippetsCompletionProcessor(ExpandSnippetAction expandSnippet) {
@@ -37,9 +39,23 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	}
 
 	@Override
-	protected TemplateContextType getContextType(ITextViewer viewer,
-			IRegion region) {
-		return SNIPPET_TEMPLATE_CONTEXT_TYPE;
+	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
+		String contentTypeString = "";
+		IDocument document = viewer.getDocument();
+		try {
+			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength() );
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+		}
+		return new SnippetTemplateContextType(contentTypeString);
+	}
+	
+	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException {
+		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
+		if (contentType != null) {
+			return ContentTypeTranslation.getDefault().translate(contentType).toString();
+		}
+		return document.getContentType(offset);
 	}
 
 	@Override
@@ -49,15 +65,14 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
-		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope("source.ruby.rails");
+		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
 		List<Template> templates = new LinkedList<Template>();
 		for (Snippet snippet : snippetsFromScope) {
 			String expansion = snippet.getExpansion();
-			
 			templates.add(new SnippetTemplate(
 					snippet.getTrigger(),
 					snippet.getDisplayName(),
-					"snippets", 
+					contextTypeId, 
 					processExpansion(expansion),
 					true));
 		}
