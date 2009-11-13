@@ -84,20 +84,20 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	// Transform Textmate variable syntax into Eclipse variable syntax
 	private static String processExpansion(String expansion) {
 		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}"));
-		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}"));
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		// transform ${n:default value} to ${default value:n} where n is a digit
 		expansion = expansion.replaceAll(
-				  "\\$\\{" 
+				  "\\$\\{"        //$NON-NLS-1$
 				+ SPACES
-				+ "(\\d)"
+				+ "(\\d)"         //$NON-NLS-1$
 				+ SPACES
-				+ ":"
+				+ ":"             //$NON-NLS-1$
 				+ SPACES
-				+ "(\\w+)"
-				+ "\\}"
-				,"\\${$2:$1}");
+				+ "(\\w+)"        //$NON-NLS-1$
+				+ "\\}"           //$NON-NLS-1$
+				,"\\${$2:$1}");   //$NON-NLS-1$
 		return expansion;
 	}
 	
@@ -111,9 +111,9 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				snippetTemplateProposal.setTemplateProposals(completionProposals);
 				Template template = snippetTemplateProposal.getTemplateSuper();
 				StyledString styledString =
-					new StyledString(String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER);
+					new StyledString(String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
 				
-				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER));
+				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$
 
 				if (i < 9) {
 					char triggerChar = (char)('1'+i);
@@ -178,7 +178,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
 			}
 			
-			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont");
+			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont"); //$NON-NLS-1$
 		}
 	}
 	

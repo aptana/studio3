@@ -11,13 +11,16 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
+import com.aptana.editor.scripting.Activator;
+
 public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	
 	public static IAction create(ITextEditor textEditor) {
-		return new ExecuteLineInsertingResultAction(ResourceBundle.getBundle(ExecuteLineInsertingResultAction.class.getName()), "ExecuteLineInsertingResultAction.", textEditor);
+		return new ExecuteLineInsertingResultAction(ResourceBundle.getBundle(ExecuteLineInsertingResultAction.class.getName()),
+				"ExecuteLineInsertingResultAction.", textEditor); //$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.ExecuteLineInsertingResult";
+	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.ExecuteLineInsertingResult"; //$NON-NLS-1$
 	
 	private ITextViewer textViewer;
 	private StyledText textWidget;
@@ -61,7 +64,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 				}
 				styledText.replaceTextRange(startOffsetOfLineAtCaret, 0, prefix + output);
 			} catch (InterruptedException e) {
-				// TODO
+				Activator.logError("Failed to read output.", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -76,7 +79,6 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 			return;
 		}
 		if (textWidget != null) {
-			// TODO
 			if (Boolean.TRUE.booleanValue()) {
 				activate();
 				return;
