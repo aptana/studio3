@@ -21,6 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
 import org.jruby.anno.JRubyMethod;
 
@@ -29,11 +30,14 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
+	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Red Bundles"; //$NON-NLS-1$
+	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Red Bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String BUNDLES_FOLDER_NAME = "bundles"; //$NON-NLS-1$
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
+	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
 
 	private List<Bundle> _bundles;
@@ -228,6 +232,30 @@ public class BundleManager
 	}
 
 	/**
+	 * getUserBundlePath
+	 * 
+	 * @return
+	 */
+	public String getUserBundlePath()
+	{
+		String OS = Platform.getOS();
+		String userHome = System.getProperty(USER_HOME_PROPERTY);
+		String result = null;
+		
+		// TODO: define user bundle paths for other platforms
+		if (OS.equals(Platform.OS_MACOSX))
+		{
+			result = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+		}
+		else
+		{
+			result = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * loadBundles
 	 */
 	public void loadBundles()
@@ -252,30 +280,25 @@ public class BundleManager
 	 */
 	private void loadUserBundles()
 	{
-		String userHomePath = System.getProperty("user.home");
+		String userBundlesPath = this.getUserBundlePath();
 		
-		if (userHomePath != null && userHomePath.length() > 0)
+		if (userBundlesPath != null && userBundlesPath.length() > 0)
 		{
-			File userHome = new File(userHomePath);
+			File userBundles = new File(userBundlesPath);
 			
-			if (userHome.exists() && userHome.isDirectory() && userHome.canRead())
+			if (userBundles.exists() && userBundles.isDirectory() && userBundles.canRead())
 			{
-				File bundlesFolder = new File(userHome.getAbsoluteFile() + File.separator + BUNDLES_FOLDER_NAME);
-				
-				if (bundlesFolder.exists() && bundlesFolder.canRead())
+				File[] bundles = userBundles.listFiles(new FileFilter()
 				{
-					File[] bundles = bundlesFolder.listFiles(new FileFilter()
+					public boolean accept(File pathname)
 					{
-						public boolean accept(File pathname)
-						{
-							return pathname.isDirectory() && pathname.canRead();
-						}
-					});
-					
-					for (File bundle : bundles)
-					{
-						this.processBundle(bundle, true);
+						return pathname.isDirectory() && pathname.canRead();
 					}
+				});
+				
+				for (File bundle : bundles)
+				{
+					this.processBundle(bundle, true);
 				}
 			}
 		}
