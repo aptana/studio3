@@ -9,13 +9,47 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.IStartingDirectory;
 import com.aptana.terminal.TerminalBrowser;
 
-public class TerminalEditor extends EditorPart
+public class TerminalEditor extends EditorPart implements IStartingDirectory
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 	
-	private TerminalBrowser browser;
+	private TerminalBrowser _browser;
+	private String _startingDirectory;
+
+	/**
+	 * TerminalEditor
+	 */
+	public TerminalEditor()
+	{
+		this(null);
+	}
+	
+	/**
+	 * TerminalEditor
+	 * 
+	 * @param startingDirectory
+	 */
+	public TerminalEditor(String startingDirectory)
+	{
+		this._startingDirectory = startingDirectory;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	public void createPartControl(Composite parent)
+	{
+		this._browser = new TerminalBrowser(this);
+		this._browser.createControl(parent);
+		
+		// Create the help context id for the viewer's control
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -24,10 +58,10 @@ public class TerminalEditor extends EditorPart
 	@Override
 	public void dispose()
 	{
-		if (this.browser != null)
+		if (this._browser != null)
 		{
-			this.browser.dispose();
-			this.browser = null;
+			this._browser.dispose();
+			this._browser = null;
 		}
 		
 		super.dispose();
@@ -49,6 +83,14 @@ public class TerminalEditor extends EditorPart
 	@Override
 	public void doSaveAs()
 	{
+	}
+
+	/**
+	 * getStartingDirectory
+	 */
+	public String getStartingDirectory()
+	{
+		return this._startingDirectory;
 	}
 
 	/*
@@ -87,25 +129,11 @@ public class TerminalEditor extends EditorPart
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
-	@Override
-	public void createPartControl(Composite parent)
-	{
-		this.browser = new TerminalBrowser(this);
-		this.browser.createControl(parent);
-		
-		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.browser.getControl(), ID);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
 	public void setFocus()
 	{
-		browser.setFocus();
+		_browser.setFocus();
 	}
 }
