@@ -51,16 +51,6 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	protected Template[] getTemplates(String contextTypeId) {
 		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope("source.ruby.rails");
 		List<Template> templates = new LinkedList<Template>();
-		templates.add(new SnippetTemplate("contact",
-				"Insert Contact",
-				"snippets", 
-				  "----------------------------\n"
-				+ "First Name : ${firstName:2}\n"
-				+ "Last Name  : ${lastName:1}\n"
-				+ "Full Name  : Mr./Mrs./Ms. ${firstName}, ${lastName}\n"
-				+ "Description: ${0}\n"
-				+ "----------------------------\n"
-				,true));
 		for (Snippet snippet : snippetsFromScope) {
 			String expansion = snippet.getExpansion();
 			
