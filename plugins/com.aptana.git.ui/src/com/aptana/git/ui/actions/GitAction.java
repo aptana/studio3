@@ -1,9 +1,7 @@
 package com.aptana.git.ui.actions;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -22,10 +20,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitRepository;
@@ -37,12 +39,61 @@ import com.aptana.git.ui.internal.actions.Messages;
  * 
  * @author cwilliams
  */
-public abstract class GitAction extends Action implements IObjectActionDelegate
+public abstract class GitAction extends Action implements IObjectActionDelegate, IWorkbenchWindowActionDelegate
 {
 
 	private ISelection selection;
 	private Shell shell;
 	private IWorkbenchPart targetPart;
+	private IWorkbenchWindow window;
+
+	private ISelectionListener selectionListener = new ISelectionListener()
+	{
+		public void selectionChanged(IWorkbenchPart part, ISelection selection)
+		{
+			if (selection instanceof IStructuredSelection)
+				GitAction.this.selection = selection;
+		}
+	};
+
+	private IPartListener2 targetPartListener = new IPartListener2()
+	{
+		public void partActivated(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partBroughtToTop(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partClosed(IWorkbenchPartReference partRef)
+		{
+			if (targetPart == partRef.getPart(false))
+			{
+				targetPart = null;
+			}
+		}
+
+		public void partDeactivated(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partHidden(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partInputChanged(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partOpened(IWorkbenchPartReference partRef)
+		{
+		}
+
+		public void partVisible(IWorkbenchPartReference partRef)
+		{
+		}
+	};
 
 	public abstract void run();
 
@@ -53,7 +104,36 @@ public abstract class GitAction extends Action implements IObjectActionDelegate
 
 	public void selectionChanged(IAction action, ISelection selection)
 	{
-		this.selection = selection;
+		if (selection instanceof IStructuredSelection)
+		{
+			this.selection = selection;
+		}
+	}
+
+	public void init(IWorkbenchWindow window)
+	{
+		this.window = window;
+		this.shell = window.getShell();
+		window.getSelectionService().addPostSelectionListener(selectionListener);
+		window.getActivePage().addPartListener(targetPartListener);
+	}
+
+	public void dispose()
+	{
+		if (window != null)
+		{
+			window.getSelectionService().removePostSelectionListener(selectionListener);
+			if (window.getActivePage() != null)
+			{
+				window.getActivePage().removePartListener(targetPartListener);
+			}
+			targetPartListener = null;
+		}
+		// Don't hold on to anything when we are disposed to prevent memory leaks (see bug 195521)
+		selection = null;
+		window = null;
+		targetPart = null;
+		shell = null;
 	}
 
 	protected IResource[] getSelectedResources()
@@ -63,7 +143,7 @@ public abstract class GitAction extends Action implements IObjectActionDelegate
 		if (!(this.selection instanceof IStructuredSelection))
 			return new IResource[0];
 
-		List<IResource> resources = new ArrayList<IResource>();
+		Set<IResource> resources = new HashSet<IResource>();
 		IStructuredSelection structured = (IStructuredSelection) this.selection;
 		for (Object element : structured.toList())
 		{
