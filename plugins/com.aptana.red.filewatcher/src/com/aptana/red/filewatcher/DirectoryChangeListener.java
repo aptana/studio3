@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - initial implementation and ideas 
  *******************************************************************************/
-package com.aptana.util.directorywatcher;
+package com.aptana.red.filewatcher;
 
 import java.io.File;
 

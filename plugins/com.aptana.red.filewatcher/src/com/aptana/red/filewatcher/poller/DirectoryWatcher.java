@@ -9,20 +9,18 @@
  *  aQute - initial implementation and ideas 
  *  IBM Corporation - initial adaptation to Equinox provisioning use
  *******************************************************************************/
-package com.aptana.util.directorywatcher;
+package com.aptana.red.filewatcher.poller;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.util.UtilPlugin;
+import com.aptana.red.filewatcher.DirectoryChangeListener;
 
-public class DirectoryWatcher
+class DirectoryWatcher
 {
 
 	public class WatcherThread extends Thread
@@ -73,7 +71,7 @@ public class DirectoryWatcher
 
 	public static void log(String string, Throwable e)
 	{
-		UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, string, e));
+		// UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, string, e));
 	}
 
 	final File[] directories;
@@ -81,20 +79,15 @@ public class DirectoryWatcher
 	private Set<File> scannedFiles = new HashSet<File>();
 	private Set<File> removals;
 	private WatcherThread watcher;
+	private boolean watchSubdirs;
 
-	public DirectoryWatcher(File directory)
+	public DirectoryWatcher(File directory, boolean watchSubtree)
 	{
 		if (directory == null)
 			throw new IllegalArgumentException(Messages.null_folder);
 
 		this.directories = new File[] { directory };
-	}
-
-	public DirectoryWatcher(File[] directories)
-	{
-		if (directories == null)
-			throw new IllegalArgumentException(Messages.null_folder);
-		this.directories = directories;
+		this.watchSubdirs = watchSubtree;
 	}
 
 	public synchronized void addListener(DirectoryChangeListener listener)
@@ -180,9 +173,8 @@ public class DirectoryWatcher
 				if (isInterested(listener, file))
 					processFile(file, listener);
 			}
-			if (file.isDirectory())
+			if (watchSubdirs && file.isDirectory())
 			{
-				// TODO Ask listener if we should scan the subdir, so we can short circuit this stuff!
 				scanDirectoryRecursively(file);
 			}
 		}
