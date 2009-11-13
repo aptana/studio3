@@ -51,7 +51,7 @@ public class TerminalBrowser
 	{
 		this._browser = new Browser(parent, SWT.NONE);
 		
-		HttpServer.getInstance().createProcess(this._id);
+		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
 		String url = NLS.bind(TERMINAL_URL, new Object[] {HttpServer.getInstance().getHost(), HttpServer.getInstance().getPort()}) + "?id=" + this._id;  //$NON-NLS-1$
 		this.setUrl(url);
 		
@@ -189,6 +189,23 @@ public class TerminalBrowser
 	public Control getControl()
 	{
 		return this._browser;
+	}
+	
+	/**
+	 * getStartingDirectory
+	 * 
+	 * @return
+	 */
+	public String getStartingDirectory()
+	{
+		String result = null;
+		
+		if (this._owningPart instanceof IStartingDirectory)
+		{
+			result = ((IStartingDirectory) this._owningPart).getStartingDirectory();
+		}
+		
+		return result;
 	}
 	
 	/**
