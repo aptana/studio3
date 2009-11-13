@@ -19,7 +19,7 @@ import com.aptana.terminal.Activator;
 
 public class ProcessWrapper
 {
-	private static final String USER_HOME_PROPERTY = "user.home";
+	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
@@ -65,7 +65,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = new String[] { "/K", "cd" };
+			result = new String[] { "/K", "cd" }; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		return result;
@@ -83,7 +83,7 @@ public class ProcessWrapper
 		
 		if (OS.equals(Platform.OS_WIN32))
 		{
-			result = "cmd.exe";
+			result = "cmd.exe"; //$NON-NLS-1$
 		}
 		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{

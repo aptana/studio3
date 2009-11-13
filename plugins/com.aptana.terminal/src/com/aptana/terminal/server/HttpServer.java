@@ -162,7 +162,7 @@ public class HttpServer extends Thread
 	public String getHost()
 	{
 		if (this.serverSocket == null)
-			return "127.0.0.1";
+			return "127.0.0.1"; //$NON-NLS-1$
 		return this.serverSocket.getInetAddress().getHostAddress();
 	}
 

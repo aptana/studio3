@@ -27,8 +27,8 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 		String userBundlesRoot = BundleManager.getInstance().getUserBundlePath().toLowerCase();
 		
 		// TODO: make this work on win32
-		USER_BUNDLE_PATTERN = Pattern.compile(userBundlesRoot + "/.+?/bundle\\.rb$");
-		USER_FILE_PATTERN = Pattern.compile(userBundlesRoot + "/.+?/(?:commands|snippets)/[^/]+\\.rb$");
+		USER_BUNDLE_PATTERN = Pattern.compile(userBundlesRoot + "/.+?/bundle\\.rb$"); //$NON-NLS-1$
+		USER_FILE_PATTERN = Pattern.compile(userBundlesRoot + "/.+?/(?:commands|snippets)/[^/]+\\.rb$"); //$NON-NLS-1$
 	}
 	
 	/*

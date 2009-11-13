@@ -8,6 +8,7 @@ public class Messages extends NLS
 	public static String BundleManager_Cannot_Locate_Built_Ins_Directory;
 	public static String BundleManager_Malformed_Built_Ins_URI;
 	public static String BundleManager_Missing_Bundle_File;
+	public static String BundleManager_NO_BUNDLES;
 	static
 	{
 		// initialize resource bundle

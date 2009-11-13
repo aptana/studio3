@@ -530,7 +530,7 @@ public class BundleManager
 		}
 		else
 		{
-			System.out.println("No bundles loaded");
+			System.out.println(Messages.BundleManager_NO_BUNDLES);
 		}
 	}
 }
