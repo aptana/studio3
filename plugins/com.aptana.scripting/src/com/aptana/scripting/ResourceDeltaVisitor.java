@@ -125,12 +125,10 @@ public class ResourceDeltaVisitor implements IResourceDeltaVisitor
 			switch (delta.getKind())
 			{
 				case IResourceDelta.ADDED:
-					System.out.println("Added");
 					BundleManager.getInstance().processSnippetOrCommand(file);
 					break;
 
 				case IResourceDelta.REMOVED:
-					System.out.println("Removed");
 					BundleManager.getInstance().removeSnippetOrCommand(file);
 					break;
 
