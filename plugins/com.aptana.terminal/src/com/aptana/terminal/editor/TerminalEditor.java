@@ -4,6 +4,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
@@ -12,10 +14,10 @@ import com.aptana.terminal.Activator;
 import com.aptana.terminal.IStartingDirectory;
 import com.aptana.terminal.TerminalBrowser;
 
-public class TerminalEditor extends EditorPart implements IStartingDirectory
+public class TerminalEditor extends EditorPart implements IStartingDirectory, IPersistableEditor
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
-	
+
 	private TerminalBrowser _browser;
 	private String _startingDirectory;
 
@@ -26,7 +28,7 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory
 	{
 		this(null);
 	}
-	
+
 	/**
 	 * TerminalEditor
 	 * 
@@ -36,7 +38,7 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory
 	{
 		this._startingDirectory = startingDirectory;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -46,7 +48,7 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory
 	{
 		this._browser = new TerminalBrowser(this);
 		this._browser.createControl(parent);
-		
+
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
 	}
@@ -63,7 +65,7 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory
 			this._browser.dispose();
 			this._browser = null;
 		}
-		
+
 		super.dispose();
 	}
 
@@ -125,6 +127,24 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory
 	public boolean isSaveAsAllowed()
 	{
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
+	 */
+	public void restoreState(IMemento memento)
+	{
+		// System.out.println("TerminalEditor: Restore State");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
+	 */
+	public void saveState(IMemento memento)
+	{
+		// System.out.println("TerminalEditor: Save State");
 	}
 
 	/*
