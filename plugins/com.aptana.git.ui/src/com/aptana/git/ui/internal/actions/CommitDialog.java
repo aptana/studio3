@@ -1,16 +1,26 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
@@ -35,19 +45,27 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchActionConstants;
 
+import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.DiffFormatter;
 
-public class CommitDialog extends StatusDialog
+public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 {
 	private GitRepository gitRepository;
 	private Text commitMessage;
@@ -91,9 +109,10 @@ public class CommitDialog extends StatusDialog
 
 		validate();
 
+		GitRepository.addListener(this); // FIXME How do I unregister? No dispose method!
 		return container;
 	}
-
+	
 	private void createDiffArea(Composite container)
 	{
 		diffArea = new Browser(container, SWT.BORDER);
@@ -307,6 +326,39 @@ public class CommitDialog extends StatusDialog
 				updateDiff(DiffFormatter.toHTML(diff));
 			}
 		});
+		
+		if (!staged)
+		{
+			final Table myTable = table;
+			MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+			menuMgr.setRemoveAllWhenShown(true);
+			menuMgr.addMenuListener(new IMenuListener()
+			{
+				public void menuAboutToShow(IMenuManager manager)
+				{
+					RevertAction revertAction = new RevertAction();
+					TableItem[] selected = myTable.getSelection();
+					List<IResource> files = new ArrayList<IResource>();
+					for (TableItem item : selected)
+					{
+						String filePath = item.getText(1);
+						String workingDirectory = gitRepository.workingDirectory();
+
+						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
+								new Path(workingDirectory).append(filePath));
+						if (file != null)
+							files.add(file);
+					}
+					revertAction.selectionChanged(null, new StructuredSelection(files));
+					manager.add(revertAction);
+					// Other plug-ins can contribute there actions here
+					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+				}
+			});
+			Menu menu = menuMgr.createContextMenu(table);
+			table.setMenu(menu);
+		}
+		
 		return table;
 	}
 
@@ -447,6 +499,57 @@ public class CommitDialog extends StatusDialog
 		{
 			dtarget.setDropTargetEffect(new TableDropTargetEffect(sourceDragTable));
 		}
+	}
+
+	public void branchChanged(BranchChangedEvent e)
+	{
+		// ignore(?)
+	}
+	
+	@Override
+	public boolean close()
+	{
+		GitRepository.removeListener(this);
+		return super.close();
+	}
+
+	public void indexChanged(IndexChangedEvent e)
+	{
+		refreshTables();
+	}
+
+	private void refreshTables()
+	{
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			
+			public void run()
+			{
+				stagedTable.setRedraw(false);
+				unstagedTable.setRedraw(false);
+				stagedTable.removeAll();
+				unstagedTable.removeAll();
+				for (ChangedFile file : gitRepository.index().changedFiles())
+				{
+					Table table = unstagedTable;
+					if (file.hasStagedChanges())
+						table = stagedTable;
+					createTableItem(table, file);			
+				}
+				stagedTable.setRedraw(true);
+				unstagedTable.setRedraw(true);
+			}
+		});
+	}
+
+	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+		// ignore	
+	}
+
+	public void repositoryRemoved(RepositoryRemovedEvent e)
+	{
+		// ignore		
 	}
 
 }

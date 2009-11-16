@@ -25,6 +25,7 @@ public class Messages extends NLS
 	public static String CommitDialog_StageFilesFirst_Error;
 	public static String DisconnectProviderOperation_DisconnectJob_Title;
 	public static String PullAction_RefreshJob_Title;
+	public static String RevertAction_Label;
 	public static String RevertAction_RefreshJob_Title;
 	static
 	{

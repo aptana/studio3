@@ -52,7 +52,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 							expandSnippet.setDeactivated(true);
 							final LinkedModeModel linkedModeModel = LinkedModeModel.getModel(document, offset);
 							final VerifyKeyListener keyListener = new VerifyKeyListener() {
-								@Override
 								public void verifyKey(VerifyEvent event) {
 									Point selection= viewer.getSelectedRange();
 									int offset= selection.x;
@@ -66,11 +65,9 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 							
 							final MouseListener mouseListener = new MouseListener() {
 								
-								@Override
 								public void mouseUp(MouseEvent e) {
 								}
 								
-								@Override
 								public void mouseDown(MouseEvent e) {
 									Point selection= viewer.getSelectedRange();
 									int offset= selection.x;
@@ -81,7 +78,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 									}
 								}
 								
-								@Override
 								public void mouseDoubleClick(MouseEvent e) {
 									
 								}
