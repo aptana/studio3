@@ -272,6 +272,7 @@ public class CommitDialog extends StatusDialog
 					}
 					removeDraggedFilesFromSource(sourceDragTable, draggedFiles);
 					workaroundEmptyTableDropEffectBug(sourceDragTable);
+					validate();
 				}
 			}
 		});
