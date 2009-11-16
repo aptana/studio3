@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::StreamUI::SimpleProgressReporter::new
+params: (out_stream, size, initial_message, terminal_message = "complete")
+name: new
+is_singleton: true
+aliases: []
+

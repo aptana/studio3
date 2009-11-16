@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Commands::QueryCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/query_command.rb, line 13</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">name</span> = <span class="ruby-value str">'query'</span>,
+                 <span class="ruby-identifier">summary</span> = <span class="ruby-value str">'Query gem information in local or remote repositories'</span>)
+    <span class="ruby-keyword kw">super</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">summary</span>,
+         <span class="ruby-identifier">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-regexp re">//</span>, <span class="ruby-identifier">:domain</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:local</span>, <span class="ruby-identifier">:details</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">:versions</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+         <span class="ruby-identifier">:installed</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">:version</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-i'</span>, <span class="ruby-value str">'--[no-]installed'</span>,
+               <span class="ruby-value str">'Check for installed gem'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:installed</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_version_option</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-n'</span>, <span class="ruby-value str">'--name-matches REGEXP'</span>,
+               <span class="ruby-value str">'Name of gem(s) to query on matches the'</span>,
+               <span class="ruby-value str">'provided REGEXP'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:name</span>] = <span class="ruby-node">/#{value}/i</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-d'</span>, <span class="ruby-value str">'--[no-]details'</span>,
+               <span class="ruby-value str">'Display detailed information of gem(s)'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:details</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(      <span class="ruby-value str">'--[no-]versions'</span>,
+               <span class="ruby-value str">'Display only gem names'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:versions</span>] = <span class="ruby-identifier">value</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:details</span>] = <span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(<span class="ruby-value str">'-a'</span>, <span class="ruby-value str">'--all'</span>,
+               <span class="ruby-value str">'Display all gem versions'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_option</span>(      <span class="ruby-value str">'--prerelease'</span>,
+               <span class="ruby-value str">'Display prerelease versions'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">value</span>, <span class="ruby-identifier">options</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prerelease</span>] = <span class="ruby-identifier">value</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">add_local_remote_options</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

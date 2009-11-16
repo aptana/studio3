@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Need to be able to set the sources without calling Gem.sources.replace since
+    that would cause an infinite loop.
+full_name: Gem::sources=
+params: (new_sources)
+name: sources=
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return a progress reporter object chosen from the current verbosity.
+full_name: Gem::StreamUI#progress_reporter
+params: (*args)
+name: progress_reporter
+is_singleton: false
+aliases: []
+

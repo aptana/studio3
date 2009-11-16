@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: io
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add file <tt>name</tt> with permissions <tt>mode</tt> <tt>size</tt> bytes
+    long. Yields an IO to write the file to.
+full_name: Gem::Package::TarWriter#add_file_simple
+params: (name, mode, size) {|io| ...}
+name: add_file_simple
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>bin_path (Gem)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems.rb, line 367</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bin_path</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">exec_name</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">version_requirements</span>)
+    <span class="ruby-identifier">version_requirements</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span> <span class="ruby-keyword kw">if</span>
+      <span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">empty?</span>
+    <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">version_requirements</span>).<span class="ruby-identifier">last</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">GemNotFoundException</span>,
+          <span class="ruby-node">&quot;can't find gem #{name} (#{version_requirements})&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">spec</span>
+
+    <span class="ruby-identifier">exec_name</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">default_executable</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">exec_name</span>
+      <span class="ruby-identifier">msg</span> = <span class="ruby-node">&quot;no default executable for #{spec.full_name}&quot;</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-identifier">msg</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">exec_name</span>
+      <span class="ruby-identifier">msg</span> = <span class="ruby-node">&quot;can't find executable #{exec_name} for #{spec.full_name}&quot;</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-identifier">msg</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">full_gem_path</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">exec_name</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

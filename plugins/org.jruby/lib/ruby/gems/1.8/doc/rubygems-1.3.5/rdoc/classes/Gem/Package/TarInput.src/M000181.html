@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Package::TarInput)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_input.rb, line 23</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">io</span>, <span class="ruby-identifier">security_policy</span> = <span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-ivar">@io</span> = <span class="ruby-identifier">io</span>
+    <span class="ruby-ivar">@tarreader</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarReader</span>.<span class="ruby-identifier">new</span> <span class="ruby-ivar">@io</span>
+    <span class="ruby-identifier">has_meta</span> = <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-identifier">data_sig</span>, <span class="ruby-identifier">meta_sig</span>, <span class="ruby-identifier">data_dgst</span>, <span class="ruby-identifier">meta_dgst</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">dgst_algo</span> = <span class="ruby-identifier">security_policy</span> <span class="ruby-value">? </span><span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">OPT</span>[<span class="ruby-identifier">:dgst_algo</span>] <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-ivar">@tarreader</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">full_name</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value str">&quot;metadata&quot;</span>
+        <span class="ruby-ivar">@metadata</span> = <span class="ruby-identifier">load_gemspec</span> <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>
+        <span class="ruby-identifier">has_meta</span> = <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value str">&quot;metadata.gz&quot;</span>
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-comment cmt"># if we have a security_policy, then pre-read the metadata file</span>
+          <span class="ruby-comment cmt"># and calculate it's digest</span>
+          <span class="ruby-identifier">sio</span> = <span class="ruby-keyword kw">nil</span>
+          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">security_policy</span>
+            <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_ssl_available</span>
+            <span class="ruby-identifier">sio</span> = <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>)
+            <span class="ruby-identifier">meta_dgst</span> = <span class="ruby-identifier">dgst_algo</span>.<span class="ruby-identifier">digest</span>(<span class="ruby-identifier">sio</span>.<span class="ruby-identifier">string</span>)
+            <span class="ruby-identifier">sio</span>.<span class="ruby-identifier">rewind</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">gzis</span> = <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">GzipReader</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sio</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">entry</span>)
+          <span class="ruby-comment cmt"># YAML wants an instance of IO</span>
+          <span class="ruby-ivar">@metadata</span> = <span class="ruby-identifier">load_gemspec</span>(<span class="ruby-identifier">gzis</span>)
+          <span class="ruby-identifier">has_meta</span> = <span class="ruby-keyword kw">true</span>
+        <span class="ruby-keyword kw">ensure</span>
+          <span class="ruby-identifier">gzis</span>.<span class="ruby-identifier">close</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gzis</span>.<span class="ruby-identifier">nil?</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'metadata.gz.sig'</span>
+        <span class="ruby-identifier">meta_sig</span> = <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'data.tar.gz.sig'</span>
+        <span class="ruby-identifier">data_sig</span> = <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'data.tar.gz'</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">security_policy</span>
+          <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_ssl_available</span>
+          <span class="ruby-identifier">data_dgst</span> = <span class="ruby-identifier">dgst_algo</span>.<span class="ruby-identifier">digest</span>(<span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">security_policy</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_ssl_available</span>
+
+      <span class="ruby-comment cmt"># map trust policy from string to actual class (or a serialized YAML</span>
+      <span class="ruby-comment cmt"># file, if that exists)</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">security_policy</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policies</span>.<span class="ruby-identifier">key?</span> <span class="ruby-identifier">security_policy</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-comment cmt"># load one of the pre-defined security policies</span>
+          <span class="ruby-identifier">security_policy</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policies</span>[<span class="ruby-identifier">security_policy</span>]
+        <span class="ruby-keyword kw">elsif</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">security_policy</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-comment cmt"># FIXME: this doesn't work yet</span>
+          <span class="ruby-identifier">security_policy</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">security_policy</span>)
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-node">&quot;Unknown trust policy '#{security_policy}'&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">data_sig</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">data_dgst</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">meta_sig</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">meta_dgst</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-comment cmt"># the user has a trust policy, and we have a signed gem</span>
+        <span class="ruby-comment cmt"># file, so use the trust policy to verify the gem signature</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">security_policy</span>.<span class="ruby-identifier">verify_gem</span>(<span class="ruby-identifier">data_sig</span>, <span class="ruby-identifier">data_dgst</span>, <span class="ruby-ivar">@metadata</span>.<span class="ruby-identifier">cert_chain</span>)
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Couldn't verify data signature: #{e}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">security_policy</span>.<span class="ruby-identifier">verify_gem</span>(<span class="ruby-identifier">meta_sig</span>, <span class="ruby-identifier">meta_dgst</span>, <span class="ruby-ivar">@metadata</span>.<span class="ruby-identifier">cert_chain</span>)
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Couldn't verify metadata signature: #{e}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">security_policy</span>.<span class="ruby-identifier">only_signed</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-value str">&quot;Unsigned gem&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-comment cmt"># FIXME: should display warning here (trust policy, but</span>
+        <span class="ruby-comment cmt"># either unsigned or badly signed gem file)</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@tarreader</span>.<span class="ruby-identifier">rewind</span>
+    <span class="ruby-ivar">@fileops</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">FileOperations</span>.<span class="ruby-identifier">new</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">FormatError</span>, <span class="ruby-value str">&quot;No metadata found!&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">has_meta</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

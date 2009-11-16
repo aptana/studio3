@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.ruby.RubySourceEditor"
+            default="true"
+            icon="icons/rb.gif"
+            id="com.aptana.radrails.editor.ruby"
+            name="%editor.rb.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.ruby">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="rb"
+            id="com.aptana.radrails.contenttype.ruby"
+            name="%content-type.rb.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

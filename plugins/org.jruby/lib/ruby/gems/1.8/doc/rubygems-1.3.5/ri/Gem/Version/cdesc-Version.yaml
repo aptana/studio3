@@ -1,0 +1,82 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Comparable
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The Version class processes string versions into comparable values. A version
+    string should normally be a series of numbers separated by periods. Each part
+    (digits separated by periods) is considered its own number, and these are used
+    for sorting. So for instance, 3.10 sorts higher than 3.2 because ten is greater
+    than two.
+- !ruby/struct:SM::Flow::P 
+  body: If any part contains letters (currently only a-z are supported) then that
+    version is considered prerelease. Versions with a prerelease part in the Nth part
+    sort less than versions with N-1 parts. Prerelease parts are sorted alphabetically
+    using the normal Ruby string sorting rules.
+- !ruby/struct:SM::Flow::P 
+  body: 'Prereleases sort between real releases (newest to oldest):'
+- !ruby/object:SM::Flow::LIST 
+  type: :NUMBER
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: "1.0"
+    label: "1."
+  - !ruby/struct:SM::Flow::LI 
+    body: 1.0.b
+    label: "2."
+  - !ruby/struct:SM::Flow::LI 
+    body: 1.0.a
+    label: "3."
+  - !ruby/struct:SM::Flow::LI 
+    body: "0.9"
+    label: "4."
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: R
+  name: version
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: <=>
+- !ruby/object:RI::MethodSummary 
+  name: balance
+- !ruby/object:RI::MethodSummary 
+  name: bump
+- !ruby/object:RI::MethodSummary 
+  name: eql?
+- !ruby/object:RI::MethodSummary 
+  name: marshal_dump
+- !ruby/object:RI::MethodSummary 
+  name: marshal_load
+- !ruby/object:RI::MethodSummary 
+  name: normalize
+- !ruby/object:RI::MethodSummary 
+  name: parts
+- !ruby/object:RI::MethodSummary 
+  name: prerelease?
+- !ruby/object:RI::MethodSummary 
+  name: release
+- !ruby/object:RI::MethodSummary 
+  name: to_s
+- !ruby/object:RI::MethodSummary 
+  name: to_yaml_properties
+- !ruby/object:RI::MethodSummary 
+  name: version=
+- !ruby/object:RI::MethodSummary 
+  name: yaml_initialize
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: correct?
+- !ruby/object:RI::MethodSummary 
+  name: create
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Version
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: '''[0-9]+(\.[0-9a-z]+)*'''
+  name: VERSION_PATTERN
+superclass: Object
+name: Version

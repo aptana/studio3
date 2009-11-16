@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Adds a pre-install hook that will be passed an Gem::Installer instance when
+    Gem::Installer#install is called
+full_name: Gem::pre_install
+params: (&hook)
+name: pre_install
+is_singleton: true
+aliases: []
+

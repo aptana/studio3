@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>generate_bin_symlink (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 368</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generate_bin_symlink</span>(<span class="ruby-identifier">filename</span>, <span class="ruby-identifier">bindir</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">win_platform?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">alert_warning</span> <span class="ruby-value str">&quot;Unable to use symlinks on Windows, installing wrapper&quot;</span>
+      <span class="ruby-identifier">generate_bin_script</span> <span class="ruby-identifier">filename</span>, <span class="ruby-identifier">bindir</span>
+      <span class="ruby-keyword kw">return</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">src</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_dir</span>, <span class="ruby-value str">'bin'</span>, <span class="ruby-identifier">filename</span>
+    <span class="ruby-identifier">dst</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">formatted_program_filename</span>(<span class="ruby-identifier">filename</span>)
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">dst</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">symlink?</span> <span class="ruby-identifier">dst</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">link</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">readlink</span>(<span class="ruby-identifier">dst</span>).<span class="ruby-identifier">split</span> <span class="ruby-constant">File</span><span class="ruby-operator">::</span><span class="ruby-constant">SEPARATOR</span>
+        <span class="ruby-identifier">cur_version</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">link</span>[<span class="ruby-value">-3</span>].<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/^.*-/</span>, <span class="ruby-value str">''</span>))
+        <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">cur_version</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">unlink</span> <span class="ruby-identifier">dst</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">symlink</span> <span class="ruby-identifier">src</span>, <span class="ruby-identifier">dst</span>, <span class="ruby-identifier">:verbose</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

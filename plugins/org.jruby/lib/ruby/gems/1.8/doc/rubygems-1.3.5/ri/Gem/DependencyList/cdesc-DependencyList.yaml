@@ -1,0 +1,40 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Enumerable
+- !ruby/object:RI::IncludedModule 
+  name: TSort
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add
+- !ruby/object:RI::MethodSummary 
+  name: dependency_order
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: find_name
+- !ruby/object:RI::MethodSummary 
+  name: ok?
+- !ruby/object:RI::MethodSummary 
+  name: ok_to_remove?
+- !ruby/object:RI::MethodSummary 
+  name: remove_by_name
+- !ruby/object:RI::MethodSummary 
+  name: spec_predecessors
+- !ruby/object:RI::MethodSummary 
+  name: tsort_each_child
+- !ruby/object:RI::MethodSummary 
+  name: tsort_each_node
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: from_source_index
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::DependencyList
+constants: []
+
+superclass: Object
+name: DependencyList

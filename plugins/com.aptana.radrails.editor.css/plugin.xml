@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.css.CSSSourceEditor"
+            default="true"
+            extensions="css"
+            icon="icons/css.png"
+            id="com.aptana.radrails.editor.css"
+            name="%editor.css.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.css">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="css"
+            id="com.aptana.radrails.contenttype.css"
+            name="%content-type.css.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

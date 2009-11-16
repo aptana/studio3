@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Get a single optional argument from the command line. If more than one argument
+    is given, return only the first. Return nil if none are given.
+full_name: Gem::Command#get_one_optional_argument
+params: ()
+name: get_one_optional_argument
+is_singleton: false
+aliases: []
+

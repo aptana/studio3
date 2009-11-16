@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>verify_gem (Gem::Security::Policy)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/security.rb, line 419</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">verify_gem</span>(<span class="ruby-identifier">signature</span>, <span class="ruby-identifier">data</span>, <span class="ruby-identifier">chain</span>, <span class="ruby-identifier">time</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>)
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_ssl_available</span>
+      <span class="ruby-identifier">cert_class</span> = <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">X509</span><span class="ruby-operator">::</span><span class="ruby-constant">Certificate</span>
+      <span class="ruby-identifier">exc</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>
+      <span class="ruby-identifier">chain</span> <span class="ruby-operator">||=</span> []
+
+      <span class="ruby-identifier">chain</span> = <span class="ruby-identifier">chain</span>.<span class="ruby-identifier">map</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">str</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cert_class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">str</span>) }
+      <span class="ruby-identifier">signer</span>, <span class="ruby-identifier">ch_len</span> = <span class="ruby-identifier">chain</span>[<span class="ruby-value">-1</span>], <span class="ruby-identifier">chain</span>.<span class="ruby-identifier">size</span>
+
+      <span class="ruby-comment cmt"># make sure signature is valid</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verify_data</span>
+        <span class="ruby-comment cmt"># get digest algorithm (TODO: this should be configurable)</span>
+        <span class="ruby-identifier">dgst</span> = <span class="ruby-ivar">@opt</span>[<span class="ruby-identifier">:dgst_algo</span>]
+
+        <span class="ruby-comment cmt"># verify the data signature (this is the most important part, so don't</span>
+        <span class="ruby-comment cmt"># screw it up :D)</span>
+        <span class="ruby-identifier">v</span> = <span class="ruby-identifier">signer</span>.<span class="ruby-identifier">public_key</span>.<span class="ruby-identifier">verify</span>(<span class="ruby-identifier">dgst</span>.<span class="ruby-identifier">new</span>, <span class="ruby-identifier">signature</span>, <span class="ruby-identifier">data</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;Invalid Gem Signature&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">v</span>
+
+        <span class="ruby-comment cmt"># make sure the signer is valid</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verify_signer</span>
+          <span class="ruby-comment cmt"># make sure the signing cert is valid right now</span>
+          <span class="ruby-identifier">v</span> = <span class="ruby-identifier">signer</span>.<span class="ruby-identifier">check_validity</span>(<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">time</span>)
+          <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-node">&quot;Invalid Signature: #{v[:desc]}&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">v</span>[<span class="ruby-identifier">:is_valid</span>]
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-comment cmt"># make sure the certificate chain is valid</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verify_chain</span>
+        <span class="ruby-comment cmt"># iterate down over the chain and verify each certificate against it's</span>
+        <span class="ruby-comment cmt"># issuer</span>
+        (<span class="ruby-identifier">ch_len</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">downto</span>(<span class="ruby-value">1</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">issuer</span>, <span class="ruby-identifier">cert</span> = <span class="ruby-identifier">chain</span>[<span class="ruby-identifier">i</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>, <span class="ruby-value">2</span>]
+          <span class="ruby-identifier">v</span> = <span class="ruby-identifier">cert</span>.<span class="ruby-identifier">check_validity</span>(<span class="ruby-identifier">issuer</span>, <span class="ruby-identifier">time</span>)
+          <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;%s: cert = '%s', error = '%s'&quot;</span> <span class="ruby-operator">%</span> [
+              <span class="ruby-value str">'Invalid Signing Chain'</span>, <span class="ruby-identifier">cert</span>.<span class="ruby-identifier">subject</span>, <span class="ruby-identifier">v</span>[<span class="ruby-identifier">:desc</span>]
+          ] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">v</span>[<span class="ruby-identifier">:is_valid</span>]
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-comment cmt"># verify root of chain</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verify_root</span>
+          <span class="ruby-comment cmt"># make sure root is self-signed</span>
+          <span class="ruby-identifier">root</span> = <span class="ruby-identifier">chain</span>[<span class="ruby-value">0</span>]
+          <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;%s: %s (subject = '%s', issuer = '%s')&quot;</span> <span class="ruby-operator">%</span> [
+              <span class="ruby-value str">'Invalid Signing Chain Root'</span>,
+              <span class="ruby-value str">'Subject does not match Issuer for Gem Signing Chain'</span>,
+              <span class="ruby-identifier">root</span>.<span class="ruby-identifier">subject</span>.<span class="ruby-identifier">to_s</span>,
+              <span class="ruby-identifier">root</span>.<span class="ruby-identifier">issuer</span>.<span class="ruby-identifier">to_s</span>,
+          ] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">root</span>.<span class="ruby-identifier">issuer</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">root</span>.<span class="ruby-identifier">subject</span>.<span class="ruby-identifier">to_s</span>
+
+          <span class="ruby-comment cmt"># make sure root is valid</span>
+          <span class="ruby-identifier">v</span> = <span class="ruby-identifier">root</span>.<span class="ruby-identifier">check_validity</span>(<span class="ruby-identifier">root</span>, <span class="ruby-identifier">time</span>)
+          <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;%s: cert = '%s', error = '%s'&quot;</span> <span class="ruby-operator">%</span> [
+              <span class="ruby-value str">'Invalid Signing Chain Root'</span>, <span class="ruby-identifier">root</span>.<span class="ruby-identifier">subject</span>, <span class="ruby-identifier">v</span>[<span class="ruby-identifier">:desc</span>]
+          ] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">v</span>[<span class="ruby-identifier">:is_valid</span>]
+
+          <span class="ruby-comment cmt"># verify that the chain root is trusted</span>
+          <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@only_trusted</span>
+            <span class="ruby-comment cmt"># get digest algorithm, calculate checksum of root.subject</span>
+            <span class="ruby-identifier">algo</span> = <span class="ruby-ivar">@opt</span>[<span class="ruby-identifier">:dgst_algo</span>]
+            <span class="ruby-identifier">path</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">Policy</span>.<span class="ruby-identifier">trusted_cert_path</span>(<span class="ruby-identifier">root</span>, <span class="ruby-ivar">@opt</span>)
+
+            <span class="ruby-comment cmt"># check to make sure trusted path exists</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;%s: cert = '%s', error = '%s'&quot;</span> <span class="ruby-operator">%</span> [
+                <span class="ruby-value str">'Untrusted Signing Chain Root'</span>,
+                <span class="ruby-identifier">root</span>.<span class="ruby-identifier">subject</span>.<span class="ruby-identifier">to_s</span>,
+                <span class="ruby-node">&quot;path \&quot;#{path}\&quot; does not exist&quot;</span>,
+            ] <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">path</span>)
+
+            <span class="ruby-comment cmt"># load calculate digest from saved cert file</span>
+            <span class="ruby-identifier">save_cert</span> = <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">X509</span><span class="ruby-operator">::</span><span class="ruby-constant">Certificate</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">path</span>))
+            <span class="ruby-identifier">save_dgst</span> = <span class="ruby-identifier">algo</span>.<span class="ruby-identifier">digest</span>(<span class="ruby-identifier">save_cert</span>.<span class="ruby-identifier">public_key</span>.<span class="ruby-identifier">to_s</span>)
+
+            <span class="ruby-comment cmt"># create digest of public key</span>
+            <span class="ruby-identifier">pkey_str</span> = <span class="ruby-identifier">root</span>.<span class="ruby-identifier">public_key</span>.<span class="ruby-identifier">to_s</span>
+            <span class="ruby-identifier">cert_dgst</span> = <span class="ruby-identifier">algo</span>.<span class="ruby-identifier">digest</span>(<span class="ruby-identifier">pkey_str</span>)
+
+            <span class="ruby-comment cmt"># now compare the two digests, raise exception</span>
+            <span class="ruby-comment cmt"># if they don't match</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-identifier">exc</span>, <span class="ruby-value str">&quot;%s: %s (saved = '%s', root = '%s')&quot;</span> <span class="ruby-operator">%</span> [
+                <span class="ruby-value str">'Invalid Signing Chain Root'</span>,
+                <span class="ruby-value str">&quot;Saved checksum doesn't match root checksum&quot;</span>,
+                <span class="ruby-identifier">save_dgst</span>, <span class="ruby-identifier">cert_dgst</span>,
+            ] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">save_dgst</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cert_dgst</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-comment cmt"># return the signing chain</span>
+        <span class="ruby-identifier">chain</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">cert</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cert</span>.<span class="ruby-identifier">subject</span> }
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

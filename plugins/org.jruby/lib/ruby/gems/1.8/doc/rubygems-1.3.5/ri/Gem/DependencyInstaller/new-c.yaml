@@ -1,0 +1,51 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Creates a new installer instance.
+- !ruby/struct:SM::Flow::P 
+  body: 'Options are:'
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: Alternate repository path to store .gem files in.
+    label: ":cache_dir:"
+  - !ruby/struct:SM::Flow::LI 
+    body: ":local, :remote, or :both. :local only searches gems in the current directory. \
+      :remote searches only gems in Gem::sources. :both searches both."
+    label: ":domain:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer::new.
+    label: ":env_shebang:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer#install.
+    label: ":force:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer#initialize.
+    label: ":format_executable:"
+  - !ruby/struct:SM::Flow::LI 
+    body: Don't install any dependencies.
+    label: ":ignore_dependencies:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer#install.
+    label: ":install_dir:"
+  - !ruby/struct:SM::Flow::LI 
+    body: Allow prerelease versions
+    label: ":prerelease:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer::new and Gem::Security.
+    label: ":security_policy:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer.new
+    label: ":user_install:"
+  - !ruby/struct:SM::Flow::LI 
+    body: See Gem::Installer::new
+    label: ":wrappers:"
+full_name: Gem::DependencyInstaller::new
+params: (options = {})
+name: new
+is_singleton: true
+aliases: []
+

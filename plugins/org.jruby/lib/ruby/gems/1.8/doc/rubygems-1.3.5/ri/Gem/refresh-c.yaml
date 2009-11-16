@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Refresh source_index from disk and clear searcher.
+full_name: Gem::refresh
+params: ()
+name: refresh
+is_singleton: true
+aliases: []
+

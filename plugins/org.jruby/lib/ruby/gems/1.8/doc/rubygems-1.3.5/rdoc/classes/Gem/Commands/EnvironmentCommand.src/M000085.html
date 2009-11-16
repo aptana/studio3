@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::EnvironmentCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/environment_command.rb, line 67</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">out</span> = <span class="ruby-value str">''</span>
+    <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:args</span>][<span class="ruby-value">0</span>]
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">arg</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^packageversion/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RubyGemsPackageVersion</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^version/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RubyGemsVersion</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^gemdir/</span>, <span class="ruby-regexp re">/^gemhome/</span>, <span class="ruby-regexp re">/^home/</span>, <span class="ruby-regexp re">/^GEM_HOME/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^gempath/</span>, <span class="ruby-regexp re">/^path/</span>, <span class="ruby-regexp re">/^GEM_PATH/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">path</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span><span class="ruby-operator">::</span><span class="ruby-constant">PATH_SEPARATOR</span>)
+    <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^remotesources/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>)
+    <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> = <span class="ruby-value str">&quot;RubyGems Environment:\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - RUBYGEMS VERSION: #{Gem::RubyGemsVersion}\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - RUBY VERSION: #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}&quot;</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; patchlevel #{RUBY_PATCHLEVEL}&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">RUBY_PATCHLEVEL</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;) [#{RUBY_PLATFORM}]\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - INSTALLATION DIRECTORY: #{Gem.dir}\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - RUBYGEMS PREFIX: #{Gem.prefix}\n&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">prefix</span>.<span class="ruby-identifier">nil?</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - RUBY EXECUTABLE: #{Gem.ruby}\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  - EXECUTABLE DIRECTORY: #{Gem.bindir}\n&quot;</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  - RUBYGEMS PLATFORMS:\n&quot;</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">platforms</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">platform</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;    - #{platform}\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  - GEM PATHS:\n&quot;</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;     - #{Gem.dir}\n&quot;</span>
+
+      <span class="ruby-identifier">path</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">path</span>.<span class="ruby-identifier">dup</span>
+      <span class="ruby-identifier">path</span>.<span class="ruby-identifier">delete</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>
+      <span class="ruby-identifier">path</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;     - #{p}\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  - GEM CONFIGURATION:\n&quot;</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;     - #{name.inspect} =&gt; #{value.inspect}\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  - REMOTE SOURCES:\n&quot;</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">sources</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;     - #{s}\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">fail</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">CommandLineError</span>, <span class="ruby-node">&quot;Unknown enviroment option [#{arg}]&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">say</span> <span class="ruby-identifier">out</span>
+    <span class="ruby-keyword kw">true</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

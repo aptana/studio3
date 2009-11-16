@@ -1,0 +1,26 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Look in all the installed gems until a matching <em>path</em> is found. Return
+    the <em>gemspec</em> of the gem where it was found. If no match is found, return
+    nil.
+- !ruby/struct:SM::Flow::P 
+  body: The gems are searched in alphabetical order, and in reverse version order.
+- !ruby/struct:SM::Flow::P 
+  body: 'For example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  find('log4r')              # -&gt; (log4r-1.1 spec)\n  find('log4r.rb') \
+    \          # -&gt; (log4r-1.1 spec)\n  find('rake/rdoctask')      # -&gt; (rake-0.4.12 \
+    spec)\n  find('foobarbaz')          # -&gt; nil\n"
+- !ruby/struct:SM::Flow::P 
+  body: Matching paths can have various suffixes ('.rb', '.so', and others), which
+    may or may not already be attached to <em>file</em>. This method doesn't care
+    about the full filename that matches; only that there is a match.
+full_name: Gem::GemPathSearcher#find
+params: (path)
+name: find
+is_singleton: false
+aliases: []
+

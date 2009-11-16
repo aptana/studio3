@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Version::Part#to_s
+params: ()
+name: to_s
+is_singleton: false
+aliases: []
+

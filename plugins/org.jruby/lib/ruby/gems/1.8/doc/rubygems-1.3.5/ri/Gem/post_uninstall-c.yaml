@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Adds a post-uninstall hook that will be passed a Gem::Uninstaller instance
+    and the spec that was uninstalled when Gem::Uninstaller#uninstall is called
+full_name: Gem::post_uninstall
+params: (&hook)
+name: post_uninstall
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>zipped_stream (Gem::Package::TarInput)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_input.rb, line 201</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">zipped_stream</span>(<span class="ruby-identifier">entry</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">Rubinius</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">zis</span> = <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">GzipReader</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">entry</span>
+      <span class="ruby-identifier">dis</span> = <span class="ruby-identifier">zis</span>.<span class="ruby-identifier">read</span>
+      <span class="ruby-identifier">is</span> = <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">dis</span>)
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-comment cmt"># This is Jamis Buck's Zlib workaround for some unknown issue</span>
+      <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>(<span class="ruby-value">10</span>) <span class="ruby-comment cmt"># skip the gzip header</span>
+      <span class="ruby-identifier">zis</span> = <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">Inflate</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">-</span><span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">MAX_WBITS</span>)
+      <span class="ruby-identifier">is</span> = <span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">zis</span>.<span class="ruby-identifier">inflate</span>(<span class="ruby-identifier">entry</span>.<span class="ruby-identifier">read</span>))
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">ensure</span>
+    <span class="ruby-identifier">zis</span>.<span class="ruby-identifier">finish</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">zis</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

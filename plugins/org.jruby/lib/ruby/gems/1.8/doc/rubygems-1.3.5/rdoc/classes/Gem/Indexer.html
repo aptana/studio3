@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Indexer</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Indexer</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/indexer_rb.html">
+                lib/rubygems/indexer.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Top level class for building the gem repository index.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000341">abbreviate</a>&nbsp;&nbsp;
+      <a href="#M000342">build_indicies</a>&nbsp;&nbsp;
+      <a href="#M000343">build_legacy_indicies</a>&nbsp;&nbsp;
+      <a href="#M000344">build_marshal_gemspecs</a>&nbsp;&nbsp;
+      <a href="#M000345">build_modern_index</a>&nbsp;&nbsp;
+      <a href="#M000346">build_modern_indicies</a>&nbsp;&nbsp;
+      <a href="#M000347">build_rss</a>&nbsp;&nbsp;
+      <a href="#M000348">collect_specs</a>&nbsp;&nbsp;
+      <a href="#M000350">compact_specs</a>&nbsp;&nbsp;
+      <a href="#M000351">compress</a>&nbsp;&nbsp;
+      <a href="#M000349">compress_indicies</a>&nbsp;&nbsp;
+      <a href="#M000352">gem_file_list</a>&nbsp;&nbsp;
+      <a href="#M000353">generate_index</a>&nbsp;&nbsp;
+      <a href="#M000354">gzip</a>&nbsp;&nbsp;
+      <a href="#M000355">install_indicies</a>&nbsp;&nbsp;
+      <a href="#M000356">make_temp_directories</a>&nbsp;&nbsp;
+      <a href="#M000340">new</a>&nbsp;&nbsp;
+      <a href="#M000357">paranoid</a>&nbsp;&nbsp;
+      <a href="#M000358">sanitize</a>&nbsp;&nbsp;
+      <a href="#M000359">sanitize_string</a>&nbsp;&nbsp;
+      <a href="#M000360">update_index</a>&nbsp;&nbsp;
+      <a href="#M000361">update_specs_index</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="UserInteraction.html">Gem::UserInteraction</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">build_legacy</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc">
+Build indexes for RubyGems older than 1.2.0 when true
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">build_modern</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc">
+Build indexes for RubyGems 1.2.0 and newer when true
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">dest_directory</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Index install location
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">dest_latest_specs_index</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Latest specs index install location
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">dest_prerelease_specs_index</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Prerelease specs index install location
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">dest_specs_index</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Specs index install location
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">directory</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Index build directory
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000340" class="method-detail">
+        <a name="M000340"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000340.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000340.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(directory, options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Create an indexer that will index the gems in <tt>directory</tt>.
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000341" class="method-detail">
+        <a name="M000341"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000341.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000341.html');return false;">
+          <span class="method-name">abbreviate</span><span class="method-args">(spec)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Abbreviate the spec for downloading. Abbreviated specs are only used for
+searching, downloading and related activities and do not need deployment
+specific information (e.g. list of files). So we <a
+href="Indexer.html#M000341">abbreviate</a> the spec, making it much smaller
+for quicker downloads.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000342" class="method-detail">
+        <a name="M000342"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000342.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000342.html');return false;">
+          <span class="method-name">build_indicies</span><span class="method-args">(index)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Build various indicies
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000343" class="method-detail">
+        <a name="M000343"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000343.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000343.html');return false;">
+          <span class="method-name">build_legacy_indicies</span><span class="method-args">(index)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Builds indicies for RubyGems older than 1.2.x
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000344" class="method-detail">
+        <a name="M000344"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000344.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000344.html');return false;">
+          <span class="method-name">build_marshal_gemspecs</span><span class="method-args">(index)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Builds Marshal quick index gemspecs.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000345" class="method-detail">
+        <a name="M000345"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000345.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000345.html');return false;">
+          <span class="method-name">build_modern_index</span><span class="method-args">(index, file, name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Build a single index for RubyGems 1.2 and newer
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000346" class="method-detail">
+        <a name="M000346"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000346.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000346.html');return false;">
+          <span class="method-name">build_modern_indicies</span><span class="method-args">(index)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Builds indicies for RubyGems 1.2 and newer. Handles full, latest,
+prerelease
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000347" class="method-detail">
+        <a name="M000347"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000347.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000347.html');return false;">
+          <span class="method-name">build_rss</span><span class="method-args">(index)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Builds an RSS feed for past two days gem releases according to the
+gem&#8216;s date.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000348" class="method-detail">
+        <a name="M000348"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000348.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000348.html');return false;">
+          <span class="method-name">collect_specs</span><span class="method-args">(gems = gem_file_list)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Collect specifications from .gem files from the gem directory.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000350" class="method-detail">
+        <a name="M000350"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000350.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000350.html');return false;">
+          <span class="method-name">compact_specs</span><span class="method-args">(specs)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Compacts Marshal output for the specs index data source by using identical
+objects as much as possible.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000351" class="method-detail">
+        <a name="M000351"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000351.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000351.html');return false;">
+          <span class="method-name">compress</span><span class="method-args">(filename, extension)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Compress <tt>filename</tt> with <tt>extension</tt>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000349" class="method-detail">
+        <a name="M000349"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000349.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000349.html');return false;">
+          <span class="method-name">compress_indicies</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Compresses indicies on disk
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000352" class="method-detail">
+        <a name="M000352"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000352.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000352.html');return false;">
+          <span class="method-name">gem_file_list</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+List of gem file names to index.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000353" class="method-detail">
+        <a name="M000353"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000353.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000353.html');return false;">
+          <span class="method-name">generate_index</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Builds and installs indicies.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000354" class="method-detail">
+        <a name="M000354"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000354.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000354.html');return false;">
+          <span class="method-name">gzip</span><span class="method-args">(filename)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Zlib::GzipWriter wrapper that gzips <tt>filename</tt> on disk.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000355" class="method-detail">
+        <a name="M000355"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000355.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000355.html');return false;">
+          <span class="method-name">install_indicies</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Install generated indicies into the destination directory.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000356" class="method-detail">
+        <a name="M000356"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000356.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000356.html');return false;">
+          <span class="method-name">make_temp_directories</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Make directories for index generation
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000357" class="method-detail">
+        <a name="M000357"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000357.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000357.html');return false;">
+          <span class="method-name">paranoid</span><span class="method-args">(path, extension)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Ensure <tt>path</tt> and path with <tt>extension</tt> are identical.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000358" class="method-detail">
+        <a name="M000358"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000358.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000358.html');return false;">
+          <span class="method-name">sanitize</span><span class="method-args">(spec)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sanitize the descriptive fields in the spec. Sometimes non-ASCII characters
+will garble the site index. Non-ASCII characters will be replaced by their
+XML entity equivalent.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000359" class="method-detail">
+        <a name="M000359"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000359.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000359.html');return false;">
+          <span class="method-name">sanitize_string</span><span class="method-args">(string)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sanitize a single string.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000360" class="method-detail">
+        <a name="M000360"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000360.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000360.html');return false;">
+          <span class="method-name">update_index</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Perform an in-place update of the repository from newly added gems. Only
+works for modern indicies, and sets build_legacy to false when run.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000361" class="method-detail">
+        <a name="M000361"></a>
+
+        <div class="method-heading">
+          <a href="Indexer.src/M000361.html" target="Code" class="method-signature"
+            onclick="popupCode('Indexer.src/M000361.html');return false;">
+          <span class="method-name">update_specs_index</span><span class="method-args">(index, source, dest)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Combines specs in <tt>index</tt> and <tt>source</tt> then writes out a <a
+href="Indexer.html#M000340">new</a> copy to <tt>dest</tt>. For a latest
+index, does not ensure the <a href="Indexer.html#M000340">new</a> file is
+minimal.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

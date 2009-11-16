@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::Package::TarHeader)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_header.rb, line 164</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">vals</span>)
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:name</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:size</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:prefix</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:mode</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;:name, :size, :prefix and :mode required&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:uid</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:gid</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:mtime</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:checksum</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:typeflag</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;0&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:magic</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;ustar&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:version</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;00&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:uname</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;wheel&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:gname</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">&quot;wheel&quot;</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:devmajor</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+    <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:devminor</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>
+
+    <span class="ruby-constant">FIELDS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">instance_variable_set</span> <span class="ruby-node">&quot;@#{name}&quot;</span>, <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">name</span>]
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@empty</span> = <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">:empty</span>]
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

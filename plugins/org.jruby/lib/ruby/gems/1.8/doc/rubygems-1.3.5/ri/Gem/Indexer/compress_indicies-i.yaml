@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Compresses indicies on disk
+full_name: Gem::Indexer#compress_indicies
+params: ()
+name: compress_indicies
+is_singleton: false
+aliases: []
+

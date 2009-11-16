@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Server#quick
+params: (req, res)
+name: quick
+is_singleton: false
+aliases: []
+

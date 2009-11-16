@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: ":update_sources, @update_sources"
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Delegates to @hash
+full_name: Gem::ConfigFile#each
+params: (&block) {|:update_sources, @update_sources| ...}
+name: each
+is_singleton: false
+aliases: []
+

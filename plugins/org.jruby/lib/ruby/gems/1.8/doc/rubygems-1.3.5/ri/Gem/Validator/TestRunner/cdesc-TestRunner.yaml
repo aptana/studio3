@@ -1,0 +1,21 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_fault
+- !ruby/object:RI::MethodSummary 
+  name: start
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: run
+full_name: Gem::Validator::TestRunner
+constants: []
+
+superclass: Object
+name: TestRunner

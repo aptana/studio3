@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return a list of all possible load paths for the latest version for all gems
+    in the Gem installation.
+full_name: Gem::latest_load_paths
+params: ()
+name: latest_load_paths
+is_singleton: true
+aliases: []
+

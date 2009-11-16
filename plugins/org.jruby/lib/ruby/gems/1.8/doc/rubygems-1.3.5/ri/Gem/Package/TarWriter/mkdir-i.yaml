@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Creates a new directory in the tar file <tt>name</tt> with <tt>mode</tt>
+full_name: Gem::Package::TarWriter#mkdir
+params: (name, mode)
+name: mkdir
+is_singleton: false
+aliases: []
+

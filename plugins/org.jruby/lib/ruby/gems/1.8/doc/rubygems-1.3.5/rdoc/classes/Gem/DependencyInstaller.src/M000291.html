@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (Gem::DependencyInstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/dependency_installer.rb, line 46</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">options</span> = {})
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">spec_dir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>], <span class="ruby-value str">'specifications'</span>
+      <span class="ruby-ivar">@source_index</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_gems_in</span> <span class="ruby-identifier">spec_dir</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-ivar">@source_index</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">options</span> = <span class="ruby-constant">DEFAULT_OPTIONS</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">options</span>
+
+    <span class="ruby-ivar">@bin_dir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:bin_dir</span>]
+    <span class="ruby-ivar">@development</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:development</span>]
+    <span class="ruby-ivar">@domain</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:domain</span>]
+    <span class="ruby-ivar">@env_shebang</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:env_shebang</span>]
+    <span class="ruby-ivar">@force</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:force</span>]
+    <span class="ruby-ivar">@format_executable</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:format_executable</span>]
+    <span class="ruby-ivar">@ignore_dependencies</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ignore_dependencies</span>]
+    <span class="ruby-ivar">@prerelease</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prerelease</span>]
+    <span class="ruby-ivar">@security_policy</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:security_policy</span>]
+    <span class="ruby-ivar">@user_install</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:user_install</span>]
+    <span class="ruby-ivar">@wrappers</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:wrappers</span>]
+
+    <span class="ruby-ivar">@installed_gems</span> = []
+
+    <span class="ruby-ivar">@install_dir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:install_dir</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>
+    <span class="ruby-ivar">@cache_dir</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:cache_dir</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@install_dir</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Load custom marshal format, re-initializing defaults as needed
+full_name: Gem::Specification::_load
+params: (str)
+name: _load
+is_singleton: true
+aliases: []
+

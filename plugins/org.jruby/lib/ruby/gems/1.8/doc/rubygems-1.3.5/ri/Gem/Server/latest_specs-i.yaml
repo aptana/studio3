@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Server#latest_specs
+params: (req, res)
+name: latest_specs
+is_singleton: false
+aliases: []
+

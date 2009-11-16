@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Writes the .gemspec specification (in Ruby) to the gem home's specifications
+    directory.
+full_name: Gem::Installer#write_spec
+params: ()
+name: write_spec
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::CheckCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/check_command.rb, line 35</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:test</span>]
+      <span class="ruby-identifier">version</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:version</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+      <span class="ruby-identifier">dep</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">get_one_gem_name</span>, <span class="ruby-identifier">version</span>
+      <span class="ruby-identifier">gem_spec</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>.<span class="ruby-identifier">search</span>(<span class="ruby-identifier">dep</span>).<span class="ruby-identifier">first</span>
+      <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Validator</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">unit_test</span>(<span class="ruby-identifier">gem_spec</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:alien</span>]
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Performing the 'alien' operation&quot;</span>
+      <span class="ruby-identifier">say</span>
+      <span class="ruby-identifier">gems</span> = <span class="ruby-identifier">get_all_gem_names</span> <span class="ruby-keyword kw">rescue</span> []
+      <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Validator</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">alien</span>(<span class="ruby-identifier">gems</span>).<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">val</span><span class="ruby-operator">|</span>
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">val</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{key} has #{val.size} problems&quot;</span>
+          <span class="ruby-identifier">val</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">error_entry</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;  #{error_entry.path}:&quot;</span>
+            <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;    #{error_entry.problem}&quot;</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{key} is error-free&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-identifier">say</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verify</span>]
+      <span class="ruby-identifier">gem_name</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verify</span>]
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gem_name</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-value str">&quot;Must specify a .gem file with --verify NAME&quot;</span>
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">gem_name</span>)
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;Unknown file: #{gem_name}.&quot;</span>
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Verifying gem: '#{gem_name}'&quot;</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Validator</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">verify_gem_file</span>(<span class="ruby-identifier">gem_name</span>)
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;#{gem_name} is invalid.&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

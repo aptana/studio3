@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return a hash of predecessors. <tt>result[spec]</tt> is an Array of gemspecs
+    that have a dependency satisfied by the named spec.
+full_name: Gem::DependencyList#spec_predecessors
+params: ()
+name: spec_predecessors
+is_singleton: false
+aliases: []
+

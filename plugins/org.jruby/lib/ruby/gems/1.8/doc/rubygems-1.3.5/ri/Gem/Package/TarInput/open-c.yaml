@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: is
+comment: 
+full_name: Gem::Package::TarInput::open
+params: (io, security_policy = nil, &block) {|is| ...}
+name: open
+is_singleton: true
+aliases: []
+

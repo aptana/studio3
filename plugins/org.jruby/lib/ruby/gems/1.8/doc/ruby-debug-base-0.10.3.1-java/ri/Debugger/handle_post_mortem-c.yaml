@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (exp)
+is_singleton: true
+block_params: 
+name: handle_post_mortem
+comment: 
+full_name: Debugger::handle_post_mortem
+visibility: public
+aliases: []
+

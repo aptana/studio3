@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Debugger::InfoCommand</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Debugger::InfoCommand</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/cli/ruby-debug/commands/info_rb.html">
+                cli/ruby-debug/commands/info.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Command
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Implements debugger &quot;info&quot; command.
+</p>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Subcommands</td>
+          <td>=</td>
+          <td class="context-item-value">[        ['args', 1, 'Argument variables of current stack frame'],        ['breakpoints', 1, 'Status of user-settable breakpoints',         'Without argument, list info about all breakpoints.  With an integer argument, list info on that breakpoint.'],        ['catch', 3, 'Exceptions that can be caught in the current stack frame'],        ['display', 2, 'Expressions to display when program stops'],        ['file', 4, 'Info about a particular file read in', ' After the file name is supplied, you can list file attributes that you wish to see.  Attributes include: &quot;all&quot;, &quot;basic&quot;, &quot;breakpoint&quot;, &quot;lines&quot;, &quot;mtime&quot;, &quot;path&quot;  and &quot;sha1&quot;.'],        ['files', 5, 'File names and timestamps of files read in'],        ['global_variables', 2, 'Global variables'],        ['instance_variables', 2,          'Instance variables of the current stack frame'],        ['line', 2,          'Line number and file name of current position in source file'],        ['locals', 2, 'Local variables of the current stack frame'],        ['program', 2, 'Execution status of the program'],        ['stack', 2, 'Backtrace of the stack'],        ['thread', 6,  'List info about thread NUM', ' If no thread number is given, we list info for all threads. \'terse\' and \'verbose\'  options are possible. If terse, just give summary thread name information. See  &quot;help info threads&quot; for more detail about this summary information.  If \'verbose\' appended to the end of the command, then the entire stack trace is given for each thread.'],        ['threads', 7, 'information of currently-known threads', ' This information includes whether the thread is current (+), if it is suspended ($), or ignored (!).  The thread number and the top stack item. If \'verbose\' is given then the entire stack frame is shown.'],        ['variables', 1,          'Local and instance variables of the current stack frame']</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">InfoFileSubcommands</td>
+          <td>=</td>
+          <td class="context-item-value">[        ['all', 1,          'All file information available - breakpoints, lines, mtime, path, and sha1'],        ['basic', 2,          'basic information - path, number of lines'],        ['breakpoints', 2, 'Show trace line numbers',         'These are the line number where a breakpoint can be set.'],        ['lines', 1, 'Show number of lines in the file'],        ['mtime', 1, 'Show modification time of file'],        ['path', 4, 'Show full file path name for file'],        ['sha1', 1, 'Show SHA1 hash of contents of the file']</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">InfoThreadSubcommands</td>
+          <td>=</td>
+          <td class="context-item-value">[        ['terse', 1,   'summary information'],        ['verbose', 1, 'summary information and stack frame info'],       ].map do |name, min, short_help, long_help|       SubcmdStruct.new(name, min, short_help, long_help)</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

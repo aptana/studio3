@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Closes the TarOutput.
+full_name: Gem::Package::TarOutput#close
+params: ()
+name: close
+is_singleton: false
+aliases: []
+

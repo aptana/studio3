@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Each attribute has a default value (possibly nil). Here, we initialize all
+    attributes to their default value. This is done through the accessor methods,
+    so special behaviours will be honored. Furthermore, we take a <em>copy</em> of
+    the default so each specification instance has its own empty arrays, etc.
+full_name: Gem::Specification#assign_defaults
+params: ()
+name: assign_defaults
+is_singleton: false
+aliases: []
+

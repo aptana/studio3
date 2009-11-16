@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: private
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Wraps <tt>text</tt> to <tt>width</tt>
+full_name: Gem::Command#wrap
+params: (text, width)
+name: wrap
+is_singleton: false
+aliases: []
+

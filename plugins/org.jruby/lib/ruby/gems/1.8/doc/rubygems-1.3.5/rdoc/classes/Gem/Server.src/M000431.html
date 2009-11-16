@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>yaml (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 795</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">yaml</span>(<span class="ruby-identifier">req</span>, <span class="ruby-identifier">res</span>)
+    <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">refresh!</span>
+
+    <span class="ruby-identifier">res</span>[<span class="ruby-value str">'date'</span>] = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-ivar">@spec_dir</span>).<span class="ruby-identifier">mtime</span>
+
+    <span class="ruby-identifier">index</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">to_yaml</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">req</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/Z$/</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'application/x-deflate'</span>
+      <span class="ruby-identifier">index</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">deflate</span> <span class="ruby-identifier">index</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'text/plain'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">req</span>.<span class="ruby-identifier">request_method</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'HEAD'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-length'</span>] = <span class="ruby-identifier">index</span>.<span class="ruby-identifier">length</span>
+      <span class="ruby-keyword kw">return</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">index</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

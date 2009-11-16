@@ -1,0 +1,17 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Potentially raised when a specification is validated.
+attributes: []
+
+instance_methods: []
+
+class_methods: []
+
+full_name: Gem::InvalidSpecificationException
+constants: []
+
+superclass: Gem::Exception
+name: InvalidSpecificationException

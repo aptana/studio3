@@ -1,0 +1,22 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Return an IO stream for the zipped entry.
+- !ruby/struct:SM::Flow::P 
+  body: 'NOTE: Originally this method used two approaches, Return a GZipReader directly,
+    or read the GZipReader into a string and return a StringIO on the string. The
+    string IO approach was used for versions of ZLib before 1.2.1 to avoid buffer
+    errors on windows machines. Then we found that errors happened with 1.2.1 as well,
+    so we changed the condition. Then we discovered errors occurred with versions
+    as late as 1.2.3. At this point (after some benchmarking to show we weren''t seriously
+    crippling the unpacking speed) we threw our hands in the air and declared that
+    this method would use the String IO approach on all platforms at all times. And
+    that''s the way it is.'
+full_name: Gem::Package::TarInput#zipped_stream
+params: (entry)
+name: zipped_stream
+is_singleton: false
+aliases: []
+

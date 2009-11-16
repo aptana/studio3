@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>windows_stub_script (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 446</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">windows_stub_script</span>(<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">bin_file_name</span>)
+    <span class="ruby-value str">&quot;@ECHO OFF\nIF NOT \&quot;%~f0\&quot; == \&quot;~f0\&quot; GOTO :WinNT\n@\&quot;\#{File.basename(Gem.ruby).chomp('\&quot;')}\&quot; \&quot;\#{File.join(bindir, bin_file_name)}\&quot; %1 %2 %3 %4 %5 %6 %7 %8 %9\nGOTO :EOF\n:WinNT\n@\&quot;\#{File.basename(Gem.ruby).chomp('\&quot;')}\&quot; \&quot;%~dpn0\&quot; %*\n&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

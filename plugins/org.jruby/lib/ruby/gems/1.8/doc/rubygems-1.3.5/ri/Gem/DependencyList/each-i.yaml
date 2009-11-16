@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Iterator over dependency_order
+full_name: Gem::DependencyList#each
+params: (&block)
+name: each
+is_singleton: false
+aliases: []
+

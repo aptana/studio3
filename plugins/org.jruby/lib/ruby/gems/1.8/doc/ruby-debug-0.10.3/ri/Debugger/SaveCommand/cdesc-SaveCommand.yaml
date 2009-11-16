@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: SaveCommand
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::SaveCommand
+superclass: Command
+class_methods: []
+

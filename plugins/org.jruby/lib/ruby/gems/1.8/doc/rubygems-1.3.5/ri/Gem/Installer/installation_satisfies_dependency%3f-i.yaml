@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: True if the gems in the source_index satisfy <tt>dependency</tt>.
+full_name: Gem::Installer#installation_satisfies_dependency?
+params: (dependency)
+name: installation_satisfies_dependency?
+is_singleton: false
+aliases: []
+

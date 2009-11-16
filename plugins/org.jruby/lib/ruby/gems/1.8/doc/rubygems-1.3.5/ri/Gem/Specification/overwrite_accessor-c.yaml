@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Some attributes require special behaviour when they are accessed. This allows
+    for that.
+full_name: Gem::Specification::overwrite_accessor
+params: (name, &block)
+name: overwrite_accessor
+is_singleton: true
+aliases: []
+

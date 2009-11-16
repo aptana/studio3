@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: EvalFunctions
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::EvalFunctions
+superclass: 
+class_methods: []
+

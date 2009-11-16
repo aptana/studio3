@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>run (Gem::CommandManager)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/command_manager.rb, line 101</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-identifier">args</span>)
+    <span class="ruby-identifier">process_args</span>(<span class="ruby-identifier">args</span>)
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">StandardError</span>, <span class="ruby-constant">Timeout</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">ex</span>
+    <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;While executing gem ... (#{ex.class})\n    #{ex.to_s}&quot;</span>
+    <span class="ruby-identifier">ui</span>.<span class="ruby-identifier">errs</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;\t#{ex.backtrace.join &quot;\n\t&quot;}&quot;</span> <span class="ruby-keyword kw">if</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">backtrace</span>
+    <span class="ruby-identifier">terminate_interaction</span>(<span class="ruby-value">1</span>)
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Interrupt</span>
+    <span class="ruby-identifier">alert_error</span> <span class="ruby-value str">&quot;Interrupted&quot;</span>
+    <span class="ruby-identifier">terminate_interaction</span>(<span class="ruby-value">1</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

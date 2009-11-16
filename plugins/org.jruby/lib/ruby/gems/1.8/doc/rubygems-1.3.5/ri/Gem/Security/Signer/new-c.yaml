@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Security::Signer::new
+params: (key, cert_chain)
+name: new
+is_singleton: true
+aliases: []
+

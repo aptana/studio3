@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>from_io (Gem::OldFormat)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/old_format.rb, line 52</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">from_io</span>(<span class="ruby-identifier">io</span>, <span class="ruby-identifier">gem_path</span>=<span class="ruby-value str">&quot;(io)&quot;</span>)
+    <span class="ruby-identifier">format</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">gem_path</span>)
+    <span class="ruby-identifier">skip_ruby</span>(<span class="ruby-identifier">io</span>)
+    <span class="ruby-identifier">format</span>.<span class="ruby-identifier">spec</span> = <span class="ruby-identifier">read_spec</span>(<span class="ruby-identifier">io</span>)
+    <span class="ruby-identifier">format</span>.<span class="ruby-identifier">file_entries</span> = []
+    <span class="ruby-identifier">read_files_from_gem</span>(<span class="ruby-identifier">io</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">file_data</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">format</span>.<span class="ruby-identifier">file_entries</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">entry</span>, <span class="ruby-identifier">file_data</span>]
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">format</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

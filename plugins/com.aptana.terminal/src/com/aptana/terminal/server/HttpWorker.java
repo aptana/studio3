@@ -14,14 +14,11 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.Size;
-import com.aptana.terminal.Utils;
 
 public class HttpWorker implements Runnable
 {
 	private static final String ID_PARAMETER = "id"; //$NON-NLS-1$
 	private static final String INDEX_PAGE_NAME = "index.html"; //$NON-NLS-1$
-	private static final String SIZE_URL = "/size"; //$NON-NLS-1$
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
 	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
@@ -120,12 +117,6 @@ public class HttpWorker implements Runnable
 			
 			this._server.createProcess(id);
 			this.sendTextResponse(output, id);
-		}
-		else if (SIZE_URL.equals(url))
-		{
-			Size size = Utils.getCharacterWidth();
-			
-			this.sendTextResponse(output, size.toString());
 		}
 		else
 		{

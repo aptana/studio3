@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns a Ruby code representation of this specification, such that it can
+    be eval'ed and reconstruct the same specification later. Attributes that still
+    have their default values are omitted.
+full_name: Gem::Specification#to_ruby
+params: ()
+name: to_ruby
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
+            default="true"
+            extensions="rhtml,erb"
+            id="com.aptana.radrails.editor.erb.html"
+            name="%editor.rhtml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.html.erb">
+         </contentTypeBinding>
+      </editor>
+      <editor
+            class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
+            extensions="rxml,erb"
+            id="com.aptana.radrails.editor.erb.xml"
+            name="%editor.rxml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.radrails.contenttype.xml.erb">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="com.aptana.radrails.contenttype.html"
+            file-extensions="rhtml,html.erb"
+            id="com.aptana.radrails.contenttype.html.erb"
+            name="%content-type.rhtml.name"
+            priority="normal">
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="rxml,xml.erb"
+            id="com.aptana.radrails.contenttype.xml.erb"
+            name="%content-type.rxml.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

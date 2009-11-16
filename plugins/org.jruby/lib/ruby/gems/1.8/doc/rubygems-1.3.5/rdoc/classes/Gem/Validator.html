@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Validator</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Validator</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/validator_rb.html">
+                lib/rubygems/validator.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="Validator.html">Validator</a> performs various gem file and gem
+database validation
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000578">alien</a>&nbsp;&nbsp;
+      <a href="#M000580">remove_leading_dot_dir</a>&nbsp;&nbsp;
+      <a href="#M000579">unit_test</a>&nbsp;&nbsp;
+      <a href="#M000576">verify_gem</a>&nbsp;&nbsp;
+      <a href="#M000577">verify_gem_file</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="UserInteraction.html">Gem::UserInteraction</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Class <a href="Validator/TestRunner.html" class="link">Gem::Validator::TestRunner</a><br />
+
+    </div>
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">ErrorData</td>
+          <td>=</td>
+          <td class="context-item-value">Struct.new :path, :problem</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000578" class="method-detail">
+        <a name="M000578"></a>
+
+        <div class="method-heading">
+          <a href="Validator.src/M000578.html" target="Code" class="method-signature"
+            onclick="popupCode('Validator.src/M000578.html');return false;">
+          <span class="method-name">alien</span><span class="method-args">(gems=[])</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Checks the gem directory for the following potential
+inconsistencies/problems:
+</p>
+<ul>
+<li>Checksum gem itself
+
+</li>
+<li>For each file in each gem, check consistency of installed versions
+
+</li>
+<li>Check for files that aren&#8216;t part of the gem but are in the gems
+directory
+
+</li>
+<li>1 cache - 1 spec - 1 directory.
+
+</li>
+</ul>
+<p>
+returns a hash of ErrorData objects, keyed on the problem gem&#8216;s name.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000580" class="method-detail">
+        <a name="M000580"></a>
+
+        <div class="method-heading">
+          <a href="Validator.src/M000580.html" target="Code" class="method-signature"
+            onclick="popupCode('Validator.src/M000580.html');return false;">
+          <span class="method-name">remove_leading_dot_dir</span><span class="method-args">(path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000579" class="method-detail">
+        <a name="M000579"></a>
+
+        <div class="method-heading">
+          <a href="Validator.src/M000579.html" target="Code" class="method-signature"
+            onclick="popupCode('Validator.src/M000579.html');return false;">
+          <span class="method-name">unit_test</span><span class="method-args">(gem_spec)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Runs unit tests for a given gem specification
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000576" class="method-detail">
+        <a name="M000576"></a>
+
+        <div class="method-heading">
+          <a href="Validator.src/M000576.html" target="Code" class="method-signature"
+            onclick="popupCode('Validator.src/M000576.html');return false;">
+          <span class="method-name">verify_gem</span><span class="method-args">(gem_data)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Given a gem file&#8216;s contents, validates against its own MD5 checksum
+</p>
+<table>
+<tr><td valign="top">gem_data:</td><td>[String] Contents of the gem file
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+      <div id="method-M000577" class="method-detail">
+        <a name="M000577"></a>
+
+        <div class="method-heading">
+          <a href="Validator.src/M000577.html" target="Code" class="method-signature"
+            onclick="popupCode('Validator.src/M000577.html');return false;">
+          <span class="method-name">verify_gem_file</span><span class="method-args">(gem_path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Given the path to a gem file, validates against its own MD5 checksum
+</p>
+<table>
+<tr><td valign="top">gem_path:</td><td>[String] Path to gem file
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

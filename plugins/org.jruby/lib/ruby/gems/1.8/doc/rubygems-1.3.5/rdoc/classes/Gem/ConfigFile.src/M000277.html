@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>each (Gem::ConfigFile)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/config_file.rb, line 167</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+    <span class="ruby-identifier">hash</span> = <span class="ruby-ivar">@hash</span>.<span class="ruby-identifier">dup</span>
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">:update_sources</span>
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">:verbose</span>
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">:benchmark</span>
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">:backtrace</span>
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">:bulk_threshold</span>
+
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span><span class="ruby-identifier">update_sources</span>, <span class="ruby-ivar">@update_sources</span>
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span><span class="ruby-identifier">verbose</span>, <span class="ruby-ivar">@verbose</span>
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span><span class="ruby-identifier">benchmark</span>, <span class="ruby-ivar">@benchmark</span>
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span><span class="ruby-identifier">backtrace</span>, <span class="ruby-ivar">@backtrace</span>
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span><span class="ruby-identifier">bulk_threshold</span>, <span class="ruby-ivar">@bulk_threshold</span>
+
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-value str">'config_file_name'</span>, <span class="ruby-ivar">@config_file_name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@config_file_name</span>
+
+    <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

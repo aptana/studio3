@@ -1,0 +1,19 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::VERB 
+  body: " Should we care what if somebody require this file directly?\n"
+- !ruby/struct:SM::Flow::P 
+  body: require 'openssl'
+attributes: []
+
+instance_methods: []
+
+class_methods: []
+
+full_name: OpenSSL
+constants: []
+
+superclass: 
+name: OpenSSL

@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Choose from a list of options. <tt>question</tt> is a prompt displayed above
+    the list. <tt>list</tt> is a list of option strings. Returns the pair [option_name,
+    option_index].
+full_name: Gem::StreamUI#choose_from_list
+params: (question, list)
+name: choose_from_list
+is_singleton: false
+aliases: []
+

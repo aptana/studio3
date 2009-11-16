@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The default directory for binaries
+full_name: Gem::default_bindir
+params: ()
+name: default_bindir
+is_singleton: true
+aliases: []
+

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+params: (code)
+is_singleton: false
+block_params: 
+name: lnums_for_str
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Trivial implementation allowing to stop on every line.
+full_name: TraceLineNumbers#lnums_for_str
+visibility: public
+aliases: []
+

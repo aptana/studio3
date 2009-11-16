@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>promote_load_path (Gem)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems.rb, line 768</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">promote_load_path</span>(<span class="ruby-identifier">gem_name</span>, <span class="ruby-identifier">over_name</span>)
+    <span class="ruby-identifier">gem</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">loaded_specs</span>[<span class="ruby-identifier">gem_name</span>]
+    <span class="ruby-identifier">over</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">loaded_specs</span>[<span class="ruby-identifier">over_name</span>]
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;gem #{gem_name} is not activated&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">nil?</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;gem #{over_name} is not activated&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">over</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-identifier">last_gem_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">full_gem_path</span>, <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">last</span>
+
+    <span class="ruby-identifier">over_paths</span> = <span class="ruby-identifier">over</span>.<span class="ruby-identifier">require_paths</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">over</span>.<span class="ruby-identifier">full_gem_path</span>, <span class="ruby-identifier">path</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">over_paths</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">$LOAD_PATH</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">path</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gem</span> = <span class="ruby-identifier">$LOAD_PATH</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">last_gem_path</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span>
+
+    <span class="ruby-identifier">$LOAD_PATH</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">gem</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">over_paths</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

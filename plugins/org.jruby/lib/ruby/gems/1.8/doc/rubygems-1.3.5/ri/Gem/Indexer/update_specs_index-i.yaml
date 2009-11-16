@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Combines specs in <tt>index</tt> and <tt>source</tt> then writes out a new
+    copy to <tt>dest</tt>. For a latest index, does not ensure the new file is minimal.
+full_name: Gem::Indexer#update_specs_index
+params: (index, source, dest)
+name: update_specs_index
+is_singleton: false
+aliases: []
+

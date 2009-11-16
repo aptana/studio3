@@ -1,0 +1,16 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: write_require_paths_file_if_needed
+class_methods: []
+
+full_name: Gem::RequirePathsBuilder
+constants: []
+
+superclass: 
+name: RequirePathsBuilder

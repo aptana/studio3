@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: A Version is only eql? to another version if it has the same version string.
+    &quot;1.0&quot; is not the same version as &quot;1&quot;.
+full_name: Gem::Version#eql?
+params: (other)
+name: eql?
+is_singleton: false
+aliases: []
+

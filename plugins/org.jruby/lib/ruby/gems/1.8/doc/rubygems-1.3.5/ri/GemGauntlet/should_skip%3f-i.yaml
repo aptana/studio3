@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: GemGauntlet#should_skip?
+params: (name)
+name: should_skip?
+is_singleton: false
+aliases: []
+

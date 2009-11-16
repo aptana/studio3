@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: InfoFunctions
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: Debugger::InfoFunctions
+superclass: 
+class_methods: []
+

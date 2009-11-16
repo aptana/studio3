@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>debug_method (Module)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/ruby-debug-base.rb, line 239</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">debug_method</span>(<span class="ruby-identifier">meth</span>)
+    <span class="ruby-identifier">old_meth</span> = <span class="ruby-node">&quot;__debugee_#{meth}&quot;</span>
+    <span class="ruby-identifier">old_meth</span> = <span class="ruby-node">&quot;#{$1}_set&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">old_meth</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^(.+)=$/</span>
+    <span class="ruby-identifier">alias_method</span> <span class="ruby-identifier">old_meth</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">meth</span>
+    <span class="ruby-identifier">class_eval</span> <span class="ruby-value str">&quot;def \#{meth}(*args, &amp;block)\nDebugger.start do\ndebugger 2\n\#{old_meth}(*args, &amp;block)\nend\nend\n&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

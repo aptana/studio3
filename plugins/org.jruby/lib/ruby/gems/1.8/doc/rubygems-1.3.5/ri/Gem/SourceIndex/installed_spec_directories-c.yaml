@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns a list of directories from Gem.path that contain specifications.
+full_name: Gem::SourceIndex::installed_spec_directories
+params: ()
+name: installed_spec_directories
+is_singleton: true
+aliases: []
+

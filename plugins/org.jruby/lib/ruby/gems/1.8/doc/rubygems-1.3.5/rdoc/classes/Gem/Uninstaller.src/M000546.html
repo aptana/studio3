@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>uninstall (Gem::Uninstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/uninstaller.rb, line 71</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">uninstall</span>
+    <span class="ruby-identifier">list</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">find_name</span> <span class="ruby-ivar">@gem</span>, <span class="ruby-ivar">@version</span>
+    <span class="ruby-identifier">list</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@user_index</span>.<span class="ruby-identifier">find_name</span> <span class="ruby-ivar">@gem</span>, <span class="ruby-ivar">@version</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@user_install</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;cannot uninstall, check `gem list -d #{@gem}`&quot;</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">and</span> <span class="ruby-ivar">@force_all</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">remove_all</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">dup</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">gem_names</span> = <span class="ruby-identifier">list</span>.<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">gem</span><span class="ruby-operator">|</span> <span class="ruby-identifier">gem</span>.<span class="ruby-identifier">full_name</span>} <span class="ruby-operator">+</span> [<span class="ruby-value str">&quot;All versions&quot;</span>]
+
+      <span class="ruby-identifier">say</span>
+      <span class="ruby-identifier">gem_name</span>, <span class="ruby-identifier">index</span> = <span class="ruby-identifier">choose_from_list</span> <span class="ruby-value str">&quot;Select gem to uninstall:&quot;</span>, <span class="ruby-identifier">gem_names</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">size</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">remove_all</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">dup</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">size</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">uninstall_gem</span> <span class="ruby-identifier">list</span>[<span class="ruby-identifier">index</span>], <span class="ruby-identifier">list</span>.<span class="ruby-identifier">dup</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Error: must enter a number [1-#{list.size+1}]&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">uninstall_gem</span> <span class="ruby-identifier">list</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">list</span>.<span class="ruby-identifier">dup</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

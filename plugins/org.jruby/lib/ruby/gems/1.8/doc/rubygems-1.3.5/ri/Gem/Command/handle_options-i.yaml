@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Handle the given list of arguments by parsing them and recording the results.
+full_name: Gem::Command#handle_options
+params: (args)
+name: handle_options
+is_singleton: false
+aliases: []
+

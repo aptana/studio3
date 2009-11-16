@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>mkdir (Gem::Package::TarWriter)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_writer.rb, line 195</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">mkdir</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">mode</span>)
+    <span class="ruby-identifier">check_closed</span>
+
+    <span class="ruby-identifier">name</span>, <span class="ruby-identifier">prefix</span> = <span class="ruby-identifier">split_name</span>(<span class="ruby-identifier">name</span>)
+
+    <span class="ruby-identifier">header</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarHeader</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">:mode</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">mode</span>,
+                                         <span class="ruby-identifier">:typeflag</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">&quot;5&quot;</span>, <span class="ruby-identifier">:size</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>,
+                                         <span class="ruby-identifier">:prefix</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">prefix</span>
+
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">header</span>
+
+    <span class="ruby-keyword kw">self</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

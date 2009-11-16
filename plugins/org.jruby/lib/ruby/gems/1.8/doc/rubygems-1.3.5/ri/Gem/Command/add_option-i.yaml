@@ -1,0 +1,20 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: value, options
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add a command-line option and handler to the command.
+- !ruby/struct:SM::Flow::P 
+  body: See OptionParser#make_switch for an explanation of <tt>opts</tt>.
+- !ruby/struct:SM::Flow::P 
+  body: <tt>handler</tt> will be called with two values, the value of the argument
+    and the options hash.
+- !ruby/struct:SM::Flow::P 
+  body: If the first argument of add_option is a Symbol, it's used to group options
+    in output. See `gem help list` for an example.
+full_name: Gem::Command#add_option
+params: (*opts) {|value, options| ...}
+name: add_option
+is_singleton: false
+aliases: []
+

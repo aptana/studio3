@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+params: (host = 'localhost', port = PORT)
+is_singleton: true
+block_params: 
+name: start_client
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Connects to the remote debugger
+full_name: Debugger::start_client
+visibility: public
+aliases: []
+

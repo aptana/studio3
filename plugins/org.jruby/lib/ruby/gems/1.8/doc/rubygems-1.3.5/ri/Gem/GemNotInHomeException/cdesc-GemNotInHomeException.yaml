@@ -1,0 +1,20 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Raised when attempting to uninstall a gem that isn't in GEM_HOME.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: RW
+  name: spec
+instance_methods: []
+
+class_methods: []
+
+full_name: Gem::GemNotInHomeException
+constants: []
+
+superclass: Gem::Exception
+name: GemNotInHomeException

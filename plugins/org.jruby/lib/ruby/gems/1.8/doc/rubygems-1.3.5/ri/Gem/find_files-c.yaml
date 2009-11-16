@@ -1,0 +1,20 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Returns a list of paths matching <tt>file</tt> that can be used by a gem
+    to pick up features from other gems. For example:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  Gem.find_files('rdoc/discover').each do |path| load path end\n"
+- !ruby/struct:SM::Flow::P 
+  body: find_files search $LOAD_PATH for files as well as gems.
+- !ruby/struct:SM::Flow::P 
+  body: Note that find_files will return all files even if they are from different
+    versions of the same gem.
+full_name: Gem::find_files
+params: (path)
+name: find_files
+is_singleton: true
+aliases: []
+

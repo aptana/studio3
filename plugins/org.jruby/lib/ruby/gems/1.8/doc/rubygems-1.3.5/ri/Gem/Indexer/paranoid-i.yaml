@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Ensure <tt>path</tt> and path with <tt>extension</tt> are identical.
+full_name: Gem::Indexer#paranoid
+params: (path, extension)
+name: paranoid
+is_singleton: false
+aliases: []
+

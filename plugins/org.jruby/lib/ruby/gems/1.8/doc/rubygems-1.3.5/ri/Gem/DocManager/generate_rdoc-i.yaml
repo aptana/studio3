@@ -1,0 +1,16 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Generate the RDoc documents for this gem spec.
+- !ruby/struct:SM::Flow::P 
+  body: Note that if both RI and RDoc documents are generated from the same process,
+    the RI docs should be done first (a likely bug in RDoc will cause RI docs generation
+    to fail if run after RDoc).
+full_name: Gem::DocManager#generate_rdoc
+params: ()
+name: generate_rdoc
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>find_gems_with_sources (Gem::DependencyInstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/dependency_installer.rb, line 80</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_gems_with_sources</span>(<span class="ruby-identifier">dep</span>)
+    <span class="ruby-identifier">gems_and_sources</span> = []
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@domain</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:both</span> <span class="ruby-keyword kw">or</span> <span class="ruby-ivar">@domain</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:local</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">Dir</span>[<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>, <span class="ruby-node">&quot;#{dep.name}-[0-9]*.gem&quot;</span>)].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem_file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">spec</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Format</span>.<span class="ruby-identifier">from_file_by_path</span>(<span class="ruby-identifier">gem_file</span>).<span class="ruby-identifier">spec</span>
+        <span class="ruby-identifier">gems_and_sources</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">spec</span>, <span class="ruby-identifier">gem_file</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">name</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@domain</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:both</span> <span class="ruby-keyword kw">or</span> <span class="ruby-ivar">@domain</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:remote</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-identifier">requirements</span> = <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">version_requirements</span>.<span class="ruby-identifier">requirements</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">req</span>, <span class="ruby-identifier">ver</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">req</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">all</span> = <span class="ruby-operator">!</span><span class="ruby-ivar">@prerelease</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">requirements</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">||</span>
+                (<span class="ruby-identifier">requirements</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">&quot;&gt;=&quot;</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">requirements</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">&quot;&gt;&quot;</span>))
+
+        <span class="ruby-identifier">found</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">fetch</span> <span class="ruby-identifier">dep</span>, <span class="ruby-identifier">all</span>, <span class="ruby-keyword kw">true</span>, <span class="ruby-ivar">@prerelease</span>
+        <span class="ruby-identifier">gems_and_sources</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">found</span>)
+
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Error fetching remote data:\t\t#{e.message}&quot;</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Falling back to local-only install&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-ivar">@domain</span> = <span class="ruby-identifier">:local</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gems_and_sources</span>.<span class="ruby-identifier">sort_by</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem</span>, <span class="ruby-identifier">source</span><span class="ruby-operator">|</span>
+      [<span class="ruby-identifier">gem</span>, <span class="ruby-identifier">source</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^http:\/\//</span> <span class="ruby-operator">?</span> <span class="ruby-value">0</span> <span class="ruby-operator">:</span> <span class="ruby-value">1</span>] <span class="ruby-comment cmt"># local gems win</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

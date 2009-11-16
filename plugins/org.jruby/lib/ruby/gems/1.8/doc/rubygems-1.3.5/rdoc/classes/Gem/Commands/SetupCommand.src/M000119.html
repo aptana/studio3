@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>install_rdoc (Gem::Commands::SetupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/setup_command.rb, line 233</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install_rdoc</span>
+    <span class="ruby-identifier">gem_doc_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>, <span class="ruby-value str">'doc'</span>
+    <span class="ruby-identifier">rubygems_name</span> = <span class="ruby-node">&quot;rubygems-#{Gem::RubyGemsVersion}&quot;</span>
+    <span class="ruby-identifier">rubygems_doc_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">gem_doc_dir</span>, <span class="ruby-identifier">rubygems_name</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span> <span class="ruby-identifier">gem_doc_dir</span> <span class="ruby-keyword kw">and</span>
+       (<span class="ruby-keyword kw">not</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">rubygems_doc_dir</span> <span class="ruby-keyword kw">or</span>
+        <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span> <span class="ruby-identifier">rubygems_doc_dir</span>) <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Removing old RubyGems RDoc and ri&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verbose</span>
+      <span class="ruby-constant">Dir</span>[<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Gem</span>.<span class="ruby-identifier">dir</span>, <span class="ruby-value str">'doc'</span>, <span class="ruby-value str">'rubygems-[0-9]*'</span>)].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dir</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">rm_rf</span> <span class="ruby-identifier">dir</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ri</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">ri_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">rubygems_doc_dir</span>, <span class="ruby-value str">'ri'</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Installing #{rubygems_name} ri into #{ri_dir}&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verbose</span>
+        <span class="ruby-identifier">run_rdoc</span> <span class="ruby-value str">'--ri'</span>, <span class="ruby-value str">'--op'</span>, <span class="ruby-identifier">ri_dir</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:rdoc</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">rdoc_dir</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">rubygems_doc_dir</span>, <span class="ruby-value str">'rdoc'</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Installing #{rubygems_name} rdoc into #{rdoc_dir}&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@verbose</span>
+        <span class="ruby-identifier">run_rdoc</span> <span class="ruby-value str">'--op'</span>, <span class="ruby-identifier">rdoc_dir</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@verbose</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Skipping RDoc generation, #{gem_doc_dir} not writable&quot;</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Set the GEM_HOME environment variable if you want RDoc generated&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

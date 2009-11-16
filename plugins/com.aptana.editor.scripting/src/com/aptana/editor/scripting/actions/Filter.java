@@ -39,7 +39,7 @@ import com.aptana.editor.scripting.Activator;
 
 @SuppressWarnings("deprecation")
 public class Filter {
-	static final String DEFAULT_CONSOLE_NAME = "Command Ouput";
+	static final String DEFAULT_CONSOLE_NAME = "Command Ouput"; //$NON-NLS-1$
 
 	public static Map<String, String> computeEnvironment(IWorkbenchWindow workbenchWindow, IEditorPart editorPart) {
 		Map<String, String> environment = new TreeMap<String, String>();
@@ -120,14 +120,14 @@ public class Filter {
 				if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
 					String shell = environment.get("SHELL");
 					if (shell == null) {
-						shell = "/bin/bash";
+						shell = "/bin/bash"; //$NON-NLS-1$
 					}
 					commandList.add(shell);
-					commandList.add("-c");
+					commandList.add("-c"); //$NON-NLS-1$
 				} else if (Platform.OS_WIN32.equals(Platform.getOS())){
-					commandList.add("cmd");
-					commandList.add("/C");
-					commandList.add("start");
+					commandList.add("cmd"); //$NON-NLS-1$
+					commandList.add("/C"); //$NON-NLS-1$
+					commandList.add("start"); //$NON-NLS-1$
 				}
 				commandList.add(command);
 				//Utilities.parseParameters(command);
@@ -174,26 +174,27 @@ public class Filter {
 					} else {
 						activator.getLog().log(
 								new Status(IStatus.ERROR, activator.getBundle()
-										.getSymbolicName(), "Process '"
+										.getSymbolicName(), "Process '" //$NON-NLS-1$
 										+ commandList.toString()
-										+ "' exited with status: " + status));
+										+ "' exited with status: " + status)); //$NON-NLS-1$
 					}
 				} catch (InterruptedException ex) {
 					activator.getLog().log(
 							new Status(IStatus.ERROR, activator.getBundle()
 									.getSymbolicName(),
-									"Exception while executing '"
-											+ commandList.toString() + "'", ex));
+									"Exception while executing '" //$NON-NLS-1$
+											+ commandList.toString() + "'", ex)); //$NON-NLS-1$
 				} catch (IOException ioe) {
 					activator.getLog().log(
 							new Status(IStatus.ERROR, activator.getBundle()
 									.getSymbolicName(),
-									"Exception while executing '"
-											+ commandList.toString() + "'", ioe));
+									"Exception while executing '" //$NON-NLS-1$
+											+ commandList.toString() + "'", ioe)); //$NON-NLS-1$
 				}
 
 			}
-		}, "Launching - " + command).start();
+		}, "Launching - " + command).start(); //$NON-NLS-1$
+
 	}
 	
 	public interface FilterInputProvider {
@@ -345,10 +346,6 @@ public class Filter {
 		}
 	}
 	
-//	public class NamedConsolePrintStreamOutputConsumer extends PrintStreamOutputConsumer {
-//		
-//	}
-	
 	public static final FilterOutputConsumer DISCARD = new PrintStreamOutputConsumer();
 	
 	public static final FilterOutputConsumer TO_SYSOUT = new PrintStreamOutputConsumer(System.out);
@@ -397,6 +394,7 @@ public class Filter {
 					printWriter.flush();
 				}
 			} catch (IOException e) {
+				Activator.logError("Failed to read output.", e); //$NON-NLS-1$
 			} finally {
 				try {
 					reader.close();

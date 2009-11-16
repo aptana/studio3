@@ -1,0 +1,23 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Factory method to construct a source index instance for a given path.
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: If supplied, from_installed_gems will act just like <tt>from_gems_in</tt>.
+      This argument is deprecated and is provided just for backwards compatibility,
+      and should not generally be used.
+    label: 'deprecated:'
+  - !ruby/struct:SM::Flow::LI 
+    body: SourceIndex instance
+    label: 'return:'
+full_name: Gem::SourceIndex::from_installed_gems
+params: (*deprecated)
+name: from_installed_gems
+is_singleton: true
+aliases: []
+

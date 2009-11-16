@@ -1,0 +1,128 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: Debugger
+constants: 
+- !ruby/object:RI::Constant 
+  name: RUBY_DEBUG_DIR
+  value: File.expand_path(File.dirname(__FILE__)) unless     defined?(RUBY_DEBUG_DIR)
+  comment: 
+- !ruby/object:RI::Constant 
+  name: PORT
+  value: 8989 unless defined?(PORT)
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: the port number used for remote debugging
+- !ruby/object:RI::Constant 
+  name: INITFILE
+  value: '''rdebug.ini'''
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Of course MS Windows has to be different
+- !ruby/object:RI::Constant 
+  name: HOME_DIR
+  value: (ENV['HOME'] ||                     ENV['HOMEDRIVE'].to_s + ENV['HOMEPATH'].to_s).to_s
+  comment: 
+- !ruby/object:RI::Constant 
+  name: INITFILE
+  value: '''.rdebugrc'''
+  comment: 
+- !ruby/object:RI::Constant 
+  name: HOME_DIR
+  value: ENV['HOME'].to_s
+  comment: 
+comment: 
+attributes: 
+- !ruby/object:RI::Attribute 
+  name: annotate
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: gdb-style annotation mode. Used in GNU Emacs interface
+  rw: RW
+- !ruby/object:RI::Attribute 
+  name: control_thread
+  comment: 
+  rw: R
+- !ruby/object:RI::Attribute 
+  name: start_sentinal
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: If set, a string to look for in caller() and is used to see if the call
+      stack is truncated.
+  rw: RW
+- !ruby/object:RI::Attribute 
+  name: thread
+  comment: 
+  rw: R
+- !ruby/object:RI::Attribute 
+  name: wait_connection
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: in remote mode, wait for the remote connection
+  rw: RW
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: info_args
+- !ruby/object:RI::MethodSummary 
+  name: info_breakpoints
+- !ruby/object:RI::MethodSummary 
+  name: info_display
+- !ruby/object:RI::MethodSummary 
+  name: info_file
+- !ruby/object:RI::MethodSummary 
+  name: info_files
+- !ruby/object:RI::MethodSummary 
+  name: info_global_variables
+- !ruby/object:RI::MethodSummary 
+  name: info_instance_variables
+- !ruby/object:RI::MethodSummary 
+  name: info_line
+- !ruby/object:RI::MethodSummary 
+  name: info_locals
+- !ruby/object:RI::MethodSummary 
+  name: info_program
+- !ruby/object:RI::MethodSummary 
+  name: info_stack
+- !ruby/object:RI::MethodSummary 
+  name: info_thread
+- !ruby/object:RI::MethodSummary 
+  name: info_threads
+- !ruby/object:RI::MethodSummary 
+  name: info_variables
+- !ruby/object:RI::MethodSummary 
+  name: regexp
+- !ruby/object:RI::MethodSummary 
+  name: regexp
+- !ruby/object:RI::MethodSummary 
+  name: regexp
+full_name: Debugger
+superclass: 
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: help
+- !ruby/object:RI::MethodSummary 
+  name: help
+- !ruby/object:RI::MethodSummary 
+  name: help
+- !ruby/object:RI::MethodSummary 
+  name: help_command
+- !ruby/object:RI::MethodSummary 
+  name: help_command
+- !ruby/object:RI::MethodSummary 
+  name: help_command
+- !ruby/object:RI::MethodSummary 
+  name: run_init_script
+- !ruby/object:RI::MethodSummary 
+  name: run_script
+- !ruby/object:RI::MethodSummary 
+  name: settings
+- !ruby/object:RI::MethodSummary 
+  name: start_client
+- !ruby/object:RI::MethodSummary 
+  name: start_remote

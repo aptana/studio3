@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The path to standard location of the user's .gemrc file.
+full_name: Gem::config_file
+params: ()
+name: config_file
+is_singleton: true
+aliases: []
+

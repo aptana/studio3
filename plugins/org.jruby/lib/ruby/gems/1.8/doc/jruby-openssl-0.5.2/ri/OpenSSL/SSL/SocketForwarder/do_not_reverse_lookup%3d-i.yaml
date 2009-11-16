@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: OpenSSL::SSL::SocketForwarder#do_not_reverse_lookup=
+params: (flag)
+name: do_not_reverse_lookup=
+is_singleton: false
+aliases: []
+

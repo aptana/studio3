@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::HelpCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/help_command.rb, line 106</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">command_manager</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">CommandManager</span>.<span class="ruby-identifier">instance</span>
+    <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:args</span>][<span class="ruby-value">0</span>]
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">begins?</span> <span class="ruby-value str">&quot;commands&quot;</span>, <span class="ruby-identifier">arg</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">out</span> = []
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;GEM commands are:&quot;</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+
+      <span class="ruby-identifier">margin_width</span> = <span class="ruby-value">4</span>
+
+      <span class="ruby-identifier">desc_width</span> = <span class="ruby-identifier">command_manager</span>.<span class="ruby-identifier">command_names</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">n</span>.<span class="ruby-identifier">size</span> }.<span class="ruby-identifier">max</span> <span class="ruby-operator">+</span> <span class="ruby-value">4</span>
+
+      <span class="ruby-identifier">summary_width</span> = <span class="ruby-value">80</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">margin_width</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">desc_width</span>
+      <span class="ruby-identifier">wrap_indent</span> = <span class="ruby-value str">' '</span> <span class="ruby-operator">*</span> (<span class="ruby-identifier">margin_width</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">desc_width</span>)
+      <span class="ruby-identifier">format</span> = <span class="ruby-node">&quot;#{' ' * margin_width}%-#{desc_width}s%s&quot;</span>
+
+      <span class="ruby-identifier">command_manager</span>.<span class="ruby-identifier">command_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cmd_name</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">summary</span> = <span class="ruby-identifier">command_manager</span>[<span class="ruby-identifier">cmd_name</span>].<span class="ruby-identifier">summary</span>
+        <span class="ruby-identifier">summary</span> = <span class="ruby-identifier">wrap</span>(<span class="ruby-identifier">summary</span>, <span class="ruby-identifier">summary_width</span>).<span class="ruby-identifier">split</span> <span class="ruby-value str">&quot;\n&quot;</span>
+        <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sprintf</span>(<span class="ruby-identifier">format</span>, <span class="ruby-identifier">cmd_name</span>, <span class="ruby-identifier">summary</span>.<span class="ruby-identifier">shift</span>)
+        <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">summary</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{wrap_indent}#{summary.shift}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;For help on a particular command, use 'gem help COMMAND'.&quot;</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;Commands may be abbreviated, so long as they are unambiguous.&quot;</span>
+      <span class="ruby-identifier">out</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;e.g. 'gem i rake' is short for 'gem install rake'.&quot;</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-identifier">out</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>)
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">begins?</span> <span class="ruby-value str">&quot;options&quot;</span>, <span class="ruby-identifier">arg</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Command</span><span class="ruby-operator">::</span><span class="ruby-constant">HELP</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">begins?</span> <span class="ruby-value str">&quot;examples&quot;</span>, <span class="ruby-identifier">arg</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-constant">EXAMPLES</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">begins?</span> <span class="ruby-value str">&quot;platforms&quot;</span>, <span class="ruby-identifier">arg</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-constant">PLATFORMS</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:help</span>] <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">command</span> = <span class="ruby-identifier">command_manager</span>[<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:help</span>]]
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">command</span>
+        <span class="ruby-comment cmt"># help with provided command</span>
+        <span class="ruby-identifier">command</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-value str">&quot;--help&quot;</span>)
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">alert_error</span> <span class="ruby-node">&quot;Unknown command #{options[:help]}.  Try 'gem help commands'&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">arg</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">possibilities</span> = <span class="ruby-identifier">command_manager</span>.<span class="ruby-identifier">find_command_possibilities</span>(<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">downcase</span>)
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">possibilities</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+        <span class="ruby-identifier">command</span> = <span class="ruby-identifier">command_manager</span>[<span class="ruby-identifier">possibilities</span>.<span class="ruby-identifier">first</span>]
+        <span class="ruby-identifier">command</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-value str">&quot;--help&quot;</span>)
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">possibilities</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Ambiguous command #{arg} (#{possibilities.join(', ')})&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Unknown command #{arg}. Try gem help commands&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Command</span><span class="ruby-operator">::</span><span class="ruby-constant">HELP</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

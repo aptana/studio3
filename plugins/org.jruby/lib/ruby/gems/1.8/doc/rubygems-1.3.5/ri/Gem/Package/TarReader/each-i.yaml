@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: entry
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Iterates over files in the tarball yielding each entry
+full_name: Gem::Package::TarReader#each
+params: () {|entry| ...}
+name: each
+is_singleton: false
+aliases: 
+- !ruby/object:RI::AliasName 
+  name: each_entry

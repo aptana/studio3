@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Reconstruct the source index from the specifications in <tt>spec_dirs</tt>.
+full_name: Gem::SourceIndex#load_gems_in
+params: (*spec_dirs)
+name: load_gems_in
+is_singleton: false
+aliases: []
+

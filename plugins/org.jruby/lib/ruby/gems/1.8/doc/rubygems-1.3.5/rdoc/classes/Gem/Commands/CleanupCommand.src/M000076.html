@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::CleanupCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/cleanup_command.rb, line 38</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Cleaning up installed gems...&quot;</span>
+    <span class="ruby-identifier">primary_gems</span> = {}
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">primary_gems</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span>
+         <span class="ruby-identifier">primary_gems</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>].<span class="ruby-identifier">version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">primary_gems</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">spec</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gems_to_cleanup</span> = []
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem_name</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">dep</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">gem_name</span>, <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+        <span class="ruby-identifier">specs</span> = <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>.<span class="ruby-identifier">search</span> <span class="ruby-identifier">dep</span>
+        <span class="ruby-identifier">specs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">gems_to_cleanup</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">spec</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">source_index</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">gems_to_cleanup</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">spec</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gems_to_cleanup</span> = <span class="ruby-identifier">gems_to_cleanup</span>.<span class="ruby-identifier">select</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">primary_gems</span>[<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>].<span class="ruby-identifier">version</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>
+    }
+
+    <span class="ruby-identifier">deplist</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DependencyList</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-identifier">gems_to_cleanup</span>.<span class="ruby-identifier">uniq</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">deplist</span>.<span class="ruby-identifier">add</span> <span class="ruby-identifier">spec</span> <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">deps</span> = <span class="ruby-identifier">deplist</span>.<span class="ruby-identifier">strongly_connected_components</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">reverse</span>
+
+    <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:dryrun</span>] <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Dry Run Mode: Would uninstall #{spec.full_name}&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Attempting to uninstall #{spec.full_name}&quot;</span>
+
+        <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:args</span>] = [<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>]
+
+        <span class="ruby-identifier">uninstall_options</span> = {
+          <span class="ruby-identifier">:executables</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>,
+          <span class="ruby-identifier">:version</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;= #{spec.version}&quot;</span>,
+        }
+
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">user_dir</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">installation_path</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">uninstall_options</span>[<span class="ruby-identifier">:install_dir</span>] = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">installation_path</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">uninstaller</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Uninstaller</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">uninstall_options</span>
+
+        <span class="ruby-keyword kw">begin</span>
+          <span class="ruby-identifier">uninstaller</span>.<span class="ruby-identifier">uninstall</span>
+        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">DependencyRemovalException</span>, <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>,
+               <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">GemNotInHomeException</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Unable to uninstall #{spec.full_name}:&quot;</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;\t#{e.class}: #{e.message}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Clean Up Complete&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

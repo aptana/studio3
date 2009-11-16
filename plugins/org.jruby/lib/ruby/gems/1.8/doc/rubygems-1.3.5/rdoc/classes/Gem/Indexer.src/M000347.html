@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>build_rss (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 298</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_rss</span>(<span class="ruby-identifier">index</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@rss_host</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-ivar">@rss_gems_host</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">alert_warning</span> <span class="ruby-value str">&quot;no --rss-host or --rss-gems-host, RSS generation disabled&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">return</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">require</span> <span class="ruby-value str">'cgi'</span>
+    <span class="ruby-identifier">require</span> <span class="ruby-value str">'rubygems/text'</span>
+
+    <span class="ruby-identifier">extend</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">time</span> <span class="ruby-value str">'Generated rss'</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">open</span> <span class="ruby-ivar">@rss_index</span>, <span class="ruby-value str">'wb'</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">rss_host</span> = <span class="ruby-constant">CGI</span>.<span class="ruby-identifier">escapeHTML</span> <span class="ruby-ivar">@rss_host</span>
+        <span class="ruby-identifier">rss_title</span> = <span class="ruby-constant">CGI</span>.<span class="ruby-identifier">escapeHTML</span>(<span class="ruby-ivar">@rss_title</span> <span class="ruby-operator">||</span> <span class="ruby-value str">'gems'</span>)
+
+        <span class="ruby-identifier">io</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;&lt;?xml version=\&quot;1.0\&quot;?&gt;\n&lt;rss version=\&quot;2.0\&quot;&gt;\n&lt;channel&gt;\n&lt;title&gt;\#{rss_title}&lt;/title&gt;\n&lt;link&gt;http://\#{rss_host}&lt;/link&gt;\n&lt;description&gt;Recently released gems from http://\#{rss_host}&lt;/description&gt;\n&lt;generator&gt;RubyGems v\#{Gem::RubyGemsVersion}&lt;/generator&gt;\n&lt;docs&gt;http://cyber.law.harvard.edu/rss/rss.html&lt;/docs&gt;\n&quot;</span>
+
+        <span class="ruby-identifier">today</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Specification</span><span class="ruby-operator">::</span><span class="ruby-constant">TODAY</span>
+        <span class="ruby-identifier">yesterday</span> = <span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">86400</span>
+
+        <span class="ruby-identifier">index</span> = <span class="ruby-identifier">index</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">spec_date</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">date</span>
+
+          <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">spec_date</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Date</span>
+            <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">spec_date</span>.<span class="ruby-identifier">to_s</span>) <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">yesterday</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Time</span>
+            <span class="ruby-identifier">spec_date</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">yesterday</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">index</span> = <span class="ruby-identifier">index</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">spec_date</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">date</span>
+
+          <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">spec_date</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Date</span>
+            <span class="ruby-constant">Time</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">spec_date</span>.<span class="ruby-identifier">to_s</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-identifier">today</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">Time</span>
+            <span class="ruby-identifier">spec_date</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-identifier">today</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">index</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> [<span class="ruby-operator">-</span><span class="ruby-identifier">spec</span>.<span class="ruby-identifier">date</span>.<span class="ruby-identifier">to_i</span>, <span class="ruby-identifier">spec</span>] }.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">gem_path</span> = <span class="ruby-constant">CGI</span>.<span class="ruby-identifier">escapeHTML</span> <span class="ruby-node">&quot;http://#{@rss_gems_host}/gems/#{spec.full_name}.gem&quot;</span>
+          <span class="ruby-identifier">size</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">stat</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">loaded_from</span>).<span class="ruby-identifier">size</span> <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">next</span>
+
+          <span class="ruby-identifier">description</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">description</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">summary</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>
+          <span class="ruby-identifier">authors</span> = <span class="ruby-constant">Array</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">authors</span>
+          <span class="ruby-identifier">emails</span> = <span class="ruby-constant">Array</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">email</span>
+          <span class="ruby-identifier">authors</span> = <span class="ruby-identifier">emails</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">authors</span>).<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">email</span>, <span class="ruby-identifier">author</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">email</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot; (#{author})&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">author</span> <span class="ruby-keyword kw">and</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">author</span>.<span class="ruby-identifier">empty?</span>
+          <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">join</span> <span class="ruby-value str">', '</span>
+
+          <span class="ruby-identifier">description</span> = <span class="ruby-identifier">description</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\n\n+/</span>).<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">chunk</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">format_text</span> <span class="ruby-identifier">chunk</span>, <span class="ruby-value">78</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">description</span> = <span class="ruby-identifier">description</span>.<span class="ruby-identifier">join</span> <span class="ruby-value str">&quot;\n\n&quot;</span>
+
+          <span class="ruby-identifier">item</span> = <span class="ruby-value str">''</span>
+
+          <span class="ruby-identifier">item</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;&lt;item&gt;\n&lt;title&gt;\#{CGI.escapeHTML spec.full_name}&lt;/title&gt;\n&lt;description&gt;\n&amp;lt;pre&amp;gt;\#{CGI.escapeHTML description.chomp}&amp;lt;/pre&amp;gt;\n&lt;/description&gt;\n&lt;author&gt;\#{CGI.escapeHTML authors}&lt;/author&gt;\n&lt;guid&gt;\#{CGI.escapeHTML spec.full_name}&lt;/guid&gt;\n&lt;enclosure url=\\\&quot;\#{gem_path}\\\&quot;\nlength=\\\&quot;\#{size}\\\&quot; type=\\\&quot;application/octet-stream\\\&quot; /&gt;\n&lt;pubDate&gt;\#{spec.date.rfc2822}&lt;/pubDate&gt;\n&quot;</span>
+
+          <span class="ruby-identifier">item</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;&lt;link&gt;\#{CGI.escapeHTML spec.homepage}&lt;/link&gt;\n&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">homepage</span>
+
+          <span class="ruby-identifier">item</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;&lt;/item&gt;\n&quot;</span>
+
+          <span class="ruby-identifier">io</span>.<span class="ruby-identifier">puts</span> <span class="ruby-identifier">item</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">io</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;&lt;/channel&gt;\n&lt;/rss&gt;\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-ivar">@files</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-ivar">@rss_index</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

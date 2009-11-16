@@ -83,7 +83,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	@Override
 	public String getDisplayString() {
 		Template template = getTemplate();
-		return template.getDescription() + " [ " + template.getName() + "\u21E5 ]";
+		return template.getDescription() + " [ " + template.getName() + "\u21E5 ]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public StyledString getStyledDisplayString() {
@@ -102,7 +102,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		this.triggerChar = triggerChar;
 	}
 	
-	private static final String TRIGGER_CHARS = "123456789";
+	private static final String TRIGGER_CHARS = "123456789"; //$NON-NLS-1$
 	
 	void setTemplateProposals(ICompletionProposal[] templateProposals) {
 		this.templateProposals = templateProposals;
