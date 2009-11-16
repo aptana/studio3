@@ -32,21 +32,14 @@ public class Diff
 	private boolean isBinary;
 	private String oldName;
 	private String newName;
-	private boolean hasModeChange;
-	private String oldMode;
-	private String newMode;
 	private GitCommit commit;
 
-	private Diff(GitCommit commit, boolean binary, String startname, String endname, boolean modeChange,
-			String oldMode, String newMode)
+	private Diff(GitCommit commit, boolean binary, String startname, String endname)
 	{
 		this.commit = commit;
 		this.isBinary = binary;
 		this.oldName = startname;
 		this.newName = endname;
-		this.hasModeChange = modeChange;
-		this.oldMode = oldMode;
-		this.newMode = newMode;
 	}
 
 	private static List<Diff> parse(GitCommit commit, Reader content) throws IOException
@@ -55,12 +48,9 @@ public class Diff
 
 		boolean header = false;
 		boolean binary = false;
-		boolean mode_change = false;
 		boolean readPrologue = false;
 		String startname = ""; //$NON-NLS-1$
 		String endname = ""; //$NON-NLS-1$
-		String new_mode = ""; //$NON-NLS-1$
-		String old_mode = ""; //$NON-NLS-1$
 		List<Diff> files = new ArrayList<Diff>();
 
 		BufferedReader buffReader = new BufferedReader(content);
@@ -79,13 +69,10 @@ public class Diff
 				if (!readPrologue)
 					readPrologue = true;
 				else
-					files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
+					files.add(new Diff(commit, binary, startname, endname));
 				startname = ""; //$NON-NLS-1$
 				endname = ""; //$NON-NLS-1$
-				old_mode = ""; //$NON-NLS-1$
-				new_mode = ""; //$NON-NLS-1$
 				binary = false;
-				mode_change = false;
 
 				Matcher m = DIFF_GIT_PATTERN.matcher(l);
 				if (m.find())
@@ -108,19 +95,9 @@ public class Diff
 						startname = DEV_NULL;
 
 					m = NEW_MODE_PATTERN.matcher(l);
-					if (m.find())
-					{
-						mode_change = true;
-						new_mode = m.group(1);
-					}
 					break;
 				case 'o':
 					m = OLD_MODE_PATTERN.matcher(l);
-					if (m.find())
-					{
-						mode_change = true;
-						old_mode = m.group(1);
-					}
 					break;
 				case 'd':
 					m = DELETED_FILE_MODE_PATTERN.matcher(l);
@@ -167,7 +144,7 @@ public class Diff
 					break;
 			}
 		}
-		files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
+		files.add(new Diff(commit, binary, startname, endname));
 		log(MessageFormat.format("Took {0}ms to parse out {1} diffs", (System.currentTimeMillis() - start), files.size())); //$NON-NLS-1$
 		return files;
 	}
