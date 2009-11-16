@@ -45,6 +45,7 @@ public class CommitFileRevision extends GitFileRevision
 		return new IStorage()
 		{
 
+			@SuppressWarnings("unchecked")
 			public Object getAdapter(Class adapter)
 			{
 				return null;
@@ -69,8 +70,8 @@ public class CommitFileRevision extends GitFileRevision
 			{
 				try
 				{
-					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show",
-							commit.sha() + ":" + path);
+					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show", //$NON-NLS-1$
+							commit.sha() + ":" + path); //$NON-NLS-1$
 					return p.getInputStream();
 				}
 				catch (IOException e)

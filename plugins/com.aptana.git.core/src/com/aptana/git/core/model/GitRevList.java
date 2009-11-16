@@ -58,7 +58,7 @@ public class GitRevList
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
 		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at"; //$NON-NLS-1$
-		boolean showSign = rev.hasLeftRight();
+		boolean showSign = ((rev == null) ? false : rev.hasLeftRight());
 		if (showSign)
 			formatString += "\01%m"; //$NON-NLS-1$
 
@@ -77,7 +77,7 @@ public class GitRevList
 		else
 			arguments.addAll(rev.parameters());
 
-		String directory = rev.getWorkingDirectory() != null ? rev.getWorkingDirectory() : repository
+		String directory = (rev != null && rev.getWorkingDirectory() != null) ? rev.getWorkingDirectory() : repository
 				.workingDirectory();
 
 		if (subMonitor.isCanceled())

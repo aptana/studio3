@@ -163,13 +163,6 @@ public class GitIndex
 			amendEnvironment.put(GitEnv.GIT_AUTHOR_EMAIL, m.group(2));
 			amendEnvironment.put(GitEnv.GIT_AUTHOR_DATE, m.group(3));
 		}
-
-		// Find the commit message
-		int r = message.indexOf("\n\n"); //$NON-NLS-1$
-		if (r != -1)
-		{
-			String commitMessage = message.substring(r + 2);
-		}
 	}
 
 	private void readOtherFiles(String string)

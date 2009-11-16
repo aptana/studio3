@@ -86,7 +86,7 @@ class GitResourceListener implements IResourceChangeListener
 		}
 		catch (final CoreException e)
 		{
-			handleException(null, e);
+			GitPlugin.logError(e);
 		}
 
 		if (resourcesToUpdate.isEmpty())
@@ -94,7 +94,7 @@ class GitResourceListener implements IResourceChangeListener
 
 		for (final GitRepository repo : resourcesToUpdate)
 		{
-			Job job = new Job("Updating Git repo index")
+			Job job = new Job("Updating Git repo index") //$NON-NLS-1$
 			{
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
@@ -107,12 +107,6 @@ class GitResourceListener implements IResourceChangeListener
 			job.setPriority(Job.SHORT);
 			job.schedule();
 		}
-	}
-
-	private void handleException(Object object, CoreException e)
-	{
-		// TODO Auto-generated method stub
-
 	}
 
 	protected GitRepository getRepo(IResource resource)

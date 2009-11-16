@@ -2,6 +2,7 @@ package com.aptana.git.core;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -89,6 +90,11 @@ public class GitPlugin extends Plugin
 	public static void logError(String msg, Throwable e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
+	}
+	
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
 	}
 
 	public static void logInfo(String string)
