@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.red.filewatcher.DirectoryChangeListener;
 import com.aptana.red.filewatcher.FileWatcherPlugin;
 
 class DirectoryWatcher

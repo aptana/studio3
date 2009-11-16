@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - initial implementation and ideas 
  *******************************************************************************/
-package com.aptana.red.filewatcher;
+package com.aptana.red.filewatcher.poller;
 
 import java.io.File;
 
