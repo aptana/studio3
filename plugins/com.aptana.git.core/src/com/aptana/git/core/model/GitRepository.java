@@ -136,7 +136,7 @@ public class GitRepository
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir");
+		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (newPath.equals(GIT_DIR))
 			return new File(repositoryPath, GIT_DIR).toURI();
 		if (newPath.length() > 0)
@@ -155,10 +155,10 @@ public class GitRepository
 
 	public String workingDirectory()
 	{
-		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/"))
+		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/")) //$NON-NLS-1$ //$NON-NLS-2$
 			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse", "--is-inside-work-tree")
-				.equals("true"))
+		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
+				.equals("true")) //$NON-NLS-1$
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
 		return null;
@@ -209,7 +209,7 @@ public class GitRepository
 		if (branchName == null)
 			return false;
 		String oldBranchName = currentBranch.simpleRef().shortName();
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout",
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
 				branchName);
 		if (result.keySet().iterator().next().intValue() != 0)
 			return false;
@@ -226,8 +226,8 @@ public class GitRepository
 
 	public String parseReference(String parent)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse",
-				"--verify", parent);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse", //$NON-NLS-1$
+				"--verify", parent); //$NON-NLS-1$
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
 			return null;
@@ -236,8 +236,8 @@ public class GitRepository
 
 	private static boolean isBareRepository(String path)
 	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository");
-		return "true".equals(output);
+		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
+		return "true".equals(output); //$NON-NLS-1$
 	}
 
 	private boolean reloadRefs()
@@ -247,9 +247,9 @@ public class GitRepository
 
 		refs = new HashMap<String, List<GitRef>>();
 
-		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref",
-				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs");
-		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n");
+		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref", //$NON-NLS-1$
+				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs"); //$NON-NLS-1$ //$NON-NLS-2$
+		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n"); //$NON-NLS-1$
 
 		for (String line : lines)
 		{
@@ -257,7 +257,7 @@ public class GitRepository
 			if (line.length() == 0)
 				continue;
 
-			List<String> components = StringUtil.componentsSeparatedByString(line, " ");
+			List<String> components = StringUtil.componentsSeparatedByString(line, " "); //$NON-NLS-1$
 
 			// First do the ref matching. If this ref is new, add it to our ref list
 			GitRef newRef = GitRef.refFromString(components.get(0));
@@ -308,7 +308,7 @@ public class GitRepository
 
 	private String parseSymbolicReference(String reference)
 	{
-		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference);
+		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference); //$NON-NLS-1$ //$NON-NLS-2$
 		if (ref.startsWith(GitRef.REFS))
 			return ref;
 
@@ -396,14 +396,14 @@ public class GitRepository
 		String hookPath = fileURL.getPath();
 		if (!hookPath.endsWith(File.separator))
 			hookPath += File.separator;
-		hookPath += "hooks" + File.separator + name;
+		hookPath += "hooks" + File.separator + name; //$NON-NLS-1$
 		File hook = new File(hookPath);
 		if (!hook.exists() || !hook.isFile())
 			return true;
 
 		try
 		{
-			Method method = File.class.getMethod("canExecute", null);
+			Method method = File.class.getMethod("canExecute", null); //$NON-NLS-1$
 			if (method != null)
 			{
 				Boolean canExecute = (Boolean) method.invoke(hook, null);
@@ -418,7 +418,7 @@ public class GitRepository
 
 		Map<String, String> env = new HashMap<String, String>();
 		env.put(GitEnv.GIT_DIR, fileURL.getPath());
-		env.put(GitEnv.GIT_INDEX_FILE, fileURL.getPath() + File.separator + "index");
+		env.put(GitEnv.GIT_INDEX_FILE, fileURL.getPath() + File.separator + "index"); //$NON-NLS-1$
 
 		int ret = 1;
 		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);
@@ -505,9 +505,9 @@ public class GitRepository
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
 		String workingDirectory = workingDirectory();
-		if (!workingDirectory.endsWith("/"))
+		if (!workingDirectory.endsWith("/")) //$NON-NLS-1$
 		{
-			workingDirectory += "/";
+			workingDirectory += "/"; //$NON-NLS-1$
 		}
 		for (ChangedFile changedFile : index().changedFiles())
 		{
@@ -550,7 +550,7 @@ public class GitRepository
 		if (existing != null)
 			return;
 
-		GitExecutable.instance().runInBackground(path, "init");
+		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
 	}
 
 	/**
@@ -607,12 +607,12 @@ public class GitRepository
 	 */
 	public GitRef remoteTrackingBranch(String branchName)
 	{
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp",
-				"^branch\\." + branchName + "\\.remote");
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
+				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (output == null || output.trim().length() == 0)
 			return null;
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName);
+		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
 	}
 
 	/**
@@ -627,9 +627,9 @@ public class GitRepository
 	public boolean createBranch(String branchName, boolean track, String startPoint)
 	{
 		List<String> args = new ArrayList<String>();
-		args.add("branch");
+		args.add("branch"); //$NON-NLS-1$
 		if (track)
-			args.add("--track");
+			args.add("--track"); //$NON-NLS-1$
 		args.add(branchName);
 		if (startPoint != null && startPoint.trim().length() > 0)
 			args.add(startPoint);
@@ -641,14 +641,14 @@ public class GitRepository
 
 	public boolean validBranchName(String branchName)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format",
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format", //$NON-NLS-1$
 				GitRef.REFS_HEADS + branchName);
 		return result.keySet().iterator().next() == 0;
 	}
 
 	public boolean deleteFile(String filePath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
 			return false;
 		index().refresh();
@@ -657,7 +657,7 @@ public class GitRepository
 
 	public boolean deleteFolder(String folderPath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r",
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath);
 		if (result.keySet().iterator().next() != 0)
 			return false;
@@ -667,7 +667,7 @@ public class GitRepository
 
 	public boolean moveFile(String source, String dest)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
 			return false;
 		index().refresh();
