@@ -304,15 +304,15 @@ class CommitGraphTable extends TableViewer
 		{
 			y += 1;
 			String txt = ref.shortName();
-			if (ref.type().equals(GitRef.HEAD_TYPE))
+			if (ref.type().equals(GitRef.TYPE.HEAD))
 			{
 				g.setBackground(refOrange);
 			}
-			else if (ref.type().equals(GitRef.REMOTE_TYPE))
+			else if (ref.type().equals(GitRef.TYPE.REMOTE))
 			{
 				g.setBackground(refBlue);
 			}
-			else if (ref.type().equals(GitRef.TAG_TYPE))
+			else if (ref.type().equals(GitRef.TYPE.TAG))
 			{
 				g.setBackground(refYellow);
 			}

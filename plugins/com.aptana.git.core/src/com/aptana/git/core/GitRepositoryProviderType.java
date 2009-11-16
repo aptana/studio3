@@ -1,5 +1,7 @@
 package com.aptana.git.core;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -24,7 +26,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 			return;
 
 		final IProject toConnect = project;
-		Job job = new Job("Auto-share")
+		Job job = new Job(Messages.GitRepositoryProviderType_AutoShareJob_Title)
 		{
 
 			@Override
@@ -32,7 +34,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 			{
 				if (monitor == null)
 					monitor = new NullProgressMonitor();
-				monitor.beginTask("Attaching project " + toConnect.getName(), 100);
+				monitor.beginTask(MessageFormat.format(Messages.GitRepositoryProviderType_AttachingProject_Message, toConnect.getName()), 100);
 				try
 				{
 					GitRepository.attachExisting(toConnect, new SubProgressMonitor(monitor, 100));

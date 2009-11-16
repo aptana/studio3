@@ -11,18 +11,19 @@ public class GitRef
 	/**
 	 * Ref dirs
 	 */
-	static final String REFS = "refs/";
-	static final String REFS_REMOTES = REFS + "remotes/";
-	private static final String REFS_TAGS = REFS + "tags/";
-	static final String REFS_HEADS = REFS + "heads/";
+	static final String REFS = "refs/"; //$NON-NLS-1$
+	static final String REFS_REMOTES = REFS + "remotes/"; //$NON-NLS-1$
+	private static final String REFS_TAGS = REFS + "tags/"; //$NON-NLS-1$
+	static final String REFS_HEADS = REFS + "heads/"; //$NON-NLS-1$
 
 	/**
 	 * Ref Types
 	 */
-	public static final String TAG_TYPE = "tag";
-	public static final String HEAD_TYPE = "head";
-	public static final String REMOTE_TYPE = "remote";
-
+	public enum TYPE
+	{
+		TAG, HEAD, REMOTE
+	}
+	
 	private String ref;
 
 	private GitRef(String string)
@@ -50,24 +51,31 @@ public class GitRef
 	 */
 	public String shortName()
 	{
-		if (type() != null)
-			return ref.substring(type().length() + 7);
-		return ref;
+		switch (type())
+		{
+			case REMOTE:
+				return ref.substring(REFS_REMOTES.length());
+			case HEAD:
+				return ref.substring(REFS_HEADS.length());
+			case TAG:
+				return ref.substring(REFS_TAGS.length());
+			default:
+				return ref;
+		}
 	}
 
 	/**
 	 * Type of reference. head (local branch), remote (remote branch) or tag.
 	 * @return
 	 */
-	public String type()
+	public TYPE type()
 	{
-		// TODO Use an enum here?
 		if (ref.startsWith(REFS_HEADS))
-			return HEAD_TYPE;
+			return TYPE.HEAD;
 		if (ref.startsWith(REFS_TAGS))
-			return TAG_TYPE;
+			return TYPE.TAG;
 		if (ref.startsWith(REFS_REMOTES))
-			return REMOTE_TYPE;
+			return TYPE.REMOTE;
 		return null;
 	}
 

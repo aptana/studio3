@@ -21,7 +21,7 @@ public class GitPlugin extends Plugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git";
+	private static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitPlugin plugin;
@@ -44,7 +44,7 @@ public class GitPlugin extends Plugin
 		super.start(context);
 		plugin = this;
 		// Add a resource listener that triggers git repo index refreshes!
-		Job job = new Job("Add Git Index Resource listener")
+		Job job = new Job("Add Git Index Resource listener") //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)

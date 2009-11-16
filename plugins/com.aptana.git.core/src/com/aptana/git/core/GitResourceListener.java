@@ -80,8 +80,7 @@ class GitResourceListener implements IResourceChangeListener
 
 					if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) > 1)
 						return false; // Don't recurse when opening projects
-					else
-						return true;
+					return true;
 				}
 			}, true /* includePhantoms */);
 		}

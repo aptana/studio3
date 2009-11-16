@@ -166,24 +166,24 @@ public class GitRepository
 
 	public Set<String> localBranches()
 	{
-		return branches(GitRef.HEAD_TYPE);
+		return branches(GitRef.TYPE.HEAD);
 	}
 
 	public Set<String> remoteBranches()
 	{
-		return branches(GitRef.REMOTE_TYPE);
+		return branches(GitRef.TYPE.REMOTE);
 	}
 
 	public Set<String> allBranches()
 	{
-		return branches(GitRef.HEAD_TYPE, GitRef.REMOTE_TYPE);
+		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
 	}
 
-	private Set<String> branches(String... types)
+	private Set<String> branches(GitRef.TYPE... types)
 	{
 		if (types == null || types.length == 0)
 			return Collections.emptySet();
-		Set<String> validTypes = new HashSet<String>(Arrays.asList(types));
+		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
 		Set<String> allBranches = new HashSet<String>();
 		for (GitRevSpecifier revSpec : branches)
 		{
@@ -192,7 +192,7 @@ public class GitRepository
 			GitRef ref = revSpec.simpleRef();
 			if (ref == null || ref.type() == null)
 				continue;
-			for (String string : types)
+			for (GitRef.TYPE string : types)
 			{
 				if (ref.type().equals(string))
 					break;
@@ -320,7 +320,7 @@ public class GitRepository
 		String type = components.get(1);
 
 		String sha;
-		if (type.equals(GitRef.TAG_TYPE) && components.size() == 4)
+		if (type.equals(GitRef.TYPE.TAG) && components.size() == 4)
 			sha = components.get(3);
 		else
 			sha = components.get(2);
@@ -403,10 +403,10 @@ public class GitRepository
 
 		try
 		{
-			Method method = File.class.getMethod("canExecute", null); //$NON-NLS-1$
+			Method method = File.class.getMethod("canExecute", (Class[]) null); //$NON-NLS-1$
 			if (method != null)
 			{
-				Boolean canExecute = (Boolean) method.invoke(hook, null);
+				Boolean canExecute = (Boolean) method.invoke(hook, (Object[]) null);
 				if (!canExecute)
 					return true;
 			}
