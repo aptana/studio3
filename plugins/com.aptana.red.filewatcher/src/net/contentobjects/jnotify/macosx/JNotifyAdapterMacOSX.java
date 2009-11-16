@@ -29,7 +29,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		// load the stat function
 		static
 		{
-			System.loadLibrary("jnotify");
+			System.loadLibrary("jnotify"); //$NON-NLS-1$
 		}
 
 		JNFile(File f) throws IOException
@@ -84,7 +84,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		@Override
 		public String toString()
 		{
-			return String.format("%08x.%016x - %d", deviceid, inode, mtime);
+			return String.format("%08x.%016x - %d", deviceid, inode, mtime); //$NON-NLS-1$
 		}
 	}
 
@@ -165,7 +165,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		@Override
 		public String toString()
 		{
-			return path + " " + recursive;
+			return path + " " + recursive; //$NON-NLS-1$
 		}
 	}
 
@@ -221,7 +221,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			_mask = mask;
 			_notifyListener = listener;
 			this.path = path;
-			this.fullpath = pathFile.getPath() + "/";
+			this.fullpath = pathFile.getPath() + "/"; //$NON-NLS-1$
 			this.watchSubtree = watchSubtree;
 			paths = new TreeMap<JNFile, TreeSet<String>>();
 			jnfiles = new TreeMap<String, JNFile>();
@@ -231,7 +231,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 
 		public String toString()
 		{
-			return "wd=" + _wd;
+			return "wd=" + _wd; //$NON-NLS-1$
 		}
 
 		/**
@@ -268,7 +268,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					String filePath = files[i].getAbsolutePath();
 					filePath = filePath.substring(rootPath.length() + 1);
 					// use only the next path component
-					int slashindex = filePath.indexOf("/");
+					int slashindex = filePath.indexOf("/"); //$NON-NLS-1$
 					if (slashindex >= 0)
 					{
 						filePath = filePath.substring(0, slashindex);
@@ -404,7 +404,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					// get the next path component after rootPath
 					String oldFilePath = jnp;
 					oldFilePath = oldFilePath.substring(rootPath.length() + 1);
-					int slashindex = oldFilePath.indexOf("/");
+					int slashindex = oldFilePath.indexOf("/"); //$NON-NLS-1$
 					if (slashindex >= 0)
 					{
 						oldFilePath = oldFilePath.substring(0, slashindex);
