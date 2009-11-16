@@ -33,12 +33,12 @@ import com.aptana.git.core.GitRepositoryProvider;
 public class GitRepository
 {
 
-	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD";
-	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG";
-	private static final String COMMIT_FILE_ENCODING = "UTF-8";
-	private static final String HEAD = "HEAD";
+	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
+	private static final String HEAD = "HEAD"; //$NON-NLS-1$
 
-	public static final String GIT_DIR = ".git";
+	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
 	private List<GitRevSpecifier> branches;
 	Map<String, List<GitRef>> refs;

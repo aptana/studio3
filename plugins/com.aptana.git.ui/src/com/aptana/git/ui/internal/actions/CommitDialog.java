@@ -291,13 +291,13 @@ public class CommitDialog extends StatusDialog
 				if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
 				{
 					// Special code to draw the image if the binary file is an image
-					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg", ".ico"};
+					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg", ".ico"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 					for (String extension : imageExtensions)
 					{
 						if (file.getPath().endsWith(extension))
 						{
 							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
-							updateDiff("<img src=\"" + fullPath + "\" />");
+							updateDiff("<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
 							return;
 						}
 					}
