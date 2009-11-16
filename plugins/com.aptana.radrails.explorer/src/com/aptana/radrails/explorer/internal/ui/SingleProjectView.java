@@ -253,7 +253,7 @@ public class SingleProjectView extends CommonNavigator
 			{
 				FileWatcher.removeWatch(watcher);
 			}
-			watcher = FileWatcher.addWatch(newProject.getLocationURI().getPath(), FileWatcher.FILE_ANY, true,
+			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), FileWatcher.FILE_ANY, true,
 					new JNotifyAdapter()
 					{
 						private WorkspaceJob job;
