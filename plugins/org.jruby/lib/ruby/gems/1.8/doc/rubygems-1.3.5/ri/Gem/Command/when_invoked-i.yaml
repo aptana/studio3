@@ -1,0 +1,16 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Call the given block when invoked.
+- !ruby/struct:SM::Flow::P 
+  body: Normal command invocations just executes the <tt>execute</tt> method of the
+    command. Specifying an invocation block allows the test methods to override the
+    normal action of a command to determine that it has been invoked correctly.
+full_name: Gem::Command#when_invoked
+params: (&block)
+name: when_invoked
+is_singleton: false
+aliases: []
+

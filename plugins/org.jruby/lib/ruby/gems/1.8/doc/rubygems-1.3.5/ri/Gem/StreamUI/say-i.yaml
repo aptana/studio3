@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Display a statement.
+full_name: Gem::StreamUI#say
+params: (statement="")
+name: say
+is_singleton: false
+aliases: []
+

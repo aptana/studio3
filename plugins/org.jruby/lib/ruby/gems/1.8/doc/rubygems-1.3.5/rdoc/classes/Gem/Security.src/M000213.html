@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>sign_cert (Gem::Security)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/security.rb, line 608</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">sign_cert</span>(<span class="ruby-identifier">cert</span>, <span class="ruby-identifier">signing_key</span>, <span class="ruby-identifier">signing_cert</span>, <span class="ruby-identifier">opt</span> = {})
+    <span class="ruby-identifier">opt</span> = <span class="ruby-constant">OPT</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opt</span>)
+
+    <span class="ruby-comment cmt"># set up issuer information</span>
+    <span class="ruby-identifier">cert</span>.<span class="ruby-identifier">issuer</span> = <span class="ruby-identifier">signing_cert</span>.<span class="ruby-identifier">subject</span>
+    <span class="ruby-identifier">cert</span>.<span class="ruby-identifier">sign</span>(<span class="ruby-identifier">signing_key</span>, <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:dgst_algo</span>].<span class="ruby-identifier">new</span>)
+
+    <span class="ruby-identifier">cert</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

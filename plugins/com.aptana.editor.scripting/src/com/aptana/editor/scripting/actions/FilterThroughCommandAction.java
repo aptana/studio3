@@ -34,10 +34,12 @@ import com.aptana.editor.scripting.actions.Filter.FilterInputProvider;
 public class FilterThroughCommandAction extends TextEditorAction {
 	
 	public static IAction create(ITextEditor textEditor) {
-		return new FilterThroughCommandAction(ResourceBundle.getBundle(FilterThroughCommandAction.class.getName()), "FilterThroughCommandAction.", textEditor);
+		return new FilterThroughCommandAction(ResourceBundle.getBundle(FilterThroughCommandAction.class.getName()),
+				"FilterThroughCommandAction.", textEditor);	//$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.FilterThroughCommand";
+	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.FilterThroughCommand";	//$NON-NLS-1$
+
 	
 	private ITextViewer textViewer;
 	private StyledText textWidget;
@@ -151,9 +153,9 @@ public class FilterThroughCommandAction extends TextEditorAction {
 					case SHOW_AS_HTML:
 						File tempHmtlFile = null;
 						try {
-							tempHmtlFile = File.createTempFile(Activator.PLUGIN_ID, ".html");
+							tempHmtlFile = File.createTempFile(Activator.PLUGIN_ID, ".html"); //$NON-NLS-1$
 						} catch (IOException e) {
-							// TODO
+							Activator.logError("Could not create temporary file.", e); //$NON-NLS-1$
 						}
 						if (tempHmtlFile != null) {
 							String output = ((Filter.StringOutputConsumer)filterOutputConsumer).getOutput();
@@ -172,15 +174,16 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								try {
 									support.getExternalBrowser().openURL(tempHmtlFile.toURI().toURL());
 								} catch (PartInitException e) {
-									// TODO
+									Activator.logError("Could not launch browser.", e); //$NON-NLS-1$
 								} catch (MalformedURLException e) {
-									// TODO
+									Activator.logError("Malformed URL: "+tempHmtlFile.toURI(), e); //$NON-NLS-1$
 								}
 							}
 						}
 						break;
 					case SHOW_AS_TOOLTIP:													
-						DefaultInformationControl tooltip = new DefaultInformationControl(workbenchWindow.getShell(), "Type escape to dismiss.", null);
+						DefaultInformationControl tooltip = new DefaultInformationControl(workbenchWindow.getShell(),
+								"Type escape to dismiss.", null); //$NON-NLS-1$
 						tooltip.setInformation(((Filter.StringOutputConsumer)filterOutputConsumer).getOutput());
 						Point p = tooltip.computeSizeHint();
 						tooltip.setSize(p.x, p.y);
@@ -193,8 +196,8 @@ public class FilterThroughCommandAction extends TextEditorAction {
 						break;
 					case CREATE_NEW_DOCUMENT:
 						File file = Utilities.queryFile();
-						IEditorInput input = Utilities.createNonExistingFileEditorInput(file, "Untitled.txt");
-						String editorId = "org.eclipse.ui.DefaultTextEditor";
+						IEditorInput input = Utilities.createNonExistingFileEditorInput(file, "Untitled.txt");	//$NON-NLS-1$
+						String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
 						try
 						{
 							IEditorPart part = workbenchWindow.getActivePage().openEditor(input, editorId);
@@ -214,19 +217,19 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								}
 								catch (BadLocationException e)
 								{
-									// TODO
+									Activator.logError("", e); //$NON-NLS-1$
 								}
 							}
 
 						}
 						catch (PartInitException e)
 						{
-							// TODO
+							Activator.logError("Error opening editor.", e); //$NON-NLS-1$
 						}
 						break;
 					}
 				} catch (InterruptedException e) {
-					// TODO
+					Activator.logError("", e); //$NON-NLS-1$
 				}
 			}
 		}
@@ -242,7 +245,6 @@ public class FilterThroughCommandAction extends TextEditorAction {
 			return;
 		}
 		if (textWidget != null) {
-			// TODO
 			if (Boolean.TRUE.booleanValue()) {
 				activate();
 				return;

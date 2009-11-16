@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>remove_executables (Gem::Uninstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/uninstaller.rb, line 123</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_executables</span>(<span class="ruby-identifier">spec</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">bindir</span> = <span class="ruby-ivar">@bin_dir</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@bin_dir</span> <span class="ruby-operator">:</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">bindir</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">installation_path</span>)
+
+      <span class="ruby-identifier">list</span> = <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>).<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">s</span>.<span class="ruby-identifier">version</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>
+      }
+
+      <span class="ruby-identifier">executables</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">clone</span>
+
+      <span class="ruby-identifier">list</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">s</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">exe_name</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">delete</span> <span class="ruby-identifier">exe_name</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">executables</span>.<span class="ruby-identifier">empty?</span>
+
+      <span class="ruby-identifier">answer</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@force_executables</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span>
+                 <span class="ruby-identifier">ask_yes_no</span>(<span class="ruby-value str">&quot;Remove executables:\n&quot;</span> \
+                            <span class="ruby-node">&quot;\t#{spec.executables.join(&quot;, &quot;)}\n\nin addition to the gem?&quot;</span>,
+                            <span class="ruby-keyword kw">true</span>) <span class="ruby-comment cmt"># &quot; # appease ruby-mode - don't ask</span>
+               <span class="ruby-keyword kw">else</span>
+                 <span class="ruby-ivar">@force_executables</span>
+               <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">answer</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;Executables and scripts will remain installed.&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">FilePermissionError</span>, <span class="ruby-identifier">bindir</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">writable?</span> <span class="ruby-identifier">bindir</span>
+
+        <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">executables</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">exe_name</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Removing #{exe_name}&quot;</span>
+          <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">rm_f</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">exe_name</span>)
+          <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">rm_f</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">bindir</span>, <span class="ruby-node">&quot;#{exe_name}.bat&quot;</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

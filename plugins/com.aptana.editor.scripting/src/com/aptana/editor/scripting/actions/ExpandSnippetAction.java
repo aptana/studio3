@@ -17,10 +17,10 @@ import org.eclipse.ui.texteditor.TextEditorAction;
 public class ExpandSnippetAction extends TextEditorAction {
 	
 	public static IAction create(ITextEditor textEditor) {
-		return new ExpandSnippetAction(ResourceBundle.getBundle(ExpandSnippetAction.class.getName()), "ExpandSnippetAction.", textEditor);
+		return new ExpandSnippetAction(ResourceBundle.getBundle(ExpandSnippetAction.class.getName()), "ExpandSnippetAction.", textEditor); //$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.ExpandSnippet";
+	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.ExpandSnippet"; //$NON-NLS-1$
 	
 	private ITextViewer textViewer;
 	private StyledText textWidget;

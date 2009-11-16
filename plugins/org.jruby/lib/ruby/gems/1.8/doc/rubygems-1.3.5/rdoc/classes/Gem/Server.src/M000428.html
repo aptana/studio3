@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>show_rdoc_for_pattern (Gem::Server)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/server.rb, line 692</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show_rdoc_for_pattern</span>(<span class="ruby-identifier">pattern</span>, <span class="ruby-identifier">res</span>)
+    <span class="ruby-identifier">found_gems</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">glob</span>(<span class="ruby-node">&quot;#{@gem_dir}/doc/#{pattern}&quot;</span>).<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">path</span><span class="ruby-operator">|</span>
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">path</span>, <span class="ruby-value str">'rdoc/index.html'</span>)
+    }
+    <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">found_gems</span>.<span class="ruby-identifier">length</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value">0</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span>
+    <span class="ruby-keyword kw">when</span> <span class="ruby-value">1</span>
+      <span class="ruby-identifier">new_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">found_gems</span>[<span class="ruby-value">0</span>])
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">status</span> = <span class="ruby-value">302</span>
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'Location'</span>] = <span class="ruby-node">&quot;/doc_root/#{new_path}/rdoc/index.html&quot;</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">doc_items</span> = []
+      <span class="ruby-identifier">found_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file_name</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">base_name</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">basename</span>(<span class="ruby-identifier">file_name</span>)
+        <span class="ruby-identifier">doc_items</span> <span class="ruby-operator">&lt;&lt;</span> {
+          <span class="ruby-identifier">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">base_name</span>,
+          <span class="ruby-identifier">:url</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-node">&quot;/doc_root/#{base_name}/rdoc/index.html&quot;</span>,
+          <span class="ruby-identifier">:summary</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">''</span>
+        }
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">template</span> = <span class="ruby-constant">ERB</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">RDOC_SEARCH_TEMPLATE</span>)
+      <span class="ruby-identifier">res</span>[<span class="ruby-value str">'content-type'</span>] = <span class="ruby-value str">'text/html'</span>
+      <span class="ruby-identifier">result</span> = <span class="ruby-identifier">template</span>.<span class="ruby-identifier">result</span> <span class="ruby-identifier">binding</span>
+      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">body</span> = <span class="ruby-identifier">result</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

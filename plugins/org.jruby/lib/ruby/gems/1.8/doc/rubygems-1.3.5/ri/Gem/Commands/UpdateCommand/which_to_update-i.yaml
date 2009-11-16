@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::UpdateCommand#which_to_update
+params: (highest_installed_gems, gem_names)
+name: which_to_update
+is_singleton: false
+aliases: []
+

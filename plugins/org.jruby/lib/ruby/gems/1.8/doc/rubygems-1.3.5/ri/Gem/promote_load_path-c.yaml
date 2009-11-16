@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Promotes the load paths of the <tt>gem_name</tt> over the load paths of <tt>over_name</tt>.
+    Useful for allowing one gem to override features in another using #find_files.'
+full_name: Gem::promote_load_path
+params: (gem_name, over_name)
+name: promote_load_path
+is_singleton: true
+aliases: []
+

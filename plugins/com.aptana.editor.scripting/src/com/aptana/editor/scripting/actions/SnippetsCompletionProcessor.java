@@ -24,12 +24,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.scripting.Activator;
+import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+import com.aptana.radrails.editor.common.QualifiedContentType;
+import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.Snippet;
 
 class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
-	private static final SnippetTemplateContextType SNIPPET_TEMPLATE_CONTEXT_TYPE = new SnippetTemplateContextType();
 	private final ExpandSnippetAction expandSnippet;
 
 	public SnippetsCompletionProcessor(ExpandSnippetAction expandSnippet) {
@@ -37,9 +39,23 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	}
 
 	@Override
-	protected TemplateContextType getContextType(ITextViewer viewer,
-			IRegion region) {
-		return SNIPPET_TEMPLATE_CONTEXT_TYPE;
+	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
+		String contentTypeString = "";
+		IDocument document = viewer.getDocument();
+		try {
+			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength() );
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+		}
+		return new SnippetTemplateContextType(contentTypeString);
+	}
+	
+	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException {
+		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
+		if (contentType != null) {
+			return ContentTypeTranslation.getDefault().translate(contentType).toString();
+		}
+		return document.getContentType(offset);
 	}
 
 	@Override
@@ -49,25 +65,14 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
-		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope("source.ruby.rails");
+		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
 		List<Template> templates = new LinkedList<Template>();
-		templates.add(new SnippetTemplate("contact",
-				"Insert Contact",
-				"snippets", 
-				  "----------------------------\n"
-				+ "First Name : ${firstName:2}\n"
-				+ "Last Name  : ${lastName:1}\n"
-				+ "Full Name  : Mr./Mrs./Ms. ${firstName}, ${lastName}\n"
-				+ "Description: ${0}\n"
-				+ "----------------------------\n"
-				,true));
 		for (Snippet snippet : snippetsFromScope) {
 			String expansion = snippet.getExpansion();
-			
 			templates.add(new SnippetTemplate(
 					snippet.getTrigger(),
 					snippet.getDisplayName(),
-					"snippets", 
+					contextTypeId, 
 					processExpansion(expansion),
 					true));
 		}
@@ -79,20 +84,20 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	// Transform Textmate variable syntax into Eclipse variable syntax
 	private static String processExpansion(String expansion) {
 		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}"));
-		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}"));
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		
 		// transform ${n:default value} to ${default value:n} where n is a digit
 		expansion = expansion.replaceAll(
-				  "\\$\\{" 
+				  "\\$\\{"        //$NON-NLS-1$
 				+ SPACES
-				+ "(\\d)"
+				+ "(\\d)"         //$NON-NLS-1$
 				+ SPACES
-				+ ":"
+				+ ":"             //$NON-NLS-1$
 				+ SPACES
-				+ "(\\w+)"
-				+ "\\}"
-				,"\\${$2:$1}");
+				+ "(\\w+)"        //$NON-NLS-1$
+				+ "\\}"           //$NON-NLS-1$
+				,"\\${$2:$1}");   //$NON-NLS-1$
 		return expansion;
 	}
 	
@@ -106,9 +111,9 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				snippetTemplateProposal.setTemplateProposals(completionProposals);
 				Template template = snippetTemplateProposal.getTemplateSuper();
 				StyledString styledString =
-					new StyledString(String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER);
+					new StyledString(String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
 				
-				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER));
+				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$
 
 				if (i < 9) {
 					char triggerChar = (char)('1'+i);
@@ -173,7 +178,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
 			}
 			
-			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont");
+			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont"); //$NON-NLS-1$
 		}
 	}
 	

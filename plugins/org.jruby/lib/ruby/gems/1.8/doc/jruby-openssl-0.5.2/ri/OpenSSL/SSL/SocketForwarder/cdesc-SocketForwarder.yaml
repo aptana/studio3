@@ -1,0 +1,28 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: addr
+- !ruby/object:RI::MethodSummary 
+  name: closed?
+- !ruby/object:RI::MethodSummary 
+  name: do_not_reverse_lookup=
+- !ruby/object:RI::MethodSummary 
+  name: fcntl
+- !ruby/object:RI::MethodSummary 
+  name: getsockopt
+- !ruby/object:RI::MethodSummary 
+  name: peeraddr
+- !ruby/object:RI::MethodSummary 
+  name: setsockopt
+class_methods: []
+
+full_name: OpenSSL::SSL::SocketForwarder
+constants: []
+
+superclass: 
+name: SocketForwarder

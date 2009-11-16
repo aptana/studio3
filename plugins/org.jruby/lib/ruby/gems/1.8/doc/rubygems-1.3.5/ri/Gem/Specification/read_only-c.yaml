@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Sometimes we don't want the world to use a setter method for a particular
+    attribute.
+- !ruby/struct:SM::Flow::P 
+  body: <tt>read_only</tt> makes it private so we can still use it internally.
+full_name: Gem::Specification::read_only
+params: (*names)
+name: read_only
+is_singleton: true
+aliases: []
+

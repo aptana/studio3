@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Validator::TestRunner#add_fault
+params: (fault)
+name: add_fault
+is_singleton: false
+aliases: []
+

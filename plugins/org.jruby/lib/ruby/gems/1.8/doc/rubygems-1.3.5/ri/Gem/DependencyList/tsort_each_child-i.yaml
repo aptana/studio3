@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: spec
+comment: 
+full_name: Gem::DependencyList#tsort_each_child
+params: (node, &block) {|spec| ...}
+name: tsort_each_child
+is_singleton: false
+aliases: []
+

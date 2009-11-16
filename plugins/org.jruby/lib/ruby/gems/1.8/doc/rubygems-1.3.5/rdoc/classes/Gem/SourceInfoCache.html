@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::SourceInfoCache</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::SourceInfoCache</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/source_info_cache_rb.html">
+                lib/rubygems/source_info_cache.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="SourceInfoCache.html">SourceInfoCache</a> stores a copy of the gem
+index for each gem source.
+</p>
+<p>
+There are two possible <a href="SourceInfoCache.html#M000459">cache</a>
+locations, the system <a href="SourceInfoCache.html#M000459">cache</a> and
+the user <a href="SourceInfoCache.html#M000459">cache</a>:
+</p>
+<ul>
+<li>The system <a href="SourceInfoCache.html#M000459">cache</a> is preferred if
+it is writable or can be created.
+
+</li>
+<li>The user <a href="SourceInfoCache.html#M000459">cache</a> is used otherwise
+
+</li>
+</ul>
+<p>
+Once a <a href="SourceInfoCache.html#M000459">cache</a> is selected, it
+will be used for all operations. <a
+href="SourceInfoCache.html">SourceInfoCache</a> will not switch between <a
+href="SourceInfoCache.html#M000459">cache</a> files dynamically.
+</p>
+<p>
+Cache data is a Hash mapping a source URI to a <a
+href="SourceInfoCacheEntry.html">SourceInfoCacheEntry</a>.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000459">cache</a>&nbsp;&nbsp;
+      <a href="#M000460">cache_data</a>&nbsp;&nbsp;
+      <a href="#M000468">cache_data</a>&nbsp;&nbsp;
+      <a href="#M000469">cache_file</a>&nbsp;&nbsp;
+      <a href="#M000470">flush</a>&nbsp;&nbsp;
+      <a href="#M000471">latest_cache_data</a>&nbsp;&nbsp;
+      <a href="#M000472">latest_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000461">latest_system_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000473">latest_system_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000462">latest_user_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000474">latest_user_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000475">read_all_cache_data</a>&nbsp;&nbsp;
+      <a href="#M000476">read_cache_data</a>&nbsp;&nbsp;
+      <a href="#M000477">refresh</a>&nbsp;&nbsp;
+      <a href="#M000463">reset</a>&nbsp;&nbsp;
+      <a href="#M000479">reset_cache_data</a>&nbsp;&nbsp;
+      <a href="#M000480">reset_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000478">reset_cache_for</a>&nbsp;&nbsp;
+      <a href="#M000481">search</a>&nbsp;&nbsp;
+      <a href="#M000464">search</a>&nbsp;&nbsp;
+      <a href="#M000465">search_with_source</a>&nbsp;&nbsp;
+      <a href="#M000482">search_with_source</a>&nbsp;&nbsp;
+      <a href="#M000483">set_cache_data</a>&nbsp;&nbsp;
+      <a href="#M000466">system_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000484">system_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000485">try_file</a>&nbsp;&nbsp;
+      <a href="#M000486">update</a>&nbsp;&nbsp;
+      <a href="#M000467">user_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000487">user_cache_file</a>&nbsp;&nbsp;
+      <a href="#M000488">write_cache</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="UserInteraction.html">Gem::UserInteraction</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000459" class="method-detail">
+        <a name="M000459"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000459.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000459.html');return false;">
+          <span class="method-name">cache</span><span class="method-args">(all = false)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The singleton <a href="SourceInfoCache.html">Gem::SourceInfoCache</a>. If
+<tt>all</tt> is true, a full <a
+href="SourceInfoCache.html#M000477">refresh</a> will be performed if the
+singleton instance is being initialized.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000460" class="method-detail">
+        <a name="M000460"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000460.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000460.html');return false;">
+          <span class="method-name">cache_data</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000461" class="method-detail">
+        <a name="M000461"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000461.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000461.html');return false;">
+          <span class="method-name">latest_system_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the system <a href="SourceInfoCache.html#M000459">cache</a>
+file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000462" class="method-detail">
+        <a name="M000462"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000462.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000462.html');return false;">
+          <span class="method-name">latest_user_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the latest user <a
+href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000463" class="method-detail">
+        <a name="M000463"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000463.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000463.html');return false;">
+          <span class="method-name">reset</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Reset all singletons, discarding any changes.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000464" class="method-detail">
+        <a name="M000464"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000464.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000464.html');return false;">
+          <span class="method-name">search</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Search all source indexes. See <a
+href="SourceInfoCache.html#M000464">Gem::SourceInfoCache#search</a>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000465" class="method-detail">
+        <a name="M000465"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000465.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000465.html');return false;">
+          <span class="method-name">search_with_source</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Search all source indexes returning the source_uri. See <a
+href="SourceInfoCache.html#M000465">Gem::SourceInfoCache#search_with_source</a>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000466" class="method-detail">
+        <a name="M000466"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000466.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000466.html');return false;">
+          <span class="method-name">system_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the system <a href="SourceInfoCache.html#M000459">cache</a>
+file. (class method)
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000467" class="method-detail">
+        <a name="M000467"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000467.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000467.html');return false;">
+          <span class="method-name">user_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the user <a href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000468" class="method-detail">
+        <a name="M000468"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000468.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000468.html');return false;">
+          <span class="method-name">cache_data</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The most recent <a href="SourceInfoCache.html#M000459">cache</a> data.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000469" class="method-detail">
+        <a name="M000469"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000469.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000469.html');return false;">
+          <span class="method-name">cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the <a href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000470" class="method-detail">
+        <a name="M000470"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000470.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000470.html');return false;">
+          <span class="method-name">flush</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Write the <a href="SourceInfoCache.html#M000459">cache</a> to a local file
+(if it is dirty).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000471" class="method-detail">
+        <a name="M000471"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000471.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000471.html');return false;">
+          <span class="method-name">latest_cache_data</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000472" class="method-detail">
+        <a name="M000472"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000472.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000472.html');return false;">
+          <span class="method-name">latest_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the latest <a href="SourceInfoCache.html#M000459">cache</a>
+file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000473" class="method-detail">
+        <a name="M000473"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000473.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000473.html');return false;">
+          <span class="method-name">latest_system_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the latest system <a
+href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000474" class="method-detail">
+        <a name="M000474"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000474.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000474.html');return false;">
+          <span class="method-name">latest_user_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the latest user <a
+href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000475" class="method-detail">
+        <a name="M000475"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000475.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000475.html');return false;">
+          <span class="method-name">read_all_cache_data</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Merges the complete <a href="SourceInfoCache.html#M000459">cache</a> file
+into this <a href="SourceInfoCache.html">Gem::SourceInfoCache</a>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000476" class="method-detail">
+        <a name="M000476"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000476.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000476.html');return false;">
+          <span class="method-name">read_cache_data</span><span class="method-args">(file)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Reads cached data from <tt>file</tt>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000477" class="method-detail">
+        <a name="M000477"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000477.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000477.html');return false;">
+          <span class="method-name">refresh</span><span class="method-args">(all)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Refreshes each source in the <a
+href="SourceInfoCache.html#M000459">cache</a> from its repository. If
+<tt>all</tt> is false, only latest gems are updated.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000479" class="method-detail">
+        <a name="M000479"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000479.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000479.html');return false;">
+          <span class="method-name">reset_cache_data</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000480" class="method-detail">
+        <a name="M000480"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000480.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000480.html');return false;">
+          <span class="method-name">reset_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Force <a href="SourceInfoCache.html#M000459">cache</a> file to be <a
+href="SourceInfoCache.html#M000463">reset</a>, useful for integration
+testing of rubygems
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000478" class="method-detail">
+        <a name="M000478"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000478.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000478.html');return false;">
+          <span class="method-name">reset_cache_for</span><span class="method-args">(url, cache_data)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000481" class="method-detail">
+        <a name="M000481"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000481.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000481.html');return false;">
+          <span class="method-name">search</span><span class="method-args">(pattern, platform_only = false, all = false)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Searches all source indexes. See <a
+href="SourceIndex.html#M000454">Gem::SourceIndex#search</a> for details on
+<tt>pattern</tt> and <tt>platform_only</tt>. If <tt>all</tt> is set to
+true, the full index will be loaded before searching.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000482" class="method-detail">
+        <a name="M000482"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000482.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000482.html');return false;">
+          <span class="method-name">search_with_source</span><span class="method-args">(pattern, only_platform = false, all = false)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Searches all source indexes for <tt>pattern</tt>. If <tt>only_platform</tt>
+is true, only gems matching <a href="../Gem.html#M000044">Gem.platforms</a>
+will be selected. Returns an Array of pairs containing the <a
+href="Specification.html">Gem::Specification</a> found and the source_uri
+it was found at.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000483" class="method-detail">
+        <a name="M000483"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000483.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000483.html');return false;">
+          <span class="method-name">set_cache_data</span><span class="method-args">(hash)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the source info <a href="SourceInfoCache.html#M000459">cache</a> data
+directly. This is mainly used for unit testing when we don&#8216;t want to
+read a file system to grab the cached source index information. The
+<tt>hash</tt> should map a source URL into a <a
+href="SourceInfoCacheEntry.html">SourceInfoCacheEntry</a>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000484" class="method-detail">
+        <a name="M000484"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000484.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000484.html');return false;">
+          <span class="method-name">system_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the system <a href="SourceInfoCache.html#M000459">cache</a>
+file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000485" class="method-detail">
+        <a name="M000485"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000485.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000485.html');return false;">
+          <span class="method-name">try_file</span><span class="method-args">(path)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Determine if <tt>path</tt> is a candidate for a <a
+href="SourceInfoCache.html#M000459">cache</a> file. Returns <tt>path</tt>
+if it is, nil if not.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000486" class="method-detail">
+        <a name="M000486"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000486.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000486.html');return false;">
+          <span class="method-name">update</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Mark the <a href="SourceInfoCache.html#M000459">cache</a> as updated (i.e.
+dirty).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000487" class="method-detail">
+        <a name="M000487"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000487.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000487.html');return false;">
+          <span class="method-name">user_cache_file</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The name of the user <a href="SourceInfoCache.html#M000459">cache</a> file.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000488" class="method-detail">
+        <a name="M000488"></a>
+
+        <div class="method-heading">
+          <a href="SourceInfoCache.src/M000488.html" target="Code" class="method-signature"
+            onclick="popupCode('SourceInfoCache.src/M000488.html');return false;">
+          <span class="method-name">write_cache</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Write data to the proper <a href="SourceInfoCache.html#M000459">cache</a>
+files.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The path the the data directory specified by the gem name. If the package
+    is not available as a gem, return nil.
+full_name: Gem::datadir
+params: (gem_name)
+name: datadir
+is_singleton: true
+aliases: []
+

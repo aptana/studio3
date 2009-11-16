@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add certificate to trusted cert list.
+- !ruby/struct:SM::Flow::P 
+  body: 'Note: At the moment these are stored in OPT[:trust_dir], although that directory
+    may change in the future.'
+full_name: Gem::Security::add_trusted_cert
+params: (cert, opt = {})
+name: add_trusted_cert
+is_singleton: true
+aliases: []
+

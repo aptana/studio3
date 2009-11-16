@@ -1,0 +1,15 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: IRB
+constants: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+full_name: IRB
+superclass: 
+class_methods: []
+

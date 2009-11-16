@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::ContentsCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/contents_command.rb, line 47</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">version</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:version</span>] <span class="ruby-operator">||</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Requirement</span>.<span class="ruby-identifier">default</span>
+
+    <span class="ruby-identifier">spec_dirs</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:specdirs</span>].<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>
+      [<span class="ruby-identifier">i</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">i</span>, <span class="ruby-value str">&quot;specifications&quot;</span>)]
+    <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">flatten</span>
+
+    <span class="ruby-identifier">path_kind</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec_dirs</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+                  <span class="ruby-identifier">spec_dirs</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">installed_spec_directories</span>
+                  <span class="ruby-value str">&quot;default gem paths&quot;</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-value str">&quot;specified path&quot;</span>
+                <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">si</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_gems_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">spec_dirs</span>)
+
+    <span class="ruby-identifier">gem_names</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:all</span>] <span class="ruby-keyword kw">then</span>
+                  <span class="ruby-identifier">si</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">spec</span><span class="ruby-operator">|</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span> }
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-identifier">get_all_gem_names</span>
+                <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gem_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">gem_spec</span> = <span class="ruby-identifier">si</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">version</span>).<span class="ruby-identifier">last</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">gem_spec</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Unable to find gem '#{name}' in #{path_kind}&quot;</span>
+
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">verbose</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">say</span> <span class="ruby-value str">&quot;\nDirectories searched:&quot;</span>
+          <span class="ruby-identifier">spec_dirs</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">dir</span><span class="ruby-operator">|</span> <span class="ruby-identifier">say</span> <span class="ruby-identifier">dir</span> }
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">terminate_interaction</span> <span class="ruby-value">1</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">gem_names</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">files</span> = <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:lib_only</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">lib_files</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">files</span>
+
+      <span class="ruby-identifier">files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">path</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:prefix</span>] <span class="ruby-keyword kw">then</span>
+                 <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_gem_path</span>, <span class="ruby-identifier">f</span>
+               <span class="ruby-keyword kw">else</span>
+                 <span class="ruby-identifier">f</span>
+               <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">say</span> <span class="ruby-identifier">path</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: return the stub script text used to launch the true ruby script
+full_name: Gem::Installer#windows_stub_script
+params: (bindir, bin_file_name)
+name: windows_stub_script
+is_singleton: false
+aliases: []
+

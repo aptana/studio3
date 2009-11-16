@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Checks that the specification contains all required fields, and does a very
+    basic sanity check.
+- !ruby/struct:SM::Flow::P 
+  body: Raises InvalidSpecificationException if the spec does not pass the checks..
+full_name: Gem::Specification#validate
+params: ()
+name: validate
+is_singleton: false
+aliases: []
+

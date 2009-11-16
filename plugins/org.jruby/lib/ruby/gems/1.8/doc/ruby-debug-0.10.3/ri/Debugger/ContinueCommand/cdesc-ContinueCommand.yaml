@@ -1,0 +1,23 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+name: ContinueCommand
+constants: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Implements debugger &quot;continue&quot; command.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: regexp
+full_name: Debugger::ContinueCommand
+superclass: Command
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: help
+- !ruby/object:RI::MethodSummary 
+  name: help_command

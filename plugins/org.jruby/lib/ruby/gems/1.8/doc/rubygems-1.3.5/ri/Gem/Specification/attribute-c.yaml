@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Specifies the <tt>name</tt> and <tt>default</tt> for a specification attribute,
+    and creates a reader and writer method like Module#attr_accessor.
+- !ruby/struct:SM::Flow::P 
+  body: The reader method returns the default if the value hasn't been set.
+full_name: Gem::Specification::attribute
+params: (name, default=nil)
+name: attribute
+is_singleton: true
+aliases: []
+

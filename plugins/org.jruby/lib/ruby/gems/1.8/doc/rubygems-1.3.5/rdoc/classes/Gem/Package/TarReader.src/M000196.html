@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>each (Gem::Package::TarReader)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_reader.rb, line 53</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">each</span>
+    <span class="ruby-identifier">loop</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">eof?</span>
+
+      <span class="ruby-identifier">header</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarHeader</span>.<span class="ruby-identifier">from</span> <span class="ruby-ivar">@io</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">header</span>.<span class="ruby-identifier">empty?</span>
+
+      <span class="ruby-identifier">entry</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarReader</span><span class="ruby-operator">::</span><span class="ruby-constant">Entry</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">header</span>, <span class="ruby-ivar">@io</span>
+      <span class="ruby-identifier">size</span> = <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">header</span>.<span class="ruby-identifier">size</span>
+
+      <span class="ruby-keyword kw">yield</span> <span class="ruby-identifier">entry</span>
+
+      <span class="ruby-identifier">skip</span> = (<span class="ruby-value">512</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">size</span> <span class="ruby-operator">%</span> <span class="ruby-value">512</span>)) <span class="ruby-operator">%</span> <span class="ruby-value">512</span>
+      <span class="ruby-identifier">pending</span> = <span class="ruby-identifier">size</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">bytes_read</span>
+
+      <span class="ruby-keyword kw">begin</span>
+        <span class="ruby-comment cmt"># avoid reading...</span>
+        <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">seek</span> <span class="ruby-identifier">pending</span>, <span class="ruby-constant">IO</span><span class="ruby-operator">::</span><span class="ruby-constant">SEEK_CUR</span>
+        <span class="ruby-identifier">pending</span> = <span class="ruby-value">0</span>
+      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">EINVAL</span>, <span class="ruby-constant">NameError</span>
+        <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">pending</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">bytes_read</span> = <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">read</span>([<span class="ruby-identifier">pending</span>, <span class="ruby-value">4096</span>].<span class="ruby-identifier">min</span>).<span class="ruby-identifier">size</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-constant">UnexpectedEOF</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">eof?</span>
+          <span class="ruby-identifier">pending</span> <span class="ruby-operator">-=</span> <span class="ruby-identifier">bytes_read</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">read</span> <span class="ruby-identifier">skip</span> <span class="ruby-comment cmt"># discard trailing zeros</span>
+
+      <span class="ruby-comment cmt"># make sure nobody can use #read, #getc or #rewind anymore</span>
+      <span class="ruby-identifier">entry</span>.<span class="ruby-identifier">close</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

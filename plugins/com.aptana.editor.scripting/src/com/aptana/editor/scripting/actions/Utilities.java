@@ -28,7 +28,7 @@ public class Utilities {
 	private static String[] escapeBackslash(String[] paths) {
 		String[] escapedPaths = new String[paths.length];
 		for (int i = 0; i < paths.length; i++) {
-			escapedPaths[i] = paths[i].replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\"));
+			escapedPaths[i] = paths[i].replaceAll(Pattern.quote("\\"), Matcher.quoteReplacement("\\\\")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return escapedPaths;
 	}
@@ -209,16 +209,9 @@ public class Utilities {
 	public static IEditorInput createNonExistingFileEditorInput(File file, String fileName)
 	{
 		IEditorInput input = null;
-		try
-		{
-			IFileSystem fs = EFS.getLocalFileSystem();
-			IFileStore localFile = fs.fromLocalFile(file);
-			input = new NonExistingFileEditorInput(localFile, fileName);
-		}
-		catch (Exception e)
-		{
-			// TODO
-		}
+		IFileSystem fs = EFS.getLocalFileSystem();
+		IFileStore localFile = fs.fromLocalFile(file);
+		input = new NonExistingFileEditorInput(localFile, fileName);
 		return input;
 	}
 	

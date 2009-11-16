@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>gets (Buffering)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/openssl/buffering.rb, line 102</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">gets</span>(<span class="ruby-identifier">eol</span>=<span class="ruby-identifier">$/</span>)
+    <span class="ruby-identifier">idx</span> = <span class="ruby-ivar">@rbuffer</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">eol</span>)
+    <span class="ruby-keyword kw">until</span> <span class="ruby-ivar">@eof</span>
+      <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">idx</span>
+      <span class="ruby-identifier">fill_rbuff</span>
+      <span class="ruby-identifier">idx</span> = <span class="ruby-ivar">@rbuffer</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">eol</span>)
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">eol</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Regexp</span>)
+      <span class="ruby-identifier">size</span> = <span class="ruby-identifier">idx</span> <span class="ruby-value">? </span><span class="ruby-identifier">idx</span><span class="ruby-operator">+</span><span class="ruby-identifier">$&amp;</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">size</span> = <span class="ruby-identifier">idx</span> <span class="ruby-value">? </span><span class="ruby-identifier">idx</span><span class="ruby-operator">+</span><span class="ruby-identifier">eol</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">consume_rbuff</span>(<span class="ruby-identifier">size</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>ask (Gem::StreamUI)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/user_interaction.rb, line 209</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ask</span>(<span class="ruby-identifier">question</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@ins</span>.<span class="ruby-identifier">tty?</span>
+
+    <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">print</span>(<span class="ruby-identifier">question</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;  &quot;</span>)
+    <span class="ruby-ivar">@outs</span>.<span class="ruby-identifier">flush</span>
+
+    <span class="ruby-identifier">result</span> = <span class="ruby-ivar">@ins</span>.<span class="ruby-identifier">gets</span>
+    <span class="ruby-identifier">result</span>.<span class="ruby-identifier">chomp!</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">result</span>
+    <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

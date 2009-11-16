@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>to_ruby (Gem::Specification)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/specification.rb, line 706</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_ruby</span>
+    <span class="ruby-identifier">mark_version</span>
+    <span class="ruby-identifier">result</span> = []
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;# -*- encoding: utf-8 -*-&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;Gem::Specification.new do |s|&quot;</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  s.name = #{ruby_code name}&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  s.version = #{ruby_code version}&quot;</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">platform</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">platform</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  s.platform = #{ruby_code original_platform}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  s.required_rubygems_version = #{ruby_code required_rubygems_version} if s.respond_to? :required_rubygems_version=&quot;</span>
+
+    <span class="ruby-identifier">handled</span> = [
+      <span class="ruby-identifier">:dependencies</span>,
+      <span class="ruby-identifier">:name</span>,
+      <span class="ruby-identifier">:platform</span>,
+      <span class="ruby-identifier">:required_rubygems_version</span>,
+      <span class="ruby-identifier">:specification_version</span>,
+      <span class="ruby-identifier">:version</span>,
+    ]
+
+    <span class="ruby-identifier">attributes</span> = <span class="ruby-ivar">@@attributes</span>.<span class="ruby-identifier">sort_by</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">attr_name</span>,<span class="ruby-operator">|</span> <span class="ruby-identifier">attr_name</span>.<span class="ruby-identifier">to_s</span> }
+
+    <span class="ruby-identifier">attributes</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attr_name</span>, <span class="ruby-identifier">default</span><span class="ruby-operator">|</span>
+      <span class="ruby-keyword kw">next</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">handled</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">attr_name</span>
+      <span class="ruby-identifier">current_value</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">attr_name</span>)
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">current_value</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">default</span> <span class="ruby-keyword kw">or</span>
+         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">required_attribute?</span> <span class="ruby-identifier">attr_name</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;  s.#{attr_name} = #{ruby_code current_value}&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  if s.respond_to? :specification_version then&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;    s.specification_version = #{specification_version}&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;    if Gem::Version.new(Gem::RubyGemsVersion) &gt;= Gem::Version.new('1.2.0') then&quot;</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">version_reqs_param</span> = <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">requirements_list</span>.<span class="ruby-identifier">inspect</span>
+        <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@type</span>, <span class="ruby-identifier">:runtime</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-comment cmt"># HACK</span>
+        <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;      s.add_#{dep.type}_dependency(%q&lt;#{dep.name}&gt;, #{version_reqs_param})&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;    else&quot;</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">version_reqs_param</span> = <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">requirements_list</span>.<span class="ruby-identifier">inspect</span>
+        <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;      s.add_dependency(%q&lt;#{dep.name}&gt;, #{version_reqs_param})&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'    end'</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  else&quot;</span>
+      <span class="ruby-identifier">dependencies</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">version_reqs_param</span> = <span class="ruby-identifier">dep</span>.<span class="ruby-identifier">requirements_list</span>.<span class="ruby-identifier">inspect</span>
+        <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;    s.add_dependency(%q&lt;#{dep.name}&gt;, #{version_reqs_param})&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;  end&quot;</span>
+
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;end&quot;</span>
+    <span class="ruby-identifier">result</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-identifier">result</span>.<span class="ruby-identifier">join</span> <span class="ruby-value str">&quot;\n&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

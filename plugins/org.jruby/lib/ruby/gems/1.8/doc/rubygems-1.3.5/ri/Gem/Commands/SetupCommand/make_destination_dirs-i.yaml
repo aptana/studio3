@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::SetupCommand#make_destination_dirs
+params: (install_destdir)
+name: make_destination_dirs
+is_singleton: false
+aliases: []
+

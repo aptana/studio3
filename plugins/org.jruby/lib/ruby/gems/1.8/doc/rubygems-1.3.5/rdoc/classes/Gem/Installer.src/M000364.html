@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>install (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 177</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install</span>
+    <span class="ruby-comment cmt"># If we're forcing the install then disable security unless the security</span>
+    <span class="ruby-comment cmt"># policy says that we only install singed gems.</span>
+    <span class="ruby-ivar">@security_policy</span> = <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@force</span> <span class="ruby-keyword kw">and</span> <span class="ruby-ivar">@security_policy</span> <span class="ruby-keyword kw">and</span>
+                              <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@security_policy</span>.<span class="ruby-identifier">only_signed</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@force</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">rrv</span> = <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">required_ruby_version</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">rrv</span>.<span class="ruby-identifier">satisfied_by?</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ruby_version</span> <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;#{@spec.name} requires Ruby version #{rrv}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">rrgv</span> = <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">required_rubygems_version</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">rrgv</span>.<span class="ruby-identifier">satisfied_by?</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Version</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RubyGemsVersion</span>) <span class="ruby-keyword kw">then</span>
+          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>,
+                <span class="ruby-node">&quot;#{@spec.name} requires RubyGems version #{rrgv}&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@ignore_dependencies</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">deps</span> = <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">runtime_dependencies</span>
+        <span class="ruby-identifier">deps</span> <span class="ruby-operator">|=</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">development_dependencies</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@development</span>
+
+        <span class="ruby-identifier">deps</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">dep_gem</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">ensure_dependency</span> <span class="ruby-ivar">@spec</span>, <span class="ruby-identifier">dep_gem</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">pre_install_hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">hook</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-ivar">@gem_home</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-ivar">@gem_home</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_gem_subdirectories</span> <span class="ruby-ivar">@gem_home</span>
+
+    <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-ivar">@gem_dir</span>
+
+    <span class="ruby-identifier">extract_files</span>
+    <span class="ruby-identifier">generate_bin</span>
+    <span class="ruby-identifier">build_extensions</span>
+    <span class="ruby-identifier">write_spec</span>
+
+    <span class="ruby-identifier">write_require_paths_file_if_needed</span>
+
+    <span class="ruby-comment cmt"># HACK remove?  Isn't this done in multiple places?</span>
+    <span class="ruby-identifier">cached_gem</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_home</span>, <span class="ruby-value str">&quot;cache&quot;</span>, <span class="ruby-ivar">@gem</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\//</span>).<span class="ruby-identifier">pop</span>
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-identifier">cached_gem</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">cp</span> <span class="ruby-ivar">@gem</span>, <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@gem_home</span>, <span class="ruby-value str">&quot;cache&quot;</span>)
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">say</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">post_install_message</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">post_install_message</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">loaded_from</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@gem_home</span>, <span class="ruby-value str">'specifications'</span>,
+                                  <span class="ruby-node">&quot;#{@spec.full_name}.gemspec&quot;</span>)
+
+    <span class="ruby-ivar">@source_index</span>.<span class="ruby-identifier">add_spec</span> <span class="ruby-ivar">@spec</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">post_install_hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">hook</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@spec</span>
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Zlib</span><span class="ruby-operator">::</span><span class="ruby-constant">GzipFile</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;gzip error installing #{@gem}&quot;</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

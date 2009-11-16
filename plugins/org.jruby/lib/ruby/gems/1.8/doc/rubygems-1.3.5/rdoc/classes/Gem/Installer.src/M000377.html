@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>extract_files (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 519</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">extract_files</span>
+    <span class="ruby-identifier">expand_and_validate_gem_dir</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;format required to extract from&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@format</span>.<span class="ruby-identifier">nil?</span>
+
+    <span class="ruby-ivar">@format</span>.<span class="ruby-identifier">file_entries</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">entry</span>, <span class="ruby-identifier">file_data</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">path</span> = <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>].<span class="ruby-identifier">untaint</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">path</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/\A\//</span> <span class="ruby-keyword kw">then</span> <span class="ruby-comment cmt"># for extra sanity</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>,
+              <span class="ruby-node">&quot;attempt to install file into #{entry['path'].inspect}&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-ivar">@gem_dir</span>, <span class="ruby-identifier">path</span>)
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">path</span> <span class="ruby-operator">!~</span> <span class="ruby-node">/\A#{Regexp.escape @gem_dir}/</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">msg</span> = <span class="ruby-value str">&quot;attempt to install file into %p under %p&quot;</span> <span class="ruby-operator">%</span>
+                [<span class="ruby-identifier">entry</span>[<span class="ruby-value str">'path'</span>], <span class="ruby-ivar">@gem_dir</span>]
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-identifier">msg</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">rm_rf</span>(<span class="ruby-identifier">path</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">path</span>)
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-identifier">path</span>)
+
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>, <span class="ruby-value str">&quot;wb&quot;</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">out</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">out</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">file_data</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">chmod</span> <span class="ruby-identifier">entry</span>[<span class="ruby-value str">'mode'</span>], <span class="ruby-identifier">path</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-identifier">path</span> <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

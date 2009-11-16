@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns Array of gem repositories that were generated with RubyGems less than
+    1.2.
+full_name: Gem::SpecFetcher#legacy_repos
+params: ()
+name: legacy_repos
+is_singleton: false
+aliases: []
+

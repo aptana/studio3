@@ -8,9 +8,10 @@
 		<script src="webterm_debug_compressed.js"></script>
         <script>
             var terminal;
+			var terminalID = "terminal";
 			var xtermHandler;
 			var debugHandler;
-			var characterWidth, characterHeight;
+			var characterWidth = null, characterHeight = null;
             
 			/**
 			 * init
@@ -35,19 +36,12 @@
 				};
 				
 				// create terminal
-                terminal = new Term("terminal", 80,20, config);
-				
-				// get character info
-				var comm = terminal.getCommunicationHandler();
-				var size = comm.getCharacterSize().split(",");
-				
-				characterWidth = size[0] - 0;
-				characterHeight = size[1] - 0;
+                terminal = new Term(terminalID, 80,20, config);
 				
 				// resize to fit
 				autoSize();
 				
-				// HACK due to architecture flaw!
+				// HACK due to architecture flaw, but for debugging purposes only!
 				xtermHandler._term = terminal;
 				
 				// start processing
@@ -191,6 +185,16 @@
 			 */
 			function autoSize()
 			{
+				if (characterWidth === null || characterHeight === null)
+				{
+					var div = document.getElementById(terminalID);
+					var divWidth = div.offsetWidth;
+					var divHeight = div.offsetHeight;
+					
+					characterWidth = divWidth / terminal.getWidth();
+					characterHeight = divHeight / terminal.getHeight();
+				}
+				
 				var viewWidth = window.innerWidth;
 				var viewHeight = window.innerHeight;
 				var width = Math.floor(viewWidth / characterWidth);

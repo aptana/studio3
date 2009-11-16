@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>run_script (Debugger)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File cli/ruby-debug.rb, line 147</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run_script</span>(<span class="ruby-identifier">file</span>, <span class="ruby-identifier">out</span> = <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">interface</span>, <span class="ruby-identifier">verbose</span>=<span class="ruby-keyword kw">false</span>)
+      <span class="ruby-identifier">interface</span> = <span class="ruby-constant">ScriptInterface</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">file</span>), <span class="ruby-identifier">out</span>)
+      <span class="ruby-identifier">processor</span> = <span class="ruby-constant">ControlCommandProcessor</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">interface</span>)
+      <span class="ruby-identifier">processor</span>.<span class="ruby-identifier">process_commands</span>(<span class="ruby-identifier">verbose</span>)
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

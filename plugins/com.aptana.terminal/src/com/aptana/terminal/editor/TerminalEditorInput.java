@@ -12,7 +12,7 @@ public class TerminalEditorInput implements IEditorInput
 	 */
 	public boolean exists()
 	{
-		return false;
+		return true;
 	}
 
 	/*
@@ -39,7 +39,7 @@ public class TerminalEditorInput implements IEditorInput
 	 */
 	public IPersistableElement getPersistable()
 	{
-		return null;
+		return new TerminalPersistable();
 	}
 
 	/*

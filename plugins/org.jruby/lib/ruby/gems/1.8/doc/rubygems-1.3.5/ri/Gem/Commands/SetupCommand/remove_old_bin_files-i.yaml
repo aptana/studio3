@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Commands::SetupCommand#remove_old_bin_files
+params: (bin_dir)
+name: remove_old_bin_files
+is_singleton: false
+aliases: []
+

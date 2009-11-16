@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Determine if <tt>path</tt> is a candidate for a cache file. Returns <tt>path</tt>
+    if it is, nil if not.
+full_name: Gem::SourceInfoCache#try_file
+params: (path)
+name: try_file
+is_singleton: false
+aliases: []
+

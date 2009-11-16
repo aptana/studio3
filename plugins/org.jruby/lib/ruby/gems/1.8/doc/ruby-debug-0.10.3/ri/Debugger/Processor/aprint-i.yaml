@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+params: (msg)
+is_singleton: false
+block_params: 
+name: aprint
+comment: 
+full_name: Debugger::Processor#aprint
+visibility: public
+aliases: []
+

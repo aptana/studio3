@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Removes all gems in <tt>list</tt>.
+- !ruby/struct:SM::Flow::P 
+  body: 'NOTE: removes uninstalled gems from <tt>list</tt>.'
+full_name: Gem::Uninstaller#remove_all
+params: (list)
+name: remove_all
+is_singleton: false
+aliases: []
+

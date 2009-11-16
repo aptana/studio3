@@ -1,0 +1,30 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Raised when RubyGems is unable to load or activate a gem. Contains the name
+    and version requirements of the gem that either conflicts with already activated
+    gems or that RubyGems is otherwise unable to activate.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Name of gem
+  rw: RW
+  name: name
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Version requirement of gem
+  rw: RW
+  name: version_requirement
+instance_methods: []
+
+class_methods: []
+
+full_name: Gem::LoadError
+constants: []
+
+superclass: "::LoadError"
+name: LoadError

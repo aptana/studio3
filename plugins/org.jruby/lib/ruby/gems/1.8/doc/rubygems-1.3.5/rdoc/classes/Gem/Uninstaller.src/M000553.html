@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>ask_if_ok (Gem::Uninstaller)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/uninstaller.rb, line 247</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ask_if_ok</span>(<span class="ruby-identifier">spec</span>)
+    <span class="ruby-identifier">msg</span> = [<span class="ruby-value str">''</span>]
+    <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'You have requested to uninstall the gem:'</span>
+    <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;\t#{spec.full_name}&quot;</span>
+    <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">dependent_gems</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">gem</span>,<span class="ruby-identifier">dep</span>,<span class="ruby-identifier">satlist</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span>
+        (<span class="ruby-node">&quot;#{gem.name}-#{gem.version} depends on &quot;</span> <span class="ruby-operator">+</span>
+        <span class="ruby-node">&quot;[#{dep.name} (#{dep.version_requirements})]&quot;</span>)
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'If you remove this gems, one or more dependencies will not be met.'</span>
+    <span class="ruby-identifier">msg</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">'Continue with Uninstall?'</span>
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">ask_yes_no</span>(<span class="ruby-identifier">msg</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>), <span class="ruby-keyword kw">true</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

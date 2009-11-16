@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::ConfigFile#load_file
+params: (filename)
+name: load_file
+is_singleton: false
+aliases: []
+

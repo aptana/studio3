@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>trusted_cert_path (Gem::Security::Policy)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/security.rb, line 401</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">trusted_cert_path</span>(<span class="ruby-identifier">cert</span>, <span class="ruby-identifier">opt</span> = {})
+      <span class="ruby-identifier">opt</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Security</span><span class="ruby-operator">::</span><span class="ruby-constant">OPT</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opt</span>)
+
+      <span class="ruby-comment cmt"># get digest algorithm, calculate checksum of root.subject</span>
+      <span class="ruby-identifier">algo</span> = <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:dgst_algo</span>]
+      <span class="ruby-identifier">dgst</span> = <span class="ruby-identifier">algo</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">cert</span>.<span class="ruby-identifier">subject</span>.<span class="ruby-identifier">to_s</span>)
+
+      <span class="ruby-comment cmt"># build path to trusted cert file</span>
+      <span class="ruby-identifier">name</span> = <span class="ruby-node">&quot;cert-#{dgst}.pem&quot;</span>
+
+      <span class="ruby-comment cmt"># join and return path components</span>
+      <span class="ruby-constant">File</span><span class="ruby-operator">::</span><span class="ruby-identifier">join</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:trust_dir</span>], <span class="ruby-identifier">name</span>)
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

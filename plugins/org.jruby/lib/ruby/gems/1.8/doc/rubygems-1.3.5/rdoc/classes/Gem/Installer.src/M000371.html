@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>generate_bin_script (Gem::Installer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/installer.rb, line 341</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generate_bin_script</span>(<span class="ruby-identifier">filename</span>, <span class="ruby-identifier">bindir</span>)
+    <span class="ruby-identifier">bin_script_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">formatted_program_filename</span>(<span class="ruby-identifier">filename</span>)
+
+    <span class="ruby-identifier">exec_path</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span> <span class="ruby-ivar">@gem_dir</span>, <span class="ruby-ivar">@spec</span>.<span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">filename</span>
+
+    <span class="ruby-comment cmt"># HACK some gems don't have #! in their executables, restore 2008/06</span>
+    <span class="ruby-comment cmt">#if File.read(exec_path, 2) == '#!' then</span>
+      <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">rm_f</span> <span class="ruby-identifier">bin_script_path</span> <span class="ruby-comment cmt"># prior install may have been --no-wrappers</span>
+
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span> <span class="ruby-identifier">bin_script_path</span>, <span class="ruby-value str">'w'</span>, <span class="ruby-value">0755</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">print</span> <span class="ruby-identifier">app_script_text</span>(<span class="ruby-identifier">filename</span>)
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-identifier">bin_script_path</span> <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+      <span class="ruby-identifier">generate_windows_script</span> <span class="ruby-identifier">bindir</span>, <span class="ruby-identifier">filename</span>
+    <span class="ruby-comment cmt">#else</span>
+    <span class="ruby-comment cmt">#  FileUtils.rm_f bin_script_path</span>
+    <span class="ruby-comment cmt">#  FileUtils.cp exec_path, bin_script_path,</span>
+    <span class="ruby-comment cmt">#               :verbose =&gt; Gem.configuration.really_verbose</span>
+    <span class="ruby-comment cmt">#end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

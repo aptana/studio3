@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>from_yaml (Gem::Specification)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/specification.rb, line 474</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">from_yaml</span>(<span class="ruby-identifier">input</span>)
+    <span class="ruby-identifier">input</span> = <span class="ruby-identifier">normalize_yaml_input</span> <span class="ruby-identifier">input</span>
+    <span class="ruby-identifier">spec</span> = <span class="ruby-constant">YAML</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">input</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">spec</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">FalseClass</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">EndOfYAMLException</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Specification</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">spec</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Exception</span>, <span class="ruby-value str">&quot;YAML data doesn't evaluate to gem specification&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">unless</span> (<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variables</span>.<span class="ruby-identifier">include?</span> <span class="ruby-value str">'@specification_version'</span> <span class="ruby-keyword kw">or</span>
+            <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variables</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">:@specification_version</span>) <span class="ruby-keyword kw">and</span>
+           <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_get</span> <span class="ruby-identifier">:@specification_version</span>
+      <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">instance_variable_set</span> <span class="ruby-identifier">:@specification_version</span>,
+                                 <span class="ruby-constant">NONEXISTENT_SPECIFICATION_VERSION</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">spec</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

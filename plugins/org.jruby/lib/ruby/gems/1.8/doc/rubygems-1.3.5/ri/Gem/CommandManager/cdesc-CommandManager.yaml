@@ -1,0 +1,45 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The command manager registers and installs all the individual sub-commands
+    supported by the gem command.
+- !ruby/struct:SM::Flow::P 
+  body: 'Extra commands can be provided by writing a rubygems_plugin.rb file in an
+    installed gem. You should register your command against the Gem::CommandManager
+    instance, like this:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  # file rubygems_plugin.rb\n  require 'rubygems/command_manager'\n\n  class \
+    Gem::Commands::EditCommand &lt; Gem::Command\n    # ...\n  end\n\n  Gem::CommandManager.instance.register_command \
+    :edit\n"
+- !ruby/struct:SM::Flow::P 
+  body: See Gem::Command for instructions on writing gem commands.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: '[]'
+- !ruby/object:RI::MethodSummary 
+  name: command_names
+- !ruby/object:RI::MethodSummary 
+  name: find_command
+- !ruby/object:RI::MethodSummary 
+  name: find_command_possibilities
+- !ruby/object:RI::MethodSummary 
+  name: process_args
+- !ruby/object:RI::MethodSummary 
+  name: register_command
+- !ruby/object:RI::MethodSummary 
+  name: run
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: instance
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::CommandManager
+constants: []
+
+superclass: Object
+name: CommandManager

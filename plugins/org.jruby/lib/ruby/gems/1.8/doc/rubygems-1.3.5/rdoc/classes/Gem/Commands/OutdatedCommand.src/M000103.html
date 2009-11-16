@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Gem::Commands::OutdatedCommand)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/commands/outdated_command.rb, line 18</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+    <span class="ruby-identifier">locals</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceIndex</span>.<span class="ruby-identifier">from_installed_gems</span>
+
+    <span class="ruby-identifier">locals</span>.<span class="ruby-identifier">outdated</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">local</span> = <span class="ruby-identifier">locals</span>.<span class="ruby-identifier">find_name</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">last</span>
+
+      <span class="ruby-identifier">dep</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Dependency</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">local</span>.<span class="ruby-identifier">name</span>, <span class="ruby-node">&quot;&gt;= #{local.version}&quot;</span>
+      <span class="ruby-identifier">remotes</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SpecFetcher</span>.<span class="ruby-identifier">fetcher</span>.<span class="ruby-identifier">fetch</span> <span class="ruby-identifier">dep</span>
+      <span class="ruby-identifier">remote</span> = <span class="ruby-identifier">remotes</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">first</span>
+
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{local.name} (#{local.version} &lt; #{remote.version})&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>execute (Debugger)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File cli/ruby-debug/commands/set.rb, line 63</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">execute</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@match</span>[<span class="ruby-value">1</span>]
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;\&quot;set\&quot; must be followed by the name of an set command:\n&quot;</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;List of set subcommands:\n\n&quot;</span>
+        <span class="ruby-keyword kw">for</span> <span class="ruby-identifier">subcmd</span> <span class="ruby-keyword kw">in</span> <span class="ruby-constant">Subcommands</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;set #{subcmd.name} -- #{subcmd.short_help}\n&quot;</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">args</span> = <span class="ruby-ivar">@match</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/[ \t]+/</span>)
+        <span class="ruby-identifier">subcmd</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>
+        <span class="ruby-identifier">subcmd</span>.<span class="ruby-identifier">downcase!</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">subcmd</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^no/i</span>
+          <span class="ruby-identifier">set_on</span> = <span class="ruby-keyword kw">false</span>
+          <span class="ruby-identifier">subcmd</span> = <span class="ruby-identifier">subcmd</span>[<span class="ruby-value">2</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>]
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">set_on</span> = <span class="ruby-keyword kw">true</span>
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">for</span> <span class="ruby-identifier">try_subcmd</span> <span class="ruby-keyword kw">in</span> <span class="ruby-constant">Subcommands</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">subcmd</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">min</span>) <span class="ruby-keyword kw">and</span>
+              (<span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">name</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-identifier">subcmd</span>.<span class="ruby-identifier">size</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>] <span class="ruby-operator">==</span> <span class="ruby-identifier">subcmd</span>)
+            <span class="ruby-keyword kw">begin</span>
+              <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">is_bool</span>
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> 
+                  <span class="ruby-identifier">set_on</span> = <span class="ruby-identifier">get_onoff</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]) 
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">name</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^annotate$/</span>
+                <span class="ruby-identifier">level</span> = <span class="ruby-identifier">get_int</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>], <span class="ruby-value str">&quot;Set annotate&quot;</span>, <span class="ruby-value">0</span>, <span class="ruby-value">3</span>, <span class="ruby-value">0</span>)
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">level</span>
+                  <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">annotate</span> = <span class="ruby-identifier">level</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-keyword kw">return</span>
+                <span class="ruby-keyword kw">end</span>
+                <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span>(<span class="ruby-constant">Debugger</span><span class="ruby-operator">::</span><span class="ruby-constant">RDEBUG_SCRIPT</span>)
+                  <span class="ruby-comment cmt"># rdebug was called initially. 1st arg is script name.</span>
+                  <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:argv</span>][<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>] = <span class="ruby-identifier">args</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-comment cmt"># rdebug wasn't called initially. 1st arg is not script name.</span>
+                  <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:argv</span>] = <span class="ruby-identifier">args</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^args$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:argv</span>][<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>] = <span class="ruby-identifier">args</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^autolist$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:autolist</span>] = (<span class="ruby-identifier">set_on</span> <span class="ruby-value">? </span><span class="ruby-value">1</span> <span class="ruby-operator">:</span> <span class="ruby-value">0</span>)
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^autoeval$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:autoeval</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^basename$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:basename</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^callstyle$/</span>
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+                  <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>
+                  <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">arg</span>
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:short</span>, <span class="ruby-identifier">:last</span>, <span class="ruby-identifier">:tracked</span>
+                    <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:callstyle</span>] = <span class="ruby-identifier">arg</span>
+                    <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">track_frame_args</span> = <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:tracked</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>
+                    <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;%s\n&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">show_setting</span>(<span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">name</span>)
+                    <span class="ruby-keyword kw">return</span>
+                  <span class="ruby-keyword kw">end</span>
+                <span class="ruby-keyword kw">end</span>
+                <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Invalid call style #{arg}. Should be one of: &quot;</span> <span class="ruby-operator">+</span>
+                  <span class="ruby-value str">&quot;'short', 'last', or 'tracked'.\n&quot;</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^trace$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:stack_trace_on_error</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^fullpath$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:full_path</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^autoreload$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:reload_source_on_change</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^autoirb$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:autoirb</span>] = (<span class="ruby-identifier">set_on</span> <span class="ruby-value">? </span><span class="ruby-value">1</span> <span class="ruby-operator">:</span> <span class="ruby-value">0</span>)
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^debuggertesting$/</span>
+                <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:debuggertesting</span>] = <span class="ruby-identifier">set_on</span>
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">set_on</span>
+                  <span class="ruby-constant">Command</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:basename</span>] = <span class="ruby-keyword kw">true</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^forcestep$/</span>
+                <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:force_stepping</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^history$/</span>
+                <span class="ruby-keyword kw">if</span> <span class="ruby-value">2</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">size</span>
+                  <span class="ruby-identifier">interface</span> = <span class="ruby-ivar">@state</span>.<span class="ruby-identifier">interface</span>
+                  <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^save$/</span>
+                    <span class="ruby-identifier">interface</span>.<span class="ruby-identifier">history_save</span> = <span class="ruby-identifier">get_onoff</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])
+                  <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^size$/</span>
+                    <span class="ruby-identifier">interface</span>.<span class="ruby-identifier">history_length</span> = <span class="ruby-identifier">get_int</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>],
+                                                       <span class="ruby-value str">&quot;Set history size&quot;</span>)
+                  <span class="ruby-keyword kw">else</span>
+                    <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Invalid history parameter #{args[0]}. Should be 'save' or 'size'.\n&quot;</span> 
+                  <span class="ruby-keyword kw">end</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Need two parameters for 'set history'; got #{args.size}.\n&quot;</span> 
+                  <span class="ruby-keyword kw">return</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^keep-frame-bindings$/</span>
+                <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">keep_frame_binding</span> = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^linetrace\+$/</span>
+                <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:tracing_plus</span>] = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^linetrace$/</span>
+                <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">tracing</span> = <span class="ruby-identifier">set_on</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^listsize$/</span>
+                <span class="ruby-identifier">listsize</span> = <span class="ruby-identifier">get_int</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>], <span class="ruby-value str">&quot;Set listsize&quot;</span>, <span class="ruby-value">1</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-value">10</span>)
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">listsize</span>
+                  <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:listsize</span>] = <span class="ruby-identifier">listsize</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-keyword kw">return</span>
+                <span class="ruby-keyword kw">end</span>
+<span class="ruby-comment cmt">#               when /^post-mortem$/</span>
+<span class="ruby-comment cmt">#                 unless Debugger.post_mortem? == set_on</span>
+<span class="ruby-comment cmt">#                   if set_on</span>
+<span class="ruby-comment cmt">#                     Debugger.post_mortem</span>
+<span class="ruby-comment cmt">#                   else</span>
+<span class="ruby-comment cmt">#                     errmsg &quot;Can't turn off post-mortem once it is on.\n&quot;</span>
+<span class="ruby-comment cmt">#                     return</span>
+<span class="ruby-comment cmt">#                   end</span>
+<span class="ruby-comment cmt">#                 end</span>
+              <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^width$/</span>
+                <span class="ruby-identifier">width</span> = <span class="ruby-identifier">get_int</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>], <span class="ruby-value str">&quot;Set width&quot;</span>, <span class="ruby-value">10</span>, <span class="ruby-keyword kw">nil</span>, <span class="ruby-value">80</span>)
+                <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">width</span>
+                  <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">settings</span>[<span class="ruby-identifier">:width</span>] = <span class="ruby-identifier">width</span>
+                  <span class="ruby-constant">ENV</span>[<span class="ruby-value str">'COLUMNS'</span>] = <span class="ruby-identifier">width</span>.<span class="ruby-identifier">to_s</span>
+                <span class="ruby-keyword kw">else</span>
+                  <span class="ruby-keyword kw">return</span>
+                <span class="ruby-keyword kw">end</span>
+              <span class="ruby-keyword kw">else</span>
+                <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Unknown setting #{@match[1]}.\n&quot;</span>
+                <span class="ruby-keyword kw">return</span>
+              <span class="ruby-keyword kw">end</span>
+              <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;%s\n&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-identifier">show_setting</span>(<span class="ruby-identifier">try_subcmd</span>.<span class="ruby-identifier">name</span>)
+              <span class="ruby-keyword kw">return</span>
+            <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">RuntimeError</span>
+              <span class="ruby-keyword kw">return</span>
+            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-node">&quot;Unknown set command #{subcmd}\n&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,1117 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Specification</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Specification</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/specification_rb.html">
+                lib/rubygems/specification.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+The <a href="Specification.html">Specification</a> class contains the
+metadata for a <a href="../Gem.html">Gem</a>. Typically defined in a
+.gemspec file or a Rakefile, and looks like this:
+</p>
+<pre>
+  spec = Gem::Specification.new do |s|
+    s.name = 'rfoo'
+    s.version = '1.0'
+    s.summary = 'Example gem specification'
+    ...
+  end
+</pre>
+<p>
+For a great way to package gems, use Hoe.
+</p>
+
+    </div>
+
+
+    <div id="contents-list">
+      <h3 class="section-bar">Contents</h3>
+      <ul>
+      <li><a href="#SEC00421">Required gemspec attributes</a></li>
+      <li><a href="#SEC00422">Optional gemspec attributes</a></li>
+      <li><a href="#SEC00423">Aliased gemspec attributes</a></li>
+     </ul>
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000514">_dump</a>&nbsp;&nbsp;
+      <a href="#M000515">_load</a>&nbsp;&nbsp;
+      <a href="#M000518">add_bindir</a>&nbsp;&nbsp;
+      <a href="#M000530">add_dependency</a>&nbsp;&nbsp;
+      <a href="#M000528">add_development_dependency</a>&nbsp;&nbsp;
+      <a href="#M000529">add_runtime_dependency</a>&nbsp;&nbsp;
+      <a href="#M000508">array_attribute</a>&nbsp;&nbsp;
+      <a href="#M000506">array_attributes</a>&nbsp;&nbsp;
+      <a href="#M000523">assign_defaults</a>&nbsp;&nbsp;
+      <a href="#M000507">attribute</a>&nbsp;&nbsp;
+      <a href="#M000513">attribute_alias_singular</a>&nbsp;&nbsp;
+      <a href="#M000502">attribute_defaults</a>&nbsp;&nbsp;
+      <a href="#M000501">attribute_names</a>&nbsp;&nbsp;
+      <a href="#M000511">attributes</a>&nbsp;&nbsp;
+      <a href="#M000503">default_value</a>&nbsp;&nbsp;
+      <a href="#M000540">dependent_gems</a>&nbsp;&nbsp;
+      <a href="#M000517">development_dependencies</a>&nbsp;&nbsp;
+      <a href="#M000533">file_name</a>&nbsp;&nbsp;
+      <a href="#M000524">from_yaml</a>&nbsp;&nbsp;
+      <a href="#M000532">full_gem_path</a>&nbsp;&nbsp;
+      <a href="#M000531">full_name</a>&nbsp;&nbsp;
+      <a href="#M000520">has_unit_tests?</a>&nbsp;&nbsp;
+      <a href="#M000522">initialize_copy</a>&nbsp;&nbsp;
+      <a href="#M000534">installation_path</a>&nbsp;&nbsp;
+      <a href="#M000519">lib_files</a>&nbsp;&nbsp;
+      <a href="#M000525">load</a>&nbsp;&nbsp;
+      <a href="#M000527">mark_version</a>&nbsp;&nbsp;
+      <a href="#M000521">new</a>&nbsp;&nbsp;
+      <a href="#M000539">normalize</a>&nbsp;&nbsp;
+      <a href="#M000526">normalize_yaml_input</a>&nbsp;&nbsp;
+      <a href="#M000512">overwrite_accessor</a>&nbsp;&nbsp;
+      <a href="#M000510">read_only</a>&nbsp;&nbsp;
+      <a href="#M000509">required_attribute</a>&nbsp;&nbsp;
+      <a href="#M000505">required_attribute?</a>&nbsp;&nbsp;
+      <a href="#M000504">required_attributes</a>&nbsp;&nbsp;
+      <a href="#M000516">runtime_dependencies</a>&nbsp;&nbsp;
+      <a href="#M000535">satisfies_requirement?</a>&nbsp;&nbsp;
+      <a href="#M000536">sort_obj</a>&nbsp;&nbsp;
+      <a href="#M000537">to_ruby</a>&nbsp;&nbsp;
+      <a href="#M000538">validate</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">NONEXISTENT_SPECIFICATION_VERSION</td>
+          <td>=</td>
+          <td class="context-item-value">-1</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+The the version number of a specification that does not specify one (i.e.
+RubyGems 0.7 or earlier).
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">CURRENT_SPECIFICATION_VERSION</td>
+          <td>=</td>
+          <td class="context-item-value">3</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+The specification version applied to any <a
+href="Specification.html#M000521">new</a> <a
+href="Specification.html">Specification</a> instances created. This should
+be bumped whenever something in the spec format changes.
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">SPECIFICATION_VERSION_HISTORY</td>
+          <td>=</td>
+          <td class="context-item-value">{     -1 =&gt; ['(RubyGems versions up to and including 0.7 did not have versioned specifications)'],     1  =&gt; [       'Deprecated &quot;test_suite_file&quot; in favor of the new, but equivalent, &quot;test_files&quot;',       '&quot;test_file=x&quot; is a shortcut for &quot;test_files=[x]&quot;'</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+An informal list of changes to the specification. The highest-valued key
+should be equal to the CURRENT_SPECIFICATION_VERSION.
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+    <div id="aliases-list">
+      <h3 class="section-bar">External Aliases</h3>
+
+      <div class="name-list">
+                        <table summary="aliases">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">loaded</td>
+          <td>-&gt;</td>
+          <td class="context-item-value">loaded?</td>
+        </tr>
+      <tr class="top-aligned-row context-row">
+        <td>&nbsp;</td>
+        <td colspan="2" class="context-item-desc">
+True if this gem was loaded from disk
+
+</td>
+      </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">==</td>
+          <td>-&gt;</td>
+          <td class="context-item-value">eql?</td>
+        </tr>
+                        </table>
+      </div>
+    </div>
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">loaded</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc">
+true when this gemspec has been loaded from a specifications directory.
+This <a href="Specification.html#M000507">attribute</a> is not persisted.
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">loaded_from</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc">
+Path this gemspec was loaded from. This <a
+href="Specification.html#M000507">attribute</a> is not persisted.
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000515" class="method-detail">
+        <a name="M000515"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000515.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000515.html');return false;">
+          <span class="method-name">_load</span><span class="method-args">(str)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Load custom marshal format, re-initializing defaults as needed
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000508" class="method-detail">
+        <a name="M000508"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000508.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000508.html');return false;">
+          <span class="method-name">array_attribute</span><span class="method-args">(name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Same as :<a href="Specification.html#M000507">attribute</a>, but ensures
+that values assigned to the <a
+href="Specification.html#M000507">attribute</a> are array values by
+applying :to_a to the value.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000506" class="method-detail">
+        <a name="M000506"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000506.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000506.html');return false;">
+          <span class="method-name">array_attributes</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="Specification.html">Specification</a> <a
+href="Specification.html#M000511">attributes</a> that are arrays
+(appendable and so-forth)
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000507" class="method-detail">
+        <a name="M000507"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000507.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000507.html');return false;">
+          <span class="method-name">attribute</span><span class="method-args">(name, default=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Specifies the <tt>name</tt> and <tt>default</tt> for a specification <a
+href="Specification.html#M000507">attribute</a>, and creates a reader and
+writer method like Module#attr_accessor.
+</p>
+<p>
+The reader method returns the default if the value hasn&#8216;t been set.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000513" class="method-detail">
+        <a name="M000513"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000513.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000513.html');return false;">
+          <span class="method-name">attribute_alias_singular</span><span class="method-args">(singular, plural)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Defines a <em>singular</em> version of an existing <em>plural</em> <a
+href="Specification.html#M000507">attribute</a> (i.e. one whose value is
+expected to be an array). This means just creating a helper method that
+takes a single value and appends it to the array. These are created for
+convenience, so that in a spec, one can write
+</p>
+<pre>
+  s.require_path = 'mylib'
+</pre>
+<p>
+instead of:
+</p>
+<pre>
+  s.require_paths = ['mylib']
+</pre>
+<p>
+That above convenience is available courtesy of:
+</p>
+<pre>
+  attribute_alias_singular :require_path, :require_paths
+</pre>
+        </div>
+      </div>
+
+      <div id="method-M000502" class="method-detail">
+        <a name="M000502"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000502.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000502.html');return false;">
+          <span class="method-name">attribute_defaults</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Default values for specification <a
+href="Specification.html#M000511">attributes</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000501" class="method-detail">
+        <a name="M000501"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000501.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000501.html');return false;">
+          <span class="method-name">attribute_names</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Names of all specification <a
+href="Specification.html#M000511">attributes</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000511" class="method-detail">
+        <a name="M000511"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000511.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000511.html');return false;">
+          <span class="method-name">attributes</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Shortcut for creating several <a
+href="Specification.html#M000511">attributes</a> at once (each with a
+default value of <tt>nil</tt>).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000503" class="method-detail">
+        <a name="M000503"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000503.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000503.html');return false;">
+          <span class="method-name">default_value</span><span class="method-args">(name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The default value for specification <a
+href="Specification.html#M000507">attribute</a> <tt>name</tt>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000524" class="method-detail">
+        <a name="M000524"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000524.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000524.html');return false;">
+          <span class="method-name">from_yaml</span><span class="method-args">(input)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Special loader for YAML files. When a <a
+href="Specification.html">Specification</a> object is loaded from a YAML
+file, it bypasses the normal Ruby object initialization routine
+(initialize). This method makes up for that and deals with gems of
+different ages.
+</p>
+<p>
+&#8216;input&#8217; can be anything that YAML.load() accepts: String or IO.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000525" class="method-detail">
+        <a name="M000525"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000525.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000525.html');return false;">
+          <span class="method-name">load</span><span class="method-args">(filename)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Loads ruby format gemspec from <tt>filename</tt>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000521" class="method-detail">
+        <a name="M000521"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000521.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000521.html');return false;">
+          <span class="method-name">new</span><span class="method-args">() {|self if block_given?| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="Specification.html">Specification</a> constructor. Assigns the
+default values to the <a href="Specification.html#M000511">attributes</a>
+and yields itself for further initialization.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000526" class="method-detail">
+        <a name="M000526"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000526.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000526.html');return false;">
+          <span class="method-name">normalize_yaml_input</span><span class="method-args">(input)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Make sure the YAML specification is properly formatted with dashes
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000512" class="method-detail">
+        <a name="M000512"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000512.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000512.html');return false;">
+          <span class="method-name">overwrite_accessor</span><span class="method-args">(name, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Some <a href="Specification.html#M000511">attributes</a> require special
+behaviour when they are accessed. This allows for that.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000510" class="method-detail">
+        <a name="M000510"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000510.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000510.html');return false;">
+          <span class="method-name">read_only</span><span class="method-args">(*names)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sometimes we don&#8216;t want the world to use a setter method for a
+particular <a href="Specification.html#M000507">attribute</a>.
+</p>
+<p>
+<tt><a href="Specification.html#M000510">read_only</a></tt> makes it
+private so we can still use it internally.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000509" class="method-detail">
+        <a name="M000509"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000509.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000509.html');return false;">
+          <span class="method-name">required_attribute</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Same as <a href="Specification.html#M000507">attribute</a> above, but also
+records this <a href="Specification.html#M000507">attribute</a> as
+mandatory.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000505" class="method-detail">
+        <a name="M000505"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000505.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000505.html');return false;">
+          <span class="method-name">required_attribute?</span><span class="method-args">(name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is <tt>name</tt> a required attribute?
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000504" class="method-detail">
+        <a name="M000504"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000504.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000504.html');return false;">
+          <span class="method-name">required_attributes</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Required specification <a href="Specification.html#M000511">attributes</a>
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000514" class="method-detail">
+        <a name="M000514"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000514.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000514.html');return false;">
+          <span class="method-name">_dump</span><span class="method-args">(limit)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Dump only crucial instance variables.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000518" class="method-detail">
+        <a name="M000518"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000518.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000518.html');return false;">
+          <span class="method-name">add_bindir</span><span class="method-args">(executables)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an array with bindir attached to each executable in the executables
+list
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000530" class="method-detail">
+        <a name="M000530"></a>
+
+        <div class="method-heading">
+          <span class="method-name">add_dependency</span><span class="method-args">(gem, *requirements)</span>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Alias for <a href="Specification.html#M000529">add_runtime_dependency</a>
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000528" class="method-detail">
+        <a name="M000528"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000528.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000528.html');return false;">
+          <span class="method-name">add_development_dependency</span><span class="method-args">(gem, *requirements)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Adds a development dependency named <tt>gem</tt> with <tt>requirements</tt>
+to this <a href="../Gem.html">Gem</a>. For example:
+</p>
+<pre>
+  spec.add_development_dependency 'jabber4r', '&gt; 0.1', '&lt;= 0.5'
+</pre>
+<p>
+Development dependencies aren&#8216;t installed by default and aren&#8216;t
+activated when a gem is required.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000529" class="method-detail">
+        <a name="M000529"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000529.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000529.html');return false;">
+          <span class="method-name">add_runtime_dependency</span><span class="method-args">(gem, *requirements)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Adds a runtime dependency named <tt>gem</tt> with <tt>requirements</tt> to
+this <a href="../Gem.html">Gem</a>. For example:
+</p>
+<pre>
+  spec.add_runtime_dependency 'jabber4r', '&gt; 0.1', '&lt;= 0.5'
+</pre>
+        </div>
+      </div>
+
+      <div id="method-M000523" class="method-detail">
+        <a name="M000523"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000523.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000523.html');return false;">
+          <span class="method-name">assign_defaults</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Each <a href="Specification.html#M000507">attribute</a> has a default value
+(possibly nil). Here, we initialize all <a
+href="Specification.html#M000511">attributes</a> to their default value.
+This is done through the accessor methods, so special behaviours will be
+honored. Furthermore, we take a <em>copy</em> of the default so each
+specification instance has its own empty arrays, etc.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000540" class="method-detail">
+        <a name="M000540"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000540.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000540.html');return false;">
+          <span class="method-name">dependent_gems</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Return a list of all gems that have a dependency on this gemspec. The list
+is structured with entries that conform to:
+</p>
+<pre>
+  [depending_gem, dependency, [list_of_gems_that_satisfy_dependency]]
+</pre>
+        </div>
+      </div>
+
+      <div id="method-M000517" class="method-detail">
+        <a name="M000517"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000517.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000517.html');return false;">
+          <span class="method-name">development_dependencies</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+List of dependencies that are used for development
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000533" class="method-detail">
+        <a name="M000533"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000533.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000533.html');return false;">
+          <span class="method-name">file_name</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The default (generated) file name of the gem.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000532" class="method-detail">
+        <a name="M000532"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000532.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000532.html');return false;">
+          <span class="method-name">full_gem_path</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The full path to the gem (install path + full name).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000531" class="method-detail">
+        <a name="M000531"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000531.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000531.html');return false;">
+          <span class="method-name">full_name</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the full name (name-version) of this <a href="../Gem.html">Gem</a>.
+<a href="Platform.html">Platform</a> information is included
+(name-version-platform) if it is specified and not the default Ruby
+platform.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000520" class="method-detail">
+        <a name="M000520"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000520.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000520.html');return false;">
+          <span class="method-name">has_unit_tests?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+True if this gem has files in test_files
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000522" class="method-detail">
+        <a name="M000522"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000522.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000522.html');return false;">
+          <span class="method-name">initialize_copy</span><span class="method-args">(other_spec)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Duplicates <a href="Specification.html#M000506">array_attributes</a> from
+<tt>other_spec</tt> so state isn&#8216;t shared.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000534" class="method-detail">
+        <a name="M000534"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000534.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000534.html');return false;">
+          <span class="method-name">installation_path</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+The directory that this gem was installed into.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000519" class="method-detail">
+        <a name="M000519"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000519.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000519.html');return false;">
+          <span class="method-name">lib_files</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Files in the <a href="../Gem.html">Gem</a> under one of the require_paths
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000527" class="method-detail">
+        <a name="M000527"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000527.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000527.html');return false;">
+          <span class="method-name">mark_version</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sets the rubygems_version to the current RubyGems version
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000539" class="method-detail">
+        <a name="M000539"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000539.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000539.html');return false;">
+          <span class="method-name">normalize</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Normalize the list of files so that:
+</p>
+<ul>
+<li>All file lists have redundancies removed.
+
+</li>
+<li>Files referenced in the extra_rdoc_files are included in the package file
+list.
+
+</li>
+</ul>
+        </div>
+      </div>
+
+      <div id="method-M000516" class="method-detail">
+        <a name="M000516"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000516.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000516.html');return false;">
+          <span class="method-name">runtime_dependencies</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+List of depedencies that will automatically be activated at runtime.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000535" class="method-detail">
+        <a name="M000535"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000535.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000535.html');return false;">
+          <span class="method-name">satisfies_requirement?</span><span class="method-args">(dependency)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Checks if this specification meets the requirement of <tt>dependency</tt>.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000536" class="method-detail">
+        <a name="M000536"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000536.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000536.html');return false;">
+          <span class="method-name">sort_obj</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an object you can use to sort specifications in sort_by.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000537" class="method-detail">
+        <a name="M000537"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000537.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000537.html');return false;">
+          <span class="method-name">to_ruby</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns a Ruby code representation of this specification, such that it can
+be eval&#8216;ed and reconstruct the same specification later. Attributes
+that still have their default values are omitted.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000538" class="method-detail">
+        <a name="M000538"></a>
+
+        <div class="method-heading">
+          <a href="Specification.src/M000538.html" target="Code" class="method-signature"
+            onclick="popupCode('Specification.src/M000538.html');return false;">
+          <span class="method-name">validate</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Checks that the specification contains all required fields, and does a very
+basic sanity check.
+</p>
+<p>
+Raises <a
+href="InvalidSpecificationException.html">InvalidSpecificationException</a>
+if the spec does not pass the checks..
+</p>
+        </div>
+      </div>
+
+
+    </div>
+    <div id="section">
+      <h2 class="section-title"><a name="SEC00421">Required gemspec attributes</a></h2>
+      <div class="section-comment">
+        
+      </div>      
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="section">
+      <h2 class="section-title"><a name="SEC00422">Optional gemspec attributes</a></h2>
+      <div class="section-comment">
+        
+      </div>      
+
+
+
+    <div id="aliases-list">
+      <h3 class="section-bar">External Aliases</h3>
+
+      <div class="name-list">
+                        <table summary="aliases">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">has_rdoc</td>
+          <td>-&gt;</td>
+          <td class="context-item-value">has_rdoc?</td>
+        </tr>
+      <tr class="top-aligned-row context-row">
+        <td>&nbsp;</td>
+        <td colspan="2" class="context-item-desc">
+True if this gem supports RDoc
+
+</td>
+      </tr>
+                        </table>
+      </div>
+    </div>
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="section">
+      <h2 class="section-title"><a name="SEC00423">Aliased gemspec attributes</a></h2>
+      <div class="section-comment">
+        
+      </div>      
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

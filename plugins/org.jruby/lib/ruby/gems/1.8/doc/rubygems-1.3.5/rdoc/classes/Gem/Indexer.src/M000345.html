@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>build_modern_index (Gem::Indexer)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/indexer.rb, line 247</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">build_modern_index</span>(<span class="ruby-identifier">index</span>, <span class="ruby-identifier">file</span>, <span class="ruby-identifier">name</span>)
+    <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;Generating #{name} index&quot;</span>
+
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">time</span> <span class="ruby-node">&quot;Generated #{name} index&quot;</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-value str">'wb'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">index</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">spec</span><span class="ruby-operator">|</span>
+          <span class="ruby-comment cmt"># We have to splat here because latest_specs is an array,</span>
+          <span class="ruby-comment cmt"># while the others are hashes. See the TODO in source_index.rb</span>
+          <span class="ruby-identifier">spec</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">last</span>
+          <span class="ruby-identifier">platform</span> = <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">original_platform</span>
+
+          <span class="ruby-comment cmt"># win32-api-1.0.4-x86-mswin32-60</span>
+          <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">String</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">platform</span> <span class="ruby-keyword kw">then</span>
+            <span class="ruby-identifier">alert_warning</span> <span class="ruby-node">&quot;Skipping invalid platform in gem: #{spec.full_name}&quot;</span>
+            <span class="ruby-keyword kw">next</span>
+          <span class="ruby-keyword kw">end</span>
+
+          <span class="ruby-identifier">platform</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Platform</span><span class="ruby-operator">::</span><span class="ruby-constant">RUBY</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">platform</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">platform</span>.<span class="ruby-identifier">empty?</span>
+          [<span class="ruby-identifier">spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">spec</span>.<span class="ruby-identifier">version</span>, <span class="ruby-identifier">platform</span>]
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">specs</span> = <span class="ruby-identifier">compact_specs</span>(<span class="ruby-identifier">specs</span>)
+        <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">specs</span>, <span class="ruby-identifier">io</span>)
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

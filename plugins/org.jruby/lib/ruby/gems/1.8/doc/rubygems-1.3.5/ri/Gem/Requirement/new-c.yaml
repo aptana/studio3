@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Constructs a Requirement from <tt>requirements</tt> which can be a String,
+    a Gem::Version, or an Array of those. See #parse for details on the formatting
+    of requirement strings.'
+full_name: Gem::Requirement::new
+params: (requirements)
+name: new
+is_singleton: true
+aliases: []
+

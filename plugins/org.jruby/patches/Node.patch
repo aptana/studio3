@@ -1,0 +1,22 @@
+Index: src/org/jruby/ast/Node.java
+===================================================================
+--- src/org/jruby/ast/Node.java	(revision 9535)
++++ src/org/jruby/ast/Node.java	(working copy)
+@@ -99,7 +99,7 @@
+     
+     public void addComment(CommentNode comment) {
+         Collection<CommentNode> comments = position.getComments();
+-        if (comments == null) {
++        if (comments == null || comments == EMPTY_COMMENT_LIST) {
+             comments = new ArrayList<CommentNode>();
+             position.setComments(comments);
+         }
+@@ -109,7 +109,7 @@
+     
+     public void addComments(Collection<CommentNode> moreComments) {
+         Collection<CommentNode> comments = position.getComments();
+-        if (comments == EMPTY_COMMENT_LIST) {
++        if (comments == null || comments == EMPTY_COMMENT_LIST) {
+             comments = new ArrayList<CommentNode>();
+             position.setComments(comments);
+         }

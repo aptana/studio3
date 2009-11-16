@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>ask_yes_no (Gem::StreamUI)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/user_interaction.rb, line 168</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ask_yes_no</span>(<span class="ruby-identifier">question</span>, <span class="ruby-identifier">default</span>=<span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@ins</span>.<span class="ruby-identifier">tty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">default</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">then</span>
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">OperationNotSupportedError</span>,
+              <span class="ruby-value str">&quot;Not connected to a tty and no default specified&quot;</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">default</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">qstr</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">default</span>
+           <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span>
+             <span class="ruby-value str">'yn'</span>
+           <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">true</span>
+             <span class="ruby-value str">'Yn'</span>
+           <span class="ruby-keyword kw">else</span>
+             <span class="ruby-value str">'yN'</span>
+           <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span> = <span class="ruby-keyword kw">nil</span>
+
+    <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">result</span> = <span class="ruby-identifier">ask</span>(<span class="ruby-node">&quot;#{question} [#{qstr}]&quot;</span>)
+      <span class="ruby-identifier">result</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">result</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^[Yy].*/</span>
+        <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^[Nn].*/</span>
+        <span class="ruby-keyword kw">false</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^$/</span>
+        <span class="ruby-identifier">default</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

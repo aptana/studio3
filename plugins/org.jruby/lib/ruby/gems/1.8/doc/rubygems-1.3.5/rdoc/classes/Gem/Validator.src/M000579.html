@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>unit_test (Gem::Validator)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/validator.rb, line 201</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">unit_test</span>(<span class="ruby-identifier">gem_spec</span>)
+    <span class="ruby-identifier">start_dir</span> = <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">pwd</span>
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_gem_path</span>)
+    <span class="ruby-identifier">$:</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">full_gem_path</span>
+    <span class="ruby-comment cmt"># XXX: why do we need this gem_spec when we've already got 'spec'?</span>
+    <span class="ruby-identifier">test_files</span> = <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">test_files</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">test_files</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;There are no unit tests to run for #{gem_spec.full_name}&quot;</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">gem</span> <span class="ruby-identifier">gem_spec</span>.<span class="ruby-identifier">name</span>, <span class="ruby-node">&quot;= #{gem_spec.version.version}&quot;</span>
+
+    <span class="ruby-identifier">test_files</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span> <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value str">'1.9'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">suite</span> = <span class="ruby-constant">Test</span><span class="ruby-operator">::</span><span class="ruby-constant">Unit</span><span class="ruby-operator">::</span><span class="ruby-constant">TestSuite</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{gem_spec.name}-#{gem_spec.version}&quot;</span>)
+
+      <span class="ruby-constant">ObjectSpace</span>.<span class="ruby-identifier">each_object</span>(<span class="ruby-constant">Class</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">klass</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">suite</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">suite</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">klass</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Test</span><span class="ruby-operator">::</span><span class="ruby-constant">Unit</span><span class="ruby-operator">::</span><span class="ruby-constant">TestCase</span>)
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">result</span> = <span class="ruby-constant">TestRunner</span>.<span class="ruby-identifier">run</span> <span class="ruby-identifier">suite</span>, <span class="ruby-identifier">ui</span>
+
+      <span class="ruby-identifier">alert_error</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">passed?</span>
+    <span class="ruby-keyword kw">else</span>
+      <span class="ruby-identifier">result</span> = <span class="ruby-constant">MiniTest</span><span class="ruby-operator">::</span><span class="ruby-constant">Unit</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-identifier">result</span>.<span class="ruby-identifier">run</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">result</span>
+  <span class="ruby-keyword kw">ensure</span>
+    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">chdir</span>(<span class="ruby-identifier">start_dir</span>)
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

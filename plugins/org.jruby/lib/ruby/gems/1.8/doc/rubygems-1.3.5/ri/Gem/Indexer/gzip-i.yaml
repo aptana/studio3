@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Zlib::GzipWriter wrapper that gzips <tt>filename</tt> on disk.
+full_name: Gem::Indexer#gzip
+params: (filename)
+name: gzip
+is_singleton: false
+aliases: []
+

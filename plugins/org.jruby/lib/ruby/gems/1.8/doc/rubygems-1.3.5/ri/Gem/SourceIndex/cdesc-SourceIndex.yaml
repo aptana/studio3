@@ -1,0 +1,89 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Enumerable
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The SourceIndex object indexes all the gems available from a particular source
+    (e.g. a list of gem directories, or a remote source). A SourceIndex maps a gem
+    full name to a gem specification.
+- !ruby/object:SM::Flow::LIST 
+  type: :NOTE
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: The class used to be named Cache, but that became confusing when cached
+      source fetchers where introduced. The constant Gem::Cache is an alias for this
+      class to allow old YAMLized source index objects to load properly.
+    label: 'NOTE:'
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: Directories to use to refresh this SourceIndex when calling refresh!
+  rw: RW
+  name: spec_dirs
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: add_spec
+- !ruby/object:RI::MethodSummary 
+  name: add_specs
+- !ruby/object:RI::MethodSummary 
+  name: all_gems
+- !ruby/object:RI::MethodSummary 
+  name: dump
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: find_name
+- !ruby/object:RI::MethodSummary 
+  name: gem_signature
+- !ruby/object:RI::MethodSummary 
+  name: index_signature
+- !ruby/object:RI::MethodSummary 
+  name: latest_specs
+- !ruby/object:RI::MethodSummary 
+  name: length
+- !ruby/object:RI::MethodSummary 
+  name: load_gems_in
+- !ruby/object:RI::MethodSummary 
+  name: outdated
+- !ruby/object:RI::MethodSummary 
+  name: prerelease_gems
+- !ruby/object:RI::MethodSummary 
+  name: prerelease_specs
+- !ruby/object:RI::MethodSummary 
+  name: refresh!
+- !ruby/object:RI::MethodSummary 
+  name: released_gems
+- !ruby/object:RI::MethodSummary 
+  name: released_specs
+- !ruby/object:RI::MethodSummary 
+  name: remove_spec
+- !ruby/object:RI::MethodSummary 
+  name: search
+- !ruby/object:RI::MethodSummary 
+  name: size
+- !ruby/object:RI::MethodSummary 
+  name: specification
+- !ruby/object:RI::MethodSummary 
+  name: update
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: from_gems_in
+- !ruby/object:RI::MethodSummary 
+  name: from_installed_gems
+- !ruby/object:RI::MethodSummary 
+  name: installed_spec_directories
+- !ruby/object:RI::MethodSummary 
+  name: load_specification
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::SourceIndex
+constants: []
+
+superclass: Object
+name: SourceIndex

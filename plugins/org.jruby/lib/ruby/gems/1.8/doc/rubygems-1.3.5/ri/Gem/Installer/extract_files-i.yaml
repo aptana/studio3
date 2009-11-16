@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Reads the file index and extracts each file into the gem directory.
+- !ruby/struct:SM::Flow::P 
+  body: Ensures that files can't be installed outside the gem directory.
+full_name: Gem::Installer#extract_files
+params: ()
+name: extract_files
+is_singleton: false
+aliases: []
+

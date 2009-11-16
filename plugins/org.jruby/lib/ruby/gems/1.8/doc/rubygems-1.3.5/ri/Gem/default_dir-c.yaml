@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Default home directory path to be used if an alternate value is not specified
+    in the environment
+full_name: Gem::default_dir
+params: ()
+name: default_dir
+is_singleton: true
+aliases: []
+

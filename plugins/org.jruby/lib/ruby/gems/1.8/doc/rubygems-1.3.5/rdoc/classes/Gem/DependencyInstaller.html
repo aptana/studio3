@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::DependencyInstaller</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::DependencyInstaller</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/dependency_installer_rb.html">
+                lib/rubygems/dependency_installer.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Installs a gem along with all its dependencies from local and remote gems.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000292">find_gems_with_sources</a>&nbsp;&nbsp;
+      <a href="#M000294">find_spec_by_name_and_version</a>&nbsp;&nbsp;
+      <a href="#M000293">gather_dependencies</a>&nbsp;&nbsp;
+      <a href="#M000295">install</a>&nbsp;&nbsp;
+      <a href="#M000291">new</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="UserInteraction.html">Gem::UserInteraction</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">DEFAULT_OPTIONS</td>
+          <td>=</td>
+          <td class="context-item-value">{     :env_shebang =&gt; false,     :domain =&gt; :both, # HACK dup     :force =&gt; false,     :format_executable =&gt; false, # HACK dup     :ignore_dependencies =&gt; false,     :prerelease =&gt; false,     :security_policy =&gt; nil, # HACK NoSecurity requires OpenSSL.  AlmostNo? Low?     :wrappers =&gt; true,   }</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">gems_to_install</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">installed_gems</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000291" class="method-detail">
+        <a name="M000291"></a>
+
+        <div class="method-heading">
+          <a href="DependencyInstaller.src/M000291.html" target="Code" class="method-signature"
+            onclick="popupCode('DependencyInstaller.src/M000291.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Creates a <a href="DependencyInstaller.html#M000291">new</a> installer
+instance.
+</p>
+<p>
+Options are:
+</p>
+<table>
+<tr><td valign="top">:cache_dir:</td><td>Alternate repository path to store .gem files in.
+
+</td></tr>
+<tr><td valign="top">:domain:</td><td>:local, :remote, or :both. :local only searches gems in the current
+directory. :remote searches only gems in Gem::sources. :both searches both.
+
+</td></tr>
+<tr><td valign="top">:env_shebang:</td><td>See Gem::Installer::new.
+
+</td></tr>
+<tr><td valign="top">:force:</td><td>See <a href="Installer.html#M000364">Gem::Installer#install</a>.
+
+</td></tr>
+<tr><td valign="top">:format_executable:</td><td>See Gem::Installer#initialize.
+
+</td></tr>
+<tr><td valign="top">:ignore_dependencies:</td><td>Don&#8216;t <a href="DependencyInstaller.html#M000295">install</a> any
+dependencies.
+
+</td></tr>
+<tr><td valign="top">:install_dir:</td><td>See <a href="Installer.html#M000364">Gem::Installer#install</a>.
+
+</td></tr>
+<tr><td valign="top">:prerelease:</td><td>Allow prerelease versions
+
+</td></tr>
+<tr><td valign="top">:security_policy:</td><td>See Gem::Installer::new and <a href="Security.html">Gem::Security</a>.
+
+</td></tr>
+<tr><td valign="top">:user_install:</td><td>See <a href="Installer.html#M000363">Gem::Installer.new</a>
+
+</td></tr>
+<tr><td valign="top">:wrappers:</td><td>See Gem::Installer::new
+
+</td></tr>
+</table>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000292" class="method-detail">
+        <a name="M000292"></a>
+
+        <div class="method-heading">
+          <a href="DependencyInstaller.src/M000292.html" target="Code" class="method-signature"
+            onclick="popupCode('DependencyInstaller.src/M000292.html');return false;">
+          <span class="method-name">find_gems_with_sources</span><span class="method-args">(dep)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns a list of pairs of gemspecs and source_uris that match <a
+href="Dependency.html">Gem::Dependency</a> <tt>dep</tt> from both local
+(Dir.pwd) and remote (<a href="../Gem.html#M000058">Gem.sources</a>)
+sources. Gems are sorted with newer gems prefered over older gems, and
+local gems preferred over remote gems.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000294" class="method-detail">
+        <a name="M000294"></a>
+
+        <div class="method-heading">
+          <a href="DependencyInstaller.src/M000294.html" target="Code" class="method-signature"
+            onclick="popupCode('DependencyInstaller.src/M000294.html');return false;">
+          <span class="method-name">find_spec_by_name_and_version</span><span class="method-args">(gem_name, version = Gem::Requirement.default)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Finds a spec and the source_uri it came from for gem <tt>gem_name</tt> and
+<tt>version</tt>. Returns an Array of specs and sources required for
+installation of the gem.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000293" class="method-detail">
+        <a name="M000293"></a>
+
+        <div class="method-heading">
+          <a href="DependencyInstaller.src/M000293.html" target="Code" class="method-signature"
+            onclick="popupCode('DependencyInstaller.src/M000293.html');return false;">
+          <span class="method-name">gather_dependencies</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Gathers all dependencies necessary for the installation from local and
+remote sources unless the ignore_dependencies was given.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000295" class="method-detail">
+        <a name="M000295"></a>
+
+        <div class="method-heading">
+          <a href="DependencyInstaller.src/M000295.html" target="Code" class="method-signature"
+            onclick="popupCode('DependencyInstaller.src/M000295.html');return false;">
+          <span class="method-name">install</span><span class="method-args">(dep_or_name, version = Gem::Requirement.default)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Installs the gem and all its dependencies. Returns an Array of installed
+gems specifications.
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

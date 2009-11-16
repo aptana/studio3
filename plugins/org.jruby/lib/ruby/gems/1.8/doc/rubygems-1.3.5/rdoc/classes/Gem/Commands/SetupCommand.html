@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::Commands::SetupCommand</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::Commands::SetupCommand</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/rubygems/commands/setup_command_rb.html">
+                lib/rubygems/commands/setup_command.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="../Command.html">
+                Gem::Command
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Installs RubyGems itself. This command is ordinarily only available from a
+RubyGems checkout or tarball.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000115">check_ruby_version</a>&nbsp;&nbsp;
+      <a href="#M000116">execute</a>&nbsp;&nbsp;
+      <a href="#M000117">install_executables</a>&nbsp;&nbsp;
+      <a href="#M000118">install_lib</a>&nbsp;&nbsp;
+      <a href="#M000119">install_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000120">make_destination_dirs</a>&nbsp;&nbsp;
+      <a href="#M000114">new</a>&nbsp;&nbsp;
+      <a href="#M000121">remove_old_bin_files</a>&nbsp;&nbsp;
+      <a href="#M000122">remove_source_caches</a>&nbsp;&nbsp;
+      <a href="#M000123">run_rdoc</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000114" class="method-detail">
+        <a name="M000114"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000114.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000114.html');return false;">
+          <span class="method-name">new</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000115" class="method-detail">
+        <a name="M000115"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000115.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000115.html');return false;">
+          <span class="method-name">check_ruby_version</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000116" class="method-detail">
+        <a name="M000116"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000116.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000116.html');return false;">
+          <span class="method-name">execute</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000117" class="method-detail">
+        <a name="M000117"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000117.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000117.html');return false;">
+          <span class="method-name">install_executables</span><span class="method-args">(bin_dir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000118" class="method-detail">
+        <a name="M000118"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000118.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000118.html');return false;">
+          <span class="method-name">install_lib</span><span class="method-args">(lib_dir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000119" class="method-detail">
+        <a name="M000119"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000119.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000119.html');return false;">
+          <span class="method-name">install_rdoc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000120" class="method-detail">
+        <a name="M000120"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000120.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000120.html');return false;">
+          <span class="method-name">make_destination_dirs</span><span class="method-args">(install_destdir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000121" class="method-detail">
+        <a name="M000121"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000121.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000121.html');return false;">
+          <span class="method-name">remove_old_bin_files</span><span class="method-args">(bin_dir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000122" class="method-detail">
+        <a name="M000122"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000122.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000122.html');return false;">
+          <span class="method-name">remove_source_caches</span><span class="method-args">(install_destdir)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000123" class="method-detail">
+        <a name="M000123"></a>
+
+        <div class="method-heading">
+          <a href="SetupCommand.src/M000123.html" target="Code" class="method-signature"
+            onclick="popupCode('SetupCommand.src/M000123.html');return false;">
+          <span class="method-name">run_rdoc</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

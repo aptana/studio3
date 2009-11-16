@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>info_program (Debugger)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File cli/ruby-debug/commands/info.rb, line 292</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">info_program</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@state</span>.<span class="ruby-identifier">context</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;The program being debugged is not being run.\n&quot;</span>
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@state</span>.<span class="ruby-identifier">context</span>.<span class="ruby-identifier">dead?</span> 
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;The program crashed.\n&quot;</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Debugger</span>.<span class="ruby-identifier">last_exception</span>
+          <span class="ruby-identifier">print</span>(<span class="ruby-node">&quot;Exception: #{Debugger.last_exception.inspect}\n&quot;</span>)
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">return</span>
+      <span class="ruby-keyword kw">end</span>
+      
+      <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;Program stopped. &quot;</span>
+      <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@state</span>.<span class="ruby-identifier">context</span>.<span class="ruby-identifier">stop_reason</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:step</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;It stopped after stepping, next'ing or initial start.\n&quot;</span>
+      <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:breakpoint</span>
+        <span class="ruby-identifier">print</span>(<span class="ruby-value str">&quot;It stopped at a breakpoint.\n&quot;</span>)
+      <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:catchpoint</span>
+        <span class="ruby-identifier">print</span>(<span class="ruby-value str">&quot;It stopped at a catchpoint.\n&quot;</span>)
+      <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:catchpoint</span>
+        <span class="ruby-identifier">print</span>(<span class="ruby-value str">&quot;It stopped at a catchpoint.\n&quot;</span>)
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">print</span> <span class="ruby-value str">&quot;unknown reason: %s\n&quot;</span> <span class="ruby-operator">%</span> <span class="ruby-ivar">@state</span>.<span class="ruby-identifier">context</span>.<span class="ruby-identifier">stop_reason</span>.<span class="ruby-identifier">to_s</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

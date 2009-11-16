@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::DocManager::rdoc_version
+params: ()
+name: rdoc_version
+is_singleton: true
+aliases: []
+

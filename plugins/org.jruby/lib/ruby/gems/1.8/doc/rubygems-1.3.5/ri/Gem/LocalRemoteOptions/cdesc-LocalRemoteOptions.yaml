@@ -1,0 +1,34 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Mixin methods for local and remote Gem::Command options.
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: accept_uri_http
+- !ruby/object:RI::MethodSummary 
+  name: add_bulk_threshold_option
+- !ruby/object:RI::MethodSummary 
+  name: add_local_remote_options
+- !ruby/object:RI::MethodSummary 
+  name: add_proxy_option
+- !ruby/object:RI::MethodSummary 
+  name: add_source_option
+- !ruby/object:RI::MethodSummary 
+  name: add_update_sources_option
+- !ruby/object:RI::MethodSummary 
+  name: both?
+- !ruby/object:RI::MethodSummary 
+  name: local?
+- !ruby/object:RI::MethodSummary 
+  name: remote?
+class_methods: []
+
+full_name: Gem::LocalRemoteOptions
+constants: []
+
+superclass: 
+name: LocalRemoteOptions

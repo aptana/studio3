@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Loads specs in <tt>file</tt>, fetching from <tt>source_uri</tt> if the on-disk
+    cache is out of date.
+full_name: Gem::SpecFetcher#load_specs
+params: (source_uri, file)
+name: load_specs
+is_singleton: false
+aliases: []
+

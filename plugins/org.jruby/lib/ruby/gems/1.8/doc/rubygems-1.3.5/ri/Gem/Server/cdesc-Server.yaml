@@ -1,0 +1,203 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: ERB::Util
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Gem::Server and allows users to serve gems for consumption by `gem --remote-install`.
+- !ruby/struct:SM::Flow::P 
+  body: 'gem_server starts an HTTP server on the given port and serves the following:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/&quot; - Browsing of gem spec files for installed gems'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/specs.#{Gem.marshal_version}.gz&quot; - specs name/version/platform
+      index'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/latest_specs.#{Gem.marshal_version}.gz&quot; - latest specs name/version/platform
+      index'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/quick/&quot; - Individual gemspecs'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/gems&quot; - Direct access to download the installable gems'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: '&quot;/rdoc?q=&quot; - Search for installed rdoc documentation'
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: 'legacy indexes:'
+    label: '*'
+  - !ruby/object:SM::Flow::LIST 
+    type: :BULLET
+    contents: 
+    - !ruby/struct:SM::Flow::LI 
+      body: '&quot;/Marshal.#{Gem.marshal_version}&quot; - Full SourceIndex dump of
+        metadata for installed gems'
+      label: '*'
+    - !ruby/struct:SM::Flow::LI 
+      body: '&quot;/yaml&quot; - YAML dump of metadata for installed gems - deprecated'
+      label: '*'
+- !ruby/struct:SM::Flow::H 
+  text: Usage
+  level: 2
+- !ruby/struct:SM::Flow::VERB 
+  body: "  gem_server = Gem::Server.new Gem.dir, 8089, false\n  gem_server.run\n"
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: Marshal
+- !ruby/object:RI::MethodSummary 
+  name: latest_specs
+- !ruby/object:RI::MethodSummary 
+  name: quick
+- !ruby/object:RI::MethodSummary 
+  name: rdoc
+- !ruby/object:RI::MethodSummary 
+  name: root
+- !ruby/object:RI::MethodSummary 
+  name: run
+- !ruby/object:RI::MethodSummary 
+  name: show_rdoc_for_pattern
+- !ruby/object:RI::MethodSummary 
+  name: specs
+- !ruby/object:RI::MethodSummary 
+  name: yaml
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+- !ruby/object:RI::MethodSummary 
+  name: run
+full_name: Gem::Server
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: <<-SEARCH       <form class="headerSearch" name="headerSearchForm" method="get"
+    action="/rdoc">         <div id="search" style="float:right">           <span>Filter/Search</span>           <input
+    id="q" type="text" style="width:10em" name="q"/>           <button type="submit"
+    style="display:none" />         </div>       </form>   SEARCH
+  name: SEARCH
+- !ruby/object:RI::Constant 
+  comment: 
+  value: <<-'DOC_TEMPLATE'   <?xml version="1.0" encoding="iso-8859-1"?>   <!DOCTYPE
+    html        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">    <html
+    xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">   <head>     <title>RubyGems
+    Documentation Index</title>     <link rel="stylesheet" href="gem-server-rdoc-style.css"
+    type="text/css" media="screen" />   </head>   <body>     <div id="fileHeader">
+    <%= SEARCH %>       <h1>RubyGems Documentation Index</h1>     </div>     <!--
+    banner header -->    <div id="bodyContent">     <div id="contextContent">       <div
+    id="description">         <h1>Summary</h1>   <p>There are <%=values["gem_count"]%>
+    gems installed:</p>   <p>   <%= values["specs"].map { |v| "<a href=\"##{v["name"]}\">#{v["name"]}</a>"
+    }.join ', ' %>.   <h1>Gems</h1>    <dl>   <% values["specs"].each do |spec| %>         <dt>         <%
+    if spec["first_name_entry"] then %>           <a name="<%=spec["name"]%>"></a>         <%
+    end %>          <b><%=spec["name"]%> <%=spec["version"]%></b>          <% if spec["rdoc_installed"]
+    then %>           <a href="<%=spec["doc_path"]%>">[rdoc]</a>         <% else %>           <span
+    title="rdoc not installed">[rdoc]</span>         <% end %>          <% if spec["homepage"]
+    then %>                 <a href="<%=spec["homepage"]%>" title="<%=spec["homepage"]%>">[www]</a>         <%
+    else %>                 <span title="no homepage available">[www]</span>         <%
+    end %>          <% if spec["has_deps"] then %>          - depends on                 <%=
+    spec["dependencies"].map { |v| "<a href=\"##{v["name"]}\">#{v["name"]}</a>" }.join
+    ', ' %>.         <% end %>         </dt>         <dd>         <%=spec["summary"]%>         <%
+    if spec["executables"] then %>           <br/>                  <% if spec["only_one_executable"]
+    then %>                     Executable is                 <% else %>                     Executables
+    are                 <%end%>                  <%= spec["executables"].map { |v|
+    "<span class=\"context-item-name\">#{v["executable"]}</span>"}.join ', ' %>.          <%end%>         <br/>         <br/>         </dd>   <%
+    end %>   </dl>        </div>      </div>     </div>   <div id="validator-badges">     <p><small><a
+    href="http://validator.w3.org/check/referer">[Validate]</a></small></p>   </div>   </body>   </html>   DOC_TEMPLATE
+  name: DOC_TEMPLATE
+- !ruby/object:RI::Constant 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: CSS is copy &amp; paste from rdoc-style.css, RDoc V1.0.1 - 20041108
+  value: '<<-RDOC_CSS body {     font-family: Verdana,Arial,Helvetica,sans-serif;     font-size:   90%;     margin:
+    0;     margin-left: 40px;     padding: 0;     background: white; }  h1,h2,h3,h4
+    { margin: 0; color: #efefef; background: transparent; } h1 { font-size: 150%;
+    } h2,h3,h4 { margin-top: 1em; }  a { background: #eef; color: #039; text-decoration:
+    none; } a:hover { background: #039; color: #eef; }  /* Override the base stylesheets
+    Anchor inside a table cell */ td > a {   background: transparent;   color: #039;   text-decoration:
+    none; }  /* and inside a section title */ .section-title > a {   background: transparent;   color:
+    #eee;   text-decoration: none; }  /* === Structural elements ===================================
+    */  div#index {     margin: 0;     margin-left: -40px;     padding: 0;     font-size:
+    90%; }   div#index a {     margin-left: 0.7em; }  div#index .section-bar {    margin-left:
+    0px;    padding-left: 0.7em;    background: #ccc;    font-size: small; }   div#classHeader,
+    div#fileHeader {     width: auto;     color: white;     padding: 0.5em 1.5em 0.5em
+    1.5em;     margin: 0;     margin-left: -40px;     border-bottom: 3px solid #006;
+    }  div#classHeader a, div#fileHeader a {     background: inherit;     color: white;
+    }  div#classHeader td, div#fileHeader td {     background: inherit;     color:
+    white; }   div#fileHeader {     background: #057; }  div#classHeader {     background:
+    #048; }   .class-name-in-header {   font-size:  180%;   font-weight: bold; }   div#bodyContent
+    {     padding: 0 1.5em 0 1.5em; }  div#description {     padding: 0.5em 1.5em;     background:
+    #efefef;     border: 1px dotted #999; }  div#description h1,h2,h3,h4,h5,h6 {     color:
+    #125;;     background: transparent; }  div#validator-badges {     text-align:
+    center; } div#validator-badges img { border: 0; }  div#copyright {     color:
+    #333;     background: #efefef;     font: 0.75em sans-serif;     margin-top: 5em;     margin-bottom:
+    0;     padding: 0.5em 2em; }   /* === Classes ===================================
+    */  table.header-table {     color: white;     font-size: small; }  .type-note
+    {     font-size: small;     color: #DEDEDE; }  .xxsection-bar {     background:
+    #eee;     color: #333;     padding: 3px; }  .section-bar {    color: #333;    border-bottom:
+    1px solid #999;     margin-left: -20px; }   .section-title {     background: #79a;     color:
+    #eee;     padding: 3px;     margin-top: 2em;     margin-left: -30px;     border:
+    1px solid #999; }  .top-aligned-row {  vertical-align: top } .bottom-aligned-row
+    { vertical-align: bottom }  /* --- Context section classes -----------------------
+    */  .context-row { } .context-item-name { font-family: monospace; font-weight:
+    bold; color: black; } .context-item-value { font-size: small; color: #448; } .context-item-desc
+    { color: #333; padding-left: 2em; }  /* --- Method classes --------------------------
+    */ .method-detail {     background: #efefef;     padding: 0;     margin-top: 0.5em;     margin-bottom:
+    1em;     border: 1px dotted #ccc; } .method-heading {   color: black;   background:
+    #ccc;   border-bottom: 1px solid #666;   padding: 0.2em 0.5em 0 0.5em; } .method-signature
+    { color: black; background: inherit; } .method-name { font-weight: bold; } .method-args
+    { font-style: italic; } .method-description { padding: 0 0.5em 0 0.5em; }  /*
+    --- Source code sections -------------------- */  a.source-toggle { font-size:
+    90%; } div.method-source-code {     background: #262626;     color: #ffdead;     margin:
+    1em;     padding: 0.5em;     border: 1px dashed #999;     overflow: hidden; }  div.method-source-code
+    pre { color: #ffdead; overflow: hidden; }  /* --- Ruby keyword styles ---------------------
+    */  .standalone-code { background: #221111; color: #ffdead; overflow: hidden;
+    }  .ruby-constant  { color: #7fffd4; background: transparent; } .ruby-keyword
+    { color: #00ffff; background: transparent; } .ruby-ivar    { color: #eedd82; background:
+    transparent; } .ruby-operator  { color: #00ffee; background: transparent; } .ruby-identifier
+    { color: #ffdead; background: transparent; } .ruby-node    { color: #ffa07a; background:
+    transparent; } .ruby-comment { color: #b22222; font-weight: bold; background:
+    transparent; } .ruby-regexp  { color: #ffa07a; background: transparent; } .ruby-value   {
+    color: #7fffd4; background: transparent; }   RDOC_CSS'
+  name: RDOC_CSS
+- !ruby/object:RI::Constant 
+  comment: 
+  value: <<-'NO_DOC' <?xml version="1.0" encoding="iso-8859-1"?> <!DOCTYPE html PUBLIC
+    "-//W3C//DTD XHTML 1.0 Transitional//EN"           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">   <head>     <title>Found
+    documentation</title>     <link rel="stylesheet" href="gem-server-rdoc-style.css"
+    type="text/css" media="screen" />   </head>   <body>     <div id="fileHeader">
+    <%= SEARCH %>       <h1>No documentation found</h1>     </div>      <div id="bodyContent">       <div
+    id="contextContent">         <div id="description">           <p>No gems matched
+    <%= h query.inspect %></p>            <p>             Back to <a href="/">complete
+    gem index</a>           </p>          </div>       </div>     </div>     <div
+    id="validator-badges">       <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>     </div>   </body>
+    </html>   NO_DOC
+  name: RDOC_NO_DOCUMENTATION
+- !ruby/object:RI::Constant 
+  comment: 
+  value: <<-'RDOC_SEARCH' <?xml version="1.0" encoding="iso-8859-1"?> <!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"           "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">   <head>     <title>Found
+    documentation</title>     <link rel="stylesheet" href="gem-server-rdoc-style.css"
+    type="text/css" media="screen" />   </head>   <body>     <div id="fileHeader">
+    <%= SEARCH %>       <h1>Found documentation</h1>     </div>     <!-- banner header
+    -->      <div id="bodyContent">       <div id="contextContent">         <div id="description">           <h1>Summary</h1>           <p><%=doc_items.length%>
+    documentation topics found.</p>           <h1>Topics</h1>            <dl>           <%
+    doc_items.each do |doc_item| %>             <dt>               <b><%=doc_item[:name]%></b>               <a
+    href="<%=doc_item[:url]%>">[rdoc]</a>             </dt>             <dd>               <%=doc_item[:summary]%>               <br/>               <br/>             </dd>           <%
+    end %>           </dl>            <p>             Back to <a href="/">complete
+    gem index</a>           </p>          </div>       </div>     </div>     <div
+    id="validator-badges">       <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>     </div>   </body>
+    </html>   RDOC_SEARCH
+  name: RDOC_SEARCH_TEMPLATE
+superclass: Object
+name: Server

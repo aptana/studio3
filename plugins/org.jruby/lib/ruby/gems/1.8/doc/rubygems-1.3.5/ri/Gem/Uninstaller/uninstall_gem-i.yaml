@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Uninstalls gem <tt>spec</tt>
+full_name: Gem::Uninstaller#uninstall_gem
+params: (spec, specs)
+name: uninstall_gem
+is_singleton: false
+aliases: []
+

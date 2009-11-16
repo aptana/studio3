@@ -1,0 +1,16 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: []
+
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: build
+full_name: Gem::Ext::ConfigureBuilder
+constants: []
+
+superclass: Gem::Ext::Builder
+name: ConfigureBuilder

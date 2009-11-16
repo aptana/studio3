@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>fetch (Gem::SpecFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/spec_fetcher.rb, line 68</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">dependency</span>, <span class="ruby-identifier">all</span> = <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">matching_platform</span> = <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">prerelease</span> = <span class="ruby-keyword kw">false</span>)
+    <span class="ruby-identifier">specs_and_sources</span> = <span class="ruby-identifier">find_matching</span> <span class="ruby-identifier">dependency</span>, <span class="ruby-identifier">all</span>, <span class="ruby-identifier">matching_platform</span>, <span class="ruby-identifier">prerelease</span>
+
+    <span class="ruby-identifier">specs_and_sources</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">spec_tuple</span>, <span class="ruby-identifier">source_uri</span><span class="ruby-operator">|</span>
+      [<span class="ruby-identifier">fetch_spec</span>(<span class="ruby-identifier">spec_tuple</span>, <span class="ruby-constant">URI</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">source_uri</span>)), <span class="ruby-identifier">source_uri</span>]
+    <span class="ruby-keyword kw">end</span>
+
+  <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">RemoteFetcher</span><span class="ruby-operator">::</span><span class="ruby-constant">FetchError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>
+    <span class="ruby-identifier">raise</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">warn_legacy</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword kw">do</span>
+      <span class="ruby-identifier">require</span> <span class="ruby-value str">'rubygems/source_info_cache'</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">SourceInfoCache</span>.<span class="ruby-identifier">search_with_source</span>(<span class="ruby-identifier">dependency</span>,
+                                                     <span class="ruby-identifier">matching_platform</span>, <span class="ruby-identifier">all</span>)
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

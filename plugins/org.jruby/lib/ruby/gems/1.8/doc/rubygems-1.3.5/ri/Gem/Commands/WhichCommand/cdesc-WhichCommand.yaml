@@ -1,0 +1,24 @@
+--- !ruby/object:RI::ClassDescription 
+includes: []
+
+comment: 
+attributes: []
+
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: execute
+- !ruby/object:RI::MethodSummary 
+  name: find_paths
+- !ruby/object:RI::MethodSummary 
+  name: gem_paths
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Commands::WhichCommand
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: '%w[.rb .rbw .so .dll .bundle]'
+  name: EXT
+superclass: Gem::Command
+name: WhichCommand

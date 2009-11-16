@@ -79,6 +79,8 @@ public class ProcessWrapper
 	protected String getProcessName()
 	{
 		String OS = Platform.getOS();
+		String OSARCH = Platform.getOSArch();
+
 		String result = null;
 		
 		if (OS.equals(Platform.OS_WIN32))
@@ -87,7 +89,12 @@ public class ProcessWrapper
 		}
 		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
+			URL url;
+			if (OS.equals(Platform.OS_MACOSX)) {
+				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
+			} else {
+				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$
+			}
 			try
 			{
 				URL fileURL = FileLocator.toFileURL(url);

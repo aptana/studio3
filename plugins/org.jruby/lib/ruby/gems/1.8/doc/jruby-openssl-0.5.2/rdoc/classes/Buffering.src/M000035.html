@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>read (Buffering)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/openssl/buffering.rb, line 56</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read</span>(<span class="ruby-identifier">size</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">buf</span>=<span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">buf</span>
+        <span class="ruby-identifier">buf</span>.<span class="ruby-identifier">clear</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">buf</span> = <span class="ruby-value str">&quot;&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@eof</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">buf</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">until</span> <span class="ruby-ivar">@eof</span>
+      <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-ivar">@rbuffer</span>.<span class="ruby-identifier">size</span>
+      <span class="ruby-identifier">fill_rbuff</span>
+    <span class="ruby-keyword kw">end</span>
+    <span class="ruby-identifier">ret</span> = <span class="ruby-identifier">consume_rbuff</span>(<span class="ruby-identifier">size</span>) <span class="ruby-operator">||</span> <span class="ruby-value str">&quot;&quot;</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">buf</span>
+      <span class="ruby-identifier">buf</span>.<span class="ruby-identifier">replace</span>(<span class="ruby-identifier">ret</span>)
+      <span class="ruby-identifier">ret</span> = <span class="ruby-identifier">buf</span>
+    <span class="ruby-keyword kw">end</span>
+    (<span class="ruby-identifier">size</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">ret</span>.<span class="ruby-identifier">empty?</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">ret</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

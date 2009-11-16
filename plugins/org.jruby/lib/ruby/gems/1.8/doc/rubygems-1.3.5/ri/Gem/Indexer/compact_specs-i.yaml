@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Compacts Marshal output for the specs index data source by using identical
+    objects as much as possible.
+full_name: Gem::Indexer#compact_specs
+params: (specs)
+name: compact_specs
+is_singleton: false
+aliases: []
+

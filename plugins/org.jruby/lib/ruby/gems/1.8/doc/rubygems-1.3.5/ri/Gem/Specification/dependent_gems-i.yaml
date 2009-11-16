@@ -1,0 +1,15 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Return a list of all gems that have a dependency on this gemspec. The list
+    is structured with entries that conform to:'
+- !ruby/struct:SM::Flow::VERB 
+  body: "  [depending_gem, dependency, [list_of_gems_that_satisfy_dependency]]\n"
+full_name: Gem::Specification#dependent_gems
+params: ()
+name: dependent_gems
+is_singleton: false
+aliases: []
+

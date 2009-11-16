@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Merge a set of command options with the set of default options (without modifying
+    the default option hash).
+full_name: Gem::Command#merge_options
+params: (new_options)
+name: merge_options
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Version#yaml_initialize
+params: (tag, values)
+name: yaml_initialize
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns library directories glob for a gemspec. For example,
+- !ruby/struct:SM::Flow::VERB 
+  body: "  '/usr/local/lib/ruby/gems/1.8/gems/foobar-1.0/{lib,ext}'\n"
+full_name: Gem::GemPathSearcher#lib_dirs_for
+params: (spec)
+name: lib_dirs_for
+is_singleton: false
+aliases: []
+

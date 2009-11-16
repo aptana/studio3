@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Wraps <tt>text</tt> to <tt>wrap</tt> characters and optionally indents by
+    <tt>indent</tt> characters
+full_name: Gem::Text#format_text
+params: (text, wrap, indent=0)
+name: format_text
+is_singleton: false
+aliases: []
+

@@ -14,8 +14,8 @@ class TabStopVariableResolver extends SimpleTemplateVariableResolver {
 	public void resolve(TemplateVariable variable, TemplateContext context) {
 		super.resolve(variable, context);
 		if (variable.getType().equals(variable.getName())) {
-			variable.setValues(new String[] {""});
-			setEvaluationString("");
+			variable.setValues(new String[] {""}); //$NON-NLS-1$
+			setEvaluationString(""); //$NON-NLS-1$
 		} else {
 			setEvaluationString(variable.getName());			
 		}

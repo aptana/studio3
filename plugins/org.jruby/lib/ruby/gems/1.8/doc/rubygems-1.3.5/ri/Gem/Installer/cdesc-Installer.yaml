@@ -1,0 +1,96 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Gem::UserInteraction
+- !ruby/object:RI::IncludedModule 
+  name: Gem::RequirePathsBuilder
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The installer class processes RubyGem .gem files and installs the files contained
+    in the .gem into the Gem.path.
+- !ruby/struct:SM::Flow::P 
+  body: Gem::Installer does the work of putting files in all the right places on the
+    filesystem including unpacking the gem into its gem dir, installing the gemspec
+    in the specifications dir, storing the cached gem in the cache dir, and installing
+    either wrappers or symlinks for executables.
+- !ruby/struct:SM::Flow::P 
+  body: The installer fires pre and post install hooks. Hooks can be added either
+    through a rubygems_plugin.rb file in an installed gem or via a rubygems/defaults/#{RUBY_ENGINE}.rb
+    or rubygems/defaults/operating_system.rb file. See Gem.pre_install and Gem.post_install
+    for details.
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The directory a gem's executables will be installed into
+  rw: R
+  name: bin_dir
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: W
+  name: exec_format
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The gem repository the gem will be installed into
+  rw: R
+  name: gem_home
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: True if we've warned about ~/.gems install
+  rw: RW
+  name: home_install_warning
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: True if we've warned about PATH not including Gem.bindir
+  rw: RW
+  name: path_warning
+- !ruby/object:RI::Attribute 
+  comment: 
+  - !ruby/struct:SM::Flow::P 
+    body: The Gem::Specification for the gem being installed
+  rw: R
+  name: spec
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: app_script_text
+- !ruby/object:RI::MethodSummary 
+  name: build_extensions
+- !ruby/object:RI::MethodSummary 
+  name: ensure_dependency
+- !ruby/object:RI::MethodSummary 
+  name: extract_files
+- !ruby/object:RI::MethodSummary 
+  name: formatted_program_filename
+- !ruby/object:RI::MethodSummary 
+  name: generate_bin
+- !ruby/object:RI::MethodSummary 
+  name: generate_bin_script
+- !ruby/object:RI::MethodSummary 
+  name: generate_bin_symlink
+- !ruby/object:RI::MethodSummary 
+  name: generate_windows_script
+- !ruby/object:RI::MethodSummary 
+  name: install
+- !ruby/object:RI::MethodSummary 
+  name: installation_satisfies_dependency?
+- !ruby/object:RI::MethodSummary 
+  name: shebang
+- !ruby/object:RI::MethodSummary 
+  name: unpack
+- !ruby/object:RI::MethodSummary 
+  name: windows_stub_script
+- !ruby/object:RI::MethodSummary 
+  name: write_spec
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: exec_format
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Gem::Installer
+constants: []
+
+superclass: Object
+name: Installer

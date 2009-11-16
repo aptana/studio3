@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Installs the gem and all its dependencies. Returns an Array of installed gems
+    specifications.
+full_name: Gem::DependencyInstaller#install
+params: (dep_or_name, version = Gem::Requirement.default)
+name: install
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,10 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+full_name: Gem::Server#yaml
+params: (req, res)
+name: yaml
+is_singleton: false
+aliases: []
+

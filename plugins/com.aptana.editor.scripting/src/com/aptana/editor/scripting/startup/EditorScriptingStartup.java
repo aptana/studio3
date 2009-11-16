@@ -82,7 +82,7 @@ public class EditorScriptingStartup implements IStartup {
 	};
 
 	public void earlyStartup() {
-		Job addEditorMonitorJobs = new WorkbenchJob("Monitor TextEditors.") {
+		Job addEditorMonitorJobs = new WorkbenchJob("Monitor TextEditors.") {  //$NON-NLS-1$
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				IWorkbench workbench = PlatformUI.getWorkbench();
 				if (workbench != null) {

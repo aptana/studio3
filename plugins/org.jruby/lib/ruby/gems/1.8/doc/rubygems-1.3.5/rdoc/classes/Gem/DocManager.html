@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Gem::DocManager</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Gem::DocManager</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/doc_manager_rb.html">
+                lib/rubygems/doc_manager.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+The documentation manager generates RDoc and RI for RubyGems.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000312">configured_args</a>&nbsp;&nbsp;
+      <a href="#M000313">configured_args=</a>&nbsp;&nbsp;
+      <a href="#M000320">generate_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000319">generate_ri</a>&nbsp;&nbsp;
+      <a href="#M000321">install_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000322">install_ri</a>&nbsp;&nbsp;
+      <a href="#M000314">load_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000317">new</a>&nbsp;&nbsp;
+      <a href="#M000318">rdoc_installed?</a>&nbsp;&nbsp;
+      <a href="#M000315">rdoc_version</a>&nbsp;&nbsp;
+      <a href="#M000323">run_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000324">setup_rdoc</a>&nbsp;&nbsp;
+      <a href="#M000325">uninstall_doc</a>&nbsp;&nbsp;
+      <a href="#M000316">update_ri_cache</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="UserInteraction.html">Gem::UserInteraction</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000312" class="method-detail">
+        <a name="M000312"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000312.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000312.html');return false;">
+          <span class="method-name">configured_args</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000313" class="method-detail">
+        <a name="M000313"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000313.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000313.html');return false;">
+          <span class="method-name">configured_args=</span><span class="method-args">(args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000314" class="method-detail">
+        <a name="M000314"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000314.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000314.html');return false;">
+          <span class="method-name">load_rdoc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Load RDoc from a gem if it is available, otherwise from Ruby&#8216;s stdlib
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000317" class="method-detail">
+        <a name="M000317"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000317.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000317.html');return false;">
+          <span class="method-name">new</span><span class="method-args">(spec, rdoc_args=&quot;&quot;)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Create a document manager for <tt>spec</tt>. <tt>rdoc_args</tt> contains
+arguments for RDoc (template etc.) as a String.
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000315" class="method-detail">
+        <a name="M000315"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000315.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000315.html');return false;">
+          <span class="method-name">rdoc_version</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000316" class="method-detail">
+        <a name="M000316"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000316.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000316.html');return false;">
+          <span class="method-name">update_ri_cache</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Updates the RI cache for RDoc 2 if it is installed
+</p>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000320" class="method-detail">
+        <a name="M000320"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000320.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000320.html');return false;">
+          <span class="method-name">generate_rdoc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Generate the RDoc documents for this gem spec.
+</p>
+<p>
+Note that if both RI and RDoc documents are generated from the same
+process, the RI docs should be done first (a likely bug in RDoc will cause
+RI docs generation to fail if run after RDoc).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000319" class="method-detail">
+        <a name="M000319"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000319.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000319.html');return false;">
+          <span class="method-name">generate_ri</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Generate the RI documents for this gem spec.
+</p>
+<p>
+Note that if both RI and RDoc documents are generated from the same
+process, the RI docs should be done first (a likely bug in RDoc will cause
+RI docs generation to fail if run after RDoc).
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000321" class="method-detail">
+        <a name="M000321"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000321.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000321.html');return false;">
+          <span class="method-name">install_rdoc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Generate and install RDoc into the documentation directory
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000322" class="method-detail">
+        <a name="M000322"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000322.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000322.html');return false;">
+          <span class="method-name">install_ri</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Generate and install RI into the documentation directory
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000318" class="method-detail">
+        <a name="M000318"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000318.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000318.html');return false;">
+          <span class="method-name">rdoc_installed?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Is the RDoc documentation installed?
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000323" class="method-detail">
+        <a name="M000323"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000323.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000323.html');return false;">
+          <span class="method-name">run_rdoc</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Run RDoc with <tt>args</tt>, which is an ARGV style argument list
+</p>
+        </div>
+      </div>
+
+      <div id="method-M000324" class="method-detail">
+        <a name="M000324"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000324.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000324.html');return false;">
+          <span class="method-name">setup_rdoc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+        </div>
+      </div>
+
+      <div id="method-M000325" class="method-detail">
+        <a name="M000325"></a>
+
+        <div class="method-heading">
+          <a href="DocManager.src/M000325.html" target="Code" class="method-signature"
+            onclick="popupCode('DocManager.src/M000325.html');return false;">
+          <span class="method-name">uninstall_doc</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Remove RDoc and RI documentation
+</p>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

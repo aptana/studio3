@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>build_self_signed_cert (Gem::Security)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/security.rb, line 672</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">build_self_signed_cert</span>(<span class="ruby-identifier">email_addr</span>, <span class="ruby-identifier">opt</span> = {})
+    <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">ensure_ssl_available</span>
+    <span class="ruby-identifier">opt</span> = <span class="ruby-constant">OPT</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opt</span>)
+    <span class="ruby-identifier">path</span> = { <span class="ruby-identifier">:key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">:cert</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span> }
+
+    <span class="ruby-comment cmt"># split email address up</span>
+    <span class="ruby-identifier">cn</span>, <span class="ruby-identifier">dcs</span> = <span class="ruby-identifier">email_addr</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">'@'</span>)
+    <span class="ruby-identifier">dcs</span> = <span class="ruby-identifier">dcs</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">'.'</span>)
+
+    <span class="ruby-comment cmt"># munge email CN and DCs</span>
+    <span class="ruby-identifier">cn</span> = <span class="ruby-identifier">cn</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:munge_re</span>], <span class="ruby-value str">'_'</span>)
+    <span class="ruby-identifier">dcs</span> = <span class="ruby-identifier">dcs</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">dc</span><span class="ruby-operator">|</span> <span class="ruby-identifier">dc</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:munge_re</span>], <span class="ruby-value str">'_'</span>) }
+
+    <span class="ruby-comment cmt"># create DN</span>
+    <span class="ruby-identifier">name</span> = <span class="ruby-node">&quot;CN=#{cn}/&quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">dcs</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">dc</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;DC=#{dc}&quot;</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">'/'</span>)
+    <span class="ruby-identifier">name</span> = <span class="ruby-constant">OpenSSL</span><span class="ruby-operator">::</span><span class="ruby-constant">X509</span><span class="ruby-operator">::</span><span class="ruby-constant">Name</span><span class="ruby-operator">::</span><span class="ruby-identifier">parse</span>(<span class="ruby-identifier">name</span>)
+
+    <span class="ruby-comment cmt"># build private key</span>
+    <span class="ruby-identifier">key</span> = <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:key_algo</span>].<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:key_size</span>])
+
+    <span class="ruby-comment cmt"># method name pretty much says it all :)</span>
+    <span class="ruby-identifier">verify_trust_dir</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:trust_dir</span>], <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:perms</span>][<span class="ruby-identifier">:trust_dir</span>])
+
+    <span class="ruby-comment cmt"># if we're saving the key, then write it out</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:save_key</span>]
+      <span class="ruby-identifier">path</span>[<span class="ruby-identifier">:key</span>] = <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:save_key_path</span>] <span class="ruby-operator">||</span> (<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:output_fmt</span>] <span class="ruby-operator">%</span> <span class="ruby-value str">'private_key'</span>)
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>[<span class="ruby-identifier">:key</span>], <span class="ruby-value str">'wb'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">chmod</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:perms</span>][<span class="ruby-identifier">:signing_key</span>])
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">key</span>.<span class="ruby-identifier">to_pem</span>)
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># build self-signed public cert from key</span>
+    <span class="ruby-identifier">cert</span> = <span class="ruby-identifier">build_cert</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">key</span>, <span class="ruby-identifier">opt</span>)
+
+    <span class="ruby-comment cmt"># if we're saving the cert, then write it out</span>
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:save_cert</span>]
+      <span class="ruby-identifier">path</span>[<span class="ruby-identifier">:cert</span>] = <span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:save_cert_path</span>] <span class="ruby-operator">||</span> (<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:output_fmt</span>] <span class="ruby-operator">%</span> <span class="ruby-value str">'public_cert'</span>)
+      <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">path</span>[<span class="ruby-identifier">:cert</span>], <span class="ruby-value str">'wb'</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">chmod</span>(<span class="ruby-identifier">opt</span>[<span class="ruby-identifier">:perms</span>][<span class="ruby-identifier">:signing_cert</span>])
+        <span class="ruby-identifier">file</span>.<span class="ruby-identifier">write</span>(<span class="ruby-identifier">cert</span>.<span class="ruby-identifier">to_pem</span>)
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-comment cmt"># return key, cert, and paths (if applicable)</span>
+    { <span class="ruby-identifier">:key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">key</span>, <span class="ruby-identifier">:cert</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cert</span>,
+      <span class="ruby-identifier">:key_path</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">path</span>[<span class="ruby-identifier">:key</span>], <span class="ruby-identifier">:cert_path</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">path</span>[<span class="ruby-identifier">:cert</span>] }
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

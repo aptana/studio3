@@ -1,0 +1,16 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Special loader for YAML files. When a Specification object is loaded from
+    a YAML file, it bypasses the normal Ruby object initialization routine (#initialize).
+    This method makes up for that and deals with gems of different ages.
+- !ruby/struct:SM::Flow::P 
+  body: '''input'' can be anything that YAML.load() accepts: String or IO.'
+full_name: Gem::Specification::from_yaml
+params: (input)
+name: from_yaml
+is_singleton: true
+aliases: []
+

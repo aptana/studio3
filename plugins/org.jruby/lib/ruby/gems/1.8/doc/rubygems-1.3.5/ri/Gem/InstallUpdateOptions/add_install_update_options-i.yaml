@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Add the install/update options to the option parser.
+full_name: Gem::InstallUpdateOptions#add_install_update_options
+params: ()
+name: add_install_update_options
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Constructs a Version from the <tt>version</tt> string. A version string is
+    a series of digits or ASCII letters separated by dots.
+full_name: Gem::Version::new
+params: (version)
+name: new
+is_singleton: true
+aliases: []
+

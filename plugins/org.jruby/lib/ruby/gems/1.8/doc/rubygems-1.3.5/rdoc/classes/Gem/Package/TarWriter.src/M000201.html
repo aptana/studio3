@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>add_file (Gem::Package::TarWriter)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/package/tar_writer.rb, line 102</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_file</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">mode</span>) <span class="ruby-comment cmt"># :yields: io</span>
+    <span class="ruby-identifier">check_closed</span>
+
+    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">NonSeekableIO</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">:pos=</span>
+
+    <span class="ruby-identifier">name</span>, <span class="ruby-identifier">prefix</span> = <span class="ruby-identifier">split_name</span> <span class="ruby-identifier">name</span>
+
+    <span class="ruby-identifier">init_pos</span> = <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">pos</span>
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">write</span> <span class="ruby-value str">&quot;\0&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-value">512</span> <span class="ruby-comment cmt"># placeholder for the header</span>
+
+    <span class="ruby-keyword kw">yield</span> <span class="ruby-constant">RestrictedStream</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@io</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+
+    <span class="ruby-identifier">size</span> = <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">pos</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">init_pos</span> <span class="ruby-operator">-</span> <span class="ruby-value">512</span>
+
+    <span class="ruby-identifier">remainder</span> = (<span class="ruby-value">512</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">size</span> <span class="ruby-operator">%</span> <span class="ruby-value">512</span>)) <span class="ruby-operator">%</span> <span class="ruby-value">512</span>
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">write</span> <span class="ruby-value str">&quot;\0&quot;</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">remainder</span>
+
+    <span class="ruby-identifier">final_pos</span> = <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">pos</span>
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">pos</span> = <span class="ruby-identifier">init_pos</span>
+
+    <span class="ruby-identifier">header</span> = <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">Package</span><span class="ruby-operator">::</span><span class="ruby-constant">TarHeader</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-identifier">:mode</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">mode</span>,
+                                         <span class="ruby-identifier">:size</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">size</span>, <span class="ruby-identifier">:prefix</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">prefix</span>
+
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">write</span> <span class="ruby-identifier">header</span>
+    <span class="ruby-ivar">@io</span>.<span class="ruby-identifier">pos</span> = <span class="ruby-identifier">final_pos</span>
+
+    <span class="ruby-keyword kw">self</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>make (Gem::Ext::Builder)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/ext/builder.rb, line 14</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">make</span>(<span class="ruby-identifier">dest_path</span>, <span class="ruby-identifier">results</span>)
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span> <span class="ruby-value str">'Makefile'</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;Makefile not found:\n\n#{results.join &quot;\n&quot;}&quot;</span> 
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">mf</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-value str">'Makefile'</span>)
+    <span class="ruby-identifier">mf</span> = <span class="ruby-identifier">mf</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^RUBYARCHDIR\s*=\s*\$[^$]*/</span>, <span class="ruby-node">&quot;RUBYARCHDIR = #{dest_path}&quot;</span>)
+    <span class="ruby-identifier">mf</span> = <span class="ruby-identifier">mf</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^RUBYLIBDIR\s*=\s*\$[^$]*/</span>, <span class="ruby-node">&quot;RUBYLIBDIR = #{dest_path}&quot;</span>)
+
+    <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-value str">'Makefile'</span>, <span class="ruby-value str">'wb'</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">print</span> <span class="ruby-identifier">mf</span>}
+
+    <span class="ruby-identifier">make_program</span> = <span class="ruby-constant">ENV</span>[<span class="ruby-value str">'make'</span>]
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">make_program</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">make_program</span> = (<span class="ruby-regexp re">/mswin/</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">RUBY_PLATFORM</span>) <span class="ruby-operator">?</span> <span class="ruby-value str">'nmake'</span> <span class="ruby-operator">:</span> <span class="ruby-value str">'make'</span>
+    <span class="ruby-keyword kw">end</span>
+
+    [<span class="ruby-value str">''</span>, <span class="ruby-value str">' install'</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">target</span><span class="ruby-operator">|</span>
+      <span class="ruby-identifier">cmd</span> = <span class="ruby-node">&quot;#{make_program}#{target}&quot;</span>
+      <span class="ruby-identifier">results</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">cmd</span>
+      <span class="ruby-identifier">results</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">`#{cmd} #{redirector}`</span>
+
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Gem</span><span class="ruby-operator">::</span><span class="ruby-constant">InstallError</span>, <span class="ruby-node">&quot;make#{target} failed:\n\n#{results}&quot;</span> <span class="ruby-keyword kw">unless</span>
+        <span class="ruby-identifier">$?</span>.<span class="ruby-identifier">success?</span>
+    <span class="ruby-keyword kw">end</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

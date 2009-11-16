@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Creates the symlinks to run the applications in the gem. Moves the symlink
+    if the gem being installed has a newer version.
+full_name: Gem::Installer#generate_bin_symlink
+params: (filename, bindir)
+name: generate_bin_symlink
+is_singleton: false
+aliases: []
+

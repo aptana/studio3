@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Same as :attribute, but ensures that values assigned to the attribute are
+    array values by applying :to_a to the value.
+full_name: Gem::Specification::array_attribute
+params: (name)
+name: array_attribute
+is_singleton: true
+aliases: []
+

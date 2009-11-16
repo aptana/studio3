@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Builds the gem from the specification. Returns the name of the file written.
+full_name: Gem::Builder#build
+params: ()
+name: build
+is_singleton: false
+aliases: []
+

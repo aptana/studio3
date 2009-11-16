@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Removes installed executables and batch files (windows only) for <tt>gemspec</tt>.
+full_name: Gem::Uninstaller#remove_executables
+params: (spec)
+name: remove_executables
+is_singleton: false
+aliases: []
+

@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: The mode needed to read a file as straight binary.
+full_name: Gem::binary_mode
+params: ()
+name: binary_mode
+is_singleton: true
+aliases: []
+

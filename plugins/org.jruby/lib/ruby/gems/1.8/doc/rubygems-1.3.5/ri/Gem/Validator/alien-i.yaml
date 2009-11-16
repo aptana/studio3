@@ -1,0 +1,29 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: 'Checks the gem directory for the following potential inconsistencies/problems:'
+- !ruby/object:SM::Flow::LIST 
+  type: :BULLET
+  contents: 
+  - !ruby/struct:SM::Flow::LI 
+    body: Checksum gem itself
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: For each file in each gem, check consistency of installed versions
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: Check for files that aren't part of the gem but are in the gems directory
+    label: '*'
+  - !ruby/struct:SM::Flow::LI 
+    body: 1 cache - 1 spec - 1 directory.
+    label: '*'
+- !ruby/struct:SM::Flow::P 
+  body: returns a hash of ErrorData objects, keyed on the problem gem's name.
+full_name: Gem::Validator#alien
+params: (gems=[])
+name: alien
+is_singleton: false
+aliases: []
+

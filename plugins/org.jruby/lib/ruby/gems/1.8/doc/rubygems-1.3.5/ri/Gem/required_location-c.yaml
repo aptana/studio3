@@ -1,0 +1,13 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Full path to <tt>libfile</tt> in <tt>gemname</tt>. Searches for the latest
+    gem unless <tt>requirements</tt> is given.
+full_name: Gem::required_location
+params: (gemname, libfile, *requirements)
+name: required_location
+is_singleton: true
+aliases: []
+

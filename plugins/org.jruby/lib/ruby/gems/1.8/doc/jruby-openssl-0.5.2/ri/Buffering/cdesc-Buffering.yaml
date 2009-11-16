@@ -1,0 +1,62 @@
+--- !ruby/object:RI::ClassDescription 
+includes: 
+- !ruby/object:RI::IncludedModule 
+  name: Enumerable
+comment: 
+attributes: 
+- !ruby/object:RI::Attribute 
+  comment: 
+  rw: RW
+  name: sync
+instance_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: "<<"
+- !ruby/object:RI::MethodSummary 
+  name: close
+- !ruby/object:RI::MethodSummary 
+  name: each
+- !ruby/object:RI::MethodSummary 
+  name: each_byte
+- !ruby/object:RI::MethodSummary 
+  name: each_line
+- !ruby/object:RI::MethodSummary 
+  name: eof
+- !ruby/object:RI::MethodSummary 
+  name: eof?
+- !ruby/object:RI::MethodSummary 
+  name: flush
+- !ruby/object:RI::MethodSummary 
+  name: getc
+- !ruby/object:RI::MethodSummary 
+  name: gets
+- !ruby/object:RI::MethodSummary 
+  name: print
+- !ruby/object:RI::MethodSummary 
+  name: printf
+- !ruby/object:RI::MethodSummary 
+  name: puts
+- !ruby/object:RI::MethodSummary 
+  name: read
+- !ruby/object:RI::MethodSummary 
+  name: readchar
+- !ruby/object:RI::MethodSummary 
+  name: readline
+- !ruby/object:RI::MethodSummary 
+  name: readlines
+- !ruby/object:RI::MethodSummary 
+  name: readpartial
+- !ruby/object:RI::MethodSummary 
+  name: ungetc
+- !ruby/object:RI::MethodSummary 
+  name: write
+class_methods: 
+- !ruby/object:RI::MethodSummary 
+  name: new
+full_name: Buffering
+constants: 
+- !ruby/object:RI::Constant 
+  comment: 
+  value: 1024*16
+  name: BLOCK_SIZE
+superclass: 
+name: Buffering

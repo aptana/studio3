@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Gem::Commands</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Gem::Commands</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/rubygems/command_rb.html">
+                lib/rubygems/command.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+This is where <a href="Commands.html">Commands</a> will be placed in the
+namespace
+</p>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Class <a href="Commands/BuildCommand.html" class="link">Gem::Commands::BuildCommand</a><br />
+Class <a href="Commands/CertCommand.html" class="link">Gem::Commands::CertCommand</a><br />
+Class <a href="Commands/CheckCommand.html" class="link">Gem::Commands::CheckCommand</a><br />
+Class <a href="Commands/CleanupCommand.html" class="link">Gem::Commands::CleanupCommand</a><br />
+Class <a href="Commands/ContentsCommand.html" class="link">Gem::Commands::ContentsCommand</a><br />
+Class <a href="Commands/DependencyCommand.html" class="link">Gem::Commands::DependencyCommand</a><br />
+Class <a href="Commands/EnvironmentCommand.html" class="link">Gem::Commands::EnvironmentCommand</a><br />
+Class <a href="Commands/FetchCommand.html" class="link">Gem::Commands::FetchCommand</a><br />
+Class <a href="Commands/GenerateIndexCommand.html" class="link">Gem::Commands::GenerateIndexCommand</a><br />
+Class <a href="Commands/HelpCommand.html" class="link">Gem::Commands::HelpCommand</a><br />
+Class <a href="Commands/InstallCommand.html" class="link">Gem::Commands::InstallCommand</a><br />
+Class <a href="Commands/ListCommand.html" class="link">Gem::Commands::ListCommand</a><br />
+Class <a href="Commands/LockCommand.html" class="link">Gem::Commands::LockCommand</a><br />
+Class <a href="Commands/MirrorCommand.html" class="link">Gem::Commands::MirrorCommand</a><br />
+Class <a href="Commands/OutdatedCommand.html" class="link">Gem::Commands::OutdatedCommand</a><br />
+Class <a href="Commands/PristineCommand.html" class="link">Gem::Commands::PristineCommand</a><br />
+Class <a href="Commands/QueryCommand.html" class="link">Gem::Commands::QueryCommand</a><br />
+Class <a href="Commands/RdocCommand.html" class="link">Gem::Commands::RdocCommand</a><br />
+Class <a href="Commands/SearchCommand.html" class="link">Gem::Commands::SearchCommand</a><br />
+Class <a href="Commands/ServerCommand.html" class="link">Gem::Commands::ServerCommand</a><br />
+Class <a href="Commands/SetupCommand.html" class="link">Gem::Commands::SetupCommand</a><br />
+Class <a href="Commands/SourcesCommand.html" class="link">Gem::Commands::SourcesCommand</a><br />
+Class <a href="Commands/SpecificationCommand.html" class="link">Gem::Commands::SpecificationCommand</a><br />
+Class <a href="Commands/StaleCommand.html" class="link">Gem::Commands::StaleCommand</a><br />
+Class <a href="Commands/UninstallCommand.html" class="link">Gem::Commands::UninstallCommand</a><br />
+Class <a href="Commands/UnpackCommand.html" class="link">Gem::Commands::UnpackCommand</a><br />
+Class <a href="Commands/UpdateCommand.html" class="link">Gem::Commands::UpdateCommand</a><br />
+Class <a href="Commands/WhichCommand.html" class="link">Gem::Commands::WhichCommand</a><br />
+
+    </div>
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

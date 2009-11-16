@@ -1,0 +1,12 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Returns an Array of Gem::Specifications that are not up to date.
+full_name: Gem::SourceIndex#outdated
+params: ()
+name: outdated
+is_singleton: false
+aliases: []
+

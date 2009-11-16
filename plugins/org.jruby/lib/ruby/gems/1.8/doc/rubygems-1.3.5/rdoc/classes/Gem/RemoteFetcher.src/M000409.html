@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>request (Gem::RemoteFetcher)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rubygems/remote_fetcher.rb, line 299</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">request</span>(<span class="ruby-identifier">uri</span>, <span class="ruby-identifier">request_class</span>, <span class="ruby-identifier">last_modified</span> = <span class="ruby-keyword kw">nil</span>)
+    <span class="ruby-identifier">request</span> = <span class="ruby-identifier">request_class</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">request_uri</span>
+
+    <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">user</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">user</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">request</span>.<span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">user</span>, <span class="ruby-identifier">uri</span>.<span class="ruby-identifier">password</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">ua</span> = <span class="ruby-node">&quot;RubyGems/#{Gem::RubyGemsVersion} #{Gem::Platform.local}&quot;</span>
+    <span class="ruby-identifier">ua</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; Ruby/#{RUBY_VERSION} (#{RUBY_RELEASE_DATE}&quot;</span>
+    <span class="ruby-identifier">ua</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; patchlevel #{RUBY_PATCHLEVEL}&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">defined?</span> <span class="ruby-constant">RUBY_PATCHLEVEL</span>
+    <span class="ruby-identifier">ua</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value str">&quot;)&quot;</span>
+
+    <span class="ruby-identifier">request</span>.<span class="ruby-identifier">add_field</span> <span class="ruby-value str">'User-Agent'</span>, <span class="ruby-identifier">ua</span>
+    <span class="ruby-identifier">request</span>.<span class="ruby-identifier">add_field</span> <span class="ruby-value str">'Connection'</span>, <span class="ruby-value str">'keep-alive'</span>
+    <span class="ruby-identifier">request</span>.<span class="ruby-identifier">add_field</span> <span class="ruby-value str">'Keep-Alive'</span>, <span class="ruby-value str">'30'</span>
+
+    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">last_modified</span> <span class="ruby-keyword kw">then</span>
+      <span class="ruby-identifier">last_modified</span> = <span class="ruby-identifier">last_modified</span>.<span class="ruby-identifier">utc</span>
+      <span class="ruby-identifier">request</span>.<span class="ruby-identifier">add_field</span> <span class="ruby-value str">'If-Modified-Since'</span>, <span class="ruby-identifier">last_modified</span>.<span class="ruby-identifier">rfc2822</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">connection</span> = <span class="ruby-identifier">connection_for</span> <span class="ruby-identifier">uri</span>
+
+    <span class="ruby-identifier">retried</span> = <span class="ruby-keyword kw">false</span>
+    <span class="ruby-identifier">bad_response</span> = <span class="ruby-keyword kw">false</span>
+
+    <span class="ruby-keyword kw">begin</span>
+      <span class="ruby-ivar">@requests</span>[<span class="ruby-identifier">connection</span>.<span class="ruby-identifier">object_id</span>] <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+      <span class="ruby-identifier">response</span> = <span class="ruby-identifier">connection</span>.<span class="ruby-identifier">request</span> <span class="ruby-identifier">request</span>
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;#{request.method} #{response.code} #{response.message}: #{uri}&quot;</span> <span class="ruby-keyword kw">if</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Net</span><span class="ruby-operator">::</span><span class="ruby-constant">HTTPBadResponse</span>
+      <span class="ruby-identifier">reset</span> <span class="ruby-identifier">connection</span>
+
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'too many bad responses'</span>, <span class="ruby-identifier">uri</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">bad_response</span>
+
+      <span class="ruby-identifier">bad_response</span> = <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">retry</span>
+    <span class="ruby-comment cmt"># HACK work around EOFError bug in Net::HTTP</span>
+    <span class="ruby-comment cmt"># NOTE Errno::ECONNABORTED raised a lot on Windows, and make impossible</span>
+    <span class="ruby-comment cmt"># to install gems.</span>
+    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">EOFError</span>, <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">ECONNABORTED</span>, <span class="ruby-constant">Errno</span><span class="ruby-operator">::</span><span class="ruby-constant">ECONNRESET</span>
+      <span class="ruby-identifier">requests</span> = <span class="ruby-ivar">@requests</span>[<span class="ruby-identifier">connection</span>.<span class="ruby-identifier">object_id</span>]
+      <span class="ruby-identifier">say</span> <span class="ruby-node">&quot;connection reset after #{requests} requests, retrying&quot;</span> <span class="ruby-keyword kw">if</span>
+        <span class="ruby-constant">Gem</span>.<span class="ruby-identifier">configuration</span>.<span class="ruby-identifier">really_verbose</span>
+
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">FetchError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'too many connection resets'</span>, <span class="ruby-identifier">uri</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">retried</span>
+
+      <span class="ruby-identifier">reset</span> <span class="ruby-identifier">connection</span>
+
+      <span class="ruby-identifier">retried</span> = <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">retry</span>
+    <span class="ruby-keyword kw">end</span>
+
+    <span class="ruby-identifier">response</span>
+  <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

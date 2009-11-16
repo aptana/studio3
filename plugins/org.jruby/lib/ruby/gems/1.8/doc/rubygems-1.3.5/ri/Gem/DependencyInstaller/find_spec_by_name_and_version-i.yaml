@@ -1,0 +1,14 @@
+--- !ruby/object:RI::MethodDescription 
+visibility: public
+block_params: 
+comment: 
+- !ruby/struct:SM::Flow::P 
+  body: Finds a spec and the source_uri it came from for gem <tt>gem_name</tt> and
+    <tt>version</tt>. Returns an Array of specs and sources required for installation
+    of the gem.
+full_name: Gem::DependencyInstaller#find_spec_by_name_and_version
+params: (gem_name, version = Gem::Requirement.default)
+name: find_spec_by_name_and_version
+is_singleton: false
+aliases: []
+
