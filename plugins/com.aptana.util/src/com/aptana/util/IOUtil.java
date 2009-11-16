@@ -41,8 +41,7 @@ public abstract class IOUtil
 		{
 			try
 			{
-				if (stream != null)
-					stream.close();
+				stream.close();
 			}
 			catch (IOException e)
 			{

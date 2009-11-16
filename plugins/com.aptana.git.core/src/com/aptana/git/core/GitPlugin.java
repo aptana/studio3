@@ -2,6 +2,7 @@ package com.aptana.git.core;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -21,7 +22,7 @@ public class GitPlugin extends Plugin
 {
 
 	// The plug-in ID
-	private static final String PLUGIN_ID = "com.aptana.git";
+	private static final String PLUGIN_ID = "com.aptana.git.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static GitPlugin plugin;
@@ -44,7 +45,7 @@ public class GitPlugin extends Plugin
 		super.start(context);
 		plugin = this;
 		// Add a resource listener that triggers git repo index refreshes!
-		Job job = new Job("Add Git Index Resource listener")
+		Job job = new Job("Add Git Index Resource listener") //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -89,6 +90,11 @@ public class GitPlugin extends Plugin
 	public static void logError(String msg, Throwable e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
+	}
+	
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
 	}
 
 	public static void logInfo(String string)

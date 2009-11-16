@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.git.core.GitPlugin;
+
 abstract class ProcessUtil
 {
 
@@ -35,8 +37,7 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -99,7 +100,7 @@ abstract class ProcessUtil
 				write(input, p.getOutputStream());
 			}
 			String read = read(new BufferedInputStream(p.getInputStream()));
-			if (read.endsWith("\n"))
+			if (read.endsWith("\n")) //$NON-NLS-1$
 				read = read.substring(0, read.length() - 1);
 			int exitValue = p.waitFor();
 			Map<Integer, String> result = new HashMap<Integer, String>();
@@ -108,13 +109,11 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e.getMessage(), e);
 		}
 		catch (InterruptedException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -130,8 +129,7 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{

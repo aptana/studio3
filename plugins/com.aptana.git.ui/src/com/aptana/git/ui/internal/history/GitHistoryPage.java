@@ -82,7 +82,7 @@ public class GitHistoryPage extends HistoryPage
 			return false;
 
 		final IResource theResource = resource;
-		Job job = new Job("Collecting commit history...")
+		Job job = new Job(Messages.GitHistoryPage_GeneratingHistoryJob_title)
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -209,7 +209,7 @@ public class GitHistoryPage extends HistoryPage
 				final ISelection s = event.getSelection();
 				if (s.isEmpty() || !(s instanceof IStructuredSelection))
 				{
-					commentViewer.setText("");
+					commentViewer.setText(""); //$NON-NLS-1$
 					fileViewer.setInput(null);
 					return;
 				}
@@ -305,8 +305,8 @@ public class GitHistoryPage extends HistoryPage
 		variables.put("\\{subject\\}", commit.getSubject()); //$NON-NLS-1$
 		String comment = commit.getComment();
 		// Auto convert references to URLs into links
-		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>");
-		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads
+		comment = comment.replaceAll("http://(.+)", "<a href=\"$0\" target=\"_blank\">http://$1</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+		comment = comment.replaceAll("\\n", "<br />"); // Convert newlines into breakreads //$NON-NLS-1$ //$NON-NLS-2$
 		variables.put("\\{comment\\}", comment); //$NON-NLS-1$
 
 		String avatar = ""; //$NON-NLS-1$
@@ -339,7 +339,7 @@ public class GitHistoryPage extends HistoryPage
 		catch (IOException e)
 		{
 			GitUIPlugin.logError(e.getMessage(), e);
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 	}
 

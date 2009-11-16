@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class UtilPlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.util";
+	public static final String PLUGIN_ID = "com.aptana.util"; //$NON-NLS-1$
 
 	// The shared instance
 	private static UtilPlugin plugin;

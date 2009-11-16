@@ -94,7 +94,7 @@ class GitProjectRefresher implements IGitRepositoryListener
 
 	private void refreshResources(final Collection<? extends IResource> resources, final int depth)
 	{
-		WorkspaceJob job = new WorkspaceJob("Refresh projects")
+		WorkspaceJob job = new WorkspaceJob("Refresh projects") //$NON-NLS-1$
 		{
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException

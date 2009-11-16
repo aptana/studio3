@@ -50,7 +50,7 @@ public class CloneWizard extends Wizard implements IImportWizard
 	{
 		final String sourceURI = cloneSource.getSource();
 		final String dest = cloneSource.getDestination();
-		Job job = new Job("Cloning git repo")
+		Job job = new Job(Messages.CloneWizard_Job_title)
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -58,7 +58,7 @@ public class CloneWizard extends Wizard implements IImportWizard
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
 				try
 				{
-					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", sourceURI, dest);
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", sourceURI, dest); //$NON-NLS-1$
 					while (!launch.isTerminated())
 					{
 						if (subMonitor.isCanceled())

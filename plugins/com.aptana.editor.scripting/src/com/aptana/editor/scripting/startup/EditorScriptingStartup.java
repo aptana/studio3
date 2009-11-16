@@ -4,6 +4,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageListener;
@@ -15,6 +17,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -23,45 +26,31 @@ import com.aptana.editor.scripting.actions.ExpandSnippetAction;
 import com.aptana.editor.scripting.actions.FilterThroughCommandAction;
 
 public class EditorScriptingStartup implements IStartup {
-	private static IPartListener partListener = new IPartListener() {
-		public void partActivated(IWorkbenchPart part) {
-		}
 
-		public void partBroughtToTop(IWorkbenchPart part) {
-		}
-
-		public void partClosed(IWorkbenchPart part) {
-		}
-
-		public void partDeactivated(IWorkbenchPart part) {
-		}
-
-		public void partOpened(IWorkbenchPart part) {
-			if (part instanceof IEditorPart) {
-				addAction((IEditorPart)part);
+	public void earlyStartup() {
+		Job addEditorMonitorJobs = new WorkbenchJob("Monitor TextEditors.") {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IWorkbench workbench = PlatformUI.getWorkbench();
+				if (workbench != null) {
+					IWorkbenchWindow[] workbenchWindows = workbench.getWorkbenchWindows();
+					for (IWorkbenchWindow workbenchWindow : workbenchWindows) {
+						processWindow(workbenchWindow);
+					}
+					workbench.addWindowListener(windowListener);
+				}
+				return Status.OK_STATUS;
 			}
-		}	
-	};
-	
-	private static IPageListener pageListener = new IPageListener() {
-		
-		public void pageOpened(IWorkbenchPage page) {
-			addPartListener(page);
-		}
-		
-		public void pageClosed(IWorkbenchPage page) {
-			page.removePartListener(partListener);
-		}
-		
-		public void pageActivated(IWorkbenchPage page) {
-			
-		}
-	};
 
+		};
+		addEditorMonitorJobs.setSystem(true);
+		addEditorMonitorJobs.schedule();
+	}
+	
 	private static IWindowListener windowListener = new IWindowListener() {
 		
 		public void windowOpened(IWorkbenchWindow window) {
-			addWindowListeners(window);
+			// process newly opened window
+			processWindow(window);
 		}
 		
 		public void windowDeactivated(IWorkbenchWindow window) {
@@ -77,49 +66,95 @@ public class EditorScriptingStartup implements IStartup {
 		}
 		
 		public void windowActivated(IWorkbenchWindow window) {
+		}
+	};
+	
+	private static IPageListener pageListener = new IPageListener() {
+		
+		public void pageOpened(IWorkbenchPage page) {
+			processPage(page);
+		}
+		
+		public void pageClosed(IWorkbenchPage page) {
+			page.removePartListener(partListener);
+		}
+		
+		public void pageActivated(IWorkbenchPage page) {
 			
 		}
 	};
-
-	public void earlyStartup() {
-		Job addEditorMonitorJobs = new WorkbenchJob("Monitor TextEditors.") {  //$NON-NLS-1$
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				if (workbench != null) {
-					IWorkbenchWindow[] workbenchWindows = workbench.getWorkbenchWindows();
-					for (IWorkbenchWindow workbenchWindow : workbenchWindows) {
-						addWindowListeners(workbenchWindow);
-					}
-					workbench.addWindowListener(windowListener);
-				}
-				return Status.OK_STATUS;
-			}
-
-		};
-		addEditorMonitorJobs.setSystem(true);
-		addEditorMonitorJobs.schedule();
-	}
 	
-	private static void addWindowListeners(IWorkbenchWindow workbenchWindow) {
+	private static IPartListener partListener = new IPartListener() {
+		public void partActivated(IWorkbenchPart part) {
+		}
+
+		public void partBroughtToTop(IWorkbenchPart part) {
+		}
+
+		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof MultiPageEditorPart) {
+				((MultiPageEditorPart) part).removePageChangedListener(pageChangedListener);
+			}
+		}
+
+		public void partDeactivated(IWorkbenchPart part) {
+		}
+
+		public void partOpened(IWorkbenchPart editorPart) {
+			if (editorPart instanceof IEditorPart) {
+				processPart((IEditorPart)editorPart);
+			}
+		}	
+	};
+	
+	private static IPageChangedListener pageChangedListener = new IPageChangedListener() {
+		public void pageChanged(PageChangedEvent event) {
+			Object selectedPage = event.getSelectedPage();
+			if (selectedPage instanceof ITextEditor) {
+				processITextEditor((ITextEditor)selectedPage);
+			}
+		}
+	};
+	
+	private static void processWindow(IWorkbenchWindow workbenchWindow) {
+		// process existing pages
 		IWorkbenchPage[] workbenchPages = workbenchWindow.getPages();
 		for (IWorkbenchPage workbenchPage : workbenchPages) {
-			addPartListener(workbenchPage);
+			processPage(workbenchPage);
 		}
+		// process future pages
 		workbenchWindow.addPageListener(pageListener);
 	}
 	
-	private static void addPartListener(IWorkbenchPage workbenchPage) {
+	private static void processPage(IWorkbenchPage workbenchPage) {
 		IEditorReference[] editorReferences = workbenchPage.getEditorReferences();
 		for (IEditorReference editorReference : editorReferences) {
-			IEditorPart editor = editorReference.getEditor(false);
-			if (editor != null) {
-				addAction(editor);
-			}
+			processPart(editorReference.getEditor(false));
 		}
 		workbenchPage.addPartListener(partListener);		
 	}
+	
+	private static void processPart(IEditorPart editorPart) {
+		if (editorPart instanceof ITextEditor) {
+			processITextEditor((ITextEditor)editorPart);
+		} else if (editorPart instanceof MultiPageEditorPart) {
+			processMultiPageEditorPart((MultiPageEditorPart) editorPart);
+		}
+	}
+	
+	private static void processITextEditor(ITextEditor textEditor) {
+		addActions(textEditor);
+	}
+	
+	private static void processMultiPageEditorPart(MultiPageEditorPart multiPageEditorPart) {
+		Object selectedPage = multiPageEditorPart.getSelectedPage();
+		if (selectedPage instanceof ITextEditor) {
+			addActions((ITextEditor)selectedPage);
+		}
+		multiPageEditorPart.addPageChangedListener(pageChangedListener);
+	}
 
-	private static void addAction(IEditorPart editorPart) {
+	private static void addActions(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor) {
 			ITextEditor textEditor = (ITextEditor) editorPart;
 			if (textEditor.isEditable()) {

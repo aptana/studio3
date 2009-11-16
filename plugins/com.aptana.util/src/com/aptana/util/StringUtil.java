@@ -28,7 +28,7 @@ public abstract class StringUtil
 		{
 			String value = entry.getValue();
 			if (value == null)
-				value = "";
+				value = ""; //$NON-NLS-1$
 			else
 				value = value.replace('$', (char) 1); // To avoid illegal group reference issues if the text has
 														// dollars!
@@ -85,13 +85,14 @@ public abstract class StringUtil
 		return null;
 	}
 
-/**
+	/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
+	 * 
 	 * @param raw
 	 * @return
 	 */
 	public static String sanitizeHTML(String raw)
 	{
-		return raw.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+		return raw.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

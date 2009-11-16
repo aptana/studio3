@@ -1,12 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Utility Plugin
+Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.util
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.util.UtilPlugin
-Bundle-Vendor: Aptana, Inc.
+Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.util,
- com.aptana.util.directorywatcher
+Export-Package: com.aptana.util
