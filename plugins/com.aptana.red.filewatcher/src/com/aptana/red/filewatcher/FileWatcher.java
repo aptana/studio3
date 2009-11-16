@@ -36,6 +36,7 @@ public class FileWatcher
 			}
 			else if (osName.startsWith("windows")) //$NON-NLS-1$
 			{
+				// FIXME On Windows 7 x64 this part works, but I get ClassNotFoundExceptions as soon as the hook is called. Need to determine if it's 7 or the 64-bit that causes that.
 				try
 				{
 					_instance = (IJNotify) Class.forName("net.contentobjects.jnotify.win32.JNotifyAdapterWin32") //$NON-NLS-1$
