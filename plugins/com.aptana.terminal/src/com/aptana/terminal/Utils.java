@@ -70,7 +70,7 @@ public class Utils
 		{
 			if (0 <= c && c < 32 || 128 <= c)
 			{
-				String hex = String.format("%1$02X", (int) c);
+				String hex = String.format("%1$02X", (int) c); //$NON-NLS-1$
 				
 				buffer.append("\\x").append(hex); //$NON-NLS-1$
 			}

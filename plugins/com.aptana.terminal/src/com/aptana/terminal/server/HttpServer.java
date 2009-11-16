@@ -141,7 +141,7 @@ public class HttpServer extends Thread
 			this.serverSocket.setReuseAddress(true);
 			
 			// emit server port which is useful for debugging purposes
-			System.out.println("TerminalView Server running on port " + this.getPort());
+			System.out.println(Messages.Terminal_View_Server_Running_On_Port0 + this.getPort());
 		}
 		catch (IOException e)
 		{

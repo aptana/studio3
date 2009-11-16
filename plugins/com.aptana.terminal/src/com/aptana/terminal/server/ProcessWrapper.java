@@ -37,8 +37,8 @@ public class ProcessWrapper
 		public Message(String name, String content)
 		{
 			this.timestamp = new Date();
-			this.name = (name != null) ? name : "";
-			this.content = (content != null) ? content : "";
+			this.name = (name != null) ? name : ""; //$NON-NLS-1$
+			this.content = (content != null) ? content : ""; //$NON-NLS-1$
 		}
 		
 		/*
@@ -47,7 +47,7 @@ public class ProcessWrapper
 		 */
 		public String toString()
 		{
-			return this.timestamp + ": " + this.name + ": " + Utils.encodeString(this.content);
+			return this.timestamp + ": " + this.name + ": " + Utils.encodeString(this.content); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	
@@ -167,7 +167,7 @@ public class ProcessWrapper
 			if (OS.equals(Platform.OS_MACOSX)) {
 				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
 			} else {
-				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$
+				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			try
 			{
@@ -237,7 +237,7 @@ public class ProcessWrapper
 			
 			if (this._trackMessages)
 			{
-				this.logMessage("<", result);
+				this.logMessage("<", result); //$NON-NLS-1$
 			}
 		}
 
@@ -283,7 +283,7 @@ public class ProcessWrapper
 			
 			if (this._trackMessages)
 			{
-				this.logMessage(">", text);
+				this.logMessage(">", text); //$NON-NLS-1$
 			}
 		}
 	}

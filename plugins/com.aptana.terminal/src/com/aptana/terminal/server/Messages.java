@@ -13,6 +13,7 @@ public class Messages extends NLS
 	public static String HttpWorker_Error_Locating_File;
 	public static String HttpWorker_Error_Writing_To_Client;
 	public static String HttpWorker_Malformed_URI;
+	public static String HttpWorker_Not_Found4;
 	public static String HttpWorker_Unrecognized_POST_URL;
 	public static String ProcessReader_Error_Reading_From_Process;
 	public static String ProcessWrapper_Error_Locating_Terminal_Executable;
@@ -21,6 +22,7 @@ public class Messages extends NLS
 	public static String ProcessWrapper_Process_File_Does_Not_Exist;
 	public static String ProcessWriter_Error_Wrinting_To_Process;
 	public static String Request_Request_Processing_Error;
+	public static String Terminal_View_Server_Running_On_Port0;
 	static
 	{
 		// initialize resource bundle
