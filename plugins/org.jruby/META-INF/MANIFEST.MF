@@ -135,3 +135,4 @@ Export-Package: com.kenai.constantine,
  org.objectweb.asm.tree,
  org.objectweb.asm.tree.analysis,
  org.objectweb.asm.util
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

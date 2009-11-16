@@ -8,7 +8,7 @@
  * Contributors:
  * IBM Corporation - initial implementation and ideas 
  *******************************************************************************/
-package com.aptana.util.directorywatcher;
+package com.aptana.red.filewatcher.poller;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ import java.io.File;
  * Abstract class which contains stub methods. Sub-classes to over-ride
  * methods which they are interested in.
  */
-public abstract class DirectoryChangeListener
+abstract class DirectoryChangeListener
 {
 
 	public void startPoll()

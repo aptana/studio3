@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,36 +17,29 @@ public class Diff
 {
 
 	private static final Pattern BINARY_FILES_DIFFER_PATTERN = Pattern
-			.compile("^Binary files (a\\/)?(.*) and (b\\/)?(.*) differ$");
-	private static final Pattern RENAME_PATTERN = Pattern.compile("^rename (from|to) (.*)$");
-	private static final Pattern PLUS_PATTERN = Pattern.compile("^\\+\\+\\+ (b\\/)?(.*)$");
-	private static final Pattern MINUS_PATTERN = Pattern.compile("^--- (a\\/)?(.*)$");
-	private static final Pattern DELETED_FILE_MODE_PATTERN = Pattern.compile("^deleted file mode .*$");
-	private static final Pattern OLD_MODE_PATTERN = Pattern.compile("^old mode (.*)$");
-	private static final Pattern NEW_MODE_PATTERN = Pattern.compile("^new mode (.*)$");
-	private static final Pattern NEW_FILE_MODE_PATTERN = Pattern.compile("^new file mode .*$");
-	private static final Pattern DIFF_GIT_PATTERN = Pattern.compile("^diff --git (a\\/)+(.*) (b\\/)+(.*)$");
+			.compile("^Binary files (a\\/)?(.*) and (b\\/)?(.*) differ$"); //$NON-NLS-1$
+	private static final Pattern RENAME_PATTERN = Pattern.compile("^rename (from|to) (.*)$"); //$NON-NLS-1$
+	private static final Pattern PLUS_PATTERN = Pattern.compile("^\\+\\+\\+ (b\\/)?(.*)$"); //$NON-NLS-1$
+	private static final Pattern MINUS_PATTERN = Pattern.compile("^--- (a\\/)?(.*)$"); //$NON-NLS-1$
+	private static final Pattern DELETED_FILE_MODE_PATTERN = Pattern.compile("^deleted file mode .*$"); //$NON-NLS-1$
+	private static final Pattern OLD_MODE_PATTERN = Pattern.compile("^old mode (.*)$"); //$NON-NLS-1$
+	private static final Pattern NEW_MODE_PATTERN = Pattern.compile("^new mode (.*)$"); //$NON-NLS-1$
+	private static final Pattern NEW_FILE_MODE_PATTERN = Pattern.compile("^new file mode .*$"); //$NON-NLS-1$
+	private static final Pattern DIFF_GIT_PATTERN = Pattern.compile("^diff --git (a\\/)+(.*) (b\\/)+(.*)$"); //$NON-NLS-1$
 
-	private static final String DEV_NULL = "/dev/null";
+	private static final String DEV_NULL = "/dev/null"; //$NON-NLS-1$
 
 	private boolean isBinary;
 	private String oldName;
 	private String newName;
-	private boolean hasModeChange;
-	private String oldMode;
-	private String newMode;
 	private GitCommit commit;
 
-	private Diff(GitCommit commit, boolean binary, String startname, String endname, boolean modeChange,
-			String oldMode, String newMode)
+	private Diff(GitCommit commit, boolean binary, String startname, String endname)
 	{
 		this.commit = commit;
 		this.isBinary = binary;
 		this.oldName = startname;
 		this.newName = endname;
-		this.hasModeChange = modeChange;
-		this.oldMode = oldMode;
-		this.newMode = newMode;
 	}
 
 	private static List<Diff> parse(GitCommit commit, Reader content) throws IOException
@@ -54,12 +48,9 @@ public class Diff
 
 		boolean header = false;
 		boolean binary = false;
-		boolean mode_change = false;
 		boolean readPrologue = false;
-		String startname = "";
-		String endname = "";
-		String new_mode = "";
-		String old_mode = "";
+		String startname = ""; //$NON-NLS-1$
+		String endname = ""; //$NON-NLS-1$
 		List<Diff> files = new ArrayList<Diff>();
 
 		BufferedReader buffReader = new BufferedReader(content);
@@ -78,13 +69,10 @@ public class Diff
 				if (!readPrologue)
 					readPrologue = true;
 				else
-					files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
-				startname = "";
-				endname = "";
-				old_mode = "";
-				new_mode = "";
+					files.add(new Diff(commit, binary, startname, endname));
+				startname = ""; //$NON-NLS-1$
+				endname = ""; //$NON-NLS-1$
 				binary = false;
-				mode_change = false;
 
 				Matcher m = DIFF_GIT_PATTERN.matcher(l);
 				if (m.find())
@@ -107,19 +95,9 @@ public class Diff
 						startname = DEV_NULL;
 
 					m = NEW_MODE_PATTERN.matcher(l);
-					if (m.find())
-					{
-						mode_change = true;
-						new_mode = m.group(1);
-					}
 					break;
 				case 'o':
 					m = OLD_MODE_PATTERN.matcher(l);
-					if (m.find())
-					{
-						mode_change = true;
-						old_mode = m.group(1);
-					}
 					break;
 				case 'd':
 					m = DELETED_FILE_MODE_PATTERN.matcher(l);
@@ -142,7 +120,7 @@ public class Diff
 					m = RENAME_PATTERN.matcher(l);
 					if (m.find())
 					{
-						if (m.group(1).equals("from"))
+						if (m.group(1).equals("from")) //$NON-NLS-1$
 							startname = m.group(2);
 						else
 							endname = m.group(2);
@@ -166,8 +144,8 @@ public class Diff
 					break;
 			}
 		}
-		files.add(new Diff(commit, binary, startname, endname, mode_change, old_mode, new_mode));
-		log("Took " + (System.currentTimeMillis() - start) + "ms to parse out " + files.size() + " diffs");
+		files.add(new Diff(commit, binary, startname, endname));
+		log(MessageFormat.format("Took {0}ms to parse out {1} diffs", (System.currentTimeMillis() - start), files.size())); //$NON-NLS-1$
 		return files;
 	}
 
@@ -222,7 +200,7 @@ public class Diff
 		try
 		{
 			String output = GitExecutable.instance().outputForCommand(gitCommit.repository().workingDirectory(),
-					"show", "--pretty=raw", "-M", "--no-color", gitCommit.sha());
+					"show", "--pretty=raw", "-M", "--no-color", gitCommit.sha()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			return parse(gitCommit, new StringReader(output));
 		}
 		catch (IOException e)

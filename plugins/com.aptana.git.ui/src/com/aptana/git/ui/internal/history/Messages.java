@@ -13,6 +13,7 @@ public class Messages extends NLS
 	public static String CommitGraphTable_AuthorColumn_Label;
 	public static String CommitGraphTable_DateColumn_Label;
 	public static String GitHistoryPage_DateFormat;
+	public static String GitHistoryPage_GeneratingHistoryJob_title;
 	
 	static
 	{

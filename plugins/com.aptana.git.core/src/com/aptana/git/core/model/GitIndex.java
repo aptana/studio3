@@ -41,8 +41,8 @@ public class GitIndex
 	{
 		super();
 
-		Assert.isNotNull(repository, "GitIndex requires a repository");
-		Assert.isNotNull(workingDirectory, "GitIndex requires a working directory");
+		Assert.isNotNull(repository, "GitIndex requires a repository"); //$NON-NLS-1$
+		Assert.isNotNull(workingDirectory, "GitIndex requires a working directory"); //$NON-NLS-1$
 
 		this.repository = repository;
 		this.workingDirectory = workingDirectory;
@@ -59,45 +59,45 @@ public class GitIndex
 		this.notify = notify;
 		refreshStatus = 0;
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q",
-				"--unmerged", "--ignore-missing", "--refresh");
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
 			return;
 
 		Set<Job> jobs = new HashSet<Job>();
-		jobs.add(new Job("other files")
+		jobs.add(new Job("other files") //$NON-NLS-1$
 		{
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "ls-files", "--others",
-						"--exclude-standard", "-z");
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				readOtherFiles(output);
 				return Status.OK_STATUS;
 			}
 		});
-		jobs.add(new Job("unstaged files")
+		jobs.add(new Job("unstaged files") //$NON-NLS-1$
 		{
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z");
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				readUnstagedFiles(output);
 				return Status.OK_STATUS;
 			}
 		});
-		jobs.add(new Job("staged files")
+		jobs.add(new Job("staged files") //$NON-NLS-1$
 		{
 
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", "--cached",
-						"-z", getParentTree());
+				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+						"-z", getParentTree()); //$NON-NLS-1$
 				readStagedFiles(output);
 				return Status.OK_STATUS;
 			}
@@ -130,11 +130,11 @@ public class GitIndex
 
 	private String getParentTree()
 	{
-		String parent = amend ? "HEAD^" : "HEAD";
+		String parent = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (repository.parseReference(parent) == null)
 			// We don't have a head ref. Return the empty tree.
-			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904"; //$NON-NLS-1$
 
 		return parent;
 	}
@@ -153,8 +153,8 @@ public class GitIndex
 		// If we amend, we want to keep the author information for the previous commit
 		// We do this by reading in the previous commit, and storing the information
 		// in a dictionary. This dictionary will then later be read by commit()
-		String message = GitExecutable.instance().outputForCommand("cat-file commit HEAD");
-		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n");
+		String message = GitExecutable.instance().outputForCommand("cat-file commit HEAD"); //$NON-NLS-1$
+		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n"); //$NON-NLS-1$
 		Matcher m = p.matcher(message);
 		if (m.find())
 		{
@@ -165,7 +165,7 @@ public class GitIndex
 		}
 
 		// Find the commit message
-		int r = message.indexOf("\n\n");
+		int r = message.indexOf("\n\n"); //$NON-NLS-1$
 		if (r != -1)
 		{
 			String commitMessage = message.substring(r + 2);
@@ -179,11 +179,11 @@ public class GitIndex
 		// Other files are untracked, so we don't have any real index information. Instead, we can just fake it.
 		// The line below is not used at all, as for these files the commitBlob isn't set
 		List<String> fileStatus = new ArrayList<String>();
-		fileStatus.add(":000000"); // for new file
-		fileStatus.add("100644");
-		fileStatus.add("0000000000000000000000000000000000000000"); // SHA
-		fileStatus.add("0000000000000000000000000000000000000000");
-		fileStatus.add("A"); // A for Add, D for delete
+		fileStatus.add(":000000"); // for new file //$NON-NLS-1$
+		fileStatus.add("100644"); //$NON-NLS-1$
+		fileStatus.add("0000000000000000000000000000000000000000"); // SHA //$NON-NLS-1$
+		fileStatus.add("0000000000000000000000000000000000000000"); //$NON-NLS-1$
+		fileStatus.add("A"); // A for Add, D for delete //$NON-NLS-1$
 		fileStatus.add(null);
 		for (String path : lines)
 		{
@@ -219,13 +219,13 @@ public class GitIndex
 			return Collections.emptyList();
 
 		// Strip trailing null
-		if (string.endsWith("\0"))
+		if (string.endsWith("\0")) //$NON-NLS-1$
 			string = string.substring(0, string.length() - 1);
 
 		if (string.length() == 0)
 			return Collections.emptyList();
 
-		return StringUtil.componentsSeparatedByString(string, "\0");
+		return StringUtil.componentsSeparatedByString(string, "\0"); //$NON-NLS-1$
 	}
 
 	private Map<String, List<String>> dictionaryForLines(List<String> lines)
@@ -235,13 +235,13 @@ public class GitIndex
 		// Fill the dictionary with the new information. These lines are in the form of:
 		// :00000 :0644 OTHER INDEX INFORMATION
 		// Filename
-		Assert.isTrue(lines.size() % 2 == 0, "Lines must have an even number of lines: " + lines);
+		Assert.isTrue(lines.size() % 2 == 0, "Lines must have an even number of lines: " + lines); //$NON-NLS-1$
 		Iterator<String> iter = lines.iterator();
 		while (iter.hasNext())
 		{
 			String fileStatus = iter.next();
 			String fileName = iter.next();
-			dictionary.put(fileName, StringUtil.componentsSeparatedByString(fileStatus, " "));
+			dictionary.put(fileName, StringUtil.componentsSeparatedByString(fileStatus, " ")); //$NON-NLS-1$
 		}
 
 		return dictionary;
@@ -271,9 +271,9 @@ public class GitIndex
 								file.hasStagedChanges = true;
 							else
 								file.hasUnstagedChanges = true;
-							if (fileStatus.get(4).equals("D"))
+							if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
 								file.status = ChangedFile.Status.DELETED;
-							else if (fileStatus.get(4).equals("U"))
+							else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
 								file.status = ChangedFile.Status.UNMERGED;
 						}
 						else
@@ -315,7 +315,6 @@ public class GitIndex
 
 		// All entries left in the dictionary haven't been accounted for
 		// above, so we need to add them to the "files" array
-		willChangeValueForKey("indexChanges");
 		synchronized (dictionary)
 		{
 			for (String path : dictionary.keySet())
@@ -323,11 +322,11 @@ public class GitIndex
 				List<String> fileStatus = dictionary.get(path);
 
 				ChangedFile file = new ChangedFile(path);
-				if (fileStatus.get(4).equals("D"))
+				if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
 					file.status = ChangedFile.Status.DELETED;
-				else if (fileStatus.get(4).equals("U"))
+				else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
 					file.status = ChangedFile.Status.UNMERGED;
-				else if (fileStatus.get(0).equals(":000000"))
+				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
 					file.status = ChangedFile.Status.NEW;
 				else
 					file.status = ChangedFile.Status.MODIFIED;
@@ -346,7 +345,6 @@ public class GitIndex
 				}
 			}
 		}
-		didChangeValueForKey("indexChanges");
 	}
 
 	/**
@@ -375,24 +373,10 @@ public class GitIndex
 
 		if (!deleteFiles.isEmpty())
 		{
-			willChangeValueForKey("indexChanges");
 			for (ChangedFile file : deleteFiles)
 				files.remove(file);
-			didChangeValueForKey("indexChanges");
 		}
 		postIndexChange(toRefresh);
-	}
-
-	private void didChangeValueForKey(String string)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	private void willChangeValueForKey(String string)
-	{
-		// TODO Auto-generated method stub
-
 	}
 
 	private void postIndexChange(Collection<ChangedFile> changedFiles)
@@ -411,9 +395,9 @@ public class GitIndex
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
 		List<String> args = new ArrayList<String>();
-		args.add("update-index");
-		args.add("--add");
-		args.add("--remove");
+		args.add("update-index"); //$NON-NLS-1$
+		args.add("--add"); //$NON-NLS-1$
+		args.add("--remove"); //$NON-NLS-1$
 		for (ChangedFile file : stageFiles)
 		{
 			args.add(file.getPath());
@@ -448,7 +432,7 @@ public class GitIndex
 
 		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
-				null, new String[] { "update-index", "-z", "--index-info" });
+				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
@@ -470,10 +454,10 @@ public class GitIndex
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : discardFiles)
 		{
-			input.append(file.getPath()).append("\0");
+			input.append(file.getPath()).append("\0"); //$NON-NLS-1$
 		}
 
-		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" };
+		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
@@ -494,8 +478,8 @@ public class GitIndex
 
 	public void commit(String commitMessage)
 	{
-		String commitSubject = "commit: ";
-		int newLine = commitMessage.indexOf("\n");
+		String commitSubject = "commit: "; //$NON-NLS-1$
+		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
 		if (newLine == -1)
 			commitSubject += commitMessage;
 		else
@@ -503,25 +487,25 @@ public class GitIndex
 
 		repository.writetoCommitFile(commitMessage);
 
-		postCommitUpdate("Creating tree");
-		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree");
+		postCommitUpdate("Creating tree"); //$NON-NLS-1$
+		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree"); //$NON-NLS-1$
 		if (tree.length() != 40)
 		{
-			postCommitFailure("Creating tree failed");
+			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
 			return;
 		}
 
 		List<String> arguments = new ArrayList<String>();
-		arguments.add("commit-tree");
+		arguments.add("commit-tree"); //$NON-NLS-1$
 		arguments.add(tree);
-		String parent = amend ? "HEAD^" : "HEAD";
+		String parent = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
 		if (repository.parseReference(parent) != null)
 		{
-			arguments.add("-p");
+			arguments.add("-p"); //$NON-NLS-1$
 			arguments.add(parent);
 		}
 
-		postCommitUpdate("Creating commit");
+		postCommitUpdate("Creating commit"); //$NON-NLS-1$
 		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
 				amendEnvironment, arguments.toArray(new String[arguments.size()]));
@@ -530,47 +514,47 @@ public class GitIndex
 
 		if (ret != 0 || commit.length() != 40)
 		{
-			postCommitFailure("Could not create a commit object");
+			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
 			return;
 		}
 
-		postCommitUpdate("Running hooks");
-		if (!repository.executeHook("pre-commit"))
+		postCommitUpdate("Running hooks"); //$NON-NLS-1$
+		if (!repository.executeHook("pre-commit")) //$NON-NLS-1$
 		{
-			postCommitFailure("Pre-commit hook failed");
+			postCommitFailure("Pre-commit hook failed"); //$NON-NLS-1$
 			return;
 		}
 
-		if (!repository.executeHook("commit-msg", repository.commitMessageFile()))
+		if (!repository.executeHook("commit-msg", repository.commitMessageFile())) //$NON-NLS-1$
 		{
-			postCommitFailure("Commit-msg hook failed");
+			postCommitFailure("Commit-msg hook failed"); //$NON-NLS-1$
 			return;
 		}
 
-		postCommitUpdate("Updating HEAD");
-		result = GitExecutable.instance().runInBackground(workingDirectory, "update-ref", "-m", commitSubject, "HEAD",
+		postCommitUpdate("Updating HEAD"); //$NON-NLS-1$
+		result = GitExecutable.instance().runInBackground(workingDirectory, "update-ref", "-m", commitSubject, "HEAD", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				commit);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
 		{
-			postCommitFailure("Could not update HEAD");
+			postCommitFailure("Could not update HEAD"); //$NON-NLS-1$
 			return;
 		}
 
-		postCommitUpdate("Running post-commit hook");
+		postCommitUpdate("Running post-commit hook"); //$NON-NLS-1$
 
-		boolean success = repository.executeHook("post-commit");
+		boolean success = repository.executeHook("post-commit"); //$NON-NLS-1$
 		Map<String, Object> userInfo = new HashMap<String, Object>();
-		userInfo.put("success", success);
+		userInfo.put("success", success); //$NON-NLS-1$
 		String description;
 		if (success)
-			description = "Successfully created commit " + commit;
+			description = "Successfully created commit " + commit; //$NON-NLS-1$
 		else
-			description = "Post-commit hook failed, but successfully created commit " + commit;
+			description = "Post-commit hook failed, but successfully created commit " + commit; //$NON-NLS-1$
 
-		userInfo.put("description", description);
-		userInfo.put("sha", commit);
+		userInfo.put("description", description); //$NON-NLS-1$
+		userInfo.put("sha", commit); //$NON-NLS-1$
 
 		if (!success)
 			return;
@@ -605,11 +589,11 @@ public class GitIndex
 	 */
 	String[] commitsBetween(String sha1, String sha2)
 	{
-		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log", "--pretty=format:\"%s\"",
-				sha1 + ".." + sha2);
+		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log", "--pretty=format:\"%s\"", //$NON-NLS-1$ //$NON-NLS-2$
+				sha1 + ".." + sha2); //$NON-NLS-1$
 		if (result == null || result.trim().length() == 0)
 			return new String[0];
-		return result.split("[\r\n]+");
+		return result.split("[\r\n]+"); //$NON-NLS-1$
 	}
 
 	/**
@@ -624,18 +608,18 @@ public class GitIndex
 	public String diffForFile(ChangedFile file, boolean staged, int contextLines)
 	{
 		if (hasBinaryAttributes(file))
-			return "Appears to be a binary file";
+			return Messages.GitIndex_BinaryDiff_Message;
 
-		String parameter = "-U" + contextLines;
+		String parameter = "-U" + contextLines; //$NON-NLS-1$
 		if (staged)
 		{
-			String indexPath = ":0:" + file.path;
+			String indexPath = ":0:" + file.path; //$NON-NLS-1$
 
 			if (file.status == ChangedFile.Status.NEW)
-				return GitExecutable.instance().outputForCommand(workingDirectory, "show", indexPath);
+				return GitExecutable.instance().outputForCommand(workingDirectory, "show", indexPath); //$NON-NLS-1$
 
-			return GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", parameter, "--cached",
-					getParentTree(), "--", file.path);
+			return GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+					getParentTree(), "--", file.path); //$NON-NLS-1$
 		}
 
 		// unstaged
@@ -651,21 +635,21 @@ public class GitIndex
 			}
 		}
 
-		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path);
+		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public boolean hasBinaryAttributes(ChangedFile file)
 	{
-		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary",
+		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary", //$NON-NLS-1$ //$NON-NLS-2$
 				file.getPath());
 		output = output.trim();
-		if (output.endsWith("binary: set"))
+		if (output.endsWith("binary: set")) //$NON-NLS-1$
 			return true;
-		if (output.endsWith("binary: unset"))
+		if (output.endsWith("binary: unset")) //$NON-NLS-1$
 			return false;
-		if (output.endsWith("binary: unspecified"))
+		if (output.endsWith("binary: unspecified")) //$NON-NLS-1$
 		{
-			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so" };
+			final String[] extensions = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$
 			// try common filename-extensions
 			for (String extension : extensions)
 			{
@@ -687,11 +671,11 @@ public class GitIndex
 	public boolean applyPatch(String hunk, boolean stage, boolean reverse)
 	{
 		List<String> array = new ArrayList<String>();
-		array.add("apply");
+		array.add("apply"); //$NON-NLS-1$
 		if (stage)
-			array.add("--cached");
+			array.add("--cached"); //$NON-NLS-1$
 		if (reverse)
-			array.add("--reverse");
+			array.add("--reverse"); //$NON-NLS-1$
 
 		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null,
@@ -699,7 +683,7 @@ public class GitIndex
 
 		if (ret != 0)
 		{
-			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values()
+			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values() //$NON-NLS-1$
 					.iterator().next()), null);
 			return false;
 		}

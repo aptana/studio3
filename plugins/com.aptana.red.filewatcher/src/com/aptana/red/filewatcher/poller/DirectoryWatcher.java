@@ -9,20 +9,18 @@
  *  aQute - initial implementation and ideas 
  *  IBM Corporation - initial adaptation to Equinox provisioning use
  *******************************************************************************/
-package com.aptana.util.directorywatcher;
+package com.aptana.red.filewatcher.poller;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.util.UtilPlugin;
+import com.aptana.red.filewatcher.FileWatcherPlugin;
 
-public class DirectoryWatcher
+class DirectoryWatcher
 {
 
 	public class WatcherThread extends Thread
@@ -71,9 +69,9 @@ public class DirectoryWatcher
 
 	private static final long DEFAULT_POLL_FREQUENCY = 2000;
 
-	public static void log(String string, Throwable e)
+	private static void log(String string, Throwable e)
 	{
-		UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, string, e));
+		FileWatcherPlugin.log(string, e);
 	}
 
 	final File[] directories;
@@ -81,45 +79,40 @@ public class DirectoryWatcher
 	private Set<File> scannedFiles = new HashSet<File>();
 	private Set<File> removals;
 	private WatcherThread watcher;
+	private boolean watchSubdirs;
 
-	public DirectoryWatcher(File directory)
+	DirectoryWatcher(File directory, boolean watchSubtree)
 	{
 		if (directory == null)
 			throw new IllegalArgumentException(Messages.null_folder);
 
 		this.directories = new File[] { directory };
+		this.watchSubdirs = watchSubtree;
 	}
 
-	public DirectoryWatcher(File[] directories)
-	{
-		if (directories == null)
-			throw new IllegalArgumentException(Messages.null_folder);
-		this.directories = directories;
-	}
-
-	public synchronized void addListener(DirectoryChangeListener listener)
+	synchronized void addListener(DirectoryChangeListener listener)
 	{
 		listeners.add(listener);
 	}
 
-	public synchronized void removeListener(DirectoryChangeListener listener)
+	synchronized void removeListener(DirectoryChangeListener listener)
 	{
 		listeners.remove(listener);
 	}
 
-	public void start()
+	void start()
 	{
 		start(DEFAULT_POLL_FREQUENCY);
 	}
 
-	public synchronized void poll()
+	synchronized void poll()
 	{
 		startPoll();
 		scanDirectories();
 		stopPoll();
 	}
 
-	public synchronized void start(final long pollFrequency)
+	synchronized void start(final long pollFrequency)
 	{
 		if (watcher != null)
 			throw new IllegalStateException(Messages.thread_started);
@@ -128,7 +121,7 @@ public class DirectoryWatcher
 		watcher.start();
 	}
 
-	public synchronized void stop()
+	synchronized void stop()
 	{
 		if (watcher == null)
 			throw new IllegalStateException(Messages.thread_not_started);
@@ -137,7 +130,7 @@ public class DirectoryWatcher
 		watcher = null;
 	}
 
-	public File[] getDirectories()
+	File[] getDirectories()
 	{
 		return directories;
 	}
@@ -180,9 +173,8 @@ public class DirectoryWatcher
 				if (isInterested(listener, file))
 					processFile(file, listener);
 			}
-			if (file.isDirectory())
+			if (watchSubdirs && file.isDirectory())
 			{
-				// TODO Ask listener if we should scan the subdir, so we can short circuit this stuff!
 				scanDirectoryRecursively(file);
 			}
 		}

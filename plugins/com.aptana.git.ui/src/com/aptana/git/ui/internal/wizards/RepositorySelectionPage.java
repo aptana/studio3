@@ -18,6 +18,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.git.core.model.GitRepository;
+
 class RepositorySelectionPage extends WizardPage
 {
 
@@ -29,8 +31,8 @@ class RepositorySelectionPage extends WizardPage
 	protected RepositorySelectionPage()
 	{
 		super(RepositorySelectionPage.class.getName());
-		setTitle("Source Repository");
-		setDescription("Enter the URI of the source repo as it would normally follow the 'git clone' command.");
+		setTitle(Messages.RepositorySelectionPage_Title);
+		setDescription(Messages.RepositorySelectionPage_Description);
 	}
 
 	public void createControl(Composite parent)
@@ -39,7 +41,7 @@ class RepositorySelectionPage extends WizardPage
 		composite.setLayout(new GridLayout(3, false));
 
 		Label sourceLabel = new Label(composite, SWT.NONE);
-		sourceLabel.setText("URI: ");
+		sourceLabel.setText(Messages.RepositorySelectionPage_SourceURI_Label);
 
 		source = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
@@ -55,10 +57,10 @@ class RepositorySelectionPage extends WizardPage
 				{ 
 					// Try to stick to a default of a project under workspace matching the last path of the remote git repo
 					String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString();
-					int index = sourceURI.lastIndexOf(".git");
+					int index = sourceURI.lastIndexOf(GitRepository.GIT_DIR);
 					if (index != -1)
 					{
-						int slash = sourceURI.lastIndexOf("/", index);
+						int slash = sourceURI.lastIndexOf("/", index); //$NON-NLS-1$
 						if (slash != -1)
 							workspacePath += sourceURI.substring(slash, index);
 					}
@@ -69,7 +71,7 @@ class RepositorySelectionPage extends WizardPage
 		});
 
 		Label dest = new Label(composite, SWT.NONE);
-		dest.setText("Destination: ");
+		dest.setText(Messages.RepositorySelectionPage_Destination_Label);
 
 		directoryText = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
@@ -84,7 +86,7 @@ class RepositorySelectionPage extends WizardPage
 		});
 
 		final Button b = new Button(composite, SWT.PUSH);
-		b.setText("Browse...");
+		b.setText(Messages.RepositorySelectionPage_Browse_Label);
 		b.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(final SelectionEvent e)
@@ -116,7 +118,7 @@ class RepositorySelectionPage extends WizardPage
 		final String sourceURI = source.getText();
 		if (sourceURI.trim().length() == 0)
 		{
-			setErrorMessage("Source required");
+			setErrorMessage(Messages.RepositorySelectionPage_SourceURIRequired_Message);
 			setPageComplete(false);
 			return;
 		}
@@ -126,21 +128,21 @@ class RepositorySelectionPage extends WizardPage
 		final String dstpath = directoryText.getText();
 		if (dstpath.length() == 0)
 		{
-			setErrorMessage("Destination required");
+			setErrorMessage(Messages.RepositorySelectionPage_DestinatioNRequired_Message);
 			setPageComplete(false);
 			return;
 		}
 		final File absoluteFile = new File(dstpath).getAbsoluteFile();
 		if (!isEmptyDir(absoluteFile))
 		{
-			setErrorMessage(NLS.bind("{0} is not an empty directory", absoluteFile.getPath()));
+			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_DirectoryExists_ErrorMessage, absoluteFile.getPath()));
 			setPageComplete(false);
 			return;
 		}
 
 		if (!canCreateSubdir(absoluteFile.getParentFile()))
 		{
-			setErrorMessage(NLS.bind("Cannot create directory {0}", absoluteFile.getPath()));
+			setErrorMessage(NLS.bind(Messages.RepositorySelectionPage_CannotCreateDirectory_ErrorMessage, absoluteFile.getPath()));
 			setPageComplete(false);
 			return;
 		}
