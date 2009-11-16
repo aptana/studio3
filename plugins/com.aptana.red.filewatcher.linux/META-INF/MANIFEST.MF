@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Linux Filewatcher
-Bundle-SymbolicName: com.aptana.red.filewatcher.linux
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: APTANA
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-NativeCode: libjnotify.so
-Eclipse-PlatformFilter: (osgi.os=linux)

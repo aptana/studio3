@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Windows Native FileWatcher
-Bundle-SymbolicName: com.aptana.red.filewatcher.win
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: APTANA
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-NativeCode: jnotify.dll
-Eclipse-PlatformFilter: (& (osgi.os=win32) (| (osgi.arch=x86) (osgi.arch=x86)))
