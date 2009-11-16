@@ -75,9 +75,8 @@ import org.eclipse.jface.text.rules.Token;
 			}
 			scanner.unread();
 			return Character.isJavaIdentifierStart(nextChar);
-		} else {
-			return detected;
-		}
+		} 
+		return detected;
 	}
 	
 	

@@ -260,11 +260,11 @@ public class SingleProjectView extends CommonNavigator
 
 						private void refresh(File file)
 						{
-							// TODO Only refresh the file/dir one level deep?
+							// TODO Only refresh the delta here. If it's a file, just refresh the file. If it's a dir, refresh its tree.
 							if (job != null)
 								job.cancel();
 							
-							job = new WorkspaceJob("Refresh")
+							job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
 							{
 
 								@Override
