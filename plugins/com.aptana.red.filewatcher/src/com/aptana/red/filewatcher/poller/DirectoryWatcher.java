@@ -71,7 +71,7 @@ class DirectoryWatcher
 
 	private static void log(String string, Throwable e)
 	{
-		FileWatcherPlugin.log(e);
+		FileWatcherPlugin.log(string, e);
 	}
 
 	final File[] directories;

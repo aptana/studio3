@@ -56,7 +56,12 @@ public class FileWatcherPlugin extends Plugin
 
 	public static void log(Throwable e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+		log(e.getMessage(), e);
+	}
+	
+	public static void log(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
 }
