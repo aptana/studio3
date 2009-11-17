@@ -15,6 +15,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -47,9 +52,7 @@ public class SingleProjectView extends CommonNavigator
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
-
 	private ResourceListener fResourceListener;
-
 	private ViewerFilter activeProjectFilter;
 
 	private Integer watcher;
@@ -97,6 +100,25 @@ public class SingleProjectView extends CommonNavigator
 			}
 		};
 		getCommonViewer().addFilter(activeProjectFilter);
+		// When user manually edits filters, they get blown away and then re-added. We need to listen to this indirectly and re-add our filter!
+		getCommonViewer().addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				ISelection selection = event.getSelection();
+				if (selection == null || !selection.isEmpty())
+					return;
+				// check to see if our filter got wiped out!
+				ViewerFilter[] filters = getCommonViewer().getFilters();
+				for (ViewerFilter viewerFilter : filters)
+				{
+					if (viewerFilter.equals(activeProjectFilter))
+						return;
+				}
+				getCommonViewer().addFilter(activeProjectFilter);
+			}
+		});
 	}
 
 	protected Composite doCreatePartControl(Composite customComposite)
