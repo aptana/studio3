@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -57,16 +56,8 @@ class GitProjectRefresher implements IGitRepositoryListener
 			if (file == null)
 				continue;
 			files.add(file);
-			// Need to add all parents up to project!
-			IContainer parent = null;
-			IResource child = file;
-			while ((parent = child.getParent()) != null)
-			{
-				files.add(parent);
-				child = parent;
-			}
 		}
-		refreshResources(files, IResource.DEPTH_ONE);
+		refreshResources(files, IResource.DEPTH_ZERO);
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
