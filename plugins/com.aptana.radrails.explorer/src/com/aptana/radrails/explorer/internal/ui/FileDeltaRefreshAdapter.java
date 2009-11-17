@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.contentobjects.jnotify.JNotifyAdapter;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -48,7 +49,7 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 				return Status.OK_STATUS;
 			}
 		};
-		job.schedule();
+		job.schedule(200); // give a little delay so we can have a chance to cancel and batch together refreshes!
 	}
 
 	@Override
@@ -74,7 +75,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 
 	private void addToRefreshList(IResource resource, Integer depth)
 	{
-		if (resource != null)
+		if (resource == null)
+			return;
+		try
 		{
 			synchronized (toRefresh)
 			{
@@ -86,11 +89,25 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 				}
 				else
 				{
-					toRefresh.put(resource, depth); // TODO Don't add files that are children of
-					// containers we've marked for infinite depth
-					// refresh!
+					for (IResource refreshing : toRefresh.keySet())
+					{
+						if (refreshing instanceof IContainer)
+						{
+							IContainer container = (IContainer) refreshing;
+							if (container.getLocation().isPrefixOf(resource.getLocation()))
+							{
+								// We already have an ancestor in the map. If it's refreshing infinitely don't add this resource
+								if (toRefresh.get(container) == IResource.DEPTH_INFINITE)
+									return;
+							}
+						}
+					}
+					toRefresh.put(resource, depth); 
 				}
 			}
+		}
+		finally
+		{
 			refresh();
 		}
 	}
