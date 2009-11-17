@@ -14,6 +14,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
@@ -207,9 +208,18 @@ public class ProcessWrapper
 			{
 				project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
 				
-				this._startingDirectory = project.getLocation().toPortableString();
+				if (project != null)
+				{
+					IPath projectLocation = project.getLocation();
+					
+					if (projectLocation != null)
+					{
+						this._startingDirectory = projectLocation.toPortableString();
+					}
+				}
 			}
-			else
+			
+			if (this._startingDirectory == null)
 			{
 				this._startingDirectory = System.getProperty(USER_HOME_PROPERTY); //$NON-NLS-1$
 			}
