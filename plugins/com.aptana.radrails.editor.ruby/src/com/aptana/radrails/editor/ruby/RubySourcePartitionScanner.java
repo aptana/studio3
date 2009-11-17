@@ -213,7 +213,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
             if (comments != null && !comments.isEmpty()) {
                 parseOutComments(comments);
                 // Queue the normal token we just ate up
-                addQueuedToken(returnValue, isEOF);
+                addQueuedToken(returnValue);
                 comments.clear();
                 return popTokenOffQueue();
             }
@@ -622,7 +622,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         return RubySourceConfiguration.SINGLE_LINE_COMMENT;
     }
 
-    private void addQueuedToken(IToken returnValue, boolean isEOF) {
+    private void addQueuedToken(IToken returnValue) {
         // grab end of last comment (last thing in queue)
         QueuedToken token = peek();
         setOffset(token.getOffset() + token.getLength());

@@ -126,10 +126,7 @@ public class RubyTokenScanner implements ITokenScanner {
             inAlias = false;
             return new Token(new Integer(Tokens.tSYMBEG));
         } // end JRuby parsing hack for alias
-        if (isKeyword(i))
-            return new Token(new Integer(Tokens.k__FILE__)); // FIXME Set up a
-                                                             // token for user
-                                                             // defined keywords
+
         switch (i) {
         case Tokens.tSYMBEG:
             if (looksLikeTertiaryConditionalWithNoSpaces()) {
@@ -218,12 +215,6 @@ public class RubyTokenScanner implements ITokenScanner {
     private boolean isRealKeyword(int i) {
         if (i >= MIN_KEYWORD && i <= MAX_KEYWORD)
             return true;
-        return false;
-    }
-
-    private boolean isKeyword(int i) {
-        // this is for user-defined keywords
-        // TODO: handles user-defined keywords
         return false;
     }
 

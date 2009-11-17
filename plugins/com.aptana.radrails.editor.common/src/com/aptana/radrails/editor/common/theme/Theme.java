@@ -27,6 +27,13 @@ import org.eclipse.swt.graphics.RGB;
 public class Theme
 {
 
+	private static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	private static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
+	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
+	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
+	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
+	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
+	
 	Map<String, TextAttribute> map;
 	private ColorManager colorManager;
 	private RGB defaultFG;
@@ -45,13 +52,13 @@ public class Theme
 
 	private void parseProps(Properties props)
 	{
-		name = (String) props.remove("name");
+		name = (String) props.remove(THEME_NAME_PROP_KEY);
 		// The general editor colors
-		defaultFG = parseHexRGB((String) props.remove("foreground"));
-		lineHighlight = parseHexRGB((String) props.remove("lineHighlight"));
-		defaultBG = parseHexRGB((String) props.remove("background"));
-		selection = parseHexRGB((String) props.remove("selection"));
-		caret = parseHexRGB((String) props.remove("caret"));
+		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
+		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
+		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
+		selection = parseHexRGB((String) props.remove(SELECTION_PROP_KEY));
+		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY));
 
 		for (Entry<Object, Object> entry : props.entrySet())
 		{
@@ -62,7 +69,7 @@ public class Theme
 			List<String> tokens = tokenize((String) entry.getValue());
 			for (String token : tokens)
 			{
-				if (token.startsWith("#"))
+				if (token.startsWith("#")) //$NON-NLS-1$
 				{
 					// it's a color!
 					RGB rgb = parseHexRGB(token);
@@ -73,11 +80,11 @@ public class Theme
 				}
 				else
 				{
-					if (token.equalsIgnoreCase("italic"))
+					if (token.equalsIgnoreCase("italic")) //$NON-NLS-1$
 						style |= SWT.ITALIC;
-					else if (token.equalsIgnoreCase("underline"))
+					else if (token.equalsIgnoreCase("underline")) //$NON-NLS-1$
 						style |= TextAttribute.UNDERLINE;
-					else if (token.equalsIgnoreCase("bold"))
+					else if (token.equalsIgnoreCase("bold")) //$NON-NLS-1$
 						style |= SWT.BOLD;
 				}
 			}
@@ -91,12 +98,12 @@ public class Theme
 	private List<String> tokenize(String value)
 	{
 		List<String> tokens = new ArrayList<String>();
-		if (!value.contains(","))
+		if (!value.contains(",")) //$NON-NLS-1$
 		{
 			tokens.add(value);
 			return tokens;
 		}
-		StringTokenizer tokenizer = new StringTokenizer(value, ", ");
+		StringTokenizer tokenizer = new StringTokenizer(value, ", "); //$NON-NLS-1$
 		while (tokenizer.hasMoreTokens())
 		{
 			tokens.add(tokenizer.nextToken());

@@ -61,22 +61,22 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		Label label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		label.setText("Foreground");
+		label.setText(Messages.ThemePreferencePage_ForegroundLabel);
 		fgSelector = new ColorSelector(colors);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		label.setText("Selection");
+		label.setText(Messages.ThemePreferencePage_SelectionLabel);
 		selectionSelector = new ColorSelector(colors);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		label.setText("Background");
+		label.setText(Messages.ThemePreferencePage_BackgroundLabel);
 		bgSelector = new ColorSelector(colors);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		label.setText("Line Highlight");
+		label.setText(Messages.ThemePreferencePage_LineHighlightLabel);
 		lineHighlightSelector = new ColorSelector(colors);
 
 		setTheme(ThemeUtil.getActiveTheme().getName());

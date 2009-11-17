@@ -30,10 +30,10 @@ import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
 public class ShowScopesAction extends TextEditorAction {
 	
 	public static IAction create(ITextEditor textEditor, ITextViewer textViewer) {
-		return new ShowScopesAction(ResourceBundle.getBundle(ShowScopesAction.class.getName()), "ShowScopesAction.", textEditor, textViewer);
+		return new ShowScopesAction(ResourceBundle.getBundle(ShowScopesAction.class.getName()), "ShowScopesAction.", textEditor, textViewer); //$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.radrails.editor.common.showscopes";
+	public static final String COMMAND_ID = "com.aptana.radrails.editor.common.showscopes"; //$NON-NLS-1$
 	
 	protected static class DefaultInformationControlCreator extends AbstractReusableInformationControlCreator {
 		public IInformationControl doCreateInformationControl(Shell shell) {
@@ -62,7 +62,7 @@ public class ShowScopesAction extends TextEditorAction {
 			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 			locationAtOffset.y += textWidget.getLineHeight(caretOffset) + 2;
 			locationAtOffset = shell.getDisplay().map(textWidget, null, locationAtOffset);
-			popup(shell, contentType+"\n", locationAtOffset);
+			popup(shell, contentType+"\n", locationAtOffset); //$NON-NLS-1$
         } catch (BadLocationException e) {
         	System.err.println(e.getMessage());
         }

@@ -35,6 +35,8 @@
 
 package com.aptana.radrails.editor.common;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -180,7 +182,7 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 		if (defaultTokenState != null && defaultTokenState.hasToken()) {
 			IToken token = defaultTokenState.token;
 			defaultTokenState = null;
-			System.out.println("> "+token.getData() + " "+getTokenOffset()+":"+getTokenLength()); // XXX
+			trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 			return token;
 		}
 		if (fContentType == null || hasSwitch) {
@@ -283,10 +285,15 @@ public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 				defaultTokenState = null;
 			}
 		}
-		System.out.println("> "+token.getData() + " "+getTokenOffset()+":"+getTokenLength()); // XXX
+		trace(MessageFormat.format("> {0} {1}:{2}", token.getData(), getTokenOffset(), getTokenLength())); //$NON-NLS-1$
 		return token;
 	}
 	
+	private void trace(String string)
+	{
+		CommonEditorPlugin.trace(string);		
+	}
+
 	private boolean hasSwitchingSequence() {
 		if (currentPartitionScanner.foundSequence()) {
 			hasSwitch = true;

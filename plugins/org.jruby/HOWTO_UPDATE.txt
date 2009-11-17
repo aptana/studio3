@@ -1,0 +1,4 @@
+- Import original JRuby source from a tag or revision of a release.
+- Patch existing source with patches found here in the patches subdirectory.
+- Copy the contents of the binary distribution of JRuby over top the root directory of this project (make sure to replace the bin and lib subdir)
+- Build and export a new jruby.jar from the modified source JRuby and the copy over top the version found in the lib dir of this plugin.

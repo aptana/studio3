@@ -86,4 +86,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(e.getStatus());
 	}
+
+	public static void trace(String string)
+	{
+		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
+	}
 }

@@ -37,10 +37,7 @@ public class RegexpRule implements IPredicateRule
 			}
 			return successToken;
 		}
-		else
-		{
-			unread(scanner, line.length());
-		}
+		unread(scanner, line.length());
 		return Token.UNDEFINED;
 	}
 
