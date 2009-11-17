@@ -331,6 +331,13 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	public void indexChanged(IndexChangedEvent e)
 	{
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
+		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			GitRepository repo = GitRepository.getAttached(project);
+			if (repo != null && repo.equals(e.getRepository()))
+				resources.add(project);
+		}
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
