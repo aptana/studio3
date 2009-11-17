@@ -207,16 +207,18 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		builder.append(" ["); //$NON-NLS-1$
 		String branch = repo.currentBranch();
 		builder.append(branch);
-		String[] commits = repo.commitsBehind(branch);
+		String[] commits = repo.commitsAhead(branch);
 		if (commits != null && commits.length > 0)
 		{
-			builder.append("-").append(commits.length); //$NON-NLS-1$
+			builder.append("+").append(commits.length); //$NON-NLS-1$
 		}
 		else
 		{
-			commits = repo.commitsAhead(branch);
+			// Happens way less frequently. usually only if you've fetched but haven't merged (which usually happens
+			// when you pull on one branch and then switch back to another that had changes not yet merged in yet)
+			commits = repo.commitsBehind(branch);
 			if (commits != null && commits.length > 0)
-				builder.append("+").append(commits.length); //$NON-NLS-1$
+				builder.append("-").append(commits.length); //$NON-NLS-1$
 		}
 		builder.append("]"); //$NON-NLS-1$
 		decoration.addSuffix(builder.toString());
@@ -371,6 +373,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	/**
 	 * Perform a blanket refresh of all decorations
+	 * 
 	 * @deprecated this is very bad performance wise. Need to avoid using this and always just use deltas if possible!
 	 */
 	public static void refresh()
