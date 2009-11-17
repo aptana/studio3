@@ -1,12 +1,17 @@
 package com.aptana.git.ui.internal;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -31,7 +36,7 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
-	private static final String DIRTY_PREFIX = "> ";
+	private static final String DIRTY_PREFIX = "> "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
 	/**
@@ -325,22 +330,41 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// This is very ugly performance-wise, but seems to be necessary. If we just try to collect the IResources for
-		// changed files and the related projects the labels won't get redrawn for views that use adapted IResources
-		// (like JDT's package explorer). So we just tell the decorator to refresh for everything.
-		postLabelEvent(new LabelProviderChangedEvent(this));
+		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
+	}
+
+	private Set<IResource> addChangedFiles(GitRepository repository, Collection<ChangedFile> changedFiles)
+	{
+		String workingDir = repository.workingDirectory();
+		Set<IResource> resources = new HashSet<IResource>();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
+					new Path(workingDir).append(changedFile.getPath()));
+			if (resource != null)
+				resources.add(resource);
+		}
+		return resources;
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
+		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
+		resources.add(e.getProject());
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
+		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
+		resources.add(e.getProject());
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	/**
 	 * Perform a blanket refresh of all decorations
+	 * @deprecated this is very bad performance wise. Need to avoid using this and always just use deltas if possible!
 	 */
 	public static void refresh()
 	{

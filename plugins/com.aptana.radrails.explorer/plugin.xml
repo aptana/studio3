@@ -27,6 +27,9 @@
             <contentExtension
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
             </contentExtension>
+            <contentExtension pattern="org.eclipse.jdt.java.ui.javaContent" />
+			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />	
+			<contentExtension pattern="org.eclipse.jdt.java.ui.javaLinkHelper" />	
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -37,6 +40,5 @@
             </actionExtension>
          </includes>
       </viewerActionBinding>
-   </extension>
-
+	</extension>
 </plugin>

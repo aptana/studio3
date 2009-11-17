@@ -1,6 +1,5 @@
 package com.aptana.git.ui.actions;
 
-import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 public class PullAction extends SimpleGitCommandAction
 {
@@ -14,9 +13,8 @@ public class PullAction extends SimpleGitCommandAction
 	@Override
 	protected void postLaunch()
 	{
+		// Refresh the in-memory index of the repo!
+		refreshRepoIndex();		
 		refreshAffectedProjects();
-		// TODO It'd be nice if we could just tell it to update the labels of the projects attached to the repo (and
-		// only the project, not it's children)!
-		GitLightweightDecorator.refresh();
 	}
 }

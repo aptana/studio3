@@ -50,7 +50,7 @@ public class SingleTagRule extends SingleLineRule {
 	 * @param token
 	 */
 	public SingleTagRule(String startSequence, IToken token) {
-		super(startSequence, "", token);
+		super(startSequence, "", token); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)

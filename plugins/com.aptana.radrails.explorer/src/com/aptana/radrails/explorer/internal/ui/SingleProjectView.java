@@ -1,8 +1,5 @@
 package com.aptana.radrails.explorer.internal.ui;
 
-import java.io.File;
-
-import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
@@ -12,16 +9,17 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -54,9 +52,7 @@ public class SingleProjectView extends CommonNavigator
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
-
 	private ResourceListener fResourceListener;
-
 	private ViewerFilter activeProjectFilter;
 
 	private Integer watcher;
@@ -104,6 +100,25 @@ public class SingleProjectView extends CommonNavigator
 			}
 		};
 		getCommonViewer().addFilter(activeProjectFilter);
+		// When user manually edits filters, they get blown away and then re-added. We need to listen to this indirectly and re-add our filter!
+		getCommonViewer().addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				ISelection selection = event.getSelection();
+				if (selection == null || !selection.isEmpty())
+					return;
+				// check to see if our filter got wiped out!
+				ViewerFilter[] filters = getCommonViewer().getFilters();
+				for (ViewerFilter viewerFilter : filters)
+				{
+					if (viewerFilter.equals(activeProjectFilter))
+						return;
+				}
+				getCommonViewer().addFilter(activeProjectFilter);
+			}
+		});
 	}
 
 	protected Composite doCreatePartControl(Composite customComposite)
@@ -254,60 +269,11 @@ public class SingleProjectView extends CommonNavigator
 				FileWatcher.removeWatch(watcher);
 			}
 			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), FileWatcher.FILE_ANY, true,
-					new JNotifyAdapter()
-					{
-						private WorkspaceJob job;
-
-						private void refresh(File file)
-						{
-							// TODO Only refresh the delta here. If it's a file, just refresh the file. If it's a dir, refresh its tree.
-							if (job != null)
-								job.cancel();
-							
-							job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
-							{
-
-								@Override
-								public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
-								{
-									selectedProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-									return Status.OK_STATUS;
-								}
-							};
-							job.schedule();
-						}
-
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileModified(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
-						{
-							refresh(new File(rootPath, oldName));
-							refresh(new File(rootPath, newName));
-						}
-
-					});
+					new FileDeltaRefreshAdapter());
 		}
 		catch (JNotifyException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ExplorerPlugin.logError(e.getMessage(), e);
 		}
 	}
 

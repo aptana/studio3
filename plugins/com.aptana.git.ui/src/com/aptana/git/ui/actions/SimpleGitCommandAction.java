@@ -70,4 +70,15 @@ public abstract class SimpleGitCommandAction extends GitAction
 			return null;
 		return new File(repo.workingDirectory());
 	}
+	
+	protected void refreshRepoIndex()
+	{
+		IResource[] resources = getSelectedResources();
+		if (resources == null || resources.length == 0)
+			return;
+		IProject project = resources[0].getProject();
+		GitRepository repo = GitRepository.getAttached(project);
+		if (repo != null)
+			repo.index().refresh();
+	}
 }

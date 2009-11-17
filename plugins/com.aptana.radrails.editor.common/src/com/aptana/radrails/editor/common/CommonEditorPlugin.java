@@ -15,7 +15,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.editor.common";
+	public static final String PLUGIN_ID = "com.aptana.radrails.editor.common"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;

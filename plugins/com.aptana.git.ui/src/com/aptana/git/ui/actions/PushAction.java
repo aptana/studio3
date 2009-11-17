@@ -4,7 +4,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.GitLightweightDecorator;
 
 public class PushAction extends SimpleGitCommandAction
 {
@@ -20,9 +19,7 @@ public class PushAction extends SimpleGitCommandAction
 	@Override
 	protected void postLaunch()
 	{
-		// TODO It'd be nice if we could just tell it to update the labels of the projects attached to the repo (and
-		// only the project, not it's children)!
-		GitLightweightDecorator.refresh();
+		refreshRepoIndex();
 	}
 
 	@Override
