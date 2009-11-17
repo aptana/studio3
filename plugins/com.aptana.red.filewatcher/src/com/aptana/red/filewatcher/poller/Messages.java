@@ -8,9 +8,10 @@
  *  Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.util.directorywatcher;
+package com.aptana.red.filewatcher.poller;
 
 import org.eclipse.osgi.util.NLS;
+
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.util.directorywatcher.messages"; //$NON-NLS-1$

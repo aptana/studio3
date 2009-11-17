@@ -275,9 +275,9 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
             if (lexerSource.getOffset() - origLength == 0) {
                 // return eof if we hit a problem found at end of parsing
                 return Token.EOF;
-            } else {
-                fLength = getOffset() - fOffset;
             }
+            fLength = getOffset() - fOffset;
+            
             Assert.isTrue(fLength >= 0);
             return new Token(RubySourceConfiguration.DEFAULT);
         } catch (IOException e) {
@@ -600,7 +600,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         int start = fOffset - origOffset;
         List<CommentNode> comments = result.getCommentNodes();
         if (comments != null && !comments.isEmpty()) {
-            Node comment = (Node) comments.get(comments.size() - 1);
+            Node comment = comments.get(comments.size() - 1);
             int end = comment.getPosition().getEndOffset();
             start = end;
         }

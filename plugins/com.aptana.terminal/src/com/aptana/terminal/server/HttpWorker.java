@@ -22,6 +22,8 @@ public class HttpWorker implements Runnable
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
 	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
+	private static final String STATUS_200 = "200"; //$NON-NLS-1$
+	private static final String STATUS_404 = "404"; //$NON-NLS-1$
 	
 	private HttpServer _server;
 	private Socket _clientSocket;
@@ -59,7 +61,7 @@ public class HttpWorker implements Runnable
 				
 				new FileInputStream(file).read(bytes);
 				
-				this.sendByteResponse(output, bytes);
+				this.sendResponse(output, STATUS_200, bytes);
 			}
 			else
 			{
@@ -99,7 +101,7 @@ public class HttpWorker implements Runnable
 				
 				if (text != null)
 				{
-					this.sendTextResponse(output, text);
+					this.sendResponse(output, text);
 				}
 				else
 				{
@@ -116,7 +118,7 @@ public class HttpWorker implements Runnable
 			String id = UUID.randomUUID().toString();
 			
 			this._server.createProcess(id);
-			this.sendTextResponse(output, id);
+			this.sendResponse(output, id);
 		}
 		else
 		{
@@ -179,26 +181,34 @@ public class HttpWorker implements Runnable
 		{
 			DataOutputStream output = new DataOutputStream(this._clientSocket.getOutputStream());
 			
-			try
+			if (this._clientSocket.getInetAddress().isLoopbackAddress())
 			{
-				Request request = Request.fromInputStream(this._clientSocket.getInputStream());
-				String method = request.getMethod();
-				
-				if ("GET".equals(method)) //$NON-NLS-1$
+				try
 				{
-					this.processGet(request, output);
+					Request request = Request.fromInputStream(this._clientSocket.getInputStream());
+					String method = request.getMethod();
+					
+					if ("GET".equals(method)) //$NON-NLS-1$
+					{
+						this.processGet(request, output);
+					}
+					else if ("POST".equals(method)) //$NON-NLS-1$
+					{
+						this.processPost(request, output);
+					}
+					else
+					{
+						this.sendErrorResponse(output);
+					}
 				}
-				else if ("POST".equals(method)) //$NON-NLS-1$
-				{
-					this.processPost(request, output);
-				}
-				else
+				catch (Exception e)
 				{
 					this.sendErrorResponse(output);
 				}
 			}
-			catch (Exception e)
+			else
 			{
+				// NOTE: We're not sending FORBIDDEN as that may be too revealing
 				this.sendErrorResponse(output);
 			}
 			
@@ -211,18 +221,42 @@ public class HttpWorker implements Runnable
 	}
 	
 	/**
+	 * sendResponse
+	 * 
+	 * @param output
+	 * @param content
+	 */
+	private void sendResponse(DataOutputStream output, String content)
+	{
+		this.sendResponse(output, STATUS_200, content.getBytes());
+	}
+	
+	/**
+	 * sendReponse
+	 * 
+	 * @param output
+	 * @param status
+	 * @param content
+	 */
+	private void sendResponse(DataOutputStream output, String status, String content)
+	{
+		this.sendResponse(output, status, content.getBytes());
+	}
+	
+	/**
 	 * sendByteResponse
 	 * 
 	 * @param output
+	 * @param status
 	 * @param bytes
 	 */
-	private void sendByteResponse(DataOutputStream output, byte[] bytes)
+	private void sendResponse(DataOutputStream output, String status, byte[] bytes)
 	{
 		int length = bytes.length;
 		
 		try
 		{
-			output.writeBytes("HTTP/1.0 200 OK\nContent-Length:" + length + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			output.writeBytes("HTTP/1.0 " + status + " OK\nContent-Length:" + length + "\n\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			output.write(bytes, 0, length);
 		}
 		catch (IOException e)
@@ -238,14 +272,7 @@ public class HttpWorker implements Runnable
 	 */
 	private void sendEmptyResponse(DataOutputStream output)
 	{
-		try
-		{
-			output.writeBytes("HTTP/1.0 200 OK\nContent-Length: 0\n\n"); //$NON-NLS-1$
-		}
-		catch (IOException e)
-		{
-			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
-		}
+		this.sendResponse(output, ""); //$NON-NLS-1$
 	}
 	
 	/**
@@ -255,24 +282,6 @@ public class HttpWorker implements Runnable
 	 */
 	private void sendErrorResponse(DataOutputStream output)
 	{
-		try
-		{
-			output.writeBytes("HTTP/1.0 404 ERROR\n\n"); //$NON-NLS-1$
-		}
-		catch (IOException e)
-		{
-			Activator.logError(Messages.HttpWorker_Error_Writing_To_Client, e);
-		}
-	}
-	
-	/**
-	 * sendText
-	 * 
-	 * @param output
-	 * @param text
-	 */
-	private void sendTextResponse(DataOutputStream output, String text)
-	{
-		this.sendByteResponse(output, text.getBytes());
+		this.sendResponse(output, STATUS_404, Messages.HttpWorker_Not_Found4);
 	}
 }

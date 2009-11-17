@@ -8,5 +8,4 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.util,
- com.aptana.util.directorywatcher
+Export-Package: com.aptana.util

@@ -2,6 +2,7 @@ package com.aptana.git.core.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import com.aptana.git.core.IPreferenceConstants;
 public class GitExecutable
 {
 
-	public static final String MIN_GIT_VERSION = "1.6.0";
+	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
 	private static ArrayList<String> fgLocations;
 	private String gitPath;
 
@@ -62,10 +63,12 @@ public class GitExecutable
 			{
 				return new GitExecutable(prefPath);
 			}
-			GitPlugin.logError(
-					"You entered a custom git path in the Preferences pane, but this path is not a valid git v"
-							+ MIN_GIT_VERSION
-							+ " or higher binary. We're going to use the default search paths instead", null);
+			GitPlugin
+					.logError(
+							MessageFormat
+									.format(
+											"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
+											MIN_GIT_VERSION), null);
 		}
 
 		// Try to find the path of the Git binary
@@ -74,7 +77,7 @@ public class GitExecutable
 			return new GitExecutable(gitPath);
 
 		// No explicit path. Try it with "which"
-		String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, "git");
+		String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, "git"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (acceptBinary(whichPath))
 			return new GitExecutable(whichPath);
 
@@ -85,7 +88,7 @@ public class GitExecutable
 				return new GitExecutable(location);
 		}
 
-		log("Could not find a git binary higher than version " + MIN_GIT_VERSION);
+		log(MessageFormat.format("Could not find a git binary higher than version {0}", MIN_GIT_VERSION)); //$NON-NLS-1$
 		return null;
 	}
 
@@ -99,20 +102,20 @@ public class GitExecutable
 		if (fgLocations == null)
 		{
 			fgLocations = new ArrayList<String>();
-			fgLocations.add("/opt/local/bin/git");
-			fgLocations.add("/sw/bin/git");
-			fgLocations.add("/opt/git/bin/git");
-			fgLocations.add("/usr/local/bin/git");
-			fgLocations.add("/usr/local/git/bin/git");
-			fgLocations.add(stringByExpandingTildeInPath("~/bin/git"));
+			fgLocations.add("/opt/local/bin/git"); //$NON-NLS-1$
+			fgLocations.add("/sw/bin/git"); //$NON-NLS-1$
+			fgLocations.add("/opt/git/bin/git"); //$NON-NLS-1$
+			fgLocations.add("/usr/local/bin/git"); //$NON-NLS-1$
+			fgLocations.add("/usr/local/git/bin/git"); //$NON-NLS-1$
+			fgLocations.add(stringByExpandingTildeInPath("~/bin/git")); //$NON-NLS-1$
 		}
 		return fgLocations;
 	}
 
 	private static String stringByExpandingTildeInPath(String string)
 	{
-		String userHome = System.getProperty("user.home");
-		return string.replaceAll("~", userHome);
+		String userHome = System.getProperty("user.home"); //$NON-NLS-1$
+		return string.replaceAll("~", userHome); //$NON-NLS-1$
 	}
 
 	private static String versionForPath(String path)
@@ -124,8 +127,8 @@ public class GitExecutable
 		if (!file.isFile())
 			return null;
 
-		String version = ProcessUtil.outputForCommand(path, null, "--version");
-		if (version.startsWith("git version "))
+		String version = ProcessUtil.outputForCommand(path, null, "--version"); //$NON-NLS-1$
+		if (version.startsWith("git version ")) //$NON-NLS-1$
 			return version.substring(12);
 
 		return null;
@@ -146,7 +149,7 @@ public class GitExecutable
 			return true;
 		}
 
-		log("Found a git binary at " + path + ", but is only version " + version);
+		log(MessageFormat.format("Found a git binary at {0}, but is only version {1}", path, version)); //$NON-NLS-1$
 		return false;
 	}
 

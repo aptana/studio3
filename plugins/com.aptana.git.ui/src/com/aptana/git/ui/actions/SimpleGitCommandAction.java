@@ -26,10 +26,10 @@ public abstract class SimpleGitCommandAction extends GitAction
 			working = workingDir.toString();
 		final String finWorking = working;
 		final String[] command = getCommand();
-		StringBuilder jobName = new StringBuilder("git");
+		StringBuilder jobName = new StringBuilder("git"); //$NON-NLS-1$
 		for (String string : command)
 		{
-			jobName.append(" ").append(string);
+			jobName.append(" ").append(string); //$NON-NLS-1$
 		}
 		Job job = new Job(jobName.toString())
 		{

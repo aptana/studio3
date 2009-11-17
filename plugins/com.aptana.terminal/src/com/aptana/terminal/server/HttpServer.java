@@ -13,14 +13,9 @@ import java.util.concurrent.Executors;
  */
 public class HttpServer extends Thread
 {
-	static private HttpServer instance;
-
-	protected int port;
-	protected ServerSocket serverSocket;
-	protected Thread runningThread;
-	protected ExecutorService threadPool;
-	protected boolean isRunning;
-	protected Map<String, ProcessWrapper> processById;
+	private static final int DEFAULT_PORT = 8181;
+	private static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
+	private static HttpServer instance;
 
 	/**
 	 * getInstance
@@ -33,8 +28,16 @@ public class HttpServer extends Thread
 		{
 			instance = new HttpServer();
 		}
+		
 		return instance;
 	}
+	protected int port;
+	protected ServerSocket serverSocket;
+	protected Thread runningThread;
+	protected ExecutorService threadPool;
+	protected boolean isRunning;
+
+	protected Map<String, ProcessWrapper> processById;
 
 	/**
 	 * HttpServer
@@ -83,6 +86,40 @@ public class HttpServer extends Thread
 	}
 
 	/**
+	 * getHost
+	 * 
+	 * @return
+	 */
+	public String getHost()
+	{
+		String result = LOCALHOST;
+		
+		if (this.serverSocket != null)
+		{
+			result = this.serverSocket.getInetAddress().getHostAddress();
+		}
+		
+		return result;
+	}
+
+	/**
+	 * getPort
+	 * 
+	 * @return
+	 */
+	public int getPort()
+	{
+		int result = DEFAULT_PORT;
+		
+		if (this.serverSocket != null)
+		{
+			result = this.serverSocket.getLocalPort();
+		}
+		
+		return result;
+	}
+
+	/**
 	 * getProcess
 	 * 
 	 * @param id
@@ -91,6 +128,25 @@ public class HttpServer extends Thread
 	public ProcessWrapper getProcess(String id)
 	{
 		return this.processById.get(id);
+	}
+
+	/**
+	 * openServerSocket
+	 */
+	private void openServerSocket()
+	{
+		try
+		{
+			this.serverSocket = new ServerSocket(0);
+			this.serverSocket.setReuseAddress(true);
+			
+			// emit server port which is useful for debugging purposes
+			System.out.println(Messages.Terminal_View_Server_Running_On_Port0 + this.getPort());
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port, e);
+		}
 	}
 
 	/**
@@ -141,35 +197,5 @@ public class HttpServer extends Thread
 				throw new RuntimeException(Messages.HttpServer_Client_Accept_Error, e);
 			}
 		}
-	}
-
-	/**
-	 * openServerSocket
-	 */
-	private void openServerSocket()
-	{
-		try
-		{
-			this.serverSocket = new ServerSocket(0);
-			this.serverSocket.setReuseAddress(true);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port, e);
-		}
-	}
-
-	public String getHost()
-	{
-		if (this.serverSocket == null)
-			return "127.0.0.1"; //$NON-NLS-1$
-		return this.serverSocket.getInetAddress().getHostAddress();
-	}
-
-	public int getPort()
-	{
-		if (this.serverSocket == null)
-			return 8181;
-		return this.serverSocket.getLocalPort();
 	}
 }

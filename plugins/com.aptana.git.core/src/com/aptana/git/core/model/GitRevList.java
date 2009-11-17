@@ -3,6 +3,7 @@ package com.aptana.git.core.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,27 +57,27 @@ public class GitRevList
 		long start = System.currentTimeMillis();
 		List<GitCommit> revisions = new ArrayList<GitCommit>();
 
-		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at";
-		boolean showSign = rev.hasLeftRight();
+		String formatString = "--pretty=format:%H\01%e\01%an\01%ae\01%s\01%b\01%P\01%at"; //$NON-NLS-1$
+		boolean showSign = ((rev == null) ? false : rev.hasLeftRight());
 		if (showSign)
-			formatString += "\01%m";
+			formatString += "\01%m"; //$NON-NLS-1$
 
 		List<String> arguments = new ArrayList<String>();
-		arguments.add("log");
-		arguments.add("-z");
-		arguments.add("--early-output");
-		arguments.add("--topo-order");
-		arguments.add("--children");
+		arguments.add("log"); //$NON-NLS-1$
+		arguments.add("-z"); //$NON-NLS-1$
+		arguments.add("--early-output"); //$NON-NLS-1$
+		arguments.add("--topo-order"); //$NON-NLS-1$
+		arguments.add("--children"); //$NON-NLS-1$
 		if (max > 0)
-			arguments.add("-" + max); // only last N revs
+			arguments.add("-" + max); // only last N revs //$NON-NLS-1$
 		arguments.add(formatString);
 
 		if (rev == null)
-			arguments.add("HEAD");
+			arguments.add("HEAD"); //$NON-NLS-1$
 		else
 			arguments.addAll(rev.parameters());
 
-		String directory = rev.getWorkingDirectory() != null ? rev.getWorkingDirectory() : repository
+		String directory = (rev != null && rev.getWorkingDirectory() != null) ? rev.getWorkingDirectory() : repository
 				.workingDirectory();
 
 		if (subMonitor.isCanceled())
@@ -113,7 +114,7 @@ public class GitRevList
 					sha = sha.substring(startIndex, startIndex + 40);
 				}
 
-				String encoding = getline(stream, '\1', "UTF-8");
+				String encoding = getline(stream, '\1', "UTF-8"); //$NON-NLS-1$
 				GitCommit newCommit = new GitCommit(repository, sha);
 
 				String author = getline(stream, '\1', encoding);
@@ -125,7 +126,7 @@ public class GitRevList
 				{
 					if (((parentString.length() + 1) % 41) != 0)
 					{
-						GitPlugin.logError("invalid parents: " + parentString.length(), null);
+						GitPlugin.logError(MessageFormat.format("invalid parents: {0}", parentString.length()), null); //$NON-NLS-1$
 						continue;
 					}
 					int nParents = (parentString.length() + 1) / 41;
@@ -152,13 +153,13 @@ public class GitRevList
 					stream.read(); // Remove separator
 					char c = (char) stream.read();
 					if (c != '>' && c != '<' && c != '^' && c != '-')
-						GitPlugin.logError("Error loading commits: sign not correct", null);
+						GitPlugin.logError("Error loading commits: sign not correct", null); //$NON-NLS-1$
 					// newCommit.setSign(c);
 				}
 
 				int read = stream.read();
 				if (read != 0 && read != -1)
-					GitPlugin.logError("Error", null);
+					GitPlugin.logError("Error", null); //$NON-NLS-1$
 
 				revisions.add(newCommit);
 				
@@ -174,7 +175,7 @@ public class GitRevList
 			}
 
 			long duration = System.currentTimeMillis() - start;
-			logInfo("Loaded " + num + " commits in " + duration + " ms");
+			logInfo(MessageFormat.format("Loaded {0} commits in {1} ms", num, duration)); //$NON-NLS-1$
 			// Make sure the commits are stored before exiting.
 			setCommits(revisions, true);
 			p.waitFor();

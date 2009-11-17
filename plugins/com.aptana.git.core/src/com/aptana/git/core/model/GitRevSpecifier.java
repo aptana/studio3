@@ -8,7 +8,6 @@ public class GitRevSpecifier
 {
 
 	private List<String> parameters;
-	private String description;
 	private String workingDirectory;
 
 	public GitRevSpecifier(String... parameters)
@@ -20,7 +19,6 @@ public class GitRevSpecifier
 	{
 		parameters = new ArrayList<String>();
 		parameters.add(newRef.ref());
-		description = newRef.shortName();
 	}
 
 	List<String> parameters()
@@ -35,21 +33,17 @@ public class GitRevSpecifier
 
 	static GitRevSpecifier allBranchesRevSpec()
 	{
-		GitRevSpecifier revspec = new GitRevSpecifier("--all");
-		revspec.description = "All branches";
-		return revspec;
+		return new GitRevSpecifier("--all"); //$NON-NLS-1$
 	}
 
 	static GitRevSpecifier localBranchesRevSpec()
 	{
-		GitRevSpecifier revspec = new GitRevSpecifier("--branches");
-		revspec.description = "Local branches";
-		return revspec;
+		return new GitRevSpecifier("--branches"); //$NON-NLS-1$
 	}
 
 	boolean isSimpleRef()
 	{
-		return parameters.size() == 1 && !parameters.get(0).startsWith("-");
+		return parameters.size() == 1 && !parameters.get(0).startsWith("-"); //$NON-NLS-1$
 	}
 
 	public GitRef simpleRef()
@@ -62,7 +56,7 @@ public class GitRevSpecifier
 	boolean hasLeftRight()
 	{
 		for (String param : parameters)
-			if (param.equals("--left-right"))
+			if (param.equals("--left-right")) //$NON-NLS-1$
 				return true;
 		return false;
 	}
@@ -73,7 +67,7 @@ public class GitRevSpecifier
 		StringBuilder builder = new StringBuilder();
 		for (String param : parameters)
 		{
-			builder.append(param).append(" ");
+			builder.append(param).append(" "); //$NON-NLS-1$
 		}
 		if (builder.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);

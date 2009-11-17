@@ -21,7 +21,7 @@ class WorkspaceFileRevision extends GitFileRevision implements IFileRevision
 {
 
 	/** Content identifier for the working copy. */
-	private static final String WORKSPACE = "Workspace";
+	private static final String WORKSPACE = "Workspace"; //$NON-NLS-1$
 
 	private final IResource rsrc;
 
@@ -48,7 +48,7 @@ class WorkspaceFileRevision extends GitFileRevision implements IFileRevision
 
 	public String getAuthor()
 	{
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	public long getTimestamp()
@@ -58,7 +58,7 @@ class WorkspaceFileRevision extends GitFileRevision implements IFileRevision
 
 	public String getComment()
 	{
-		return "";
+		return ""; //$NON-NLS-1$
 	}
 
 	public String getContentIdentifier()

@@ -18,6 +18,13 @@ import com.aptana.git.core.model.GitRepository;
 
 public class RevertAction extends StagingAction
 {
+	
+	@Override
+	public String getText()
+	{
+		return Messages.RevertAction_Label;
+	}
+	
 	@Override
 	protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
 	{

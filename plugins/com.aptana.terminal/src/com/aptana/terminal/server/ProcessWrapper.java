@@ -6,6 +6,8 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +18,39 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Utils;
 
 public class ProcessWrapper
 {
+	public class Message
+	{
+		public final Date timestamp;
+		public final String name;
+		public final String content;
+		
+		/**
+		 * Message
+		 * 
+		 * @param name
+		 * @param content
+		 */
+		public Message(String name, String content)
+		{
+			this.timestamp = new Date();
+			this.name = (name != null) ? name : ""; //$NON-NLS-1$
+			this.content = (content != null) ? content : ""; //$NON-NLS-1$
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString()
+		{
+			return this.timestamp + ": " + this.name + ": " + Utils.encodeString(this.content); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+	
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
@@ -32,6 +64,8 @@ public class ProcessWrapper
 	private ProcessWriter _stdin;
 	private StringBuffer _output;
 	private String _startingDirectory;
+	private boolean _trackMessages = false;
+	private List<Message> _messages;
 	
 	/**
 	 * ProcessWrapper
@@ -54,6 +88,17 @@ public class ProcessWrapper
 	}
 	
 	/**
+	 * clearMessages
+	 */
+	public void clearMessages()
+	{
+		if (this._messages != null)
+		{
+			this._messages.clear();
+		}
+	}
+	
+	/**
 	 * getCommandLineArguments
 	 * 
 	 * @return
@@ -66,6 +111,35 @@ public class ProcessWrapper
 		if (OS.equals(Platform.OS_WIN32))
 		{
 			result = new String[] { "/K", "cd" }; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getMessages
+	 * 
+	 * @return
+	 */
+	public Message[] getMessages()
+	{
+		Message[] result;
+		
+		if (this._messages != null)
+		{
+			result = this._messages.toArray(new Message[this._messages.size()]);
+			
+			Arrays.sort(result, new Comparator<Message>()
+			{
+				public int compare(Message o1, Message o2)
+				{
+					return o1.timestamp.compareTo(o2.timestamp);
+				}
+			});
+		}
+		else
+		{
+			result = new Message[0];
 		}
 		
 		return result;
@@ -93,7 +167,7 @@ public class ProcessWrapper
 			if (OS.equals(Platform.OS_MACOSX)) {
 				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
 			} else {
-				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$
+				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			try
 			{
@@ -160,11 +234,32 @@ public class ProcessWrapper
 				result = this._output.toString();
 				this._output.setLength(0);
 			}
+			
+			if (this._trackMessages)
+			{
+				this.logMessage("<", result); //$NON-NLS-1$
+			}
 		}
 
 		return result;
 	}
 
+	/**
+	 * logMessage
+	 * 
+	 * @param name
+	 * @param content
+	 */
+	protected void logMessage(String name, String content)
+	{
+		if (this._messages == null)
+		{
+			this._messages = new ArrayList<Message>();
+		}
+		
+		this._messages.add(new Message(name, content));
+	}
+	
 	/**
 	 * sendText
 	 * 
@@ -185,6 +280,11 @@ public class ProcessWrapper
 		if (this._stdin != null)
 		{
 			this._stdin.sendText(text);
+			
+			if (this._trackMessages)
+			{
+				this.logMessage(">", text); //$NON-NLS-1$
+			}
 		}
 	}
 	
@@ -271,6 +371,17 @@ public class ProcessWrapper
 	 */
 	public void stop()
 	{
+		if (this._messages != null)
+		{
+			for (Message message : this.getMessages())
+			{
+				if (message.content != null && message.content.length() > 0)
+				{
+					System.out.println(message.toString());
+				}
+			}
+		}
+		
 		if (this._process != null)
 		{
 			this._process.destroy();
@@ -285,5 +396,15 @@ public class ProcessWrapper
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	/**
+	 * trackMessages
+	 * 
+	 * @param value
+	 */
+	public void trackMessages(boolean value)
+	{
+		this._trackMessages = value;
 	}
 }

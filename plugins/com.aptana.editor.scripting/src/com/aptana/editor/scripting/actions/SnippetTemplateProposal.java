@@ -10,11 +10,19 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
+import org.eclipse.jface.text.link.LinkedPosition;
+import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6 {
@@ -32,21 +40,58 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	}
 
 	@Override
-	public void apply(ITextViewer viewer, char trigger, int stateMask, final int offset) {
+	public void apply(final ITextViewer viewer, char trigger, int stateMask, final int offset) {
 		final IDocument document = viewer.getDocument();
+		final StyledText textWidget = viewer.getTextWidget();
+
 		IDocumentListener documentListener = new IDocumentListener() {
 			public void documentChanged(DocumentEvent event) {
 				Display.getCurrent().asyncExec(new Runnable() {
 					public void run() {
 						if (LinkedModeModel.hasInstalledModel(document)) {
 							expandSnippet.setDeactivated(true);
-							LinkedModeModel linkedModeModel = LinkedModeModel.getModel(document, offset);
+							final LinkedModeModel linkedModeModel = LinkedModeModel.getModel(document, offset);
+							final VerifyKeyListener keyListener = new VerifyKeyListener() {
+								public void verifyKey(VerifyEvent event) {
+									Point selection= viewer.getSelectedRange();
+									int offset= selection.x;
+									int length= selection.y;
+									LinkedPosition findPosition = linkedModeModel.findPosition(new LinkedPosition(document, offset, length, LinkedPositionGroup.NO_STOP));
+									if (findPosition == null) {
+										linkedModeModel.exit(ILinkedModeListener.EXIT_ALL);
+									}
+								}
+							};
+							
+							final MouseListener mouseListener = new MouseListener() {
+								
+								public void mouseUp(MouseEvent e) {
+								}
+								
+								public void mouseDown(MouseEvent e) {
+									Point selection= viewer.getSelectedRange();
+									int offset= selection.x;
+									int length= selection.y;
+									LinkedPosition findPosition = linkedModeModel.findPosition(new LinkedPosition(document, offset, length, LinkedPositionGroup.NO_STOP));
+									if (findPosition == null) {
+										linkedModeModel.exit(ILinkedModeListener.EXIT_ALL);
+									}
+								}
+								
+								public void mouseDoubleClick(MouseEvent e) {
+									
+								}
+							};
+							textWidget.addVerifyKeyListener(keyListener);
+							textWidget.addMouseListener(mouseListener);
 							linkedModeModel.addLinkingListener(new ILinkedModeListener() {								
 								public void suspend(LinkedModeModel model) {
 								}
 								public void resume(LinkedModeModel model, int flags) {
 								}
 								public void left(LinkedModeModel model, int flags) {
+									textWidget.removeVerifyKeyListener(keyListener);
+									textWidget.removeMouseListener(mouseListener);
 									expandSnippet.setDeactivated(false);
 								}
 							});

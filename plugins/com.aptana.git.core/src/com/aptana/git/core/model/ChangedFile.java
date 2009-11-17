@@ -55,17 +55,17 @@ public class ChangedFile
 	public String indexInfo()
 	{
 		Assert.isTrue(status == Status.NEW || commitBlobSHA != null,
-				"File is not new, but doesn't have an index entry!");
+				"File is not new, but doesn't have an index entry!"); //$NON-NLS-1$
 		if (commitBlobSHA == null)
-			return "0 0000000000000000000000000000000000000000\t" + path + "\0";
-		else
-			return commitBlobMode + " " + commitBlobSHA + "\t" + path + "\0";
+			return "0 0000000000000000000000000000000000000000\t" + path + "\0"; //$NON-NLS-1$ //$NON-NLS-2$
+		
+		return commitBlobMode + " " + commitBlobSHA + "\t" + path + "\0"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@Override
 	public String toString()
 	{
-		return getStatus() + " " + getPath();
+		return getStatus() + " " + getPath(); //$NON-NLS-1$
 	}
 
 	public boolean hasUnmergedChanges()

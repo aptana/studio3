@@ -108,13 +108,8 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	private boolean cannotModifyRepository(final IResourceTree tree)
 	{
-		tree
-				.failed(new Status(
-						IStatus.ERROR,
-						GitPlugin.getPluginId(),
-						0,
-						"Folder contains an active Git repository.\nThe folder cannot be moved, renamed or deleted until the team provider is disconnected.",
-						null));
+		tree.failed(new Status(IStatus.ERROR, GitPlugin.getPluginId(), 0,
+				Messages.GitMoveDeleteHook_CannotModifyRepository_ErrorMessage, null));
 		return I_AM_DONE;
 	}
 

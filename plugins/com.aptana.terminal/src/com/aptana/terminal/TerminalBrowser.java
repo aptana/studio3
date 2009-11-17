@@ -20,6 +20,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 import com.aptana.terminal.server.HttpServer;
 
+@SuppressWarnings("restriction")
 public class TerminalBrowser
 {
 	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme"; //$NON-NLS-1$

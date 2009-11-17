@@ -1,8 +1,9 @@
 package com.aptana.radrails.explorer.internal.ui;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+
+import net.contentobjects.jnotify.JNotifyAdapter;
+import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -14,10 +15,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -39,8 +38,7 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.radrails.explorer.ExplorerPlugin;
-import com.aptana.util.directorywatcher.DirectoryChangeListener;
-import com.aptana.util.directorywatcher.DirectoryWatcher;
+import com.aptana.red.filewatcher.FileWatcher;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -61,7 +59,7 @@ public class SingleProjectView extends CommonNavigator
 
 	private ViewerFilter activeProjectFilter;
 
-	private DirectoryWatcher watcher;
+	private Integer watcher;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -249,103 +247,68 @@ public class SingleProjectView extends CommonNavigator
 
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
-		if (watcher != null)
+		try
 		{
-			watcher.stop();
-		}
-		watcher = new DirectoryWatcher(newProject.getLocation().toFile());
-		watcher.addListener(new DirectoryChangeListener()
-		{
-
-			private boolean shouldRefresh = false;
-			private Map<File, Long> files = new HashMap<File, Long>();
-
-			@Override
-			public void startPoll()
+			if (watcher != null)
 			{
-				shouldRefresh = false;
+				FileWatcher.removeWatch(watcher);
 			}
-
-			@Override
-			public void stopPoll()
-			{
-				if (shouldRefresh)
-				{
-					WorkspaceJob job = new WorkspaceJob("Refresh")
+			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), FileWatcher.FILE_ANY, true,
+					new JNotifyAdapter()
 					{
+						private WorkspaceJob job;
+
+						private void refresh(File file)
+						{
+							// TODO Only refresh the delta here. If it's a file, just refresh the file. If it's a dir, refresh its tree.
+							if (job != null)
+								job.cancel();
+							
+							job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
+							{
+
+								@Override
+								public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+								{
+									selectedProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+									return Status.OK_STATUS;
+								}
+							};
+							job.schedule();
+						}
 
 						@Override
-						public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
+						public void fileCreated(int wd, String rootPath, String name)
 						{
-							selectedProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-							return Status.OK_STATUS;
+							refresh(new File(rootPath, name));
 						}
-					};
-					job.schedule();
-				}
-			}
 
-			@Override
-			public boolean added(File file)
-			{
-				shouldRefresh = true;
-				files.put(file, file.lastModified());
-				return true;
-			}
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							refresh(new File(rootPath, name));
+						}
 
-			@Override
-			public boolean removed(File file)
-			{
-				shouldRefresh = true;
-				files.remove(file);
-				return true;
-			}
+						@Override
+						public void fileModified(int wd, String rootPath, String name)
+						{
+							refresh(new File(rootPath, name));
+						}
 
-			@Override
-			public boolean changed(File file)
-			{
-				shouldRefresh = true;
-				files.put(file, file.lastModified());
-				return true;
-			}
+						@Override
+						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						{
+							refresh(new File(rootPath, oldName));
+							refresh(new File(rootPath, newName));
+						}
 
-			@Override
-			public boolean isInterested(File file)
-			{
-				return true;
-			}
-
-			@Override
-			public Long getSeenFile(File file)
-			{
-				Long timestamp = files.get(file);
-				IResource resource = null;
-				IPath location = new Path(file.getAbsolutePath());
-				if (file.isDirectory())
-				{
-					resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(location);
-				}
-				else
-				{
-					resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-				}
-				Long resourceTimestamp = null;
-				if (resource != null && resource.exists())
-					resourceTimestamp = resource.getLocalTimeStamp();
-				if (resourceTimestamp == null && timestamp == null)
-				{
-					return null;
-				}
-				if (resourceTimestamp != null && (timestamp == null || resourceTimestamp > timestamp))
-				{
-					files.put(file, resourceTimestamp);
-					return resourceTimestamp;
-				}
-				files.put(file, timestamp);
-				return timestamp;
-			}
-		});
-		watcher.start();
+					});
+		}
+		catch (JNotifyException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected void refreshViewer()

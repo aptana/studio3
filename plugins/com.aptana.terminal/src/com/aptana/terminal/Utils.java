@@ -2,12 +2,6 @@ package com.aptana.terminal;
 
 import java.text.MessageFormat;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -18,20 +12,9 @@ import com.aptana.terminal.editor.TerminalEditorInput;
 
 public class Utils
 {
-	private static final String SAMPLE_TEXT;
-
-	static
-	{
-		char[] chars = new char[200];
-		
-		for (int i = 0; i < chars.length; i++)
-		{
-			chars[i] = 'M';
-		}
-		
-		SAMPLE_TEXT = new String(chars);
-	}
-	
+	/**
+	 * Utils
+	 */
 	private Utils()
 	{
 	}
@@ -87,7 +70,9 @@ public class Utils
 		{
 			if (0 <= c && c < 32 || 128 <= c)
 			{
-				buffer.append("\\x").append(Integer.toString(c, 16)); //$NON-NLS-1$
+				String hex = String.format("%1$02X", (int) c); //$NON-NLS-1$
+				
+				buffer.append("\\x").append(hex); //$NON-NLS-1$
 			}
 			else
 			{
