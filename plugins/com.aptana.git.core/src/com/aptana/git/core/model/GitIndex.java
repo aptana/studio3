@@ -387,7 +387,7 @@ public class GitIndex
 
 	public List<ChangedFile> changedFiles()
 	{
-		return Collections.unmodifiableList(files);
+		return new ArrayList<ChangedFile>(files);
 	}
 
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
