@@ -12,6 +12,8 @@
 			var xtermHandler;
 			var debugHandler;
 			var characterWidth = null, characterHeight = null;
+			var RESIZE_INTERVAL = 250;
+			var resizeID = null;
             
 			/**
 			 * init
@@ -39,7 +41,7 @@
                 terminal = new Term(terminalID, 80,20, config);
 				
 				// resize to fit
-				autoSize();
+				resizeHelper();
 				
 				// HACK due to architecture flaw, but for debugging purposes only!
 				xtermHandler._term = terminal;
@@ -185,6 +187,19 @@
 			 */
 			function autoSize()
 			{
+				if (resizeID !== null)
+				{
+					window.clearTimeout(resizeID);
+				}
+				
+				resizeID = window.setTimeout(resizeHelper, RESIZE_INTERVAL);
+			}
+				
+			function resizeHelper()
+			{
+				// clear timeout id
+				resizeID = null;
+				
 				if (characterWidth === null || characterHeight === null)
 				{
 					var div = document.getElementById(terminalID);
