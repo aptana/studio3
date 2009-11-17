@@ -6,7 +6,8 @@
       <editor
             class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
             default="true"
-            extensions="rhtml,erb"
+            extensions="rhtml"
+            icon="icons/erb.png"
             id="com.aptana.radrails.editor.erb.html"
             name="%editor.rhtml.name">
          <contentTypeBinding
@@ -15,7 +16,8 @@
       </editor>
       <editor
             class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
-            extensions="rxml,erb"
+            extensions="rxml"
+            icon="icons/erb.png"
             id="com.aptana.radrails.editor.erb.xml"
             name="%editor.rxml.name">
          <contentTypeBinding
@@ -27,14 +29,16 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="com.aptana.radrails.contenttype.html"
-            file-extensions="rhtml,html.erb"
+            describer="com.aptana.radrails.editor.erb.html.RHTMLContentDescriber"
+            file-extensions="rhtml,erb"
             id="com.aptana.radrails.contenttype.html.erb"
             name="%content-type.rhtml.name"
             priority="normal">
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.xml"
-            file-extensions="rxml,xml.erb"
+            describer="com.aptana.radrails.editor.erb.xml.RXMLContentDescriber"
+            file-extensions="rxml,erb"
             id="com.aptana.radrails.contenttype.xml.erb"
             name="%content-type.rxml.name"
             priority="normal">
