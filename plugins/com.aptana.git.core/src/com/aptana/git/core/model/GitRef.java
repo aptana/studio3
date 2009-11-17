@@ -51,7 +51,10 @@ public class GitRef
 	 */
 	public String shortName()
 	{
-		switch (type())
+		TYPE type = type();
+		if (type == null)
+			return ref;
+		switch (type)
 		{
 			case REMOTE:
 				return ref.substring(REFS_REMOTES.length());
