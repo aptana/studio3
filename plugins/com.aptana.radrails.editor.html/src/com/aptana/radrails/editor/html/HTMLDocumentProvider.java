@@ -37,7 +37,7 @@ package com.aptana.radrails.editor.html;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import com.aptana.radrails.editor.common.CompositePartitionScanner;
 import com.aptana.radrails.editor.common.DocumentContentTypeManager;
@@ -46,10 +46,13 @@ import com.aptana.radrails.editor.common.IExtendedPartitioner;
 import com.aptana.radrails.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.radrails.editor.common.NullSubPartitionScanner;
 
-public class HTMLDocumentProvider extends FileDocumentProvider {
+public class HTMLDocumentProvider extends TextFileDocumentProvider {
 
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
+    @Override
+	public void connect(Object element) throws CoreException {
+	    super.connect(element);
+
+		IDocument document = getDocument(element);
 		if (document != null) {
 			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
 					HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
@@ -63,6 +66,5 @@ public class HTMLDocumentProvider extends FileDocumentProvider {
 			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IHTMLConstants.CONTENT_TYPE_HTML);
 			DocumentContentTypeManager.getInstance().registerConfiguration(document, HTMLSourceConfiguration.getDefault());
 		}
-		return document;
 	}
 }

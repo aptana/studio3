@@ -38,14 +38,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import com.aptana.radrails.editor.common.DocumentContentTypeManager;
 
-public class RubyDocumentProvider extends FileDocumentProvider {
+public class RubyDocumentProvider extends TextFileDocumentProvider {
 
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
+    @Override
+	public void connect(Object element) throws CoreException {
+	    super.connect(element);
+
+		IDocument document = getDocument(element);
 		if (document != null) {
 			IDocumentPartitioner partitioner = new FastPartitioner(
 					new RubySourcePartitionScanner(),
@@ -55,6 +58,5 @@ public class RubyDocumentProvider extends FileDocumentProvider {
 			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IRubyConstants.CONTENT_TYPE_RUBY);
 			DocumentContentTypeManager.getInstance().registerConfiguration(document, RubySourceConfiguration.getDefault());
 		}
-		return document;
 	}
 }

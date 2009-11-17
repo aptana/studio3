@@ -38,13 +38,13 @@ package com.aptana.radrails.editor.common;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 /**
  * @author Max Stepanov
  *
  */
-public class CompositeDocumentProvider extends FileDocumentProvider {
+public class CompositeDocumentProvider extends TextFileDocumentProvider {
 
 	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
@@ -69,12 +69,11 @@ public class CompositeDocumentProvider extends FileDocumentProvider {
 		this.partitionerSwitchStrategy = partitionerSwitchStrategy;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.editors.text.StorageDocumentProvider#createDocument(java.lang.Object)
-	 */
 	@Override
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
+	public void connect(Object element) throws CoreException {
+	    super.connect(element);
+
+		IDocument document = getDocument(element);
 		if (document != null) {			
 			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
 					defaultPartitioningConfiguration.createSubPartitionScanner(),
@@ -93,7 +92,5 @@ public class CompositeDocumentProvider extends FileDocumentProvider {
 			DocumentContentTypeManager.getInstance().registerConfigurations(document,
 					new IPartitioningConfiguration[] { defaultPartitioningConfiguration, primaryPartitioningConfiguration });
 		}
-		return document;
 	}
-
 }

@@ -38,14 +38,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.FileDocumentProvider;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import com.aptana.radrails.editor.common.DocumentContentTypeManager;
 
-public class XMLDocumentProvider extends FileDocumentProvider {
+public class XMLDocumentProvider extends TextFileDocumentProvider {
 
-	protected IDocument createDocument(Object element) throws CoreException {
-		IDocument document = super.createDocument(element);
+    @Override
+	public void connect(Object element) throws CoreException {
+	    super.connect(element);
+
+		IDocument document = getDocument(element);
 		if (document != null) {
 			IDocumentPartitioner partitioner = new FastPartitioner(
 					new XMLPartitionScanner(),
@@ -55,6 +58,5 @@ public class XMLDocumentProvider extends FileDocumentProvider {
 			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IXMLConstants.CONTENT_TYPE_XML);
 			DocumentContentTypeManager.getInstance().registerConfiguration(document, XMLSourceConfiguration.getDefault());
 		}
-		return document;
 	}
 }
