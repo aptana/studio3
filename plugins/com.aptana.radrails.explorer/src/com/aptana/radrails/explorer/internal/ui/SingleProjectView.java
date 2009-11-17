@@ -1,8 +1,5 @@
 package com.aptana.radrails.explorer.internal.ui;
 
-import java.io.File;
-
-import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
@@ -12,13 +9,9 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -254,60 +247,11 @@ public class SingleProjectView extends CommonNavigator
 				FileWatcher.removeWatch(watcher);
 			}
 			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), FileWatcher.FILE_ANY, true,
-					new JNotifyAdapter()
-					{
-						private WorkspaceJob job;
-
-						private void refresh(File file)
-						{
-							// TODO Only refresh the delta here. If it's a file, just refresh the file. If it's a dir, refresh its tree.
-							if (job != null)
-								job.cancel();
-							
-							job = new WorkspaceJob(Messages.SingleProjectView_RefreshJob_title)
-							{
-
-								@Override
-								public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException
-								{
-									selectedProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-									return Status.OK_STATUS;
-								}
-							};
-							job.schedule();
-						}
-
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileModified(int wd, String rootPath, String name)
-						{
-							refresh(new File(rootPath, name));
-						}
-
-						@Override
-						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
-						{
-							refresh(new File(rootPath, oldName));
-							refresh(new File(rootPath, newName));
-						}
-
-					});
+					new FileDeltaRefreshAdapter());
 		}
 		catch (JNotifyException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ExplorerPlugin.logError(e.getMessage(), e);
 		}
 	}
 
