@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.CompatVersion;
@@ -59,9 +60,7 @@ import org.jrubyparser.parser.ParserResult;
 import org.jrubyparser.parser.ParserSupport;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.radrails.editor.common.SourceConfigurationPartitionScanner;
-
-public class RubySourcePartitionScanner extends SourceConfigurationPartitionScanner {
+public class RubySourcePartitionScanner implements IPartitionTokenScanner {
 
     private static final String BEGIN = "=begin"; //$NON-NLS-1$
 
@@ -116,7 +115,6 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
     private String fOpeningString;
 
     public RubySourcePartitionScanner() {
-        super(RubySourceConfiguration.getDefault());
         lexer = new Lexer();
         parserSupport = new ParserSupport();
         ParserConfiguration config = new ParserConfiguration(0,
@@ -128,7 +126,6 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         lexer.setWarnings(new NullWarnings());
     }
 
-    @Override
     public void setPartialRange(IDocument document, int offset, int length, String contentType,
             int partitionOffset) {
         reset();
@@ -157,17 +154,14 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         origLength = length;
     }
 
-    @Override
     public int getTokenLength() {
         return fLength;
     }
 
-    @Override
     public int getTokenOffset() {
         return fOffset;
     }
 
-    @Override
     public IToken nextToken() {
         if (!fQueue.isEmpty()) {
             return popTokenOffQueue();
@@ -281,12 +275,14 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         }
         if (!isEOF) {
             fLength = getOffset() - fOffset;
+            // HACK End of heredocs are returning a zero length token for end of string that hoses us
+            if (fLength == 0 && returnValue.getData().equals(RubySourceConfiguration.STRING))
+            	return nextToken();
             Assert.isTrue(fLength >= 0);
         }
         return returnValue;
     }
 
-    @Override
     public void setRange(IDocument document, int offset, int length) {
         setPartialRange(document, offset, length, RubySourceConfiguration.DEFAULT, 0);
     }
