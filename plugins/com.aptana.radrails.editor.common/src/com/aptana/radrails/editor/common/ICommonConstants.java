@@ -41,6 +41,6 @@ package com.aptana.radrails.editor.common;
  */
 public interface ICommonConstants {
 
-	public String CONTENT_TYPE_UKNOWN = "com.aptana.radrails.contenttype.unknown";
+	public String CONTENT_TYPE_UKNOWN = "com.aptana.radrails.contenttype.unknown"; //$NON-NLS-1$
 
 }

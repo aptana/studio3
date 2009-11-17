@@ -48,8 +48,8 @@ import org.eclipse.jface.text.rules.Token;
  */
 public final class CompositePartitionScanner extends RuleBasedPartitionScanner {
 
-	public final static String START_SWITCH_TAG = "__common_start_switch_tag";
-	public final static String END_SWITCH_TAG = "__common_end_switch_tag";
+	public final static String START_SWITCH_TAG = "__common_start_switch_tag"; //$NON-NLS-1$
+	public final static String END_SWITCH_TAG = "__common_end_switch_tag"; //$NON-NLS-1$
 
 	public final static String[] SWITCHING_CONTENT_TYPES = new String[] {
 			START_SWITCH_TAG,
