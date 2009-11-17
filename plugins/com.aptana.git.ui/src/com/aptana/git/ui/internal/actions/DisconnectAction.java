@@ -30,6 +30,6 @@ public class DisconnectAction extends AbstractOperationAction
 
 	protected void postOperation()
 	{
-		GitLightweightDecorator.refresh();
+		// do nothing
 	}
 }
