@@ -1,5 +1,6 @@
 package com.aptana.radrails.explorer.internal.ui;
 
+import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
@@ -17,9 +18,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -268,7 +267,9 @@ public class SingleProjectView extends CommonNavigator
 			{
 				FileWatcher.removeWatch(watcher);
 			}
-			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), FileWatcher.FILE_ANY, true,
+			if (newProject == null || !newProject.exists() || newProject.getLocation() == null)
+				return;
+			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
 					new FileDeltaRefreshAdapter());
 		}
 		catch (JNotifyException e)

@@ -11,7 +11,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.contentobjects.jnotify.IJNotify;
-import net.contentobjects.jnotify.JNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
@@ -180,19 +179,19 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		TreeMap<String, String> renamed;
 
 		JNEvents(int mask) {
-			if ((mask & (JNotify.FILE_CREATED | JNotify.FILE_RENAMED)) != 0)
+			if ((mask & (FILE_CREATED | FILE_RENAMED)) != 0)
 			{
 				created = new TreeMap<JNFile, TreeSet<String>>();
 			}
-			if ((mask & JNotify.FILE_MODIFIED) != 0)
+			if ((mask & FILE_MODIFIED) != 0)
 			{
 				modified = new TreeSet<String>();
 			}
-			if ((mask & (JNotify.FILE_DELETED | JNotify.FILE_RENAMED)) != 0)
+			if ((mask & (FILE_DELETED | FILE_RENAMED)) != 0)
 			{
 				deleted = new TreeMap<JNFile, TreeSet<String>>();
 			}
-			if ((mask & JNotify.FILE_RENAMED) != 0)
+			if ((mask & FILE_RENAMED) != 0)
 			{
 				renamed = new TreeMap<String, String>();
 			}
@@ -591,7 +590,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 			}
 
 			// send events
-			if ((watchData._mask & JNotify.FILE_CREATED) != 0)
+			if ((watchData._mask & FILE_CREATED) != 0)
 			{
 				for (TreeSet<String> cpaths : e.created.values())
 				{
@@ -601,7 +600,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					}
 				}
 			}
-			if ((watchData._mask & JNotify.FILE_DELETED) != 0)
+			if ((watchData._mask & FILE_DELETED) != 0)
 			{
 				for (TreeSet<String> cpaths : e.deleted.values())
 				{
@@ -611,14 +610,14 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					}
 				}
 			}
-			if ((watchData._mask & JNotify.FILE_MODIFIED) != 0)
+			if ((watchData._mask & FILE_MODIFIED) != 0)
 			{
 				for (String path : e.modified)
 				{
 					watchData._notifyListener.fileModified(wd, watchData.path, path.substring(watchData.fullpath.length()));
 				}
 			}
-			if ((watchData._mask & JNotify.FILE_RENAMED) != 0)
+			if ((watchData._mask & FILE_RENAMED) != 0)
 			{
 				for (Map.Entry<String, String> entry : e.renamed.entrySet())
 				{

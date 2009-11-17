@@ -49,7 +49,7 @@ public class PollingNotifier implements IJNotify
 			public boolean added(File file)
 			{
 				files.put(file, file.lastModified());
-				if ((mask & FileWatcher.FILE_CREATED) == 0)
+				if ((mask & IJNotify.FILE_CREATED) == 0)
 					return false;
 				listener.fileCreated(0, file.getParent(), file.getName());
 				return true;
@@ -59,7 +59,7 @@ public class PollingNotifier implements IJNotify
 			public boolean removed(File file)
 			{
 				files.remove(file);
-				if ((mask & FileWatcher.FILE_DELETED) == 0)
+				if ((mask & IJNotify.FILE_DELETED) == 0)
 					return false;
 				listener.fileDeleted(0, file.getParent(), file.getName());
 				return true;
@@ -69,7 +69,7 @@ public class PollingNotifier implements IJNotify
 			public boolean changed(File file)
 			{
 				files.put(file, file.lastModified());
-				if ((mask & FileWatcher.FILE_MODIFIED) == 0)
+				if ((mask & IJNotify.FILE_MODIFIED) == 0)
 					return false;
 				listener.fileModified(0, file.getParent(), file.getName());
 				return true;
