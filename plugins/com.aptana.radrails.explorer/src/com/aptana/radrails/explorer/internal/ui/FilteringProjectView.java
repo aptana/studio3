@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -184,8 +185,8 @@ public class FilteringProjectView extends GitProjectView
 
 				if (t == null)
 					return;
-				IResource data = (IResource) t.getData();
-				if (data.getType() == IResource.FILE)
+				IResource data = getResource(t);
+				if (data != null && (data.getType() == IResource.FILE))
 				{
 					hoveredItem = t;
 					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
@@ -643,10 +644,9 @@ public class FilteringProjectView extends GitProjectView
 	private String getResourceNameToFilterBy()
 	{
 		String text = hoveredItem.getText();
-		Object data = hoveredItem.getData();
-		if (data instanceof IResource)
+		IResource resource = getResource(hoveredItem);
+		if (resource != null)
 		{
-			IResource resource = (IResource) data;
 			text = resource.getName(); // if we can, use the raw filename so we don't pick up decorators added
 		}
 		// Try and strip filename down to the resource name!
@@ -680,9 +680,8 @@ public class FilteringProjectView extends GitProjectView
 		}
 		else if (text.endsWith(".yml")) //$NON-NLS-1$
 		{
-			if (data instanceof IResource)
+			if (resource != null)
 			{
-				IResource resource = (IResource) data;
 				IPath path = resource.getProjectRelativePath();
 				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
 				{
@@ -698,9 +697,8 @@ public class FilteringProjectView extends GitProjectView
 		else
 		{
 			// We need to grab the full path, so we can determine the resource name!
-			if (data instanceof IResource)
+			if (resource != null)
 			{
-				IResource resource = (IResource) data;
 				IPath path = resource.getProjectRelativePath();
 				if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
 				{
@@ -750,5 +748,18 @@ public class FilteringProjectView extends GitProjectView
 	{
 		return getFilterString() != null && getFilterString().trim().length() > 0
 				&& !getFilterString().equals(initialText);
+	}
+
+	protected IResource getResource(final TreeItem t)
+	{
+		Object data = t.getData();
+		if (data instanceof IResource)
+			return (IResource) t.getData();
+		if (data instanceof IAdaptable)
+		{
+			IAdaptable adapt = (IAdaptable) data;
+			return (IResource) adapt.getAdapter(IResource.class);
+		}
+		return null;
 	}
 }
