@@ -1,4 +1,0 @@
-jarprocesor.exclude=true
-jarprocessor.exclude.pack=true
-jarprocessor.exclude.children=true
-jarprocessor.exclude.children.pack=true
