@@ -4,7 +4,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
-import org.jruby.parser.Tokens;
+import org.jrubyparser.parser.Tokens;
 
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 

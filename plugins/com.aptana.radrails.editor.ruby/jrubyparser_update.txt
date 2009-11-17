@@ -1,0 +1,4 @@
+Instead of using the entire JRuby distribution we now just use the spin-off JRuby Parser project.
+
+This can be found at http://kenai.com/projects/jruby-parser
+Import it as a project, generate the jar and include it in this project.

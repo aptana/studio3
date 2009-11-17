@@ -45,20 +45,19 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.jruby.CompatVersion;
-import org.jruby.ast.CommentNode;
-import org.jruby.ast.Node;
-import org.jruby.common.NullWarnings;
-import org.jruby.lexer.yacc.ISourcePosition;
-import org.jruby.lexer.yacc.LexerSource;
-import org.jruby.lexer.yacc.RubyYaccLexer;
-import org.jruby.lexer.yacc.SyntaxException;
-import org.jruby.lexer.yacc.RubyYaccLexer.LexState;
-import org.jruby.parser.ParserConfiguration;
-import org.jruby.parser.ParserSupport;
-import org.jruby.parser.RubyParserResult;
-import org.jruby.parser.Tokens;
-import org.jruby.util.KCode;
+import org.jrubyparser.CompatVersion;
+import org.jrubyparser.SourcePosition;
+import org.jrubyparser.Parser.NullWarnings;
+import org.jrubyparser.ast.CommentNode;
+import org.jrubyparser.ast.Node;
+import org.jrubyparser.lexer.Lexer;
+import org.jrubyparser.lexer.LexerSource;
+import org.jrubyparser.lexer.SyntaxException;
+import org.jrubyparser.lexer.Lexer.LexState;
+import org.jrubyparser.parser.ParserConfiguration;
+import org.jrubyparser.parser.ParserResult;
+import org.jrubyparser.parser.ParserSupport;
+import org.jrubyparser.parser.Tokens;
 
 import com.aptana.radrails.editor.common.SourceConfigurationPartitionScanner;
 
@@ -101,9 +100,9 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         }
     }
 
-    private RubyYaccLexer lexer;
+    private Lexer lexer;
     private ParserSupport parserSupport;
-    private RubyParserResult result;
+    private ParserResult result;
     private String fContents;
     private LexerSource lexerSource;
     private int origOffset;
@@ -118,17 +117,15 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
 
     public RubySourcePartitionScanner() {
         super(RubySourceConfiguration.getDefault());
-        lexer = new RubyYaccLexer();
+        lexer = new Lexer();
         parserSupport = new ParserSupport();
-        ParserConfiguration config = new ParserConfiguration(KCode.NIL, 0, false,
+        ParserConfiguration config = new ParserConfiguration(0,
                 CompatVersion.RUBY1_8);
-        config.setExtraPositionInformation(true);
         parserSupport.setConfiguration(config);
-        result = new RubyParserResult();
+        result = new ParserResult();
         parserSupport.setResult(result);
         lexer.setParserSupport(parserSupport);
         lexer.setWarnings(new NullWarnings());
-        lexer.setEncoding(config.getKCode().getEncoding());
     }
 
     @Override
@@ -146,15 +143,14 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
         }
         if (myOffset == -1)
             myOffset = 0;
-        ParserConfiguration config = new ParserConfiguration(KCode.NIL, 0, true, false,
-                CompatVersion.RUBY1_8);
+        ParserConfiguration config = new ParserConfiguration(0, CompatVersion.RUBY1_8);
         try {
             fContents = document.get(myOffset, length);
-            lexerSource = LexerSource.getSource("filename", new StringReader(fContents), null, //$NON-NLS-1$
+            lexerSource = LexerSource.getSource("filename", new StringReader(fContents), //$NON-NLS-1$
                     config);
             lexer.setSource(lexerSource);
         } catch (BadLocationException e) {
-            lexerSource = LexerSource.getSource("filename", new StringReader(""), null, config); //$NON-NLS-1$ //$NON-NLS-2$
+            lexerSource = LexerSource.getSource("filename", new StringReader(""), config); //$NON-NLS-1$ //$NON-NLS-2$
             lexer.setSource(lexerSource);
         }
         origOffset = myOffset;
@@ -653,7 +649,7 @@ public class RubySourcePartitionScanner extends SourceConfigurationPartitionScan
     private static String getSource(String contents, Node node) {
         if (node == null || contents == null)
             return null;
-        ISourcePosition pos = node.getPosition();
+        SourcePosition pos = node.getPosition();
         if (pos == null)
             return null;
         if (pos.getStartOffset() >= contents.length())

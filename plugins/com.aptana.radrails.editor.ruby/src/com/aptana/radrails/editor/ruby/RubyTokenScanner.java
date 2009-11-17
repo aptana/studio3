@@ -8,17 +8,16 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
-import org.jruby.CompatVersion;
-import org.jruby.common.NullWarnings;
-import org.jruby.lexer.yacc.LexerSource;
-import org.jruby.lexer.yacc.RubyYaccLexer;
-import org.jruby.lexer.yacc.SyntaxException;
-import org.jruby.lexer.yacc.RubyYaccLexer.LexState;
-import org.jruby.parser.ParserConfiguration;
-import org.jruby.parser.ParserSupport;
-import org.jruby.parser.RubyParserResult;
-import org.jruby.parser.Tokens;
-import org.jruby.util.KCode;
+import org.jrubyparser.CompatVersion;
+import org.jrubyparser.Parser.NullWarnings;
+import org.jrubyparser.lexer.Lexer;
+import org.jrubyparser.lexer.LexerSource;
+import org.jrubyparser.lexer.SyntaxException;
+import org.jrubyparser.lexer.Lexer.LexState;
+import org.jrubyparser.parser.ParserConfiguration;
+import org.jrubyparser.parser.ParserResult;
+import org.jrubyparser.parser.ParserSupport;
+import org.jrubyparser.parser.Tokens;
 
 /**
  * A token scanner which returns integers for ruby tokens. These can later be
@@ -37,7 +36,7 @@ public class RubyTokenScanner implements ITokenScanner {
     static final int MIN_KEYWORD = 257;
     static final int MAX_KEYWORD = 303;
 
-    private RubyYaccLexer lexer;
+    private Lexer lexer;
     private LexerSource lexerSource;
     private ParserSupport parserSupport;
 
@@ -46,22 +45,20 @@ public class RubyTokenScanner implements ITokenScanner {
 
     private boolean isInSymbol;
     private boolean inAlias;
-    private RubyParserResult result;
+    private ParserResult result;
     private int origOffset;
     private int origLength;
     private String fContents;
 
     public RubyTokenScanner() {
-        lexer = new RubyYaccLexer();
+        lexer = new Lexer();
         parserSupport = new ParserSupport();
-        ParserConfiguration config = new ParserConfiguration(KCode.NIL, 0, true, false,
-                CompatVersion.RUBY1_8);
+        ParserConfiguration config = new ParserConfiguration(0, CompatVersion.RUBY1_8);
         parserSupport.setConfiguration(config);
-        result = new RubyParserResult();
+        result = new ParserResult();
         parserSupport.setResult(result);
         lexer.setParserSupport(parserSupport);
         lexer.setWarnings(new NullWarnings());
-        lexer.setEncoding(config.getKCode().getEncoding());
     }
 
     public int getTokenLength() {
@@ -235,15 +232,14 @@ public class RubyTokenScanner implements ITokenScanner {
         lexer.setState(LexState.EXPR_BEG);
         parserSupport.initTopLocalVariables();
         isInSymbol = false;
-        ParserConfiguration config = new ParserConfiguration(KCode.NIL, 0, true, false,
-                CompatVersion.RUBY1_8);
+        ParserConfiguration config = new ParserConfiguration(0, CompatVersion.RUBY1_8);
         try {
             fContents = document.get(offset, length);
-            lexerSource = LexerSource.getSource("filename", new StringReader(fContents), null, //$NON-NLS-1$
+            lexerSource = LexerSource.getSource("filename", new StringReader(fContents), //$NON-NLS-1$
                     config);
             lexer.setSource(lexerSource);
         } catch (BadLocationException e) {
-            lexerSource = LexerSource.getSource("filename", new StringReader(""), null, config); //$NON-NLS-1$ //$NON-NLS-2$
+            lexerSource = LexerSource.getSource("filename", new StringReader(""), config); //$NON-NLS-1$ //$NON-NLS-2$
             lexer.setSource(lexerSource);
         }
         origOffset = offset;
