@@ -178,7 +178,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getMultiLineCommentScanner() {
         if (multiLineCommentScanner == null) {
             multiLineCommentScanner = new RuleBasedScanner();
-            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.ruby")); //$NON-NLS-1$
+            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
         }
         return multiLineCommentScanner;
     }
@@ -187,7 +187,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
         if (singleLineCommentScanner == null) {
             singleLineCommentScanner = new RuleBasedScanner();
             singleLineCommentScanner.setDefaultReturnToken(ThemeUtil
-                    .getToken("comment.line.double-slash.ruby")); //$NON-NLS-1$
+                    .getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
         }
         return singleLineCommentScanner;
     }
@@ -202,7 +202,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getCommandScanner() {
         if (commandScanner == null) {
             commandScanner = new RuleBasedScanner();
-            commandScanner.setDefaultReturnToken(ThemeUtil.getToken("string.interpolated.rb")); //$NON-NLS-1$
+            commandScanner.setDefaultReturnToken(ThemeUtil.getToken("string.interpolated.ruby")); //$NON-NLS-1$
         }
         return commandScanner;
     }
@@ -210,7 +210,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     private ITokenScanner getStringScanner() {
         if (stringScanner == null) {
             stringScanner = new RuleBasedScanner();
-            stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.rb")); //$NON-NLS-1$
+            stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.ruby")); //$NON-NLS-1$
         }
         return stringScanner;
     }

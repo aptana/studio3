@@ -316,7 +316,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner {
         }
         IDocument document = new Document(fakeContents.toString());
         List<QueuedToken> queueCopy = new ArrayList<QueuedToken>(fQueue);
-        setPartialRange(document, start, fakeContents.length() - start, null, start);
+        setPartialRange(document, start, fakeContents.length() - start, RubySourceConfiguration.DEFAULT, start);
         fQueue = new ArrayList<QueuedToken>(queueCopy);
         lexer.advance();
     }
@@ -478,7 +478,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner {
         }
         IDocument document = new Document(fakeContents.toString());
         List<QueuedToken> queueCopy = new ArrayList<QueuedToken>(fQueue);
-        setPartialRange(document, start, fakeContents.length() - start, null, start);
+        setPartialRange(document, start, fakeContents.length() - start, RubySourceConfiguration.DEFAULT, start);
         fQueue = new ArrayList<QueuedToken>(queueCopy);
         lexer.advance();
     }

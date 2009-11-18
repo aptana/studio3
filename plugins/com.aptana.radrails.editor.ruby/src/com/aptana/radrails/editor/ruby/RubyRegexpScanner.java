@@ -13,9 +13,9 @@ public class RubyRegexpScanner extends BufferedRuleBasedScanner {
 
     public RubyRegexpScanner() {
         List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule("\\\\.", ThemeUtil.getToken("constant.character.escape.rb"))); //$NON-NLS-1$ //$NON-NLS-2$
+        rules.add(new RegexpRule("\\\\.", ThemeUtil.getToken("constant.character.escape.ruby"))); //$NON-NLS-1$ //$NON-NLS-2$
         setRules(rules.toArray(new IRule[rules.size()]));
 
-        setDefaultReturnToken(ThemeUtil.getToken("string.regexp.rb")); //$NON-NLS-1$
+        setDefaultReturnToken(ThemeUtil.getToken("string.regexp.ruby")); //$NON-NLS-1$
     }
 }

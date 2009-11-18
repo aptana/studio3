@@ -51,7 +51,7 @@ public class RubyDocumentProvider extends TextFileDocumentProvider {
 		IDocument document = getDocument(element);
 		if (document != null) {
 			IDocumentPartitioner partitioner = new FastPartitioner(
-					new RubySourcePartitionScanner(),
+					new MergingPartitionScanner(new RubySourcePartitionScanner()),
 					RubySourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
