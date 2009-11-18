@@ -70,6 +70,36 @@ public class RubyCodeScanner implements ITokenScanner
 		}
 		switch (data.intValue())
 		{
+			case RubyTokenScanner.ASSIGNMENT:
+				return ThemeUtil.getToken("keyword.operator.assignment.ruby"); //$NON-NLS-1$
+			case Tokens.tCMP:		/* <=> */
+			case Tokens.tMATCH:     /* =~ */
+			case Tokens.tNMATCH:    /* !~ */
+			case Tokens.tEQ:            /* == */
+			case Tokens.tEQQ:           /* === */
+			case Tokens.tNEQ:           /* != */
+			case Tokens.tGEQ:           /* >= */
+			case Tokens.tLEQ:
+			case Tokens.tLT:
+			case Tokens.tGT:
+				return ThemeUtil.getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$				
+			case Tokens.tAMPER:
+			case Tokens.tPERCENT:
+			case Tokens.tPOW:
+			case Tokens.tSTAR:
+			case Tokens.tPLUS:
+			case Tokens.tMINUS:
+			case Tokens.tDIVIDE:
+				return ThemeUtil.getToken("keyword.operator.arithmetic.ruby"); //$NON-NLS-1$			
+			case Tokens.tANDOP:
+			case Tokens.tBANG:
+			case Tokens.tOROP:
+			case Tokens.tCARET:
+				return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+			case Tokens.tOP_ASGN:
+				return ThemeUtil.getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
+			case Tokens.tASSOC:
+				return ThemeUtil.getToken("punctuation.separator.key-value"); //$NON-NLS-1$
 			case RubyTokenScanner.CHARACTER:
 				return ThemeUtil.getToken("character.ruby"); //$NON-NLS-1$
 			case Tokens.tFLOAT:

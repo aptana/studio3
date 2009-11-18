@@ -31,6 +31,7 @@ public class RubyTokenScanner implements ITokenScanner {
 
     private static final int COMMA = 44;
     private static final int COLON = 58;
+    static final int ASSIGNMENT = 61;
     private static final int NEWLINE = 10;
     public static final int CHARACTER = 128;
     static final int MIN_KEYWORD = 257;
