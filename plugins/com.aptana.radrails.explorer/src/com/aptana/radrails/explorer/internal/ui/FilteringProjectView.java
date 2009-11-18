@@ -264,7 +264,7 @@ public class FilteringProjectView extends GitProjectView
 		focus.setLayoutData(data2);
 
 		patternFilter = new PathFilter();
-		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		filterText.setText(initialText);
 		filterText.addModifyListener(new ModifyListener()
 		{
