@@ -145,6 +145,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			myOffset = partitionOffset;
 			length += diff;
 			this.fContentType = contentType;
+			// FIXME What if a heredoc with dynamic code inside is broken? contents will start with "}" rather than
+			// expected
 		}
 		if (myOffset == -1)
 			myOffset = 0;
@@ -774,9 +776,14 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				char c = input.charAt(i);
 				switch (c)
 				{
-					case '\\':
 					case '$':
-						// skip next character
+						// skip next character only if inside a string! (because it may be a global ref)
+						if (topEquals("\"")) //$NON-NLS-1$
+						{
+							i++;
+						}
+						break;
+					case '\\':
 						i++;
 						break;
 					case '"':
@@ -795,7 +802,10 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 						}
 						else
 						{
-							push("/"); //$NON-NLS-1$
+							// Only if we're not inside a string
+							if (!topEquals("'") && !topEquals("\"")) { //$NON-NLS-1$ //$NON-NLS-2$
+								push("/"); //$NON-NLS-1$
+							}							
 						}
 						break;
 					case '\'':
@@ -818,7 +828,10 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 						if (topEquals("\"")) { //$NON-NLS-1$
 							c = input.charAt(i + 1);
 							if (c == '{')
+							{
 								push("#{"); //$NON-NLS-1$
+								i++;
+							}
 						}
 						break;
 					case '}':
