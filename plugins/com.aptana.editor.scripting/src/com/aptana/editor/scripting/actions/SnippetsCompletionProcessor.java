@@ -40,7 +40,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
 	@Override
 	protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
-		String contentTypeString = "";
+		String contentTypeString = ""; //$NON-NLS-1$
 		IDocument document = viewer.getDocument();
 		try {
 			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength() );
@@ -113,7 +113,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				StyledString styledString =
 					new StyledString(String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
 				
-				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$
+				styledString.append(new StyledString(String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (i < 9) {
 					char triggerChar = (char)('1'+i);

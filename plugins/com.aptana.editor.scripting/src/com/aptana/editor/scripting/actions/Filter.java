@@ -118,7 +118,7 @@ public class Filter {
 				List<String> commandList = new LinkedList<String>();
 				
 				if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
-					String shell = environment.get("SHELL");
+					String shell = environment.get("SHELL"); //$NON-NLS-1$
 					if (shell == null) {
 						shell = "/bin/bash"; //$NON-NLS-1$
 					}
@@ -153,7 +153,7 @@ public class Filter {
 							while (true) {
 								try {
 									int readCount = is.read(bytes);
-									if (readCount == -1 || new String(bytes, 0, readCount).toLowerCase().startsWith("[eof]")) {
+									if (readCount == -1 || new String(bytes, 0, readCount).toLowerCase().startsWith("[eof]")) { //$NON-NLS-1$
 										os.flush();
 										os.close();
 										break;
@@ -209,7 +209,7 @@ public class Filter {
 		private final String string;
 
 		public StringInputProvider() {
-			this("");
+			this(""); //$NON-NLS-1$
 		}
 		
 		public StringInputProvider(String string) {
@@ -301,7 +301,7 @@ public class Filter {
 					String line = null;
 					try {
 						while ((line = br.readLine()) != null) {
-							stringBuilder.append(line + "\n");
+							stringBuilder.append(line + "\n"); //$NON-NLS-1$
 						}
 					} catch (IOException e) {
 					} finally {

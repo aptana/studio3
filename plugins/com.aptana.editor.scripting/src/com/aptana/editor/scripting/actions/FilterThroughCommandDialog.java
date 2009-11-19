@@ -340,7 +340,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		}
 		
 		consoleNameText.setEnabled(outputToConsoleButton.getSelection());
-		if (lastConsoleName == null || lastConsoleName.trim().equals("")) {
+		if (lastConsoleName == null || lastConsoleName.trim().equals("")) { //$NON-NLS-1$
 			consoleNameText.setText(Filter.DEFAULT_CONSOLE_NAME);
 		} else {
 			consoleNameText.setText(lastConsoleName);
@@ -358,7 +358,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		lastOutputType = outputType;
 		lastConsoleName = consoleName;
 		if (lastConsoleName.equals(Filter.DEFAULT_CONSOLE_NAME)) {
-			lastConsoleName = "";
+			lastConsoleName = ""; //$NON-NLS-1$
 		}
 	}
 

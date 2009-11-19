@@ -11,21 +11,21 @@
          point="org.eclipse.ui.commands">
       <command
       	categoryId="org.eclipse.ui.category.edit"
-            description="Expand the snippets specified by the prefix"
+            description="%command.expand.description"
             id="com.aptana.editor.scripting.command.ExpandSnippet"
-            name="Expand Snippet Command">
+            name="%command.expand.name">
       </command>
        <command
        		categoryId="org.eclipse.ui.category.edit"
-            description="Execute Line Inserting Result"
+            description="%command.execute.description"
             id="com.aptana.editor.scripting.command.ExecuteLineInsertingResult"
-            name="Execute Line Inserting Result">
+            name="%command.execute.name">
       </command>
        <command
        		categoryId="org.eclipse.ui.category.edit"
-            description="Filter Through Command..."
+            description="%command.filter.description"
             id="com.aptana.editor.scripting.command.FilterThroughCommand"
-            name="Filter Through Command...">
+            name="%command.filter.name">
       </command>
    </extension>
    <extension

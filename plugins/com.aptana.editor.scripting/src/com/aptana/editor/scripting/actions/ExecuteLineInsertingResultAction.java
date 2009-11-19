@@ -54,7 +54,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 				int lineAtCaret = styledText.getLineAtOffset(caretOffset);
 				int lineCount = styledText.getLineCount();
 				int startOffsetOfLineAtCaret = -1;
-				String prefix = "";
+				String prefix = ""; //$NON-NLS-1$
 				if (lineAtCaret == (lineCount - 1)) {
 					// We are on the last line
 					startOffsetOfLineAtCaret = styledText.getCharCount();
