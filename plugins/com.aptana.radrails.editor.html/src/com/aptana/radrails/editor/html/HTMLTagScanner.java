@@ -99,7 +99,7 @@ public class HTMLTagScanner extends RuleBasedScanner {
 		}
 		
 		IToken blockDotAnyToken = ThemeUtil.getToken("entity.name.tag.block.any.html");		 //$NON-NLS-1$
-		for (String blockDotAnyTag : STRUCTURE_DOT_ANY) {
+		for (String blockDotAnyTag : BLOCK_DOT_ANY) {
 			wordRule.addWord(blockDotAnyTag, blockDotAnyToken);
 		}
 		
