@@ -4,11 +4,8 @@ import java.util.ResourceBundle;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -35,12 +32,6 @@ public class ShowScopesAction extends TextEditorAction {
 	
 	public static final String COMMAND_ID = "com.aptana.radrails.editor.common.showscopes"; //$NON-NLS-1$
 	
-	protected static class DefaultInformationControlCreator extends AbstractReusableInformationControlCreator {
-		public IInformationControl doCreateInformationControl(Shell shell) {
-			return new DefaultInformationControl(shell, true);
-		}
-	}
-	
 	private final ITextViewer textViewer;
 
 	public ShowScopesAction(ResourceBundle bundle, String prefix,
@@ -58,7 +49,6 @@ public class ShowScopesAction extends TextEditorAction {
 			StyledText textWidget = textViewer.getTextWidget();
 			int caretOffset = textWidget.getCaretOffset();
 			String contentType = getContentTypeAtOffset(textEditor, caretOffset);
-			System.out.println(contentType);
 			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
 			locationAtOffset.y += textWidget.getLineHeight(caretOffset) + 2;
 			locationAtOffset = shell.getDisplay().map(textWidget, null, locationAtOffset);
@@ -79,7 +69,7 @@ public class ShowScopesAction extends TextEditorAction {
 	
 	private void popup(Shell shell, final String description, final Point location) {
 		PopupDialog popupDialog = new PopupDialog(shell, PopupDialog.HOVER_SHELLSTYLE,
-				true, false, false, false, false, null, "Type Escape to dismiss.") {
+				true, false, false, false, false, null, "Type Escape to dismiss.") { //$NON-NLS-1$
 			
 			@Override
 			protected Point getInitialLocation(Point initialSize) {
