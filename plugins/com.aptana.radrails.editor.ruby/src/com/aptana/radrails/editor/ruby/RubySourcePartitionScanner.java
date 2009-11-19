@@ -758,7 +758,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		return new String(contents.substring(pos.getStartOffset(), pos.getEndOffset()));
 	}
 
-	private static class EndBraceFinder
+	public static class EndBraceFinder
 	{
 		private String input;
 		private List<String> stack;
@@ -777,8 +777,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				switch (c)
 				{
 					case '$':
-						// skip next character only if inside a string! (because it may be a global ref)
-						if (topEquals("\"")) //$NON-NLS-1$
+						// don't skip next char if we're in a regexp
+						if (!topEquals("/")) //$NON-NLS-1$
 						{
 							i++;
 						}
