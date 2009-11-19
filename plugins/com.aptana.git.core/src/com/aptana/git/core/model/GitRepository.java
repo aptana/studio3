@@ -29,6 +29,7 @@ import org.eclipse.team.core.TeamException;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
+import com.aptana.util.ProcessUtil;
 
 public class GitRepository
 {

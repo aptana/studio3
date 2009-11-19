@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.git.core.GitPlugin;
+import com.aptana.util.ProcessUtil;
 
 public class GitIndex
 {

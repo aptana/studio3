@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
+import com.aptana.util.ProcessUtil;
 
 public class GitExecutable
 {

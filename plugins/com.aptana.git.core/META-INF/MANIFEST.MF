@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.team.core,
  org.eclipse.core.resources;bundle-version="3.4.0",
  org.eclipse.debug.core;bundle-version="3.4.0",
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ com.aptana.util;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

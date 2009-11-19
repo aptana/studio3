@@ -1,4 +1,4 @@
-package com.aptana.git.core.model;
+package com.aptana.util;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -10,12 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.git.core.GitPlugin;
-
-abstract class ProcessUtil
+/**
+ * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
+ * infrastructure or our terminal!
+ * 
+ * @author cwilliams
+ */
+public abstract class ProcessUtil
 {
 
-	static String outputForCommand(String command, String workingDir, String... args)
+	public static String outputForCommand(String command, String workingDir, String... args)
 	{
 		Map<Integer, String> result = runInBackground(command, workingDir, args);
 		if (result == null || result.isEmpty())
@@ -23,7 +27,7 @@ abstract class ProcessUtil
 		return result.values().iterator().next();
 	}
 
-	static String read(InputStream stream)
+	public static String read(InputStream stream)
 	{
 		StringBuilder builder = new StringBuilder();
 		try
@@ -37,7 +41,7 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			UtilPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -54,12 +58,12 @@ abstract class ProcessUtil
 		return null;
 	}
 
-	static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
+	public static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
 	{
 		return runInBackground(command, workingDir, null, args);
 	}
 
-	static Map<Integer, String> runInBackground(String command, String workingDir, Map<String, String> env,
+	public static Map<Integer, String> runInBackground(String command, String workingDir, Map<String, String> env,
 			String[] args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
@@ -75,7 +79,7 @@ abstract class ProcessUtil
 	 * @param args
 	 * @return
 	 */
-	static Map<Integer, String> runInBackground(String command, String workingDir, String input,
+	public static Map<Integer, String> runInBackground(String command, String workingDir, String input,
 			Map<String, String> env, String[] args)
 	{
 		List<String> commands = new ArrayList<String>();
@@ -109,11 +113,11 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			UtilPlugin.logError(e.getMessage(), e);
 		}
 		catch (InterruptedException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			UtilPlugin.logError(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -129,7 +133,7 @@ abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			GitPlugin.logError(e.getMessage(), e);
+			UtilPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -153,7 +157,7 @@ abstract class ProcessUtil
 	 * @return
 	 * @throws IOException
 	 */
-	static Process run(String command, String workingDir, String... args) throws IOException
+	public static Process run(String command, String workingDir, String... args) throws IOException
 	{
 		List<String> commands = new ArrayList<String>();
 		commands.add(command);

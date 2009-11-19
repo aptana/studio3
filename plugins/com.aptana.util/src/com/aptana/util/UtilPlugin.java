@@ -1,6 +1,8 @@
 package com.aptana.util;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -45,6 +47,11 @@ public class UtilPlugin extends Plugin {
 	 */
 	public static UtilPlugin getDefault() {
 		return plugin;
+	}
+
+	public static void logError(String message, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));	
 	}
 
 }
