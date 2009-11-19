@@ -58,5 +58,8 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
 		return ERBPartitionerSwitchStrategy.getDafault();
 	}
-
+	
+	protected String getStartEndTokenType() {
+		return "punctuation.section.embedded.ruby";
+	}
 }

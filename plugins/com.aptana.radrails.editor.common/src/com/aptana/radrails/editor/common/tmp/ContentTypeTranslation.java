@@ -68,6 +68,11 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby.rails")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "__common_start_switch_tag"),
+				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "__common_end_switch_tag"),
+				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.html"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$
 		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -96,6 +101,12 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("__rb_multiline_comment"), new QualifiedContentType("comment.block.documentation.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("__rb_regular_expression"), new QualifiedContentType("string.regexp.classic.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 
+		
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb", "__common_start_switch_tag"),
+				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb", "__common_end_switch_tag"),
+				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
 	public static ContentTypeTranslation getDefault() {

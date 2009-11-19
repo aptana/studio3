@@ -58,5 +58,9 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
 		return ERBPartitionerSwitchStrategy.getDafault();
 	}
+	
+	protected String getStartEndTokenType() {
+		return "punctuation.section.embedded.ruby";
+	}
 
 }

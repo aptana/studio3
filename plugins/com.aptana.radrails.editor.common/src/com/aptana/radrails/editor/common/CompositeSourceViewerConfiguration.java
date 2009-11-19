@@ -50,6 +50,8 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.radrails.editor.common.theme.ThemeUtil;
+
 /**
  * @author Max Stepanov
  *
@@ -105,19 +107,19 @@ public abstract class CompositeSourceViewerConfiguration extends SourceViewerCon
 	
 	protected abstract IPartitionerSwitchStrategy getPartitionerSwitchStrategy();
 	
+	protected abstract String getStartEndTokenType();
+	
 	private ITokenScanner getStartEndTokenScanner() {
 		if (startEndTokenScanner == null) {
 			RuleBasedScanner ts = new RuleBasedScanner();
-			IToken seqToken = new Token(
-					new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(ICommonColorConstants.START_END_SEQUENCE)));
+			IToken seqToken = ThemeUtil.getToken(getStartEndTokenType());
 			List<IRule> rules = new ArrayList<IRule>();
 			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs()) {
 				rules.add(new SingleTagRule(pair[0], seqToken));
 				rules.add(new SingleTagRule(pair[1], seqToken));
 			}
 			ts.setRules(rules.toArray(new IRule[rules.size()]));
-			ts.setDefaultReturnToken(new Token(
-					new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(ICommonColorConstants.DEFAULT))));
+			ts.setDefaultReturnToken(ThemeUtil.getToken("text"));
 			startEndTokenScanner = ts;
 		}
 		return startEndTokenScanner;
