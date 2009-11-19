@@ -79,7 +79,7 @@ public abstract class CompositeSourceViewerConfiguration extends SourceViewerCon
 	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return TextUtils.combine(new String[][] {
 				CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
-				defaultSourceViewerConfiguration.getContentTypes(),
+				primarySourceViewerConfiguration.getContentTypes(),
 				defaultSourceViewerConfiguration.getContentTypes()
 		});
 	}
