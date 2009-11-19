@@ -15,24 +15,28 @@ import org.eclipse.team.ui.history.IHistoryPageSource;
 import com.aptana.git.ui.internal.history.GitHistoryPageSource;
 
 /**
- * This class is an intelligent "cast" operation for getting
- * an instance of a suitable object from another for a specific
- * purpose.
+ * This class is an intelligent "cast" operation for getting an instance of a suitable object from another for a
+ * specific purpose.
  */
-public class GitAdapterFactory implements IAdapterFactory {
+public class GitAdapterFactory implements IAdapterFactory
+{
 
 	private Object historyPageSource = new GitHistoryPageSource();
 
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
-		if (adapterType.isAssignableFrom(IHistoryPageSource.class)) {
+	@SuppressWarnings("unchecked")
+	public Object getAdapter(Object adaptableObject, Class adapterType)
+	{
+		if (adapterType.isAssignableFrom(IHistoryPageSource.class))
+		{
 			return historyPageSource;
 		}
 		return null;
 	}
 
-	public Class[] getAdapterList() {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public Class[] getAdapterList()
+	{
+		return new Class[] { IHistoryPageSource.class };
 	}
 
 }
