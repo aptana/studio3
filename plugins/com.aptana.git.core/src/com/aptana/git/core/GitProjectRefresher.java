@@ -85,6 +85,9 @@ class GitProjectRefresher implements IGitRepositoryListener
 
 	private void refreshResources(final Collection<? extends IResource> resources, final int depth)
 	{
+		if (resources == null || resources.isEmpty())
+			return;
+		
 		WorkspaceJob job = new WorkspaceJob("Refresh projects") //$NON-NLS-1$
 		{
 			@Override

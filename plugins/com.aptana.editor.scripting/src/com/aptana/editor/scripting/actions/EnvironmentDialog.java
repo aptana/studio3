@@ -25,7 +25,7 @@ public class EnvironmentDialog extends Dialog {
 		super(shell);
 		this.environment = new TreeMap<String, String>();
 		this.environment.putAll(environment);
-		this.environment.putAll(new ProcessBuilder("").environment());
+		this.environment.putAll(new ProcessBuilder("").environment()); //$NON-NLS-1$
 	}
 	
 	@Override
