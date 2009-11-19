@@ -422,7 +422,7 @@ public class BundleManager
 				{
 					if (resource instanceof IFolder)
 					{
-						this.processBundle((IFolder) resource, true);
+						this.processBundle(resource, true);
 					}
 				}
 			}
