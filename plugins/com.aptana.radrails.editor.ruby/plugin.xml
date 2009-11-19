@@ -18,7 +18,8 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="rb"
+            file-extensions="rb,rake,cgi,fcgi,rbx,rjs,gemspec,irbrc"
+            file-names="Rakefile,Capfile"
             id="com.aptana.radrails.contenttype.ruby"
             name="%content-type.rb.name"
             priority="normal">
