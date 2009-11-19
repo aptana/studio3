@@ -38,7 +38,6 @@ package com.aptana.radrails.editor.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -46,7 +45,6 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
@@ -119,7 +117,7 @@ public abstract class CompositeSourceViewerConfiguration extends SourceViewerCon
 				rules.add(new SingleTagRule(pair[1], seqToken));
 			}
 			ts.setRules(rules.toArray(new IRule[rules.size()]));
-			ts.setDefaultReturnToken(ThemeUtil.getToken("text"));
+			ts.setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
 			startEndTokenScanner = ts;
 		}
 		return startEndTokenScanner;
