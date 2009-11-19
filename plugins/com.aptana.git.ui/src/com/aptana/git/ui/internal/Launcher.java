@@ -53,7 +53,6 @@ public abstract class Launcher
 		config.setAttribute(IExternalToolConstants.ATTR_TOOL_ARGUMENTS, toolArgs);
 		config.setAttribute(IExternalToolConstants.ATTR_WORKING_DIRECTORY, workingDir);
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
-		config.setAttribute(IExternalToolConstants.ATTR_PROMPT_FOR_ARGUMENTS, false);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		return config;
