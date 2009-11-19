@@ -46,7 +46,9 @@ public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 	private static ERBPartitionerSwitchStrategy instance;
 	
 	private static final String[][] ERB_PAIRS = new String[][] {
+		{ "<%=", "-%>" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "<%=", "%>" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "<%", "-%>" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "<%", "%>" } //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
