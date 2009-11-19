@@ -21,14 +21,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.internal.keys.KeyAssistMessages;
 
 public class MenuDialog extends PopupDialog
 {
 
+	private static final String TITLE = "title"; //$NON-NLS-1$
+	private static final String SEPARATOR = "separator"; //$NON-NLS-1$
+	private static final String IMAGE = "image"; //$NON-NLS-1$
+
+	@SuppressWarnings("unchecked")
 	private List<Map> menuItems;
 	private Table completionsTable;
 
+	@SuppressWarnings("unchecked")
 	public MenuDialog(Shell parent, Map... menuItems)
 	{
 		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
@@ -75,7 +80,7 @@ public class MenuDialog extends PopupDialog
 	private final void createEmptyDialogArea(final Composite parent)
 	{
 		final Label noMatchesLabel = new Label(parent, SWT.NULL);
-		noMatchesLabel.setText(KeyAssistMessages.NoMatches_Message);
+		noMatchesLabel.setText(Messages.MenuDialog_NoMatchesFound);
 		noMatchesLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		noMatchesLabel.setBackground(parent.getBackground());
 	}
@@ -90,6 +95,7 @@ public class MenuDialog extends PopupDialog
 	 *            The lexicographically sorted map of partial matches for the current state; must not be
 	 *            <code>null</code> or empty.
 	 */
+	@SuppressWarnings("unchecked")
 	private final void createTableDialogArea(final Composite parent, final List<Map> partialMatches)
 	{
 		// Layout the table.
@@ -103,19 +109,19 @@ public class MenuDialog extends PopupDialog
 
 		// Initialize the columns and rows.
 		Map rep = partialMatches.iterator().next();
-		if (rep.containsKey("title"))
+		if (rep.containsKey(TITLE))
 		{
 			// just a list
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
 			for (Map map : partialMatches)
 			{
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
-				if (map.containsKey("separator"))
+				if (map.containsKey(SEPARATOR))
 				{
 					// TODO Insert a separator
 					continue;
 				}
-				item.setText((String) map.get("title"));
+				item.setText((String) map.get(TITLE));
 			}
 		}
 		else
@@ -126,12 +132,12 @@ public class MenuDialog extends PopupDialog
 			for (Map map : partialMatches)
 			{
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
-				if (map.containsKey("separator"))
+				if (map.containsKey(SEPARATOR))
 				{
 					// TODO Insert a separator
 					continue;
 				}
-				String filename = (String) map.get("image");
+				String filename = (String) map.get(IMAGE);
 				Image image = null;
 				if (filename != null && filename.trim().length() > 0)
 				{
@@ -151,7 +157,7 @@ public class MenuDialog extends PopupDialog
 					item.setImage(0, image);
 				}
 
-				item.setText(1, (String) map.get("display"));
+				item.setText(1, (String) map.get("display")); //$NON-NLS-1$
 			}
 		}
 
@@ -168,12 +174,12 @@ public class MenuDialog extends PopupDialog
 		{
 			public final void handleEvent(final Event event)
 			{
-				select(event);
+				select();
 			}
 		});
 	}
 
-	protected void select(Event event)
+	protected void select()
 	{
 		int index = completionsTable.getSelectionIndex();
 		setReturnCode(index);
@@ -202,8 +208,7 @@ public class MenuDialog extends PopupDialog
 	{
 		// Use the display provided by the shell if possible
 		Display display = loopShell.getDisplay();
-
-		while (loopShell != null && !loopShell.isDisposed())
+		while (!loopShell.isDisposed())
 		{
 			try
 			{
@@ -214,6 +219,7 @@ public class MenuDialog extends PopupDialog
 			}
 			catch (Throwable e)
 			{
+				// FIXME Handle exception in some way
 				// exceptionHandler.handleException(e);
 			}
 		}

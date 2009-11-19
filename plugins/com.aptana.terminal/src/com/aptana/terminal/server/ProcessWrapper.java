@@ -221,7 +221,7 @@ public class ProcessWrapper
 			
 			if (this._startingDirectory == null)
 			{
-				this._startingDirectory = System.getProperty(USER_HOME_PROPERTY); //$NON-NLS-1$
+				this._startingDirectory = System.getProperty(USER_HOME_PROPERTY);
 			}
 		}
 		

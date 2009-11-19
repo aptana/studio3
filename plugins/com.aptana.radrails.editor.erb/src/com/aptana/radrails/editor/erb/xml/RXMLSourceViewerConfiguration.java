@@ -60,7 +60,7 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	}
 	
 	protected String getStartEndTokenType() {
-		return "punctuation.section.embedded.ruby";
+		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
 	}
 
 }

@@ -60,6 +60,6 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 	}
 	
 	protected String getStartEndTokenType() {
-		return "punctuation.section.embedded.ruby";
+		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
 	}
 }
