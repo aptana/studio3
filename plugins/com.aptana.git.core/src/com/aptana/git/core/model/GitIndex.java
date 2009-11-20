@@ -30,10 +30,12 @@ public class GitIndex
 {
 
 	/**
-	 * File extensions we check against and use to assume if a file may be binary (to not show a diff/content in various UI views)
+	 * File extensions we check against and use to assume if a file may be binary (to not show a diff/content in various
+	 * UI views)
 	 */
-	private static final String[] BINARY_EXTENSIONS = new String[] { ".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so", ".jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
-	
+	private static final String[] BINARY_EXTENSIONS = new String[] {
+			".pdf", ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".o", ".class", ".zip", ".gz", ".tar", ".ico", ".so", ".jar" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$ //$NON-NLS-11$ //$NON-NLS-12$ //$NON-NLS-13$ //$NON-NLS-14$
+
 	private GitRepository repository;
 	private boolean amend;
 	private String workingDirectory;
@@ -74,40 +76,42 @@ public class GitIndex
 
 		Set<Job> jobs = new HashSet<Job>();
 		jobs.add(new Job("other files") //$NON-NLS-1$
-		{
+				{
 
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
-						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-				readOtherFiles(output);
-				return Status.OK_STATUS;
-			}
-		});
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+								"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+								"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+						readOtherFiles(output);
+						return Status.OK_STATUS;
+					}
+				});
 		jobs.add(new Job("unstaged files") //$NON-NLS-1$
-		{
+				{
 
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-				readUnstagedFiles(output);
-				return Status.OK_STATUS;
-			}
-		});
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+						readUnstagedFiles(output);
+						return Status.OK_STATUS;
+					}
+				});
 		jobs.add(new Job("staged files") //$NON-NLS-1$
-		{
+				{
 
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-						"-z", getParentTree()); //$NON-NLS-1$
-				readStagedFiles(output);
-				return Status.OK_STATUS;
-			}
-		});
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+								"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+								"-z", getParentTree()); //$NON-NLS-1$
+						readStagedFiles(output);
+						return Status.OK_STATUS;
+					}
+				});
 
 		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that
 		// shouldn't be there anymore (especially unstaged ones)
@@ -557,7 +561,8 @@ public class GitIndex
 
 		if (!success)
 			return;
-        // TODO Need to fire off changes for the files that were staged and got committed
+		// Need to explicitly fire off changes for the files that were staged and got committed
+		postIndexChange(getStagedFiles());
 		repository.hasChanged();
 
 		amendEnvironment = null;
@@ -565,6 +570,20 @@ public class GitIndex
 			this.amend = false;
 		else
 			refresh();
+	}
+
+	private Collection<ChangedFile> getStagedFiles()
+	{
+		Collection<ChangedFile> staged = new ArrayList<ChangedFile>();
+		synchronized (this.files)
+		{			
+			for (ChangedFile file : this.files)
+			{
+				if (file.hasStagedChanges())
+					staged.add(file);
+			}
+		}
+		return staged;
 	}
 
 	private void postCommitFailure(String string)
