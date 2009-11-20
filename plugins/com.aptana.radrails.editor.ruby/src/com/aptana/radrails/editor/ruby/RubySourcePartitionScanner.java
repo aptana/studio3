@@ -144,6 +144,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			myOffset = partitionOffset;
 			length += diff;
 			this.fContentType = contentType;
+			if (this.fContentType.equals(RubySourceConfiguration.SINGLE_LINE_COMMENT))
+				this.fContentType = RubySourceConfiguration.DEFAULT;
 			// FIXME What if a heredoc with dynamic code inside is broken? contents will start with "}" rather than
 			// expected
 		}
