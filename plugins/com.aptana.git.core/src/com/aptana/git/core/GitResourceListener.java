@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -51,7 +52,18 @@ class GitResourceListener implements IResourceChangeListener
 						return true;
 					}
 
+					// Auto-attach to git if it's a new project being added and there's a repo and it's not already attached
 					final IResource resource = delta.getResource();
+					if (resource != null && resource instanceof IProject && delta.getKind() == IResourceDelta.ADDED)
+					{
+						final GitRepository mapping = getRepo(resource);
+						IProject project = (IProject) resource;
+						if (mapping == null)
+						{
+							GitRepository.attachExisting(project, new NullProgressMonitor());
+							return false;
+						}
+					}
 
 					// If the resource is not part of a project under Git
 					// revision control
