@@ -80,5 +80,6 @@ public abstract class SimpleGitCommandAction extends GitAction
 		GitRepository repo = GitRepository.getAttached(project);
 		if (repo != null)
 			repo.index().refresh();
+		// FIXME All the staged files that got committed don't seem to be getting their decorations updated!
 	}
 }
