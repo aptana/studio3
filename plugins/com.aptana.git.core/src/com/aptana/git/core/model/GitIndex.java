@@ -557,7 +557,7 @@ public class GitIndex
 
 		if (!success)
 			return;
-
+        // TODO Need to fire off changes for the files that were staged and got committed
 		repository.hasChanged();
 
 		amendEnvironment = null;
