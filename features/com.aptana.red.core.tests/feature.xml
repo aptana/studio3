@@ -17,6 +17,10 @@
       [Enter License Description here.]
    </license>
 
+   <requires>
+      <import feature="com.aptana.red.core"/>
+   </requires>
+
    <plugin
          id="com.aptana.radrails.editor.ruby.tests"
          download-size="0"
