@@ -53,6 +53,8 @@ public abstract class DiffFormatter
 		for (int i = 4; i < lines.length; i++)
 		{
 			String line = lines[i];
+			if (line == null || line.length() == 0)
+				continue;
 			char c = line.charAt(0);
 			switch (c)
 			{
