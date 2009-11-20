@@ -107,7 +107,7 @@
 			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
 			<param name="p2.repo" value="${red-core.p2.repo}" />
 		</antcall>
-		<!-- TODO Rename plugins to something else, and then rename 'test' to 'plugins' -->
+		<!-- TODO Rename plugins to something else, and then rename 'tests' to 'plugins' -->
 		<!-- Copy test plugins into plugins dir -->
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="${buildDirectory}/tests">
@@ -180,16 +180,16 @@
 			<param name="test.plugin" value="com.aptana.util.tests" />
 			<param name="test.classname" value="com.aptana.util.tests.AllTests" />
 		</antcall>
+		<!-- FIXME BRoken
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
 			<param name="test.classname" value="com.aptana.scope.AllTests" />
 		</antcall>
-		<!--
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.RED_Core.tests" />
-			<param name="test.classname" value="com.aptana.RED_Core.TS_Aptana" />
-		</antcall>
 		-->
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.radrails.editor.ruby.tests" />
+			<param name="test.classname" value="com.aptana.radrails.editor.ruby.tests.AllTests" />
+		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->
 		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">
