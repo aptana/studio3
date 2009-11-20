@@ -18,7 +18,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -138,10 +141,34 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 
 	protected IResource[] getSelectedResources()
 	{
-		if (this.selection == null)
+		if (this.selection == null || !(this.selection instanceof IStructuredSelection))
+		{
+
+			final IResource[] editorResource = new IResource[1];
+			Display.getDefault().syncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					try
+					{
+						IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+								.getActiveEditor();
+						IEditorInput input = part.getEditorInput();
+						if (input == null)
+							return;
+						editorResource[0] = (IResource) input.getAdapter(IResource.class);
+					}
+					catch (Exception e)
+					{
+						// ignore
+					}
+				}
+			});
+			if (editorResource[0] != null)
+				return editorResource;
 			return new IResource[0];
-		if (!(this.selection instanceof IStructuredSelection))
-			return new IResource[0];
+		}
 
 		Set<IResource> resources = new HashSet<IResource>();
 		IStructuredSelection structured = (IStructuredSelection) this.selection;
@@ -279,6 +306,5 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			}
 		}
 		return targetPart;
-
 	}
 }
