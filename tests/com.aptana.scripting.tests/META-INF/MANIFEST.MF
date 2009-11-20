@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: com.aptana.scripting.tests
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.aptana.scope
+Require-Bundle: com.aptana.scripting;bundle-version="1.0.0"
