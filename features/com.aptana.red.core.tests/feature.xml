@@ -18,7 +18,14 @@
    </license>
 
    <requires>
-      <import feature="com.aptana.red.core"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="com.aptana.radrails.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit" version="3.8.2" match="greaterOrEqual"/>
+      <import plugin="com.aptana.util" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.junit4" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
