@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -333,6 +334,21 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	public void indexChanged(IndexChangedEvent e)
 	{
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
+		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
+		// ancestor folders!
+		for (IResource resource : resources)
+		{
+			IResource child = resource;
+			IContainer parent = null;
+			while ((parent = child.getParent()) != null)
+			{
+				if (parent.getType() == IResource.PROJECT || parent.getType() == IResource.ROOT)
+					break;
+				resources.add(parent);
+				child = parent;
+			}
+		}
+
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
