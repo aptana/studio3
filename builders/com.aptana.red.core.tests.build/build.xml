@@ -177,6 +177,10 @@
 		<property name="library-file" value="${baseLocation}/dropins/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
+			<param name="test.plugin" value="com.aptana.util.tests" />
+			<param name="test.classname" value="com.aptana.util.tests.AllTests" />
+		</antcall>
+		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
 			<param name="test.classname" value="com.aptana.scope.AllTests" />
 		</antcall>
