@@ -396,8 +396,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 	public void testNestedHeredocs()
 	{
 		String code = "methods += <<-BEGIN + nn_element_def(element) + <<-END\n"
-				+ "  def #{element.downcase}(attributes = {})\n" + "BEGIN\n" + "  end\n" + "END\n" + "\n"
-				+ "puts :symbol\n";
+				+ "  def #{element.downcase}(attributes = {})\n" + 
+				"BEGIN\n" + 
+				"  end\n" + 
+				"END\n" + 
+				"\n" +
+				"puts :symbol\n";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
 		// _<_<-BEGIN
 		assertContentType(RubySourceConfiguration.STRING, code, 11);
@@ -409,6 +413,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.STRING, code, 62); // #'{'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 63); // #{'e'lem
 		assertContentType(RubySourceConfiguration.STRING, code, 79); // case'}'
+		
+		assertContentType(RubySourceConfiguration.STRING, code, 80); // }'('att
+		assertContentType(RubySourceConfiguration.STRING, code, 96); // )
+		assertContentType(RubySourceConfiguration.STRING, code, 102); // BEGI'N'
+		assertContentType(RubySourceConfiguration.STRING, code, 108); // en'd'
+		
 		assertContentType(RubySourceConfiguration.STRING, code, 112); // EN'D'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 115); // 'p'uts
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 120); // ':'sym
@@ -585,13 +595,28 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCGI()
 	{
-		String src = "module TagMaker # :nodoc:\n" + "		\n"
-				+ "    # Generate code for an element with required start and end tags.\n" + "    #\n"
-				+ "    #   - -\n" + "    def nn_element_def(element)\n" + "      nOE_element_def(element, <<-END)\n"
-				+ "          if block_given?\n" + "            yield.to_s\n" + "          else\n"
-				+ "            \"\"\n" + "          end +\n" + "          \"</#{element.upcase}>\"\n" + "      END\n"
-				+ "    end\n" + "    \n" + "    # Generate code for an empty element.\n" + "    #\n"
-				+ "    #   - O EMPTY\n" + "    def nOE_element_def(element, append = nil)\n" + "   end\n" + "end";
+		String src = "module TagMaker # :nodoc:\n" + 
+		"		\n" + 
+		"    # Generate code for an element with required start and end tags.\n" + 
+		"    #\n" +
+		"    #   - -\n" + 
+		"    def nn_element_def(element)\n" + 
+		"      nOE_element_def(element, <<-END)\n" +
+		"          if block_given?\n" + 
+		"            yield.to_s\n" + 
+		"          else\n" +
+		"            \"\"\n" + 
+		"          end +\n" + 
+		"          \"</#{element.upcase}>\"\n" + 
+		"      END\n" +
+		"    end\n" + 
+		"    \n" + 
+		"    # Generate code for an empty element.\n" + 
+		"    #\n" +
+		"    #   - O EMPTY\n" + 
+		"    def nOE_element_def(element, append = nil)\n" + 
+		"   end\n" + 
+		"end";
 		// module TagMaker # :nodoc:
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 0); // m
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, src, 16); // #

@@ -36,6 +36,7 @@ package com.aptana.radrails.editor.ruby;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +64,9 @@ import org.jrubyparser.parser.Tokens;
 public class RubySourcePartitionScanner implements IPartitionTokenScanner
 {
 
+	private static final String INDENTED_HEREDOC_MARKER_PREFIX = "<<-";
+	private static final String HEREDOC_MARKER_PREFIX = "<<";
+	private static final String DEFAULT_FILENAME = "filename"; //$NON-NLS-1$
 	private static final String BEGIN = "=begin"; //$NON-NLS-1$
 
 	private static class QueuedToken
@@ -96,13 +100,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		@Override
 		public String toString()
 		{
-			StringBuilder text = new StringBuilder();
-			text.append(getToken().getData());
-			text.append(": offset: "); //$NON-NLS-1$
-			text.append(getOffset());
-			text.append(", length: "); //$NON-NLS-1$
-			text.append(getLength());
-			return text.toString();
+			return MessageFormat
+					.format("{0}: offset: {1}, length: {2}", getToken().getData(), getOffset(), getLength()); //$NON-NLS-1$
 		}
 	}
 
@@ -154,13 +153,12 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		try
 		{
 			fContents = document.get(myOffset, length);
-			lexerSource = LexerSource.getSource("filename", new StringReader(fContents), //$NON-NLS-1$
-					config);
+			lexerSource = LexerSource.getSource(DEFAULT_FILENAME, new StringReader(fContents), config);
 			lexer.setSource(lexerSource);
 		}
 		catch (BadLocationException e)
 		{
-			lexerSource = LexerSource.getSource("filename", new StringReader(""), config); //$NON-NLS-1$ //$NON-NLS-2$
+			lexerSource = LexerSource.getSource(DEFAULT_FILENAME, new StringReader(""), config); //$NON-NLS-1$
 			lexer.setSource(lexerSource);
 		}
 		origOffset = myOffset;
@@ -183,8 +181,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		{
 			return popTokenOffQueue();
 		}
-		fOffset = getOffset();
-		fLength = 0;
+		setOffset(getAdjustedOffset());
+		setLength(0);
 		IToken returnValue = new Token(RubySourceConfiguration.DEFAULT);
 		boolean isEOF = false;
 		try
@@ -197,38 +195,23 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			else
 			{
 				int lexerToken = lexer.token();
-				if (!inSingleQuote && lexerToken == Tokens.tSTRING_DVAR)
+				if (isSingleVariableStringInterpolation(lexerToken))
 				{
-					// we hit a single dynamic variable
-					addPoundToken();
-					scanDynamicVariable();
-					setLexerPastDynamicSectionOfString();
-					return popTokenOffQueue();
+					return handleSingleVariableStringInterpolation();
 				}
-				else if (!inSingleQuote && lexerToken == Tokens.tSTRING_DBEG)
+				else if (isStringInterpolation(lexerToken))
 				{
-					// if we hit dynamic code inside a string
-					addPoundBraceToken();
-					scanTokensInsideDynamicPortion();
-					addClosingBraceToken();
-					setLexerPastDynamicSectionOfString();
-					return popTokenOffQueue();
+					return handleStringInterpolation();
 				}
 				else if (lexerToken == Tokens.tSTRING_BEG)
 				{
-					String opening = getUntrimmedOpeningString();
-					int endOfMarker = indexOf(opening.trim(), ", +)"); //$NON-NLS-1$
-					if (opening.trim().startsWith("<<") && endOfMarker != -1) { //$NON-NLS-1$
-						adjustOffset(opening);
-						addHereDocStartToken(endOfMarker);
-						addCommaToken(endOfMarker);
-						scanRestOfLineAfterHeredocBegins(opening.trim(), endOfMarker);
-						setLexerPastHeredocBeginning(opening.trim());
-						return popTokenOffQueue();
-					}
+					IToken heredoc = handleHeredocInMiddleOfLine();
+					if (heredoc != null)
+						return heredoc;
 				}
 				returnValue = getToken(lexerToken);
 			}
+			// TODO Are there ever comment nodes anymore? Do we need this code?!
 			List<CommentNode> comments = result.getCommentNodes();
 			if (comments != null && !comments.isEmpty())
 			{
@@ -242,55 +225,10 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		catch (SyntaxException se)
 		{
 			if (se.getMessage().equals("embedded document meets end of file")) { //$NON-NLS-1$
-				// Add to the queue (at end), then try to just do the rest of
-				// the file...
-				// TODO recover somehow by removing this chunk out of the
-				// fContents?
-				int start = se.getPosition().getStartOffset();
-				int length = fContents.length() - start;
-				QueuedToken qtoken = new QueuedToken(new Token(RubySourceConfiguration.MULTI_LINE_COMMENT), start
-						+ origOffset, length);
-				if (fOffset == origOffset)
-				{
-					// If we never got to read in beginning contents
-					RubySourcePartitionScanner scanner = new RubySourcePartitionScanner();
-					String possible = new String(fContents.substring(0, start));
-					IDocument document = new Document(possible);
-					scanner.setRange(document, origOffset, possible.length());
-					IToken token;
-					while (!(token = scanner.nextToken()).isEOF())
-					{
-						push(new QueuedToken(token, scanner.getTokenOffset() + fOffset, scanner.getTokenLength()));
-					}
-				}
-				push(qtoken);
-				push(new QueuedToken(Token.EOF, start + origOffset + length, 0));
-				return popTokenOffQueue();
+				return handleUnterminedMultilineComment(se);
 			}
 			else if (se.getMessage().equals("unterminated string meets end of file")) { //$NON-NLS-1$
-				// Add to the queue (at end), then try to just do the rest of
-				// the file...
-				// TODO recover somehow by removing this chunk out of the
-				// fContents?
-				int start = se.getPosition().getStartOffset();
-				int length = fContents.length() - start;
-				QueuedToken qtoken = new QueuedToken(new Token(fContentType), start + origOffset, length);
-				if (fOffset == origOffset)
-				{
-					// If we never got to read in beginning contents
-					RubySourcePartitionScanner scanner = new RubySourcePartitionScanner();
-					String possible = new String(fContents.substring(0, start));
-					IDocument document = new Document(possible);
-					scanner.setRange(document, origOffset, possible.length());
-					IToken token;
-					while (!(token = scanner.nextToken()).isEOF())
-					{
-						push(new QueuedToken(token, scanner.getTokenOffset() + fOffset, scanner.getTokenLength()));
-					}
-				}
-				push(qtoken);
-				push(new QueuedToken(Token.EOF, start + origOffset + length, 0));
-				return popTokenOffQueue();
+				return handleUnterminatedString(se);
 			}
 
 			if (lexerSource.getOffset() - origLength == 0)
@@ -298,24 +236,126 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				// return eof if we hit a problem found at end of parsing
 				return Token.EOF;
 			}
-			fLength = getOffset() - fOffset;
-
-			Assert.isTrue(fLength >= 0);
+			setLength(getAdjustedOffset() - fOffset);
 			return new Token(RubySourceConfiguration.DEFAULT);
 		}
 		catch (IOException e)
 		{
-			System.out.println(e);
+			Activator.log(e);
 		}
 		if (!isEOF)
 		{
-			fLength = getOffset() - fOffset;
+			setLength(getAdjustedOffset() - fOffset);
 			// HACK End of heredocs are returning a zero length token for end of string that hoses us
 			if (fLength == 0 && returnValue.getData().equals(RubySourceConfiguration.STRING))
 				return nextToken();
-			Assert.isTrue(fLength >= 0);
 		}
 		return returnValue;
+	}
+
+	private boolean isSingleVariableStringInterpolation(int lexerToken)
+	{
+		return !inSingleQuote && lexerToken == Tokens.tSTRING_DVAR;
+	}
+
+	private boolean isStringInterpolation(int lexerToken)
+	{
+		return !inSingleQuote && lexerToken == Tokens.tSTRING_DBEG;
+	}
+
+	private IToken handleHeredocInMiddleOfLine() throws IOException
+	{
+		String opening = getOpeningStringToEndOfLine();
+		int endOfMarker = indexOf(opening.trim(), ", +)"); //$NON-NLS-1$
+		if (opening.trim().startsWith(HEREDOC_MARKER_PREFIX) && endOfMarker != -1) //$NON-NLS-1$
+		{
+			adjustOffset(opening);
+			addHereDocStartToken(endOfMarker);
+			addCommaToken(endOfMarker);
+			scanRestOfLineAfterHeredocBegins(opening.trim(), endOfMarker);
+			setLexerPastHeredocBeginning(opening.trim());
+			return popTokenOffQueue();
+		}
+		return null;
+	}
+
+	private String getOpeningStringToEndOfLine()
+	{
+		int start = fOffset - origOffset;
+		// TODO Are there ever comment nodes anymore? Do we need this code?!
+		List<CommentNode> comments = result.getCommentNodes();
+		if (comments != null && !comments.isEmpty())
+		{
+			Node comment = comments.get(comments.size() - 1);
+			int end = comment.getPosition().getEndOffset();
+			start = end;
+		}
+		// Need to grab until newline or EOF!
+		String untilEnd = new String(fContents.substring(start));
+		int index = indexOf(untilEnd, "\r\n"); //$NON-NLS-1$
+		if (index != -1)
+			untilEnd = new String(untilEnd.substring(0, index + 1));
+		return untilEnd;
+	}
+
+	private void setLength(int newLength)
+	{
+		fLength = newLength;
+		Assert.isTrue(fLength >= 0);
+	}
+
+	private IToken handleUnterminedMultilineComment(SyntaxException se)
+	{
+		return handleUnterminatedPartition(se.getPosition().getStartOffset(),
+				RubySourceConfiguration.MULTI_LINE_COMMENT);
+	}
+
+	private IToken handleUnterminatedString(SyntaxException se)
+	{
+		return handleUnterminatedPartition(se.getPosition().getStartOffset(), fContentType);
+	}
+
+	private IToken handleUnterminatedPartition(int start, String contentType)
+	{
+		// Add to the queue (at end), then try to just do the rest of
+		// the file...
+		// TODO recover somehow by removing this chunk out of the
+		// fContents?
+		int length = fContents.length() - start;
+		QueuedToken qtoken = new QueuedToken(new Token(contentType), start + origOffset, length);
+		if (fOffset == origOffset)
+		{
+			// If we never got to read in beginning contents
+			RubySourcePartitionScanner scanner = new RubySourcePartitionScanner();
+			String possible = new String(fContents.substring(0, start));
+			IDocument document = new Document(possible);
+			scanner.setRange(document, origOffset, possible.length());
+			IToken token;
+			while (!(token = scanner.nextToken()).isEOF())
+			{
+				push(new QueuedToken(token, scanner.getTokenOffset() + fOffset, scanner.getTokenLength()));
+			}
+		}
+		push(qtoken);
+		push(new QueuedToken(Token.EOF, start + origOffset + length, 0));
+		return popTokenOffQueue();
+	}
+
+	private IToken handleSingleVariableStringInterpolation() throws IOException
+	{
+		addPoundToken();
+		scanDynamicVariable();
+		setLexerPastDynamicSectionOfString();
+		return popTokenOffQueue();
+	}
+
+	private IToken handleStringInterpolation() throws IOException
+	{
+		addPoundBraceToken();
+		scanTokensInsideDynamicPortion();
+		addClosingBraceToken();
+		setLexerPastDynamicSectionOfString();
+		return popTokenOffQueue();
 	}
 
 	public void setRange(IDocument document, int offset, int length)
@@ -333,38 +373,9 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		inSingleQuote = false;
 	}
 
-	private void setLexerPastHeredocBeginning(String rawBeginning) throws IOException
-	{
-		StringBuffer fakeContents = new StringBuffer();
-		int toAdd = 1;
-		if (rawBeginning.startsWith("<<-")) { //$NON-NLS-1$
-			toAdd = 2;
-		}
-		int start = fOffset - (fOpeningString.length() + toAdd);
-		for (int i = 0; i < start; i++)
-		{
-			fakeContents.append(" "); //$NON-NLS-1$
-		}
-		fakeContents.append("<<"); //$NON-NLS-1$
-		if (rawBeginning.startsWith("<<-")) { //$NON-NLS-1$
-			fakeContents.append("-"); //$NON-NLS-1$
-		}
-		fakeContents.append(fOpeningString.trim());
-		if ((fOffset - origOffset) < origLength)
-		{
-			// BLAH removed + 1 from end here
-			fakeContents.append(new String(fContents.substring((fOffset - origOffset))));
-		}
-		IDocument document = new Document(fakeContents.toString());
-		List<QueuedToken> queueCopy = new ArrayList<QueuedToken>(fQueue);
-		setPartialRange(document, start, fakeContents.length() - start, RubySourceConfiguration.DEFAULT, start);
-		fQueue = new ArrayList<QueuedToken>(queueCopy);
-		lexer.advance();
-	}
-
 	private void adjustOffset(String opening)
 	{
-		int index = opening.indexOf("<<"); //$NON-NLS-1$
+		int index = opening.indexOf(HEREDOC_MARKER_PREFIX);
 		if (index > 0)
 			setOffset(fOffset + index);
 	}
@@ -419,7 +430,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		else
 		{
 			String marker = new String(opening.substring(0, index).trim());
-			fOpeningString = generateHeredocMarker(marker);
+			fOpeningString = generateOpeningStringForHeredocMarker(marker);
 		}
 		fContentType = RubySourceConfiguration.STRING;
 	}
@@ -518,42 +529,66 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private void setLexerPastDynamicSectionOfString() throws IOException
 	{
-		StringBuffer fakeContents = new StringBuffer();
 		String opening = fOpeningString;
 		if (opening.endsWith("\n")) { //$NON-NLS-1$
 			// What about When it should remain <<-!
 			// try searching backwards from fOffset in fContents for <<-opening
 			// or <<opening and take whichever we find
 			// first. If we fail to find, assume <<
-			String heredocStart = "<<"; //$NON-NLS-1$
-			int lastIndent = fContents.lastIndexOf("<<-" + opening, fOffset); //$NON-NLS-1$
+			String heredocStart = HEREDOC_MARKER_PREFIX;
+			int lastIndent = fContents.lastIndexOf(INDENTED_HEREDOC_MARKER_PREFIX + opening, fOffset);
 			if (lastIndent != -1)
 			{
-				if (lastIndent > fContents.lastIndexOf("<<" + opening, fOffset)) //$NON-NLS-1$
-					heredocStart = "<<-"; //$NON-NLS-1$
+				if (lastIndent > fContents.lastIndexOf(HEREDOC_MARKER_PREFIX + opening, fOffset))
+					heredocStart = INDENTED_HEREDOC_MARKER_PREFIX;
 			}
 			opening = heredocStart + opening;
 		}
-		int start = fOffset - opening.length();
+		String oldContentType = fContentType;
+		String oldOpening = fOpeningString;
+		generateHackedSource(opening);
+		fContentType = oldContentType;
+		fOpeningString = oldOpening;
+	}
+	
+	private void setLexerPastHeredocBeginning(String rawBeginning) throws IOException
+	{
+		String heredocMarker = HEREDOC_MARKER_PREFIX;
+		if (rawBeginning.startsWith(INDENTED_HEREDOC_MARKER_PREFIX))
+		{
+			heredocMarker = INDENTED_HEREDOC_MARKER_PREFIX;
+		}
+		heredocMarker += fOpeningString.trim();
+
+		generateHackedSource(heredocMarker);
+
+		// Add a token for the heredoc string we just ate up!
+		fContentType = RubySourceConfiguration.STRING;
+		int afterHeredoc = fOffset + heredocMarker.length();
+		push(new QueuedToken(new Token(RubySourceConfiguration.STRING), afterHeredoc, getAdjustedOffset()
+				- afterHeredoc));
+	}
+
+
+	private void generateHackedSource(String beginning) throws IOException
+	{
+		StringBuffer fakeContents = new StringBuffer();
+		int start = fOffset - beginning.length();
 		for (int i = 0; i < start; i++)
 		{
 			fakeContents.append(" "); //$NON-NLS-1$
 		}
-		fakeContents.append(opening);
+		fakeContents.append(beginning);
 		if ((fOffset - origOffset) < origLength)
 		{
-			// BLAH removed + 1 from end here
 			fakeContents.append(new String(fContents.substring((fOffset - origOffset))));
 		}
+
 		IDocument document = new Document(fakeContents.toString());
 		List<QueuedToken> queueCopy = new ArrayList<QueuedToken>(fQueue);
-		String oldContentType = fContentType;
-		String oldOpening = fOpeningString;
 		setPartialRange(document, start, fakeContents.length() - start, RubySourceConfiguration.DEFAULT, start);
 		fQueue = new ArrayList<QueuedToken>(queueCopy);
 		lexer.advance();
-		fContentType = oldContentType;
-		fOpeningString = oldOpening;
 	}
 
 	private void parseOutComments(List<CommentNode> comments)
@@ -579,23 +614,27 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	{
 		QueuedToken token = fQueue.remove(0);
 		setOffset(token.getOffset());
-		Assert.isTrue(token.getLength() >= 0);
-		fLength = token.getLength();
+		setLength(token.getLength());
 		return token.getToken();
 	}
 
 	private IToken getToken(int i)
 	{
-		// If we hit a 32 (space) inside a qword, just return string content
-		// type (not default)
-		// FIXME IF we're in qwords, we should inspect the contents because it
-		// may be a variable
-		if (i == 32)
+		// We have an unresolved heredoc
+		if (fContentType.equals(RubySourceConfiguration.STRING) && insideHeredoc())
 		{
-			return new Token(fContentType);
+			if (reachedEndOfHeredoc())
+			{
+				fContentType = RubySourceConfiguration.DEFAULT;
+				inSingleQuote = false;
+				return new Token(RubySourceConfiguration.STRING);
+			}
 		}
+
 		switch (i)
 		{
+			case RubyTokenScanner.SPACE:
+				return new Token(fContentType);
 			case Tokens.tCOMMENT:
 				return new Token(RubySourceConfiguration.SINGLE_LINE_COMMENT);
 			case Tokens.tDOCUMENTATION:
@@ -607,8 +646,9 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				if (fOpeningString.equals("'") || fOpeningString.startsWith("%q")) { //$NON-NLS-1$//$NON-NLS-2$
 					inSingleQuote = true;
 				}
-				else if (fOpeningString.startsWith("<<")) { // here-doc //$NON-NLS-1$
-					fOpeningString = generateHeredocMarker(fOpeningString);
+				else if (fOpeningString.startsWith(HEREDOC_MARKER_PREFIX))
+				{ // here-doc
+					fOpeningString = generateOpeningStringForHeredocMarker(fOpeningString);
 				}
 				fContentType = RubySourceConfiguration.STRING;
 				return new Token(RubySourceConfiguration.STRING);
@@ -622,6 +662,10 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				fContentType = RubySourceConfiguration.STRING;
 				return new Token(RubySourceConfiguration.STRING);
 			case Tokens.tSTRING_END:
+				// If we're ending a heredoc, make sure we're not nested and ending one of the earlier ones!
+				if (insideHeredoc() && !reachedEndOfHeredoc())
+					return new Token(RubySourceConfiguration.STRING);
+
 				String oldContentType = fContentType;
 				fContentType = RubySourceConfiguration.DEFAULT;
 				inSingleQuote = false;
@@ -660,17 +704,29 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				}
 				return new Token(RubySourceConfiguration.DEFAULT);
 			default:
-				return new Token(RubySourceConfiguration.DEFAULT);
+				return new Token(fContentType);
 		}
 	}
 
-	private String generateHeredocMarker(String marker)
+	private boolean insideHeredoc()
 	{
-		if (marker.startsWith("<<")) { //$NON-NLS-1$
-			marker = marker.substring(2);
+		return fOpeningString.endsWith("\n"); //$NON-NLS-1$
+	}
+
+	private boolean reachedEndOfHeredoc()
+	{
+		return fContents.startsWith(fOpeningString.trim(), (fOffset - origOffset));
+	}
+
+	private String generateOpeningStringForHeredocMarker(String marker)
+	{
+		if (marker.startsWith(INDENTED_HEREDOC_MARKER_PREFIX))
+		{
+			marker = marker.substring(3);
 		}
-		if (marker.startsWith("-")) { //$NON-NLS-1$
-			marker = marker.substring(1);
+		else if (marker.startsWith(HEREDOC_MARKER_PREFIX))
+		{
+			marker = marker.substring(2);
 		}
 		return marker + "\n"; //$NON-NLS-1$
 	}
@@ -720,7 +776,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		// grab end of last comment (last thing in queue)
 		QueuedToken token = peek();
 		setOffset(token.getOffset() + token.getLength());
-		int length = getOffset() - fOffset;
+		int length = getAdjustedOffset() - fOffset;
 		if (length < 0)
 		{
 			length = 0;
@@ -739,7 +795,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		fQueue.add(token);
 	}
 
-	private int getOffset()
+	private int getAdjustedOffset()
 	{
 		return lexerSource.getOffset() + origOffset;
 	}
@@ -758,6 +814,12 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		return new String(contents.substring(pos.getStartOffset(), pos.getEndOffset()));
 	}
 
+	/**
+	 * Used to find the end of string interpolation (the '}'). Uses a stack to maintain nesting of strings/regexp, and
+	 * knowledge of esacape chars.
+	 * 
+	 * @author cwilliams
+	 */
 	public static class EndBraceFinder
 	{
 		private String input;
@@ -769,6 +831,11 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			stack = new ArrayList<String>();
 		}
 
+		/**
+		 * Return index of the end brace. -1 if not found.
+		 * 
+		 * @return
+		 */
 		public int find()
 		{
 			for (int i = 0; i < input.length(); i++)
@@ -805,7 +872,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 							// Only if we're not inside a string
 							if (!topEquals("'") && !topEquals("\"")) { //$NON-NLS-1$ //$NON-NLS-2$
 								push("/"); //$NON-NLS-1$
-							}							
+							}
 						}
 						break;
 					case '\'':
