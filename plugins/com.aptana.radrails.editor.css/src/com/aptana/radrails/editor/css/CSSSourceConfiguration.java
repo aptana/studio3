@@ -63,9 +63,9 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
 	public final static String PREFIX = "__css_"; //$NON-NLS-1$
-	public final static String DEFAULT = "__css" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String STRING = "__css_string"; //$NON-NLS-1$
-	public final static String MULTILINE_COMMENT = "__css_multiline_comment"; //$NON-NLS-1$
+	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
+	public final static String MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] {
 		DEFAULT,
