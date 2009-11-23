@@ -1,5 +1,6 @@
 package com.aptana.radrails.editor.common.theme.preferences;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,14 +21,19 @@ import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -40,6 +46,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
+	private static final int ROW_HEIGHT = 20;
 	protected String fSelectedTheme;
 	private ColorSelector fgSelector;
 	private ColorSelector bgSelector;
@@ -47,6 +54,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private ColorSelector selectionSelector;
 	private Combo fThemeCombo;
 	private TableViewer tableViewer;
+	private Set<TableEditor> fTableEditors;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -117,6 +125,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		table.setLinesVisible(false);
 		final TableLayout layout = new TableLayout();
 		table.setLayout(layout);
+
+		table.addListener(SWT.MeasureItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				event.height = ROW_HEIGHT;
+			}
+		});
 
 		tableViewer = new TableViewer(table);
 		tableViewer.setContentProvider(new IStructuredContentProvider()
@@ -192,16 +208,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				return ""; //$NON-NLS-1$
 			}
-
-			@Override
-			public Color getBackground(Object element)
-			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				Color bg = token.getValue().getForeground();
-				if (bg == null)
-					return new Color(Display.getCurrent(), ThemeUtil.getTheme(fSelectedTheme).getForeground());
-				return bg;
-			}
 		});
 
 		// TODO Add a color editor
@@ -217,13 +223,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public String getText(Object element)
 			{
 				return ""; //$NON-NLS-1$
-			}
-
-			@Override
-			public Color getBackground(Object element)
-			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				return token.getValue().getBackground();
 			}
 		});
 
@@ -275,13 +274,97 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		selectionSelector.setColorValue(theme.getSelection());
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
-		TableItem[] items = tableViewer.getTable().getItems();
-		for (TableItem tableItem : items)
+		addCustomTableEditorControls();
+	}
+
+	private void addCustomTableEditorControls()
+	{
+		clearTableEditors();
+
+		final Table table = tableViewer.getTable();
+		TableItem[] items = table.getItems();
+		for (int i = 0; i < items.length; i++)
 		{
-			TableEditor editor = new TableEditor(tableViewer.getTable());
-			ColorSelector colorSelector = new ColorSelector(tableViewer.getTable());
-			editor.setEditor(colorSelector.getButton(), tableItem, 1);
+
+			Map.Entry<String, TextAttribute> commit = (Map.Entry<String, TextAttribute>) items[i].getData();
+			createButton(table, items[i], 1, commit.getValue().getForeground());
+			if (commit.getValue().getBackground() != null)
+				createButton(table, items[i], 2, commit.getValue().getBackground());
+
+			createFontStyle(table, items[i], commit.getValue());
 		}
+	}
+
+	private void clearTableEditors()
+	{
+		if (fTableEditors == null)
+			fTableEditors = new HashSet<TableEditor>();
+
+		for (TableEditor tableEditor : fTableEditors)
+		{
+			tableEditor.getEditor().dispose();
+			tableEditor.dispose();
+		}
+		fTableEditors.clear();
+	}
+
+	private void createFontStyle(final Table table, TableItem item, TextAttribute text)
+	{
+		boolean isBold = isBold(text.getFont());
+		boolean isItalic = isItalic(text.getFont());
+		boolean isUnderline = (text.getStyle() & TextAttribute.UNDERLINE) != 0;
+		TableEditor editor = new TableEditor(table);
+		Composite buttons = new Composite(table, SWT.NONE);
+		GridLayout grid = new GridLayout(3, false);
+		grid.marginHeight = 0;
+		grid.marginWidth = 0;
+		grid.horizontalSpacing = 0;
+		buttons.setLayout(grid);
+		Button b = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		b.setText("B");
+		b.setSelection(isBold);
+		Button italic = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		italic.setText("I");
+		italic.setSelection(isItalic);
+		Button u = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		u.setText("U");
+		u.setSelection(isUnderline);
+		buttons.pack();
+		editor.minimumWidth = buttons.getSize().x;
+		editor.horizontalAlignment = SWT.LEFT;
+		editor.setEditor(buttons, item, 3);
+		fTableEditors.add(editor);
+	}
+
+	private boolean isBold(Font font)
+	{
+		if (font == null || font.getFontData() == null)
+			return false;
+		return (font.getFontData()[0].getStyle() & SWT.BOLD) == 0;
+	}
+
+	private boolean isItalic(Font font)
+	{
+		if (font == null || font.getFontData() == null)
+			return false;
+		return (font.getFontData()[0].getStyle() & SWT.ITALIC) == 0;
+	}
+
+	private void createButton(final Table table, final TableItem tableItem, int index, Color color)
+	{
+		TableEditor editor = new TableEditor(table);
+		Button button = new Button(table, SWT.PUSH | SWT.FLAT);
+		Image image = new Image(table.getDisplay(), 16, 16);
+		GC gc = new GC(image);
+		gc.setBackground(color);
+		gc.fillRectangle(0, 0, 16, 16);
+		gc.dispose();
+		button.setImage(image);
+		button.pack();
+		editor.minimumWidth = button.getSize().x;
+		editor.horizontalAlignment = SWT.LEFT;
+		editor.setEditor(button, tableItem, index);
+		fTableEditors.add(editor);
 	}
 
 	public void init(IWorkbench workbench)
