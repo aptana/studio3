@@ -20,13 +20,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -37,6 +42,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -119,8 +125,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createTokenEditTable(Composite composite)
 	{
+		new Label(composite, SWT.NONE);
+
 		// TODO Hook in custom paint listeners to paint selection background color using the theme's selection color
-		final Table table = new Table(composite, SWT.FULL_SELECTION);
+		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
 		final TableLayout layout = new TableLayout();
@@ -192,9 +200,17 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					return new Color(Display.getCurrent(), ThemeUtil.getTheme(fSelectedTheme).getBackground());
 				return bg;
 			}
+
+			@Override
+			public Font getFont(Object element)
+			{
+				// FIXME show bold, italic, underline properly!
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
+				Font font = token.getValue().getFont();
+				return font;
+			}
 		});
 
-		// TODO Add a color editor
 		column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn foreground = column.getColumn();
 		foreground.setResizable(true);
@@ -210,7 +226,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 		});
 
-		// TODO Add a color editor
 		column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn background = column.getColumn();
 		background.setResizable(true);
@@ -226,12 +241,48 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 		});
 
-		// TODO Insert custom control for toggling bold/italic/underline
 		final TableColumn fontStyle = new TableColumn(table, SWT.NONE);
 		fontStyle.setResizable(true);
 		fontStyle.setText(Messages.ThemePreferencePage_FontStyleColumnLabel);
 		fontStyle.setWidth(75);
 		layout.addColumnData(new ColumnWeightData(15, true));
+		
+		Composite editTokenList = new Composite(composite, SWT.NONE);
+		GridLayout grid = new GridLayout(2, false);
+		grid.marginWidth = -3;
+		editTokenList.setLayout(grid);
+		
+		Composite buttons = new Composite(editTokenList, SWT.NONE);
+		buttons.setLayout(new RowLayout(SWT.HORIZONTAL));
+		Button addToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);		
+		Button removeToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		removeToken.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
+		
+		Composite textField = new Composite(editTokenList, SWT.NONE);
+		textField.setLayoutData(new GridData(GridData.END, GridData.CENTER, true, false));
+		textField.setLayout(new RowLayout(SWT.HORIZONTAL));
+		Label addTokenLabel = new Label(textField, SWT.RIGHT);
+		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
+		
+		final Text text = new Text(textField, SWT.SINGLE);
+		RowData data = new RowData();
+		data.width = 250;
+		text.setLayoutData(data);
+		table.addSelectionListener(new SelectionListener()
+		{
+			
+			public void widgetSelected(SelectionEvent e)
+			{
+				TableItem item = (TableItem) e.item;
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
+				text.setText(token.getKey());				
+			}
+			
+			public void widgetDefaultSelected(SelectionEvent e)
+			{				
+			}
+		});
 	}
 
 	static class TokenLabelProvider extends BaseLabelProvider implements ITableLabelProvider
@@ -308,10 +359,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fTableEditors.clear();
 	}
 
-	private void createFontStyle(final Table table, TableItem item, TextAttribute text)
+	private void createFontStyle(final Table table, final TableItem item, TextAttribute text)
 	{
-		boolean isBold = isBold(text.getFont());
-		boolean isItalic = isItalic(text.getFont());
+		boolean isBold = (text.getStyle() & SWT.BOLD) != 0;
+		boolean isItalic = (text.getStyle() & SWT.ITALIC) != 0;
 		boolean isUnderline = (text.getStyle() & TextAttribute.UNDERLINE) != 0;
 		TableEditor editor = new TableEditor(table);
 		Composite buttons = new Composite(table, SWT.NONE);
@@ -320,37 +371,46 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		grid.marginWidth = 0;
 		grid.horizontalSpacing = 0;
 		buttons.setLayout(grid);
-		Button b = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
-		b.setText("B");
+		final Button b = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		b.setText(Messages.ThemePreferencePage_BoldButtonLabel);
 		b.setSelection(isBold);
-		Button italic = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
-		italic.setText("I");
+		final Button italic = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		italic.setText(Messages.ThemePreferencePage_ItalicButtonLabel);
 		italic.setSelection(isItalic);
-		Button u = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
-		u.setText("U");
+		final Button u = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
+		u.setText(Messages.ThemePreferencePage_UnderlineButtonLabel);
 		u.setSelection(isUnderline);
 		buttons.pack();
 		editor.minimumWidth = buttons.getSize().x;
 		editor.horizontalAlignment = SWT.LEFT;
 		editor.setEditor(buttons, item, 3);
 		fTableEditors.add(editor);
+
+		SelectionAdapter selectionAdapter = new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
+				int style = 0;
+				if (u.getSelection())
+					style |= TextAttribute.UNDERLINE;
+				if (b.getSelection())
+					style |= SWT.BOLD;
+				if (italic.getSelection())
+					style |= SWT.ITALIC;
+				TextAttribute at = new TextAttribute(token.getValue().getForeground(),
+						token.getValue().getBackground(), style, token.getValue().getFont());
+				ThemeUtil.getTheme(fSelectedTheme).update(token.getKey(), at);
+				setTheme(fSelectedTheme);
+			}
+		};
+		b.addSelectionListener(selectionAdapter);
+		italic.addSelectionListener(selectionAdapter);
+		u.addSelectionListener(selectionAdapter);
 	}
 
-	private boolean isBold(Font font)
-	{
-		if (font == null || font.getFontData() == null)
-			return false;
-		return (font.getFontData()[0].getStyle() & SWT.BOLD) == 0;
-	}
-
-	private boolean isItalic(Font font)
-	{
-		if (font == null || font.getFontData() == null)
-			return false;
-		return (font.getFontData()[0].getStyle() & SWT.ITALIC) == 0;
-	}
-
-	private void createButton(final Table table, final TableItem tableItem, int index, Color color)
+	private void createButton(final Table table, final TableItem tableItem, final int index, final Color color)
 	{
 		TableEditor editor = new TableEditor(table);
 		Button button = new Button(table, SWT.PUSH | SWT.FLAT);
@@ -365,6 +425,36 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		editor.horizontalAlignment = SWT.LEFT;
 		editor.setEditor(button, tableItem, index);
 		fTableEditors.add(editor);
+
+		button.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ColorDialog colorDialog = new ColorDialog(table.getShell());
+				colorDialog.setRGB(color.getRGB());
+				RGB newRGB = colorDialog.open();
+				if (newRGB == null)
+					return;
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				Color fg = token.getValue().getForeground();
+				Color bg = token.getValue().getBackground();
+				if (index == 1)
+				{
+					// fg
+					fg = new Color(Display.getCurrent(), newRGB);
+				}
+				else
+				{
+					// bg
+					bg = new Color(Display.getCurrent(), newRGB);
+				}
+
+				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
+				ThemeUtil.getTheme(fSelectedTheme).update(token.getKey(), at);
+				setTheme(fSelectedTheme);
+			}
+		});
 	}
 
 	public void init(IWorkbench workbench)
@@ -375,6 +465,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
+		// FIXME Save any changes to the theme permanently!
 		ThemeUtil.setActiveTheme(ThemeUtil.getTheme(fSelectedTheme));
 		return super.performOk();
 	}

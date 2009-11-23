@@ -19,9 +19,8 @@ import org.eclipse.swt.graphics.RGB;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,
- * values are comma delimited with hex colors and font style keywords.
- * 
- * First hex color becomes FG, second becomes BG (if there).
+ * values are comma delimited with hex colors and font style keywords. First hex color becomes FG, second becomes BG (if
+ * there).
  * 
  * @author cwilliams
  */
@@ -34,7 +33,7 @@ public class Theme
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
 	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
-	
+
 	Map<String, TextAttribute> map;
 	private ColorManager colorManager;
 	private RGB defaultFG;
@@ -177,6 +176,14 @@ public class Theme
 	public Map<String, TextAttribute> getTokens()
 	{
 		return Collections.unmodifiableMap(map);
+	}
+
+	public void update(String key, TextAttribute at)
+	{
+		map.put(key, at);
+		if (ThemeUtil.getActiveTheme().equals(this))
+			ThemeUtil.setActiveTheme(this);
+		// FIXME Doesn't seem to redraw the editors properly!
 	}
 
 }
