@@ -1,5 +1,7 @@
 package com.aptana.radrails.editor.common.theme;
 
+import java.io.ByteArrayOutputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,10 +14,17 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.osgi.service.prefs.Preferences;
+
+import com.aptana.radrails.editor.common.CommonEditorPlugin;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,
@@ -26,6 +35,12 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class Theme
 {
+
+	private static final String DELIMETER = ","; //$NON-NLS-1$
+
+	private static final String UNDERLINE = "underline"; //$NON-NLS-1$
+	private static final String BOLD = "bold"; //$NON-NLS-1$
+	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
 	private static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
 	private static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
@@ -42,17 +57,21 @@ public class Theme
 	private RGB selection;
 	private RGB caret;
 	private String name;
+	private Properties props;
 
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
 		map = new HashMap<String, TextAttribute>();
 		parseProps(props);
+		storeDefaults();
 	}
 
 	private void parseProps(Properties props)
 	{
 		name = (String) props.remove(THEME_NAME_PROP_KEY);
+		if (name == null)
+			throw new IllegalStateException("Invalid theme properties!"); //$NON-NLS-1$
 		// The general editor colors
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
 		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
@@ -80,11 +99,11 @@ public class Theme
 				}
 				else
 				{
-					if (token.equalsIgnoreCase("italic")) //$NON-NLS-1$
+					if (token.equalsIgnoreCase(ITALIC))
 						style |= SWT.ITALIC;
-					else if (token.equalsIgnoreCase("underline")) //$NON-NLS-1$
+					else if (token.equalsIgnoreCase(UNDERLINE))
 						style |= TextAttribute.UNDERLINE;
-					else if (token.equalsIgnoreCase("bold")) //$NON-NLS-1$
+					else if (token.equalsIgnoreCase(BOLD))
 						style |= SWT.BOLD;
 				}
 			}
@@ -98,7 +117,7 @@ public class Theme
 	private List<String> tokenize(String value)
 	{
 		List<String> tokens = new ArrayList<String>();
-		if (!value.contains(",")) //$NON-NLS-1$
+		if (!value.contains(DELIMETER))
 		{
 			tokens.add(value);
 			return tokens;
@@ -113,6 +132,8 @@ public class Theme
 
 	private RGB parseHexRGB(String token)
 	{
+		if (token == null)
+			return new RGB(0, 0, 0);
 		String s = token.substring(1, 3);
 		int r = Integer.parseInt(s, 16);
 		s = token.substring(3, 5);
@@ -183,7 +204,94 @@ public class Theme
 		map.put(key, at);
 		if (ThemeUtil.getActiveTheme().equals(this))
 			ThemeUtil.setActiveTheme(this);
+		save();
 		// FIXME Doesn't seem to redraw the editors properly!
+	}
+
+	private Properties toProps()
+	{
+		Properties props = new Properties();
+		props.put(THEME_NAME_PROP_KEY, getName());
+		props.put(SELECTION_PROP_KEY, toHex(getSelection()));
+		props.put(LINE_HIGHLIGHT_PROP_KEY, toHex(getLineHighlight()));
+		props.put(FOREGROUND_PROP_KEY, toHex(getForeground()));
+		props.put(BACKGROUND_PROP_KEY, toHex(getBackground()));
+		props.put(CARET_PROP_KEY, toHex(caret));
+		for (Map.Entry<String, TextAttribute> entry : map.entrySet())
+		{
+			if (entry.getKey() == null)
+				continue;
+			StringBuilder value = new StringBuilder();
+			TextAttribute attr = entry.getValue();
+			Color color = attr.getForeground();
+			if (color != null)
+			{
+				value.append(toHex(color.getRGB())).append(DELIMETER);
+			}
+			color = attr.getBackground();
+			if (color != null)
+			{
+				value.append(toHex(color.getRGB())).append(DELIMETER);
+			}
+			int style = attr.getStyle();
+			if ((style & SWT.ITALIC) != 0)
+			{
+				value.append(ITALIC).append(DELIMETER);
+			}
+			if ((style & TextAttribute.UNDERLINE) != 0)
+			{
+				value.append(UNDERLINE).append(DELIMETER);
+			}
+			if ((style & SWT.BOLD) != 0)
+			{
+				value.append(BOLD).append(DELIMETER);
+			}
+			value.deleteCharAt(value.length() - 1);
+			if (value.length() == 0)
+				continue;
+			props.put(entry.getKey(), value.toString());
+		}
+		return props;
+	}
+
+	private String toHex(RGB rgb)
+	{
+		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
+	}
+
+	private void storeDefaults()
+	{
+		save(new DefaultScope());
+	}
+
+	private void save()
+	{
+		save(new InstanceScope());
+	}
+
+	private void save(IScopeContext scope)
+	{
+		try
+		{
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			toProps().storeToXML(os, null);
+			IEclipsePreferences prefs = scope.getNode(CommonEditorPlugin.PLUGIN_ID);
+			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			preferences.put(getName(), os.toString());
+			prefs.flush();
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 }

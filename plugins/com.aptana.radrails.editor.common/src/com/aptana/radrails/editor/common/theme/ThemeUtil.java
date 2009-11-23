@@ -1,5 +1,6 @@
 package com.aptana.radrails.editor.common.theme;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -26,10 +28,26 @@ import com.aptana.radrails.editor.common.CommonEditorPlugin;
 public abstract class ThemeUtil
 {
 	/**
+	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
+	 */
+	private static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
+
+	/**
+	 * Preference key used to store the list of known themes.
+	 */
+	private static final String THEME_LIST_PREF_KEY = "themeList"; //$NON-NLS-1$
+
+	/**
 	 * Preference key used to save the active theme.
 	 */
 	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
-	
+
+	/**
+	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
+	 * theme name, value is XML format java Properties object.
+	 */
+	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
+
 	private static Theme fgTheme;
 	private static HashMap<String, Theme> fgThemeMap;
 	private static Map<WeakReference<Token>, String> fgTokens = new HashMap<WeakReference<Token>, String>();
@@ -71,8 +89,8 @@ public abstract class ThemeUtil
 	{
 		if (fgTheme == null)
 		{
-			String activeThemeName = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID, ACTIVE_THEME,
-					null, null);
+			String activeThemeName = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
+					ACTIVE_THEME, null, null);
 			if (activeThemeName != null)
 				fgTheme = getTheme(activeThemeName);
 			if (fgTheme == null)
@@ -113,7 +131,8 @@ public abstract class ThemeUtil
 	private static String toString(RGB selection)
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(",").append(selection.green).append(",").append(selection.blue); //$NON-NLS-1$ //$NON-NLS-2$
+		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green).append(
+				THEME_NAMES_DELIMETER).append(selection.blue);
 		return builder.toString();
 	}
 
@@ -136,11 +155,59 @@ public abstract class ThemeUtil
 		return getThemeMap().keySet();
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void loadThemes()
 	{
 		fgThemeMap = new HashMap<String, Theme>();
-		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle().findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
+		// Load builtin themes stored in properties files
+		loadBuiltinThemes();
+		// Load themes from the preferences
+		loadUserThemes();
+
+		StringBuilder builder = new StringBuilder();
+		for (String themeName : fgThemeMap.keySet())
+		{
+			// FIXME What if the themeName contains our delimeter?!
+			builder.append(themeName).append(THEME_NAMES_DELIMETER);
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs.put(THEME_LIST_PREF_KEY, builder.toString());
+
+	}
+
+	private static void loadUserThemes()
+	{
+		String themeNames = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
+				THEME_LIST_PREF_KEY, null, null);
+		if (themeNames == null)
+			return;
+		StringTokenizer tokenizer = new StringTokenizer(themeNames, THEME_NAMES_DELIMETER);
+		while (tokenizer.hasMoreElements())
+		{
+			try
+			{
+				String themeName = tokenizer.nextToken();
+				String xmlProps = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
+						THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
+				if (xmlProps == null || xmlProps.trim().length() == 0)
+					continue;
+				Properties props = new Properties();
+				props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
+				Theme theme = new Theme(CommonEditorPlugin.getDefault().getColorManager(), props);
+				fgThemeMap.put(theme.getName(), theme);
+			}
+			catch (Exception e)
+			{
+				CommonEditorPlugin.logError(e);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void loadBuiltinThemes()
+	{
+		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle()
+				.findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (urls == null)
 			return;
 		while (urls.hasMoreElements())
@@ -156,7 +223,7 @@ public abstract class ThemeUtil
 			}
 			catch (Exception e)
 			{
-				CommonEditorPlugin.logError(e);
+				CommonEditorPlugin.logError(url.toString(), e);
 			}
 		}
 	}

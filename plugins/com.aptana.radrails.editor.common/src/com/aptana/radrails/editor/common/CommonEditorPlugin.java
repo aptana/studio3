@@ -92,4 +92,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		if (getDefault() != null && getDefault().isDebugging())
 			getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
+
+	public static void logError(String string, Exception e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
+	}
 }
