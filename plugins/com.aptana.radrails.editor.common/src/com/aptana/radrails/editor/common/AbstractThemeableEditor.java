@@ -3,10 +3,17 @@ package com.aptana.radrails.editor.common;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
+import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.radrails.editor.common.actions.ShowScopesAction;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
@@ -15,6 +22,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  * TODO Need a way to override the caret color!
  * 
  * @author cwilliams
+ * @author schitale
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
@@ -27,7 +35,27 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super();
 	}
-
+	
+	@Override
+	public void init(IEditorSite site, IEditorInput input)
+			throws PartInitException
+	{
+		super.init(site, input);
+		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext("com.aptana.editor.scope"); //$NON-NLS-1$
+	}
+	
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+	@Override
+    public void createPartControl(Composite parent)
+	{
+	    Composite findBarComposite = getfindBarDecorator().createFindBarComposite(parent);
+	    super.createPartControl(findBarComposite);
+	    getfindBarDecorator().createFindBar(getSourceViewer());
+	}
+    
 	@Override
 	protected void initializeEditor()
 	{
@@ -53,8 +81,19 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	}
 	
 	@Override
-	protected void createActions() {
+	protected void createActions()
+	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
+		getfindBarDecorator().createActions();
+	}
+	 
+	private IFindBarDecorator findBarDecorator;
+	private IFindBarDecorator getfindBarDecorator()
+	{
+		if (findBarDecorator == null) {
+			findBarDecorator = FindBarDecoratorFactory.createFindBarDecorator(this, getStatusLineManager());
+		}
+		return findBarDecorator;
 	}
 }
