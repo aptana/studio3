@@ -1,6 +1,7 @@
 package com.aptana.radrails.editor.common.theme;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -171,6 +172,11 @@ public class Theme
 	public String getName()
 	{
 		return name;
+	}
+
+	public Map<String, TextAttribute> getTokens()
+	{
+		return Collections.unmodifiableMap(map);
 	}
 
 }
