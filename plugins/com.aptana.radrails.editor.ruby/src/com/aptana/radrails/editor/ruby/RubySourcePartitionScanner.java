@@ -64,8 +64,8 @@ import org.jrubyparser.parser.Tokens;
 public class RubySourcePartitionScanner implements IPartitionTokenScanner
 {
 
-	private static final String INDENTED_HEREDOC_MARKER_PREFIX = "<<-";
-	private static final String HEREDOC_MARKER_PREFIX = "<<";
+	private static final String INDENTED_HEREDOC_MARKER_PREFIX = "<<-"; //$NON-NLS-1$
+	private static final String HEREDOC_MARKER_PREFIX = "<<"; //$NON-NLS-1$
 	private static final String DEFAULT_FILENAME = "filename"; //$NON-NLS-1$
 	private static final String BEGIN = "=begin"; //$NON-NLS-1$
 
@@ -269,7 +269,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	{
 		String opening = getOpeningStringToEndOfLine();
 		int endOfMarker = indexOf(opening.trim(), ", +)"); //$NON-NLS-1$
-		if (opening.trim().startsWith(HEREDOC_MARKER_PREFIX) && endOfMarker != -1) //$NON-NLS-1$
+		if (opening.trim().startsWith(HEREDOC_MARKER_PREFIX) && endOfMarker != -1)
 		{
 			adjustOffset(opening);
 			addHereDocStartToken(endOfMarker);
