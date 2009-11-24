@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ColorManager
 {
+	// TODO Hook an auto dispose like ColorRegistry when display is disposed?
 	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(10);
 
 	public void dispose()
