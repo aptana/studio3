@@ -43,6 +43,12 @@ public abstract class ThemeUtil
 	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
+	 * Preference key used to store teh timestamp of last theme change. Used to force a redraw of editors when theme
+	 * changes (even if it remains same theme, but has been edited).
+	 */
+	public static final String THEME_CHANGED = "THEME_CHANGED"; //$NON-NLS-1$
+
+	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
@@ -104,6 +110,7 @@ public abstract class ThemeUtil
 		fgTheme = theme;
 		adaptTokens();
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		prefs.put(ACTIVE_THEME, theme.getName());
 
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
