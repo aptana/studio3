@@ -55,7 +55,6 @@ public class ExpandSnippetAction extends TextEditorAction {
 			if (adapter instanceof ITextViewer) {
 				textViewer = (ITextViewer) adapter;
 				contentAssistant = new SnippetsContentAssistant(this);
-				contentAssistant.install(textViewer);
 				textWidget = textViewer.getTextWidget();
 				if (textViewer instanceof ITextViewerExtension2) {
 					ITextViewerExtension2 textViewerExtension2 = (ITextViewerExtension2) textViewer;
@@ -68,7 +67,12 @@ public class ExpandSnippetAction extends TextEditorAction {
 	@Override
 	public void run() {
 		if (contentAssistant != null) {
-			contentAssistant.showPossibleCompletions();
+			try {
+				contentAssistant.install(textViewer);
+				contentAssistant.showPossibleCompletions();
+			} finally {
+				contentAssistant.uninstall();
+			}
 		}
 	}
 
