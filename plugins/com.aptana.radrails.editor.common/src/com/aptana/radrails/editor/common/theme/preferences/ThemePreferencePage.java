@@ -1,8 +1,11 @@
 package com.aptana.radrails.editor.common.theme.preferences;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -15,15 +18,16 @@ import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,6 +62,54 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
+
+	private static List<String> tokenTypeNames = new ArrayList<String>();
+	static
+	{
+		tokenTypeNames.add("comment"); //$NON-NLS-1$
+		tokenTypeNames.add("comment.block"); //$NON-NLS-1$
+		tokenTypeNames.add("comment.documentation"); //$NON-NLS-1$
+		tokenTypeNames.add("comment.line"); //$NON-NLS-1$
+		tokenTypeNames.add("constant"); //$NON-NLS-1$
+		tokenTypeNames.add("constant.character"); //$NON-NLS-1$
+		tokenTypeNames.add("constant.language"); //$NON-NLS-1$
+		tokenTypeNames.add("constant.numeric"); //$NON-NLS-1$
+		tokenTypeNames.add("constant.other"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.name"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.name.class"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.name.function"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.name.tag"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.other"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.other.attribute-name"); //$NON-NLS-1$
+		tokenTypeNames.add("entity.other.inherited-class"); //$NON-NLS-1$
+		tokenTypeNames.add("invalid"); //$NON-NLS-1$
+		tokenTypeNames.add("invalid.deprecated"); //$NON-NLS-1$
+		tokenTypeNames.add("invalid.illegal"); //$NON-NLS-1$
+		tokenTypeNames.add("keyword"); //$NON-NLS-1$
+		tokenTypeNames.add("keyword.control"); //$NON-NLS-1$
+		tokenTypeNames.add("keyword.operator"); //$NON-NLS-1$
+		tokenTypeNames.add("keyword.other"); //$NON-NLS-1$
+		tokenTypeNames.add("storage"); //$NON-NLS-1$
+		tokenTypeNames.add("storage.modifier"); //$NON-NLS-1$
+		tokenTypeNames.add("storage.other"); //$NON-NLS-1$
+		tokenTypeNames.add("storage.type"); //$NON-NLS-1$
+		tokenTypeNames.add("string"); //$NON-NLS-1$
+		tokenTypeNames.add("string.interpolated"); //$NON-NLS-1$
+		tokenTypeNames.add("string.other"); //$NON-NLS-1$
+		tokenTypeNames.add("string.quoted"); //$NON-NLS-1$
+		tokenTypeNames.add("string.regexp"); //$NON-NLS-1$
+		tokenTypeNames.add("string.unquoted"); //$NON-NLS-1$
+		tokenTypeNames.add("support"); //$NON-NLS-1$
+		tokenTypeNames.add("support.class"); //$NON-NLS-1$
+		tokenTypeNames.add("support.constant"); //$NON-NLS-1$
+		tokenTypeNames.add("support.function"); //$NON-NLS-1$
+		tokenTypeNames.add("support.other"); //$NON-NLS-1$
+		tokenTypeNames.add("support.type"); //$NON-NLS-1$
+		tokenTypeNames.add("variable"); //$NON-NLS-1$
+		tokenTypeNames.add("variable.language"); //$NON-NLS-1$
+		tokenTypeNames.add("variable.other"); //$NON-NLS-1$
+		tokenTypeNames.add("variable.parameter"); //$NON-NLS-1$
+	}
 
 	private static final int ROW_HEIGHT = 20;
 	protected String fSelectedTheme;
@@ -159,7 +211,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 		});
 		// Manual hack to draw the right bg color for the first column selection
-		// FIXME This shoudl be able to be done by listening to Erase/PaintItem events!
+		// FIXME This should be able to be done by listening to Erase/PaintItem events!
 		table.addSelectionListener(new SelectionListener()
 		{
 			TableItem lastSelected;
@@ -275,6 +327,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		column.setEditingSupport(new EditingSupport(tableViewer)
 		{
 
+			private ComboBoxCellEditor cellEditor;
+
 			@SuppressWarnings("unchecked")
 			@Override
 			protected void setValue(Object element, Object value)
@@ -282,7 +336,26 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				// FIXME What if user has edited the value but is trying to delete the row? check to see if the token
 				// even exists in the theme before saving/updating
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				String newName = (String) value;
+				Integer selection = (Integer) value;
+				String newName = null;
+				if (selection.intValue() == -1)
+				{
+					try
+					{
+						// edited value, need to grab text of combo
+						Field field = cellEditor.getClass().getDeclaredField("comboBox");
+						field.setAccessible(true);
+						CCombo combo = (CCombo) field.get(cellEditor);
+						newName = combo.getText();
+					}
+					catch (Exception e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				else
+					newName = cellEditor.getItems()[selection];
 				if (newName.equals(token.getKey()))
 					return;
 				Theme theme = getTheme();
@@ -291,18 +364,22 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				setTheme(fSelectedTheme);
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected Object getValue(Object element)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				return token.getKey();
+				return 0;
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			protected CellEditor getCellEditor(Object element)
 			{
-				return new TextCellEditor(table);
+				List<String> tokenTypes = new ArrayList<String>();
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
+				tokenTypes.add(token.getKey());
+				tokenTypes.addAll(tokenTypeNames);
+				cellEditor = new ComboBoxCellEditor(table, tokenTypes.toArray(new String[tokenTypes.size()]));
+				return cellEditor;
 			}
 
 			@Override
@@ -417,6 +494,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		RowData data = new RowData();
 		data.width = 250;
 		text.setLayoutData(data);
+		text.setEditable(false);
 		table.addSelectionListener(new SelectionListener()
 		{
 
