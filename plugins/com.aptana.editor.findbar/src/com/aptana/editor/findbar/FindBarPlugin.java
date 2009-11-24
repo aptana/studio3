@@ -6,20 +6,20 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The activator class controls the plug-in life cycle
+ * This class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class FindBarPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.findbar"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static FindBarPlugin plugin;
 	
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public FindBarPlugin() {
 	}
 
 	/*
@@ -45,14 +45,22 @@ public class Activator extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static FindBarPlugin getDefault() {
 		return plugin;
 	}
 	
 	public static final String CLOSE = "/icons/close.png"; //$NON-NLS-1$
+	public static final String PREVIOUS = "/icons/previous.png"; //$NON-NLS-1$
+	public static final String NEXT = "/icons/next.png"; //$NON-NLS-1$
+	public static final String SIGMA = "/icons/sigma.png"; //$NON-NLS-1$
+	public static final String FINDREPLACE = "/icons/findreplace.png"; //$NON-NLS-1$
 	
 	protected void initializeImageRegistry(ImageRegistry reg) {
 		reg.put(CLOSE, imageDescriptorFromPlugin(PLUGIN_ID, CLOSE));
+		reg.put(PREVIOUS, imageDescriptorFromPlugin(PLUGIN_ID, PREVIOUS));
+		reg.put(NEXT, imageDescriptorFromPlugin(PLUGIN_ID, NEXT));
+		reg.put(SIGMA, imageDescriptorFromPlugin(PLUGIN_ID, SIGMA));
+		reg.put(FINDREPLACE, imageDescriptorFromPlugin(PLUGIN_ID, FINDREPLACE));
 	}
 	
 	public Image getImage(String imageID) {

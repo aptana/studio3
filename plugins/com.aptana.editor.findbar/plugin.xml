@@ -31,7 +31,7 @@
       <!-- The following binding is active in Aptana editors -->
       <key
             commandId="org.eclipse.ui.edit.find.bar"
-            contextId="com.aptana.editor.scope"
+            contextId="org.eclipse.ui.textEditorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
       </key>
@@ -76,12 +76,20 @@
    </extension>
    
    <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.editor.findbar.impl.ShowFindBarHandler"
+            commandId="org.eclipse.ui.edit.find.bar">
+      </handler>
+   </extension>
+   
+   <extension
          point="org.eclipse.ui.contexts">
       <context
             description="%FindBar.context.description"
             id="org.eclipse.ui.textEditorScope.findbar"
             name="%FindBar.context.name"
-            parentId="com.aptana.editor.scope">
+            parentId="org.eclipse.ui.textEditorScope">
       </context>
    </extension>
 </plugin>

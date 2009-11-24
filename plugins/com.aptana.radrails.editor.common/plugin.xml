@@ -27,13 +27,4 @@
             sequence="Ctrl+Shift+P">
       </key>
    </extension>
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            description="Aptana Editor Scope is active in Aptana editors."
-            id="com.aptana.editor.scope"
-            name="Aptana Editor Scope"
-            parentId="org.eclipse.ui.textEditorScope">
-      </context>
-   </extension>
 </plugin>

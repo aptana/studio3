@@ -4,15 +4,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
+import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.radrails.editor.common.actions.ShowScopesAction;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
@@ -37,12 +34,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	}
 	
 	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException
-	{
-		super.init(site, input);
-		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext("com.aptana.editor.scope"); //$NON-NLS-1$
+	public Object getAdapter(Class adapter) {
+		if (IFindBarDecorated.class == adapter) {
+			return AbstractThemeableEditor.this.getFindBarDecorated();
+		}
+		return super.getAdapter(adapter);
 	}
 	
     /* (non-Javadoc)
@@ -51,9 +47,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
     public void createPartControl(Composite parent)
 	{
-	    Composite findBarComposite = getfindBarDecorator().createFindBarComposite(parent);
+	    Composite findBarComposite = getFindBarDecorator().createFindBarComposite(parent);
 	    super.createPartControl(findBarComposite);
-	    getfindBarDecorator().createFindBar(getSourceViewer());
+	    getFindBarDecorator().createFindBar(getSourceViewer());
 	}
     
 	@Override
@@ -85,11 +81,22 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
-		getfindBarDecorator().createActions();
+	}
+	
+	private IFindBarDecorated findBarDecorated;
+	private IFindBarDecorated getFindBarDecorated() {
+		if (findBarDecorated == null) {
+			findBarDecorated = new IFindBarDecorated() {
+				public IFindBarDecorator getFindBarDecorator() {
+					return AbstractThemeableEditor.this.	getFindBarDecorator();
+				}
+			};
+		}
+		return findBarDecorated;
 	}
 	 
 	private IFindBarDecorator findBarDecorator;
-	private IFindBarDecorator getfindBarDecorator()
+	private IFindBarDecorator getFindBarDecorator()
 	{
 		if (findBarDecorator == null) {
 			findBarDecorator = FindBarDecoratorFactory.createFindBarDecorator(this, getStatusLineManager());

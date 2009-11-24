@@ -15,7 +15,6 @@ import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
@@ -31,8 +30,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -43,17 +40,17 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.ISharedImages;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.findbar.Activator;
+import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 
 public class FindBarDecorator implements IFindBarDecorator {
@@ -90,37 +87,43 @@ public class FindBarDecorator implements IFindBarDecorator {
 		findBarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		findBarGridData.exclude = true;
 		findBar.setLayoutData(findBarGridData);
-
+		
 		GridLayout gridLayout = new GridLayout(12, false);
-		gridLayout.marginWidth = 0;
+		gridLayout.marginWidth = 5;
 		gridLayout.marginHeight = 0;
 		gridLayout.marginTop = 0;
-		gridLayout.marginLeft = 10;
+		gridLayout.marginLeft = 0;
 		gridLayout.marginBottom = 0;
-		gridLayout.marginRight = 5;
+		gridLayout.marginRight = 0;
+		gridLayout.horizontalSpacing = 4;
+		gridLayout.verticalSpacing = 0;
 		findBar.setLayout(gridLayout);
 
-		Label close = new Label(findBar, SWT.PUSH);
+		ToolBar closeToolBar = new ToolBar(findBar, SWT.NONE);
+		ToolItem close = new ToolItem(closeToolBar, SWT.NONE);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
-		close.setImage(Activator.getDefault().getImage(Activator.CLOSE));
-		close.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		close.addMouseListener(new MouseListener() {
-			public void mouseUp(MouseEvent e) {}
-			public void mouseDown(MouseEvent e) { hideFindBar(); }
-			public void mouseDoubleClick(MouseEvent e) {}
+		close.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.CLOSE));
+		close.addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				hideFindBar();
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
+		closeToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
 		Label findLabel = new Label(findBar, SWT.NONE);
 		findLabel.setText(Messages.FindBarDecorator_LABEL_FInd);
 		GridData findLabelGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		findLabelGridData.horizontalIndent = 5;
 		findLabel.setLayoutData(findLabelGridData);
-
+		
 		combo = new Combo(findBar, SWT.DROP_DOWN);
 		combo.setText("                            "); //$NON-NLS-1$
 		Point size = combo.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		GridData comboGridData = new GridData(SWT.LEFT, SWT.CENTER, false,
-				false);
+		GridData comboGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		comboGridData.horizontalIndent = 2;
 		comboGridData.widthHint = size.x;
 		combo.setLayoutData(comboGridData);
 		combo.setText(EMPTY);
@@ -135,12 +138,13 @@ public class FindBarDecorator implements IFindBarDecorator {
 			}
 		});
 		
-		previous = new Button(findBar, SWT.PUSH);
+		ToolBar previousNextToolBar = new ToolBar(findBar, SWT.NONE);
+		GridData previousNextToolBarGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		previousNextToolBar.setLayoutData(previousNextToolBarGridData);
+
+		previous = new ToolItem(previousNextToolBar, SWT.PUSH);
 		previous.setEnabled(false);
-		// previous.setText("Previous");
-		previous.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
-				ISharedImages.IMG_TOOL_BACK));
-		previous.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		previous.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.PREVIOUS));
 		previous.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				findPrevious();
@@ -150,12 +154,9 @@ public class FindBarDecorator implements IFindBarDecorator {
 			}
 		});
 
-		next = new Button(findBar, SWT.PUSH);
+		next = new ToolItem(previousNextToolBar, SWT.PUSH);
 		next.setEnabled(false);
-		// next.setText("Next");
-		next.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
-				ISharedImages.IMG_TOOL_FORWARD));
-		next.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		next.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.NEXT));
 		next.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				findNext();
@@ -165,11 +166,10 @@ public class FindBarDecorator implements IFindBarDecorator {
 				widgetSelected(e);
 			}
 		});
-
+		
 		caseSensitive = new Button(findBar, SWT.CHECK);
 		caseSensitive.setText(Messages.FindBarDecorator_LABEL_CaseSensitive);
-		caseSensitive.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false,
-				false));
+		caseSensitive.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		caseSensitive.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				find(true, true);
@@ -198,8 +198,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 		if (findReplaceTarget instanceof IFindReplaceTargetExtension3) {
 			regularExpression = new Button(findBar, SWT.CHECK);
 			regularExpression.setText(Messages.FindBarDecorator_LABEL_RegularExpression);
-			regularExpression.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER,
-					false, false));
+			regularExpression.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 			regularExpression.addSelectionListener(new SelectionListener() {
 				public void widgetSelected(SelectionEvent e) {
 					find(true, true);
@@ -212,10 +211,14 @@ public class FindBarDecorator implements IFindBarDecorator {
 			});
 		}
 		
-		countTotal = new Button(findBar, SWT.TOGGLE);
-		countTotal.setText("\u2211"); //$NON-NLS-1$
+		ToolBar countTotalToolBar = new ToolBar(findBar, SWT.NONE);
+		countTotalToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		
+		ToolItem separator = new ToolItem(countTotalToolBar, SWT.SEPARATOR);
+		
+		countTotal = new ToolItem(countTotalToolBar, SWT.CHECK);
+		countTotal.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.SIGMA));
 		countTotal.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowMatchCount);
-		countTotal.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		countTotal.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				showCountTotal();
@@ -232,12 +235,13 @@ public class FindBarDecorator implements IFindBarDecorator {
 
 		Label streach = new Label(findBar, SWT.PUSH);
 		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-		Button showFindReplaceDialog = new Button(findBar, SWT.PUSH);
-		showFindReplaceDialog.setText(Messages.FindBarDecorator_LABEL_Elipses);
+		
+		ToolBar showFindReplaceDialogToolBar = new ToolBar(findBar, SWT.NONE);
+		showFindReplaceDialogToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		
+		ToolItem showFindReplaceDialog = new ToolItem(showFindReplaceDialogToolBar, SWT.PUSH);
+		showFindReplaceDialog.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.FINDREPLACE));
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog); 
-		showFindReplaceDialog.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER,
-				false, false));
 		showFindReplaceDialog.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				showFindReplaceDialog();
@@ -246,11 +250,6 @@ public class FindBarDecorator implements IFindBarDecorator {
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 		
-	}
-	
-	public void createActions() {
-		textEditor.setAction(SHOW_FIND_BAR_COMMAND_ID, new ShowFindBarAction());
-		
 		// Activate handlers
 		IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
 		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.hide", new HideFindBarHandler()); //$NON-NLS-1$
@@ -258,23 +257,48 @@ public class FindBarDecorator implements IFindBarDecorator {
 		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.findNext", new FindNextHandler()); //$NON-NLS-1$
 	}
 
-	private Combo combo;
-	private Button caseSensitive;
-	private Button wholeWord;
-	private Button regularExpression;
-	private int incrementalOffset = -1;
-	private Button next;
-	private Button previous;
-	private Button countTotal;
-	private Label count;
+	public void showFindBar() {
+		boolean wasExcluded = findBarGridData.exclude;
+		if (findBarGridData.exclude) {
+			findBarGridData.exclude = false;
+			composite.layout();
+		}
+		ISelection selection = sourceViewer.getSelectionProvider()
+				.getSelection();
+		if (selection instanceof ITextSelection) {
+			ITextSelection textSelection = (ITextSelection) selection;
+			String text = textSelection.getText();
+			if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
+				setFindText(text, !wasExcluded);
+			}
+		}
+		if (wasExcluded) {
+			combo.addModifyListener(modifyListener);
+		}
+		adjustEnablement();
+		boolean comboHasFocus = combo.isFocusControl();
+		if (!comboHasFocus) {
+			combo.setFocus();
+			incrementalOffset = -1;
+		}
+	}
+
 	private Composite composite;
 	
 	private Composite findBar;
 	private GridData findBarGridData;
 	
-	private IContextActivation findBarContextActivation;
+	private Combo combo;
+	private Button caseSensitive;
+	private Button wholeWord;
+	private Button regularExpression;
+	private int incrementalOffset = -1;
+	private ToolItem next;
+	private ToolItem previous;
+	private ToolItem countTotal;
+	private Label count;
 	
-	private static String SHOW_FIND_BAR_COMMAND_ID = "org.eclipse.ui.edit.find.bar"; //$NON-NLS-1$
+	private IContextActivation findBarContextActivation;
 	
 	private static final String EMPTY = ""; //$NON-NLS-1$
 	
@@ -306,16 +330,6 @@ public class FindBarDecorator implements IFindBarDecorator {
 		}
 	};
 
-	private class ShowFindBarAction extends Action {
-		private ShowFindBarAction() {
-			setActionDefinitionId(SHOW_FIND_BAR_COMMAND_ID);
-		}
-
-		public void run() {
-			showFindBar();
-		}
-	}
-	
 	private class HideFindBarHandler extends AbstractHandler {
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			hideFindBar();
@@ -349,7 +363,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 		if (regularExpression == null) {
 			return;
 		}
-		regularExpression.setForeground(null);
+//		regularExpression.setForeground(null);
 		String findText = combo.getText();
 		if (EMPTY.equals(findText)) {
 			return;
@@ -357,9 +371,9 @@ public class FindBarDecorator implements IFindBarDecorator {
 		if (regularExpression.getSelection()) {
 			try {
 				Pattern.compile(findText);
-				regularExpression.setForeground(null);
+//				regularExpression.setForeground(null);
 			} catch (PatternSyntaxException pse) {
-				regularExpression.setForeground(regularExpression.getDisplay().getSystemColor(SWT.COLOR_RED));
+//				regularExpression.setForeground(regularExpression.getDisplay().getSystemColor(SWT.COLOR_RED));
 			}
 		}
 	}
@@ -373,32 +387,6 @@ public class FindBarDecorator implements IFindBarDecorator {
 			findBarContext(false);
 		}
 		textEditor.setFocus();
-	}
-
-	private void showFindBar() {
-		boolean wasExcluded = findBarGridData.exclude;
-		if (findBarGridData.exclude) {
-			findBarGridData.exclude = false;
-			composite.layout();
-		}
-		ISelection selection = sourceViewer.getSelectionProvider()
-				.getSelection();
-		if (selection instanceof ITextSelection) {
-			ITextSelection textSelection = (ITextSelection) selection;
-			String text = textSelection.getText();
-			if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
-				setFindText(text, !wasExcluded);
-			}
-		}
-		if (wasExcluded) {
-			combo.addModifyListener(modifyListener);
-		}
-		adjustEnablement();
-		boolean comboHasFocus = combo.isFocusControl();
-		if (!comboHasFocus) {
-			combo.setFocus();
-			incrementalOffset = -1;
-		}
 	}
 	
 	private void findPrevious() {

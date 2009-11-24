@@ -37,15 +37,7 @@ public interface IFindBarDecorator {
 	void createFindBar(ISourceViewer sourceViewer);
 	
 	/**
-	 * This hooks up the actions and command handlers. This should be called from:
-	 * 
-	 * <pre>
-	 * protected void createActions() {
-	 *     super.createActions();
-     *     getfindBarDecorator().createActions();
-     * }
-     * </pre>
-	 * 
+	 * Shows Find Bar.
 	 */
-	void createActions();
+	void showFindBar();
 }
