@@ -203,13 +203,16 @@ public class Theme
 		return Collections.unmodifiableMap(map);
 	}
 
+	/**
+	 * Updates the TextAttribute for a token and immediately saves the theme.
+	 * 
+	 * @param key
+	 * @param at
+	 */
 	public void update(String key, TextAttribute at)
 	{
 		map.put(key, at);
-		if (ThemeUtil.getActiveTheme().equals(this))
-			ThemeUtil.setActiveTheme(this);
 		save();
-		// FIXME Doesn't seem to redraw the editors properly!
 	}
 
 	private Properties toProps()
@@ -284,9 +287,11 @@ public class Theme
 		}
 	}
 
-	private void save()
+	public void save()
 	{
 		save(new InstanceScope());
+		if (ThemeUtil.getActiveTheme().equals(this))
+			ThemeUtil.setActiveTheme(this);
 	}
 
 	private void save(IScopeContext scope)
@@ -336,6 +341,26 @@ public class Theme
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	/**
+	 * Removes a token from the theme.
+	 * 
+	 * @param key
+	 */
+	public void remove(String key)
+	{
+		map.remove(key);
+	}
+
+	/**
+	 * Adds a new token entry with no font styling, no bg, same FG as default for theme.
+	 */
+	public void addNewDefaultToken(String name)
+	{
+		TextAttribute attr = new TextAttribute(colorManager.getColor(defaultFG));
+		map.put(name, attr);
+		save();
 	}
 
 }

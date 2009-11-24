@@ -1,20 +1,26 @@
 package com.aptana.radrails.editor.common.theme.preferences;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.viewers.BaseLabelProvider;
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
@@ -157,10 +163,22 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			}
 
+			@SuppressWarnings("unchecked")
 			public Object[] getElements(Object inputElement)
 			{
 				Map<String, TextAttribute> tokens = theme.getTokens();
-				return tokens.entrySet().toArray();
+				Object[] array = tokens.entrySet().toArray();
+				// Sort by keys!
+				Arrays.sort(array, new Comparator()
+				{
+					public int compare(Object o1, Object o2)
+					{
+						Entry<String, TextAttribute> e1 = (Entry<String, TextAttribute>) o1;
+						Entry<String, TextAttribute> e2 = (Entry<String, TextAttribute>) o2;
+						return e1.getKey().compareTo(e2.getKey());
+					}
+				});
+				return array;
 			}
 		});
 		tableViewer.setLabelProvider(new TokenLabelProvider());
@@ -188,7 +206,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Color fg = token.getValue().getForeground();
 				if (fg == null)
-					return new Color(Display.getCurrent(), ThemeUtil.getTheme(fSelectedTheme).getForeground());
+					return new Color(Display.getCurrent(), getTheme().getForeground());
 				return fg;
 			}
 
@@ -199,7 +217,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Color bg = token.getValue().getBackground();
 				if (bg == null)
-					return new Color(Display.getCurrent(), ThemeUtil.getTheme(fSelectedTheme).getBackground());
+					return new Color(Display.getCurrent(), getTheme().getBackground());
 				return bg;
 			}
 
@@ -211,6 +229,46 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Font font = token.getValue().getFont();
 				return font;
+			}
+		});
+
+		column.setEditingSupport(new EditingSupport(tableViewer)
+		{
+
+			@SuppressWarnings("unchecked")
+			@Override
+			protected void setValue(Object element, Object value)
+			{
+				// FIXME What if user has edited the value but is trying to delete the row? check to see if the token
+				// even exists in the theme before saving/updating
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
+				String newName = (String) value;
+				if (newName.equals(token.getKey()))
+					return;
+				Theme theme = getTheme();
+				theme.remove(token.getKey());
+				theme.update(newName, token.getValue());
+				setTheme(fSelectedTheme);
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			protected Object getValue(Object element)
+			{
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
+				return token.getKey();
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element)
+			{
+				return new TextCellEditor(table);
+			}
+
+			@Override
+			protected boolean canEdit(Object element)
+			{
+				return true;
 			}
 		});
 
@@ -259,8 +317,56 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		buttons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		Button addToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
 		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);
+		addToken.addSelectionListener(new SelectionAdapter()
+		{
+			@SuppressWarnings("unchecked")
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				// Add a new row to the table by adding a basic token to the theme
+				Theme theme = getTheme();
+				String newName = "newToken";
+				theme.addNewDefaultToken(newName);
+				setTheme(fSelectedTheme);
+				// Select the new token!
+				TableItem[] items = table.getItems();
+				int i = 0;
+				for (TableItem tableItem : items)
+				{
+					Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					if (entry.getKey().equals(newName))
+					{
+						break;
+					}
+					i++;
+				}
+				table.select(i);
+				// TODO Somehow set focus on the first column so we can have the user edit right away?
+			}
+		});
 		Button removeToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
 		removeToken.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
+		removeToken.addSelectionListener(new SelectionAdapter()
+		{
+			@SuppressWarnings("unchecked")
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				TableItem[] items = table.getSelection();
+				if (items == null || items.length == 0)
+					return;
+
+				Theme theme = getTheme();
+				for (TableItem tableItem : items)
+				{
+					Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
+					theme.remove(entry.getKey());
+				}
+				// FIXME This isn't removing the row in the table!
+				theme.save();
+				setTheme(fSelectedTheme);
+			}
+		});
 
 		Composite textField = new Composite(editTokenList, SWT.NONE);
 		textField.setLayoutData(new GridData(GridData.END, GridData.CENTER, true, false));
@@ -323,7 +429,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	protected void setTheme(String themeName)
 	{
 		fSelectedTheme = themeName;
-		Theme theme = ThemeUtil.getTheme(themeName);
+		Theme theme = getTheme();
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
 		lineHighlightSelector.setColorValue(theme.getLineHighlight());
@@ -408,7 +514,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					style |= SWT.ITALIC;
 				TextAttribute at = new TextAttribute(token.getValue().getForeground(),
 						token.getValue().getBackground(), style, token.getValue().getFont());
-				ThemeUtil.getTheme(fSelectedTheme).update(token.getKey(), at);
+				getTheme().update(token.getKey(), at);
 				setTheme(fSelectedTheme);
 			}
 		};
@@ -459,7 +565,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				}
 
 				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
-				ThemeUtil.getTheme(fSelectedTheme).update(token.getKey(), at);
+				getTheme().update(token.getKey(), at);
 				setTheme(fSelectedTheme);
 			}
 		});
@@ -473,7 +579,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		ThemeUtil.setActiveTheme(ThemeUtil.getTheme(fSelectedTheme));
+		ThemeUtil.setActiveTheme(getTheme());
 		return super.performOk();
 	}
 
@@ -482,8 +588,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	{
 		try
 		{
-			ThemeUtil.getTheme(fSelectedTheme).loadFromDefaults();
-			ThemeUtil.setActiveTheme(ThemeUtil.getTheme(fSelectedTheme));
+			Theme theme = getTheme();
+			theme.loadFromDefaults();
+			ThemeUtil.setActiveTheme(theme);
 			setTheme(fSelectedTheme);
 		}
 		catch (Exception e)
@@ -491,6 +598,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			CommonEditorPlugin.logError(e);
 		}
 		super.performDefaults();
+	}
+
+	protected Theme getTheme()
+	{
+		return ThemeUtil.getTheme(fSelectedTheme);
 	}
 
 }
