@@ -46,14 +46,15 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(ThemeUtil.ACTIVE_THEME))
+		if (event.getProperty().equals(ThemeUtil.ACTIVE_THEME) || event.getProperty().equals(ThemeUtil.THEME_CHANGED))
 		{
 			getSourceViewer().invalidateTextPresentation();
 		}
 	}
-	
+
 	@Override
-	protected void createActions() {
+	protected void createActions()
+	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 	}

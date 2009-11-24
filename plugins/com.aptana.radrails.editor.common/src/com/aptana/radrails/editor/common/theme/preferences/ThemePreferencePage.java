@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.aptana.radrails.editor.common.CommonEditorPlugin;
 import com.aptana.radrails.editor.common.theme.Theme;
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
@@ -125,8 +126,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createTokenEditTable(Composite composite)
 	{
-		new Label(composite, SWT.NONE);
-
 		// TODO Hook in custom paint listeners to paint selection background color using the theme's selection color
 		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
@@ -174,6 +173,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		layout.addColumnData(new ColumnWeightData(50, true));
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
+			@SuppressWarnings("unchecked")
 			@Override
 			public String getText(Object element)
 			{
@@ -181,6 +181,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return token.getKey();
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public Color getForeground(Object element)
 			{
@@ -191,6 +192,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return fg;
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public Color getBackground(Object element)
 			{
@@ -201,10 +203,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return bg;
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public Font getFont(Object element)
 			{
-				// FIXME show bold, italic, underline properly!
+				// FIXME show bold, italic, underline properly in first column!
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Font font = token.getValue().getFont();
 				return font;
@@ -246,41 +249,42 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fontStyle.setText(Messages.ThemePreferencePage_FontStyleColumnLabel);
 		fontStyle.setWidth(75);
 		layout.addColumnData(new ColumnWeightData(15, true));
-		
+
 		Composite editTokenList = new Composite(composite, SWT.NONE);
 		GridLayout grid = new GridLayout(2, false);
 		grid.marginWidth = -3;
 		editTokenList.setLayout(grid);
-		
+
 		Composite buttons = new Composite(editTokenList, SWT.NONE);
 		buttons.setLayout(new RowLayout(SWT.HORIZONTAL));
 		Button addToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
-		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);		
+		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);
 		Button removeToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
 		removeToken.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
-		
+
 		Composite textField = new Composite(editTokenList, SWT.NONE);
 		textField.setLayoutData(new GridData(GridData.END, GridData.CENTER, true, false));
 		textField.setLayout(new RowLayout(SWT.HORIZONTAL));
 		Label addTokenLabel = new Label(textField, SWT.RIGHT);
 		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
-		
+
 		final Text text = new Text(textField, SWT.SINGLE);
 		RowData data = new RowData();
 		data.width = 250;
 		text.setLayoutData(data);
 		table.addSelectionListener(new SelectionListener()
 		{
-			
+
+			@SuppressWarnings("unchecked")
 			public void widgetSelected(SelectionEvent e)
 			{
 				TableItem item = (TableItem) e.item;
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
-				text.setText(token.getKey());				
+				text.setText(token.getKey());
 			}
-			
+
 			public void widgetDefaultSelected(SelectionEvent e)
-			{				
+			{
 			}
 		});
 	}
@@ -293,6 +297,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			return null;
 		}
 
+		@SuppressWarnings("unchecked")
 		public String getColumnText(Object element, int columnIndex)
 		{
 			Map.Entry<String, TextAttribute> commit = (Map.Entry<String, TextAttribute>) element;
@@ -328,6 +333,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		addCustomTableEditorControls();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void addCustomTableEditorControls()
 	{
 		clearTableEditors();
@@ -388,6 +394,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		SelectionAdapter selectionAdapter = new SelectionAdapter()
 		{
+			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -428,6 +435,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		button.addSelectionListener(new SelectionAdapter()
 		{
+			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -465,9 +473,24 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		// FIXME Save any changes to the theme permanently!
 		ThemeUtil.setActiveTheme(ThemeUtil.getTheme(fSelectedTheme));
 		return super.performOk();
+	}
+
+	@Override
+	protected void performDefaults()
+	{
+		try
+		{
+			ThemeUtil.getTheme(fSelectedTheme).loadFromDefaults();
+			ThemeUtil.setActiveTheme(ThemeUtil.getTheme(fSelectedTheme));
+			setTheme(fSelectedTheme);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		super.performDefaults();
 	}
 
 }
