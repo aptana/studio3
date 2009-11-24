@@ -151,6 +151,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				setTheme(fThemeCombo.getText());
+				ThemeUtil.setActiveTheme(getTheme());
 				super.widgetSelected(e);
 			}
 		});
