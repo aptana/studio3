@@ -10,23 +10,26 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Kevin Lindsey
  */
-public class ColorManager {
+public class ColorManager
+{
 	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(10);
 
-	public void dispose() {
-		for (Color c : this._colorsByRGB.values()) {
+	public void dispose()
+	{
+		for (Color c : this._colorsByRGB.values())
+		{
 			c.dispose();
 		}
 	}
 
-	public Color getColor(RGB rgb) {
+	public Color getColor(RGB rgb)
+	{
 		Color color = this._colorsByRGB.get(rgb);
-		
-		if (color == null) {
+		if (color == null)
+		{
 			color = new Color(Display.getCurrent(), rgb);
 			this._colorsByRGB.put(rgb, color);
 		}
-		
 		return color;
 	}
 }

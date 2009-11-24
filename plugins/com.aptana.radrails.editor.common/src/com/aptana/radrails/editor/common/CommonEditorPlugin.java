@@ -45,6 +45,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		if (_colorManager != null)
+			_colorManager.dispose();
+		_colorManager = null;
 		plugin = null;
 		super.stop(context);
 	}
