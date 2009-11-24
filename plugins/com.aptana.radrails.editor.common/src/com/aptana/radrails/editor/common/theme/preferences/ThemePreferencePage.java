@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -41,7 +42,6 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -206,7 +206,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Color fg = token.getValue().getForeground();
 				if (fg == null)
-					return new Color(Display.getCurrent(), getTheme().getForeground());
+					return CommonEditorPlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
 				return fg;
 			}
 
@@ -217,7 +217,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Color bg = token.getValue().getBackground();
 				if (bg == null)
-					return new Color(Display.getCurrent(), getTheme().getBackground());
+				{
+					return CommonEditorPlugin.getDefault().getColorManager().getColor(getTheme().getBackground());
+				}
 				return bg;
 			}
 
@@ -228,6 +230,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				// FIXME show bold, italic, underline properly in first column!
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Font font = token.getValue().getFont();
+				if (font == null)
+					font = JFaceResources.getTextFont();
 				return font;
 			}
 		});
@@ -362,7 +366,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
 					theme.remove(entry.getKey());
 				}
-				// FIXME This isn't removing the row in the table!
 				theme.save();
 				setTheme(fSelectedTheme);
 			}
@@ -555,13 +558,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				Color bg = token.getValue().getBackground();
 				if (index == 1)
 				{
-					// fg
-					fg = new Color(Display.getCurrent(), newRGB);
+					fg = CommonEditorPlugin.getDefault().getColorManager().getColor(newRGB);
 				}
 				else
 				{
-					// bg
-					bg = new Color(Display.getCurrent(), newRGB);
+					bg = CommonEditorPlugin.getDefault().getColorManager().getColor(newRGB);
 				}
 
 				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
