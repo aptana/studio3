@@ -146,6 +146,42 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				event.height = ROW_HEIGHT;
 			}
 		});
+		// Override selection color to match what is set in theme
+		table.addListener(SWT.EraseItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				// Don't draw the background of the first column for selections
+				if ((event.detail & SWT.SELECTED) != 0 && event.index == 0)
+				{
+					event.detail &= ~SWT.SELECTED;
+				}
+			}
+		});
+		// Manual hack to draw the right bg color for the first column selection
+		// FIXME This shoudl be able to be done by listening to Erase/PaintItem events!
+		table.addSelectionListener(new SelectionListener()
+		{
+			TableItem lastSelected;
+			private Color lastSelectedColor;
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (lastSelected != null)
+				{
+					lastSelected.setBackground(0, lastSelectedColor);
+				}
+				TableItem item = (TableItem) e.item;
+				lastSelectedColor = item.getBackground(0);
+				lastSelected = item;
+				item.setBackground(0, CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getTheme().getSelection()));
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+			}
+		});
 
 		tableViewer = new TableViewer(table);
 		tableViewer.setContentProvider(new IStructuredContentProvider()
