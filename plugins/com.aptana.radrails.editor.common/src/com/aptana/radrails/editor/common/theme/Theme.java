@@ -1,11 +1,15 @@
 package com.aptana.radrails.editor.common.theme;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -22,6 +26,7 @@ import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.radrails.editor.common.CommonEditorPlugin;
@@ -57,7 +62,6 @@ public class Theme
 	private RGB selection;
 	private RGB caret;
 	private String name;
-	private Properties props;
 
 	public Theme(ColorManager colormanager, Properties props)
 	{
@@ -269,7 +273,15 @@ public class Theme
 
 	private void storeDefaults()
 	{
-		save(new DefaultScope());
+		// Only save to defaults if it has never been saved there. Basically take a snapshot of first version and
+		// use that as the "default"
+		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		String value = preferences.get(getName(), null);
+		if (value == null)
+		{
+			save(new DefaultScope());
+		}
 	}
 
 	private void save()
@@ -289,6 +301,38 @@ public class Theme
 			prefs.flush();
 		}
 		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
+	{
+		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		String xmlProps = preferences.get(getName(), null);
+		if (xmlProps == null)
+			return;
+		Properties props = new Properties();
+		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
+		map.clear();
+		parseProps(props);
+		deleteCustomVersion();
+	}
+
+	/**
+	 * Removes the saved instance version of theme.
+	 */
+	private void deleteCustomVersion()
+	{
+		try
+		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			preferences.remove(getName());
+			preferences.flush();
+		}
+		catch (BackingStoreException e)
 		{
 			CommonEditorPlugin.logError(e);
 		}
