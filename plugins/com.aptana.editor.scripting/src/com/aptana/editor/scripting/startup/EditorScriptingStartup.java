@@ -24,6 +24,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.scripting.actions.ExecuteLineInsertingResultAction;
 import com.aptana.editor.scripting.actions.ExpandSnippetAction;
 import com.aptana.editor.scripting.actions.FilterThroughCommandAction;
+import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 public class EditorScriptingStartup implements IStartup {
 
@@ -157,7 +158,7 @@ public class EditorScriptingStartup implements IStartup {
 	private static void addActions(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor) {
 			ITextEditor textEditor = (ITextEditor) editorPart;
-			if (textEditor.isEditable()) {
+			if (textEditor instanceof AbstractThemeableEditor && textEditor.isEditable()) {
 				textEditor.setAction(ExpandSnippetAction.COMMAND_ID, ExpandSnippetAction.create(textEditor));
 				textEditor.setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(textEditor));
 				textEditor.setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(textEditor));
