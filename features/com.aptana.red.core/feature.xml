@@ -114,10 +114,18 @@
          version="0.0.0"
          unpack="false"/>
 
-  <plugin
+   <plugin
          id="com.aptana.red.filewatcher"
          download-size="0"
          install-size="0"
          version="0.0.0"
-	 unpack="false"/>
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.findbar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

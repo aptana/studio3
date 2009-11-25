@@ -259,67 +259,67 @@
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.pull"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.status"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.revert"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.stage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.create_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.switch_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
        <key
             commandId="com.aptana.git.ui.command.merge_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_conflicts"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+G">
+            sequence="CTRL+M2+G">
       </key>
    </extension>
    <extension
