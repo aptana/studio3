@@ -45,6 +45,7 @@ public class FilterThroughCommandDialog extends Dialog {
 	private Button replaceWordButton;
 	private Button replaceDocumentButton;
 	private Button insertAsTextButton;
+	private Button insertAsSnippetButton;
 	private Button showAsHTMLButton;
 	private Button showAsToolTipButton;
 	private Button createNewDocumentButton;
@@ -131,8 +132,8 @@ public class FilterThroughCommandDialog extends Dialog {
 		replaceDocumentButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceDocument);
 		insertAsTextButton = new Button(outputGroup, SWT.RADIO);
 		insertAsTextButton.setText(Messages.FilterThroughCommandDialog_LBL_InsertAsText);
-//		insertAsTemplateButton = new Button(outputGroup, SWT.RADIO);
-//		insertAsTemplateButton.setText("Insert as Template");
+		insertAsSnippetButton = new Button(outputGroup, SWT.RADIO);
+		insertAsSnippetButton.setText(Messages.FilterThroughCommandDialog_LBL_InsertAsSnippet);
 		showAsHTMLButton = new Button(outputGroup, SWT.RADIO);
 		showAsHTMLButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowAsHTML);
 		showAsToolTipButton = new Button(outputGroup, SWT.RADIO);
@@ -257,6 +258,8 @@ public class FilterThroughCommandDialog extends Dialog {
 			outputType = OUTPUT_TYPE.REPLACE_WORD;
 		} else if (insertAsTextButton.getSelection()) {
 			outputType = OUTPUT_TYPE.INSERT_AS_TEXT;
+		} else if (insertAsSnippetButton.getSelection()) {
+			outputType = OUTPUT_TYPE.INSERT_AS_SNIPPET;
 		} else if (showAsHTMLButton.getSelection()) {
 			outputType = OUTPUT_TYPE.SHOW_AS_HTML;
 		} else if (showAsToolTipButton.getSelection()) {
@@ -336,6 +339,9 @@ public class FilterThroughCommandDialog extends Dialog {
 			break;
 		case INSERT_AS_TEXT:
 			insertAsTextButton.setSelection(true);
+			break;
+		case INSERT_AS_SNIPPET:
+			insertAsSnippetButton.setSelection(true);
 			break;
 		}
 		

@@ -82,7 +82,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	private static final String SPACES= "\\s*+"; //$NON-NLS-1$
 	
 	// Transform Textmate variable syntax into Eclipse variable syntax
-	private static String processExpansion(String expansion) {
+	static String processExpansion(String expansion) {
 		// cursor $ or ${0} to ${cursor}
 		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$

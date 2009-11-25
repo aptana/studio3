@@ -11,6 +11,7 @@ public class Messages extends NLS {
 	public static String FilterThroughCommandDialog_LBL_Document;
 	public static String FilterThroughCommandDialog_LBL_FromConsole;
 	public static String FilterThroughCommandDialog_LBL_Input;
+	public static String FilterThroughCommandDialog_LBL_InsertAsSnippet;
 	public static String FilterThroughCommandDialog_LBL_InsertAsText;
 	public static String FilterThroughCommandDialog_LBL_Line;
 	public static String FilterThroughCommandDialog_LBL_None;
