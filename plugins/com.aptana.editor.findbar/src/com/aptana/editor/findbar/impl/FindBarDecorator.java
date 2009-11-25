@@ -495,7 +495,11 @@ public class FindBarDecorator implements IFindBarDecorator {
 						selection = textWidget.getSelection();
 						incrementalOffset = selection.x;
 					}
-					statusLineManager.setMessage(EMPTY);
+					if (wrapping) {
+						statusLineManager.setMessage(Messages.FindBarDecorator_MSG_Wrapped);
+					} else {
+						statusLineManager.setMessage(EMPTY);
+					}
 				} else {
 					if (wrap) {
 						if (!wrapping) {
