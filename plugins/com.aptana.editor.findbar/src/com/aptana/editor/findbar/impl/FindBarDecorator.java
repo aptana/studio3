@@ -251,12 +251,6 @@ public class FindBarDecorator implements IFindBarDecorator {
 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
-		
-		// Activate handlers
-		IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
-		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.hide", new HideFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.findNext", new FindNextHandler()); //$NON-NLS-1$
 	}
 	
 	/* (non-Javadoc)
@@ -279,6 +273,12 @@ public class FindBarDecorator implements IFindBarDecorator {
 	
 	public void installActions() {
 		textEditor.setAction(ITextEditorActionConstants.FIND, new ShowFindBarAction(textEditor));
+		
+		// Activate handlers
+		IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.hide", new HideFindBarHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
 	}
 	
 	boolean isActive() {
