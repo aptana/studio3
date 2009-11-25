@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.team.core.history.IFileRevision;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
