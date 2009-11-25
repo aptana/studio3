@@ -27,12 +27,4 @@
             sequence="Ctrl+Shift+P">
       </key>
    </extension>
-   <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            id="com.aptana.editor.scope"
-            name="%context.name"
-            parentId="org.eclipse.ui.textEditorScope">
-      </context>
-   </extension>
 </plugin>

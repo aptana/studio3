@@ -257,33 +257,25 @@ public class FindBarDecorator implements IFindBarDecorator {
 		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
 		handlerService.activateHandler("org.eclipse.ui.edit.find.bar.findNext", new FindNextHandler()); //$NON-NLS-1$
 	}
-
-	public void showFindBar() {
-		boolean wasExcluded = findBarGridData.exclude;
-		if (findBarGridData.exclude) {
-			findBarGridData.exclude = false;
-			composite.layout();
-		}
-		ISelection selection = sourceViewer.getSelectionProvider()
-				.getSelection();
-		if (selection instanceof ITextSelection) {
-			ITextSelection textSelection = (ITextSelection) selection;
-			String text = textSelection.getText();
-			if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
-				setFindText(text, !wasExcluded);
-			}
-		}
-		if (wasExcluded) {
-			combo.addModifyListener(modifyListener);
-		}
-		adjustEnablement();
-		boolean comboHasFocus = combo.isFocusControl();
-		if (!comboHasFocus) {
-			combo.setFocus();
-			incrementalOffset = -1;
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.findbar.api.IFindBarDecorator#setVisible(boolean)
+	 */
+	public void setVisible(boolean visible) {
+		if (visible) {
+			showFindBar();
+		} else {
+			hideFindBar();
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.findbar.api.IFindBarDecorator#isVisible()
+	 */
+	public boolean isVisible() {
+		return !findBarGridData.exclude;
+	}
+	
 	private Composite composite;
 	
 	private Composite findBar;
@@ -387,6 +379,32 @@ public class FindBarDecorator implements IFindBarDecorator {
 			combo.removeModifyListener(modifyListener);
 		}
 		textEditor.setFocus();
+	}
+	
+	private void showFindBar() {
+		boolean wasExcluded = findBarGridData.exclude;
+		if (findBarGridData.exclude) {
+			findBarGridData.exclude = false;
+			composite.layout();
+		}
+		ISelection selection = sourceViewer.getSelectionProvider()
+				.getSelection();
+		if (selection instanceof ITextSelection) {
+			ITextSelection textSelection = (ITextSelection) selection;
+			String text = textSelection.getText();
+			if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
+				setFindText(text, !wasExcluded);
+			}
+		}
+		if (wasExcluded) {
+			combo.addModifyListener(modifyListener);
+		}
+		adjustEnablement();
+		boolean comboHasFocus = combo.isFocusControl();
+		if (!comboHasFocus) {
+			combo.setFocus();
+			incrementalOffset = -1;
+		}
 	}
 	
 	private void findPrevious() {

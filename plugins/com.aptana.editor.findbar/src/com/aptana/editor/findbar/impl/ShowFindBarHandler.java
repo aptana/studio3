@@ -36,7 +36,7 @@ public class ShowFindBarHandler extends AbstractHandler {
 					findBarDecorated = (IFindBarDecorated) textEditor.getAdapter(IFindBarDecorated.class);
 				}
 				if (findBarDecorated != null) {
-					findBarDecorated.getFindBarDecorator().showFindBar();
+					findBarDecorated.getFindBarDecorator().setVisible(true);
 				} else {
 					IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
 					try {

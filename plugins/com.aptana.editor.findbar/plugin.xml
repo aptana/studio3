@@ -29,12 +29,6 @@
          point="org.eclipse.ui.bindings">
       
       <!-- The following binding is active in Aptana editors -->
-      <key
-            commandId="org.eclipse.ui.edit.find.bar"
-            contextId="com.aptana.editor.scope"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+F">
-      </key>
       
       <!-- The following bindings are active once the Find Bar is visible -->
       <key
@@ -113,7 +107,7 @@
             description="%FindBar.context.description"
             id="org.eclipse.ui.textEditorScope.findbar"
             name="%FindBar.context.name"
-            parentId="com.aptana.editor.scope">
+            parentId="org.eclipse.ui.textEditorScope">
       </context>
    </extension>
 </plugin>
