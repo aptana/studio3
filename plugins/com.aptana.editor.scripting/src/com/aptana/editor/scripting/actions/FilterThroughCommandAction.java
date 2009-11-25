@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -172,7 +173,19 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								pw.close();
 								IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
 								try {
-									support.getExternalBrowser().openURL(tempHmtlFile.toURI().toURL());
+									URL url = tempHmtlFile.toURI().toURL();
+									if (support.isInternalWebBrowserAvailable()) {
+										support.createBrowser(
+												IWorkbenchBrowserSupport.NAVIGATION_BAR
+												| IWorkbenchBrowserSupport.LOCATION_BAR 
+												| IWorkbenchBrowserSupport.AS_EDITOR
+												| IWorkbenchBrowserSupport.STATUS,
+												getText(),
+												getText(),
+												filterThroughCommandDialog.getCommand()).openURL(url);
+									} else {
+										support.getExternalBrowser().openURL(url);
+									}
 								} catch (PartInitException e) {
 									Activator.logError("Could not launch browser.", e); //$NON-NLS-1$
 								} catch (MalformedURLException e) {
