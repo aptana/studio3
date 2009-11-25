@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+ <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.find.bar"
+            name="%ShowFindBar.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.find.bar.hide"
+            name="%HideFindBar.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.find.bar.findNext"
+            name="%FindNext.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.find.bar.findPrevious"
+            name="%FindPrevious.command.name">
+      </command>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.bindings">
+      
+      <!-- The following binding is active in Aptana editors -->
+      <key
+            commandId="org.eclipse.ui.edit.find.bar"
+            contextId="com.aptana.editor.scope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+      
+      <!-- The following bindings are active once the Find Bar is visible -->
+      <key
+            commandId="org.eclipse.ui.edit.find.bar.hide"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESCAPE">
+      </key>
+      
+      <!-- Find Previous -->
+      <key
+            commandId="org.eclipse.ui.edit.find.bar.findPrevious"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+K">
+      </key>
+      
+      <!-- Find Next -->
+      <key
+            commandId="org.eclipse.ui.edit.find.bar.findNext"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+K">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.find.bar.findNext"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ENTER">
+      </key>
+
+      <!-- Show Eclipse's Find/Replace dialog -->      
+      <key
+            commandId="org.eclipse.ui.edit.findReplace"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+F">
+      </key>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.editor.findbar.impl.ShowFindBarHandler"
+            commandId="org.eclipse.ui.edit.find.bar">
+         <activeWhen>
+            <with variable="activeEditor">
+                  <or>
+                     <instanceof
+                           value="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </instanceof>
+                     <adapt
+                           type="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </adapt>
+                  </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activeEditor">
+                  <or>
+                     <instanceof
+                           value="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </instanceof>
+                     <adapt
+                           type="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </adapt>
+                  </or>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="%FindBar.context.description"
+            id="org.eclipse.ui.textEditorScope.findbar"
+            name="%FindBar.context.name"
+            parentId="com.aptana.editor.scope">
+      </context>
+   </extension>
+</plugin>
