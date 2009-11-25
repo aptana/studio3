@@ -31,7 +31,7 @@
       <!-- The following binding is active in Aptana editors -->
       <key
             commandId="org.eclipse.ui.edit.find.bar"
-            contextId="org.eclipse.ui.textEditorScope"
+            contextId="com.aptana.editor.scope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
       </key>
@@ -80,6 +80,30 @@
       <handler
             class="com.aptana.editor.findbar.impl.ShowFindBarHandler"
             commandId="org.eclipse.ui.edit.find.bar">
+         <activeWhen>
+            <with variable="activeEditor">
+                  <or>
+                     <instanceof
+                           value="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </instanceof>
+                     <adapt
+                           type="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </adapt>
+                  </or>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with variable="activeEditor">
+                  <or>
+                     <instanceof
+                           value="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </instanceof>
+                     <adapt
+                           type="com.aptana.editor.findbar.api.IFindBarDecorated">
+                     </adapt>
+                  </or>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    
@@ -89,7 +113,7 @@
             description="%FindBar.context.description"
             id="org.eclipse.ui.textEditorScope.findbar"
             name="%FindBar.context.name"
-            parentId="org.eclipse.ui.textEditorScope">
+            parentId="com.aptana.editor.scope">
       </context>
    </extension>
 </plugin>
