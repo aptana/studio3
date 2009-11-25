@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.actions;
+package com.aptana.editor.findbar.impl;
 
 import java.util.ResourceBundle;
 
@@ -14,7 +14,7 @@ public class ShowFindBarAction extends FindReplaceAction {
 	private final ITextEditor textEditor;
 
 	public ShowFindBarAction(ITextEditor textEditor) {
-		super(ResourceBundle.getBundle(ShowScopesAction.class.getName()), ShowFindBarAction.class.getSimpleName()+".", textEditor); //$NON-NLS-1$
+		super(ResourceBundle.getBundle(ShowFindBarAction.class.getName()), ShowFindBarAction.class.getSimpleName()+".", textEditor); //$NON-NLS-1$
 		this.textEditor = textEditor;
 		setActionDefinitionId(IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE);
 	}
@@ -25,7 +25,7 @@ public class ShowFindBarAction extends FindReplaceAction {
 		IFindBarDecorated findBarDecorated = (IFindBarDecorated) textEditor.getAdapter(IFindBarDecorated.class);
 		if (findBarDecorated != null) {
 			IFindBarDecorator findBarDecorator = findBarDecorated.getFindBarDecorator();
-			if (findBarDecorator.isVisible()) {
+			if (((FindBarDecorator)findBarDecorator).isActive()) {
 				super.run();
 			} else {
 				findBarDecorator.setVisible(true);

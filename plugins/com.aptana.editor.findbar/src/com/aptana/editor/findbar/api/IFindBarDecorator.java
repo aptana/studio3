@@ -37,6 +37,12 @@ public interface IFindBarDecorator {
 	void createFindBar(ISourceViewer sourceViewer);
 	
 	/**
+	 * Install actions.
+	 * 
+	 */
+	void installActions();
+	
+	/**
 	 * Return the visibility state of Find Bar.
 	 * @return true if Find Bar is visible else false
 	 */

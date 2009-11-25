@@ -49,6 +49,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
@@ -274,6 +275,14 @@ public class FindBarDecorator implements IFindBarDecorator {
 	 */
 	public boolean isVisible() {
 		return !findBarGridData.exclude;
+	}
+	
+	public void installActions() {
+		textEditor.setAction(ITextEditorActionConstants.FIND, new ShowFindBarAction(textEditor));
+	}
+	
+	boolean isActive() {
+		return isVisible() && (combo.getDisplay().getFocusControl() == combo);
 	}
 	
 	private Composite composite;
