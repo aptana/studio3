@@ -214,7 +214,8 @@ public class FindBarDecorator implements IFindBarDecorator {
 		ToolBar countTotalToolBar = new ToolBar(findBar, SWT.NONE);
 		countTotalToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		
-		ToolItem separator = new ToolItem(countTotalToolBar, SWT.SEPARATOR);
+		// Add separator
+		new ToolItem(countTotalToolBar, SWT.SEPARATOR);
 		
 		countTotal = new ToolItem(countTotalToolBar, SWT.CHECK);
 		countTotal.setImage(FindBarPlugin.getDefault().getImage(FindBarPlugin.SIGMA));
@@ -384,7 +385,6 @@ public class FindBarDecorator implements IFindBarDecorator {
 			composite.layout();
 			incrementalOffset = -1;
 			combo.removeModifyListener(modifyListener);
-			findBarContext(false);
 		}
 		textEditor.setFocus();
 	}
