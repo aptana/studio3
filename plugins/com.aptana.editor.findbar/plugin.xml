@@ -5,22 +5,22 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.find.bar"
+            id="org.eclipse.ui.edit.findbar"
             name="%ShowFindBar.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.find.bar.hide"
+            id="org.eclipse.ui.edit.findbar.hide"
             name="%HideFindBar.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.find.bar.findNext"
+            id="org.eclipse.ui.edit.findbar.findNext"
             name="%FindNext.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.find.bar.findPrevious"
+            id="org.eclipse.ui.edit.findbar.findPrevious"
             name="%FindPrevious.command.name">
       </command>
    </extension>
@@ -28,11 +28,9 @@
    <extension
          point="org.eclipse.ui.bindings">
       
-      <!-- The following binding is active in Aptana editors -->
-      
       <!-- The following bindings are active once the Find Bar is visible -->
       <key
-            commandId="org.eclipse.ui.edit.find.bar.hide"
+            commandId="org.eclipse.ui.edit.findbar.hide"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ESCAPE">
@@ -40,7 +38,7 @@
       
       <!-- Find Previous -->
       <key
-            commandId="org.eclipse.ui.edit.find.bar.findPrevious"
+            commandId="org.eclipse.ui.edit.findbar.findPrevious"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+K">
@@ -48,13 +46,13 @@
       
       <!-- Find Next -->
       <key
-            commandId="org.eclipse.ui.edit.find.bar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNext"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+K">
       </key>
       <key
-            commandId="org.eclipse.ui.edit.find.bar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNext"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
@@ -73,7 +71,7 @@
          point="org.eclipse.ui.handlers">
       <handler
             class="com.aptana.editor.findbar.impl.ShowFindBarHandler"
-            commandId="org.eclipse.ui.edit.find.bar">
+            commandId="org.eclipse.ui.edit.findbar">
          <activeWhen>
             <with variable="activeEditor">
                   <or>
