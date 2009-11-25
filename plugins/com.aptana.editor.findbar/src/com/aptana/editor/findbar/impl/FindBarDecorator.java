@@ -406,8 +406,11 @@ public class FindBarDecorator implements IFindBarDecorator {
 			}
 		}
 		if (wasExcluded) {
-			combo.addModifyListener(modifyListener);
-		}
+			combo.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					combo.addModifyListener(modifyListener);
+				}
+			});		}
 		adjustEnablement();
 		boolean comboHasFocus = combo.isFocusControl();
 		if (!comboHasFocus) {
@@ -538,7 +541,11 @@ public class FindBarDecorator implements IFindBarDecorator {
 			combo.select(0);
 		} finally {
 			if (removeAddListener) {
-				combo.addModifyListener(modifyListener);
+				combo.getDisplay().asyncExec(new Runnable() {
+					public void run() {
+						combo.addModifyListener(modifyListener);
+					}
+				});
 			}
 		}
 	}
