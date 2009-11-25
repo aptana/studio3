@@ -53,7 +53,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		enableAutoInsert(true);
 		enableColoredLabels(true);
 		setStatusLineVisible(true);
-		setStatusMessage("Type 1..9 to select nth snippet"); // TODO
+		setStatusMessage(Messages.SnippetsContentAssistant_MSG_SelectNthSnippet); // TODO
 		setInformationControlCreator(new DefaultInformationControlCreator());
 	}
 	
