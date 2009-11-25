@@ -230,7 +230,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 		});
 		
 		count = new Label(findBar, SWT.NONE);
-		count.setText("      "); //$NON-NLS-1$
+		count.setText("            "); //$NON-NLS-1$
 		count.setToolTipText(Messages.FindBarDecorator_TOOLTIP_MatchCount);
 		count.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
@@ -530,6 +530,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 		}
 	}
 	
+	private static final int TOO_MANY = Integer.getInteger(FindBarDecorator.class.getName()+".TOO_MANY", 100); //$NON-NLS-1$
 	private void showCountTotal() {
 		if (!countTotal.getSelection()) {
 			count.setText(EMPTY);
@@ -556,10 +557,17 @@ public class FindBarDecorator implements IFindBarDecorator {
 				total = 1;
 				while (matcher.find()) {
 					++total;
+					if ((TOO_MANY != -1) && total > TOO_MANY) {
+						break;
+					}
 				}
 			}
 		}
-		count.setText(String.valueOf(total));
+		if ((TOO_MANY != -1) && total > TOO_MANY) {
+			count.setText("> " + TOO_MANY); //$NON-NLS-1$
+		} else {
+			count.setText(String.valueOf(total));
+		}
 	}
 	
 	private void showFindReplaceDialog() {
