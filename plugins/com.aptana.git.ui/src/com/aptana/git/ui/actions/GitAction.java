@@ -194,29 +194,25 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 	@Override
 	public boolean isEnabled()
 	{
+		return getSelectedRepository() != null;
+	}
+
+	protected GitRepository getSelectedRepository()
+	{
 		IResource[] resources = getSelectedResources();
 		if (resources == null || resources.length != 1)
-			return false;
+			return null;
 		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
-		if (repo == null)
-			return false;
-		return true;
+		return GitRepository.getAttached(project);
 	}
 
 	protected void refreshAffectedProjects()
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
-		for (IResource resource : getSelectedResources())
+		GitRepository repo = getSelectedRepository();
+		if (repo != null)
 		{
-			if (resource == null)
-				continue;
-			affectedProjects.add(resource.getProject());
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
-			if (repo != null)
-			{
-				affectedProjects.addAll(getAssociatedProjects(repo));
-			}
+			affectedProjects.addAll(getAssociatedProjects(repo));
 		}
 
 		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
