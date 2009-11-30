@@ -14,6 +14,8 @@ import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -117,6 +119,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private ColorSelector bgSelector;
 	private ColorSelector lineHighlightSelector;
 	private ColorSelector selectionSelector;
+	private ColorSelector caretSelector;
 	private Combo fThemeCombo;
 	private TableViewer tableViewer;
 	private Set<TableEditor> fTableEditors;
@@ -166,21 +169,91 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_ForegroundLabel);
 		fgSelector = new ColorSelector(colors);
+		fgSelector.addListener(new IPropertyChangeListener()
+		{
+
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				RGB newColor = (RGB) event.getNewValue();
+				if (newColor == null)
+					return;
+				Theme theme = getTheme();
+				theme.updateFG(newColor);
+				setTheme(fSelectedTheme);
+			}
+		});
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_SelectionLabel);
 		selectionSelector = new ColorSelector(colors);
+		selectionSelector.addListener(new IPropertyChangeListener()
+		{
+
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				RGB newColor = (RGB) event.getNewValue();
+				if (newColor == null)
+					return;
+				Theme theme = getTheme();
+				theme.updateSelection(newColor);
+				setTheme(fSelectedTheme);
+			}
+		});
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_BackgroundLabel);
 		bgSelector = new ColorSelector(colors);
+		bgSelector.addListener(new IPropertyChangeListener()
+		{
+
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				RGB newColor = (RGB) event.getNewValue();
+				if (newColor == null)
+					return;
+				Theme theme = getTheme();
+				theme.updateBG(newColor);
+				setTheme(fSelectedTheme);
+			}
+		});
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_LineHighlightLabel);
 		lineHighlightSelector = new ColorSelector(colors);
+		lineHighlightSelector.addListener(new IPropertyChangeListener()
+		{
+
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				RGB newColor = (RGB) event.getNewValue();
+				if (newColor == null)
+					return;
+				Theme theme = getTheme();
+				theme.updateLineHighlight(newColor);
+				setTheme(fSelectedTheme);
+			}
+		});
+
+		label = new Label(colors, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		label.setText("Caret");
+		caretSelector = new ColorSelector(colors);
+		caretSelector.addListener(new IPropertyChangeListener()
+		{
+
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				RGB newColor = (RGB) event.getNewValue();
+				if (newColor == null)
+					return;
+				Theme theme = getTheme();
+				theme.updateCaret(newColor);
+				setTheme(fSelectedTheme);
+			}
+		});
 	}
 
 	private void createTokenEditTable(Composite composite)
@@ -551,6 +624,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
 		lineHighlightSelector.setColorValue(theme.getLineHighlight());
+		caretSelector.setColorValue(theme.getCaret());
 		selectionSelector.setColorValue(theme.getSelection());
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
