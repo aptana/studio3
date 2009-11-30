@@ -3,6 +3,7 @@ package com.aptana.radrails.editor.common.theme.preferences;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -142,7 +143,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void createThemeCombo(Composite composite)
 	{
 		fThemeCombo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		Set<String> themeNames = ThemeUtil.getThemeNames();
+		List<String> themeNames = new ArrayList<String>(ThemeUtil.getThemeNames());
+		Collections.sort(themeNames, new Comparator<String>()
+		{
+			public int compare(String o1, String o2)
+			{
+				return o1.compareToIgnoreCase(o2);
+			}
+		});
 		for (String themeName : themeNames)
 		{
 			fThemeCombo.add(themeName);
@@ -239,7 +247,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-		label.setText("Caret");
+		label.setText(Messages.ThemePreferencePage_CaretLabel);
 		caretSelector = new ColorSelector(colors);
 		caretSelector.addListener(new IPropertyChangeListener()
 		{
@@ -417,7 +425,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					try
 					{
 						// edited value, need to grab text of combo
-						Field field = cellEditor.getClass().getDeclaredField("comboBox");
+						Field field = cellEditor.getClass().getDeclaredField("comboBox"); //$NON-NLS-1$
 						field.setAccessible(true);
 						CCombo combo = (CCombo) field.get(cellEditor);
 						newName = combo.getText();
@@ -516,7 +524,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				// Add a new row to the table by adding a basic token to the theme
 				Theme theme = getTheme();
-				String newName = "newToken";
+				String newName = "newToken"; //$NON-NLS-1$
 				theme.addNewDefaultToken(newName);
 				setTheme(fSelectedTheme);
 				// Select the new token!
