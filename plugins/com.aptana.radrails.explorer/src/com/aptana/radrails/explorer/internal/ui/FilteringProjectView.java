@@ -196,6 +196,9 @@ public class FilteringProjectView extends GitProjectView
 					{
 						public void run()
 						{
+							if (hoveredItem == null || getCommonViewer() == null || getCommonViewer().getTree() == null
+									|| hoveredItem.getBounds() == null)
+								return;
 							getCommonViewer().getTree().redraw(hoveredItem.getBounds().x, hoveredItem.getBounds().y,
 									hoveredItem.getBounds().width, hoveredItem.getBounds().height, true);
 						}
