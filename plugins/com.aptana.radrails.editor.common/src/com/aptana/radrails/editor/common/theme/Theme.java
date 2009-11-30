@@ -193,6 +193,11 @@ public class Theme
 		return lineHighlight;
 	}
 
+	public RGB getCaret()
+	{
+		return caret;
+	}
+
 	public String getName()
 	{
 		return name;
@@ -363,4 +368,43 @@ public class Theme
 		save();
 	}
 
+	public void updateCaret(RGB newColor)
+	{
+		if (caret != null && caret.equals(newColor))
+			return;
+		caret = newColor;
+		save();
+	}
+
+	public void updateFG(RGB newColor)
+	{
+		if (defaultFG != null && defaultFG.equals(newColor))
+			return;
+		defaultFG = newColor;
+		save();
+	}
+
+	public void updateBG(RGB newColor)
+	{
+		if (defaultBG != null && defaultBG.equals(newColor))
+			return;
+		defaultBG = newColor;
+		save();
+	}
+
+	public void updateLineHighlight(RGB newColor)
+	{
+		if (lineHighlight != null && lineHighlight.equals(newColor))
+			return;
+		lineHighlight = newColor;
+		save();
+	}
+
+	public void updateSelection(RGB newColor)
+	{
+		if (selection != null && selection.equals(newColor))
+			return;
+		selection = newColor;
+		save();
+	}
 }
