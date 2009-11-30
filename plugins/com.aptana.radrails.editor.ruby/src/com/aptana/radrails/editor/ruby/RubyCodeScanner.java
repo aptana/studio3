@@ -15,6 +15,8 @@ public class RubyCodeScanner implements ITokenScanner
 	private boolean nextIsMethodName;
 	private boolean nextIsModuleName;
 	private boolean nextIsClassName;
+	private boolean inPipe;
+	private boolean lookForBlock;
 
 	public RubyCodeScanner()
 	{
@@ -44,6 +46,12 @@ public class RubyCodeScanner implements ITokenScanner
 			return Token.EOF;
 		}
 
+		if (lookForBlock)
+		{
+			if (!inPipe && data.intValue() != Tokens.tPIPE)
+				lookForBlock = false;
+		}
+		
 		// Convert the integer tokens into tokens containing color information!
 		if (isKeyword(data.intValue()))
 		{
@@ -67,6 +75,8 @@ public class RubyCodeScanner implements ITokenScanner
 				case Tokens.kOR:
 					return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 				case Tokens.kDO_BLOCK:
+				case Tokens.kDO:
+					lookForBlock = true;
 					return ThemeUtil.getToken("keyword.control.start-block.ruby"); //$NON-NLS-1$
 				case Tokens.kCLASS:
 					nextIsClassName = true;
@@ -110,6 +120,18 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tCARET:
 			case RubyTokenScanner.QUESTION:
 				return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+			case Tokens.tPIPE:
+				if (lookForBlock)
+				{
+					inPipe = !inPipe;
+					if (!inPipe)
+						lookForBlock = false;
+					return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+				}
+				return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+			case Tokens.tLBRACE:
+				lookForBlock = true;
+				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
 			case Tokens.tLSHFT:
 				if (nextIsClassName)
 				{
@@ -158,6 +180,8 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsMethodName = false;
 					return ThemeUtil.getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
+				if (lookForBlock && inPipe)
+					return ThemeUtil.getToken("variable.other.block.ruby"); //$NON-NLS-1$
 				// intentionally fall through
 			default:
 				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
@@ -167,6 +191,16 @@ public class RubyCodeScanner implements ITokenScanner
 	public void setRange(IDocument document, int offset, int length)
 	{
 		fScanner.setRange(document, offset, length);
+		reset();
+	}
+
+	private void reset()
+	{
+		nextIsMethodName = false;
+		nextIsModuleName = false;
+		nextIsClassName = false;
+		inPipe = false;
+		lookForBlock = false;
 	}
 
 	private boolean isKeyword(int i)
