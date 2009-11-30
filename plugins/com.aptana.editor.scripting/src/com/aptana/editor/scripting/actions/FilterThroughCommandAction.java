@@ -157,8 +157,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								((Filter.StringOutputConsumer)filterOutputConsumer).getOutput());
 						break;
 					case INSERT_AS_SNIPPET:
-						ExpandSnippetAction expandSnippetAction = (ExpandSnippetAction) textEditor.getAction(ExpandSnippetAction.COMMAND_ID);
-						SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor(expandSnippetAction);
+						SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
 						Template template = new SnippetTemplate(
 								"", //$NON-NLS-1$
 								"", //$NON-NLS-1$

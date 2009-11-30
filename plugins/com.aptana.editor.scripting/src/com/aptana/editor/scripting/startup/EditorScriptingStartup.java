@@ -6,6 +6,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageListener;
@@ -22,7 +24,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.scripting.actions.ExecuteLineInsertingResultAction;
-import com.aptana.editor.scripting.actions.ExpandSnippetAction;
+import com.aptana.editor.scripting.actions.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.scripting.actions.FilterThroughCommandAction;
 import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
@@ -157,11 +159,15 @@ public class EditorScriptingStartup implements IStartup {
 
 	private static void addActions(IEditorPart editorPart) {
 		if (editorPart instanceof ITextEditor) {
-			ITextEditor textEditor = (ITextEditor) editorPart;
+			final ITextEditor textEditor = (ITextEditor) editorPart;
 			if (textEditor instanceof AbstractThemeableEditor && textEditor.isEditable()) {
-				textEditor.setAction(ExpandSnippetAction.COMMAND_ID, ExpandSnippetAction.create(textEditor));
 				textEditor.setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(textEditor));
 				textEditor.setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(textEditor));
+				Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+				if (adapter instanceof ITextViewerExtension) {
+					ITextViewerExtension textViewerExtension = (ITextViewerExtension) adapter;
+					textViewerExtension.prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(textEditor));
+				}
 			}
 		}
 	}

@@ -32,10 +32,7 @@ import com.aptana.scripting.model.Snippet;
 
 class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
-	private final ExpandSnippetAction expandSnippet;
-
-	public SnippetsCompletionProcessor(ExpandSnippetAction expandSnippet) {
-		this.expandSnippet = expandSnippet;
+	public SnippetsCompletionProcessor() {
 	}
 
 	@Override
@@ -128,7 +125,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
-		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance, expandSnippet);
+		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance);
 	}
 	
 	@Override
