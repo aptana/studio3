@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -83,6 +84,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
+		Assert.isNotNull(gitRepository, "Must have a non-null git repository!"); //$NON-NLS-1$
 		this.gitRepository = gitRepository;
 		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
 		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
