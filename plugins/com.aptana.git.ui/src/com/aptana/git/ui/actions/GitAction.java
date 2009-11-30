@@ -200,10 +200,23 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 	protected GitRepository getSelectedRepository()
 	{
 		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length != 1)
+		if (resources == null || resources.length == 0)
 			return null;
-		IProject project = resources[0].getProject();
-		return GitRepository.getAttached(project);
+		// Actions can handle multiple selections if they share the same repo
+		Set<GitRepository> repos = new HashSet<GitRepository>();
+		for (IResource resource : resources)
+		{
+			if (resource == null)
+				continue;
+			IProject project = resource.getProject();
+			GitRepository repo = GitRepository.getAttached(project);
+			if (repo != null)
+				repos.add(repo);
+		}
+		if (repos.isEmpty() || repos.size() != 1)
+			return null;
+		return repos.iterator().next();
+
 	}
 
 	protected void refreshAffectedProjects()
