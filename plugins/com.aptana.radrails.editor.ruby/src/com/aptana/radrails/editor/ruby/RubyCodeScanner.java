@@ -147,6 +147,7 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsClassName = false;
 					return ThemeUtil.getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
 				}
+				// FIXME Need to return "support.class.ruby" if it ends in "::" or "\.*"
 				return ThemeUtil.getToken("variable.other.constant.ruby"); //$NON-NLS-1$
 			case Tokens.yyErrorCode:
 				return ThemeUtil.getToken("error.ruby"); //$NON-NLS-1$
@@ -157,7 +158,7 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsMethodName = false;
 					return ThemeUtil.getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
-				return ThemeUtil.getToken("entity.name.ruby"); //$NON-NLS-1$
+				// intentionally fall through
 			default:
 				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
 		}
