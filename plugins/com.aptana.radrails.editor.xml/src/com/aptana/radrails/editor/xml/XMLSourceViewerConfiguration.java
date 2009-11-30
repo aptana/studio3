@@ -34,18 +34,23 @@
  */
 package com.aptana.radrails.editor.xml;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.radrails.editor.common.TextUtils;
 
-public class XMLSourceViewerConfiguration extends SourceViewerConfiguration {
+public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 	
 	private XMLDoubleClickStrategy doubleClickStrategy;
+
+	public XMLSourceViewerConfiguration(IPreferenceStore preferences) {
+	    super(preferences);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -76,5 +81,4 @@ public class XMLSourceViewerConfiguration extends SourceViewerConfiguration {
 		XMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-
 }

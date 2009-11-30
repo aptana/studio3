@@ -32,41 +32,17 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.css;
+package com.aptana.radrails.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
-import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.TextUtils;
+public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
-public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
-	
-    public CSSSourceViewerConfiguration(IPreferenceStore preferences) {
-        super(preferences);
+    public CommonSourceViewerConfiguration() {
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				CSSSourceConfiguration.CONTENT_TYPES
-			});
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = new PresentationReconciler();
-		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
+    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
+        super(preferenceStore);
+    }
 }

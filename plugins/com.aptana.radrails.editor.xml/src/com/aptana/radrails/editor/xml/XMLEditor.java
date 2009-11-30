@@ -36,16 +36,13 @@ package com.aptana.radrails.editor.xml;
 
 import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class XMLEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-		setSourceViewerConfiguration(new XMLSourceViewerConfiguration());
-		setDocumentProvider(new XMLDocumentProvider());
-	}
+public class XMLEditor extends AbstractThemeableEditor {
+
+    @Override
+    protected void initializeEditor() {
+        super.initializeEditor();
+
+        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore()));
+        setDocumentProvider(new XMLDocumentProvider());
+    }
 }

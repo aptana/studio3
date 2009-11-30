@@ -36,16 +36,12 @@ package com.aptana.radrails.editor.js;
 
 import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
-public class JSSourceEditor extends AbstractThemeableEditor
-{
+public class JSSourceEditor extends AbstractThemeableEditor {
 
-	/*
-	 * (non-Javadoc) Method declared on AbstractTextEditor
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-		setSourceViewerConfiguration(new JSSourceViewerConfiguration());
-		setDocumentProvider(new JSDocumentProvider());
-	}
+    protected void initializeEditor() {
+        super.initializeEditor();
+
+        setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore()));
+        setDocumentProvider(new JSDocumentProvider());
+    }
 }

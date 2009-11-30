@@ -34,16 +34,20 @@
  */
 package com.aptana.radrails.editor.js;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.radrails.editor.common.TextUtils;
 
-public class JSSourceViewerConfiguration extends SourceViewerConfiguration {
-	
+public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+
+    public JSSourceViewerConfiguration(IPreferenceStore preferences) {
+        super(preferences);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -65,5 +69,4 @@ public class JSSourceViewerConfiguration extends SourceViewerConfiguration {
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-
 }

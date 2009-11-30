@@ -34,18 +34,23 @@
  */
 package com.aptana.radrails.editor.html;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.radrails.editor.common.TextUtils;
 
-public class HTMLSourceViewerConfiguration extends SourceViewerConfiguration {
+public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 	
 	private HTMLDoubleClickStrategy doubleClickStrategy;
+
+	public HTMLSourceViewerConfiguration(IPreferenceStore preferences) {
+	    super(preferences);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -61,7 +66,7 @@ public class HTMLSourceViewerConfiguration extends SourceViewerConfiguration {
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
 	 */
 	@Override
-	public ITextDoubleClickStrategy getDoubleClickStrategy( ISourceViewer sourceViewer, String contentType) {
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType) {
 		if (doubleClickStrategy == null)
 			doubleClickStrategy = new HTMLDoubleClickStrategy();
 		return doubleClickStrategy;
@@ -76,5 +81,4 @@ public class HTMLSourceViewerConfiguration extends SourceViewerConfiguration {
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-
 }

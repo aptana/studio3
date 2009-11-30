@@ -38,13 +38,11 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 public class RubySourceEditor extends AbstractThemeableEditor {
 
-	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	@Override
-	protected void initializeEditor() {
-		super.initializeEditor();
-		setSourceViewerConfiguration(new RubySourceViewerConfiguration());
-		setDocumentProvider(new RubyDocumentProvider());
-	}
+    @Override
+    protected void initializeEditor() {
+        super.initializeEditor();
+
+        setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
+        setDocumentProvider(new RubyDocumentProvider());
+    }
 }

@@ -38,13 +38,11 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 
 public class HTMLEditor extends AbstractThemeableEditor {
 
-	/*
-	 * (non-Javadoc) Method declared on AbstractTextEditor
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration());
-		setDocumentProvider(new HTMLDocumentProvider());
-	}
+    @Override
+    protected void initializeEditor() {
+        super.initializeEditor();
+
+        setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore()));
+        setDocumentProvider(new HTMLDocumentProvider());
+    }
 }

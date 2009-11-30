@@ -38,6 +38,7 @@ package com.aptana.radrails.editor.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -46,7 +47,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 import com.aptana.radrails.editor.common.theme.ThemeUtil;
 
@@ -54,7 +54,7 @@ import com.aptana.radrails.editor.common.theme.ThemeUtil;
  * @author Max Stepanov
  *
  */
-public abstract class CompositeSourceViewerConfiguration extends SourceViewerConfiguration {
+public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 
 	private ITokenScanner startEndTokenScanner;
 	private ISourceViewerConfiguration defaultSourceViewerConfiguration;
@@ -67,10 +67,17 @@ public abstract class CompositeSourceViewerConfiguration extends SourceViewerCon
 	protected CompositeSourceViewerConfiguration(
 			ISourceViewerConfiguration defaultSourceViewerConfiguration,
 			ISourceViewerConfiguration primarySourceViewerConfiguration) {
-		super();
-		this.defaultSourceViewerConfiguration = defaultSourceViewerConfiguration;
-		this.primarySourceViewerConfiguration = primarySourceViewerConfiguration;
+	    this(defaultSourceViewerConfiguration, primarySourceViewerConfiguration, null);
 	}
+
+    protected CompositeSourceViewerConfiguration(
+            ISourceViewerConfiguration defaultSourceViewerConfiguration,
+            ISourceViewerConfiguration primarySourceViewerConfiguration,
+            IPreferenceStore preferences) {
+        super(preferences);
+        this.defaultSourceViewerConfiguration = defaultSourceViewerConfiguration;
+        this.primarySourceViewerConfiguration = primarySourceViewerConfiguration;
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
