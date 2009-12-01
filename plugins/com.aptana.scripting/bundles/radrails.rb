@@ -1,5 +1,6 @@
 require "radrails/bundle"
 require "radrails/command"
+require "radrails/menu"
 require "radrails/snippet"
 
 def bundle(name, &block)
