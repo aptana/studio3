@@ -25,6 +25,10 @@ module RadRails
       @jobj.display_name = display_name
     end
     
+    def java_object
+      @jobj
+    end
+    
     def path
       @jobj.path
     end
@@ -35,6 +39,20 @@ module RadRails
     
     def scope=(scope)
       @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
+    end
+    
+    class << self
+      def define_menu(name, &block)
+        menu = Menu.new(name)
+        block.call(menu) if block_given?
+        
+        # add command to bundle
+        bundle = BundleManager.bundle_from_path(menu.path)
+        
+        if bundle.nil? == false
+          bundle.add_menu(menu)
+        end
+      end
     end
   end
   
