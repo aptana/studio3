@@ -1,8 +1,5 @@
 package com.aptana.scripting.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.jruby.anno.JRubyMethod;
 
 public class Snippet extends AbstractModel
@@ -64,26 +61,17 @@ public class Snippet extends AbstractModel
 		this._trigger = trigger;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * toSource
 	 */
-	public String toString()
+	protected void toSource(SourcePrinter printer)
 	{
-		StringWriter sw = new StringWriter();
-		PrintWriter writer = new PrintWriter(sw);
+		printer.printWithIndent("snippet \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		// open snippet
-		writer.append("  snippet \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
+		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
 		
-		// show body
-		writer.append("    path:  ").println(this._path); //$NON-NLS-1$
-		writer.append("    scope: ").println(this._scope); //$NON-NLS-1$
-		writer.append("    trigger: ").println(this._trigger); //$NON-NLS-1$
-		
-		// close snippet
-		writer.println("  }"); //$NON-NLS-1$
-		
-		return sw.toString();
+		printer.decreaseIndent().printlnWithIndent("}");
 	}
 }

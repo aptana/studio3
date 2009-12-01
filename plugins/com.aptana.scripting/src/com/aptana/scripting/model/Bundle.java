@@ -431,27 +431,36 @@ public class Bundle
 		this._licenseUrl = licenseUrl;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * toSource
+	 * 
+	 * @return
 	 */
-	public String toString()
+	public String toSource()
 	{
-		StringWriter sw = new StringWriter();
-		PrintWriter writer = new PrintWriter(sw);
+		SourcePrinter printer = new SourcePrinter();
 		
 		// open bundle
-		writer.append("bundle \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("bundle \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
-		writer.append("  path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		
 		// output commands
 		if (this._commands != null)
 		{
 			for (Command command : this._commands)
 			{
-				writer.print(command.toString());
+				command.toSource(printer);
+			}
+		}
+		
+		// output menus
+		if (this._menus != null)
+		{
+			for (Menu menu : this._menus)
+			{
+				menu.toSource(printer);
 			}
 		}
 		
@@ -460,13 +469,13 @@ public class Bundle
 		{
 			for (Snippet snippet : this._snippets)
 			{
-				writer.print(snippet.toString());
+				snippet.toSource(printer);
 			}
 		}
 		
 		// close bundle
-		writer.print("}"); //$NON-NLS-1$
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 		
-		return sw.toString();
+		return printer.toString();
 	}
 }

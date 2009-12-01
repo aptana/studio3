@@ -96,4 +96,24 @@ public abstract class AbstractModel
 		this._scope = scope;
 	}
 
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter printer = new SourcePrinter();
+		
+		this.toSource(printer);
+		
+		return printer.toString();
+	}
+	
+	/**
+	 * toSource
+	 * 
+	 * @param printer
+	 */
+	abstract protected void toSource(SourcePrinter printer);
 }

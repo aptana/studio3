@@ -1,10 +1,20 @@
 package com.aptana.scripting.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jruby.anno.JRubyMethod;
+
+import com.aptana.scope.ScopeSelector;
 
 public class Menu extends AbstractModel
 {
+	private static final String SEPARATOR_TEXT = "-";
+	
+	private Menu _parent;
+	private List<Menu> _children;
+	private String _commandName;
+	
 	/**
 	 * Snippet
 	 * 
@@ -15,25 +25,141 @@ public class Menu extends AbstractModel
 		super(path);
 	}
 
+	/**
+	 * addMenu
+	 * 
+	 * @param menu
+	 */
+	@JRubyMethod(name = "add_menu")
+	public void addMenu(Menu menu)
+	{
+		if (menu != null)
+		{
+			if (this._children == null)
+			{
+				this._children = new ArrayList<Menu>();
+			}
+			
+			// set parent
+			menu._parent = this;
+			
+			// add to our list
+			this._children.add(menu);
+		}
+	}
+	
+	/**
+	 * getCommand
+	 * 
+	 * @return
+	 */
+	public Command getCommand()
+	{
+		Command result = null;
+		
+		if (this.hasChildren() == false)
+		{
+			// TODO: lookup command in this menu's bundle
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getCommandName
+	 * 
+	 * @param name
+	 * @return
+	 */
+	@JRubyMethod(name = "command")
+	public String getCommandName(String name)
+	{
+		return this._commandName;
+	}
+	
+	/**
+	 * getParent
+	 * 
+	 * @return
+	 */
+	public Menu getParent()
+	{
+		return this._parent;
+	}
+	
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see com.aptana.scripting.model.AbstractModel#getScopeSelector()
 	 */
-	public String toString()
+	public ScopeSelector getScopeSelector()
 	{
-		StringWriter sw = new StringWriter();
-		PrintWriter writer = new PrintWriter(sw);
+		ScopeSelector result = null;
+		
+		if (this._scope != null)
+		{
+			result = new ScopeSelector(this._scope);
+		}
+		else
+		{
+			// TODO: make iterative to avoid unneeded recursion
+			if (this._parent != null)
+			{
+				result = this._parent.getScopeSelector();
+			}
+		}
+		
+		return result;
+	}
 
-		// open snippet
-		writer.append("  menu \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		// show body
-		writer.append("    path:  ").println(this._path); //$NON-NLS-1$
-		writer.append("    scope: ").println(this._scope); //$NON-NLS-1$
-
-		// close snippet
-		writer.println("  }"); //$NON-NLS-1$
-
-		return sw.toString();
+	/**
+	 * hasChildren
+	 * 
+	 * @return
+	 */
+	public boolean hasChildren()
+	{
+		return this._children != null && this._children.size() > 0;
+	}
+	
+	/**
+	 * isSeparator
+	 * 
+	 * @return
+	 */
+	public boolean isSeparator()
+	{
+		return this._displayName != null && this._displayName.startsWith(SEPARATOR_TEXT);
+	}
+	
+	/**
+	 * setCommandName
+	 * 
+	 * @param name
+	 */
+	@JRubyMethod(name = "command=")
+	public void setCommandName(String name)
+	{
+		this.addMenu(new Menu(name));
+	}
+	
+	/**
+	 * toSource
+	 */
+	protected void toSource(SourcePrinter printer)
+	{
+		printer.printWithIndent("menu \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
+		
+		if (this.hasChildren())
+		{
+			for (Menu menu : this._children)
+			{
+				menu.toSource(printer);
+			}
+		}
+		
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }

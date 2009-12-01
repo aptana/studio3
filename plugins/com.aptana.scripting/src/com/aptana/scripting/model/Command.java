@@ -1,8 +1,5 @@
 package com.aptana.scripting.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.jruby.anno.JRubyMethod;
 
 public class Command extends AbstractModel
@@ -21,6 +18,17 @@ public class Command extends AbstractModel
 		super(path);
 	}
 
+	/**
+	 * execute
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public CommandResult execute(CommandContext context)
+	{
+		return new CommandResult();
+	}
+	
 	/**
 	 * getInvoke
 	 * 
@@ -87,25 +95,16 @@ public class Command extends AbstractModel
 		this._output = output;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * toSource
 	 */
-	public String toString()
+	protected void toSource(SourcePrinter printer)
 	{
-		StringWriter sw = new StringWriter();
-		PrintWriter writer = new PrintWriter(sw);
+		printer.printWithIndent("command \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		// open snippet
-		writer.append("  command \"").append(this._displayName).println("\" {"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
 		
-		// show body
-		writer.append("    path:  ").println(this._path); //$NON-NLS-1$
-		writer.append("    scope: ").println(this._scope); //$NON-NLS-1$
-		
-		// close snippet
-		writer.println("  }"); //$NON-NLS-1$
-		
-		return sw.toString();
+		printer.decreaseIndent().printlnWithIndent("}");
 	}
 }
