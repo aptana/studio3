@@ -61,6 +61,31 @@ public class ScopeSelector
 	}
 	
 	/**
+	 * matches
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	public boolean matches(String[] scopes)
+	{
+		boolean result = false;
+		
+		if (this._root != null && scopes != null)
+		{
+			for (String scope : scopes)
+			{
+				if (this.matches(scope))
+				{
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * parse
 	 * 
 	 * @param selector
