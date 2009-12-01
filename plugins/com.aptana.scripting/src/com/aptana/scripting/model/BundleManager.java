@@ -181,7 +181,7 @@ public class BundleManager
 			{
 				for (Command command : bundle.getCommands())
 				{
-					if (command.getScopeSelector().matches(scope))
+					if (command.matches(scope))
 					{
 						commands.add(command);
 					}
@@ -212,7 +212,7 @@ public class BundleManager
 			{
 				for (Command command : bundle.getCommands())
 				{
-					if (command.getScopeSelector().matches(scopes))
+					if (command.matches(scopes))
 					{
 						commands.add(command);
 					}
@@ -274,7 +274,7 @@ public class BundleManager
 			{
 				for (Menu menu : bundle.getMenus())
 				{
-					if (menu.getScopeSelector().matches(scope))
+					if (menu.matches(scope))
 					{
 						menus.add(menu);
 					}
@@ -305,7 +305,7 @@ public class BundleManager
 			{
 				for (Menu menu : bundle.getMenus())
 				{
-					if (menu.getScopeSelector().matches(scopes))
+					if (menu.matches(scopes))
 					{
 						menus.add(menu);
 					}
@@ -336,7 +336,7 @@ public class BundleManager
 			{
 				for (Snippet snippet : bundle.getSnippets())
 				{
-					if (snippet.getScopeSelector().matches(scope))
+					if (snippet.matches(scope))
 					{
 						snippets.add(snippet);
 					}
@@ -367,7 +367,7 @@ public class BundleManager
 			{
 				for (Snippet snippet : bundle.getSnippets())
 				{
-					if (snippet.getScopeSelector().matches(scopes))
+					if (snippet.matches(scopes))
 					{
 						snippets.add(snippet);
 					}

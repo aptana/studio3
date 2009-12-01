@@ -65,6 +65,28 @@ public abstract class AbstractModel
 	}
 
 	/**
+	 * matches
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public boolean matches(String scope)
+	{
+		return this.getScopeSelector().matches(scope);
+	}
+	
+	/**
+	 * matches
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	public boolean matches(String[] scopes)
+	{
+		return this.getScopeSelector().matches(scopes);
+	}
+	
+	/**
 	 * setDisplayName
 	 * 
 	 * @param displayName
