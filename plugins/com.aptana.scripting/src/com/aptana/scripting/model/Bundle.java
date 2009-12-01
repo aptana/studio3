@@ -9,9 +9,6 @@ import org.jruby.anno.JRubyMethod;
 
 public class Bundle
 {
-	private static final Snippet[] NO_SNIPPETS = new Snippet[0];
-	private static final Command[] NO_COMMANDS = new Command[0];
-
 	private String _path;
 	private String _displayName;
 	private String _author;
@@ -20,6 +17,7 @@ public class Bundle
 	private String _licenseUrl;
 	private String _gitRepo;
 	
+	private List<Menu> _menus;
 	private List<Snippet> _snippets;
 	private List<Command> _commands;
 
@@ -49,6 +47,25 @@ public class Bundle
 			}
 
 			this._commands.add(command);
+		}
+	}
+	
+	/**
+	 * addMenu
+	 * 
+	 * @param snippet
+	 */
+	@JRubyMethod(name = "add_menu")
+	public void addMenu(Menu menu)
+	{
+		if (menu != null)
+		{
+			if (this._menus == null)
+			{
+				this._menus = new ArrayList<Menu>();
+			}
+			
+			this._menus.add(menu);
 		}
 	}
 
@@ -96,6 +113,30 @@ public class Bundle
 	}
 	
 	/**
+	 * findMenusFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public Menu[] findMenusFromPath(String path)
+	{
+		List<Menu> result = new ArrayList<Menu>();
+		
+		if (path != null && path.length() > 0 && this._menus != null)
+		{
+			for (Menu menu : this._menus)
+			{
+				if (path.equals(menu.getPath()))
+				{
+					result.add(menu);
+				}
+			}
+		}
+		
+		return result.toArray(new Menu[result.size()]);
+	}
+	
+	/**
 	 * findSnippetsFromPath
 	 * 
 	 * @param path
@@ -137,7 +178,7 @@ public class Bundle
 	 */
 	public Command[] getCommands()
 	{
-		Command[] result = NO_COMMANDS;
+		Command[] result = BundleManager.NO_COMMANDS;
 
 		if (this._commands != null && this._commands.size() > 0)
 		{
@@ -203,6 +244,23 @@ public class Bundle
 	}
 
 	/**
+	 * getMenus
+	 * 
+	 * @return
+	 */
+	public Menu[] getMenus()
+	{
+		Menu[] result = BundleManager.NO_MENUS;
+		
+		if (this._menus != null && this._menus.size() > 0)
+		{
+			result = this._menus.toArray(new Menu[this._menus.size()]);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getPath
 	 * 
 	 * @return
@@ -220,7 +278,7 @@ public class Bundle
 	 */
 	public Snippet[] getSnippets()
 	{
-		Snippet[] result = NO_SNIPPETS;
+		Snippet[] result = BundleManager.NO_SNIPPETS;
 
 		if (this._snippets != null && this._snippets.size() > 0)
 		{
@@ -276,6 +334,20 @@ public class Bundle
 		if (this._commands != null)
 		{
 			this._commands.remove(command);
+		}
+	}
+	
+	/**
+	 * removeMenu
+	 * 
+	 * @param command
+	 */
+	@JRubyMethod(name = "remove_menu")
+	public void removeMenu(Menu menu)
+	{
+		if (this._menus != null)
+		{
+			this._menus.remove(menu);
 		}
 	}
 	
