@@ -26,7 +26,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.scripting.actions.ExecuteLineInsertingResultAction;
 import com.aptana.editor.scripting.actions.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.scripting.actions.FilterThroughCommandAction;
-import com.aptana.radrails.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class EditorScriptingStartup implements IStartup {
 

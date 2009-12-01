@@ -24,9 +24,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.scripting.Activator;
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
-import com.aptana.radrails.editor.common.QualifiedContentType;
-import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.Snippet;
 
