@@ -18,7 +18,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -138,10 +141,34 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 
 	protected IResource[] getSelectedResources()
 	{
-		if (this.selection == null)
+		if (this.selection == null || !(this.selection instanceof IStructuredSelection))
+		{
+
+			final IResource[] editorResource = new IResource[1];
+			Display.getDefault().syncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					try
+					{
+						IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+								.getActiveEditor();
+						IEditorInput input = part.getEditorInput();
+						if (input == null)
+							return;
+						editorResource[0] = (IResource) input.getAdapter(IResource.class);
+					}
+					catch (Exception e)
+					{
+						// ignore
+					}
+				}
+			});
+			if (editorResource[0] != null)
+				return editorResource;
 			return new IResource[0];
-		if (!(this.selection instanceof IStructuredSelection))
-			return new IResource[0];
+		}
 
 		Set<IResource> resources = new HashSet<IResource>();
 		IStructuredSelection structured = (IStructuredSelection) this.selection;
@@ -167,29 +194,38 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 	@Override
 	public boolean isEnabled()
 	{
+		return getSelectedRepository() != null;
+	}
+
+	protected GitRepository getSelectedRepository()
+	{
 		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length != 1)
-			return false;
-		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
-		if (repo == null)
-			return false;
-		return true;
+		if (resources == null || resources.length == 0)
+			return null;
+		// Actions can handle multiple selections if they share the same repo
+		Set<GitRepository> repos = new HashSet<GitRepository>();
+		for (IResource resource : resources)
+		{
+			if (resource == null)
+				continue;
+			IProject project = resource.getProject();
+			GitRepository repo = GitRepository.getAttached(project);
+			if (repo != null)
+				repos.add(repo);
+		}
+		if (repos.isEmpty() || repos.size() != 1)
+			return null;
+		return repos.iterator().next();
+
 	}
 
 	protected void refreshAffectedProjects()
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
-		for (IResource resource : getSelectedResources())
+		GitRepository repo = getSelectedRepository();
+		if (repo != null)
 		{
-			if (resource == null)
-				continue;
-			affectedProjects.add(resource.getProject());
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
-			if (repo != null)
-			{
-				affectedProjects.addAll(getAssociatedProjects(repo));
-			}
+			affectedProjects.addAll(getAssociatedProjects(repo));
 		}
 
 		WorkspaceJob job = new WorkspaceJob(Messages.PullAction_RefreshJob_Title)
@@ -279,6 +315,5 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			}
 		}
 		return targetPart;
-
 	}
 }

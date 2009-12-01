@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.js.JSSourceEditor"
+            default="true"
+            icon="icons/js.gif"
+            id="com.aptana.editor.js"
+            name="%editor.js.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.js">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="js"
+            id="com.aptana.contenttype.js"
+            name="%content-type.js.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>

@@ -27,16 +27,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6 {
 
-	private final ExpandSnippetAction expandSnippet;
 	private ICompletionProposal[] templateProposals;
 	private char triggerChar;
 	private char[] triggerChars;
 	private StyledString styledDisplayString;
 
 	public SnippetTemplateProposal(Template template, TemplateContext context,
-			IRegion region, Image image, int relevance, ExpandSnippetAction expandSnippet) {
+			IRegion region, Image image, int relevance) {
 		super(template, context, region, image, relevance);
-		this.expandSnippet = expandSnippet;
 	}
 
 	@Override
@@ -49,7 +47,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				Display.getCurrent().asyncExec(new Runnable() {
 					public void run() {
 						if (LinkedModeModel.hasInstalledModel(document)) {
-							expandSnippet.setDeactivated(true);
 							final LinkedModeModel linkedModeModel = LinkedModeModel.getModel(document, offset);
 							final VerifyKeyListener keyListener = new VerifyKeyListener() {
 								public void verifyKey(VerifyEvent event) {
@@ -62,9 +59,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 									}
 								}
 							};
-							
 							final MouseListener mouseListener = new MouseListener() {
-								
 								public void mouseUp(MouseEvent e) {
 								}
 								
@@ -92,7 +87,6 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 								public void left(LinkedModeModel model, int flags) {
 									textWidget.removeVerifyKeyListener(keyListener);
 									textWidget.removeMouseListener(mouseListener);
-									expandSnippet.setDeactivated(false);
 								}
 							});
 						}

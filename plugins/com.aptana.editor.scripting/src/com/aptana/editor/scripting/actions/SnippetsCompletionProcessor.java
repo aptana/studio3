@@ -24,18 +24,15 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.scripting.Activator;
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
-import com.aptana.radrails.editor.common.QualifiedContentType;
-import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.Snippet;
 
 class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
-	private final ExpandSnippetAction expandSnippet;
-
-	public SnippetsCompletionProcessor(ExpandSnippetAction expandSnippet) {
-		this.expandSnippet = expandSnippet;
+	public SnippetsCompletionProcessor() {
 	}
 
 	@Override
@@ -82,7 +79,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	private static final String SPACES= "\\s*+"; //$NON-NLS-1$
 	
 	// Transform Textmate variable syntax into Eclipse variable syntax
-	private static String processExpansion(String expansion) {
+	static String processExpansion(String expansion) {
 		// cursor $ or ${0} to ${cursor}
 		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
@@ -128,7 +125,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
-		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance, expandSnippet);
+		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance);
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,9 +10,12 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -45,7 +47,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
@@ -77,10 +79,12 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 	private Image deletedFileImage;
 	private Image emptyFileImage;
 	private Browser diffArea;
+	private UIJob refreshTablesJob;
 
 	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
+		Assert.isNotNull(gitRepository, "Must have a non-null git repository!"); //$NON-NLS-1$
 		this.gitRepository = gitRepository;
 		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
 		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
@@ -112,7 +116,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 		GitRepository.addListener(this); // FIXME How do I unregister? No dispose method!
 		return container;
 	}
-	
+
 	private void createDiffArea(Composite container)
 	{
 		diffArea = new Browser(container, SWT.BORDER);
@@ -308,10 +312,11 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 				ChangedFile file = findChangedFile(path);
 				if (file == null)
 					return;
-				if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
+				if (gitRepository.index().hasBinaryAttributes(file)
+						&& !file.getStatus().equals(ChangedFile.Status.DELETED))
 				{
 					// Special code to draw the image if the binary file is an image
-					String[] imageExtensions = new String[] {".png", ".gif", ".jpeg", ".jpg", ".ico"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 					for (String extension : imageExtensions)
 					{
 						if (file.getPath().endsWith(extension))
@@ -323,10 +328,18 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 					}
 				}
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				updateDiff(DiffFormatter.toHTML(diff));
+				try
+				{
+					diff = DiffFormatter.toHTML(diff);
+				}
+				catch (Throwable t)
+				{
+					GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+				}
+				updateDiff(diff);
 			}
 		});
-		
+
 		if (!staged)
 		{
 			final Table myTable = table;
@@ -358,7 +371,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 			Menu menu = menuMgr.createContextMenu(table);
 			table.setMenu(menu);
 		}
-		
+
 		return table;
 	}
 
@@ -505,7 +518,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 	{
 		// ignore(?)
 	}
-	
+
 	@Override
 	public boolean close()
 	{
@@ -520,10 +533,14 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 
 	private void refreshTables()
 	{
-		Display.getDefault().asyncExec(new Runnable()
+		if (refreshTablesJob != null)
+			refreshTablesJob.cancel();
+
+		refreshTablesJob = new UIJob("refresh commit dialog file tables") //$NON-NLS-1$
 		{
-			
-			public void run()
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				stagedTable.setRedraw(false);
 				unstagedTable.setRedraw(false);
@@ -531,25 +548,31 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 				unstagedTable.removeAll();
 				for (ChangedFile file : gitRepository.index().changedFiles())
 				{
+					if (monitor.isCanceled())
+						return Status.CANCEL_STATUS;
 					Table table = unstagedTable;
 					if (file.hasStagedChanges())
 						table = stagedTable;
-					createTableItem(table, file);			
+					createTableItem(table, file);
 				}
 				stagedTable.setRedraw(true);
 				unstagedTable.setRedraw(true);
+				return Status.OK_STATUS;
 			}
-		});
+		};
+		refreshTablesJob.setSystem(true);
+		refreshTablesJob.setPriority(Job.INTERACTIVE);
+		refreshTablesJob.schedule();
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
-		// ignore	
+		// ignore
 	}
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
-		// ignore		
+		// ignore
 	}
 
 }

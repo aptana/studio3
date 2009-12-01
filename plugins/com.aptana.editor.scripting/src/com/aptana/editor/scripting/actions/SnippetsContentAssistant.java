@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Shell;
 public class SnippetsContentAssistant extends ContentAssistant {
 	
 	private IContentAssistProcessor contentAssistProcessor;
-	private ExpandSnippetAction expandSnippetAction;
 	
 	private static class StringInformationPresenter implements IInformationPresenter {
 		public String updatePresentation(Display display, String hoverInfo,
@@ -45,15 +44,14 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		}
 	}
 
-	public SnippetsContentAssistant(ExpandSnippetAction expandSnippet) {
+	public SnippetsContentAssistant() {
 		super();
-		this.expandSnippetAction = expandSnippet;
 		enableAutoActivation(false);
 		enablePrefixCompletion(true);
 		enableAutoInsert(true);
 		enableColoredLabels(true);
 		setStatusLineVisible(true);
-		setStatusMessage("Type 1..9 to select nth snippet"); // TODO
+		setStatusMessage(Messages.SnippetsContentAssistant_MSG_SelectNthSnippet); // TODO
 		setInformationControlCreator(new DefaultInformationControlCreator());
 	}
 	
@@ -61,7 +59,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 	public IContentAssistProcessor getContentAssistProcessor(
 			String contentType) {
 		if (contentAssistProcessor == null) {
-			contentAssistProcessor = new SnippetsCompletionProcessor(expandSnippetAction);
+			contentAssistProcessor = new SnippetsCompletionProcessor();
 		}
 		return contentAssistProcessor;
 	}

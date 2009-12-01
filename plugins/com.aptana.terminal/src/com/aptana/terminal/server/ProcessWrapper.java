@@ -57,7 +57,7 @@ public class ProcessWrapper
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
 	private static final String ACTIVE_PROJECT_PROPERTY = "activeProject"; //$NON-NLS-1$
-	public static final String EXPLORER_PLUGIN_ID = "com.aptana.radrails.explorer"; //$NON-NLS-1$
+	public static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	
 	private Process _process;
 	private ProcessReader _stdout;

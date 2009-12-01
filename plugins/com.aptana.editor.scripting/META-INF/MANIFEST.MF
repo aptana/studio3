@@ -14,6 +14,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
  com.aptana.scripting,
- com.aptana.radrails.editor.common
+ com.aptana.editor.common
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy; exclude:="com.aptana.editor.scripting.startup, com.aptana.editor.scripting.actions"

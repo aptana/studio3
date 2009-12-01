@@ -1,8 +1,5 @@
 package com.aptana.git.ui.actions;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-
 import com.aptana.git.core.model.GitRepository;
 
 public class PushAction extends SimpleGitCommandAction
@@ -25,11 +22,7 @@ public class PushAction extends SimpleGitCommandAction
 	@Override
 	public boolean isEnabled()
 	{
-		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length != 1)
-			return false;
-		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
+		GitRepository repo = getSelectedRepository();
 		if (repo == null)
 			return false;
 		String[] commits = repo.commitsAhead(repo.currentBranch());

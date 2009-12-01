@@ -20,7 +20,7 @@
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.jface.text"/>
-      <import plugin="com.aptana.radrails.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit" version="3.8.2" match="greaterOrEqual"/>
       <import plugin="com.aptana.util" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
@@ -29,7 +29,7 @@
    </requires>
 
    <plugin
-         id="com.aptana.radrails.editor.ruby.tests"
+         id="com.aptana.editor.ruby.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

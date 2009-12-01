@@ -45,6 +45,7 @@ public class FilterThroughCommandDialog extends Dialog {
 	private Button replaceWordButton;
 	private Button replaceDocumentButton;
 	private Button insertAsTextButton;
+	private Button insertAsSnippetButton;
 	private Button showAsHTMLButton;
 	private Button showAsToolTipButton;
 	private Button createNewDocumentButton;
@@ -74,7 +75,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		composite.setLayout(compositeGridLayout);
 
 		Label commandLabel = new Label(composite, SWT.TRAIL);
-		commandLabel.setText("Command:");
+		commandLabel.setText(Messages.FilterThroughCommandDialog_LBL_Command);
 		GridData commandLabelGridData = new GridData(SWT.LEAD, SWT.TOP, false, false);
 		commandLabel.setLayoutData(commandLabelGridData);
 		
@@ -88,29 +89,29 @@ public class FilterThroughCommandDialog extends Dialog {
 		padding.setLayoutData(paddingGridData);
 		
 		Group inputGroup = new Group(composite, SWT.NONE);
-		inputGroup.setText("Input");
+		inputGroup.setText(Messages.FilterThroughCommandDialog_LBL_Input);
 		GridData inputGroupGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		inputGroup.setLayoutData(inputGroupGridData);
 		
 		inputGroup.setLayout(new RowLayout(SWT.VERTICAL));
 
 		noneButton = new Button(inputGroup, SWT.RADIO);
-		noneButton.setText("None");
+		noneButton.setText(Messages.FilterThroughCommandDialog_LBL_None);
 		selectionButton = new Button(inputGroup, SWT.RADIO);
-		selectionButton.setText("Selection");
+		selectionButton.setText(Messages.FilterThroughCommandDialog_LBL_Selection);
 		selectedLinesButton = new Button(inputGroup, SWT.RADIO);
-		selectedLinesButton.setText("Selected Lines");
+		selectedLinesButton.setText(Messages.FilterThroughCommandDialog_LBL_SelectedLines);
 		documentButton = new Button(inputGroup, SWT.RADIO);
-		documentButton.setText("Document");
+		documentButton.setText(Messages.FilterThroughCommandDialog_LBL_Document);
 		lineButton = new Button(inputGroup, SWT.RADIO);
-		lineButton.setText("Line");
+		lineButton.setText(Messages.FilterThroughCommandDialog_LBL_Line);
 		wordButton = new Button(inputGroup, SWT.RADIO);
-		wordButton.setText("Word");
+		wordButton.setText(Messages.FilterThroughCommandDialog_LBL_Word);
 		inputFromConsoleButton = new Button(inputGroup, SWT.RADIO);
-		inputFromConsoleButton.setText("From Console");
+		inputFromConsoleButton.setText(Messages.FilterThroughCommandDialog_LBL_FromConsole);
 		
 		Group outputGroup = new Group(composite, SWT.NONE);
-		outputGroup.setText("Output");
+		outputGroup.setText(Messages.FilterThroughCommandDialog_LBL_Output);
 		GridData outputGroupGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		outputGroupGridData.verticalSpan = 2;
 		outputGroup.setLayoutData(outputGroupGridData);
@@ -118,36 +119,36 @@ public class FilterThroughCommandDialog extends Dialog {
 		outputGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		
 		discardButton = new Button(outputGroup, SWT.RADIO);
-		discardButton.setText("Discard");
+		discardButton.setText(Messages.FilterThroughCommandDialog_LBL_Discard);
 		replaceSelectionButton = new Button(outputGroup, SWT.RADIO);
-		replaceSelectionButton.setText("Replace Selection");
+		replaceSelectionButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceSelection);
 		replaceSelectedLinesButton = new Button(outputGroup, SWT.RADIO);
-		replaceSelectedLinesButton.setText("Replace Selected Lines");
+		replaceSelectedLinesButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceSelectedLines);
 		replaceLineButton = new Button(outputGroup, SWT.RADIO);
-		replaceLineButton.setText("Replace Line");
+		replaceLineButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceLine);
 		replaceWordButton = new Button(outputGroup, SWT.RADIO);
-		replaceWordButton.setText("Replace Word");
+		replaceWordButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceWord);
 		replaceDocumentButton = new Button(outputGroup, SWT.RADIO);
-		replaceDocumentButton.setText("Replace Document");
+		replaceDocumentButton.setText(Messages.FilterThroughCommandDialog_LBL_ReplaceDocument);
 		insertAsTextButton = new Button(outputGroup, SWT.RADIO);
-		insertAsTextButton.setText("Insert as Text");
-//		insertAsTemplateButton = new Button(outputGroup, SWT.RADIO);
-//		insertAsTemplateButton.setText("Insert as Template");
+		insertAsTextButton.setText(Messages.FilterThroughCommandDialog_LBL_InsertAsText);
+		insertAsSnippetButton = new Button(outputGroup, SWT.RADIO);
+		insertAsSnippetButton.setText(Messages.FilterThroughCommandDialog_LBL_InsertAsSnippet);
 		showAsHTMLButton = new Button(outputGroup, SWT.RADIO);
-		showAsHTMLButton.setText("Show as HTML");
+		showAsHTMLButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowAsHTML);
 		showAsToolTipButton = new Button(outputGroup, SWT.RADIO);
-		showAsToolTipButton.setText("Show as Tool Tip");
+		showAsToolTipButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowAsToolTip);
 		createNewDocumentButton = new Button(outputGroup, SWT.RADIO);
-		createNewDocumentButton.setText("Create New Document");
+		createNewDocumentButton.setText(Messages.FilterThroughCommandDialog_LBL_CreateNewDocument);
 		outputToConsoleButton = new Button(outputGroup, SWT.RADIO);
-		outputToConsoleButton.setText("To Console");
+		outputToConsoleButton.setText(Messages.FilterThroughCommandDialog_LBL_ToConsole);
 		
 		padding = new Label(composite, SWT.NONE);
 		paddingGridData = new GridData(SWT.LEAD, SWT.TOP, false, false);
 		padding.setLayoutData(paddingGridData);
 
 		Button showEnvironmentButton = new Button(composite, SWT.PUSH);
-		showEnvironmentButton.setText("Show Environment...");
+		showEnvironmentButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowEnvironment);
 		GridData showEnvironmentButtonGridData = new GridData(SWT.FILL, SWT.TOP, true, false);
 		showEnvironmentButton.setLayoutData(showEnvironmentButtonGridData);
 		showEnvironmentButton.addSelectionListener(new SelectionListener() {			
@@ -162,7 +163,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		});
 		
 		Label consoleLabel = new Label(composite, SWT.NONE);
-		consoleLabel.setText("Console Name:");
+		consoleLabel.setText(Messages.FilterThroughCommandDialog_LBL_ConsoleName);
 		GridData consoleLabelGridData = new GridData(SWT.LEAD, SWT.CENTER, false, false);
 		consoleLabel.setLayoutData(consoleLabelGridData);
 		
@@ -257,6 +258,8 @@ public class FilterThroughCommandDialog extends Dialog {
 			outputType = OUTPUT_TYPE.REPLACE_WORD;
 		} else if (insertAsTextButton.getSelection()) {
 			outputType = OUTPUT_TYPE.INSERT_AS_TEXT;
+		} else if (insertAsSnippetButton.getSelection()) {
+			outputType = OUTPUT_TYPE.INSERT_AS_SNIPPET;
 		} else if (showAsHTMLButton.getSelection()) {
 			outputType = OUTPUT_TYPE.SHOW_AS_HTML;
 		} else if (showAsToolTipButton.getSelection()) {
@@ -336,6 +339,9 @@ public class FilterThroughCommandDialog extends Dialog {
 			break;
 		case INSERT_AS_TEXT:
 			insertAsTextButton.setSelection(true);
+			break;
+		case INSERT_AS_SNIPPET:
+			insertAsSnippetButton.setSelection(true);
 			break;
 		}
 		

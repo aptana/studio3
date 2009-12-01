@@ -1,18 +1,20 @@
 package com.aptana.git.ui.actions;
 
 import java.io.File;
+import java.text.MessageFormat;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.jface.dialogs.MessageDialog;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.internal.Launcher;
+import com.aptana.git.ui.internal.actions.Messages;
 
 public abstract class SimpleGitCommandAction extends GitAction
 {
@@ -21,10 +23,23 @@ public abstract class SimpleGitCommandAction extends GitAction
 	public void run()
 	{
 		File workingDir = getWorkingDir();
-		String working = null;
-		if (workingDir != null)
-			working = workingDir.toString();
-		final String finWorking = working;
+		if (workingDir == null)
+		{
+			GitRepository theRepo = getSelectedRepository();
+			if (theRepo == null && getSelectedResources() != null && getSelectedResources().length == 0)
+			{
+				MessageDialog.openError(getShell(), Messages.CommitAction_NoRepo_Title,
+						Messages.CommitAction_NoRepo_Message);
+				return;
+			}
+			if (theRepo == null && getSelectedResources() != null && getSelectedResources().length != 1)
+			{
+				MessageDialog.openError(getShell(), Messages.CommitAction_MultipleRepos_Title,
+						Messages.CommitAction_MultipleRepos_Message);
+				return;
+			}
+		}
+		final String finWorking = workingDir.toString();
 		final String[] command = getCommand();
 		StringBuilder jobName = new StringBuilder("git"); //$NON-NLS-1$
 		for (String string : command)
@@ -42,6 +57,17 @@ public abstract class SimpleGitCommandAction extends GitAction
 					Thread.yield();
 					if (monitor.isCanceled())
 						return Status.CANCEL_STATUS;
+				}
+				try
+				{
+					int exitValue = launch.getProcesses()[0].getExitValue();
+					if (exitValue != 0)
+						GitPlugin.trace(MessageFormat.format(
+								"command returned non-zero exit value. wd: {0}, command: {1}", finWorking, command)); //$NON-NLS-1$
+				}
+				catch (Throwable e)
+				{
+					GitPlugin.logError(e.getMessage(), e);
 				}
 				postLaunch();
 				return Status.OK_STATUS;
@@ -61,23 +87,15 @@ public abstract class SimpleGitCommandAction extends GitAction
 
 	private File getWorkingDir()
 	{
-		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length == 0)
-			return null;
-		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
+		GitRepository repo = getSelectedRepository();
 		if (repo == null)
 			return null;
 		return new File(repo.workingDirectory());
 	}
-	
+
 	protected void refreshRepoIndex()
 	{
-		IResource[] resources = getSelectedResources();
-		if (resources == null || resources.length == 0)
-			return;
-		IProject project = resources[0].getProject();
-		GitRepository repo = GitRepository.getAttached(project);
+		GitRepository repo = getSelectedRepository();
 		if (repo != null)
 			repo.index().refresh();
 	}

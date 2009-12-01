@@ -45,7 +45,7 @@
          version="0.0.0"/>
 
    <plugin
-         id="com.aptana.radrails.explorer"
+         id="com.aptana.explorer"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -66,58 +66,66 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.common"
+         id="com.aptana.editor.common"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.css"
+         id="com.aptana.editor.css"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.erb"
+         id="com.aptana.editor.erb"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.html"
+         id="com.aptana.editor.html"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.js"
+         id="com.aptana.editor.js"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.ruby"
+         id="com.aptana.editor.ruby"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.aptana.radrails.editor.xml"
+         id="com.aptana.editor.xml"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
-  <plugin
-         id="com.aptana.red.filewatcher"
+   <plugin
+         id="com.aptana.filewatcher"
          download-size="0"
          install-size="0"
          version="0.0.0"
-	 unpack="false"/>
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.findbar"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
