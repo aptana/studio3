@@ -42,11 +42,12 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.radrails.editor.common.CommonDoubleClickStrategy;
 import com.aptana.radrails.editor.common.TextUtils;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 	
-	private HTMLDoubleClickStrategy doubleClickStrategy;
+	private CommonDoubleClickStrategy doubleClickStrategy;
 
 	public HTMLSourceViewerConfiguration(IPreferenceStore preferences) {
 	    super(preferences);
@@ -62,13 +63,15 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 				HTMLSourceConfiguration.CONTENT_TYPES
 			});
 	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
 	 */
 	@Override
 	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType) {
-		if (doubleClickStrategy == null)
-			doubleClickStrategy = new HTMLDoubleClickStrategy();
+		if (doubleClickStrategy == null) {
+			doubleClickStrategy = new CommonDoubleClickStrategy();
+		}
 		return doubleClickStrategy;
 	}
 

@@ -36,7 +36,6 @@ package com.aptana.radrails.editor.xml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -45,8 +44,6 @@ import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.radrails.editor.common.TextUtils;
 
 public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
-	
-	private XMLDoubleClickStrategy doubleClickStrategy;
 
 	public XMLSourceViewerConfiguration(IPreferenceStore preferences) {
 	    super(preferences);
@@ -61,15 +58,6 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 				{ IDocument.DEFAULT_CONTENT_TYPE },
 				XMLSourceConfiguration.CONTENT_TYPES
 			});
-	}
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
-	 */
-	@Override
-	public ITextDoubleClickStrategy getDoubleClickStrategy( ISourceViewer sourceViewer, String contentType) {
-		if (doubleClickStrategy == null)
-			doubleClickStrategy = new XMLDoubleClickStrategy();
-		return doubleClickStrategy;
 	}
 
 	/* (non-Javadoc)

@@ -32,25 +32,31 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
+package com.aptana.radrails.editor.common;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.ITextViewer;
 
-public class XMLDoubleClickStrategy implements ITextDoubleClickStrategy {
+public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy {
 
 	protected ITextViewer fText;
+
+	private boolean fCtrlDown;
 
 	public void doubleClicked(ITextViewer part) {
 		int pos = part.getSelectedRange().x;
 		if (pos < 0)
 			return;
 		fText = part;
-		if (!selectComment(pos)) {
-			selectWord(pos);
-		}
+        if (fCtrlDown) {
+            if (!selectComment(pos)) {
+                selectWord(pos);
+            }
+        } else {
+            selectWord(pos);
+        }
 	}
 
 	protected boolean selectComment(int caretPos) {
