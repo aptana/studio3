@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
@@ -18,8 +18,8 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
-import com.aptana.radrails.editor.common.actions.ShowScopesAction;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * Provides a way to override the editor fg, bg and selection fg, bg from what is set in global text editor color prefs.

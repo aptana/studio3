@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import junit.framework.TestCase;
 
@@ -6,7 +6,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.radrails.editor.ruby.RubyTokenScanner;
+import com.aptana.editor.ruby.RubyTokenScanner;
 
 public class RubyTokenScannerTest extends TestCase
 {

@@ -1,4 +1,4 @@
-package com.aptana.red.filewatcher.poller;
+package com.aptana.filewatcher.poller;
 
 import java.io.File;
 import java.util.HashMap;

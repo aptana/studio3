@@ -32,9 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
-import com.aptana.radrails.editor.common.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.SourceConfigurationPartitionScanner;
 
 public class HTMLPartitionScanner extends SourceConfigurationPartitionScanner {
 	

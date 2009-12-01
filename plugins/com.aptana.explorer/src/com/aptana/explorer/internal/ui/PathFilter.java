@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import java.text.BreakIterator;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.internal.misc.StringMatcher;
 
-import com.aptana.radrails.explorer.ExplorerPlugin;
+import com.aptana.explorer.ExplorerPlugin;
 
 class PathFilter extends ViewerFilter
 {

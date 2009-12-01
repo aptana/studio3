@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.css;
+package com.aptana.editor.css;
 
 import org.eclipse.swt.graphics.RGB;
 

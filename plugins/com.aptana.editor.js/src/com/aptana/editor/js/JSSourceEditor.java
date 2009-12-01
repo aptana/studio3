@@ -32,9 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
-import com.aptana.radrails.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class JSSourceEditor extends AbstractThemeableEditor {
 

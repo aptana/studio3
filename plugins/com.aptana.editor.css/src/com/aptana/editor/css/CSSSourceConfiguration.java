@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.css;
+package com.aptana.editor.css;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -50,11 +50,11 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.IPartitioningConfiguration;
-import com.aptana.radrails.editor.common.ISourceViewerConfiguration;
-import com.aptana.radrails.editor.common.ISubPartitionScanner;
-import com.aptana.radrails.editor.common.SubPartitionScanner;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.ISubPartitionScanner;
+import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
@@ -160,28 +160,28 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getContentTypes()
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
 	public String[] getContentTypes() {
 		return CONTENT_TYPES;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getPartitioningRules()
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
 	public IPredicateRule[] getPartitioningRules() {
 		return partitioningRules;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
 	public String getDocumentContentType(String contentType) {
 		if (contentType.startsWith(PREFIX)) {
@@ -191,7 +191,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());

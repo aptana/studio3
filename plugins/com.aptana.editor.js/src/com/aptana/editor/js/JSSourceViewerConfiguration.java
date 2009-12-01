@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
@@ -41,9 +41,9 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonDoubleClickStrategy;
-import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.TextUtils;
+import com.aptana.editor.common.CommonDoubleClickStrategy;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.TextUtils;
 
 public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 

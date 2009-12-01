@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.theme;
+package com.aptana.editor.common.theme;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public abstract class ThemeUtil
 {

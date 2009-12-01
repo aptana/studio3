@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer;
+package com.aptana.explorer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -15,7 +15,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.explorer"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 
 	// The shared instance
 	private static ExplorerPlugin plugin;

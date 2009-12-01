@@ -4,13 +4,13 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.radrails.editor.ruby.RubySourceEditor"
+            class="com.aptana.editor.ruby.RubySourceEditor"
             default="true"
             icon="icons/rb.gif"
-            id="com.aptana.radrails.editor.ruby"
+            id="com.aptana.editor.ruby"
             name="%editor.rb.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.radrails.contenttype.ruby">
+               contentTypeId="com.aptana.contenttype.ruby">
          </contentTypeBinding>
       </editor>
    </extension>
@@ -20,7 +20,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="rb,rake,cgi,fcgi,rbx,rjs,gemspec,irbrc"
             file-names="Rakefile,Capfile"
-            id="com.aptana.radrails.contenttype.ruby"
+            id="com.aptana.contenttype.ruby"
             name="%content-type.rb.name"
             priority="normal">
       </content-type>

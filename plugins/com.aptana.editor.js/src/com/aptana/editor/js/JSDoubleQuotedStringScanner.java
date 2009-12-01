@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 
-import com.aptana.radrails.editor.common.RegexpRule;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner {
 

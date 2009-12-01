@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.erb.common;
+package com.aptana.editor.erb.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;

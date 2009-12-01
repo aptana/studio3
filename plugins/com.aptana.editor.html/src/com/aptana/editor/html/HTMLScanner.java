@@ -32,14 +32,14 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 
-import com.aptana.radrails.editor.common.WhitespaceDetector;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class HTMLScanner extends RuleBasedScanner {
 

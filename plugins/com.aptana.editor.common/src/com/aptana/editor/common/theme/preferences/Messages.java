@@ -1,10 +1,10 @@
-package com.aptana.radrails.editor.common.theme.preferences;
+package com.aptana.editor.common.theme.preferences;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.radrails.editor.common.theme.preferences.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.editor.common.theme.preferences.messages"; //$NON-NLS-1$
 	public static String ThemePreferencePage_AddTokenLabel;
 	public static String ThemePreferencePage_BackgroundColumnLabel;
 	public static String ThemePreferencePage_BackgroundLabel;

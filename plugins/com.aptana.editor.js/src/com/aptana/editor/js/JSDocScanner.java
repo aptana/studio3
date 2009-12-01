@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,8 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.radrails.editor.common.WhitespaceDetector;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * A rule based JavaDoc scanner.

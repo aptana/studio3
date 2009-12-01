@@ -32,9 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
+package com.aptana.editor.xml;
 
-import com.aptana.radrails.editor.common.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.SourceConfigurationPartitionScanner;
 
 public class XMLPartitionScanner extends SourceConfigurationPartitionScanner {
 	

@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -12,7 +12,7 @@ public class Activator extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.editor.ruby"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.editor.ruby"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

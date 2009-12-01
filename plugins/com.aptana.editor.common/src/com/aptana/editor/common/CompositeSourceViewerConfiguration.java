@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov

@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
@@ -40,7 +40,7 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.DocumentContentTypeManager;
 
 public class JSDocumentProvider extends TextFileDocumentProvider {
 

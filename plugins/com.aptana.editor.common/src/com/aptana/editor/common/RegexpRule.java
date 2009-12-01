@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

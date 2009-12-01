@@ -1,10 +1,10 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.radrails.explorer.internal.ui.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.explorer.internal.ui.messages"; //$NON-NLS-1$
 
 	public static String GitProjectView_AttachGitRepo_button;
 	public static String GitProjectView_AttachGitRepo_jobTitle;

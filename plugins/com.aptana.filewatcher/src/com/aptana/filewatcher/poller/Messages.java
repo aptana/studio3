@@ -8,7 +8,7 @@
  *  Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.red.filewatcher.poller;
+package com.aptana.filewatcher.poller;
 
 import org.eclipse.osgi.util.NLS;
 

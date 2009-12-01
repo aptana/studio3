@@ -33,9 +33,9 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb;
+package com.aptana.editor.erb;
 
-import com.aptana.radrails.editor.common.PartitionerSwitchStrategy;
+import com.aptana.editor.common.PartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov
@@ -72,7 +72,7 @@ public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
 	 */
 	public String[][] getSwitchTagPairs() {
 		return ERB_PAIRS;

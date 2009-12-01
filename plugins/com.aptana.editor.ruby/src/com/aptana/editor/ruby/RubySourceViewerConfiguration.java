@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
@@ -40,8 +40,8 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.radrails.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.TextUtils;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.TextUtils;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
 

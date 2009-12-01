@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
@@ -6,7 +6,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class RubyCodeScanner implements ITokenScanner
 {

@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 /**
  * @author Max Stepanov
@@ -65,7 +65,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
 	 */
 	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy() {
 		return new IPartitionScannerSwitchStrategy() {
@@ -80,7 +80,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
 	 */
 	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy() {
 		return new IPartitionScannerSwitchStrategy() {

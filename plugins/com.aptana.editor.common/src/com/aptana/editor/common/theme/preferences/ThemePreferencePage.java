@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.theme.preferences;
+package com.aptana.editor.common.theme.preferences;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -59,9 +59,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
-import com.aptana.radrails.editor.common.theme.Theme;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.Theme;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {

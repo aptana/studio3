@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.radrails.editor.common.RegexpRule;
-import com.aptana.radrails.editor.common.WhitespaceDetector;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Kevin Lindsey

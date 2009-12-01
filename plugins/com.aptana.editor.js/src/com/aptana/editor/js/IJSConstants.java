@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.js;
+package com.aptana.editor.js;
 
 /**
  * @author Max Stepanov
@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.js;
  */
 public interface IJSConstants {
 
-	public String CONTENT_TYPE_JS = "com.aptana.radrails.contenttype.js"; //$NON-NLS-1$
+	public String CONTENT_TYPE_JS = "com.aptana.contenttype.js"; //$NON-NLS-1$
 }

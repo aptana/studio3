@@ -1,6 +1,6 @@
-package com.aptana.radrails.editor.erb.html;
+package com.aptana.editor.erb.html;
 
-import com.aptana.radrails.editor.erb.common.ERBContentDescriber;
+import com.aptana.editor.erb.common.ERBContentDescriber;
 
 public class RHTMLContentDescriber extends ERBContentDescriber {
 

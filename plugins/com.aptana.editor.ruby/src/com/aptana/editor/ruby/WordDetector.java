@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 

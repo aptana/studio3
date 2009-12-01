@@ -1,6 +1,6 @@
-package com.aptana.radrails.editor.erb.xml;
+package com.aptana.editor.erb.xml;
 
-import com.aptana.radrails.editor.erb.common.ERBContentDescriber;
+import com.aptana.editor.erb.common.ERBContentDescriber;
 
 public class RXMLContentDescriber extends ERBContentDescriber {
 

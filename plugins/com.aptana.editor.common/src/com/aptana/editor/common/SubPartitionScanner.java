@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,56 +71,56 @@ public class SubPartitionScanner implements ISubPartitionScanner {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy)
+	 * @see com.aptana.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.editor.common.IPartitionScannerSwitchStrategy)
 	 */
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
 		this.characterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getRules()
+	 * @see com.aptana.editor.common.ISubPartitionScanner#getRules()
 	 */
 	public Collection<IPredicateRule> getRules() {
 		return rules;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getDefaultToken()
+	 * @see com.aptana.editor.common.ISubPartitionScanner#getDefaultToken()
 	 */
 	public IToken getDefaultToken() {
 		return defaultToken;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#getCharacterScanner()
+	 * @see com.aptana.editor.common.ISubPartitionScanner#getCharacterScanner()
 	 */
 	public ICharacterScanner getCharacterScanner() {
 		return characterScanner;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#foundSequence()
+	 * @see com.aptana.editor.common.ISubPartitionScanner#foundSequence()
 	 */
 	public boolean foundSequence() {
 		return characterScanner.foundSequence();
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#doResetRules()
+	 * @see com.aptana.editor.common.ISubPartitionScanner#doResetRules()
 	 */
 	public boolean doResetRules() {
 		return false;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
+	 * @see com.aptana.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
 	 */
 	public boolean hasContentType(String contentType) {
 		return contentTypes.contains(contentType);
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.ISubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
+	 * @see com.aptana.editor.common.ISubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	public void setLastToken(IToken token) {
 	}

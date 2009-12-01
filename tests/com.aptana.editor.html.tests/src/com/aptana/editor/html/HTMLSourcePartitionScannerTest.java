@@ -2,7 +2,7 @@
  * Created on Feb 19, 2005
  *
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 import junit.framework.TestCase;
 
@@ -10,12 +10,12 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 
-import com.aptana.radrails.editor.common.CompositePartitionScanner;
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
-import com.aptana.radrails.editor.common.ExtendedFastPartitioner;
-import com.aptana.radrails.editor.common.IExtendedPartitioner;
-import com.aptana.radrails.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.common.NullSubPartitionScanner;
+import com.aptana.editor.common.CompositePartitionScanner;
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import com.aptana.editor.common.NullSubPartitionScanner;
 
 /**
  * @author Chris

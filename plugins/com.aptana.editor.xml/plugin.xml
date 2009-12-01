@@ -5,10 +5,10 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.radrails.editor.xml.XMLEditor"
+            class="com.aptana.editor.xml.XMLEditor"
             default="true"
             extensions="xml"
-            id="com.aptana.radrails.editor.xml"
+            id="com.aptana.editor.xml"
             name="%editor.xml.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.xml">

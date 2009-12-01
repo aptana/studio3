@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.rules.FastPartitioner;

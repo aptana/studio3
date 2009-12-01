@@ -4,42 +4,42 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.radrails.editor.erb.html.RHTMLEditor"
+            class="com.aptana.editor.erb.html.RHTMLEditor"
             default="true"
             extensions="rhtml"
             icon="icons/erb.png"
-            id="com.aptana.radrails.editor.erb.html"
+            id="com.aptana.editor.erb.html"
             name="%editor.rhtml.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.radrails.contenttype.html.erb">
+               contentTypeId="com.aptana.contenttype.html.erb">
          </contentTypeBinding>
       </editor>
       <editor
-            class="com.aptana.radrails.editor.erb.xml.RXMLEditor"
+            class="com.aptana.editor.erb.xml.RXMLEditor"
             extensions="rxml"
             icon="icons/erb.png"
-            id="com.aptana.radrails.editor.erb.xml"
+            id="com.aptana.editor.erb.xml"
             name="%editor.rxml.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.radrails.contenttype.xml.erb">
+               contentTypeId="com.aptana.contenttype.xml.erb">
          </contentTypeBinding>
       </editor>
    </extension>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
-            base-type="com.aptana.radrails.contenttype.html"
-            describer="com.aptana.radrails.editor.erb.html.RHTMLContentDescriber"
+            base-type="com.aptana.contenttype.html"
+            describer="com.aptana.editor.erb.html.RHTMLContentDescriber"
             file-extensions="rhtml,erb"
-            id="com.aptana.radrails.contenttype.html.erb"
+            id="com.aptana.contenttype.html.erb"
             name="%content-type.rhtml.name"
             priority="normal">
       </content-type>
       <content-type
             base-type="org.eclipse.core.runtime.xml"
-            describer="com.aptana.radrails.editor.erb.xml.RXMLContentDescriber"
+            describer="com.aptana.editor.erb.xml.RXMLContentDescriber"
             file-extensions="rxml,erb"
-            id="com.aptana.radrails.contenttype.xml.erb"
+            id="com.aptana.contenttype.xml.erb"
             name="%content-type.rxml.name"
             priority="normal">
       </content-type>

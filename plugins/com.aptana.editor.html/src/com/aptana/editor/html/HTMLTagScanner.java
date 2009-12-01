@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,9 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.radrails.editor.common.RegexpRule;
-import com.aptana.radrails.editor.common.WhitespaceDetector;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class HTMLTagScanner extends RuleBasedScanner {
 	private static String[] STRUCTURE_DOT_ANY = {

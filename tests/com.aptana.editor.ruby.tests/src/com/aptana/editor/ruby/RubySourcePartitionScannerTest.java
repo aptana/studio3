@@ -2,7 +2,7 @@
  * Created on Feb 19, 2005
  *
  */
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 import junit.framework.TestCase;
 
@@ -11,9 +11,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.radrails.editor.ruby.MergingPartitionScanner;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourcePartitionScanner;
+import com.aptana.editor.ruby.MergingPartitionScanner;
+import com.aptana.editor.ruby.RubySourceConfiguration;
+import com.aptana.editor.ruby.RubySourcePartitionScanner;
 
 /**
  * @author Chris

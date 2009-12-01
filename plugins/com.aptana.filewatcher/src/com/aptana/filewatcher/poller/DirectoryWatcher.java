@@ -9,7 +9,7 @@
  *  aQute - initial implementation and ideas 
  *  IBM Corporation - initial adaptation to Equinox provisioning use
  *******************************************************************************/
-package com.aptana.red.filewatcher.poller;
+package com.aptana.filewatcher.poller;
 
 import java.io.File;
 import java.util.HashSet;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.red.filewatcher.FileWatcherPlugin;
+import com.aptana.filewatcher.FileWatcherPlugin;
 
 class DirectoryWatcher
 {

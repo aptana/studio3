@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
+package com.aptana.editor.xml;
 
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -40,9 +40,9 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.radrails.editor.common.RegexpRule;
-import com.aptana.radrails.editor.common.WhitespaceDetector;
-import com.aptana.radrails.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.theme.ThemeUtil;
 
 public class XMLScanner extends RuleBasedScanner
 {

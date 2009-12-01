@@ -33,9 +33,9 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb.html;
+package com.aptana.editor.erb.html;
 
-import com.aptana.radrails.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 /**
  * @author Max Stepanov
@@ -44,7 +44,7 @@ import com.aptana.radrails.editor.common.AbstractThemeableEditor;
 public class RHTMLEditor extends AbstractThemeableEditor {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.AbstractThemeableEditor#initializeEditor()
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
 	protected void initializeEditor() {

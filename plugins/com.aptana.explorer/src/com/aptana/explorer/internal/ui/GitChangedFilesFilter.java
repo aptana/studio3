@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import java.util.List;
 

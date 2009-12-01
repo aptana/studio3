@@ -4,13 +4,13 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.radrails.editor.html.HTMLEditor"
+            class="com.aptana.editor.html.HTMLEditor"
             default="true"
             icon="icons/html.png"
-            id="com.aptana.radrails.editor.html"
+            id="com.aptana.editor.html"
             name="%editor.html.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.radrails.contenttype.html">
+               contentTypeId="com.aptana.contenttype.html">
          </contentTypeBinding>
       </editor>
    </extension>
@@ -19,7 +19,7 @@
       <content-type
             base-type="org.eclipse.core.runtime.text"
             file-extensions="html,htm"
-            id="com.aptana.radrails.contenttype.html"
+            id="com.aptana.contenttype.html"
             name="%content-type.html.name"
             priority="normal">
       </content-type>

@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.theme;
+package com.aptana.editor.common.theme;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
 /**
  * @author Max Stepanov
@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.ruby;
  */
 public interface IRubyConstants {
 
-	public String CONTENT_TYPE_RUBY = "com.aptana.radrails.contenttype.ruby"; //$NON-NLS-1$
+	public String CONTENT_TYPE_RUBY = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
 }

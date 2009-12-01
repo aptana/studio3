@@ -32,19 +32,19 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.radrails.editor.common.CompositePartitionScanner;
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
-import com.aptana.radrails.editor.common.ExtendedFastPartitioner;
-import com.aptana.radrails.editor.common.IExtendedPartitioner;
-import com.aptana.radrails.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.common.NullSubPartitionScanner;
+import com.aptana.editor.common.CompositePartitionScanner;
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import com.aptana.editor.common.NullSubPartitionScanner;
 
 public class HTMLDocumentProvider extends TextFileDocumentProvider {
 

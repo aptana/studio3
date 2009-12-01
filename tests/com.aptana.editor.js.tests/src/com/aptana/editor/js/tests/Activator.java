@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.js.tests;
+package com.aptana.editor.js.tests;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.editor.js.tests";
+	public static final String PLUGIN_ID = "com.aptana.editor.js.tests";
 
 	// The shared instance
 	private static Activator plugin;

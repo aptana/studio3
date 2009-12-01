@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.radrails.editor.common.theme.ColorManager;
+import com.aptana.editor.common.theme.ColorManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -15,7 +15,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.radrails.editor.common"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;

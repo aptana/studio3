@@ -1,10 +1,10 @@
-package com.aptana.red.filewatcher;
+package com.aptana.filewatcher;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
-import com.aptana.red.filewatcher.poller.PollingNotifier;
+import com.aptana.filewatcher.poller.PollingNotifier;
 
 public class FileWatcher
 {

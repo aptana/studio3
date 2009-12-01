@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +46,7 @@ import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
-import com.aptana.radrails.explorer.ExplorerPlugin;
+import com.aptana.explorer.ExplorerPlugin;
 
 /**
  * Adds Git UI elements to the Single Project View.

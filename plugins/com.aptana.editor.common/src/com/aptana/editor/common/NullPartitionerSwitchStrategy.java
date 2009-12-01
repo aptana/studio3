@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 /**
  * @author Max Stepanov
@@ -57,21 +57,21 @@ public class NullPartitionerSwitchStrategy implements IPartitionerSwitchStrategy
 	};
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getDefaultSwitchStrategy()
 	 */
 	public IPartitionScannerSwitchStrategy getDefaultSwitchStrategy() {
 		return EMPTY_STRATEGY;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getPrimarySwitchStrategy()
 	 */
 	public IPartitionScannerSwitchStrategy getPrimarySwitchStrategy() {
 		return EMPTY_STRATEGY;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
 	 */
 	public String[][] getSwitchTagPairs() {
 		return EMPTY;

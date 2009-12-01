@@ -4,13 +4,13 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.radrails.editor.js.JSSourceEditor"
+            class="com.aptana.editor.js.JSSourceEditor"
             default="true"
             icon="icons/js.gif"
-            id="com.aptana.radrails.editor.js"
+            id="com.aptana.editor.js"
             name="%editor.js.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.radrails.contenttype.js">
+               contentTypeId="com.aptana.contenttype.js">
          </contentTypeBinding>
       </editor>
    </extension>
@@ -19,7 +19,7 @@
       <content-type
             base-type="org.eclipse.core.runtime.text"
             file-extensions="js"
-            id="com.aptana.radrails.contenttype.js"
+            id="com.aptana.contenttype.js"
             name="%content-type.js.name"
             priority="normal">
       </content-type>

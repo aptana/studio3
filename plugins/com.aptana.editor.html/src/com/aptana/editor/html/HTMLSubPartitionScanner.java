@@ -33,19 +33,19 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.radrails.editor.common.CompositeSubPartitionScanner;
-import com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy;
-import com.aptana.radrails.editor.common.ISubPartitionScanner;
-import com.aptana.radrails.editor.common.PartitionScannerSwitchStrategy;
-import com.aptana.radrails.editor.common.SubPartitionScanner;
-import com.aptana.radrails.editor.css.CSSSourceConfiguration;
-import com.aptana.radrails.editor.js.JSSourceConfiguration;
+import com.aptana.editor.common.CompositeSubPartitionScanner;
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
+import com.aptana.editor.common.ISubPartitionScanner;
+import com.aptana.editor.common.PartitionScannerSwitchStrategy;
+import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.js.JSSourceConfiguration;
 
 /**
  * @author Max Stepanov
@@ -80,7 +80,7 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
+	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	@Override
 	public void setLastToken(IToken token) {

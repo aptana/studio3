@@ -32,9 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.ruby;
+package com.aptana.editor.ruby;
 
-import com.aptana.radrails.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class RubySourceEditor extends AbstractThemeableEditor {
 

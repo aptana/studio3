@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
-import com.aptana.radrails.explorer.ExplorerPlugin;
+import com.aptana.explorer.ExplorerPlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.

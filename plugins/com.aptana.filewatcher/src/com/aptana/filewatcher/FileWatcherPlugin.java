@@ -1,4 +1,4 @@
-package com.aptana.red.filewatcher;
+package com.aptana.filewatcher;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -12,7 +12,7 @@ public class FileWatcherPlugin extends Plugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.red.filewatcher"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.filewatcher"; //$NON-NLS-1$
 
 	// The shared instance
 	private static FileWatcherPlugin plugin;

@@ -33,13 +33,13 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb.xml;
+package com.aptana.editor.erb.xml;
 
-import com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration;
-import com.aptana.radrails.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
-import com.aptana.radrails.editor.xml.XMLSourceConfiguration;
+import com.aptana.editor.common.CompositeSourceViewerConfiguration;
+import com.aptana.editor.common.IPartitionerSwitchStrategy;
+import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
+import com.aptana.editor.ruby.RubySourceConfiguration;
+import com.aptana.editor.xml.XMLSourceConfiguration;
 
 /**
  * @author Max Stepanov
@@ -52,7 +52,7 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.CompositeSourceViewerConfiguration#getPartitionerSwitchStrategy()
+	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getPartitionerSwitchStrategy()
 	 */
 	@Override
 	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {

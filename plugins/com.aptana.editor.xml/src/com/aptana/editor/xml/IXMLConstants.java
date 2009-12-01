@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.xml;
+package com.aptana.editor.xml;
 
 /**
  * @author Max Stepanov
@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.xml;
  */
 public interface IXMLConstants {
 
-	public String CONTENT_TYPE_XML = "com.aptana.radrails.contenttype.xml"; //$NON-NLS-1$
+	public String CONTENT_TYPE_XML = "com.aptana.contenttype.xml"; //$NON-NLS-1$
 }

@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.radrails.editor.xml;
+package com.aptana.editor.xml;
 
 import org.eclipse.jface.text.rules.*;
 

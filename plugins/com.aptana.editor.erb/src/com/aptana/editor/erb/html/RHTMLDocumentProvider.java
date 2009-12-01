@@ -33,13 +33,13 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb.html;
+package com.aptana.editor.erb.html;
 
-import com.aptana.radrails.editor.common.CompositeDocumentProvider;
-import com.aptana.radrails.editor.erb.ERBPartitionerSwitchStrategy;
-import com.aptana.radrails.editor.erb.IERBConstants;
-import com.aptana.radrails.editor.html.HTMLSourceConfiguration;
-import com.aptana.radrails.editor.ruby.RubySourceConfiguration;
+import com.aptana.editor.common.CompositeDocumentProvider;
+import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
+import com.aptana.editor.erb.IERBConstants;
+import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
  * @author Max Stepanov

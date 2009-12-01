@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.actions;
+package com.aptana.editor.common.actions;
 
 import java.util.ResourceBundle;
 
@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
-import com.aptana.radrails.editor.common.DocumentContentTypeManager;
-import com.aptana.radrails.editor.common.QualifiedContentType;
-import com.aptana.radrails.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 public class ShowScopesAction extends TextEditorAction {
 	
@@ -30,7 +30,7 @@ public class ShowScopesAction extends TextEditorAction {
 		return new ShowScopesAction(ResourceBundle.getBundle(ShowScopesAction.class.getName()), "ShowScopesAction.", textEditor, textViewer); //$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.radrails.editor.common.showscopes"; //$NON-NLS-1$
+	public static final String COMMAND_ID = "com.aptana.editor.common.showscopes"; //$NON-NLS-1$
 	
 	private final ITextViewer textViewer;
 

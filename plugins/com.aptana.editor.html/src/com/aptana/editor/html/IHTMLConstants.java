@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.html;
+package com.aptana.editor.html;
 
 /**
  * @author Max Stepanov
@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.html;
  */
 public interface IHTMLConstants {
 
-	public String CONTENT_TYPE_HTML = "com.aptana.radrails.contenttype.html"; //$NON-NLS-1$
+	public String CONTENT_TYPE_HTML = "com.aptana.contenttype.html"; //$NON-NLS-1$
 }

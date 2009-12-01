@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 /**
  * @author Max Stepanov
@@ -41,6 +41,6 @@ package com.aptana.radrails.editor.common;
  */
 public interface ICommonConstants {
 
-	public String CONTENT_TYPE_UKNOWN = "com.aptana.radrails.contenttype.unknown"; //$NON-NLS-1$
+	public String CONTENT_TYPE_UKNOWN = "com.aptana.contenttype.unknown"; //$NON-NLS-1$
 
 }

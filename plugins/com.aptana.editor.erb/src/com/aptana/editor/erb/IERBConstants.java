@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.erb;
+package com.aptana.editor.erb;
 
 /**
  * @author Max Stepanov
@@ -41,7 +41,7 @@ package com.aptana.radrails.editor.erb;
  */
 public interface IERBConstants {
 
-	public String CONTENT_TYPE_HTML_ERB = "com.aptana.radrails.contenttype.html.erb"; //$NON-NLS-1$
-	public String CONTENT_TYPE_XML_ERB = "com.aptana.radrails.contenttype.xml.erb"; //$NON-NLS-1$
+	public String CONTENT_TYPE_HTML_ERB = "com.aptana.contenttype.html.erb"; //$NON-NLS-1$
+	public String CONTENT_TYPE_XML_ERB = "com.aptana.contenttype.xml.erb"; //$NON-NLS-1$
 	
 }

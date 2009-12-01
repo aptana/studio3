@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.aptana.radrails.editor.common.theme.preferences.ThemePreferencePage"
-            id="com.aptana.radrails.editor.common.theme.page"
+            class="com.aptana.editor.common.theme.preferences.ThemePreferencePage"
+            id="com.aptana.editor.common.theme.page"
             name="%preferencePage.themes.name">
       </page>
    </extension>
@@ -14,14 +14,14 @@
       <command
             categoryId="org.eclipse.ui.category.textEditor"
             description="%command.scope.description"
-            id="com.aptana.radrails.editor.common.showscopes"
+            id="com.aptana.editor.common.showscopes"
             name="%command.scope.name">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="com.aptana.radrails.editor.common.showscopes"
+            commandId="com.aptana.editor.common.showscopes"
             contextId="org.eclipse.ui.textEditorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+P">

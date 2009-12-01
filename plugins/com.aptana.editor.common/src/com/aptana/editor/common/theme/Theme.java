@@ -1,4 +1,4 @@
-package com.aptana.radrails.editor.common.theme;
+package com.aptana.editor.common.theme;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import com.aptana.radrails.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,

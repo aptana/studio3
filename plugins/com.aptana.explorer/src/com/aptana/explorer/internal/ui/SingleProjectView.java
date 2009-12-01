@@ -1,4 +1,4 @@
-package com.aptana.radrails.explorer.internal.ui;
+package com.aptana.explorer.internal.ui;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.radrails.explorer.ExplorerPlugin;
-import com.aptana.red.filewatcher.FileWatcher;
+import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.filewatcher.FileWatcher;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.

@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common;
+package com.aptana.editor.common;
 
 /**
  * @author Max Stepanov
@@ -59,14 +59,14 @@ public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchSt
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy#getEscapeSequences()
+	 * @see com.aptana.editor.common.IPartitionScannerSwitchStrategy#getEscapeSequences()
 	 */
 	public char[][][] getEscapeSequences() {
 		return escapeSequences;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.radrails.editor.common.IPartitionScannerSwitchStrategy#getSwitchSequences()
+	 * @see com.aptana.editor.common.IPartitionScannerSwitchStrategy#getSwitchSequences()
 	 */
 	public char[][] getSwitchSequences() {
 		return switchSequences;

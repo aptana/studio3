@@ -33,14 +33,14 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.common.tmp;
+package com.aptana.editor.common.tmp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.radrails.editor.common.QualifiedContentType;
+import com.aptana.editor.common.QualifiedContentType;
 
 /**
  * @author Max Stepanov
@@ -56,30 +56,30 @@ public class ContentTypeTranslation {
 	 * 
 	 */
 	private ContentTypeTranslation() {
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.js"), new QualifiedContentType("source.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.css"), new QualifiedContentType("source.css")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.js"), new QualifiedContentType("source.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.css"), new QualifiedContentType("source.css")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html"), new QualifiedContentType("text.html.basic")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html"), new QualifiedContentType("text.html.basic")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html", "com.aptana.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
 						new QualifiedContentType("text.html.basic", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html", "com.aptana.radrails.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html", "com.aptana.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.basic", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.ruby"), new QualifiedContentType("source.ruby.rails")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.ruby"), new QualifiedContentType("source.ruby.rails")); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.html"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.html"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.html.erb", "com.aptana.radrails.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.ruby.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		addTranslation(new QualifiedContentType("__html_comment"), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -102,10 +102,10 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("__rb_regular_expression"), new QualifiedContentType("string.regexp.classic.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.radrails.contenttype.xml.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	

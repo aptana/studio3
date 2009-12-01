@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.radrails.editor.css;
+package com.aptana.editor.css;
 
 /**
  * @author Max Stepanov
@@ -41,5 +41,5 @@ package com.aptana.radrails.editor.css;
  */
 public interface ICSSConstants {
 
-	public String CONTENT_TYPE_CSS = "com.aptana.radrails.contenttype.css"; //$NON-NLS-1$
+	public String CONTENT_TYPE_CSS = "com.aptana.contenttype.css"; //$NON-NLS-1$
 }
