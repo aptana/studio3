@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -30,7 +31,7 @@ public abstract class ThemeUtil
 	/**
 	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
 	 */
-	private static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
+	public static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
 
 	/**
 	 * Preference key used to store the list of known themes.
@@ -56,6 +57,7 @@ public abstract class ThemeUtil
 
 	private static Theme fgTheme;
 	private static HashMap<String, Theme> fgThemeMap;
+	private static HashSet<String> fgBuiltins;
 	private static Map<WeakReference<Token>, String> fgTokens = new HashMap<WeakReference<Token>, String>();
 
 	private static Theme loadTheme(InputStream stream)
@@ -170,6 +172,11 @@ public abstract class ThemeUtil
 		// Load themes from the preferences
 		loadUserThemes();
 
+		saveThemeList();
+	}
+
+	private static void saveThemeList()
+	{
 		StringBuilder builder = new StringBuilder();
 		for (String themeName : fgThemeMap.keySet())
 		{
@@ -179,7 +186,14 @@ public abstract class ThemeUtil
 		builder.deleteCharAt(builder.length() - 1);
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		prefs.put(THEME_LIST_PREF_KEY, builder.toString());
-
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 	private static void loadUserThemes()
@@ -213,6 +227,7 @@ public abstract class ThemeUtil
 	@SuppressWarnings("unchecked")
 	private static void loadBuiltinThemes()
 	{
+		fgBuiltins = new HashSet<String>();
 		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle()
 				.findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (urls == null)
@@ -226,6 +241,7 @@ public abstract class ThemeUtil
 				if (theme != null)
 				{
 					fgThemeMap.put(theme.getName(), theme);
+					fgBuiltins.add(theme.getName());
 				}
 			}
 			catch (Exception e)
@@ -250,5 +266,28 @@ public abstract class ThemeUtil
 			if (token != null)
 				token.setData(getTextAttribute(entry.getValue()));
 		}
+	}
+
+	public static void addTheme(Theme newTheme)
+	{
+		fgThemeMap.put(newTheme.getName(), newTheme);
+		saveThemeList();
+	}
+
+	public static void removeTheme(Theme theme)
+	{
+		Theme activeTheme = getActiveTheme();
+		fgThemeMap.remove(theme.getName());
+		saveThemeList();
+		// change active theme if we just removed it
+		if (activeTheme.getName().equals(theme.getName()))
+		{
+			setActiveTheme(fgThemeMap.values().iterator().next());
+		}
+	}
+
+	public static boolean isBuiltinTheme(String themeName)
+	{
+		return fgBuiltins.contains(themeName);
 	}
 }

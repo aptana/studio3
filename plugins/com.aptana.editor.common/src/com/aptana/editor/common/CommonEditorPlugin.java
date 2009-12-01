@@ -3,6 +3,7 @@ package com.aptana.editor.common;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -13,6 +14,8 @@ import com.aptana.editor.common.theme.ColorManager;
  */
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
+
+	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
@@ -99,5 +102,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static void logError(String string, Exception e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
+	}
+
+	@Override
+	protected ImageRegistry createImageRegistry()
+	{
+		ImageRegistry reg = super.createImageRegistry();
+		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
+		return reg;
 	}
 }

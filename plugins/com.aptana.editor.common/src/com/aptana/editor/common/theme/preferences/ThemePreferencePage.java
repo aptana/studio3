@@ -1,6 +1,7 @@
 package com.aptana.editor.common.theme.preferences;
 
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -29,6 +33,7 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
@@ -124,6 +129,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Combo fThemeCombo;
 	private TableViewer tableViewer;
 	private Set<TableEditor> fTableEditors;
+	private Button renameThemeButton;
+	private Button deleteThemeButton;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -132,7 +139,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		composite.setLayout(new GridLayout(1, false));
 		composite.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true));
 
-		createThemeCombo(composite);
+		createThemeListControls(composite);
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
 
@@ -140,9 +147,109 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return composite;
 	}
 
-	private void createThemeCombo(Composite composite)
+	private void createThemeListControls(Composite composite)
 	{
-		fThemeCombo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
+		Composite themesComp = new Composite(composite, SWT.NONE);
+		themesComp.setLayout(new GridLayout(4, false));
+
+		fThemeCombo = new Combo(themesComp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		loadThemeNames();
+		fThemeCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				setTheme(fThemeCombo.getText());
+				ThemeUtil.setActiveTheme(getTheme());
+				super.widgetSelected(e);
+			}
+		});
+
+		final IInputValidator themeNameValidator = new IInputValidator()
+		{
+
+			public String isValid(String newText)
+			{
+				if (newText == null || newText.trim().length() == 0)
+					return Messages.ThemePreferencePage_NameNonEmptyMsg;
+				if (ThemeUtil.getThemeNames().contains(newText.trim()))
+					return Messages.ThemePreferencePage_NameAlreadyExistsMsg;
+				if (newText.contains(ThemeUtil.THEME_NAMES_DELIMETER))
+					return MessageFormat.format(Messages.ThemePreferencePage_InvalidCharInThemeName,
+							ThemeUtil.THEME_NAMES_DELIMETER);
+				return null;
+			}
+		};
+
+		Button copyTheme = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		copyTheme.setText(Messages.ThemePreferencePage_AddTokenLabel);
+		copyTheme.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				// Pop a dialog to ask for new name
+				InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_NewThemeTitle,
+						Messages.ThemePreferencePage_NewThemeMsg, MessageFormat.format(
+								Messages.ThemePreferencePage_NewThemeDefaultName, fSelectedTheme), themeNameValidator);
+				if (dialog.open() == Window.OK)
+				{
+					Theme newTheme = getTheme().copy(dialog.getValue());
+					// Add theme to theme list, make current theme this one
+					ThemeUtil.setActiveTheme(newTheme);
+					loadThemeNames();
+					setTheme(newTheme.getName());
+				}
+			}
+		});
+
+		renameThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		renameThemeButton.setText(Messages.ThemePreferencePage_RenameButtonLabel);
+		renameThemeButton.setImage(CommonEditorPlugin.getDefault().getImageRegistry().get(
+				CommonEditorPlugin.PENCIL_ICON));
+		renameThemeButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				// Pop a dialog to ask for new name
+				InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_RenameThemeTitle,
+						Messages.ThemePreferencePage_RenameThemeMsg, fSelectedTheme, themeNameValidator);
+				if (dialog.open() == Window.OK)
+				{
+					Theme oldTheme = getTheme();
+					Theme newTheme = oldTheme.copy(dialog.getValue());
+					ThemeUtil.setActiveTheme(newTheme);
+					oldTheme.delete();
+					loadThemeNames();
+					setTheme(newTheme.getName());
+				}
+			}
+		});
+
+		deleteThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		deleteThemeButton.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
+		deleteThemeButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				boolean ok = MessageDialog.openConfirm(getShell(), MessageFormat.format(
+						Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme), MessageFormat.format(
+						Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
+				if (!ok)
+					return;
+
+				getTheme().delete();
+				loadThemeNames();
+				setTheme(ThemeUtil.getActiveTheme().getName());
+			}
+		});
+	}
+
+	private void loadThemeNames()
+	{
+		fThemeCombo.removeAll();
 		List<String> themeNames = new ArrayList<String>(ThemeUtil.getThemeNames());
 		Collections.sort(themeNames, new Comparator<String>()
 		{
@@ -155,17 +262,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			fThemeCombo.add(themeName);
 		}
-
-		fThemeCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				setTheme(fThemeCombo.getText());
-				ThemeUtil.setActiveTheme(getTheme());
-				super.widgetSelected(e);
-			}
-		});
 	}
 
 	private void createGlobalColorControls(Composite composite)
@@ -266,7 +362,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createTokenEditTable(Composite composite)
 	{
-		// TODO Hook in custom paint listeners to paint selection background color using the theme's selection color
 		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
@@ -432,8 +527,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					}
 					catch (Exception e)
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						CommonEditorPlugin.logError(e);
 					}
 				}
 				else
@@ -637,6 +731,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
+		if (ThemeUtil.isBuiltinTheme(themeName))
+		{
+			renameThemeButton.setEnabled(false);
+			deleteThemeButton.setEnabled(false);
+		}
+		else
+		{
+			renameThemeButton.setEnabled(true);
+			deleteThemeButton.setEnabled(true);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
