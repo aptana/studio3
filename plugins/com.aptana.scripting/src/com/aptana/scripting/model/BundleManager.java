@@ -412,7 +412,7 @@ public class BundleManager
 		this.loadProjectBundles();
 		this.loadUserBundles();
 		
-		this.showBundles();
+		//this.showBundles();
 	}
 	
 	/**
