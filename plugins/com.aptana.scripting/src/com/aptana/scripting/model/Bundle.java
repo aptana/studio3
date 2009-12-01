@@ -1,7 +1,5 @@
 package com.aptana.scripting.model;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
