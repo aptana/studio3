@@ -5,15 +5,10 @@ import java.io.StringWriter;
 
 import org.jruby.anno.JRubyMethod;
 
-import com.aptana.scope.ScopeSelector;
-
-public class Snippet
+public class Snippet extends AbstractModel
 {
-	private String _path;
-	private String _displayName;
 	private String _trigger;
 	private String _expansion;
-	private String _scope;
 
 	/**
 	 * Snippet
@@ -22,18 +17,7 @@ public class Snippet
 	 */
 	public Snippet(String path)
 	{
-		this._path = path;
-	}
-
-	/**
-	 * getDisplayName
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "display_name")
-	public String getDisplayName()
-	{
-		return this._displayName;
+		super(path);
 	}
 
 	/**
@@ -45,39 +29,6 @@ public class Snippet
 	public String getExpansion()
 	{
 		return this._expansion;
-	}
-
-	/**
-	 * getPath
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "path")
-	public String getPath()
-	{
-		return this._path;
-	}
-
-	/**
-	 * getScope
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "scope")
-	public String getScope()
-	{
-		return this._scope;
-	}
-	
-	/**
-	 * getScopeSelector
-	 * 
-	 * @return
-	 */
-	public ScopeSelector getScopeSelector()
-	{
-		// TODO: cache this
-		return new ScopeSelector(this._scope);
 	}
 	
 	/**
@@ -92,17 +43,6 @@ public class Snippet
 	}
 	
 	/**
-	 * setDisplayName
-	 * 
-	 * @param displayName
-	 */
-	@JRubyMethod(name = "display_name=")
-	public void setDisplayName(String displayName)
-	{
-		this._displayName = displayName;
-	}
-	
-	/**
 	 * setExpansion
 	 * 
 	 * @param expansion
@@ -111,27 +51,6 @@ public class Snippet
 	public void setExpansion(String expansion)
 	{
 		this._expansion = expansion;
-	}
-
-	/**
-	 * setPath
-	 * 
-	 * @param path
-	 */
-	void setPath(String path)
-	{
-		this._path = path;
-	}
-	
-	/**
-	 * setScope
-	 * 
-	 * @param scope
-	 */
-	@JRubyMethod(name = "scope=")
-	public void setScope(String scope)
-	{
-		this._scope = scope;
 	}
 
 	/**
