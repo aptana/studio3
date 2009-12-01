@@ -85,6 +85,6 @@ public class AndSelectorTests
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		
-		assertFalse(selector.matches(null));
+		assertFalse(selector.matches((String) null));
 	}
 }

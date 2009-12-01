@@ -67,6 +67,6 @@ public class NameSelectorTests
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
 		
-		assertFalse(selector.matches(null));
+		assertFalse(selector.matches((String) null));
 	}
 }
