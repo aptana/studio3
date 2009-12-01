@@ -101,10 +101,19 @@ public class Menu extends AbstractModel
 		}
 		else
 		{
-			// TODO: make iterative to avoid unneeded recursion
-			if (this._parent != null)
+			Menu parent = this._parent;
+			
+			while (parent != null)
 			{
-				result = this._parent.getScopeSelector();
+				if (parent._scope != null)
+				{
+					result = new ScopeSelector(parent._scope);
+					break;
+				}
+				else
+				{
+					parent = parent._parent;
+				}
 			}
 		}
 		
