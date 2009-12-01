@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Set<TableEditor> fTableEditors;
 	private Button renameThemeButton;
 	private Button deleteThemeButton;
+	private HashMap<Integer, Font> fFonts;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -367,7 +369,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		table.setLinesVisible(false);
 		final TableLayout layout = new TableLayout();
 		table.setLayout(layout);
-
+		// Hack to force a specific row height
 		table.addListener(SWT.MeasureItem, new Listener()
 		{
 			public void handleEvent(Event event)
@@ -375,6 +377,30 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				event.height = ROW_HEIGHT;
 			}
 		});
+		// Hack to draw the underline in first column
+		table.addListener(SWT.PaintItem, new Listener()
+		{
+			@SuppressWarnings("unchecked")
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.FOREGROUND) != 0 && event.index == 0)
+				{
+					TableItem item = (TableItem) event.item;
+					Entry<String, TextAttribute> token = (Entry<String, TextAttribute>) item.getData();
+					if ((token.getValue().getStyle() & TextAttribute.UNDERLINE) != 0)
+					{
+						int y = event.getBounds().y + event.getBounds().height - 6;
+						int x2 = event.getBounds().width;
+						Color oldFG = event.gc.getForeground();
+						event.gc.setForeground(token.getValue().getForeground());
+						event.gc.drawLine(0, y, x2, y);
+						event.gc.setForeground(oldFG);
+						event.detail &= ~SWT.FOREGROUND;
+					}
+				}
+			}
+		});
+
 		// Override selection color to match what is set in theme
 		table.addListener(SWT.EraseItem, new Listener()
 		{
@@ -457,7 +483,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
 			@SuppressWarnings("unchecked")
-			@Override
 			public String getText(Object element)
 			{
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
@@ -465,7 +490,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 
 			@SuppressWarnings("unchecked")
-			@Override
 			public Color getForeground(Object element)
 			{
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
@@ -476,7 +500,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 
 			@SuppressWarnings("unchecked")
-			@Override
 			public Color getBackground(Object element)
 			{
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
@@ -489,15 +512,15 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 
 			@SuppressWarnings("unchecked")
-			@Override
 			public Font getFont(Object element)
 			{
-				// FIXME show bold, italic, underline properly in first column!
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
 				Font font = token.getValue().getFont();
 				if (font == null)
 					font = JFaceResources.getTextFont();
-				return font;
+				if (token.getValue().getStyle() == 0) // TODO Limit to only checking for bold or italic
+					return font;
+				return lazyFont(font, token.getValue().getStyle());
 			}
 		});
 
@@ -686,6 +709,20 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 			}
 		});
+	}
+
+	protected Font lazyFont(Font font, int style)
+	{
+		if (fFonts == null)
+			fFonts = new HashMap<Integer, Font>();
+		Font returnFont = fFonts.get(style);
+		if (returnFont == null)
+		{
+			returnFont = new Font(font.getDevice(), font.getFontData()[0].getName(), font.getFontData()[0].getHeight(),
+					style);
+			fFonts.put(style, returnFont);
+		}
+		return returnFont;
 	}
 
 	static class TokenLabelProvider extends BaseLabelProvider implements ITableLabelProvider
@@ -905,6 +942,21 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	protected Theme getTheme()
 	{
 		return ThemeUtil.getTheme(fSelectedTheme);
+	}
+
+	@Override
+	public void dispose()
+	{
+		if (fFonts != null)
+		{
+			for (Font font : fFonts.values())
+			{
+				font.dispose();
+			}
+			fFonts.clear();
+			fFonts = null;
+		}
+		super.dispose();
 	}
 
 }
