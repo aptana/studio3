@@ -17,6 +17,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -26,15 +28,23 @@ import org.eclipse.core.runtime.URIUtil;
 import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scripting.Activator;
+import com.aptana.scripting.ResourceChangeListener;
 import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
-	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Red Bundles"; //$NON-NLS-1$
-	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Red Bundles"; //$NON-NLS-1$
+	static final Menu[] NO_MENUS = new Menu[0];
+	static final Snippet[] NO_SNIPPETS = new Snippet[0];
+	static final Command[] NO_COMMANDS = new Command[0];
+	
+	private static final IResourceChangeListener resourceListener = new ResourceChangeListener();
+	
+	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Bundles"; //$NON-NLS-1$
+	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String BUNDLES_FOLDER_NAME = "bundles"; //$NON-NLS-1$
+	private static final String LIB_FOLDER_NAME = "lib"; //$NON-NLS-1$
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
@@ -64,6 +74,8 @@ public class BundleManager
 	 */
 	private BundleManager()
 	{
+		// attach resource change listener so we can track changes to the workspace
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/**
@@ -159,21 +171,27 @@ public class BundleManager
 	 */
 	public Command[] getCommandsFromScope(String scope)
 	{
-		if (this._bundles == null)
-			return new Command[0];
+		Command[] result = NO_COMMANDS;
 		
-		List<Command> result = new ArrayList<Command>();
-		for (Bundle bundle : this._bundles)
+		if (this._bundles != null && this._bundles.size() > 0)
 		{
-			for (Command command : bundle.getCommands())
+			List<Command> commands = new ArrayList<Command>();
+			
+			for (Bundle bundle : this._bundles)
 			{
-				if (command.getScopeSelector().matches(scope))
+				for (Command command : bundle.getCommands())
 				{
-					result.add(command);
+					if (command.getScopeSelector().matches(scope))
+					{
+						commands.add(command);
+					}
 				}
 			}
+			
+			result = commands.toArray(new Command[commands.size()]);
 		}
-		return result.toArray(new Command[result.size()]);
+		
+		return result;
 	}
 	
 	/**
@@ -187,11 +205,10 @@ public class BundleManager
 		File folder = (resource != null && resource.isDirectory()) ? resource : resource.getParentFile();
 		List<String> loadPaths = new ArrayList<String>();
 		File bundleFolder = folder.getParentFile();
-		File bundlesFolder = bundleFolder.getParentFile();
+		File bundleLibFolder = new File(bundleFolder.getAbsolutePath() + File.separator + LIB_FOLDER_NAME);
 		
 		loadPaths.add(this.getBuiltinsLoadPath());
-		loadPaths.add(bundlesFolder.getAbsolutePath());
-		loadPaths.add(bundleFolder.getAbsolutePath());
+		loadPaths.add(bundleLibFolder.getAbsolutePath());
 		loadPaths.add("."); //$NON-NLS-1$
 		
 		return loadPaths;
@@ -207,6 +224,37 @@ public class BundleManager
 	{
 		return this.getLoadPaths(resource.getLocation().toFile());
 	}
+	
+	/**
+	 * getMenusFromScope
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public Menu[] getMenusFromScope(String scope)
+	{
+		Menu[] result = NO_MENUS;
+		
+		if (this._bundles != null && this._bundles.size() > 0)
+		{		
+			List<Menu> menus = new ArrayList<Menu>();
+			
+			for (Bundle bundle : this._bundles)
+			{
+				for (Menu menu : bundle.getMenus())
+				{
+					if (menu.getScopeSelector().matches(scope))
+					{
+						menus.add(menu);
+					}
+				}
+			}
+			
+			result = menus.toArray(new Menu[menus.size()]);
+		}
+		
+		return result;
+	}
 
 	/**
 	 * getSnippetsFromScope
@@ -216,22 +264,27 @@ public class BundleManager
 	 */
 	public Snippet[] getSnippetsFromScope(String scope)
 	{
-		if (this._bundles == null)
-			return new Snippet[0];
+		Snippet[] result = NO_SNIPPETS;
 		
-		List<Snippet> result = new ArrayList<Snippet>();
-		for (Bundle bundle : this._bundles)
+		if (this._bundles != null && this._bundles.size() > 0)
 		{
-			for (Snippet snippet : bundle.getSnippets())
+			List<Snippet> snippets = new ArrayList<Snippet>();
+			
+			for (Bundle bundle : this._bundles)
 			{
-				if (snippet.getScopeSelector().matches(scope))
+				for (Snippet snippet : bundle.getSnippets())
 				{
-					result.add(snippet);
+					if (snippet.getScopeSelector().matches(scope))
+					{
+						snippets.add(snippet);
+					}
 				}
 			}
+	
+			result = snippets.toArray(new Snippet[snippets.size()]);
 		}
-
-		return result.toArray(new Snippet[result.size()]);
+		
+		return result;
 	}
 
 	/**
@@ -422,7 +475,7 @@ public class BundleManager
 				{
 					if (resource instanceof IFolder)
 					{
-						this.processBundle(resource, true);
+						this.processBundle((IFolder) resource, true);
 					}
 				}
 			}
