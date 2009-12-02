@@ -4,7 +4,7 @@ import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scope.ScopeSelector;
 
-public abstract class AbstractModel
+public abstract class AbstractNode
 {
 	protected Bundle _owningBundle;
 	protected String _path;
@@ -16,7 +16,7 @@ public abstract class AbstractModel
 	 * 
 	 * @param path
 	 */
-	public AbstractModel(String path)
+	public AbstractNode(String path)
 	{
 		this._path = path;
 	}
