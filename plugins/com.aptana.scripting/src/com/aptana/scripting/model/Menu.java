@@ -8,7 +8,7 @@ import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scope.ScopeSelector;
 
-public class Menu extends AbstractModel
+public class Menu extends AbstractNode
 {
 	private static final String SEPARATOR_TEXT = "-";
 	
@@ -98,9 +98,9 @@ public class Menu extends AbstractModel
 	 * 
 	 * @return
 	 */
-	public Command getCommand()
+	public TriggerableNode getCommand()
 	{
-		Command result = null;
+		TriggerableNode result = null;
 		
 		if (this.isLeafMenu() && this._owningBundle != null)
 		{
