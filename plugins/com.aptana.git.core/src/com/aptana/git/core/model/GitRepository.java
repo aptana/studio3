@@ -616,6 +616,26 @@ public class GitRepository
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
 	}
 
+	public Set<String> remoteURLs()
+	{
+		Set<String> remotes = new HashSet<String>();
+		for (String remoteBranch : remoteBranches())
+		{
+			remotes.add(remoteBranch.substring(0, remoteBranch.indexOf("/"))); //$NON-NLS-1$
+		}
+
+		Set<String> remoteURLs = new HashSet<String>();
+		for (String string : remotes)
+		{
+			String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
+					"^remote\\." + string + "\\.url"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (output == null || output.trim().length() == 0)
+				continue;
+			remoteURLs.add(output.substring(output.indexOf(".url ") + 5)); //$NON-NLS-1$
+		}
+		return remoteURLs;
+	}
+
 	/**
 	 * @param branchName
 	 *            Name of the new branch

@@ -335,9 +335,19 @@ public class Theme
 	 */
 	private void deleteCustomVersion()
 	{
+		delete(new InstanceScope());
+	}
+
+	private void deleteDefaultVersion()
+	{
+		delete(new DefaultScope());
+	}
+
+	private void delete(IScopeContext context)
+	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = context.getNode(CommonEditorPlugin.PLUGIN_ID);
 			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
 			preferences.remove(getName());
 			preferences.flush();
@@ -406,5 +416,21 @@ public class Theme
 			return;
 		selection = newColor;
 		save();
+	}
+
+	public Theme copy(String value)
+	{
+		Properties props = toProps();
+		props.setProperty(THEME_NAME_PROP_KEY, value);
+		Theme newTheme = new Theme(colorManager, props);
+		ThemeUtil.addTheme(newTheme);
+		return newTheme;
+	}
+
+	public void delete()
+	{
+		ThemeUtil.removeTheme(this);
+		deleteCustomVersion();
+		deleteDefaultVersion();
 	}
 }
