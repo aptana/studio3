@@ -1,5 +1,7 @@
 package com.aptana.editor.ruby;
 
+import java.util.Vector;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -18,6 +20,9 @@ public class RubyCodeScanner implements ITokenScanner
 	private boolean inPipe;
 	private boolean lookForBlock;
 	private boolean nextAreArgs;
+	private Vector<QueuedToken> queue;
+	private int fLength;
+	private int fOffset;
 
 	public RubyCodeScanner()
 	{
@@ -26,38 +31,33 @@ public class RubyCodeScanner implements ITokenScanner
 
 	public int getTokenLength()
 	{
-		return fScanner.getTokenLength();
+		return fLength;
 	}
 
 	public int getTokenOffset()
 	{
-		return fScanner.getTokenOffset();
+		return fOffset;
 	}
 
 	public IToken nextToken()
 	{
-		IToken intToken = fScanner.nextToken();
-		if (intToken == null || intToken.isEOF())
-		{
+		IToken intToken = pop();
+		if (intToken.isEOF())
 			return Token.EOF;
-		}
 		Integer data = (Integer) intToken.getData();
-		if (data == null)
-		{
-			return Token.EOF;
-		}
 
 		if (lookForBlock)
 		{
 			if (!inPipe && data.intValue() != Tokens.tPIPE)
 				lookForBlock = false;
 		}
-		
-		if (nextAreArgs && (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
+
+		if (nextAreArgs
+				&& (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
 		{
 			nextAreArgs = false;
 		}
-		
+
 		// Convert the integer tokens into tokens containing color information!
 		if (isKeyword(data.intValue()))
 		{
@@ -178,7 +178,11 @@ public class RubyCodeScanner implements ITokenScanner
 					nextIsClassName = false;
 					return ThemeUtil.getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
 				}
-				// FIXME Need to return "support.class.ruby" if it ends in "::" or "\.*"
+				int nextToken = peek();
+				if (nextToken == Tokens.tCOLON2 || nextToken == Tokens.tDOT)
+				{
+					return ThemeUtil.getToken("support.class.ruby"); //$NON-NLS-1$
+				}
 				return ThemeUtil.getToken("variable.other.constant.ruby"); //$NON-NLS-1$
 			case Tokens.yyErrorCode:
 				return ThemeUtil.getToken("error.ruby"); //$NON-NLS-1$
@@ -202,6 +206,56 @@ public class RubyCodeScanner implements ITokenScanner
 		}
 	}
 
+	private IToken pop()
+	{
+		IToken intToken = null;
+		if (queue == null || queue.isEmpty())
+		{
+			intToken = fScanner.nextToken();
+			fOffset = fScanner.getTokenOffset();
+			fLength = fScanner.getTokenLength();
+		}
+		else
+		{
+			QueuedToken queued = queue.remove(0);
+			fOffset = queued.getOffset();
+			fLength = queued.getLength();
+			intToken = queued.getToken();
+		}
+		if (intToken == null)
+			return Token.EOF;
+		Integer data = (Integer) intToken.getData();
+		if (data == null)
+			return Token.EOF;
+
+		return intToken;
+	}
+
+	private int peek()
+	{
+		int oldOffset = getTokenOffset();
+		int oldLength = getTokenLength();
+		IToken next = pop();
+		push(next);
+		fOffset = oldOffset;
+		fLength = oldLength;
+		if (next.isEOF())
+		{
+			return -1;
+		}
+		Integer data = (Integer) next.getData();
+		return data.intValue();
+	}
+
+	private void push(IToken next)
+	{
+		if (queue == null)
+		{
+			queue = new Vector<QueuedToken>();
+		}
+		queue.add(new QueuedToken(next, getTokenOffset(), getTokenLength()));
+	}
+
 	public void setRange(IDocument document, int offset, int length)
 	{
 		fScanner.setRange(document, offset, length);
@@ -216,6 +270,7 @@ public class RubyCodeScanner implements ITokenScanner
 		inPipe = false;
 		lookForBlock = false;
 		nextAreArgs = false;
+		queue = null;
 	}
 
 	private boolean isKeyword(int i)
