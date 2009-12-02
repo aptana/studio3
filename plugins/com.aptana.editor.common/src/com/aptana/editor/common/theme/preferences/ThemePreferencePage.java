@@ -367,7 +367,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
-		final TableLayout layout = new TableLayout();
+		GridData gridData = new GridData();
+		gridData.heightHint = 200;
+		table.setLayoutData(gridData);
+		TableLayout layout = new TableLayout();
 		table.setLayout(layout);
 		// Hack to force a specific row height
 		table.addListener(SWT.MeasureItem, new Listener()
