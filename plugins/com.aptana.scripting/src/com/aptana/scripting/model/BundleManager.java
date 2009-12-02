@@ -169,29 +169,21 @@ public class BundleManager
 	 * @param scope
 	 * @return
 	 */
-	public Command[] getCommandsFromScope(String scope)
+	public TriggerableNode[] getCommandsFromScope(String scope)
 	{
-		Command[] result = NO_COMMANDS;
-		
-		if (this._bundles != null && this._bundles.size() > 0)
-		{
-			List<Command> commands = new ArrayList<Command>();
-			
-			for (Bundle bundle : this._bundles)
-			{
-				for (Command command : bundle.getCommands())
-				{
-					if (command.matches(scope))
-					{
-						commands.add(command);
-					}
-				}
-			}
-			
-			result = commands.toArray(new Command[commands.size()]);
-		}
-		
-		return result;
+		return this.getCommandsFromScopes(new String[] { scope }, null);
+	}
+	
+	/**
+	 * getCommandsFromScope
+	 * 
+	 * @param scope
+	 * @param filter
+	 * @return
+	 */
+	public TriggerableNode[] getCommandsFromScope(String scope, IModelFilter filter)
+	{
+		return this.getCommandsFromScopes(new String[] { scope }, filter);
 	}
 
 	/**
@@ -200,11 +192,23 @@ public class BundleManager
 	 * @param scopes
 	 * @return
 	 */
-	public Command[] getCommandsFromScopes(String[] scopes)
+	public TriggerableNode[] getCommandsFromScopes(String[] scopes)
 	{
-		Command[] result = NO_COMMANDS;
+		return this.getCommandsFromScopes(scopes, null);
+	}
+	
+	/**
+	 * getCommandsFromScopes
+	 * 
+	 * @param scopes
+	 * @param filter
+	 * @return
+	 */
+	public TriggerableNode[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	{
+		TriggerableNode[] result = NO_COMMANDS;
 		
-		if (this._bundles != null && this._bundles.size() > 0)
+		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{
 			List<Command> commands = new ArrayList<Command>();
 			
@@ -212,7 +216,7 @@ public class BundleManager
 			{
 				for (Command command : bundle.getCommands())
 				{
-					if (command.matches(scopes))
+					if (command.matches(scopes) && ((filter != null) ? filter.include(command) : true))
 					{
 						commands.add(command);
 					}
@@ -264,40 +268,44 @@ public class BundleManager
 	 */
 	public Menu[] getMenusFromScope(String scope)
 	{
-		Menu[] result = NO_MENUS;
-		
-		if (this._bundles != null && this._bundles.size() > 0)
-		{		
-			List<Menu> menus = new ArrayList<Menu>();
-			
-			for (Bundle bundle : this._bundles)
-			{
-				for (Menu menu : bundle.getMenus())
-				{
-					if (menu.matches(scope))
-					{
-						menus.add(menu);
-					}
-				}
-			}
-			
-			result = menus.toArray(new Menu[menus.size()]);
-		}
-		
-		return result;
+		return this.getMenusFromScopes(new String[] { scope }, null);
+	}
+	
+	/**
+	 * getMenusFromScope
+	 * 
+	 * @param scope
+	 * @param filter
+	 * @return
+	 */
+	public Menu[] getMenusFromScope(String scope, IModelFilter filter)
+	{
+		return this.getMenusFromScopes(new String[] { scope }, filter);
+	}
+	
+	/**
+	 * getMenusFromScope
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	public Menu[] getMenusFromScope(String[] scopes)
+	{
+		return this.getMenusFromScopes(scopes, null);
 	}
 	
 	/**
 	 * getMenusFromScopes
 	 * 
 	 * @param scopes
+	 * @param filter
 	 * @return
 	 */
-	public Menu[] getMenusFromScopes(String[] scopes)
+	public Menu[] getMenusFromScopes(String[] scopes, IModelFilter filter)
 	{
 		Menu[] result = NO_MENUS;
 		
-		if (this._bundles != null && this._bundles.size() > 0)
+		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{		
 			List<Menu> menus = new ArrayList<Menu>();
 			
@@ -305,7 +313,7 @@ public class BundleManager
 			{
 				for (Menu menu : bundle.getMenus())
 				{
-					if (menu.matches(scopes))
+					if (menu.matches(scopes) && ((filter != null) ? filter.include(menu) : true))
 					{
 						menus.add(menu);
 					}
@@ -326,27 +334,19 @@ public class BundleManager
 	 */
 	public Snippet[] getSnippetsFromScope(String scope)
 	{
-		Snippet[] result = NO_SNIPPETS;
-		
-		if (this._bundles != null && this._bundles.size() > 0)
-		{
-			List<Snippet> snippets = new ArrayList<Snippet>();
-			
-			for (Bundle bundle : this._bundles)
-			{
-				for (Snippet snippet : bundle.getSnippets())
-				{
-					if (snippet.matches(scope))
-					{
-						snippets.add(snippet);
-					}
-				}
-			}
-			
-			result = snippets.toArray(new Snippet[snippets.size()]);
-		}
-		
-		return result;
+		return this.getSnippetsFromScopes(new String[] { scope }, null);
+	}
+	
+	/**
+	 * getSnippetsFromScope
+	 * 
+	 * @param scope
+	 * @param filter
+	 * @return
+	 */
+	public Snippet[] getSnippetsFromScope(String scope, IModelFilter filter)
+	{
+		return this.getSnippetsFromScopes(new String[] { scope }, filter);
 	}
 
 	/**
@@ -357,9 +357,21 @@ public class BundleManager
 	 */
 	public Snippet[] getSnippetsFromScopes(String[] scopes)
 	{
+		return this.getSnippetsFromScopes(scopes, null);
+	}
+	
+	/**
+	 * getSnippetsFromScopes
+	 * 
+	 * @param scopes
+	 * @param filter
+	 * @return
+	 */
+	public Snippet[] getSnippetsFromScopes(String[] scopes, IModelFilter filter)
+	{
 		Snippet[] result = NO_SNIPPETS;
 		
-		if (this._bundles != null && this._bundles.size() > 0)
+		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			
@@ -367,7 +379,7 @@ public class BundleManager
 			{
 				for (Snippet snippet : bundle.getSnippets())
 				{
-					if (snippet.matches(scopes))
+					if (snippet.matches(scopes) && ((filter != null) ? filter.include(snippet) : true))
 					{
 						snippets.add(snippet);
 					}
@@ -412,7 +424,7 @@ public class BundleManager
 		this.loadProjectBundles();
 		this.loadUserBundles();
 		
-		//this.showBundles();
+		this.showBundles();
 	}
 	
 	/**
