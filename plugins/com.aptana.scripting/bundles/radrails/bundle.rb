@@ -42,12 +42,24 @@ module RadRails
       @jobj.copyright = copyright
     end
     
-    def display_name
+    def description
+      @jobj.description
+    end
+    
+    def description=(description)
+      @jobj.description = description
+    end
+    
+    def menu(name, &block)
+      Menu.define_menu(name, &block)
+    end
+    
+    def name
       @jobj.display_name
     end
     
-    def display_name=(display_name)
-      @jobj.display_name = display_name
+    def name=(name)
+      @jobj.display_name = name
     end
     
     def git_repo
@@ -88,10 +100,11 @@ module RadRails
     
     class << self
       def define_bundle(name, &block)
+        # create new bundle and add to bundle manager so the block, if given
+        # can lookup the bundle by path name
         bundle = Bundle.new(name)
-        block.call(bundle) if block_given?
-        
         BundleManager.add_bundle(bundle)
+        block.call(bundle) if block_given?
       end
     end
   end

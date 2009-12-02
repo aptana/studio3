@@ -18,3 +18,17 @@ end
 def command(name, &block)
   RadRails::Command.define_command(name, &block)
 end
+
+module RadRails
+  class << self
+    def current_bundle(&block)
+      bundle = BundleManager.bundle_from_path(File.dirname($fullpath))
+      
+      if bundle.nil?
+        Bundle.define_bundle("<unknown>", &block)
+      else
+        block.call(bundle) if block_given?
+      end
+    end
+  end
+end

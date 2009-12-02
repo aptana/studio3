@@ -11,6 +11,7 @@ public class Bundle
 	private String _displayName;
 	private String _author;
 	private String _copyright;
+	private String _description;
 	private String _license;
 	private String _licenseUrl;
 	private String _gitRepo;
@@ -228,6 +229,17 @@ public class Bundle
 	}
 
 	/**
+	 * getDescription
+	 * 
+	 * @return
+	 */
+	@JRubyMethod(name = "description")
+	public String getDescription()
+	{
+		return this._description;
+	}
+	
+	/**
 	 * getDisplayName
 	 * 
 	 * @return
@@ -414,6 +426,17 @@ public class Bundle
 	{
 		this._copyright = copyright;
 	}
+	
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 */
+	@JRubyMethod(name = "description=")
+	public void setDescription(String description)
+	{
+		this._description = description;
+	}
 
 	/**
 	 * setDisplayName
@@ -473,6 +496,11 @@ public class Bundle
 		
 		// show body
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(this._displayName); //$NON-NLS-1$
+		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
+		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
+		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
+		printer.printWithIndent("git: ").println(this._gitRepo); //$NON-NLS-1$
 		
 		// output commands
 		if (this._commands != null)
