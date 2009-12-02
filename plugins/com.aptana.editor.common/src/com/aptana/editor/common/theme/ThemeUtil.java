@@ -60,17 +60,13 @@ public abstract class ThemeUtil
 	private static HashSet<String> fgBuiltins;
 	private static Map<WeakReference<Token>, String> fgTokens = new HashMap<WeakReference<Token>, String>();
 
-	private static Theme loadTheme(InputStream stream)
+	private static Theme loadTheme(InputStream stream) throws IOException
 	{
 		try
 		{
 			Properties props = new Properties();
 			props.load(stream);
 			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), props);
-		}
-		catch (Exception e)
-		{
-			// ignore
 		}
 		finally
 		{
@@ -83,7 +79,6 @@ public abstract class ThemeUtil
 				// ignore
 			}
 		}
-		return null;
 	}
 
 	private static TextAttribute getTextAttribute(String name)
