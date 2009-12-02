@@ -17,6 +17,7 @@ public class RubyCodeScanner implements ITokenScanner
 	private boolean nextIsClassName;
 	private boolean inPipe;
 	private boolean lookForBlock;
+	private boolean nextAreArgs;
 
 	public RubyCodeScanner()
 	{
@@ -50,6 +51,11 @@ public class RubyCodeScanner implements ITokenScanner
 		{
 			if (!inPipe && data.intValue() != Tokens.tPIPE)
 				lookForBlock = false;
+		}
+		
+		if (nextAreArgs && (data.intValue() == RubyTokenScanner.NEWLINE || data.intValue() == RubyTokenScanner.SEMICOLON))
+		{
+			nextAreArgs = false;
 		}
 		
 		// Convert the integer tokens into tokens containing color information!
@@ -132,6 +138,9 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tLBRACE:
 				lookForBlock = true;
 				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+			case Tokens.tRPAREN:
+				nextAreArgs = false;
+				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
 			case Tokens.tLSHFT:
 				if (nextIsClassName)
 				{
@@ -175,9 +184,14 @@ public class RubyCodeScanner implements ITokenScanner
 				return ThemeUtil.getToken("error.ruby"); //$NON-NLS-1$
 			case Tokens.tIDENTIFIER:
 			case Tokens.tFID:
+				if (nextAreArgs)
+				{
+					return ThemeUtil.getToken("variable.parameter.ruby"); //$NON-NLS-1$
+				}
 				if (nextIsMethodName)
 				{
 					nextIsMethodName = false;
+					nextAreArgs = true;
 					return ThemeUtil.getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				if (lookForBlock && inPipe)
@@ -201,6 +215,7 @@ public class RubyCodeScanner implements ITokenScanner
 		nextIsClassName = false;
 		inPipe = false;
 		lookForBlock = false;
+		nextAreArgs = false;
 	}
 
 	private boolean isKeyword(int i)
