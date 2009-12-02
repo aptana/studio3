@@ -45,6 +45,8 @@ public class Bundle
 			}
 
 			this._commands.add(command);
+
+			command.setOwningBundle(this);
 		}
 	}
 	
@@ -64,6 +66,8 @@ public class Bundle
 			}
 			
 			this._menus.add(menu);
+			
+			menu.setOwningBundle(this);
 		}
 	}
 
@@ -83,6 +87,8 @@ public class Bundle
 			}
 
 			this._snippets.add(snippet);
+			
+			snippet.setOwningBundle(this);
 		}
 	}
 
@@ -169,6 +175,30 @@ public class Bundle
 		return this._author;
 	}
 
+	/**
+	 * getCommandByName
+	 * 
+	 * @return
+	 */
+	public Command getCommandByName(String name)
+	{
+		Command result = null;
+		
+		if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
+		{
+			for (Command command : this._commands)
+			{
+				if (name.equals(command.getDisplayName()))
+				{
+					result = command;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getCommands
 	 * 

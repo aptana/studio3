@@ -6,6 +6,7 @@ import com.aptana.scope.ScopeSelector;
 
 public abstract class AbstractModel
 {
+	protected Bundle _owningBundle;
 	protected String _path;
 	protected String _displayName;
 	protected String _scope;
@@ -31,6 +32,16 @@ public abstract class AbstractModel
 		return this._displayName;
 	}
 
+	/**
+	 * getOwningBundle
+	 * 
+	 * @return
+	 */
+	public Bundle getOwningBundle()
+	{
+		return this._owningBundle;
+	}
+	
 	/**
 	 * getPath
 	 * 
@@ -97,6 +108,16 @@ public abstract class AbstractModel
 		this._displayName = displayName;
 	}
 
+	/**
+	 * setOwningBundle
+	 * 
+	 * @param bundle
+	 */
+	void setOwningBundle(Bundle bundle)
+	{
+		this._owningBundle = bundle;
+	}
+	
 	/**
 	 * setPath
 	 * 
