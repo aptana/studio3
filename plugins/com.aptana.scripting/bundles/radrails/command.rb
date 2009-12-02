@@ -7,6 +7,12 @@ module RadRails
     def initialize(name)
       @jobj = com.aptana.scripting.model.Command.new($fullpath)
       @jobj.display_name = name;
+      
+      bundle = BundleManager.bundle_from_path(path)
+      
+      if bundle.nil? == false
+        bundle.apply_defaults(self)
+      end
     end
     
     def display_name
@@ -71,6 +77,14 @@ module RadRails
         scope:  #{scope}
       )
       EOS
+    end
+    
+    def trigger
+      @jobj.trigger
+    end
+    
+    def trigger=(trigger)
+      @jobj.trigger = trigger
     end
     
     class << self

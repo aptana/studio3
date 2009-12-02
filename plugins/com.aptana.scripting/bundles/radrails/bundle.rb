@@ -4,14 +4,18 @@ require "radrails/bundle_manager"
 module RadRails
   
   class Bundle
-    def initialize(name)
+    @@defaults = {}
+    
+    def initialize(name, default_values={})
       if name.kind_of? String
         @jobj = com.aptana.scripting.model.Bundle.new(File.dirname($fullpath))
-        @jobj.display_name = name;
+        @jobj.display_name = name
+        @@defaults[path.to_sym] = default_values
       else
         # hack to pass in java object...should test type
         @jobj = name
       end
+      
     end
     
     def add_command(command)
@@ -24,6 +28,18 @@ module RadRails
     
     def add_snippet(snippet)
       @jobj.add_snippet snippet.java_object
+    end
+    
+    def apply_defaults(obj)
+      if obj.nil? == false
+        defaults.each do |k,v|
+          property = "#{k.to_s}=".to_sym
+          
+          if obj.respond_to?(property)
+            obj.send(property, v)
+          end
+        end
+      end
     end
     
     def author
@@ -40,6 +56,14 @@ module RadRails
     
     def copyright=(copyright)
       @jobj.copyright = copyright
+    end
+    
+    def defaults
+      @@defaults[path.to_sym] ||= {}
+    end
+    
+    def defaults=(defaults)
+      @@defaults[path.to_sym] = defaults
     end
     
     def description
@@ -90,6 +114,10 @@ module RadRails
       @jobj.license_url = license_url.join("\n")
     end
     
+    def path
+      @jobj.path
+    end
+    
     def to_s
       <<-EOS
       bundle(
@@ -99,10 +127,10 @@ module RadRails
     end
     
     class << self
-      def define_bundle(name, &block)
+      def define_bundle(name, values, &block)
         # create new bundle and add to bundle manager so the block, if given
         # can lookup the bundle by path name
-        bundle = Bundle.new(name)
+        bundle = Bundle.new(name, values)
         BundleManager.add_bundle(bundle)
         block.call(bundle) if block_given?
       end

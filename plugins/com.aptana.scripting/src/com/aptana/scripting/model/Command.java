@@ -7,6 +7,7 @@ public class Command extends AbstractModel
 	private String _invoke;
 	private String _keyBinding;
 	private String _output;
+	private String _trigger;	// Not sure what this is used for, but appears in command samples
 
 	/**
 	 * Snippet
@@ -63,6 +64,17 @@ public class Command extends AbstractModel
 	}
 	
 	/**
+	 * getTrigger
+	 * 
+	 * @return
+	 */
+	@JRubyMethod(name = "trigger")
+	public String getTrigger()
+	{
+		return this._trigger;
+	}
+	
+	/**
 	 * setInvoke
 	 * 
 	 * @param invoke
@@ -96,6 +108,17 @@ public class Command extends AbstractModel
 	}
 	
 	/**
+	 * setTrigger
+	 * 
+	 * @param trigger
+	 */
+	@JRubyMethod(name = "trigger=")
+	public void setTrigger(String trigger)
+	{
+		this._trigger = trigger;
+	}
+	
+	/**
 	 * toSource
 	 */
 	protected void toSource(SourcePrinter printer)
@@ -104,6 +127,10 @@ public class Command extends AbstractModel
 		
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
+		printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
+		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
+		printer.printWithIndent("output: ").println(this._output); //$NON-NLS-1$
+		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
 		
 		printer.decreaseIndent().printlnWithIndent("}");
 	}

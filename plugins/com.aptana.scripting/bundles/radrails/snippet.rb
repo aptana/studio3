@@ -8,6 +8,12 @@ module RadRails
     def initialize(name)
       @jobj = com.aptana.scripting.model.Snippet.new($fullpath)
       @jobj.display_name = name
+      
+      bundle = BundleManager.bundle_from_path(path)
+      
+      if bundle.nil? == false
+        bundle.apply_defaults(self)
+      end
     end
     
     def display_name
