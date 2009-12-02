@@ -138,6 +138,12 @@ public class Theme
 	{
 		if (token == null)
 			return new RGB(0, 0, 0);
+		if (token.length() != 7)
+		{
+			CommonEditorPlugin.logError(
+					MessageFormat.format("Received RGB Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
+			return defaultFG;
+		}
 		String s = token.substring(1, 3);
 		int r = Integer.parseInt(s, 16);
 		s = token.substring(3, 5);
