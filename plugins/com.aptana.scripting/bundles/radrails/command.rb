@@ -23,8 +23,12 @@ module RadRails
       @jobj.display_name = display_name
     end
     
-    def invoke
-      @jobj.invoke
+    def invoke(&block)
+      if block_given?
+        @jobj.invoke_block = block
+      else
+        @jobj.invoke
+      end
     end
     
     def invoke=(invoke)

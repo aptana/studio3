@@ -1,10 +1,12 @@
 package com.aptana.scripting.model;
 
+import org.jruby.RubyProc;
 import org.jruby.anno.JRubyMethod;
 
 public class Command extends AbstractModel
 {
 	private String _invoke;
+	private RubyProc _invokeBlock;
 	private String _keyBinding;
 	private String _output;
 	private String _trigger;	// Not sure what this is used for, but appears in command samples
@@ -39,6 +41,17 @@ public class Command extends AbstractModel
 	public String getInvoke()
 	{
 		return this._invoke;
+	}
+	
+	/**
+	 * getInvokeBlock
+	 * 
+	 * @return
+	 */
+	@JRubyMethod(name = "invoke_block")
+	public RubyProc getInvokeBlock()
+	{
+		return this._invokeBlock;
 	}
 
 	/**
@@ -86,6 +99,17 @@ public class Command extends AbstractModel
 	}
 	
 	/**
+	 * setInvokeBlock
+	 * 
+	 * @param block
+	 */
+	@JRubyMethod(name = "invoke_block=")
+	public void setInvokeBlock(RubyProc block)
+	{
+		this._invokeBlock = block;
+	}
+	
+	/**
 	 * setKeyBinding
 	 * 
 	 * @param keyBinding
@@ -127,7 +151,14 @@ public class Command extends AbstractModel
 		
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
-		printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
+		if (this._invoke != null)
+		{
+			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
+		}
+		if (this._invokeBlock != null)
+		{
+			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
+		}
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
 		printer.printWithIndent("output: ").println(this._output); //$NON-NLS-1$
 		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
