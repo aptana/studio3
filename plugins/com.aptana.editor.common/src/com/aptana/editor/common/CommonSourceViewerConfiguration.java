@@ -34,9 +34,20 @@
  */
 package com.aptana.editor.common;
 
+import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
+import com.aptana.editor.common.preferences.IPreferenceConstants;
+
+@SuppressWarnings("restriction")
 public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
     public CommonSourceViewerConfiguration() {
@@ -44,5 +55,32 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
         super(preferenceStore);
+    }
+
+    @Override
+    public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+        ContentAssistant assistant = new ContentAssistant();
+
+        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        if (fPreferenceStore != null) {
+            assistant.enableAutoActivation(fPreferenceStore
+                    .getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+            assistant.setAutoActivationDelay(fPreferenceStore
+                    .getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+        }
+        assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+
+        return assistant;
+    }
+
+    @Override
+    public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer) {
+        return new IInformationControlCreator() {
+
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, (String) null, new HTMLTextPresenter(
+                        false));
+            }
+        };
     }
 }
