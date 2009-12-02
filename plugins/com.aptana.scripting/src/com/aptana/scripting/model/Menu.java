@@ -2,6 +2,7 @@ package com.aptana.scripting.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.jruby.anno.JRubyMethod;
 
@@ -47,6 +48,50 @@ public class Menu extends AbstractModel
 			this._children.add(menu);
 		}
 	}
+
+	/**
+	 * cloneByScope
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public Menu cloneByScope(String scope)
+	{
+		Menu result = null;
+		
+		// find all menus in the specified scope
+		List<Menu> matches = new ArrayList<Menu>();
+		
+		for (Menu menu : this.getLeafMenus())
+		{
+			if (menu.matches(scope))
+			{
+				matches.add(menu);
+			}
+		}
+		
+		// collect into one tree
+		
+		
+		return result;
+	}
+	
+	/**
+	 * getChildren
+	 * 
+	 * @return
+	 */
+	public Menu[] getChildren()
+	{
+		Menu[] result = BundleManager.NO_MENUS;
+		
+		if (this._children != null && this._children.size() > 0)
+		{
+			result = this._children.toArray(new Menu[this._children.size()]);
+		}
+		
+		return result;
+	}
 	
 	/**
 	 * getCommand
@@ -57,9 +102,9 @@ public class Menu extends AbstractModel
 	{
 		Command result = null;
 		
-		if (this.hasChildren() == false)
+		if (this.isLeafMenu() && this._owningBundle != null)
 		{
-			// TODO: lookup command in this menu's bundle
+			result = this._owningBundle.getCommandByName(this._commandName);
 		}
 		
 		return result;
@@ -75,6 +120,38 @@ public class Menu extends AbstractModel
 	public String getCommandName(String name)
 	{
 		return this._commandName;
+	}
+	
+	/**
+	 * getLeafMenus
+	 * 
+	 * @return
+	 */
+	protected Menu[] getLeafMenus()
+	{
+		Stack<Menu> stack = new Stack<Menu>();
+		List<Menu> result = new ArrayList<Menu>();
+		
+		// prime stack
+		stack.push(this);
+		
+		while (stack.size() > 0)
+		{
+			Menu menu = stack.pop();
+			
+			if (menu.isHierarchicalMenu())
+			{
+				stack.addAll(menu._children);
+			}
+			else if (menu.isLeafMenu())
+			{
+				result.add(menu);
+			}
+			
+			// NOTE: we ignore separators
+		}
+		
+		return result.toArray(new Menu[result.size()]);
 	}
 	
 	/**
@@ -128,6 +205,26 @@ public class Menu extends AbstractModel
 	public boolean hasChildren()
 	{
 		return this._children != null && this._children.size() > 0;
+	}
+	
+	/**
+	 * isHierarchical
+	 * 
+	 * @return
+	 */
+	public boolean isHierarchicalMenu()
+	{
+		return this.isSeparator() == false && this.hasChildren();
+	}
+	
+	/**
+	 * isLeafMenu
+	 * 
+	 * @return
+	 */
+	public boolean isLeafMenu()
+	{
+		return this.isSeparator() == false && this.hasChildren() == false;
 	}
 	
 	/**
