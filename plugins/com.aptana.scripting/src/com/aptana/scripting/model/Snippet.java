@@ -2,9 +2,8 @@ package com.aptana.scripting.model;
 
 import org.jruby.anno.JRubyMethod;
 
-public class Snippet extends AbstractModel
+public class Snippet extends TriggerableNode
 {
-	private String _trigger;
 	private String _expansion;
 
 	/**
@@ -29,17 +28,6 @@ public class Snippet extends AbstractModel
 	}
 	
 	/**
-	 * getTrigger
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "trigger")
-	public String getTrigger()
-	{
-		return this._trigger;
-	}
-	
-	/**
 	 * setExpansion
 	 * 
 	 * @param expansion
@@ -48,17 +36,6 @@ public class Snippet extends AbstractModel
 	public void setExpansion(String expansion)
 	{
 		this._expansion = expansion;
-	}
-
-	/**
-	 * setTrigger
-	 * 
-	 * @param trigger
-	 */
-	@JRubyMethod(name = "trigger=")
-	public void setTrigger(String trigger)
-	{
-		this._trigger = trigger;
 	}
 	
 	/**

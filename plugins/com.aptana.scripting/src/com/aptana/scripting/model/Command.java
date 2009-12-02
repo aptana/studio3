@@ -3,14 +3,12 @@ package com.aptana.scripting.model;
 import org.jruby.RubyProc;
 import org.jruby.anno.JRubyMethod;
 
-public class Command extends AbstractModel
+public class Command extends TriggerableNode
 {
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
 	private String _output;
-	private String _trigger;	// Not sure what this is used for, but appears in command samples
-
 	/**
 	 * Snippet
 	 * 
@@ -77,17 +75,6 @@ public class Command extends AbstractModel
 	}
 	
 	/**
-	 * getTrigger
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "trigger")
-	public String getTrigger()
-	{
-		return this._trigger;
-	}
-	
-	/**
 	 * setInvoke
 	 * 
 	 * @param invoke
@@ -129,17 +116,6 @@ public class Command extends AbstractModel
 	public void setOutput(String output)
 	{
 		this._output = output;
-	}
-	
-	/**
-	 * setTrigger
-	 * 
-	 * @param trigger
-	 */
-	@JRubyMethod(name = "trigger=")
-	public void setTrigger(String trigger)
-	{
-		this._trigger = trigger;
 	}
 	
 	/**
