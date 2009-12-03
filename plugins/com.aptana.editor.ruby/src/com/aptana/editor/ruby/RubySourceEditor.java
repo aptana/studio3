@@ -34,15 +34,25 @@
  */
 package com.aptana.editor.ruby;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class RubySourceEditor extends AbstractThemeableEditor {
+public class RubySourceEditor extends AbstractThemeableEditor
+{
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	@Override
+	protected void initializeEditor()
+	{
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
+				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
+				EditorsPlugin.getDefault().getPreferenceStore() }));
 
-        setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
-        setDocumentProvider(new RubyDocumentProvider());
-    }
+		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
+		setDocumentProvider(new RubyDocumentProvider());
+
+	}
 }
