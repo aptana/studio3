@@ -1,8 +1,17 @@
 package com.aptana.editor.common;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -14,13 +23,20 @@ import com.aptana.editor.common.theme.ColorManager;
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
+	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
+
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
+
+    private static final String TEMPLATES = PLUGIN_ID + ".templates"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;
 
 	private ColorManager _colorManager;
+
+	private Map<String, Image> images = new HashMap<String, Image>();
+    private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 
 	/**
 	 * The constructor
@@ -100,4 +116,47 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
 	}
+
+	@Override
+	protected ImageRegistry createImageRegistry()
+	{
+		ImageRegistry reg = super.createImageRegistry();
+		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
+		return reg;
+	}
+
+    public Image getImage(String path) {
+        Image image = images.get(path);
+        if (image == null) {
+            ImageDescriptor id = getImageDescriptor(path);
+            if (id == null) {
+                return null;
+            }
+
+            image = id.createImage();
+            images.put(path, image);
+        }
+        return image;
+    }
+
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry) {
+        if (fTemplateStoreMap == null) {
+            fTemplateStoreMap = new HashMap<ContextTypeRegistry, ContributionTemplateStore>();
+        }
+        ContributionTemplateStore store = fTemplateStoreMap.get(contextTypeRegistry);
+        if (store == null) {
+            store = new ContributionTemplateStore(contextTypeRegistry, getPreferenceStore(), TEMPLATES);
+            try {
+                store.load();
+                fTemplateStoreMap.put(contextTypeRegistry, store);
+            } catch (IOException e) {
+                logError(e.getMessage(), e);
+            }
+        }
+        return store;
+    }
 }

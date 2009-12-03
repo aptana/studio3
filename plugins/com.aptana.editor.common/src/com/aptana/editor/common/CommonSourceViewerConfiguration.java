@@ -35,7 +35,20 @@
 package com.aptana.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.information.IInformationPresenter;
+import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
@@ -44,5 +57,63 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
         super(preferenceStore);
+    }
+
+    @Override
+    public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+        ContentAssistant assistant = new ContentAssistant();
+
+        assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        if (fPreferenceStore != null) {
+            assistant.enableAutoActivation(fPreferenceStore
+                    .getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+            assistant.setAutoActivationDelay(fPreferenceStore
+                    .getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+        }
+        assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+
+        return assistant;
+    }
+
+    @Override
+    public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer) {
+        return new IInformationControlCreator() {
+
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, false);
+            }
+        };
+    }
+
+    @Override
+    public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
+        InformationPresenter presenter = new InformationPresenter(
+                getInformationPresenterControlCreator(sourceViewer));
+        presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+
+        // registers information provider
+        IInformationProvider provider = new CommonInformationProvider();
+        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        for (String type : contentTypes) {
+            presenter.setInformationProvider(provider, type);
+        }
+
+        presenter.setSizeConstraints(60, 10, true, true);
+
+        return presenter;
+    }
+
+    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType) {
+        return null;
+    }
+
+    private IInformationControlCreator getInformationPresenterControlCreator(
+            ISourceViewer sourceViewer) {
+        return new IInformationControlCreator() {
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, true);
+            }
+        };
     }
 }

@@ -32,27 +32,51 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.ruby;
+package com.aptana.editor.common.contentassist;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.templates.ContextTypeRegistry;
+import org.eclipse.jface.text.templates.Template;
+import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
+import org.eclipse.jface.text.templates.TemplateContextType;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 
-public class RubySourceEditor extends AbstractThemeableEditor
-{
+public class CommonTemplateCompletionProcessor extends TemplateCompletionProcessor {
 
-	@Override
-	protected void initializeEditor()
-	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
-				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() }));
+    private static final String IMAGE_PATH = "icons/template.gif"; //$NON-NLS-1$
 
-		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
-		setDocumentProvider(new RubyDocumentProvider());
+    private String fContextTypeId;
+    private ContributionContextTypeRegistry fContextTypeRegistry;
 
-	}
+    public CommonTemplateCompletionProcessor(String contentType) {
+        fContextTypeId = CommonTemplateContextType.getTemplateContextTypeId(contentType);
+    }
+
+    @Override
+    protected TemplateContextType getContextType(ITextViewer viewer, IRegion region) {
+        return getContextTypeRegistry().getContextType(fContextTypeId);
+    }
+
+    @Override
+    protected Image getImage(Template template) {
+        return CommonEditorPlugin.getDefault().getImage(IMAGE_PATH);
+    }
+
+    @Override
+    protected Template[] getTemplates(String contextTypeId) {
+        return CommonEditorPlugin.getDefault().getTemplateStore(getContextTypeRegistry())
+                .getTemplates(contextTypeId);
+    }
+
+    private synchronized ContextTypeRegistry getContextTypeRegistry() {
+        if (fContextTypeRegistry == null) {
+            fContextTypeRegistry = new ContributionContextTypeRegistry();
+            fContextTypeRegistry.addContextType(fContextTypeId);
+        }
+        return fContextTypeRegistry;
+    }
 }

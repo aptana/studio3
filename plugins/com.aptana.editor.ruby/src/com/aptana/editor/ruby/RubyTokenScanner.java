@@ -38,6 +38,7 @@ public class RubyTokenScanner implements ITokenScanner
 	static final int MAX_KEYWORD = 305;
 	public static final int SPACE = 32;
 	private static final int LBRACK = 91;
+	public static final int SEMICOLON = 59;
 
 	private Lexer lexer;
 	private LexerSource lexerSource;

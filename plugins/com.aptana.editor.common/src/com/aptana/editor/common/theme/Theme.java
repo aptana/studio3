@@ -138,6 +138,12 @@ public class Theme
 	{
 		if (token == null)
 			return new RGB(0, 0, 0);
+		if (token.length() != 7)
+		{
+			CommonEditorPlugin.logError(
+					MessageFormat.format("Received RGB Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
+			return defaultFG;
+		}
 		String s = token.substring(1, 3);
 		int r = Integer.parseInt(s, 16);
 		s = token.substring(3, 5);
@@ -335,9 +341,19 @@ public class Theme
 	 */
 	private void deleteCustomVersion()
 	{
+		delete(new InstanceScope());
+	}
+
+	private void deleteDefaultVersion()
+	{
+		delete(new DefaultScope());
+	}
+
+	private void delete(IScopeContext context)
+	{
 		try
 		{
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = context.getNode(CommonEditorPlugin.PLUGIN_ID);
 			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
 			preferences.remove(getName());
 			preferences.flush();
@@ -406,5 +422,21 @@ public class Theme
 			return;
 		selection = newColor;
 		save();
+	}
+
+	public Theme copy(String value)
+	{
+		Properties props = toProps();
+		props.setProperty(THEME_NAME_PROP_KEY, value);
+		Theme newTheme = new Theme(colorManager, props);
+		ThemeUtil.addTheme(newTheme);
+		return newTheme;
+	}
+
+	public void delete()
+	{
+		ThemeUtil.removeTheme(this);
+		deleteCustomVersion();
+		deleteDefaultVersion();
 	}
 }
