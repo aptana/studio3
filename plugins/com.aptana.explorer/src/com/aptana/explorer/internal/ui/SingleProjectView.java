@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -35,6 +37,7 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
 
 /**
@@ -44,10 +47,6 @@ import com.aptana.filewatcher.FileWatcher;
  */
 public class SingleProjectView extends CommonNavigator
 {
-	/**
-	 * Property we assign to a project to make it the active one that this view is filtered to.
-	 */
-	private static final String ACTIVE_PROJECT = "activeProject"; //$NON-NLS-1$
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
@@ -99,10 +98,11 @@ public class SingleProjectView extends CommonNavigator
 			}
 		};
 		getCommonViewer().addFilter(activeProjectFilter);
-		// When user manually edits filters, they get blown away and then re-added. We need to listen to this indirectly and re-add our filter!
+		// When user manually edits filters, they get blown away and then re-added. We need to listen to this indirectly
+		// and re-add our filter!
 		getCommonViewer().addSelectionChangedListener(new ISelectionChangedListener()
 		{
-			
+
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				ISelection selection = event.getSelection();
@@ -118,6 +118,29 @@ public class SingleProjectView extends CommonNavigator
 				getCommonViewer().addFilter(activeProjectFilter);
 			}
 		});
+
+		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				new IPreferenceChangeListener()
+				{
+
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
+							return;
+						IProject oldActiveProject = selectedProject;
+						Object obj = event.getNewValue();
+						if (obj == null)
+							return;
+						String newProjectName = (String) obj;
+						if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
+							return;
+						IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(
+								newProjectName);
+						selectedProject = newSelectedProject;
+						projectChanged(oldActiveProject, newSelectedProject);
+						refreshViewer();
+					}
+				});
 	}
 
 	protected Composite doCreatePartControl(Composite customComposite)
@@ -190,7 +213,8 @@ public class SingleProjectView extends CommonNavigator
 
 	private void detectSelectedProject()
 	{
-		String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID, ACTIVE_PROJECT, null, null);
+		String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID,
+				IPreferenceConstants.ACTIVE_PROJECT, null, null);
 		IProject project = null;
 		if (value != null)
 		{
@@ -236,7 +260,7 @@ public class SingleProjectView extends CommonNavigator
 		try
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
-			prefs.put(ACTIVE_PROJECT, selectedProject.getName());
+			prefs.put(IPreferenceConstants.ACTIVE_PROJECT, selectedProject.getName());
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
@@ -250,7 +274,7 @@ public class SingleProjectView extends CommonNavigator
 		try
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
-			prefs.remove(ACTIVE_PROJECT);
+			prefs.remove(IPreferenceConstants.ACTIVE_PROJECT);
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
@@ -259,6 +283,10 @@ public class SingleProjectView extends CommonNavigator
 		}
 	}
 
+	/**
+	 * @param oldProject
+	 * @param newProject
+	 */
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
 		try

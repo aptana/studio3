@@ -29,9 +29,14 @@ public abstract class ProcessUtil
 
 	public static String read(InputStream stream)
 	{
+		// TODO Use IOUtil.read!
 		StringBuilder builder = new StringBuilder();
 		try
 		{
+			if (!(stream instanceof BufferedInputStream))
+			{
+				stream = new BufferedInputStream(stream);
+			}
 			int read;
 			while ((read = stream.read()) != -1)
 			{
@@ -95,7 +100,6 @@ public abstract class ProcessUtil
 		{
 			builder.environment().putAll(env);
 		}
-
 		try
 		{
 			Process p = builder.start();
@@ -103,7 +107,7 @@ public abstract class ProcessUtil
 			{
 				write(input, p.getOutputStream());
 			}
-			String read = read(new BufferedInputStream(p.getInputStream()));
+			String read = read(p.getInputStream());
 			if (read.endsWith("\n")) //$NON-NLS-1$
 				read = read.substring(0, read.length() - 1);
 			int exitValue = p.waitFor();

@@ -36,7 +36,6 @@ package com.aptana.editor.ruby;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,42 +67,6 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	private static final String HEREDOC_MARKER_PREFIX = "<<"; //$NON-NLS-1$
 	private static final String DEFAULT_FILENAME = "filename"; //$NON-NLS-1$
 	private static final String BEGIN = "=begin"; //$NON-NLS-1$
-
-	private static class QueuedToken
-	{
-		private IToken token;
-		private int length;
-		private int offset;
-
-		QueuedToken(IToken token, int offset, int length)
-		{
-			this.token = token;
-			this.length = length;
-			this.offset = offset;
-		}
-
-		public int getLength()
-		{
-			return length;
-		}
-
-		public int getOffset()
-		{
-			return offset;
-		}
-
-		public IToken getToken()
-		{
-			return token;
-		}
-
-		@Override
-		public String toString()
-		{
-			return MessageFormat
-					.format("{0}: offset: {1}, length: {2}", getToken().getData(), getOffset(), getLength()); //$NON-NLS-1$
-		}
-	}
 
 	private Lexer lexer;
 	private ParserSupport parserSupport;

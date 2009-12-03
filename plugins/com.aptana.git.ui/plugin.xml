@@ -11,7 +11,16 @@
                name="projectPersistentProperty"
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
-          <action
+         <action
+               class="com.aptana.git.ui.internal.actions.GithubNetworkAction"
+               definitionId="com.aptana.git.ui.command.github.network"
+               icon="icons/obj16/github.gif"
+               id="com.aptana.git.ui.actions.GithubNetworkAction"
+               label="%GithubNetworkAction_label"
+               menubarPath="team.main/group1"
+               tooltip="%GithubNetworkAction_tooltip">
+         </action>
+         <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
                 class="com.aptana.git.ui.internal.actions.DisconnectAction"
@@ -204,6 +213,11 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.github.network"
+            name="%GithubNetworkAction_label">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.pull"
             name="%PullAction_tooltip">
       </command>
@@ -257,6 +271,12 @@
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.github.network"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">

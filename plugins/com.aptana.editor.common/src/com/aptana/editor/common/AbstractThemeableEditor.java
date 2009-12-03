@@ -19,6 +19,7 @@ import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.peer.PeerCharacterCloser;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
@@ -89,6 +90,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		super.createPartControl(findBarComposite);
 		getFindBarDecorator().createFindBar(getSourceViewer());
 		overrideCaretColor();
+		PeerCharacterCloser.install(getSourceViewer());
 	}
 
 	protected void overrideCaretColor()
