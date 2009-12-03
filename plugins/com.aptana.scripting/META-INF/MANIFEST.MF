@@ -15,3 +15,4 @@ Bundle-ClassPath: lib/jruby.jar,
 Export-Package: com.aptana.scope,
  com.aptana.scripting,
  com.aptana.scripting.model
+Eclipse-BuddyPolicy: global
