@@ -140,7 +140,9 @@ module RadRails
       prefs.flush
     end
    
-    # TODO Be able to register as a listener so we can get notified when a file changes in a project or subdir!
+    def add_listener(recursive = true, &blk)
+      com.aptana.scripting.FileChangeNotifier.add_listener(project.location.toOSString, recursive, &blk)
+    end
   end
 end
 
@@ -174,5 +176,23 @@ class File
   def resource
     ipath = org.eclipse.core.runtime.Path.new(path)
     org.eclipse.core.resources.ResourcesPlugin.workspace.root.getFileForLocation(ipath)
+  end
+end
+
+# Re-open the event class
+class com.aptana.scripting.FileChangeNotifier::FileModificationEvent
+  alias :old_type :type
+  # Coerce the java integer type into a symbol to make it more ruby-like
+  def type
+    case old_type
+    when CREATED
+      :created
+    when DELETED
+      :deleted
+    when RENAMED
+      :renamed
+    else
+      :modified
+    end
   end
 end
