@@ -1,5 +1,11 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jruby.RubyProc;
 import org.jruby.anno.JRubyMethod;
 
@@ -27,7 +33,84 @@ public class Command extends TriggerableNode
 	 */
 	public CommandResult execute(CommandContext context)
 	{
-		return new CommandResult();
+		String resultText = "";
+		
+		if (this.isExecutable())
+		{
+			if (this.isShellCommand())
+			{
+				resultText = this.invokeStringCommand();
+			}
+			else if (this.isBlockCommand())
+			{
+				
+			}
+		}
+		
+		return new CommandResult(resultText);
+	}
+
+	/**
+	 * invokeStringCommand
+	 * 
+	 * @return
+	 */
+	private String invokeStringCommand()
+	{
+		// TODO: hardly a robust implementation, but enough to start testing
+		// functionality
+		
+		List<String> commands = new ArrayList<String>();
+		ProcessBuilder builder = new ProcessBuilder();
+		String result = "";
+		
+		commands.add("/bin/bash");
+		commands.add("-c");
+		commands.add(this._invoke);
+		
+		// setup command-line
+		builder.command(commands);
+		
+		// setup working directory
+		if (this._path != null && this._path.length() > 0)
+		{
+			builder.directory(new File(this.getPath()));
+		}
+
+		// run process and get output
+		try
+		{
+			final Process process = builder.start();
+			final StringBuffer buffer = new StringBuffer();
+			
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					InputStream is = process.getInputStream();
+					byte[] line = new byte[1024];
+					int count;
+					
+					try
+					{
+						while ((count = is.read(line)) != -1)
+						{
+							buffer.append(new String(line, 0, count));
+						}
+					}
+					catch (IOException e)
+					{
+					}
+				}
+			}).start();
+			
+			result = buffer.toString();
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -72,6 +155,36 @@ public class Command extends TriggerableNode
 	public String getOutput()
 	{
 		return this._output;
+	}
+	
+	/**
+	 * isExecutable
+	 * 
+	 * @return
+	 */
+	public boolean isExecutable()
+	{
+		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
+	}
+	
+	/**
+	 * isBlockCommand
+	 * 
+	 * @return
+	 */
+	public boolean isBlockCommand()
+	{
+		return (this._invokeBlock != null);
+	}
+	
+	/**
+	 * isShellCommand
+	 * 
+	 * @return
+	 */
+	public boolean isShellCommand()
+	{
+		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
 	}
 	
 	/**
