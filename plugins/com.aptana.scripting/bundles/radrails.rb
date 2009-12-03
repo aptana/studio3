@@ -3,8 +3,8 @@ require "radrails/command"
 require "radrails/menu"
 require "radrails/snippet"
 
-def bundle(name, values, &block)
-  RadRails::Bundle.define_bundle(name, values, &block)
+def bundle(name, &block)
+  RadRails::Bundle.define_bundle(name, {}, &block)
 end
 
 def command(name, &block)
@@ -23,7 +23,7 @@ def with_defaults(values, &block)
   bundle = RadRails::BundleManager.bundle_from_path(File.dirname($fullpath))
   
   if bundle.nil?
-    bundle = bundle("<unknown>", values, &block)
+    bundle = RadRails::Bundle.define_bundle("<unknown>", values, &block)
   else
     bundle.defaults = values
     block.call(bundle) if block_given?
