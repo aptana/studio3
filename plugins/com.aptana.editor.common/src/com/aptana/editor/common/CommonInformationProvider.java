@@ -32,41 +32,39 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.ruby;
+package com.aptana.editor.common;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.information.IInformationProvider;
+import org.eclipse.jface.text.information.IInformationProviderExtension2;
+import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+@SuppressWarnings("restriction")
+public class CommonInformationProvider implements IInformationProvider,
+        IInformationProviderExtension2 {
 
-public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
-
-    public RubySourceViewerConfiguration(IPreferenceStore preferences) {
-        super(preferences);
+    public String getInformation(ITextViewer textViewer, IRegion subject) {
+        // TODO
+        return null;
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				RubySourceConfiguration.CONTENT_TYPES
-			});
-	}
+    public IRegion getSubject(ITextViewer textViewer, int offset) {
+        // TODO
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
+    public IInformationControlCreator getInformationPresenterControlCreator() {
+        return new IInformationControlCreator() {
+
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, (String) null, new HTMLTextPresenter(
+                        false));
+            }
+        };
+    }
 }
