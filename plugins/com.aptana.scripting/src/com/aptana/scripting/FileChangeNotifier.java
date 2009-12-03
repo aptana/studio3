@@ -19,7 +19,7 @@ public class FileChangeNotifier
 {
 
 	/**
-	 * The interface that a listener conforms to. In Ruby this listener is justa block that JRuby magically proxies to
+	 * The interface that a listener conforms to. In Ruby this listener is just a block that JRuby magically proxies to
 	 * when this method is called.
 	 * 
 	 * @author cwilliams
@@ -58,6 +58,15 @@ public class FileChangeNotifier
 	 */
 	public static boolean addListener(String filepath, boolean watchSubtree, final IFileChangeListener listener)
 	{
+		// If it's a single file we need to watch parent and filter in the callback methods
+		final File file = new File(filepath);
+		if (!file.exists())
+			return false;
+		final boolean filterToSingleFile = file.isFile();
+		if (filterToSingleFile)
+		{
+			filepath = file.getParentFile().getAbsolutePath();
+		}
 		try
 		{
 			int watchId = FileWatcher.addWatch(filepath, IJNotify.FILE_ANY, watchSubtree, new JNotifyListener()
@@ -70,6 +79,9 @@ public class FileChangeNotifier
 						fileModified(wd, rootPath, newName);
 						return;
 					}
+					if (filterToSingleFile && doesntMatch(rootPath, oldName))
+						return;
+					// TODO When renamed, we need to update our filename we check against
 					FileModificationEvent e = new FileModificationEvent();
 					e.type = FileModificationEvent.RENAMED;
 					e.oldName = rootPath + File.separator + oldName;
@@ -79,6 +91,9 @@ public class FileChangeNotifier
 
 				public void fileModified(int wd, String rootPath, String name)
 				{
+					if (filterToSingleFile && doesntMatch(rootPath, name))
+						return;
+
 					FileModificationEvent e = new FileModificationEvent();
 					e.type = FileModificationEvent.MODIFIED;
 					e.name = rootPath + File.separator + name;
@@ -86,8 +101,17 @@ public class FileChangeNotifier
 					listener.fileModified(e);
 				}
 
+				private boolean doesntMatch(String rootPath, String name)
+				{
+					String singleFilePath = file.getAbsolutePath();
+					String fullPath = rootPath + File.separator + name;
+					return (!fullPath.equals(singleFilePath));
+				}
+
 				public void fileDeleted(int wd, String rootPath, String name)
 				{
+					if (filterToSingleFile && doesntMatch(rootPath, name))
+						return;
 					FileModificationEvent e = new FileModificationEvent();
 					e.type = FileModificationEvent.DELETED;
 					e.name = rootPath + File.separator + name;
@@ -97,6 +121,8 @@ public class FileChangeNotifier
 
 				public void fileCreated(int wd, String rootPath, String name)
 				{
+					if (filterToSingleFile && doesntMatch(rootPath, name))
+						return;
 					FileModificationEvent e = new FileModificationEvent();
 					e.type = FileModificationEvent.CREATED;
 					e.name = rootPath + File.separator + name;

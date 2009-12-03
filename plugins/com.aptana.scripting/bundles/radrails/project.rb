@@ -119,6 +119,7 @@ module RadRails
       !is_open?
     end
     
+    # Close the project
     def close
       return if is_closed?
       job = RubyJob.new("Close project") {|monitor| project.close(monitor) }
@@ -126,6 +127,7 @@ module RadRails
       job.join
     end
     
+    # Delete the project
     def delete
       return if !exists?
       job = RubyJob.new("Delete project") {|monitor| project.delete(true, true, monitor) }
@@ -133,6 +135,7 @@ module RadRails
       job.join
     end
     
+    # Make the project the current/active one highlighted by the App Explorer
     def make_current
       scope = org.eclipse.core.runtime.preferences.InstanceScope.new
       prefs = scope.getNode(com.aptana.explorer.ExplorerPlugin::PLUGIN_ID)
@@ -140,11 +143,20 @@ module RadRails
       prefs.flush
     end
    
+    # Adds a listener to be notified of file changes in the project
     def add_listener(recursive = true, &blk)
       com.aptana.scripting.FileChangeNotifier.add_listener(project.location.toOSString, recursive, &blk)
     end
+    
+    # Query method to tell if a project has a rails nature
+    def rails?
+      has_nature? org.radrails.rails.core.RailsProjectNature::ID
+    end
+    
   end
 end
+
+# TODO Override the file operations methods like delete/move/copy so that if they're in the workspace we use the Eclipse APIs?
 
 class Dir
   # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
@@ -160,12 +172,18 @@ class Dir
     ipath = org.eclipse.core.runtime.Path.new(path)
     org.eclipse.core.resources.ResourcesPlugin.workspace.root.getContainerForLocation(ipath)
   end
+  
+  # Adds a listener to be notified of file changes in the directory
+  def add_listener(recursive = true, &blk)
+    com.aptana.scripting.FileChangeNotifier.add_listener(File.expand_path(path), recursive, &blk)
+  end
 end
 
 class File
 
   # Forces a refresh of the file
   def refresh
+    return if resource.nil?
     depth = org.eclipse.core.resources.IResource::DEPTH_ZERO
     job = RubyJob.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
@@ -174,8 +192,13 @@ class File
   
   # Grabs the IResource (IFile) that Eclipse uses that we then operate on
   def resource
-    ipath = org.eclipse.core.runtime.Path.new(path)
+    ipath = org.eclipse.core.runtime.Path.new(File.expand_path(path))
     org.eclipse.core.resources.ResourcesPlugin.workspace.root.getFileForLocation(ipath)
+  end
+  
+  # Adds a listener to be notified of file changes
+  def add_listener(&blk)
+    com.aptana.scripting.FileChangeNotifier.add_listener(File.expand_path(path), false, &blk)
   end
 end
 
