@@ -65,7 +65,7 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	 */
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = new PresentationReconciler();
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		XMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}

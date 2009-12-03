@@ -65,7 +65,7 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	 */
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = new PresentationReconciler();
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}

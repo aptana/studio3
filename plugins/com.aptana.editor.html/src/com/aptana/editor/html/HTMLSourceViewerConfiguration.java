@@ -41,8 +41,8 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.CommonDoubleClickStrategy;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
@@ -80,7 +80,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	 */
 	@Override
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = new PresentationReconciler();
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}

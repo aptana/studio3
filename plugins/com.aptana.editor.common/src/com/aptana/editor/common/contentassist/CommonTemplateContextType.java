@@ -32,41 +32,27 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.ruby;
+package com.aptana.editor.common.contentassist;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.templates.GlobalTemplateVariables;
+import org.eclipse.jface.text.templates.TemplateContextType;
 
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+public class CommonTemplateContextType extends TemplateContextType {
 
-public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
+    private static final String PREFIX = "com.aptana.editor.common.templatecontext."; //$NON-NLS-1$
 
-    public RubySourceViewerConfiguration(IPreferenceStore preferences) {
-        super(preferences);
+    public CommonTemplateContextType() {
+        addResolver(new GlobalTemplateVariables.Cursor());
+        addResolver(new GlobalTemplateVariables.Date());
+        addResolver(new GlobalTemplateVariables.Dollar());
+        addResolver(new GlobalTemplateVariables.LineSelection());
+        addResolver(new GlobalTemplateVariables.Time());
+        addResolver(new GlobalTemplateVariables.User());
+        addResolver(new GlobalTemplateVariables.WordSelection());
+        addResolver(new GlobalTemplateVariables.Year());
     }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				RubySourceConfiguration.CONTENT_TYPES
-			});
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
+    public static String getTemplateContextTypeId(String contentType) {
+        return PREFIX + contentType;
+    }
 }
