@@ -54,6 +54,7 @@ import com.aptana.explorer.ExplorerPlugin;
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
 

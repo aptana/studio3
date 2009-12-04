@@ -29,11 +29,9 @@ public class MenuDialog extends PopupDialog
 	private static final String SEPARATOR = "separator"; //$NON-NLS-1$
 	private static final String IMAGE = "image"; //$NON-NLS-1$
 
-	@SuppressWarnings("unchecked")
 	private List<Map> menuItems;
 	private Table completionsTable;
 
-	@SuppressWarnings("unchecked")
 	public MenuDialog(Shell parent, Map... menuItems)
 	{
 		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
@@ -95,7 +93,6 @@ public class MenuDialog extends PopupDialog
 	 *            The lexicographically sorted map of partial matches for the current state; must not be
 	 *            <code>null</code> or empty.
 	 */
-	@SuppressWarnings("unchecked")
 	private final void createTableDialogArea(final Composite parent, final List<Map> partialMatches)
 	{
 		// Layout the table.

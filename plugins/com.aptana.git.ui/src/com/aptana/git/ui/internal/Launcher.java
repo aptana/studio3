@@ -18,6 +18,7 @@ import com.aptana.git.ui.GitUIPlugin;
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public abstract class Launcher
 {
 

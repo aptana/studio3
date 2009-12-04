@@ -14,6 +14,7 @@ import com.aptana.git.core.model.Diff;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.ui.GitUIPlugin;
 
+@SuppressWarnings("restriction")
 class OpenRevisionAction extends Action
 {
 

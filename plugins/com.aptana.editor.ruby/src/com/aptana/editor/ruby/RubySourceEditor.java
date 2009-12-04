@@ -41,6 +41,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 
+@SuppressWarnings("restriction")
 public class RubySourceEditor extends AbstractThemeableEditor
 {
 
