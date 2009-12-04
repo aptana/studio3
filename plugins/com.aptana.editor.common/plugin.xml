@@ -27,4 +27,10 @@
             sequence="Ctrl+Shift+P">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.common.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 </plugin>
