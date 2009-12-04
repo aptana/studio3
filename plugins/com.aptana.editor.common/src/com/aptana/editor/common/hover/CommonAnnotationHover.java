@@ -69,8 +69,8 @@ public class CommonAnnotationHover extends DefaultAnnotationHover {
      * (non-Javadoc)
      * @see org.eclipse.jface.text.source.DefaultAnnotationHover#formatMultipleMessages(java.util.List)
      */
-    @SuppressWarnings("unchecked")
-    protected String formatMultipleMessages(List messages) {
+    @SuppressWarnings("rawtypes")
+	protected String formatMultipleMessages(List messages) {
         StringBuffer buffer = new StringBuffer();
 
         HTMLPrinter.addPageProlog(buffer);
