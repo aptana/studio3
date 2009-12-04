@@ -6,8 +6,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jruby.Ruby;
 import org.jruby.RubyProc;
 import org.jruby.anno.JRubyMethod;
+import org.jruby.runtime.ThreadContext;
+import org.jruby.runtime.builtin.IRubyObject;
+
+import com.aptana.scripting.ScriptingEngine;
 
 public class Command extends TriggerableNode
 {
@@ -43,7 +48,15 @@ public class Command extends TriggerableNode
 			}
 			else if (this.isBlockCommand())
 			{
+				Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+				ThreadContext threadContext = runtime.getCurrentContext(); //ThreadContext.newContext(runtime);
 				
+				IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[0]);
+				
+				if (result != null)
+				{
+					resultText = result.asString().asJavaString();
+				}
 			}
 		}
 		
