@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
 import org.jruby.anno.JRubyMethod;
@@ -74,13 +75,17 @@ public class Command extends TriggerableNode
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
 		
+		String OS = Platform.getOS();
 		File tempFile = null;
 		String result = "";
 		
 		try
 		{
 			// create temporary file for execution
-			tempFile = File.createTempFile("command_temp_", ".sh");
+			tempFile = File.createTempFile(
+				"command_temp_",
+				(OS.equals(Platform.OS_WIN32) ? ".bat" : ".sh")
+			);
 			
 			// dump "invoke" content into temp file
 			PrintWriter pw = new PrintWriter(tempFile);
@@ -90,7 +95,14 @@ public class Command extends TriggerableNode
 			List<String> commands = new ArrayList<String>();
 			ProcessBuilder builder = new ProcessBuilder();
 			
-			commands.add("/bin/bash");
+			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			{
+				commands.add("/bin/bash");
+			}
+			else
+			{
+				commands.add("cmd");
+			}
 			commands.add(tempFile.getAbsolutePath());
 			
 			// setup command-line
@@ -103,13 +115,9 @@ public class Command extends TriggerableNode
 			}
 	
 			// run process and get output
-			final StringBuffer buffer = new StringBuffer();
-			final Process process = builder.start();
+			StringBuffer buffer = new StringBuffer();
+			Process process = builder.start();
 			
-			//new Thread(new Runnable()
-			//{
-			//	public void run()
-			//	{
 			InputStream is = process.getInputStream();
 			byte[] line = new byte[1024];
 			int count;
@@ -124,8 +132,6 @@ public class Command extends TriggerableNode
 			catch (IOException e)
 			{
 			}
-			//	}
-			//}).start();
 			
 			result = buffer.toString();
 		}
