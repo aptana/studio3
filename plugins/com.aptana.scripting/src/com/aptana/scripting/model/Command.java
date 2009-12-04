@@ -3,6 +3,7 @@ package com.aptana.scripting.model;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,54 +74,71 @@ public class Command extends TriggerableNode
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
 		
-		List<String> commands = new ArrayList<String>();
-		ProcessBuilder builder = new ProcessBuilder();
+		File tempFile = null;
 		String result = "";
 		
-		commands.add("/bin/bash");
-		commands.add("-c");
-		commands.add(this._invoke);
-		
-		// setup command-line
-		builder.command(commands);
-		
-		// setup working directory
-		if (this._path != null && this._path.length() > 0)
-		{
-			builder.directory(new File(this.getPath()));
-		}
-
-		// run process and get output
 		try
 		{
-			final Process process = builder.start();
-			final StringBuffer buffer = new StringBuffer();
+			// create temporary file for execution
+			tempFile = File.createTempFile("command_temp_", ".sh");
 			
-			new Thread(new Runnable()
+			// dump "invoke" content into temp file
+			PrintWriter pw = new PrintWriter(tempFile);
+			pw.print(this._invoke);
+			pw.close();
+			
+			List<String> commands = new ArrayList<String>();
+			ProcessBuilder builder = new ProcessBuilder();
+			
+			commands.add("/bin/bash");
+			commands.add(tempFile.getAbsolutePath());
+			
+			// setup command-line
+			builder.command(commands);
+			
+			// setup working directory
+			if (this._path != null && this._path.length() > 0)
 			{
-				public void run()
+				builder.directory(new File(this.getPath()).getParentFile());
+			}
+	
+			// run process and get output
+			final StringBuffer buffer = new StringBuffer();
+			final Process process = builder.start();
+			
+			//new Thread(new Runnable()
+			//{
+			//	public void run()
+			//	{
+			InputStream is = process.getInputStream();
+			byte[] line = new byte[1024];
+			int count;
+			
+			try
+			{
+				while ((count = is.read(line)) != -1)
 				{
-					InputStream is = process.getInputStream();
-					byte[] line = new byte[1024];
-					int count;
-					
-					try
-					{
-						while ((count = is.read(line)) != -1)
-						{
-							buffer.append(new String(line, 0, count));
-						}
-					}
-					catch (IOException e)
-					{
-					}
+					buffer.append(new String(line, 0, count));
 				}
-			}).start();
+			}
+			catch (IOException e)
+			{
+			}
+			//	}
+			//}).start();
 			
 			result = buffer.toString();
 		}
 		catch (IOException e)
 		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (tempFile != null && tempFile.exists())
+			{
+				tempFile.delete();
+			}
 		}
 		
 		return result;
