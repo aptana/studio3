@@ -36,6 +36,8 @@ import org.eclipse.ui.texteditor.TextEditorAction;
 
 import com.aptana.editor.scripting.Activator;
 import com.aptana.editor.scripting.actions.Filter.FilterInputProvider;
+import com.aptana.scripting.model.INPUT_TYPE;
+import com.aptana.scripting.model.OUTPUT_TYPE;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	

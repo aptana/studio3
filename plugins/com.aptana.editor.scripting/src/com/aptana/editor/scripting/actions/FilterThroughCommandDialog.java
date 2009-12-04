@@ -20,6 +20,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.scripting.model.INPUT_TYPE;
+import com.aptana.scripting.model.OUTPUT_TYPE;
+
 public class FilterThroughCommandDialog extends Dialog {
 
 	private Map<String, String> environment;

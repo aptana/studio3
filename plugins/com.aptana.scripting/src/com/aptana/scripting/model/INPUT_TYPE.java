@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.scripting.model;
 
 import java.util.HashMap;
 import java.util.Map;
