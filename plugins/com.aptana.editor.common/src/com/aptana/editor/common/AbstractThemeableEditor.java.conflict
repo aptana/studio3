@@ -44,13 +44,21 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	// Adapter factory to adapt to IFindBarDecorated
 	private static IAdapterFactory factory = new IAdapterFactory()
 	{
+<<<<<<< HEAD
+		@SuppressWarnings("rawtypes")
+=======
 		@SuppressWarnings({ "rawtypes" })
+>>>>>>> 0be57c8c8cc118412831002692414fcd7eaee528
 		public Class[] getAdapterList()
 		{
 			return new Class[] { AbstractThemeableEditor.class, IFindBarDecorated.class };
 		}
 
+<<<<<<< HEAD
+		@SuppressWarnings("rawtypes")
+=======
 		@SuppressWarnings({ "rawtypes" })
+>>>>>>> 0be57c8c8cc118412831002692414fcd7eaee528
 		public Object getAdapter(Object adaptableObject, Class adapterType)
 		{
 			if (adaptableObject instanceof AbstractThemeableEditor)
