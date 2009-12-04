@@ -21,7 +21,7 @@ import com.aptana.git.ui.actions.GitAction;
 
 public class GithubNetworkAction extends GitAction
 {
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void run()
 	{
