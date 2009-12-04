@@ -1,20 +1,44 @@
 package com.aptana.scripting.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
 
 import org.junit.Test;
 
 public class CommandTests
 {
+	protected String executeCommand(String bundleName, String commandName)
+	{
+		BundleManager manager = BundleManager.getInstance();
+		
+		// make sure we have a test bundle
+		File bundleFile = new File("bundles" + File.separator + bundleName);
+		assertTrue(bundleFile.exists());
+		
+		// load bundle
+		manager.processBundle(bundleFile, false);
+		Bundle bundle = manager.getBundleFromPath(bundleFile.getAbsolutePath());
+		assertNotNull(bundle);
+
+		// get command
+		Command command = bundle.getCommandByName(commandName);
+		assertNotNull(command);
+		
+		// run command and grab result
+		CommandResult result = command.execute(null);
+		assertNotNull(result);
+		
+		// return string result
+		return result.getResultText();
+	}
+	
 	@Test
 	public void invokeStringCommand()
 	{
-		Command command = new Command("/");
-
-		command.setInvoke("echo hello");
-
-		CommandResult result = command.execute(null);
-		String resultText = result.getResultText();
+		String resultText = this.executeCommand("invokeString", "Test");
 		
 		assertEquals("hello\n", resultText);
 	}
@@ -22,5 +46,8 @@ public class CommandTests
 	@Test
 	public void invokeBlockCommand()
 	{
+		String resultText = this.executeCommand("invokeBlock", "Test");
+		
+		assertEquals("hello", resultText);
 	}
 }
