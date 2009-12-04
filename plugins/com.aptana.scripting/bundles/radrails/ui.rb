@@ -1,6 +1,21 @@
 require "java"
 
 module RadRails
+  
+  # A class to make it easy to generate UIJobs. Takes a block which is 
+  # then called as the body of runInUIThread
+  class UIJob < org.eclipse.ui.progress.UIJob
+    def initialize(name, &blk)
+      super(name)
+      @block = blk
+    end
+    
+    def runInUIThread(monitor)
+      @block.call(monitor)
+      return org.eclipse.core.runtime.Status::OK_STATUS
+    end
+  end
+  
   module UI
     class << self
       # Opens a modal dialog
@@ -18,9 +33,9 @@ module RadRails
         when :error
           type = org.eclipse.jface.dialogs.MessageDialog::ERROR
         end
-		dialog = org.eclipse.jface.dialogs.MessageDialog.new(shell, title, nil, message, type, buttons.to_java(:String), 0)
-		button_index = dialog.open
-		buttons[button_index]
+		    dialog = org.eclipse.jface.dialogs.MessageDialog.new(shell, title, nil, message, type, buttons.to_java(:String), 0)
+		    button_index = dialog.open
+		    buttons[button_index]
       end
       
       # show the system color picker and return a hex-format color (#RRGGBB).
@@ -30,13 +45,13 @@ module RadRails
         color  = string
         prefix, string = string.match(/(#?)([0-9A-F]{3,6})/i)[1,2]
         string = $1 * 2 + $2 * 2 + $3 * 2 if string =~ /^(.)(.)(.)$/
-		r = string[0...2].hex
-		g = string[2...4].hex
-		b = string[4...6].hex 
+		    r = string[0...2].hex
+		    g = string[2...4].hex
+		    b = string[4...6].hex 
         value = org.eclipse.swt.graphics.RGB.new(r, g, b)
         color_dialog = org.eclipse.swt.widgets.ColorDialog.new(shell)
-		color_dialog.setRGB(value)
-		new_rgb = color_dialog.open    
+		    color_dialog.setRGB(value)
+		    new_rgb = color_dialog.open    
         "#{prefix}#{new_rgb.red.to_s(16).rjust(2, '0')}#{new_rgb.green.to_s(16).rjust(2, '0')}#{new_rgb.blue.to_s(16).rjust(2, '0')}"
       end
       
@@ -50,7 +65,7 @@ module RadRails
         title    = options[:title]   || ''
         summary  = options[:summary] || ''
         log      = options[:log]     || ''
-		alert(:info, title, summary, "OK")        
+		    alert(:info, title, summary, "OK")        
       end
       
       # show a standard open file dialog
@@ -155,9 +170,22 @@ module RadRails
           options = options.collect { |e| e == nil ? { 'separator' => 1 } : { 'title' => e } }
         end
 
-		dialog = com.aptana.scripting.MenuDialog.new(shell, options.to_java("java.util.Map"))
-		index = dialog.open
+		    dialog = com.aptana.scripting.MenuDialog.new(shell, options.to_java("java.util.Map"))
+		    index = dialog.open
         return return_hash ? options[index] : index
+      end
+      
+      def active_window
+        100.times do
+          window = org.eclipse.ui.PlatformUI.workbench.active_workbench_window
+          return window if window
+          java.lang.Thread.yield
+        end
+        nil
+      end
+    
+      def active_page
+        active_window.active_page if active_window
       end
       
       private
