@@ -34,16 +34,28 @@
  */
 package com.aptana.editor.common.preferences;
 
-public interface IPreferenceConstants {
+import com.aptana.editor.common.CommonEditorPlugin;
 
-    /**
-     * Do we auto-pop content assist?
-     */
-    public static final String CONTENT_ASSIST_AUTO_ACTIVATION = "CONTENT_ASSIST_AUTO_ACTIVATION"; //$NON-NLS-1$
+public interface IPreferenceConstants
+{
 
-    /**
-     * The delay before which we show code assist
-     */
-    public static final String CONTENT_ASSIST_DELAY = "CONTENT_ASSIST_DELAY"; //$NON-NLS-1$
+	/**
+	 * Do we auto-pop content assist?
+	 */
+	public static final String CONTENT_ASSIST_AUTO_ACTIVATION = "CONTENT_ASSIST_AUTO_ACTIVATION"; //$NON-NLS-1$
 
+	/**
+	 * The delay before which we show code assist
+	 */
+	public static final String CONTENT_ASSIST_DELAY = "CONTENT_ASSIST_DELAY"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for the enable of coloring pair matches.
+	 */
+	public String ENABLE_CHARACTER_PAIR_COLORING = CommonEditorPlugin.PLUGIN_ID + ".enableCharacterPairColoring"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for the color of the pair matching box.
+	 */
+	public String CHARACTER_PAIR_COLOR = CommonEditorPlugin.PLUGIN_ID + ".characterPairColor"; //$NON-NLS-1$
 }

@@ -2,7 +2,10 @@ package com.aptana.editor.common;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
@@ -14,17 +17,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.peer.PeerCharacterCloser;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
-import com.aptana.editor.common.actions.ShowScopesAction;
-import com.aptana.editor.common.peer.PeerCharacterCloser;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
- * Provides a way to override the editor fg, bg and selection fg, bg from what is set in global text editor color prefs.
- * TODO Need a way to override the caret color!
+ * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
+ * color prefs.
  * 
  * @author cwilliams
  * @author schitale
@@ -32,6 +38,9 @@ import com.aptana.editor.common.theme.ThemeUtil;
 @SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
 {
+	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'',
+			'"', '"' };
+
 	// Adapter factory to adapt to IFindBarDecorated
 	private static IAdapterFactory factory = new IAdapterFactory()
 	{
@@ -93,6 +102,16 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		PeerCharacterCloser.install(getSourceViewer());
 	}
 
+	@Override
+	protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support)
+	{
+		super.configureSourceViewerDecorationSupport(support);
+
+		support.setCharacterPairMatcher(new DefaultCharacterPairMatcher(PAIR_MATCHING_CHARS));
+		support.setMatchingCharacterPainterPreferenceKeys(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
+				IPreferenceConstants.CHARACTER_PAIR_COLOR);
+	}
+
 	protected void overrideCaretColor()
 	{
 		if (getSourceViewer().getTextWidget() == null)
@@ -102,6 +121,10 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		RGB caretColor = ThemeUtil.getActiveTheme().getCaret();
 		if (caretColor == null)
 			return;
+
+		// Set the character pair matching color to this
+		setCharacterPairColor(caretColor);
+
 		// This is an ugly hack. Setting a black image doesn't work for some reason, but setting no image will cause it
 		// to be black.
 		if (caretColor.equals(new RGB(0, 0, 0)))
@@ -145,6 +168,20 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			}
 		}
 
+	}
+
+	private void setCharacterPairColor(RGB rgb)
+	{
+		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, rgb.red + "," + rgb.green + "," + rgb.blue);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 	@Override
