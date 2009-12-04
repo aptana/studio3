@@ -32,11 +32,11 @@ import org.eclipse.ui.texteditor.TextEditorAction;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.Filter;
 import com.aptana.editor.common.scripting.commands.FilterThroughCommandDialog;
-import com.aptana.editor.common.scripting.commands.INPUT_TYPE;
-import com.aptana.editor.common.scripting.commands.OUTPUT_TYPE;
 import com.aptana.editor.common.scripting.commands.Utilities;
 import com.aptana.editor.common.scripting.commands.Filter.FilterInputProvider;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
+import com.aptana.scripting.model.INPUT_TYPE;
+import com.aptana.scripting.model.OUTPUT_TYPE;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	
