@@ -213,7 +213,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(ThemeUtil.ACTIVE_THEME) || event.getProperty().equals(ThemeUtil.THEME_CHANGED))
+		if (event.getProperty().equals(ThemeUtil.THEME_CHANGED))
 		{
 			overrideCaretColor();
 			getSourceViewer().invalidateTextPresentation();
