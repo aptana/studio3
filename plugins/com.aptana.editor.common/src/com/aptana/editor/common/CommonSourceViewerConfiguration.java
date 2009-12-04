@@ -38,16 +38,23 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
+import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
+import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
+import com.aptana.editor.common.hover.CommonAnnotationHover;
+import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
@@ -64,6 +71,16 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         ContentAssistant assistant = new ContentAssistant();
 
         assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+
+        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        IContentAssistProcessor processor;
+        for (String type : contentTypes) {
+            processor = getContentAssistProcessor(sourceViewer, type);
+            if (processor != null) {
+                assistant.setContentAssistProcessor(processor, type);
+            }
+        }
+
         assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
         if (fPreferenceStore != null) {
             assistant.enableAutoActivation(fPreferenceStore
@@ -74,6 +91,31 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
         return assistant;
+    }
+
+    @Override
+    public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
+        return new CommonAnnotationHover(false) {
+
+            protected boolean isIncluded(Annotation annotation) {
+                return isShowInVerticalRuler(annotation);
+            }
+        };
+    }
+
+    @Override
+    public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer) {
+        return new CommonAnnotationHover(true) {
+
+            protected boolean isIncluded(Annotation annotation) {
+                return isShowInOverviewRuler(annotation);
+            }
+        };
+    }
+
+    @Override
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType) {
+        return new CommonTextHover();
     }
 
     @Override
@@ -104,13 +146,24 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         return presenter;
     }
 
-    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType) {
+    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
+            String contentType) {
         return null;
+    }
+
+    protected IContentAssistProcessor addTemplateCompleteProcessor(
+            IContentAssistProcessor processor, String contentType) {
+        if (processor == null) {
+            return new CommonTemplateCompletionProcessor(contentType);
+        }
+        return new CompositeContentAssistProcessor(processor,
+                new CommonTemplateCompletionProcessor(contentType));
     }
 
     private IInformationControlCreator getInformationPresenterControlCreator(
             ISourceViewer sourceViewer) {
         return new IInformationControlCreator() {
+
             public IInformationControl createInformationControl(Shell parent) {
                 return new DefaultInformationControl(parent, true);
             }
