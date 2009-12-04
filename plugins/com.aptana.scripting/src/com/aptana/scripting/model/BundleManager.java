@@ -3,11 +3,6 @@ package com.aptana.scripting.model;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +16,9 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
 import org.jruby.anno.JRubyMethod;
 
-import com.aptana.scripting.Activator;
 import com.aptana.scripting.ResourceChangeListener;
 import com.aptana.scripting.ScriptingEngine;
 
@@ -50,9 +41,6 @@ public class BundleManager
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
 
-	private List<Bundle> _bundles;
-	private Map<String, Bundle> _bundlesByPath;
-	
 	/**
 	 * getInstance
 	 * 
@@ -68,6 +56,9 @@ public class BundleManager
 
 		return INSTANCE;
 	}
+	private List<Bundle> _bundles;
+	
+	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * BundleManager
@@ -111,39 +102,9 @@ public class BundleManager
 	 */
 	private String getBuiltinsLoadPath()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUNDLES_FOLDER_NAME), null);
-		String result = null;
-
-		try
-		{
-			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
-			File file = new File(fileURI);
-
-			result = file.getAbsolutePath();
-		}
-		catch (IOException e)
-		{
-			String message = MessageFormat.format(
-				Messages.BundleManager_Cannot_Locate_Built_Ins_Directory,
-				new Object[] { url.toString() }
-			);
-
-			Activator.logError(message, e);
-		}
-		catch (URISyntaxException e)
-		{
-			String message = MessageFormat.format(
-				Messages.BundleManager_Malformed_Built_Ins_URI,
-				new Object[] { url.toString() }
-			);
-
-			Activator.logError(message, e);
-		}
-
-		return result;
+		return ScriptingEngine.getBuiltinsLoadPath();
 	}
-
+	
 	/**
 	 * getBundleFromPath
 	 * 
@@ -173,7 +134,7 @@ public class BundleManager
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, null);
 	}
-	
+
 	/**
 	 * getCommandsFromScope
 	 * 
@@ -185,7 +146,7 @@ public class BundleManager
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, filter);
 	}
-
+	
 	/**
 	 * getCommandsFromScopes
 	 * 
@@ -228,7 +189,7 @@ public class BundleManager
 		
 		return result;
 	}
-	
+
 	/**
 	 * getLoadPaths
 	 * 
@@ -499,17 +460,6 @@ public class BundleManager
 	 * @param bundleRoot
 	 * @param processChildren
 	 */
-	public void processBundle(IResource bundleRoot, boolean processChildren)
-	{
-		this.processBundle(bundleRoot.getLocation().toFile(), processChildren);
-	}
-	
-	/**
-	 * processBundle
-	 * 
-	 * @param bundleRoot
-	 * @param processChildren
-	 */
 	public void processBundle(File bundleRoot, boolean processChildren)
 	{
 		String bundlePath = bundleRoot.getAbsolutePath();
@@ -536,6 +486,17 @@ public class BundleManager
 		{
 			System.out.println(Messages.BundleManager_Missing_Bundle_File + bundlePath);
 		}
+	}
+	
+	/**
+	 * processBundle
+	 * 
+	 * @param bundleRoot
+	 * @param processChildren
+	 */
+	public void processBundle(IResource bundleRoot, boolean processChildren)
+	{
+		this.processBundle(bundleRoot.getLocation().toFile(), processChildren);
 	}
 	
 	/**
