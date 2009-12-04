@@ -157,7 +157,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
-		reconciler.setRepairer(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);	
 
 		dr = new DefaultDamagerRepairer(getHTMLTagScanner());		
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_SCRIPT);
@@ -172,6 +172,10 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
 		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
+		
+		 ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("meta.tag.sgml.doctype")); //$NON-NLS-1$
+		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
+		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_DOCTYPE);
 		
 		dr = new DefaultDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);

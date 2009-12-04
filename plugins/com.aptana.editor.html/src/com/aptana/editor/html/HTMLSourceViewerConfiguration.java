@@ -44,6 +44,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonDoubleClickStrategy;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.js.JSSourceConfiguration;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 	
@@ -60,7 +62,9 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
 		return TextUtils.combine(new String[][] {
 				{ IDocument.DEFAULT_CONTENT_TYPE },
-				HTMLSourceConfiguration.CONTENT_TYPES
+				HTMLSourceConfiguration.CONTENT_TYPES,
+				JSSourceConfiguration.CONTENT_TYPES,
+				CSSSourceConfiguration.CONTENT_TYPES
 			});
 	}
 
