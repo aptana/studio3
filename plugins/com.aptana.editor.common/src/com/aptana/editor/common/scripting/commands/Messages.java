@@ -1,9 +1,9 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-	private static final String BUNDLE_NAME = "com.aptana.editor.scripting.actions.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.editor.common.scripting.commands.messages"; //$NON-NLS-1$
 	public static String FilterThroughCommandDialog_LBL_Command;
 	public static String FilterThroughCommandDialog_LBL_ConsoleName;
 	public static String FilterThroughCommandDialog_LBL_CreateNewDocument;
@@ -28,7 +28,6 @@ public class Messages extends NLS {
 	public static String FilterThroughCommandDialog_LBL_ShowEnvironment;
 	public static String FilterThroughCommandDialog_LBL_ToConsole;
 	public static String FilterThroughCommandDialog_LBL_Word;
-	public static String SnippetsContentAssistant_MSG_SelectNthSnippet;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -24,6 +24,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
 	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
+    public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
@@ -116,15 +117,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
 	}
-
-	@Override
-	protected ImageRegistry createImageRegistry()
-	{
-		ImageRegistry reg = super.createImageRegistry();
-		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
-		return reg;
-	}
-
+	
     public Image getImage(String path) {
         Image image = images.get(path);
         if (image == null) {
@@ -142,6 +135,21 @@ public class CommonEditorPlugin extends AbstractUIPlugin
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
+    	
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg) {
+		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
+		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
+	}
+	
+	public Image getImageFromImageRegistry(String imageID) {
+		return getImageRegistry().get(imageID);
+	}
+	
+	public static String getPluginId()
+	{
+		return PLUGIN_ID;
+	}
 
     public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry) {
         if (fTemplateStoreMap == null) {

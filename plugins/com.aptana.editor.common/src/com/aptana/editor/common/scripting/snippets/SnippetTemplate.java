@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.templates.Template;
 

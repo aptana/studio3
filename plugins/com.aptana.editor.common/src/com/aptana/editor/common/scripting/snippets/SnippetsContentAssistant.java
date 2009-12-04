@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
@@ -51,7 +51,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 		enableAutoInsert(true);
 		enableColoredLabels(true);
 		setStatusLineVisible(true);
-		setStatusMessage(Messages.SnippetsContentAssistant_MSG_SelectNthSnippet); // TODO
+		setStatusMessage(Messages.SnippetsContentAssistant_MSG_SelectNthSnippet);
 		setInformationControlCreator(new DefaultInformationControlCreator());
 	}
 	

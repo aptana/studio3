@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 public enum VARIABLES_NAMES {
 	TM_BUNDLE_SUPPORT

@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.actions;
 
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -11,7 +11,9 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
-import com.aptana.editor.scripting.Activator;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.scripting.commands.Filter;
+import com.aptana.editor.common.scripting.commands.VARIABLES_NAMES;
 
 public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	
@@ -20,7 +22,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 				"ExecuteLineInsertingResultAction.", textEditor); //$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.ExecuteLineInsertingResult"; //$NON-NLS-1$
+	public static final String COMMAND_ID = "com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"; //$NON-NLS-1$
 	
 	private ITextViewer textViewer;
 	private StyledText textWidget;
@@ -64,7 +66,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 				}
 				styledText.replaceTextRange(startOffsetOfLineAtCaret, 0, prefix + output);
 			} catch (InterruptedException e) {
-				Activator.logError("Failed to read output.", e); //$NON-NLS-1$
+				CommonEditorPlugin.logError("Failed to read output.", e); //$NON-NLS-1$
 			}
 		}
 	}

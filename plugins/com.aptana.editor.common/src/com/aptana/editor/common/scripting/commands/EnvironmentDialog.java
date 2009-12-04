@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 import java.util.Map;
 import java.util.TreeMap;

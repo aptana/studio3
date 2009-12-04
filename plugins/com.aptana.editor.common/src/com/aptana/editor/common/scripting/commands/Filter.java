@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.scripting.Activator;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 @SuppressWarnings("deprecation")
 public class Filter {
@@ -114,7 +114,7 @@ public class Filter {
 		// Launch command on a separate thread.
 		new Thread(new Runnable() {
 			public void run() {
-				Activator activator = Activator.getDefault();
+				CommonEditorPlugin activator = CommonEditorPlugin.getDefault();
 				List<String> commandList = new LinkedList<String>();
 				
 				if (Platform.OS_LINUX.equals(Platform.getOS()) || Platform.OS_MACOSX.equals(Platform.getOS())) {
@@ -394,7 +394,7 @@ public class Filter {
 					printWriter.flush();
 				}
 			} catch (IOException e) {
-				Activator.logError("Failed to read output.", e); //$NON-NLS-1$
+				CommonEditorPlugin.logError("Failed to read output.", e); //$NON-NLS-1$
 			} finally {
 				try {
 					reader.close();

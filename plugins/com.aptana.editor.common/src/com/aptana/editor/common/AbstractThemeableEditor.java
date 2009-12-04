@@ -3,6 +3,7 @@ package com.aptana.editor.common;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
@@ -15,12 +16,15 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
+import com.aptana.editor.common.actions.FilterThroughCommandAction;
+import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.peer.PeerCharacterCloser;
+import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
-import com.aptana.editor.common.actions.ShowScopesAction;
-import com.aptana.editor.common.peer.PeerCharacterCloser;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * Provides a way to override the editor fg, bg and selection fg, bg from what is set in global text editor color prefs.
@@ -188,6 +192,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
+		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
+		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
+		((ITextViewerExtension)getSourceViewer()).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
 		getFindBarDecorator().installActions();
 	}
 

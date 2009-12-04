@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.internal.editors.text.NonExistingFileEditorInput;
 
-import com.aptana.editor.scripting.Activator;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
  * This implements some utility methods.
@@ -215,9 +215,9 @@ public class Utilities {
 		return input;
 	}
 	
-	static File queryFile()
+	public static File getNonExistingFileBackingStore()
 	{
-		IPath stateLocation = Activator.getDefault().getStateLocation();
+		IPath stateLocation = CommonEditorPlugin.getDefault().getStateLocation();
 		IPath path = stateLocation.append("/_" + new Object().hashCode()); //$NON-NLS-1$ 
 		return new File(path.toOSString());
 	}

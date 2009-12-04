@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.actions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,14 +13,9 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.templates.Template;
-import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IEditorInput;
@@ -34,8 +29,14 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
-import com.aptana.editor.scripting.Activator;
-import com.aptana.editor.scripting.actions.Filter.FilterInputProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.scripting.commands.Filter;
+import com.aptana.editor.common.scripting.commands.FilterThroughCommandDialog;
+import com.aptana.editor.common.scripting.commands.INPUT_TYPE;
+import com.aptana.editor.common.scripting.commands.OUTPUT_TYPE;
+import com.aptana.editor.common.scripting.commands.Utilities;
+import com.aptana.editor.common.scripting.commands.Filter.FilterInputProvider;
+import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	
@@ -44,8 +45,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 				"FilterThroughCommandAction.", textEditor);	//$NON-NLS-1$
 	}
 	
-	public static final String COMMAND_ID = "com.aptana.editor.scripting.command.FilterThroughCommand";	//$NON-NLS-1$
-
+	public static final String COMMAND_ID = "com.aptana.editor.common.scripting.commands.FilterThroughCommand";	//$NON-NLS-1$
 	
 	private ITextViewer textViewer;
 	private StyledText textWidget;
@@ -157,34 +157,16 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								((Filter.StringOutputConsumer)filterOutputConsumer).getOutput());
 						break;
 					case INSERT_AS_SNIPPET:
-						SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
-						Template template = new SnippetTemplate(
-								"", //$NON-NLS-1$
-								"", //$NON-NLS-1$
-								"",  //$NON-NLS-1$
-								SnippetsCompletionProcessor.processExpansion(((Filter.StringOutputConsumer)filterOutputConsumer).getOutput()),
-								true);
-						IRegion region = new IRegion() {
-							public int getOffset() {
-								return caretOffset;
-							}
-
-							public int getLength() {
-								return 0;
-							}
-						};
-						TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
-						SnippetTemplateProposal completionProposal = 
-							(SnippetTemplateProposal) snippetsCompletionProcessor.createProposal(template, context, region, 0);
-						completionProposal.setTemplateProposals(new ICompletionProposal[] {completionProposal});
-						completionProposal.apply(textViewer, '0', SWT.NONE, caretOffset);
+						SnippetsCompletionProcessor.insertAsTemplate(textViewer,
+								caretOffset,
+								((Filter.StringOutputConsumer)filterOutputConsumer).getOutput());
 						break;
 					case SHOW_AS_HTML:
 						File tempHmtlFile = null;
 						try {
-							tempHmtlFile = File.createTempFile(Activator.PLUGIN_ID, ".html"); //$NON-NLS-1$
+							tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
 						} catch (IOException e) {
-							Activator.logError("Could not create temporary file.", e); //$NON-NLS-1$
+							CommonEditorPlugin.logError("Could not create temporary file.", e); //$NON-NLS-1$
 						}
 						if (tempHmtlFile != null) {
 							String output = ((Filter.StringOutputConsumer)filterOutputConsumer).getOutput();
@@ -215,9 +197,9 @@ public class FilterThroughCommandAction extends TextEditorAction {
 										support.getExternalBrowser().openURL(url);
 									}
 								} catch (PartInitException e) {
-									Activator.logError("Could not launch browser.", e); //$NON-NLS-1$
+									CommonEditorPlugin.logError("Could not launch browser.", e); //$NON-NLS-1$
 								} catch (MalformedURLException e) {
-									Activator.logError("Malformed URL: "+tempHmtlFile.toURI(), e); //$NON-NLS-1$
+									CommonEditorPlugin.logError("Malformed URL: "+tempHmtlFile.toURI(), e); //$NON-NLS-1$
 								}
 							}
 						}
@@ -236,7 +218,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 						tooltip.setFocus();
 						break;
 					case CREATE_NEW_DOCUMENT:
-						File file = Utilities.queryFile();
+						File file = Utilities.getNonExistingFileBackingStore();
 						IEditorInput input = Utilities.createNonExistingFileEditorInput(file, "Untitled.txt");	//$NON-NLS-1$
 						String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
 						try
@@ -258,19 +240,19 @@ public class FilterThroughCommandAction extends TextEditorAction {
 								}
 								catch (BadLocationException e)
 								{
-									Activator.logError("", e); //$NON-NLS-1$
+									CommonEditorPlugin.logError("", e); //$NON-NLS-1$
 								}
 							}
 
 						}
 						catch (PartInitException e)
 						{
-							Activator.logError("Error opening editor.", e); //$NON-NLS-1$
+							CommonEditorPlugin.logError("Error opening editor.", e); //$NON-NLS-1$
 						}
 						break;
 					}
 				} catch (InterruptedException e) {
-					Activator.logError("", e); //$NON-NLS-1$
+					CommonEditorPlugin.logError("", e); //$NON-NLS-1$
 				}
 			}
 		}

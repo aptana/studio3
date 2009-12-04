@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.snippets;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,17 +20,18 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 
-import com.aptana.editor.scripting.Activator;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.Snippet;
 
-class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
+public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
 	public SnippetsCompletionProcessor() {
 	}
@@ -57,7 +58,7 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
 	@Override
 	protected Image getImage(Template template) {
-		return Activator.getDefault().getImage(Activator.SNIPPET);
+		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
 	}
 	
 	@Override
@@ -157,6 +158,30 @@ class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 		} catch (BadLocationException e) {
 			return ""; //$NON-NLS-1$
 		}
+	}
+	
+	public static void insertAsTemplate(ITextViewer textViewer, final int caretOffset, String templateText) {
+		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
+		Template template = new SnippetTemplate(
+				"", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				SnippetsCompletionProcessor.processExpansion(templateText),
+				true);
+		IRegion region = new IRegion() {
+			public int getOffset() {
+				return caretOffset;
+			}
+
+			public int getLength() {
+				return 0;
+			}
+		};
+		TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
+		SnippetTemplateProposal completionProposal = 
+			(SnippetTemplateProposal) snippetsCompletionProcessor.createProposal(template, context, region, 0);
+		completionProposal.setTemplateProposals(new ICompletionProposal[] {completionProposal});
+		completionProposal.apply(textViewer, '0', SWT.NONE, caretOffset);
 	}
 	
 	private static class CustomStyler extends Styler {

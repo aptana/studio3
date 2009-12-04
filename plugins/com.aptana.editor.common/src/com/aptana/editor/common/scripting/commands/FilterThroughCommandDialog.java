@@ -1,4 +1,4 @@
-package com.aptana.editor.scripting.actions;
+package com.aptana.editor.common.scripting.commands;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class FilterThroughCommandDialog extends Dialog {
 	private OUTPUT_TYPE outputType;
 	private static OUTPUT_TYPE lastOutputType = OUTPUT_TYPE.OUTPUT_TO_CONSOLE;
 
-	FilterThroughCommandDialog(Shell parentShell, Map<String, String> environment) {
+	public FilterThroughCommandDialog(Shell parentShell, Map<String, String> environment) {
 		super(parentShell);
 		this.environment = environment;
 	}

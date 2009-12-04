@@ -17,6 +17,18 @@
             id="com.aptana.editor.common.showscopes"
             name="%command.scope.name">
       </command>
+      <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="%command.execute.description"
+            id="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
+            name="%command.execute.name">
+      </command>
+       <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="%command.filter.description"
+            id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
+            name="%command.filter.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -26,5 +38,18 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+P">
       </key>
+      <key
+            commandId="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+R">
+      </key>
+      <key
+            commandId="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Shift+R">
+      </key>
    </extension>
+
 </plugin>
