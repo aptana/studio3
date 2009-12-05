@@ -36,6 +36,7 @@ package com.aptana.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextHover;
@@ -50,6 +51,7 @@ import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
 import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
@@ -64,6 +66,12 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
         super(preferenceStore);
+    }
+
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+        return new IAutoEditStrategy[] { new CommonAutoIndentStrategy(contentType, this,
+                sourceViewer) };
     }
 
     @Override
@@ -144,6 +152,25 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         presenter.setSizeConstraints(60, 10, true, true);
 
         return presenter;
+    }
+
+    /**
+     * @return the default indentation string (either tab or spaces which
+     *         represents a tab)
+     */
+    public String getIndent() {
+        boolean useSpaces = fPreferenceStore
+                .getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+        if (useSpaces) {
+            int tabWidth = fPreferenceStore
+                    .getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < tabWidth; ++i) {
+                buf.append(" "); //$NON-NLS-1$
+            }
+            return buf.toString();
+        }
+        return "\t"; //$NON-NLS-1$
     }
 
     protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
