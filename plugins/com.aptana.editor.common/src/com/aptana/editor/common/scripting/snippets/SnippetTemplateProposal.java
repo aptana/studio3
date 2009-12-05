@@ -27,9 +27,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6 {
 
-	private ICompletionProposal[] templateProposals;
-	private char triggerChar;
-	private char[] triggerChars;
+	protected ICompletionProposal[] templateProposals;
+	protected char triggerChar;
+	protected char[] triggerChars;
 	private StyledString styledDisplayString;
 
 	public SnippetTemplateProposal(Template template, TemplateContext context,
@@ -149,7 +149,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		TRIGGER_CHARS.getChars(0, triggerChars.length, triggerChars, 0);
 	}
 	
-	private static boolean contains(char[] characters, char c) {
+	protected static boolean contains(char[] characters, char c) {
 		if (characters == null)
 			return false;
 

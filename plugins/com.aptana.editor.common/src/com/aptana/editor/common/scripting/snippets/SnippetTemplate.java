@@ -2,20 +2,28 @@ package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.templates.Template;
 
+import com.aptana.scripting.model.Snippet;
+
 public class SnippetTemplate extends Template {
 
-	public SnippetTemplate() {
-	}
+	private Snippet snippet;
 
-	public SnippetTemplate(Template template) {
-		super(template);
+	public SnippetTemplate(String name, String description, String contextTypeId, String pattern) {
+		super(name, description, contextTypeId, pattern, true);
+		this.snippet = null;
 	}
-
-	public SnippetTemplate(String name, String description,
-			String contextTypeId, String pattern, boolean isAutoInsertable) {
-		super(name, description, contextTypeId, pattern, isAutoInsertable);
+	
+	public SnippetTemplate(Snippet snippet, String contextTypeId) {
+		this(snippet.getTrigger(),
+				snippet.getDisplayName(),
+				contextTypeId,
+				SnippetsCompletionProcessor.processExpansion(snippet.getExpansion()));
+		this.snippet = snippet;
 	}
-
+	
+	public Snippet getSnippet() {
+		return snippet;
+	}
 
 	@Override
 	public boolean matches(String prefix, String contextTypeId) {

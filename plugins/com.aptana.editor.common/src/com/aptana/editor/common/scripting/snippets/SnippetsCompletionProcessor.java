@@ -29,7 +29,10 @@ import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.Command;
 import com.aptana.scripting.model.Snippet;
+import com.aptana.scripting.model.TriggerOnlyFilter;
+import com.aptana.scripting.model.TriggerableNode;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
@@ -58,6 +61,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
 	@Override
 	protected Image getImage(Template template) {
+		if (template instanceof CommandTemplate) {
+			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND);
+		}
 		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
 	}
 	
@@ -66,14 +72,20 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
 		List<Template> templates = new LinkedList<Template>();
 		for (Snippet snippet : snippetsFromScope) {
-			String expansion = snippet.getExpansion();
-			templates.add(new SnippetTemplate(
-					snippet.getTrigger(),
-					snippet.getDisplayName(),
-					contextTypeId, 
-					processExpansion(expansion),
-					true));
+			templates.add(new SnippetTemplate(snippet, contextTypeId));
 		}
+		
+		TriggerableNode[] commandsFromScope =
+			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+		for (TriggerableNode triggerableNode : commandsFromScope) {
+			if (triggerableNode instanceof Command) {
+				Command command = (Command) triggerableNode;
+				if (command.getTrigger() != null) {
+					templates.add (new CommandTemplate((Command)triggerableNode, contextTypeId));
+				}
+			}
+		}
+		
 		return templates.toArray(new Template[0]);
 	}
 	
@@ -126,6 +138,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region, int relevance) {
+		if (template instanceof CommandTemplate) {
+			return new CommandProposal(template, context, region, getImage(template), relevance);
+		}
 		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance);
 	}
 	
@@ -166,8 +181,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				"", //$NON-NLS-1$
 				"", //$NON-NLS-1$
 				"", //$NON-NLS-1$
-				SnippetsCompletionProcessor.processExpansion(templateText),
-				true);
+				SnippetsCompletionProcessor.processExpansion(templateText));
 		IRegion region = new IRegion() {
 			public int getOffset() {
 				return caretOffset;
