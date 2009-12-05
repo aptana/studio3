@@ -32,26 +32,19 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js;
+package com.aptana.editor.js.preferences;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
-import org.eclipse.jface.text.rules.IRule;
+import com.aptana.editor.js.Activator;
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.theme.ThemeUtil;
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner {
-
-    public JSDoubleQuotedStringScanner() {
-        List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule(
-                "\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-                ThemeUtil.getToken("constant.character.escape.js"))); //$NON-NLS-1$
-        setRules(rules.toArray(new IRule[rules.size()]));
-
-        setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.js")); //$NON-NLS-1$
+    @Override
+    public void initializeDefaultPreferences() {
+        IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+        prefs.setDefault(IPreferenceConstants.COMMENT_INDENT_USE_STAR, true);
+        prefs.setDefault(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, true);
     }
 }

@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.internal;
+package com.aptana.editor.js.internal;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
@@ -45,16 +45,14 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 import com.aptana.editor.common.CommonAutoIndentStrategy;
+import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.preferences.IPreferenceConstants;
 
-/**
- * @author Ingo Muschenetz
- * @author Michael Xia (mxia@aptana.com)
- */
-public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
+public class JSCommentIndentStrategy extends CommonAutoIndentStrategy {
 
     private String fPartitioning;
 
-    public CSSCommentIndentStrategy(String partitioning, String contentType,
+    public JSCommentIndentStrategy(String partitioning, String contentType,
             SourceViewerConfiguration configuration, ISourceViewer sourceViewer) {
         super(contentType, configuration, sourceViewer);
         fPartitioning = partitioning;
@@ -77,7 +75,6 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
      * @param c
      *            the command to deal with
      */
-    @Override
     protected void autoIndentAfterNewLine(IDocument d, DocumentCommand c) {
         int offset = c.offset;
         if (offset == -1 || d.getLength() == 0) {
@@ -105,7 +102,12 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
 
             StringBuilder buf = new StringBuilder(c.text);
 
-            IRegion prefix = findPrefixRange(d, line);
+            // get line prefix
+            boolean useStar = Activator.getDefault().getPreferenceStore().getBoolean(
+                    IPreferenceConstants.COMMENT_INDENT_USE_STAR);
+            String linePrefix = useStar ? "* " : " "; //$NON-NLS-1$ //$NON-NLS-2$
+
+            IRegion prefix = findPrefixRange(d, line, linePrefix);
             String indentation = d.get(prefix.getOffset(), prefix.getLength());
             int lengthToAdd = Math.min(offset - prefix.getOffset(), prefix.getLength());
             buf.append(indentation.substring(0, lengthToAdd));
@@ -113,7 +115,7 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
             if (firstNonWS < offset) {
                 if (d.getChar(firstNonWS) == '/') {
                     // comment started on this line
-                    buf.append(" * "); //$NON-NLS-1$
+                    buf.append(" " + linePrefix); //$NON-NLS-1$
 
                     if (isNewComment(d, offset)) {
                         c.shiftsCaret = false;
@@ -133,7 +135,7 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
             }
 
             // move the caret behind the prefix, even if we do not have to
-            // insert it
+            // insert it.
             if (lengthToAdd < prefix.getLength()) {
                 c.caretOffset = offset + prefix.getLength() - lengthToAdd;
             }
@@ -159,8 +161,8 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
 
         if (isClose) {
             String append = getIndentationString(doc, lineOffset, firstNonWS);
-            // multiline comments indent with "space *" after the first, so
-            // trims that if it is there
+            // multiline comments indent with "space *" after the first, so trim
+            // that if it is there
             if (append.endsWith(" ")) { //$NON-NLS-1$
                 append = append.substring(0, append.length() - 1);
             }
@@ -173,28 +175,32 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
     /**
      * Returns the range of the multiline comment prefix on the given line in
      * <code>document</code>. The prefix greedily matches the following regex
-     * pattern: <code>\w*\*\w*</code>, i.e, any number of whitespace characters,
-     * followed by an asterix ('*'), followed by any number of whitespace
-     * characters.
+     * pattern: <code>\w*\*\w*</code>, that is, any number of whitespace
+     * characters, followed by an asterix ('*'), followed by any number of
+     * whitespace characters.
      * 
      * @param document
      *            the document to which <code>line</code> refers
      * @param line
      *            the line from which to extract the prefix range
+     * @param linePrefix
+     *            the default prefix for the line ("*" or " ")
      * 
      * @return an <code>IRegion</code> describing the range of the prefix on the
      *         given line
      * @throws BadLocationException
      *             if accessing the document fails
      */
-    private IRegion findPrefixRange(IDocument document, IRegion line) throws BadLocationException {
+    private IRegion findPrefixRange(IDocument document, IRegion line, String linePrefix)
+            throws BadLocationException {
         int lineOffset = line.getOffset();
         int lineEnd = lineOffset + line.getLength();
         int indentEnd = findEndOfWhiteSpace(document, lineOffset, lineEnd);
-        if (indentEnd < lineEnd && document.getChar(indentEnd) == '*') {
+        if (indentEnd < lineEnd && document.get(indentEnd, linePrefix.length()).equals(linePrefix)) {
             indentEnd++;
-            while (indentEnd < lineEnd && document.getChar(indentEnd) == ' ')
+            while (indentEnd < lineEnd && document.getChar(indentEnd) == ' ') {
                 indentEnd++;
+            }
         }
         return new Region(lineOffset, indentEnd - lineOffset);
     }
@@ -233,7 +239,7 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
             if (!comment.endsWith("*/")) { //$NON-NLS-1$
                 return true;
             }
-            // assume short comment always unclosed and guard for next test
+            // assume short comment is always unclosed and guard for next test
             if (comment.length() < 4) {
                 return true;
             }
@@ -241,22 +247,30 @@ public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
                 return false;
             }
 
+            // comments that have * as the first non-whitespace char on next
+            // line are probably closed
             int firstNewline = comment.indexOf('\n');
-            if (firstNewline > -1 && firstNewline <= comment.length()) {
-                // comments that have * as the first non-whitespace char on next
-                // line are probably closed
-                String subComment = comment.substring(firstNewline).trim();
-                if (subComment.startsWith("*")) { //$NON-NLS-1$
-                    return false;
-                }
-
-                // no extra lines means probably not closed (can be a */ line
-                // due to previous test)
-                if (subComment.indexOf("\n") == -1) { //$NON-NLS-1$
-                    return true;
-                }
+            String subComment = comment.substring(firstNewline).trim();
+            if (subComment.startsWith("*")) { //$NON-NLS-1$
+                return false;
             }
 
+            // no extra lines means probably not closed (can be a */ line due to
+            // previous test)
+            if (subComment.indexOf("\n") == -1) { //$NON-NLS-1$
+                return true;
+            }
+
+            String firstLine = subComment.substring(0, subComment.indexOf("\n")); //$NON-NLS-1$
+            if (firstLine.indexOf("=") > -1) { //$NON-NLS-1$
+                return true;
+            }
+            if (firstLine.indexOf("function") > -1) { //$NON-NLS-1$
+                return true;
+            }
+            if (firstLine.indexOf("var") > -1) { //$NON-NLS-1$
+                return true;
+            }
             if (comment.indexOf("/*", 2) != -1) { //$NON-NLS-1$
                 // enclosed another comment -> probably a new comment
                 return true;

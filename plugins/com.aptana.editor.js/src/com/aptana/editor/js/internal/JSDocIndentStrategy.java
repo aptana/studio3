@@ -32,26 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js;
+package com.aptana.editor.js.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
-import org.eclipse.jface.text.rules.IRule;
+public class JSDocIndentStrategy extends JSCommentIndentStrategy {
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.theme.ThemeUtil;
-
-public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner {
-
-    public JSDoubleQuotedStringScanner() {
-        List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule(
-                "\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-                ThemeUtil.getToken("constant.character.escape.js"))); //$NON-NLS-1$
-        setRules(rules.toArray(new IRule[rules.size()]));
-
-        setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.js")); //$NON-NLS-1$
+    public JSDocIndentStrategy(String partitioning, String contentType,
+            SourceViewerConfiguration configuration, ISourceViewer sourceViewer) {
+        super(partitioning, contentType, configuration, sourceViewer);
     }
 }

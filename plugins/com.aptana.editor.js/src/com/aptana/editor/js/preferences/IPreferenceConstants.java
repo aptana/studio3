@@ -32,26 +32,18 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js;
+package com.aptana.editor.js.preferences;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface IPreferenceConstants {
 
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
-import org.eclipse.jface.text.rules.IRule;
+    /**
+     * The value is a boolean to indicate if "*" should be used for multiline
+     * comment indenting
+     */
+    public static final String COMMENT_INDENT_USE_STAR = "COMMENT_INDENT_USE_STAR"; //$NON-NLS-1$
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.theme.ThemeUtil;
-
-public class JSDoubleQuotedStringScanner extends BufferedRuleBasedScanner {
-
-    public JSDoubleQuotedStringScanner() {
-        List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule(
-                "\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-                ThemeUtil.getToken("constant.character.escape.js"))); //$NON-NLS-1$
-        setRules(rules.toArray(new IRule[rules.size()]));
-
-        setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.js")); //$NON-NLS-1$
-    }
+    /**
+     * The value is a boolean to indicate if we auto-indent on carriage return
+     */
+    public static final String AUTO_INDENT_ON_CARRIAGE_RETURN = "AUTO_INDENT_ON_CARRIAGE_RETURN"; //$NON-NLS-1$
 }
