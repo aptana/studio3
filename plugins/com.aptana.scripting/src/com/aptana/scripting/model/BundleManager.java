@@ -130,7 +130,7 @@ public class BundleManager
 	 * @param scope
 	 * @return
 	 */
-	public TriggerableNode[] getCommandsFromScope(String scope)
+	public Command[] getCommandsFromScope(String scope)
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, null);
 	}
@@ -142,7 +142,7 @@ public class BundleManager
 	 * @param filter
 	 * @return
 	 */
-	public TriggerableNode[] getCommandsFromScope(String scope, IModelFilter filter)
+	public Command[] getCommandsFromScope(String scope, IModelFilter filter)
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, filter);
 	}
@@ -153,7 +153,7 @@ public class BundleManager
 	 * @param scopes
 	 * @return
 	 */
-	public TriggerableNode[] getCommandsFromScopes(String[] scopes)
+	public Command[] getCommandsFromScopes(String[] scopes)
 	{
 		return this.getCommandsFromScopes(scopes, null);
 	}
@@ -165,9 +165,9 @@ public class BundleManager
 	 * @param filter
 	 * @return
 	 */
-	public TriggerableNode[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	public Command[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
 	{
-		TriggerableNode[] result = NO_COMMANDS;
+		Command[] result = NO_COMMANDS;
 		
 		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{
