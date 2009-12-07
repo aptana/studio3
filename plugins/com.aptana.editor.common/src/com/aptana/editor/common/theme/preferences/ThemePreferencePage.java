@@ -1,5 +1,6 @@
 package com.aptana.editor.common.theme.preferences;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -66,6 +68,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.ThemeUtil;
 
@@ -152,7 +155,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void createThemeListControls(Composite composite)
 	{
 		Composite themesComp = new Composite(composite, SWT.NONE);
-		themesComp.setLayout(new GridLayout(4, false));
+		themesComp.setLayout(new GridLayout(5, false));
 
 		fThemeCombo = new Combo(themesComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		loadThemeNames();
@@ -245,6 +248,28 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				getTheme().delete();
 				loadThemeNames();
 				setTheme(ThemeUtil.getActiveTheme().getName());
+			}
+		});
+		
+		// Textmate Import
+		Button importButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		importButton.setText(Messages.ThemePreferencePage_ImportLabel);
+		importButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+				fileDialog.setFilterExtensions(new String[] {"*.tmTheme"}); //$NON-NLS-1$
+				String path = fileDialog.open();
+				if (path == null)
+					return;
+				
+				Theme theme = new TextmateImporter().convert(new File(path));
+				ThemeUtil.addTheme(theme);
+				ThemeUtil.setActiveTheme(theme);
+				loadThemeNames();
+				setTheme(theme.getName());
 			}
 		});
 	}

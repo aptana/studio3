@@ -13,6 +13,6 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.xml,
  com.aptana.editor.ruby,
  com.aptana.editor.html
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
