@@ -39,6 +39,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -46,6 +48,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -250,7 +253,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				setTheme(ThemeUtil.getActiveTheme().getName());
 			}
 		});
-		
+
 		// Textmate Import
 		Button importButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
 		importButton.setText(Messages.ThemePreferencePage_ImportLabel);
@@ -260,11 +263,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
-				fileDialog.setFilterExtensions(new String[] {"*.tmTheme"}); //$NON-NLS-1$
+				fileDialog.setFilterExtensions(new String[] { "*.tmTheme" }); //$NON-NLS-1$
 				String path = fileDialog.open();
 				if (path == null)
 					return;
-				
+
 				Theme theme = new TextmateImporter().convert(new File(path));
 				ThemeUtil.addTheme(theme);
 				ThemeUtil.setActiveTheme(theme);
@@ -645,7 +648,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return ""; //$NON-NLS-1$
 			}
 		});
-
+		
 		final TableColumn fontStyle = new TableColumn(table, SWT.NONE);
 		fontStyle.setResizable(true);
 		fontStyle.setText(Messages.ThemePreferencePage_FontStyleColumnLabel);
@@ -822,9 +825,34 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			createButton(table, items[i], 1, commit.getValue().getForeground());
 			if (commit.getValue().getBackground() != null)
 				createButton(table, items[i], 2, commit.getValue().getBackground());
-
 			createFontStyle(table, items[i], commit.getValue());
 		}
+		table.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				// If user is clicking in the BG column when it's empty, pop open a color dialog
+				int myX = table.getColumn(0).getWidth();
+				myX += table.getColumn(1).getWidth();
+				int width = table.getColumn(2).getWidth() + 2;
+				if (!(e.x > myX && e.x < (myX + width)))
+					return;
+				TableItem tableItem = table.getItem(new Point(e.x, e.y));
+				ColorDialog colorDialog = new ColorDialog(table.getShell());
+				colorDialog.setRGB(getTheme().getBackground());
+				RGB newRGB = colorDialog.open();
+				if (newRGB == null)
+					return;
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				Color fg = token.getValue().getForeground();
+				Color bg = CommonEditorPlugin.getDefault().getColorManager().getColor(newRGB);
+
+				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
+				getTheme().update(token.getKey(), at);
+				setTheme(fSelectedTheme);
+			}
+		});
 	}
 
 	private void clearTableEditors()
