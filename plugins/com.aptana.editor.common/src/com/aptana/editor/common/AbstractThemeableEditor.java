@@ -5,7 +5,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
@@ -21,6 +20,7 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.peer.CharacterPairMatcher;
 import com.aptana.editor.common.peer.PeerCharacterCloser;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.ThemeUtil;
@@ -107,7 +107,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super.configureSourceViewerDecorationSupport(support);
 
-		support.setCharacterPairMatcher(new DefaultCharacterPairMatcher(PAIR_MATCHING_CHARS));
+		support.setCharacterPairMatcher(new CharacterPairMatcher(PAIR_MATCHING_CHARS));
 		support.setMatchingCharacterPainterPreferenceKeys(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
 	}
