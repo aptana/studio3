@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.common,
  com.aptana.editor.js,
  com.aptana.editor.css
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.html
