@@ -134,7 +134,7 @@ public class FileChangeNotifier
 		}
 		catch (JNotifyException e)
 		{
-			Activator.logError("Error adding file change listener", e);
+			Activator.logError("Error adding file change listener", e); //$NON-NLS-1$
 			return false;
 		}
 
@@ -152,7 +152,7 @@ public class FileChangeNotifier
 		}
 		catch (JNotifyException e)
 		{
-			Activator.logError("Error removing file change listener", e);
+			Activator.logError("Error removing file change listener", e); //$NON-NLS-1$
 			return false;
 		}
 	}

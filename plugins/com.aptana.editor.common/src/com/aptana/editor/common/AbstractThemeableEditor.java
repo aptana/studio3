@@ -1,11 +1,14 @@
 package com.aptana.editor.common;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -103,6 +106,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	}
 
 	@Override
+	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
+	{
+		super.initializeLineNumberRulerColumn(rulerColumn);
+		rulerColumn.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+				ThemeUtil.getActiveTheme().getBackground()));
+		rulerColumn.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+				ThemeUtil.getActiveTheme().getForeground()));
+		rulerColumn.redraw();
+	}
+
+	@Override
 	protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support)
 	{
 		super.configureSourceViewerDecorationSupport(support);
@@ -173,7 +187,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private void setCharacterPairColor(RGB rgb)
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, rgb.red + "," + rgb.green + "," + rgb.blue);
+		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format("{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();

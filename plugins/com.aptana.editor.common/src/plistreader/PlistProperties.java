@@ -70,58 +70,80 @@ public class PlistProperties
 	 * Stores all the key values
 	 */
 	private Vector<String> internalKeys = new Vector<String>();
+
 	/**
 	 * Stores all the values of the keys
 	 */
-	private Vector internalValues = new Vector();
+	private Vector<Object> internalValues = new Vector<Object>();
+
 	/**
 	 * Stores the key of this object itselves
 	 */
 	private String key;
+
 	/**
 	 * Class object for a String
 	 */
-	public final static Class TYPE_STRING = String.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_STRING = String.class.getClass();
+
 	/**
 	 * Class object for an Integer
 	 */
-	public final static Class TYPE_INTEGER = Integer.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_INTEGER = Integer.class.getClass();
+
 	/**
 	 * Class object for a Double
 	 */
-	public final static Class TYPE_DOUBLE = Double.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_DOUBLE = Double.class.getClass();
+
 	/**
 	 * Class object for a Date
 	 */
-	public final static Class TYPE_DATE = Date.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_DATE = Date.class.getClass();
+
 	/**
 	 * Class object for a Byte[]
 	 */
-	public final static Class TYPE_DATA = Byte.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_DATA = Byte.class.getClass();
+
 	/**
 	 * Class object for a Boolean
 	 */
-	public final static Class TYPE_BOOLEAN = Boolean.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_BOOLEAN = Boolean.class.getClass();
+
 	/**
 	 * Class object for a Vector (follows <code>PLIST</code> syntax)
 	 */
-	public final static Class TYPE_ARRAY = Vector.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_ARRAY = Vector.class.getClass();
+
 	/**
 	 * Alias for a <code>TYPE_ARRAY</code>
 	 * 
 	 * @see #TYPE_VECTOR
 	 */
-	public final static Class TYPE_VECTOR = Vector.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_VECTOR = Vector.class.getClass();
+
 	/**
 	 * Class object for a PlistProperties
 	 */
-	public final static Class TYPE_PLISTPROPERTIES = PlistProperties.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_PLISTPROPERTIES = PlistProperties.class.getClass();
+
 	/**
 	 * Alias for a <code>TYPE_PLISTPROPERTIES</code> (follows <code>PLIST</code> syntax)
 	 * 
 	 * @see #TYPE_PLISTPROPERTIES
 	 */
-	public final static Class TYPE_DICTIONARY = PlistProperties.class.getClass();
+	@SuppressWarnings("rawtypes")
+	public final static Class<? extends Class> TYPE_DICTIONARY = PlistProperties.class.getClass();
 
 	/**
 	 * Empty constructor
@@ -153,7 +175,7 @@ public class PlistProperties
 		Object _return = null;
 		for (int i = 0; i < internalKeys.size(); i++)
 		{
-			if (((String) internalKeys.elementAt(i)).equals(_key))
+			if (internalKeys.elementAt(i).equals(_key))
 			{
 				_return = internalValues.elementAt(i);
 				break;
@@ -174,7 +196,7 @@ public class PlistProperties
 		int _index = -1;
 		for (int i = 0; i < internalKeys.size(); i++)
 		{
-			if (((String) internalKeys.elementAt(i)).equals(_key))
+			if (internalKeys.elementAt(i).equals(_key))
 			{
 				_index = i;
 			}
@@ -190,6 +212,7 @@ public class PlistProperties
 	 *            String
 	 * @return Object
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getPropertyRecursive(String _key)
 	{
 		Object _return = null;
@@ -331,6 +354,7 @@ public class PlistProperties
 	 *            Class
 	 * @return int
 	 */
+	@SuppressWarnings("rawtypes")
 	public int propertyTypeCount(Class _type)
 	{
 		return propertyTypeCount(_type, 0);
@@ -347,6 +371,7 @@ public class PlistProperties
 	 *            int
 	 * @return int
 	 */
+	@SuppressWarnings("rawtypes")
 	public int propertyTypeCount(Class _type, int _baseCount)
 	{
 		int count = _baseCount;
@@ -392,7 +417,7 @@ public class PlistProperties
 		Properties props = new Properties();
 		for (int i = 0; i < internalKeys.size(); i++)
 		{
-			props.setProperty((String) internalKeys.elementAt(i), internalValues.elementAt(i).toString());
+			props.setProperty(internalKeys.elementAt(i), internalValues.elementAt(i).toString());
 		}
 		return props;
 	}
@@ -405,7 +430,7 @@ public class PlistProperties
 	public static PlistProperties convertToPlistProperties(Properties _props)
 	{
 		PlistProperties newprops = new PlistProperties();
-		Enumeration keys = _props.keys();
+		Enumeration<Object> keys = _props.keys();
 		while (keys.hasMoreElements())
 		{
 			String key = (String) keys.nextElement();
@@ -510,6 +535,7 @@ public class PlistProperties
 	 *            int
 	 * @throws PlistReaderException
 	 */
+	@SuppressWarnings("rawtypes")
 	private void printContent(Object _out, int _tabIndex) throws PlistReaderException
 	{
 		try
@@ -517,13 +543,13 @@ public class PlistProperties
 			// Get the method from the object _out which must be a PrintStream or a
 			// PrintWriter... otherwise errors.
 			// Next print by typing printMethod.invoke(Object,Object[]);
-			Method printMethod = _out.getClass().getMethod("print", new Class[] { String.class });
+			Method printMethod = _out.getClass().getMethod("print", new Class[] { String.class }); //$NON-NLS-1$
 			// Define the tabstring
-			String tab = "";
+			String tab = ""; //$NON-NLS-1$
 			// Set the tab based on the _tabIndex
 			for (int t = 0; t < _tabIndex; t++)
 			{
-				tab += "\t";
+				tab += "\t"; //$NON-NLS-1$
 			}
 			// loop synchronous through the internalKeys and internalValues Vector
 			// and get value
@@ -531,13 +557,13 @@ public class PlistProperties
 			{
 				Object value = internalValues.elementAt(i);
 				// Print the key
-				printMethod.invoke(_out, new Object[] { tab + " - " });
-				printMethod.invoke(_out, new Object[] { internalKeys.elementAt(i).toString() + ":" });
+				printMethod.invoke(_out, new Object[] { tab + " - " }); //$NON-NLS-1$
+				printMethod.invoke(_out, new Object[] { internalKeys.elementAt(i).toString() + ":" }); //$NON-NLS-1$
 				// If value is instance of PlistProperties: recurse via list function of
 				// that value.
 				if (value instanceof PlistProperties)
 				{
-					printMethod.invoke(_out, new Object[] { "\r\n" });
+					printMethod.invoke(_out, new Object[] { "\r\n" }); //$NON-NLS-1$
 					if (_out instanceof PrintStream)
 					{
 						((PlistProperties) value).list((PrintStream) _out, _tabIndex + 1);
@@ -552,7 +578,7 @@ public class PlistProperties
 				// If it is a vector print all the elements after the key.
 				if (value instanceof Vector)
 				{
-					printMethod.invoke(_out, new Object[] { "\r\n" });
+					printMethod.invoke(_out, new Object[] { "\r\n" }); //$NON-NLS-1$
 					// Loop through the vector
 					for (int j = 0; j < ((Vector) value).size(); j++)
 					{
@@ -562,8 +588,8 @@ public class PlistProperties
 						if (element instanceof PlistProperties)
 						{
 							// Print key of PlistProperties
-							printMethod.invoke(_out, new Object[] { tab + "   + "
-									+ ((PlistProperties) element).getPropertiesKey() + ":\r\n" });
+							printMethod.invoke(_out, new Object[] { tab + "   + " //$NON-NLS-1$
+									+ ((PlistProperties) element).getPropertiesKey() + ":\r\n" }); //$NON-NLS-1$
 							if (_out instanceof PrintStream)
 							{
 								((PlistProperties) element).list((PrintStream) _out, _tabIndex + 1);
@@ -577,8 +603,8 @@ public class PlistProperties
 						// Print the array element
 						else
 						{
-							printMethod.invoke(_out, new Object[] { tab + "   + " + element.toString() + " (Class: "
-									+ element.getClass().getName() + ")\r\n" });
+							printMethod.invoke(_out, new Object[] { tab + "   + " + element.toString() + " (Class: " //$NON-NLS-1$ //$NON-NLS-2$
+									+ element.getClass().getName() + ")\r\n" }); //$NON-NLS-1$
 						}
 					}
 					// Jump over the next lines and start new turn of the loop
@@ -586,7 +612,7 @@ public class PlistProperties
 				}
 				// If the current key - value pair contains no PlistProperties or Vector
 				// object whe should reach this line which only prints out the value :)
-				printMethod.invoke(_out, new Object[] { internalValues.elementAt(i).toString() + "\r\n" });
+				printMethod.invoke(_out, new Object[] { internalValues.elementAt(i).toString() + "\r\n" }); //$NON-NLS-1$
 			}
 
 		}
@@ -619,7 +645,7 @@ public class PlistProperties
 	 * 
 	 * @return Vector
 	 */
-	public Vector getKeys()
+	public Vector<String> getKeys()
 	{
 		return internalKeys;
 	}
@@ -629,7 +655,7 @@ public class PlistProperties
 	 * 
 	 * @return Vector
 	 */
-	public Vector getValues()
+	public Vector<Object> getValues()
 	{
 		return internalValues;
 	}

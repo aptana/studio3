@@ -1,11 +1,13 @@
 package plistreader;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.*;
-import java.util.Vector;
-import java.util.Date;
+import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
 
 /**
  * <p>Title: PlistReader AbstractWriter</p>
@@ -111,11 +113,11 @@ public abstract class AbstractWriter {
       }
       PrintWriter out = new PrintWriter(new FileOutputStream(file));
       //Print header of file
-      out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-      out.print("<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n");
-      out.print("<plist version=\"1.0\">");
+      out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"); //$NON-NLS-1$
+      out.print("<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\r\n"); //$NON-NLS-1$
+      out.print("<plist version=\"1.0\">"); //$NON-NLS-1$
       writeDictionary(out,props,0);
-      out.print("</plist>");
+      out.print("</plist>"); //$NON-NLS-1$
       out.flush();
       out.close();
     }
@@ -158,30 +160,31 @@ public abstract class AbstractWriter {
    * @param _props PlistProperties
    * @param _tabIndex int
    */
-  private void writeDictionary(PrintWriter _out, PlistProperties _props,
+  @SuppressWarnings("rawtypes")
+private void writeDictionary(PrintWriter _out, PlistProperties _props,
                                int _tabIndex) {
     //Vectors for the keys and the fields
     Vector keys = _props.getKeys();
     Vector values = _props.getValues();
     //Define the tabstring
-    String tab = "";
+    String tab = ""; //$NON-NLS-1$
     //Set the tab based on the _tabIndex
     for (int t = 0; t < _tabIndex; t++) {
-      tab += "\t";
+      tab += "\t"; //$NON-NLS-1$
     }
     //Print header
-    _out.print(tab + "<dict>\r\n");
-    tab = "\t" + tab;
+    _out.print(tab + "<dict>\r\n"); //$NON-NLS-1$
+    tab = "\t" + tab; //$NON-NLS-1$
     //loop synchronous through the internalKeys and internalValues Vector
     //and get value
     for (int i = 0; i < keys.size(); i++) {
       Object value = values.elementAt(i);
-      _out.print(tab + makeTag("key", (String) keys.elementAt(i)));
+      _out.print(tab + makeTag("key", (String) keys.elementAt(i))); //$NON-NLS-1$
       printValue(_out, _tabIndex + 1, tab , value);
 
     }
     //Print footer
-    _out.print(tab.substring(1, tab.length()) + "</dict>\r\n");
+    _out.print(tab.substring(1, tab.length()) + "</dict>\r\n"); //$NON-NLS-1$
   }
 
   /**
@@ -190,17 +193,18 @@ public abstract class AbstractWriter {
    * @param _vector Vector
    * @param _tabIndex int
    */
-  private void writeArray(PrintWriter _out, Vector _vector, int _tabIndex) {
+  @SuppressWarnings("rawtypes")
+private void writeArray(PrintWriter _out, Vector _vector, int _tabIndex) {
 
     //Define the tabstring
-    String tab = "";
+    String tab = ""; //$NON-NLS-1$
     //Set the tab based on the _tabIndex
     for (int t = 0; t < _tabIndex; t++) {
-      tab += "\t";
+      tab += "\t"; //$NON-NLS-1$
     }
     //Print header
-    _out.print(tab + "<array>\r\n");
-    tab = "\t" + tab;
+    _out.print(tab + "<array>\r\n"); //$NON-NLS-1$
+    tab = "\t" + tab; //$NON-NLS-1$
     //loop synchronous through the internalKeys and internalValues Vector
     //and get value
     for (int i = 0; i < _vector.size(); i++) {
@@ -209,7 +213,7 @@ public abstract class AbstractWriter {
 
     }
     //Print footer
-    _out.print(tab.substring(1, tab.length()) + "</array>\r\n");
+    _out.print(tab.substring(1, tab.length()) + "</array>\r\n"); //$NON-NLS-1$
 
   }
 
@@ -222,7 +226,8 @@ public abstract class AbstractWriter {
    * @param tab String
    * @param _value Object
    */
-  private void printValue(PrintWriter _out, int _tabIndex, String tab, Object _value) {
+  @SuppressWarnings("rawtypes")
+private void printValue(PrintWriter _out, int _tabIndex, String tab, Object _value) {
     //Recurse if it is a PlistProperties
     if (_value instanceof PlistProperties) {
       writeDictionary(_out, (PlistProperties) _value, _tabIndex + 1);
@@ -233,15 +238,15 @@ public abstract class AbstractWriter {
     }
     //Write a string
     else if (_value instanceof String) {
-      _out.print(tab + makeTag("string", (String) _value));
+      _out.print(tab + makeTag("string", (String) _value)); //$NON-NLS-1$
     }
     //Write an integer
     else if (_value instanceof Integer) {
-      _out.print(tab + makeTag("integer", ( (Integer) _value).toString()));
+      _out.print(tab + makeTag("integer", ( (Integer) _value).toString())); //$NON-NLS-1$
     }
     //Write a double
     else if (_value instanceof Double) {
-      _out.print(tab + makeTag("real", ( (Double) _value).toString()));
+      _out.print(tab + makeTag("real", ( (Double) _value).toString())); //$NON-NLS-1$
     }
     //Write a boolean
     else if (_value instanceof Boolean) {
@@ -249,11 +254,11 @@ public abstract class AbstractWriter {
     }
     //Write a date
     else if (_value instanceof Date) {
-      _out.print(tab + makeTag("date", new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format((Date) _value)));
+      _out.print(tab + makeTag("date", new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").format((Date) _value))); //$NON-NLS-1$ //$NON-NLS-2$
     }
     //Write data
     else if (_value instanceof Byte[]) {
-      _out.print(tab + makeTag("data", ( (Byte[]) _value).toString()));
+      _out.print(tab + makeTag("data", ( (Byte[]) _value).toString())); //$NON-NLS-1$
     }
   }
 
@@ -267,11 +272,9 @@ public abstract class AbstractWriter {
    */
   private String makeTag(String tagname, String value) {
     if (value == null) {
-      return "<" + tagname + " />\r\n";
+      return MessageFormat.format("<{0} />\r\n", tagname); //$NON-NLS-1$
     }
-    else {
-      return "<" + tagname + ">" + value + "</" + tagname + ">\r\n";
-    }
+	return  MessageFormat.format("<{0}>{1}</{2}>\r\n", tagname, value, tagname); //$NON-NLS-1$
   }
 
 }
