@@ -35,6 +35,9 @@
 
 package com.aptana.editor.erb.html;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.texteditor.ITextEditor;
+
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
@@ -47,9 +50,10 @@ import com.aptana.editor.ruby.RubySourceConfiguration;
  */
 public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
 
-	protected RHTMLSourceViewerConfiguration() {
-		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
-	}
+    protected RHTMLSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(),
+                preferences, editor);
+    }
 
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getLanguageSpecification()

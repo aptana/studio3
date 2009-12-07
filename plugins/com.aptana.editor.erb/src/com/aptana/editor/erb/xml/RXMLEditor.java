@@ -47,10 +47,10 @@ public class RXMLEditor extends AbstractThemeableEditor {
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor() {
-		super.initializeEditor();
-		setSourceViewerConfiguration(new RXMLSourceViewerConfiguration());
-		setDocumentProvider(new RXMLDocumentProvider());
-	}
+    protected void initializeEditor() {
+        super.initializeEditor();
 
+        setSourceViewerConfiguration(new RXMLSourceViewerConfiguration(getPreferenceStore(), this));
+        setDocumentProvider(new RXMLDocumentProvider());
+    }
 }
