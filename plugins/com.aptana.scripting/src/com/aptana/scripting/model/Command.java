@@ -21,7 +21,9 @@ public class Command extends TriggerableNode
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
-	private String _output;
+	private InputType _inputType;
+	private OutputType _outputType;
+	
 	/**
 	 * Snippet
 	 * 
@@ -30,6 +32,9 @@ public class Command extends TriggerableNode
 	public Command(String path)
 	{
 		super(path);
+		
+		this._inputType = InputType.UNDEFINED;
+		this._outputType = OutputType.UNDEFINED;
 	}
 
 	/**
@@ -151,6 +156,17 @@ public class Command extends TriggerableNode
 	}
 	
 	/**
+	 * getInput
+	 * 
+	 * @return
+	 */
+	@JRubyMethod(name = "input")
+	public String getInputType()
+	{
+		return this._inputType.getName();
+	}
+	
+	/**
 	 * getInvoke
 	 * 
 	 * @return
@@ -189,9 +205,9 @@ public class Command extends TriggerableNode
 	 * @return
 	 */
 	@JRubyMethod(name = "output")
-	public String getOutput()
+	public String getOutputType()
 	{
-		return this._output;
+		return this._outputType.getName();
 	}
 	
 	/**
@@ -222,6 +238,17 @@ public class Command extends TriggerableNode
 	public boolean isShellCommand()
 	{
 		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param input
+	 */
+	@JRubyMethod(name = "input=")
+	public void setInputType(String input)
+	{
+		this._inputType = InputType.get(input);
 	}
 	
 	/**
@@ -263,9 +290,9 @@ public class Command extends TriggerableNode
 	 * @param output
 	 */
 	@JRubyMethod(name = "output=")
-	public void setOutput(String output)
+	public void setOutputType(String output)
 	{
-		this._output = output;
+		this._outputType = OutputType.get(output);
 	}
 	
 	/**
@@ -286,7 +313,7 @@ public class Command extends TriggerableNode
 			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
 		}
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
-		printer.printWithIndent("output: ").println(this._output); //$NON-NLS-1$
+		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
 		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
 		
 		printer.decreaseIndent().printlnWithIndent("}");

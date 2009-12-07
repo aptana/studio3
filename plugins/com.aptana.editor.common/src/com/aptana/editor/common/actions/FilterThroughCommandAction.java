@@ -35,8 +35,8 @@ import com.aptana.editor.common.scripting.commands.FilterThroughCommandDialog;
 import com.aptana.editor.common.scripting.commands.Utilities;
 import com.aptana.editor.common.scripting.commands.Filter.FilterInputProvider;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
-import com.aptana.scripting.model.INPUT_TYPE;
-import com.aptana.scripting.model.OUTPUT_TYPE;
+import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.model.OutputType;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	
@@ -87,7 +87,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 			
 			FilterThroughCommandDialog filterThroughCommandDialog = new FilterThroughCommandDialog(workbenchWindow.getShell(), environment);
 			if (filterThroughCommandDialog.open() == Window.OK) {
-				INPUT_TYPE inputType = filterThroughCommandDialog.getInputType();
+				InputType inputType = filterThroughCommandDialog.getInputType();
 				FilterInputProvider filterInputProvider = Filter.EOF;
 
 				switch (inputType) {
@@ -113,7 +113,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 				}
 
 				Filter.FilterOutputConsumer filterOutputConsumer = null;
-				OUTPUT_TYPE ouputType = filterThroughCommandDialog.getOuputType();
+				OutputType ouputType = filterThroughCommandDialog.getOuputType();
 				switch (ouputType) {
 				case DISCARD:
 					filterOutputConsumer = Filter.DISCARD;

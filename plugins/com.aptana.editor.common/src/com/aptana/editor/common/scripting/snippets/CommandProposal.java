@@ -10,7 +10,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.scripting.model.Command;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
-import com.aptana.scripting.model.OUTPUT_TYPE;
+import com.aptana.scripting.model.OutputType;
 
 public class CommandProposal extends SnippetTemplateProposal {
 
@@ -33,7 +33,7 @@ public class CommandProposal extends SnippetTemplateProposal {
 			Command command = commandTemplate.getCommand();
 			CommandResult commandResult = command.execute(new CommandContext());
 			try {
-				OUTPUT_TYPE output = OUTPUT_TYPE.valueOf(command.getOutput().toUpperCase());
+				OutputType output = OutputType.valueOf(command.getOutputType().toUpperCase());
 				System.out.println(commandResult.getResultText());
 			} catch (IllegalArgumentException iae) {
 				System.err.println(commandResult.getResultText());

@@ -23,6 +23,14 @@ module RadRails
       @jobj.display_name = display_name
     end
     
+    def input
+     @jobj.input 
+    end
+    
+    def input=(input)
+      @jobj.input = input.to_s
+    end
+    
     def invoke(&block)
       if block_given?
         @jobj.invoke_block = block
