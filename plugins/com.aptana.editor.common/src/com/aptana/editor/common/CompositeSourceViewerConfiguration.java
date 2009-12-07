@@ -47,6 +47,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.theme.ThemeUtil;
 
@@ -59,22 +60,18 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	private ITokenScanner startEndTokenScanner;
 	private ISourceViewerConfiguration defaultSourceViewerConfiguration;
 	private ISourceViewerConfiguration primarySourceViewerConfiguration;
-	
+
 	/**
 	 * @param defaultSourceViewerConfiguration
 	 * @param primarySourceViewerConfiguration
+	 * @param preferences
+	 * @param editor
 	 */
-	protected CompositeSourceViewerConfiguration(
-			ISourceViewerConfiguration defaultSourceViewerConfiguration,
-			ISourceViewerConfiguration primarySourceViewerConfiguration) {
-	    this(defaultSourceViewerConfiguration, primarySourceViewerConfiguration, null);
-	}
-
     protected CompositeSourceViewerConfiguration(
             ISourceViewerConfiguration defaultSourceViewerConfiguration,
             ISourceViewerConfiguration primarySourceViewerConfiguration,
-            IPreferenceStore preferences) {
-        super(preferences);
+            IPreferenceStore preferences, ITextEditor editor) {
+        super(preferences, editor);
         this.defaultSourceViewerConfiguration = defaultSourceViewerConfiguration;
         this.primarySourceViewerConfiguration = primarySourceViewerConfiguration;
     }

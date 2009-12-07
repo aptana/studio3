@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common;
 
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -52,6 +54,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
 import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
@@ -61,11 +64,11 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
-    public CommonSourceViewerConfiguration() {
-    }
+    private ITextEditor fTextEditor;
 
-    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
+    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor) {
         super(preferenceStore);
+        fTextEditor = editor;
     }
 
     @Override
@@ -171,6 +174,14 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
             return buf.toString();
         }
         return "\t"; //$NON-NLS-1$
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer) {
+        Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+        targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
+        return targets;
     }
 
     protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,

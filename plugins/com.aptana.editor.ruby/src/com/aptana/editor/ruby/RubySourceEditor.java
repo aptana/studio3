@@ -42,18 +42,16 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 @SuppressWarnings("restriction")
-public class RubySourceEditor extends AbstractThemeableEditor
-{
+public class RubySourceEditor extends AbstractThemeableEditor {
 
-	@Override
-	protected void initializeEditor()
-	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
-				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() }));
+    @Override
+    protected void initializeEditor() {
+        setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
+                Activator.getDefault().getPreferenceStore(),
+                CommonEditorPlugin.getDefault().getPreferenceStore(),
+                EditorsPlugin.getDefault().getPreferenceStore() }));
 
-		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
-		setDocumentProvider(new RubyDocumentProvider());
-
-	}
+        setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
+        setDocumentProvider(new RubyDocumentProvider());
+    }
 }

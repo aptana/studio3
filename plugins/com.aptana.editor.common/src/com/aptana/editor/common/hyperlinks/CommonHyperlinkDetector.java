@@ -32,17 +32,28 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.xml;
+package com.aptana.editor.common.hyperlinks;
+
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class XMLEditor extends AbstractThemeableEditor {
+public class CommonHyperlinkDetector extends AbstractHyperlinkDetector {
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+    public CommonHyperlinkDetector() {
+    }
 
-        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new XMLDocumentProvider());
+    public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
+            boolean canShowMultipleHyperlinks) {
+        ITextEditor textEditor = (ITextEditor) getAdapter(ITextEditor.class);
+        if (region == null || !(textEditor instanceof AbstractThemeableEditor)) {
+            return null;
+        }
+        // TODO
+        return null;
     }
 }

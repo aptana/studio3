@@ -42,7 +42,7 @@ public class HTMLEditor extends AbstractThemeableEditor {
     protected void initializeEditor() {
         super.initializeEditor();
 
-        setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore()));
+        setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new HTMLDocumentProvider());
     }
 }

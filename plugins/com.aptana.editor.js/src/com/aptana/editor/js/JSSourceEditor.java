@@ -41,7 +41,7 @@ public class JSSourceEditor extends AbstractThemeableEditor {
     protected void initializeEditor() {
         super.initializeEditor();
 
-        setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore()));
+        setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new JSDocumentProvider());
     }
 }
