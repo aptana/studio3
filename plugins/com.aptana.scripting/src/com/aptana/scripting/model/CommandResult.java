@@ -1,26 +1,56 @@
 package com.aptana.scripting.model;
 
+import java.io.OutputStream;
+
 public class CommandResult
 {
-	private String _resultText;
+	private String _outputString;
+	private OutputStream _outputStream;
+
+	/**
+	 * CommandResult
+	 */
+	public CommandResult()
+	{
+	}
 	
 	/**
 	 * CommandResult
 	 * 
-	 * @param resultText
+	 * @param output
 	 */
-	public CommandResult(String resultText)
+	public CommandResult(String output)
 	{
-		this._resultText = resultText;
+		this._outputString = output;
 	}
 	
 	/**
-	 * getResultText
+	 * CommandResult
+	 * 
+	 * @param stream
+	 */
+	public CommandResult(OutputStream stream)
+	{
+		this._outputStream = stream;
+	}
+
+	/**
+	 * getOutputStream
 	 * 
 	 * @return
 	 */
-	public String getResultText()
+	public OutputStream getOutputStream()
 	{
-		return this._resultText;
+		return this._outputStream;
+	}
+
+	/**
+	 * getOutputString
+	 * 
+	 * @return
+	 */
+	public String getOutputString()
+	{
+		return this._outputString;
 	}
 }

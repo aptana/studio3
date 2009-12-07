@@ -15,7 +15,8 @@ public enum InputType
 	LEFT_CHAR("left_character"),
 	RIGHT_CHAR("right_character"),
 	DOCUMENT("document"),
-	INPUT_FROM_CONSOLE("input_from_console");
+	INPUT_FROM_CONSOLE("input_from_console"),
+	INPUT_FROM_STREAM("input_from_stream");
 
 	private static final Map<String, InputType> NAME_MAP;
 	private String _name;

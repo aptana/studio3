@@ -18,7 +18,8 @@ public enum OutputType
 	SHOW_AS_HTML("show_as_html"),
 	SHOW_AS_TOOLTIP("show_as_tooltip"),
 	CREATE_NEW_DOCUMENT("create_new_document"),
-	OUTPUT_TO_CONSOLE("output_to_console");
+	OUTPUT_TO_CONSOLE("output_to_console"),
+	OUTPUT_TO_STREAM("output_to_stream");
 
 	private static Map<String, OutputType> NAME_MAP;
 	private String _name;
