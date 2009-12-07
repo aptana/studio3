@@ -3,6 +3,8 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -69,10 +71,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
+		List<Template> templatesList = new LinkedList<Template>();
 		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
-		List<Template> templates = new LinkedList<Template>();
 		for (Snippet snippet : snippetsFromScope) {
-			templates.add(new SnippetTemplate(snippet, contextTypeId));
+			templatesList.add(new SnippetTemplate(snippet, contextTypeId));
 		}
 		
 		TriggerableNode[] commandsFromScope =
@@ -81,12 +83,17 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 			if (triggerableNode instanceof Command) {
 				Command command = (Command) triggerableNode;
 				if (command.getTrigger() != null) {
-					templates.add (new CommandTemplate((Command)triggerableNode, contextTypeId));
+					templatesList.add (new CommandTemplate((Command)triggerableNode, contextTypeId));
 				}
 			}
 		}
-		
-		return templates.toArray(new Template[0]);
+		Collections.sort(templatesList, new Comparator<Template>() {
+			@Override
+			public int compare(Template template1, Template template2) {
+				return template1.getDescription().compareTo(template2.getDescription());
+			}
+		});
+		return templatesList.toArray(new Template[0]);
 	}
 	
 	private static final String SPACES= "\\s*+"; //$NON-NLS-1$
