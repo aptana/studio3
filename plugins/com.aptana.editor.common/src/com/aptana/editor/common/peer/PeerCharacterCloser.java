@@ -51,6 +51,13 @@ public class PeerCharacterCloser implements VerifyKeyListener
 
 		try
 		{
+			// TODO Don't auto-close if we have an open pair!
+			if (length > 0)
+			{
+				wrapSelection(event, document, offset, length);
+				return;
+			}
+
 			final char closingCharacter = getPeerCharacter(event.character);
 			// Check if the next character in source is the closing character (and don't close if it is)!
 			if (offset < document.getLength())
@@ -76,12 +83,25 @@ public class PeerCharacterCloser implements VerifyKeyListener
 				}
 				buffer.append(delim);
 			}
+
 			document.replace(offset, length, buffer.toString());
 		}
 		catch (BadLocationException e)
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	private void wrapSelection(VerifyEvent event, IDocument document, final int offset, final int length)
+			throws BadLocationException
+	{
+		final char closingCharacter = getPeerCharacter(event.character);
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append(event.character);
+		buffer.append(document.get(offset, length));
+		buffer.append(closingCharacter);
+		document.replace(offset, length, buffer.toString());
+		event.doit = false;
 	}
 
 	private char getPeerCharacter(char character)
