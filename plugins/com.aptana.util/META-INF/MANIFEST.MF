@@ -6,6 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.util.UtilPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.util
