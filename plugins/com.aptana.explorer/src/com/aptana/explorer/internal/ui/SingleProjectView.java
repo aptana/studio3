@@ -50,6 +50,8 @@ import com.aptana.filewatcher.FileWatcher;
 public class SingleProjectView extends CommonNavigator
 {
 
+	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
+	
 	private Combo projectCombo;
 	protected IProject selectedProject;
 	private ResourceListener fResourceListener;
