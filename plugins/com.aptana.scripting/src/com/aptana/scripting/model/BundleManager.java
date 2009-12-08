@@ -14,22 +14,22 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.jruby.anno.JRubyMethod;
 
-import com.aptana.scripting.ResourceChangeListener;
+import com.aptana.scripting.ResourceDeltaVisitor;
 import com.aptana.scripting.ScriptingEngine;
 
-public class BundleManager
+public class BundleManager implements IResourceChangeListener
 {
 	static final Menu[] NO_MENUS = new Menu[0];
 	static final Snippet[] NO_SNIPPETS = new Snippet[0];
 	static final Command[] NO_COMMANDS = new Command[0];
 	
-	private static final IResourceChangeListener resourceListener = new ResourceChangeListener();
-	
+	private static final IResourceDeltaVisitor deltaVistor = new ResourceDeltaVisitor();
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Bundles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
@@ -40,6 +40,9 @@ public class BundleManager
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
+
+	private List<Bundle> _bundles;
+	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * getInstance
@@ -56,9 +59,6 @@ public class BundleManager
 
 		return INSTANCE;
 	}
-	private List<Bundle> _bundles;
-	
-	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * BundleManager
@@ -66,7 +66,7 @@ public class BundleManager
 	private BundleManager()
 	{
 		// attach resource change listener so we can track changes to the workspace
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/**
@@ -637,6 +637,22 @@ public class BundleManager
 					}
 				}
 			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
+	 */
+	public void resourceChanged(IResourceChangeEvent event)
+	{
+		try
+		{
+			event.getDelta().accept(deltaVistor);
+		}
+		catch (CoreException e)
+		{
+			// log an error in the error log
 		}
 	}
 	
