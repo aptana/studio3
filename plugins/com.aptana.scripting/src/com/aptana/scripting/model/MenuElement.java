@@ -16,10 +16,6 @@ public class MenuElement extends AbstractBundleElement
 	private List<MenuElement> _children;
 	private String _commandName;
 
-	protected BundleElement _owningBundle;
-
-	protected String _scope;
-	
 	/**
 	 * Snippet
 	 * 
@@ -158,6 +154,31 @@ public class MenuElement extends AbstractBundleElement
 		return result.toArray(new MenuElement[result.size()]);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.AbstractBundleElement#getOwningBundle()
+	 */
+	public BundleElement getOwningBundle()
+	{
+		MenuElement currentMenu = this;
+		BundleElement result = null;
+		
+		while (currentMenu != null)
+		{
+			if (currentMenu._owningBundle != null)
+			{
+				result = currentMenu._owningBundle;
+				break;
+			}
+			else
+			{
+				currentMenu = currentMenu._parent;
+			}
+		}
+		
+		return result;
+	}
+
 	/**
 	 * getParent
 	 * 
@@ -249,7 +270,7 @@ public class MenuElement extends AbstractBundleElement
 	@JRubyMethod(name = "command=")
 	public void setCommandName(String name)
 	{
-		this.addMenu(new MenuElement(name));
+		this._commandName = name;
 	}
 	
 	/**
@@ -271,47 +292,5 @@ public class MenuElement extends AbstractBundleElement
 		}
 		
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
-	}
-
-	/**
-	 * getOwningBundle
-	 * 
-	 * @return
-	 */
-	public BundleElement getOwningBundle()
-	{
-		return this._owningBundle;
-	}
-
-	/**
-	 * getScope
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "scope")
-	public String getScope()
-	{
-		return this._scope;
-	}
-
-	/**
-	 * setOwningBundle
-	 * 
-	 * @param bundle
-	 */
-	void setOwningBundle(BundleElement bundle)
-	{
-		this._owningBundle = bundle;
-	}
-
-	/**
-	 * setScope
-	 * 
-	 * @param scope
-	 */
-	@JRubyMethod(name = "scope=")
-	public void setScope(String scope)
-	{
-		this._scope = scope;
 	}
 }
