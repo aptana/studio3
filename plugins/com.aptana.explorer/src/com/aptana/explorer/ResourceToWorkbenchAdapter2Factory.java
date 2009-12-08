@@ -18,7 +18,13 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.internal.ui.SingleProjectView;
 
-public class AdapterFactory implements IAdapterFactory
+/**
+ * Used to override the font and colors of the tree items in the app explorer to match them theme and the font pref for
+ * the app explorer.
+ * 
+ * @author cwilliams
+ */
+public class ResourceToWorkbenchAdapter2Factory implements IAdapterFactory
 {
 
 	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
