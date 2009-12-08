@@ -8,13 +8,17 @@ import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scope.ScopeSelector;
 
-public class MenuElement extends AbstractElement
+public class MenuElement extends AbstractBundleElement
 {
 	private static final String SEPARATOR_TEXT = "-";
 	
 	private MenuElement _parent;
 	private List<MenuElement> _children;
 	private String _commandName;
+
+	protected BundleElement _owningBundle;
+
+	protected String _scope;
 	
 	/**
 	 * Snippet
@@ -267,5 +271,47 @@ public class MenuElement extends AbstractElement
 		}
 		
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+	}
+
+	/**
+	 * getOwningBundle
+	 * 
+	 * @return
+	 */
+	public BundleElement getOwningBundle()
+	{
+		return this._owningBundle;
+	}
+
+	/**
+	 * getScope
+	 * 
+	 * @return
+	 */
+	@JRubyMethod(name = "scope")
+	public String getScope()
+	{
+		return this._scope;
+	}
+
+	/**
+	 * setOwningBundle
+	 * 
+	 * @param bundle
+	 */
+	void setOwningBundle(BundleElement bundle)
+	{
+		this._owningBundle = bundle;
+	}
+
+	/**
+	 * setScope
+	 * 
+	 * @param scope
+	 */
+	@JRubyMethod(name = "scope=")
+	public void setScope(String scope)
+	{
+		this._scope = scope;
 	}
 }

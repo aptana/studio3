@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.jruby.anno.JRubyMethod;
 
-public class BundleElement
+public class BundleElement extends AbstractElement
 {
-	private String _path;
-	private String _displayName;
 	private String _author;
 	private String _copyright;
 	private String _description;
@@ -27,7 +25,7 @@ public class BundleElement
 	 */
 	public BundleElement(String path)
 	{
-		this._path = path;
+		super(path);
 	}
 
 	/**
@@ -238,17 +236,6 @@ public class BundleElement
 	{
 		return this._description;
 	}
-	
-	/**
-	 * getDisplayName
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "display_name")
-	public String getDisplayName()
-	{
-		return this._displayName;
-	}
 
 	/**
 	 * getGitRepo
@@ -298,17 +285,6 @@ public class BundleElement
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * getPath
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "path")
-	public String getPath()
-	{
-		return this._path;
 	}
 
 	/**
@@ -439,17 +415,6 @@ public class BundleElement
 	}
 
 	/**
-	 * setDisplayName
-	 * 
-	 * @param displayName
-	 */
-	@JRubyMethod(name = "display_name=")
-	public void setDisplayName(String displayName)
-	{
-		this._displayName = displayName;
-	}
-
-	/**
 	 * setGitRepo
 	 * 
 	 * @param gitRepo
@@ -487,10 +452,8 @@ public class BundleElement
 	 * 
 	 * @return
 	 */
-	public String toSource()
+	public void toSource(SourcePrinter printer)
 	{
-		SourcePrinter printer = new SourcePrinter();
-		
 		// open bundle
 		printer.printWithIndent("bundle \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
@@ -531,7 +494,5 @@ public class BundleElement
 		
 		// close bundle
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
-		
-		return printer.toString();
 	}
 }
