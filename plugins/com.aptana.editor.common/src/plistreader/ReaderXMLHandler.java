@@ -1,13 +1,13 @@
 package plistreader;
 
-import org.xml.sax.helpers.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import java.util.Vector;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.text.*;
 import java.util.Date;
+import java.util.Vector;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * <p>
@@ -40,7 +40,7 @@ import java.util.Date;
  * @author Gie Spaepen
  * @version 1.3
  */
-public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
+public class ReaderXMLHandler extends DefaultHandler
 {
 
 	/**
@@ -78,6 +78,7 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	/**
 	 * Vector to hold the different data nodes
 	 */
+	@SuppressWarnings("rawtypes")
 	private Vector storageObjects = new Vector();
 
 	/**
@@ -115,43 +116,43 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	public void startElement(String _URI, String _local, String _raw, Attributes atts)
 	{
 
-		if (_local.equals("key"))
+		if (_local.equals("key")) //$NON-NLS-1$
 		{
 			isKeyLoaded = true;
 		} // Handle a key node
-		else if (_local.equals("string"))
+		else if (_local.equals("string")) //$NON-NLS-1$
 		{
 			isStringLoaded = true;
 		} // Handle a string node
-		else if (_local.equals("date"))
+		else if (_local.equals("date")) //$NON-NLS-1$
 		{
 			isDateLoaded = true;
 		} // Handle a date node
-		else if (_local.equals("data"))
+		else if (_local.equals("data")) //$NON-NLS-1$
 		{
 			isDataLoaded = true;
 		} // Handle a data node
-		else if (_local.equals("integer"))
+		else if (_local.equals("integer")) //$NON-NLS-1$
 		{
 			isIntegerLoaded = true;
 		} // Handle an integer node
-		else if (_local.equals("real"))
+		else if (_local.equals("real")) //$NON-NLS-1$
 		{
 			isRealLoaded = true;
 		} // Handle a real node
-		else if (_local.equals("true"))
+		else if (_local.equals("true")) //$NON-NLS-1$
 		{
 			setProperty(tempKey, new Boolean(_local));
 		} // Handle a true boolean
-		else if (_local.equals("false"))
+		else if (_local.equals("false")) //$NON-NLS-1$
 		{
 			setProperty(tempKey, new Boolean(_local));
 		} // Handle a false boolean
-		else if (_local.equals("dict"))
+		else if (_local.equals("dict")) //$NON-NLS-1$
 		{
 			levelUp(false);
 		} // Handle a dictionary node
-		else if (_local.equals("array"))
+		else if (_local.equals("array")) //$NON-NLS-1$
 		{
 			levelUp(true);
 		} // Handle an array
@@ -223,7 +224,7 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	{
 		try
 		{
-			return new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").parse(value);
+			return new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'").parse(value); //$NON-NLS-1$
 		}
 		catch (ParseException ex)
 		{
@@ -250,35 +251,35 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	 */
 	public void endElement(String _URI, String _local, String _raw)
 	{
-		if (_local.equals("key"))
+		if (_local.equals("key")) //$NON-NLS-1$
 		{
 			isKeyLoaded = false;
 		} // Handle a key
-		else if (_local.equals("string"))
+		else if (_local.equals("string")) //$NON-NLS-1$
 		{
 			isStringLoaded = false;
 		} // Handle a string
-		else if (_local.equals("integer"))
+		else if (_local.equals("integer")) //$NON-NLS-1$
 		{
 			isIntegerLoaded = false;
 		} // Handle an integer
-		else if (_local.equals("real"))
+		else if (_local.equals("real")) //$NON-NLS-1$
 		{
 			isRealLoaded = false;
 		}
-		else if (_local.equals("date"))
+		else if (_local.equals("date")) //$NON-NLS-1$
 		{
 			isDateLoaded = false;
 		} // Handle a date
-		else if (_local.equals("data"))
+		else if (_local.equals("data")) //$NON-NLS-1$
 		{
 			isDataLoaded = false;
 		} // Handle data
-		else if (_local.equals("dict"))
+		else if (_local.equals("dict")) //$NON-NLS-1$
 		{
 			levelDown(false);
 		} // Handle a dict
-		else if (_local.equals("array"))
+		else if (_local.equals("array")) //$NON-NLS-1$
 		{
 			levelDown(true);
 		} // Handle an array
@@ -299,13 +300,13 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	public InputSource resolveEntity(String _pubId, String _sysId)
 	{
 		// Detect the DOCTYPE line from the plist file
-		if (_pubId.equals("-//Apple Computer//DTD PLIST 1.0//EN") || _pubId.equals("-//Apple//DTD PLIST 1.0//EN")
-				|| _pubId.contains("//DTD PLIST 1.0//EN"))
+		if (_pubId.equals("-//Apple Computer//DTD PLIST 1.0//EN") || _pubId.equals("-//Apple//DTD PLIST 1.0//EN") //$NON-NLS-1$ //$NON-NLS-2$
+				|| _pubId.contains("//DTD PLIST 1.0//EN")) //$NON-NLS-1$
 		{
-			return new InputSource(getClass().getResourceAsStream("plist.dtd"));
+			return new InputSource(getClass().getResourceAsStream("plist.dtd")); //$NON-NLS-1$
 		}
 		// Pro forma
-		return new InputSource("");
+		return new InputSource(""); //$NON-NLS-1$
 	}
 
 	/**
@@ -318,6 +319,7 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	 * @param _value
 	 *            Object
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void setProperty(String _key, Object _value)
 	{
 		// Get the last element from the data storage
@@ -367,6 +369,7 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	 * @param _array
 	 *            boolean - new level is an array level (true) or a dict level (false)
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void levelUp(boolean _array)
 	{
 		// Handle arrays
@@ -403,6 +406,7 @@ public class ReaderXMLHandler extends DefaultHandler implements EntityResolver
 	 * @param _array
 	 *            boolean - True for arrays and false for dictionaries.
 	 */
+	@SuppressWarnings("rawtypes")
 	private void levelDown(boolean _array)
 	{
 		// Determine if there's more than one element
