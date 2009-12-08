@@ -112,6 +112,9 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 			}
 
 			this._bundlesByPath.put(bundle.getPath(), bundle);
+			
+			// fire add event
+			this.fireElementAddedEvent(bundle);
 		}
 	}
 
@@ -781,12 +784,12 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void removeBundle(BundleElement bundle)
 	{
-		if (bundle != null)
+		if (this._bundles != null && bundle != null)
 		{
-			if (this._bundles != null)
-			{
-				this._bundles.remove(bundle);
-			}
+			this._bundles.remove(bundle);
+			
+			// fire remove event
+			this.fireElementDeletedEvent(bundle);
 		}
 	}
 	
@@ -797,12 +800,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void removeBundle(String bundleFolder)
 	{
-		BundleElement bundle = this.getBundleFromPath(bundleFolder);
-
-		if (bundle != null)
-		{
-			this.removeBundle(bundle);
-		}
+		this.removeBundle(this.getBundleFromPath(bundleFolder));
 	}
 	
 	/**
