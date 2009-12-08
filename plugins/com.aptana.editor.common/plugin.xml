@@ -52,4 +52,19 @@
          </context>
       </target>
    </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <theme
+            id="com.aptana.editor.common.theme"
+            name="%customThemeName">
+         <fontOverride
+               id="org.eclipse.jface.textfont"
+               value="Inconsolata-regular-14">
+         </fontOverride>
+         <fontOverride
+               id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
+               value="Inconsolata-regular-14">
+         </fontOverride>
+      </theme>
+   </extension>
 </plugin>

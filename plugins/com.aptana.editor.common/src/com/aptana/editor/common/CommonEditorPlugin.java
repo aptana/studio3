@@ -28,7 +28,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
 
-    private static final String TEMPLATES = PLUGIN_ID + ".templates"; //$NON-NLS-1$
+	private static final String TEMPLATES = PLUGIN_ID + ".templates"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;
@@ -36,7 +36,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private ColorManager _colorManager;
 
 	private Map<String, Image> images = new HashMap<String, Image>();
-    private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
+	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 
 	/**
 	 * The constructor
@@ -53,6 +53,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+
+		new EditorFontOverride().schedule();
 	}
 
 	/*
@@ -116,7 +118,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
 	}
-	
+
 	public static void logWarning(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
@@ -130,38 +132,48 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return reg;
 	}
 
-    public Image getImage(String path) {
-        Image image = images.get(path);
-        if (image == null) {
-            ImageDescriptor id = getImageDescriptor(path);
-            if (id == null) {
-                return null;
-            }
+	public Image getImage(String path)
+	{
+		Image image = images.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+			if (id == null)
+			{
+				return null;
+			}
 
-            image = id.createImage();
-            images.put(path, image);
-        }
-        return image;
-    }
+			image = id.createImage();
+			images.put(path, image);
+		}
+		return image;
+	}
 
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
-    public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry) {
-        if (fTemplateStoreMap == null) {
-            fTemplateStoreMap = new HashMap<ContextTypeRegistry, ContributionTemplateStore>();
-        }
-        ContributionTemplateStore store = fTemplateStoreMap.get(contextTypeRegistry);
-        if (store == null) {
-            store = new ContributionTemplateStore(contextTypeRegistry, getPreferenceStore(), TEMPLATES);
-            try {
-                store.load();
-                fTemplateStoreMap.put(contextTypeRegistry, store);
-            } catch (IOException e) {
-                logError(e.getMessage(), e);
-            }
-        }
-        return store;
-    }
+	public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry)
+	{
+		if (fTemplateStoreMap == null)
+		{
+			fTemplateStoreMap = new HashMap<ContextTypeRegistry, ContributionTemplateStore>();
+		}
+		ContributionTemplateStore store = fTemplateStoreMap.get(contextTypeRegistry);
+		if (store == null)
+		{
+			store = new ContributionTemplateStore(contextTypeRegistry, getPreferenceStore(), TEMPLATES);
+			try
+			{
+				store.load();
+				fTemplateStoreMap.put(contextTypeRegistry, store);
+			}
+			catch (IOException e)
+			{
+				logError(e.getMessage(), e);
+			}
+		}
+		return store;
+	}
 }
