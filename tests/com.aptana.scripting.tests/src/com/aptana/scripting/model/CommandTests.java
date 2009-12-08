@@ -32,7 +32,7 @@ public class CommandTests
 		assertNotNull(result);
 		
 		// return string result
-		return result.getResultText();
+		return result.getOutputString();
 	}
 	
 	@Test

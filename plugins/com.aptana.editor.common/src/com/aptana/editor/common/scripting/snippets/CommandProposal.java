@@ -34,9 +34,9 @@ public class CommandProposal extends SnippetTemplateProposal {
 			CommandResult commandResult = command.execute(new CommandContext());
 			try {
 				OutputType output = OutputType.valueOf(command.getOutputType().toUpperCase());
-				System.out.println(commandResult.getResultText());
+				System.out.println(commandResult.getOutputString());
 			} catch (IllegalArgumentException iae) {
-				System.err.println(commandResult.getResultText());
+				System.err.println(commandResult.getOutputString());
 			}
 		}
 	}
