@@ -138,7 +138,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * 
 	 * @param element
 	 */
-	protected void fireElementAddedEvent(AbstractElement element)
+	void fireElementAddedEvent(AbstractElement element)
 	{
 		if (this._elementListeners != null)
 		{
@@ -154,7 +154,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * 
 	 * @param element
 	 */
-	protected void fireElementDeletedEvent(AbstractElement element)
+	void fireElementDeletedEvent(AbstractElement element)
 	{
 		if (this._elementListeners != null)
 		{
@@ -170,7 +170,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * 
 	 * @param element
 	 */
-	protected void fireElementModifiedEvent(AbstractElement element)
+	void fireElementModifiedEvent(AbstractElement element)
 	{
 		if (this._elementListeners != null)
 		{
@@ -784,10 +784,8 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void removeBundle(BundleElement bundle)
 	{
-		if (this._bundles != null && bundle != null)
+		if (this._bundles != null && this._bundles.remove(bundle))
 		{
-			this._bundles.remove(bundle);
-			
 			// fire remove event
 			this.fireElementDeletedEvent(bundle);
 		}
