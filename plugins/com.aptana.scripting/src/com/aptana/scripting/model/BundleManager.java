@@ -41,13 +41,15 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
 	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
-	
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$"); //$NON-NLS-1$
 	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets)/[^/]+\\.rb$"); //$NON-NLS-1$
 	private static final Pattern USER_BUNDLE_PATTERN;
 	private static final Pattern USER_FILE_PATTERN;
 	
 	private static BundleManager INSTANCE;
+	
+	private List<Bundle> _bundles;
+	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * getInstance
@@ -64,9 +66,6 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 
 		return INSTANCE;
 	}
-	private List<Bundle> _bundles;
-
-	private Map<String, Bundle> _bundlesByPath;
 
 	/**
 	 * static constructor
