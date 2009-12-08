@@ -6,6 +6,7 @@ module RadRails
   class Menu
     def initialize(name)
       @jobj = com.aptana.scripting.model.MenuElement.new($fullpath)
+      @jobj.command_name = name;
       @jobj.display_name = name;
     end
     
