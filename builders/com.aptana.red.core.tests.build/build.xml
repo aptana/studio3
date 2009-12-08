@@ -97,7 +97,7 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
 		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="${baseLocation}/configuration/.settings">
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
