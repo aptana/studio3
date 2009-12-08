@@ -26,6 +26,7 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.junit4" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="com.aptana.red.core" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
