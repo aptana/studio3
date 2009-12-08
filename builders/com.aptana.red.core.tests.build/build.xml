@@ -161,7 +161,7 @@
 	<target name="test" depends="build">
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${p2.artifact.repo}" />
+			<param name="p2.repo" value="${p2.repo.dir}" />
 		</antcall>
 		<!-- Add Eclipse Testing Framework -->
 		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/test-framework" />
