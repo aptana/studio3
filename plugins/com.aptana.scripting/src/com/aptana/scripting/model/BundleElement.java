@@ -46,6 +46,9 @@ public class BundleElement extends AbstractElement
 			this._commands.add(command);
 
 			command.setOwningBundle(this);
+			
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(command);
 		}
 	}
 	
@@ -67,6 +70,9 @@ public class BundleElement extends AbstractElement
 			this._menus.add(menu);
 			
 			menu.setOwningBundle(this);
+			
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(menu);
 		}
 	}
 
@@ -88,6 +94,9 @@ public class BundleElement extends AbstractElement
 			this._snippets.add(snippet);
 			
 			snippet.setOwningBundle(this);
+			
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(snippet);
 		}
 	}
 
@@ -347,9 +356,10 @@ public class BundleElement extends AbstractElement
 	@JRubyMethod(name = "remove_command")
 	public void removeCommand(CommandElement command)
 	{
-		if (this._commands != null)
+		if (this._commands != null && this._commands.remove(command))
 		{
-			this._commands.remove(command);
+			// fire delete event
+			BundleManager.getInstance().fireElementDeletedEvent(command);
 		}
 	}
 	
@@ -361,9 +371,10 @@ public class BundleElement extends AbstractElement
 	@JRubyMethod(name = "remove_menu")
 	public void removeMenu(MenuElement menu)
 	{
-		if (this._menus != null)
+		if (this._menus != null && this._menus.remove(menu))
 		{
-			this._menus.remove(menu);
+			// fire delete event
+			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
 	}
 	
@@ -375,9 +386,10 @@ public class BundleElement extends AbstractElement
 	@JRubyMethod(name = "remove_snippet")
 	public void removeSnippet(SnippetElement snippet)
 	{
-		if (this._snippets != null)
+		if (this._snippets != null && this._snippets.remove(snippet))
 		{
-			this._snippets.remove(snippet);
+			// fire delete event
+			BundleManager.getInstance().fireElementDeletedEvent(snippet);
 		}
 	}
 	
