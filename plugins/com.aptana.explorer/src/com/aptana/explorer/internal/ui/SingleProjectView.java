@@ -36,6 +36,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
@@ -160,6 +162,26 @@ public class SingleProjectView extends CommonNavigator
 		data2.left = new FormAttachment(0, 0);
 		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
+
+		// Hook up to themes
+		getCommonViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				new IPreferenceChangeListener()
+				{
+
+					@Override
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+						{
+							getCommonViewer().refresh();
+							getCommonViewer().getTree().setBackground(
+									CommonEditorPlugin.getDefault().getColorManager().getColor(
+											ThemeUtil.getActiveTheme().getBackground()));
+						}
+					}
+				});
 	}
 
 	private IProject[] createProjectCombo(Composite parent)

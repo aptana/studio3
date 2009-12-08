@@ -7,6 +7,8 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 
+import com.aptana.editor.common.theme.ThemeUtil;
+
 public class AdapterFactory implements IAdapterFactory
 {
 
@@ -24,13 +26,14 @@ public class AdapterFactory implements IAdapterFactory
 				@Override
 				public RGB getForeground(Object element)
 				{
-					return null;
+					return ThemeUtil.getActiveTheme().getForeground();
 				}
 
 				@Override
 				public FontData getFont(Object element)
 				{
-					// FIXME We need to listen for changes to this font and force a redraw of the app explorer (and maybe any other views of resources)!
+					// FIXME We need to listen for changes to this font and force a redraw of the app explorer (and
+					// maybe any other views of resources)!
 					FontDescriptor fd = JFaceResources.getFontDescriptor(APP_EXPLORER_FONT_NAME);
 					if (fd == null)
 					{
@@ -42,7 +45,6 @@ public class AdapterFactory implements IAdapterFactory
 				@Override
 				public RGB getBackground(Object element)
 				{
-					// TODO See if we can pick up the theme colors!
 					return null;
 				}
 			};
