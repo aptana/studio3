@@ -167,7 +167,7 @@
 		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/test-framework" />
 		<antcall target="run.director">
 			<param name="p2.installIU" value="org.eclipse.test.feature.group" />
-			<param name="p2.repo" value="${baseLocation}/test-framework" />
+			<param name="p2.repo" value="file:${baseLocation}/test-framework/eclipse" />
 		</antcall>
 
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
@@ -182,7 +182,7 @@
 			</instr>
 		</emma>
 
-		<property name="library-file" value="${baseLocation}/dropins/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
+		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.util.tests" />
