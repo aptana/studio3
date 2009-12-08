@@ -48,6 +48,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	
 	private static BundleManager INSTANCE;
 	
+	private List<ElementChangeListener> _elementListeners;
 	private List<BundleElement> _bundles;
 	private Map<String, BundleElement> _bundlesByPath;
 
@@ -114,6 +115,69 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 		}
 	}
 
+	/**
+	 * addElementChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void addElementChangeListener(ElementChangeListener listener)
+	{
+		if (this._elementListeners == null)
+		{
+			this._elementListeners = new ArrayList<ElementChangeListener>();
+		}
+		
+		this._elementListeners.add(listener);
+	}
+	
+	/**
+	 * fireElementAddedEvent
+	 * 
+	 * @param element
+	 */
+	protected void fireElementAddedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.elementAdded(element);
+			}
+		}
+	}
+	
+	/**
+	 * fireElementDeletedEvent
+	 * 
+	 * @param element
+	 */
+	protected void fireElementDeletedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.elementDeleted(element);
+			}
+		}
+	}
+	
+	/**
+	 * fireElementModifiedEvent
+	 * 
+	 * @param element
+	 */
+	protected void fireElementModifiedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.elementModified(element);
+			}
+		}
+	}
+	
 	/**
 	 * getBuiltinsLoadPath
 	 * 
@@ -738,6 +802,19 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 		if (bundle != null)
 		{
 			this.removeBundle(bundle);
+		}
+	}
+	
+	/**
+	 * removeElementChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void removeElementChangeListener(ElementChangeListener listener)
+	{
+		if (this._elementListeners != null)
+		{
+			this._elementListeners.remove(listener);
 		}
 	}
 	
