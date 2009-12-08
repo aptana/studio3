@@ -1,15 +1,11 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
-import org.junit.Test;
-
-public class ScopeSelectorTests
+public class ScopeSelectorTests extends TestCase
 {
-	@Test()
-	public void parseSimpleName()
+	
+	public void testParseSimpleName()
 	{
 		String scope = "source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -25,8 +21,8 @@ public class ScopeSelectorTests
 		assertTrue(root instanceof NameSelector);
 	}
 
-	@Test()
-	public void parseSimpleAndSelector()
+	
+	public void testParseSimpleAndSelector()
 	{
 		String scope = "text.html source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -47,8 +43,8 @@ public class ScopeSelectorTests
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
 	
-	@Test()
-	public void parseSimpleOrSelector()
+	
+	public void testParseSimpleOrSelector()
 	{
 		String scope = "text.html, source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -69,8 +65,8 @@ public class ScopeSelectorTests
 		assertTrue(orSelector.getRightChild() instanceof NameSelector);
 	}
 
-	@Test()
-	public void parseMultiAndSelector()
+	
+	public void testParseMultiAndSelector()
 	{
 		String scope = "text.html source.ruby string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -91,8 +87,8 @@ public class ScopeSelectorTests
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
 	
-	@Test()
-	public void parseMultiOrSelector()
+	
+	public void testParseMultiOrSelector()
 	{
 		String scope = "text.html, source.ruby, string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -114,8 +110,8 @@ public class ScopeSelectorTests
 	}
 	
 
-	@Test()
-	public void parseMultiMixedSelector()
+	
+	public void testParseMultiMixedSelector()
 	{
 		String scope = "text.html source.ruby, text.erb source.ruby, source.ruby string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);

@@ -1,14 +1,11 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
-import org.junit.Test;
-
-public class NameSelectorTests
+public class NameSelectorTests extends TestCase
 {
-	@Test
-	public void nameIsPrefix()
+
+	public void testNameIsPrefix()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -16,8 +13,8 @@ public class NameSelectorTests
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsIdentical()
+
+	public void testNameIsIdentical()
 	{
 		NameSelector name = new NameSelector("source.ruby");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -25,8 +22,8 @@ public class NameSelectorTests
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsPartial()
+
+	public void testNameIsPartial()
 	{
 		NameSelector name = new NameSelector("sourc");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -34,8 +31,8 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsEmpty()
+
+	public void testNameIsEmpty()
 	{
 		NameSelector name = new NameSelector("");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -43,8 +40,8 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void scopeIsEmpty()
+
+	public void testScopeIsEmpty()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -52,8 +49,8 @@ public class NameSelectorTests
 		assertFalse(selector.matches(""));
 	}
 	
-	@Test
-	public void nameIsNull()
+
+	public void testNameIsNull()
 	{
 		NameSelector name = new NameSelector(null);
 		ScopeSelector selector = new ScopeSelector(name);
@@ -61,8 +58,8 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void scopeIsNull()
+
+	public void testScopeIsNull()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);

@@ -1,87 +1,74 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
+import junit.framework.TestCase;
 
 
-public class AndSelectorTests
+public class AndSelectorTests extends TestCase
 {
-	@Test
-	public void namesArePrefixes()
+	public void testNamesArePrefixes()
 	{
 		ScopeSelector selector = new ScopeSelector("source string.quoted");
 		
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void prefixThenExact()
+	public void testPrefixThenExact()
 	{
 		ScopeSelector selector = new ScopeSelector("source string.quoted.double.ruby");
 		
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void exactThenPrefix()
+	public void testExactThenPrefix()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted");
 		
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void namesAreExact()
+	public void testNamesAreExact()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void firstNonMatching()
+	public void testFirstNonMatching()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		
 		assertFalse(selector.matches("source.php string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void secondNonMatching()
+	public void testSecondNonMatching()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		
 		assertFalse(selector.matches("source.ruby string.quoted.double.php"));
 	}
 	
-	@Test
-	public void emptySelector()
+	public void testEmptySelector()
 	{
 		ScopeSelector selector = new ScopeSelector("");
 		
 		assertFalse(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void emptyScope()
+	public void testEmptyScope()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		
 		assertFalse(selector.matches(""));
 	}
 	
-	@Test
-	public void nullSelector()
+	public void testNullSelector()
 	{
 		ScopeSelector selector = new ScopeSelector((String) null);
 		
 		assertFalse(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void nullScope()
+	public void testNullScope()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 		

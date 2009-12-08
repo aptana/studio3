@@ -1,14 +1,11 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
-import org.junit.Test;
-
-public class OrSelectorTests
+public class OrSelectorTests extends TestCase
 {
-	@Test
-	public void prefixThenNonMatch()
+	
+	public void testPrefixThenNonMatch()
 	{
 		ScopeSelector selector = new ScopeSelector("source, string.quoted.single.ruby");
 
@@ -16,8 +13,8 @@ public class OrSelectorTests
 		assertFalse(selector.matches("string.quoted.double.ruby"));
 	}
 
-	@Test
-	public void nonMatchThenPrefix()
+	
+	public void testNonMatchThenPrefix()
 	{
 		ScopeSelector selector = new ScopeSelector("source.php, string.quoted");
 
@@ -25,8 +22,8 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	@Test
-	public void namesArePrefixes()
+	
+	public void testNamesArePrefixes()
 	{
 		ScopeSelector selector = new ScopeSelector("source, string.quoted");
 
@@ -34,8 +31,8 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	@Test
-	public void exactThenNonMatch()
+	
+	public void testExactThenNonMatch()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.single.ruby");
 
@@ -43,8 +40,8 @@ public class OrSelectorTests
 		assertFalse(selector.matches("string.quoted.double.ruby"));
 	}
 
-	@Test
-	public void nonMatchThenExact()
+	
+	public void testNonMatchThenExact()
 	{
 		ScopeSelector selector = new ScopeSelector("source.php, string.quoted.double.ruby");
 
@@ -52,8 +49,8 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 
-	@Test
-	public void namesAreExact()
+	
+	public void testNamesAreExact()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.double.ruby");
 
@@ -61,8 +58,8 @@ public class OrSelectorTests
 		assertTrue(selector.matches("string.quoted.double.ruby"));
 	}
 	
-	@Test
-	public void mixedMatch()
+	
+	public void testMixedMatch()
 	{
 		ScopeSelector selector = new ScopeSelector("source.ruby string, source.php string");
 		

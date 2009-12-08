@@ -1,17 +1,20 @@
 package com.aptana.scope;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-@RunWith(Suite.class)
-@SuiteClasses({
-	ScopeSelectorTests.class,
-	NameSelectorTests.class,
-	AndSelectorTests.class,
-	OrSelectorTests.class
-})
 public class AllTests
 {
 
+	public static Test suite()
+	{
+		TestSuite suite = new TestSuite("Tests for com.aptana.scripting");
+		// $JUnit-BEGIN$
+		suite.addTestSuite(ScopeSelectorTests.class);
+		suite.addTestSuite(NameSelectorTests.class);
+		suite.addTestSuite(AndSelectorTests.class);
+		suite.addTestSuite(OrSelectorTests.class);
+		// $JUnit-END$
+		return suite;
+	}
 }
