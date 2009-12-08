@@ -164,7 +164,11 @@
 			<param name="p2.repo" value="${p2.artifact.repo}" />
 		</antcall>
 		<!-- Add Eclipse Testing Framework -->
-		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/dropins" />
+		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/test-framework" />
+		<antcall target="run.director">
+			<param name="p2.installIU" value="org.eclipse.test.feature.group" />
+			<param name="p2.repo" value="${baseLocation}/test-framework" />
+		</antcall>
 
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.4.2.v200902111700/plugin_customization.ini">
