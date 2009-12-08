@@ -16,7 +16,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		try
 		{
 			prefs.putBoolean(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING, true);
-			prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, "128,128,128");
+			prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, "128,128,128"); //$NON-NLS-1$
 			prefs.flush();
 		}
 		catch (BackingStoreException e)

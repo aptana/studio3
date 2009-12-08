@@ -3,8 +3,6 @@ package com.aptana.editor.common.theme;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.List;
@@ -33,12 +31,12 @@ public class TextmateImporter
 	/**
 	 * Property names used in textmate plist files.
 	 */
-	private static final String NAME = "name";
-	private static final String SCOPE = "scope";
-	private static final String FONT_STYLE = "fontStyle";
-	private static final String BACKGROUND = "background";
-	private static final String FOREGROUND = "foreground";
-	private static final String SETTINGS = "settings";
+	private static final String NAME = "name"; //$NON-NLS-1$
+	private static final String SCOPE = "scope"; //$NON-NLS-1$
+	private static final String FONT_STYLE = "fontStyle"; //$NON-NLS-1$
+	private static final String BACKGROUND = "background"; //$NON-NLS-1$
+	private static final String FOREGROUND = "foreground"; //$NON-NLS-1$
+	private static final String SETTINGS = "settings"; //$NON-NLS-1$
 
 	public TextmateImporter()
 	{
@@ -54,7 +52,6 @@ public class TextmateImporter
 	{
 		try
 		{
-			// TODO Auto save to theme list?
 			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), convertToProperties(file));
 		}
 		catch (Exception e)
@@ -62,15 +59,6 @@ public class TextmateImporter
 			CommonEditorPlugin.logError(e);
 		}
 		return null;
-	}
-
-	public static void main(String[] args) throws PlistReaderException, IOException
-	{
-		Properties radRailsProps = TextmateImporter.convertToProperties(new File(
-				"/Users/cwilliams/Desktop/Bespin.tmTheme"));
-		FileWriter writer = new FileWriter(
-				"/Users/cwilliams/repos/red_core/plugins/com.aptana.editor.common/themes/bespin.properties");
-		radRailsProps.store(writer, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -107,7 +95,7 @@ public class TextmateImporter
 				else
 				{
 					String tokenName = (String) token.getProperty(NAME);
-					CommonEditorPlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName));
+					CommonEditorPlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName)); //$NON-NLS-1$
 					continue;
 				}
 			}
@@ -135,7 +123,7 @@ public class TextmateImporter
 					}
 				}
 			}
-			StringTokenizer tokenizer = new StringTokenizer(scope, ",");
+			StringTokenizer tokenizer = new StringTokenizer(scope, ","); //$NON-NLS-1$
 			while (tokenizer.hasMoreTokens())
 			{
 				radRailsProps.put(tokenizer.nextToken().trim(), value.toString());

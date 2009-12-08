@@ -6,7 +6,6 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.team.core.history.IFileHistory;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.provider.FileHistory;
@@ -16,7 +15,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
 
-public class GitFileHistory extends FileHistory implements IFileHistory
+public class GitFileHistory extends FileHistory
 {
 
 	private IResource resource;
