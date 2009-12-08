@@ -28,7 +28,7 @@ module RadRails
     end
     
     def input=(input)
-      @jobj.input = input.to_s
+      @jobj.input_type = input.to_s
     end
     
     def invoke(&block)
@@ -63,7 +63,7 @@ module RadRails
     end
     
     def output=(output)
-      @jobj.output = output.to_s
+      @jobj.output_type = output.to_s
     end
     
     def path

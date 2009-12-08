@@ -404,7 +404,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 		this.loadProjectBundles();
 		this.loadUserBundles();
 		
-		this.showBundles();
+		//this.showBundles();
 	}
 	
 	/**
