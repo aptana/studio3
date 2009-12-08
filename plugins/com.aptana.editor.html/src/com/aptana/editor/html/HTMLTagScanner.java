@@ -84,7 +84,7 @@ public class HTMLTagScanner extends RuleBasedScanner {
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		
-		rules.add(new RegexpRule("[a-zA-Z0-9]+=", ThemeUtil.getToken("entity.other.attribute-name.html"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("[a-zA-Z0-9\\-]+=", ThemeUtil.getToken("entity.other.attribute-name.html"))); //$NON-NLS-1$ //$NON-NLS-2$
 		WordRule wordRule = new WordRule(new WordDetector(), ThemeUtil.getToken("entity.name.tag.inline.any.html")); //$NON-NLS-1$
 
 		// script tag
