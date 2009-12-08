@@ -102,11 +102,13 @@
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
 		</delete>
+		<!--
 		<delete verbose="true">
 			<fileset dir="${buildDirectory}/plugins">
 				<include name="**/*" />
 			</fileset>
 		</delete>
+		-->
 		<!-- Copy test plugins into plugins dir -->
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="${buildDirectory}/tests">
@@ -114,10 +116,12 @@
 			</fileset>
 		</copy>
 		<!-- Install Red Core feature -->
+		<!--
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
 			<param name="p2.repo" value="${red-core.p2.repo}" />
 		</antcall>
+		-->
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
