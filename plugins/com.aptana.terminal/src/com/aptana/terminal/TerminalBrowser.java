@@ -74,7 +74,7 @@ public class TerminalBrowser
 					try
 					{
 						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-						Scheme currentScheme = bindingService.getBindingManager().getActiveScheme();
+						Scheme currentScheme = bindingService.getActiveScheme();
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
 						
 						// NOTE: During debugging I saw two activation events in a row with no
@@ -85,7 +85,7 @@ public class TerminalBrowser
 						{
 							oldScheme = currentScheme;
 						}
-						
+						// FIXME This getBidningManager method doesn't exist in 3.4!
 						bindingService.getBindingManager().setActiveScheme(scheme);
 					}
 					catch (NotDefinedException e)
