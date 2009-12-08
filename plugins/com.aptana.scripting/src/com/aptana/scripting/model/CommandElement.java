@@ -16,7 +16,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptingEngine;
 
-public class Command extends TriggerableNode
+public class CommandElement extends TriggerableElement
 {
 	private String _invoke;
 	private RubyProc _invokeBlock;
@@ -29,7 +29,7 @@ public class Command extends TriggerableNode
 	 * 
 	 * @param path
 	 */
-	public Command(String path)
+	public CommandElement(String path)
 	{
 		super(path);
 		

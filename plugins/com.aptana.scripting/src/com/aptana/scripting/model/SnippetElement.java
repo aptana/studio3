@@ -2,7 +2,7 @@ package com.aptana.scripting.model;
 
 import org.jruby.anno.JRubyMethod;
 
-public class Snippet extends TriggerableNode
+public class SnippetElement extends TriggerableElement
 {
 	private String _expansion;
 
@@ -11,7 +11,7 @@ public class Snippet extends TriggerableNode
 	 * 
 	 * @param name
 	 */
-	public Snippet(String path)
+	public SnippetElement(String path)
 	{
 		super(path);
 	}

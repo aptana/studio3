@@ -20,11 +20,11 @@ public class CommandTests
 		
 		// load bundle
 		manager.processBundle(bundleFile, false);
-		Bundle bundle = manager.getBundleFromPath(bundleFile.getAbsolutePath());
+		BundleElement bundle = manager.getBundleFromPath(bundleFile.getAbsolutePath());
 		assertNotNull(bundle);
 
 		// get command
-		Command command = bundle.getCommandByName(commandName);
+		CommandElement command = bundle.getCommandByName(commandName);
 		assertNotNull(command);
 		
 		// run command and grab result

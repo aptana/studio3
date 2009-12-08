@@ -4,9 +4,9 @@ import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scope.ScopeSelector;
 
-public abstract class AbstractNode
+public abstract class AbstractElement
 {
-	protected Bundle _owningBundle;
+	protected BundleElement _owningBundle;
 	protected String _path;
 	protected String _displayName;
 	protected String _scope;
@@ -16,7 +16,7 @@ public abstract class AbstractNode
 	 * 
 	 * @param path
 	 */
-	public AbstractNode(String path)
+	public AbstractElement(String path)
 	{
 		this._path = path;
 	}
@@ -37,7 +37,7 @@ public abstract class AbstractNode
 	 * 
 	 * @return
 	 */
-	public Bundle getOwningBundle()
+	public BundleElement getOwningBundle()
 	{
 		return this._owningBundle;
 	}
@@ -113,7 +113,7 @@ public abstract class AbstractNode
 	 * 
 	 * @param bundle
 	 */
-	void setOwningBundle(Bundle bundle)
+	void setOwningBundle(BundleElement bundle)
 	{
 		this._owningBundle = bundle;
 	}

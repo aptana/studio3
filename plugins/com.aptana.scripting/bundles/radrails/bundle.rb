@@ -8,7 +8,7 @@ module RadRails
     
     def initialize(name, default_values={})
       if name.kind_of? String
-        @jobj = com.aptana.scripting.model.Bundle.new(File.dirname($fullpath))
+        @jobj = com.aptana.scripting.model.BundleElement.new(File.dirname($fullpath))
         @jobj.display_name = name
         @@defaults[path.to_sym] = default_values
       else

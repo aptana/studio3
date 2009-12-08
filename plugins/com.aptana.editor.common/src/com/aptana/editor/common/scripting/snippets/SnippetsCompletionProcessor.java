@@ -31,10 +31,10 @@ import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.Command;
-import com.aptana.scripting.model.Snippet;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerOnlyFilter;
-import com.aptana.scripting.model.TriggerableNode;
+import com.aptana.scripting.model.TriggerableElement;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
@@ -72,18 +72,18 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	@Override
 	protected Template[] getTemplates(String contextTypeId) {
 		List<Template> templatesList = new LinkedList<Template>();
-		Snippet[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
-		for (Snippet snippet : snippetsFromScope) {
+		SnippetElement[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
+		for (SnippetElement snippet : snippetsFromScope) {
 			templatesList.add(new SnippetTemplate(snippet, contextTypeId));
 		}
 		
-		TriggerableNode[] commandsFromScope =
+		TriggerableElement[] commandsFromScope =
 			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
-		for (TriggerableNode triggerableNode : commandsFromScope) {
-			if (triggerableNode instanceof Command) {
-				Command command = (Command) triggerableNode;
+		for (TriggerableElement triggerableNode : commandsFromScope) {
+			if (triggerableNode instanceof CommandElement) {
+				CommandElement command = (CommandElement) triggerableNode;
 				if (command.getTrigger() != null) {
-					templatesList.add (new CommandTemplate((Command)triggerableNode, contextTypeId));
+					templatesList.add (new CommandTemplate((CommandElement)triggerableNode, contextTypeId));
 				}
 			}
 		}

@@ -8,12 +8,12 @@ import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scope.ScopeSelector;
 
-public class Menu extends AbstractNode
+public class MenuElement extends AbstractElement
 {
 	private static final String SEPARATOR_TEXT = "-";
 	
-	private Menu _parent;
-	private List<Menu> _children;
+	private MenuElement _parent;
+	private List<MenuElement> _children;
 	private String _commandName;
 	
 	/**
@@ -21,7 +21,7 @@ public class Menu extends AbstractNode
 	 * 
 	 * @param path
 	 */
-	public Menu(String path)
+	public MenuElement(String path)
 	{
 		super(path);
 	}
@@ -32,13 +32,13 @@ public class Menu extends AbstractNode
 	 * @param menu
 	 */
 	@JRubyMethod(name = "add_menu")
-	public void addMenu(Menu menu)
+	public void addMenu(MenuElement menu)
 	{
 		if (menu != null)
 		{
 			if (this._children == null)
 			{
-				this._children = new ArrayList<Menu>();
+				this._children = new ArrayList<MenuElement>();
 			}
 			
 			// set parent
@@ -55,14 +55,14 @@ public class Menu extends AbstractNode
 	 * @param scope
 	 * @return
 	 */
-	public Menu cloneByScope(String scope)
+	public MenuElement cloneByScope(String scope)
 	{
-		Menu result = null;
+		MenuElement result = null;
 		
 		// find all menus in the specified scope
-		List<Menu> matches = new ArrayList<Menu>();
+		List<MenuElement> matches = new ArrayList<MenuElement>();
 		
-		for (Menu menu : this.getLeafMenus())
+		for (MenuElement menu : this.getLeafMenus())
 		{
 			if (menu.matches(scope))
 			{
@@ -81,13 +81,13 @@ public class Menu extends AbstractNode
 	 * 
 	 * @return
 	 */
-	public Menu[] getChildren()
+	public MenuElement[] getChildren()
 	{
-		Menu[] result = BundleManager.NO_MENUS;
+		MenuElement[] result = BundleManager.NO_MENUS;
 		
 		if (this._children != null && this._children.size() > 0)
 		{
-			result = this._children.toArray(new Menu[this._children.size()]);
+			result = this._children.toArray(new MenuElement[this._children.size()]);
 		}
 		
 		return result;
@@ -98,9 +98,9 @@ public class Menu extends AbstractNode
 	 * 
 	 * @return
 	 */
-	public Command getCommand()
+	public CommandElement getCommand()
 	{
-		Command result = null;
+		CommandElement result = null;
 		
 		if (this.isLeafMenu() && this._owningBundle != null)
 		{
@@ -127,17 +127,17 @@ public class Menu extends AbstractNode
 	 * 
 	 * @return
 	 */
-	protected Menu[] getLeafMenus()
+	protected MenuElement[] getLeafMenus()
 	{
-		Stack<Menu> stack = new Stack<Menu>();
-		List<Menu> result = new ArrayList<Menu>();
+		Stack<MenuElement> stack = new Stack<MenuElement>();
+		List<MenuElement> result = new ArrayList<MenuElement>();
 		
 		// prime stack
 		stack.push(this);
 		
 		while (stack.size() > 0)
 		{
-			Menu menu = stack.pop();
+			MenuElement menu = stack.pop();
 			
 			if (menu.isHierarchicalMenu())
 			{
@@ -151,7 +151,7 @@ public class Menu extends AbstractNode
 			// NOTE: we ignore separators
 		}
 		
-		return result.toArray(new Menu[result.size()]);
+		return result.toArray(new MenuElement[result.size()]);
 	}
 	
 	/**
@@ -159,7 +159,7 @@ public class Menu extends AbstractNode
 	 * 
 	 * @return
 	 */
-	public Menu getParent()
+	public MenuElement getParent()
 	{
 		return this._parent;
 	}
@@ -178,7 +178,7 @@ public class Menu extends AbstractNode
 		}
 		else
 		{
-			Menu parent = this._parent;
+			MenuElement parent = this._parent;
 			
 			while (parent != null)
 			{
@@ -245,7 +245,7 @@ public class Menu extends AbstractNode
 	@JRubyMethod(name = "command=")
 	public void setCommandName(String name)
 	{
-		this.addMenu(new Menu(name));
+		this.addMenu(new MenuElement(name));
 	}
 	
 	/**
@@ -260,7 +260,7 @@ public class Menu extends AbstractNode
 		
 		if (this.hasChildren())
 		{
-			for (Menu menu : this._children)
+			for (MenuElement menu : this._children)
 			{
 				menu.toSource(printer);
 			}

@@ -28,9 +28,9 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager implements IResourceChangeListener, IResourceDeltaVisitor
 {
-	static final Menu[] NO_MENUS = new Menu[0];
-	static final Snippet[] NO_SNIPPETS = new Snippet[0];
-	static final Command[] NO_COMMANDS = new Command[0];
+	static final MenuElement[] NO_MENUS = new MenuElement[0];
+	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Bundles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Bundles"; //$NON-NLS-1$
@@ -48,8 +48,8 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	
 	private static BundleManager INSTANCE;
 	
-	private List<Bundle> _bundles;
-	private Map<String, Bundle> _bundlesByPath;
+	private List<BundleElement> _bundles;
+	private Map<String, BundleElement> _bundlesByPath;
 
 	/**
 	 * getInstance
@@ -94,20 +94,20 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param bundle
 	 */
 	@JRubyMethod(name = "add_bundle")
-	public void addBundle(Bundle bundle)
+	public void addBundle(BundleElement bundle)
 	{
 		if (bundle != null)
 		{
 			if (this._bundles == null)
 			{
-				this._bundles = new ArrayList<Bundle>();
+				this._bundles = new ArrayList<BundleElement>();
 			}
 
 			this._bundles.add(bundle);
 
 			if (this._bundlesByPath == null)
 			{
-				this._bundlesByPath = new HashMap<String, Bundle>();
+				this._bundlesByPath = new HashMap<String, BundleElement>();
 			}
 
 			this._bundlesByPath.put(bundle.getPath(), bundle);
@@ -131,9 +131,9 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @return
 	 */
 	@JRubyMethod(name = "bundle_from_path")
-	public Bundle getBundleFromPath(String path)
+	public BundleElement getBundleFromPath(String path)
 	{
-		Bundle result = null;
+		BundleElement result = null;
 
 		if (this._bundlesByPath != null)
 		{
@@ -149,7 +149,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scope
 	 * @return
 	 */
-	public Command[] getCommandsFromScope(String scope)
+	public CommandElement[] getCommandsFromScope(String scope)
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, null);
 	}
@@ -161,7 +161,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Command[] getCommandsFromScope(String scope, IModelFilter filter)
+	public CommandElement[] getCommandsFromScope(String scope, IModelFilter filter)
 	{
 		return this.getCommandsFromScopes(new String[] { scope }, filter);
 	}
@@ -172,7 +172,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scopes
 	 * @return
 	 */
-	public Command[] getCommandsFromScopes(String[] scopes)
+	public CommandElement[] getCommandsFromScopes(String[] scopes)
 	{
 		return this.getCommandsFromScopes(scopes, null);
 	}
@@ -184,17 +184,17 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Command[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	public CommandElement[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
 	{
-		Command[] result = NO_COMMANDS;
+		CommandElement[] result = NO_COMMANDS;
 		
 		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{
-			List<Command> commands = new ArrayList<Command>();
+			List<CommandElement> commands = new ArrayList<CommandElement>();
 			
-			for (Bundle bundle : this._bundles)
+			for (BundleElement bundle : this._bundles)
 			{
-				for (Command command : bundle.getCommands())
+				for (CommandElement command : bundle.getCommands())
 				{
 					if (command.matches(scopes) && ((filter != null) ? filter.include(command) : true))
 					{
@@ -203,7 +203,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 				}
 			}
 			
-			result = commands.toArray(new Command[commands.size()]);
+			result = commands.toArray(new CommandElement[commands.size()]);
 		}
 		
 		return result;
@@ -246,7 +246,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scope
 	 * @return
 	 */
-	public Menu[] getMenusFromScope(String scope)
+	public MenuElement[] getMenusFromScope(String scope)
 	{
 		return this.getMenusFromScopes(new String[] { scope }, null);
 	}
@@ -258,7 +258,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Menu[] getMenusFromScope(String scope, IModelFilter filter)
+	public MenuElement[] getMenusFromScope(String scope, IModelFilter filter)
 	{
 		return this.getMenusFromScopes(new String[] { scope }, filter);
 	}
@@ -269,7 +269,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scopes
 	 * @return
 	 */
-	public Menu[] getMenusFromScope(String[] scopes)
+	public MenuElement[] getMenusFromScope(String[] scopes)
 	{
 		return this.getMenusFromScopes(scopes, null);
 	}
@@ -281,17 +281,17 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Menu[] getMenusFromScopes(String[] scopes, IModelFilter filter)
+	public MenuElement[] getMenusFromScopes(String[] scopes, IModelFilter filter)
 	{
-		Menu[] result = NO_MENUS;
+		MenuElement[] result = NO_MENUS;
 		
 		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{		
-			List<Menu> menus = new ArrayList<Menu>();
+			List<MenuElement> menus = new ArrayList<MenuElement>();
 			
-			for (Bundle bundle : this._bundles)
+			for (BundleElement bundle : this._bundles)
 			{
-				for (Menu menu : bundle.getMenus())
+				for (MenuElement menu : bundle.getMenus())
 				{
 					if (menu.matches(scopes) && ((filter != null) ? filter.include(menu) : true))
 					{
@@ -300,7 +300,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 				}
 			}
 			
-			result = menus.toArray(new Menu[menus.size()]);
+			result = menus.toArray(new MenuElement[menus.size()]);
 		}
 		
 		return result;
@@ -312,7 +312,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scope
 	 * @return
 	 */
-	public Snippet[] getSnippetsFromScope(String scope)
+	public SnippetElement[] getSnippetsFromScope(String scope)
 	{
 		return this.getSnippetsFromScopes(new String[] { scope }, null);
 	}
@@ -324,7 +324,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Snippet[] getSnippetsFromScope(String scope, IModelFilter filter)
+	public SnippetElement[] getSnippetsFromScope(String scope, IModelFilter filter)
 	{
 		return this.getSnippetsFromScopes(new String[] { scope }, filter);
 	}
@@ -335,7 +335,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param scopes
 	 * @return
 	 */
-	public Snippet[] getSnippetsFromScopes(String[] scopes)
+	public SnippetElement[] getSnippetsFromScopes(String[] scopes)
 	{
 		return this.getSnippetsFromScopes(scopes, null);
 	}
@@ -347,17 +347,17 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * @param filter
 	 * @return
 	 */
-	public Snippet[] getSnippetsFromScopes(String[] scopes, IModelFilter filter)
+	public SnippetElement[] getSnippetsFromScopes(String[] scopes, IModelFilter filter)
 	{
-		Snippet[] result = NO_SNIPPETS;
+		SnippetElement[] result = NO_SNIPPETS;
 		
 		if (this._bundles != null && this._bundles.size() > 0 && scopes != null && scopes.length > 0)
 		{
-			List<Snippet> snippets = new ArrayList<Snippet>();
+			List<SnippetElement> snippets = new ArrayList<SnippetElement>();
 			
-			for (Bundle bundle : this._bundles)
+			for (BundleElement bundle : this._bundles)
 			{
-				for (Snippet snippet : bundle.getSnippets())
+				for (SnippetElement snippet : bundle.getSnippets())
 				{
 					if (snippet.matches(scopes) && ((filter != null) ? filter.include(snippet) : true))
 					{
@@ -366,7 +366,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 				}
 			}
 	
-			result = snippets.toArray(new Snippet[snippets.size()]);
+			result = snippets.toArray(new SnippetElement[snippets.size()]);
 		}
 		
 		return result;
@@ -457,7 +457,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (newFolder != null && newFolder.length() > 0)
 		{
-			Bundle bundle = this.getBundleFromPath(oldFolder);
+			BundleElement bundle = this.getBundleFromPath(oldFolder);
 
 			if (bundle != null)
 			{
@@ -715,7 +715,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 * 
 	 * @param bundle
 	 */
-	public void removeBundle(Bundle bundle)
+	public void removeBundle(BundleElement bundle)
 	{
 		if (bundle != null)
 		{
@@ -733,7 +733,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void removeBundle(String bundleFolder)
 	{
-		Bundle bundle = this.getBundleFromPath(bundleFolder);
+		BundleElement bundle = this.getBundleFromPath(bundleFolder);
 
 		if (bundle != null)
 		{
@@ -752,24 +752,24 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 		{
 			IContainer parentFolder = file.getParent();
 			IContainer bundleFolder = parentFolder.getParent();
-			Bundle bundle = this.getBundleFromPath(bundleFolder.getLocation().toPortableString());
+			BundleElement bundle = this.getBundleFromPath(bundleFolder.getLocation().toPortableString());
 			
 			if (bundle != null)
 			{
 				if (parentFolder.getName().equals(SNIPPETS_FOLDER_NAME))
 				{
-					Snippet[] snippets = bundle.findSnippetsFromPath(file.getLocation().toPortableString());
+					SnippetElement[] snippets = bundle.findSnippetsFromPath(file.getLocation().toPortableString());
 					
-					for (Snippet snippet : snippets)
+					for (SnippetElement snippet : snippets)
 					{
 						bundle.removeSnippet(snippet);
 					}
 				}
 				else if (parentFolder.getName().equals(COMMANDS_FOLDER_NAME))
 				{
-					Command[] commands = bundle.findCommandsFromPath(file.getLocation().toPortableString());
+					CommandElement[] commands = bundle.findCommandsFromPath(file.getLocation().toPortableString());
 					
-					for (Command command : commands)
+					for (CommandElement command : commands)
 					{
 						bundle.removeCommand(command);
 					}
@@ -801,7 +801,7 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (this._bundles != null)
 		{
-			for (Bundle bundle : this._bundles)
+			for (BundleElement bundle : this._bundles)
 			{
 				System.out.println(bundle.toSource());
 			}

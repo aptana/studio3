@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.jruby.anno.JRubyMethod;
 
-public class Bundle
+public class BundleElement
 {
 	private String _path;
 	private String _displayName;
@@ -16,16 +16,16 @@ public class Bundle
 	private String _licenseUrl;
 	private String _gitRepo;
 	
-	private List<Menu> _menus;
-	private List<Snippet> _snippets;
-	private List<Command> _commands;
+	private List<MenuElement> _menus;
+	private List<SnippetElement> _snippets;
+	private List<CommandElement> _commands;
 
 	/**
 	 * Bundle
 	 * 
 	 * @param path
 	 */
-	public Bundle(String path)
+	public BundleElement(String path)
 	{
 		this._path = path;
 	}
@@ -36,13 +36,13 @@ public class Bundle
 	 * @param command
 	 */
 	@JRubyMethod(name = "add_command")
-	public void addCommand(Command command)
+	public void addCommand(CommandElement command)
 	{
 		if (command != null)
 		{
 			if (this._commands == null)
 			{
-				this._commands = new ArrayList<Command>();
+				this._commands = new ArrayList<CommandElement>();
 			}
 
 			this._commands.add(command);
@@ -57,13 +57,13 @@ public class Bundle
 	 * @param snippet
 	 */
 	@JRubyMethod(name = "add_menu")
-	public void addMenu(Menu menu)
+	public void addMenu(MenuElement menu)
 	{
 		if (menu != null)
 		{
 			if (this._menus == null)
 			{
-				this._menus = new ArrayList<Menu>();
+				this._menus = new ArrayList<MenuElement>();
 			}
 			
 			this._menus.add(menu);
@@ -78,13 +78,13 @@ public class Bundle
 	 * @param snippet
 	 */
 	@JRubyMethod(name = "add_snippet")
-	public void addSnippet(Snippet snippet)
+	public void addSnippet(SnippetElement snippet)
 	{
 		if (snippet != null)
 		{
 			if (this._snippets == null)
 			{
-				this._snippets = new ArrayList<Snippet>();
+				this._snippets = new ArrayList<SnippetElement>();
 			}
 
 			this._snippets.add(snippet);
@@ -99,13 +99,13 @@ public class Bundle
 	 * @param path
 	 * @return
 	 */
-	public Command[] findCommandsFromPath(String path)
+	public CommandElement[] findCommandsFromPath(String path)
 	{
-		List<Command> result = new ArrayList<Command>();
+		List<CommandElement> result = new ArrayList<CommandElement>();
 		
 		if (path != null && path.length() > 0 && this._commands != null)
 		{
-			for (Command command : this._commands)
+			for (CommandElement command : this._commands)
 			{
 				if (path.equals(command.getPath()))
 				{
@@ -114,7 +114,7 @@ public class Bundle
 			}
 		}
 		
-		return result.toArray(new Command[result.size()]);
+		return result.toArray(new CommandElement[result.size()]);
 	}
 	
 	/**
@@ -123,13 +123,13 @@ public class Bundle
 	 * @param path
 	 * @return
 	 */
-	public Menu[] findMenusFromPath(String path)
+	public MenuElement[] findMenusFromPath(String path)
 	{
-		List<Menu> result = new ArrayList<Menu>();
+		List<MenuElement> result = new ArrayList<MenuElement>();
 		
 		if (path != null && path.length() > 0 && this._menus != null)
 		{
-			for (Menu menu : this._menus)
+			for (MenuElement menu : this._menus)
 			{
 				if (path.equals(menu.getPath()))
 				{
@@ -138,7 +138,7 @@ public class Bundle
 			}
 		}
 		
-		return result.toArray(new Menu[result.size()]);
+		return result.toArray(new MenuElement[result.size()]);
 	}
 	
 	/**
@@ -147,13 +147,13 @@ public class Bundle
 	 * @param path
 	 * @return
 	 */
-	public Snippet[] findSnippetsFromPath(String path)
+	public SnippetElement[] findSnippetsFromPath(String path)
 	{
-		List<Snippet> result = new ArrayList<Snippet>();
+		List<SnippetElement> result = new ArrayList<SnippetElement>();
 		
 		if (path != null && path.length() > 0 && this._snippets != null)
 		{
-			for (Snippet snippet : this._snippets)
+			for (SnippetElement snippet : this._snippets)
 			{
 				if (path.equals(snippet.getPath()))
 				{
@@ -162,7 +162,7 @@ public class Bundle
 			}
 		}
 		
-		return result.toArray(new Snippet[result.size()]);
+		return result.toArray(new SnippetElement[result.size()]);
 	}
 	
 	/**
@@ -181,13 +181,13 @@ public class Bundle
 	 * 
 	 * @return
 	 */
-	public Command getCommandByName(String name)
+	public CommandElement getCommandByName(String name)
 	{
-		Command result = null;
+		CommandElement result = null;
 		
 		if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
 		{
-			for (Command command : this._commands)
+			for (CommandElement command : this._commands)
 			{
 				if (name.equals(command.getDisplayName()))
 				{
@@ -205,13 +205,13 @@ public class Bundle
 	 * 
 	 * @return
 	 */
-	public Command[] getCommands()
+	public CommandElement[] getCommands()
 	{
-		Command[] result = BundleManager.NO_COMMANDS;
+		CommandElement[] result = BundleManager.NO_COMMANDS;
 
 		if (this._commands != null && this._commands.size() > 0)
 		{
-			result = this._commands.toArray(new Command[this._commands.size()]);
+			result = this._commands.toArray(new CommandElement[this._commands.size()]);
 		}
 
 		return result;
@@ -288,13 +288,13 @@ public class Bundle
 	 * 
 	 * @return
 	 */
-	public Menu[] getMenus()
+	public MenuElement[] getMenus()
 	{
-		Menu[] result = BundleManager.NO_MENUS;
+		MenuElement[] result = BundleManager.NO_MENUS;
 		
 		if (this._menus != null && this._menus.size() > 0)
 		{
-			result = this._menus.toArray(new Menu[this._menus.size()]);
+			result = this._menus.toArray(new MenuElement[this._menus.size()]);
 		}
 		
 		return result;
@@ -316,13 +316,13 @@ public class Bundle
 	 * 
 	 * @return
 	 */
-	public Snippet[] getSnippets()
+	public SnippetElement[] getSnippets()
 	{
-		Snippet[] result = BundleManager.NO_SNIPPETS;
+		SnippetElement[] result = BundleManager.NO_SNIPPETS;
 
 		if (this._snippets != null && this._snippets.size() > 0)
 		{
-			result = this._snippets.toArray(new Snippet[this._snippets.size()]);
+			result = this._snippets.toArray(new SnippetElement[this._snippets.size()]);
 		}
 
 		return result;
@@ -343,7 +343,7 @@ public class Bundle
 		// update command paths
 		if (this._commands != null)
 		{
-			for (Command command : this._commands)
+			for (CommandElement command : this._commands)
 			{
 				String newCommandPath = path + command.getPath().substring(oldPathLength);
 
@@ -354,7 +354,7 @@ public class Bundle
 		// update snippet paths
 		if (this._snippets != null)
 		{
-			for (Snippet snippet : this._snippets)
+			for (SnippetElement snippet : this._snippets)
 			{
 				String newSnippetPath = path + snippet.getPath().substring(oldPathLength);
 
@@ -369,7 +369,7 @@ public class Bundle
 	 * @param command
 	 */
 	@JRubyMethod(name = "remove_command")
-	public void removeCommand(Command command)
+	public void removeCommand(CommandElement command)
 	{
 		if (this._commands != null)
 		{
@@ -383,7 +383,7 @@ public class Bundle
 	 * @param command
 	 */
 	@JRubyMethod(name = "remove_menu")
-	public void removeMenu(Menu menu)
+	public void removeMenu(MenuElement menu)
 	{
 		if (this._menus != null)
 		{
@@ -397,7 +397,7 @@ public class Bundle
 	 * @param snippet
 	 */
 	@JRubyMethod(name = "remove_snippet")
-	public void removeSnippet(Snippet snippet)
+	public void removeSnippet(SnippetElement snippet)
 	{
 		if (this._snippets != null)
 		{
@@ -505,7 +505,7 @@ public class Bundle
 		// output commands
 		if (this._commands != null)
 		{
-			for (Command command : this._commands)
+			for (CommandElement command : this._commands)
 			{
 				command.toSource(printer);
 			}
@@ -514,7 +514,7 @@ public class Bundle
 		// output menus
 		if (this._menus != null)
 		{
-			for (Menu menu : this._menus)
+			for (MenuElement menu : this._menus)
 			{
 				menu.toSource(printer);
 			}
@@ -523,7 +523,7 @@ public class Bundle
 		// output snippets
 		if (this._snippets != null)
 		{
-			for (Snippet snippet : this._snippets)
+			for (SnippetElement snippet : this._snippets)
 			{
 				snippet.toSource(printer);
 			}

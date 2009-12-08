@@ -7,7 +7,7 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.scripting.model.Command;
+import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.OutputType;
@@ -30,7 +30,7 @@ public class CommandProposal extends SnippetTemplateProposal {
 		Template template = getTemplate();
 		if (template instanceof CommandTemplate) {
 			CommandTemplate commandTemplate = (CommandTemplate) template;
-			Command command = commandTemplate.getCommand();
+			CommandElement command = commandTemplate.getCommand();
 			CommandResult commandResult = command.execute(new CommandContext());
 			try {
 				OutputType output = OutputType.valueOf(command.getOutputType().toUpperCase());

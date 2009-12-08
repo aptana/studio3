@@ -8,7 +8,7 @@ public interface IModelFilter
 	 * @param element
 	 * @return
 	 */
-	boolean exclude(AbstractNode element);
+	boolean exclude(AbstractElement element);
 	
 	/**
 	 * include
@@ -16,5 +16,5 @@ public interface IModelFilter
 	 * @param element
 	 * @return
 	 */
-	boolean include(AbstractNode element);
+	boolean include(AbstractElement element);
 }

@@ -2,7 +2,7 @@ package com.aptana.scripting.model;
 
 import org.jruby.anno.JRubyMethod;
 
-public abstract class TriggerableNode extends AbstractNode
+public abstract class TriggerableElement extends AbstractElement
 {
 	protected String _trigger;
 
@@ -11,7 +11,7 @@ public abstract class TriggerableNode extends AbstractNode
 	 * 
 	 * @param path
 	 */
-	public TriggerableNode(String path)
+	public TriggerableElement(String path)
 	{
 		super(path);
 	}

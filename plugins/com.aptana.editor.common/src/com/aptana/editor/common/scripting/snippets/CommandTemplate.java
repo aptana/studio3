@@ -2,13 +2,13 @@ package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.templates.Template;
 
-import com.aptana.scripting.model.Command;
+import com.aptana.scripting.model.CommandElement;
 
 public class CommandTemplate extends Template {
 
-	private final Command command;
+	private final CommandElement command;
 
-	public CommandTemplate(Command command, String contextTypeId) {
+	public CommandTemplate(CommandElement command, String contextTypeId) {
 		super(command.getTrigger(),
 				command.getDisplayName(), 
 				contextTypeId,
@@ -17,7 +17,7 @@ public class CommandTemplate extends Template {
 		this.command = command;
 	}
 	
-	public Command getCommand() {
+	public CommandElement getCommand() {
 		return command;
 	}
 

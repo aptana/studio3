@@ -2,18 +2,18 @@ package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.templates.Template;
 
-import com.aptana.scripting.model.Snippet;
+import com.aptana.scripting.model.SnippetElement;
 
 public class SnippetTemplate extends Template {
 
-	private Snippet snippet;
+	private SnippetElement snippet;
 
 	public SnippetTemplate(String name, String description, String contextTypeId, String pattern) {
 		super(name, description, contextTypeId, pattern, true);
 		this.snippet = null;
 	}
 	
-	public SnippetTemplate(Snippet snippet, String contextTypeId) {
+	public SnippetTemplate(SnippetElement snippet, String contextTypeId) {
 		this(snippet.getTrigger(),
 				snippet.getDisplayName(),
 				contextTypeId,
@@ -21,7 +21,7 @@ public class SnippetTemplate extends Template {
 		this.snippet = snippet;
 	}
 	
-	public Snippet getSnippet() {
+	public SnippetElement getSnippet() {
 		return snippet;
 	}
 

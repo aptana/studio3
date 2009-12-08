@@ -6,7 +6,7 @@ module RadRails
   
   class Snippet
     def initialize(name)
-      @jobj = com.aptana.scripting.model.Snippet.new($fullpath)
+      @jobj = com.aptana.scripting.model.SnippetElement.new($fullpath)
       @jobj.display_name = name
       
       bundle = BundleManager.bundle_from_path(path)
