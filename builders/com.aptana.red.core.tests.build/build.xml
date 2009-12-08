@@ -27,7 +27,7 @@
 		</fileset>
 	</path>
 	<path id="source.path">
-		<dirset dir="${src.dir}/plugins">
+		<dirset dir="${buildDirectory}/plugins">
 			<include name="*/src" />
 		</dirset>
 	</path>
@@ -164,11 +164,7 @@
 			<param name="p2.repo" value="${p2.artifact.repo}" />
 		</antcall>
 		<!-- Add Eclipse Testing Framework -->
-		<unzip src="eclipse-test-framework-3.4.2.zip" dest="${buildDirectory}/test-framework" />
-		<copy todir="${baseLocation}/dropins">
-			<fileset dir="${buildDirectory}/test-framework" defaultexcludes="false" />
-		</copy>
-		<delete dir="${buildDirectory}/test-framework" />
+		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/dropins" />
 
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.4.2.v200902111700/plugin_customization.ini">
@@ -188,15 +184,25 @@
 			<param name="test.plugin" value="com.aptana.util.tests" />
 			<param name="test.classname" value="com.aptana.util.tests.AllTests" />
 		</antcall>
-		<!-- FIXME BRoken
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
 			<param name="test.classname" value="com.aptana.scope.AllTests" />
 		</antcall>
-		-->
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.ruby.tests" />
 			<param name="test.classname" value="com.aptana.editor.ruby.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.js.tests" />
+			<param name="test.classname" value="com.aptana.editor.js.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.css.tests" />
+			<param name="test.classname" value="com.aptana.editor.css.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.html.tests" />
+			<param name="test.classname" value="com.aptana.editor.html.tests.AllTests" />
 		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->
