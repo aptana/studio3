@@ -485,7 +485,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			}
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings("unchecked")
 			public Object[] getElements(Object inputElement)
 			{
 				Map<String, TextAttribute> tokens = theme.getTokens();

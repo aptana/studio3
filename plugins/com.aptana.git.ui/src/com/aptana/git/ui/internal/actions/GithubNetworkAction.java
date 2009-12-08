@@ -22,7 +22,7 @@ import com.aptana.git.ui.actions.GitAction;
 @SuppressWarnings("restriction")
 public class GithubNetworkAction extends GitAction
 {
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run()
 	{
