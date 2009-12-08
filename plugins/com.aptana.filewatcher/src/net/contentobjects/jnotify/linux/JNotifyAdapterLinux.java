@@ -43,7 +43,7 @@ import net.contentobjects.jnotify.Util;
 
 
 /** TODO : added by omry at Dec 11, 2005 : Handle move events*/
-
+@SuppressWarnings("nls")
 public class JNotifyAdapterLinux implements IJNotify
 {
 	private Hashtable<Integer, Integer> _linuxWd2Wd;
@@ -209,10 +209,7 @@ public class JNotifyAdapterLinux implements IJNotify
 				unwatch(watchData);
 				return true;
 			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 
