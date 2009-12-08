@@ -100,11 +100,12 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public CommandElement getCommand()
 	{
+		BundleElement owningBundle = this.getOwningBundle();
 		CommandElement result = null;
 		
-		if (this.isLeafMenu() && this._owningBundle != null)
+		if (this.isLeafMenu() && owningBundle != null)
 		{
-			result = this._owningBundle.getCommandByName(this._commandName);
+			result = owningBundle.getCommandByName(this._commandName);
 		}
 		
 		return result;
@@ -113,11 +114,10 @@ public class MenuElement extends AbstractBundleElement
 	/**
 	 * getCommandName
 	 * 
-	 * @param name
 	 * @return
 	 */
 	@JRubyMethod(name = "command")
-	public String getCommandName(String name)
+	public String getCommandName()
 	{
 		return this._commandName;
 	}
@@ -282,6 +282,7 @@ public class MenuElement extends AbstractBundleElement
 		
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
+		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
 		
 		if (this.hasChildren())
 		{
