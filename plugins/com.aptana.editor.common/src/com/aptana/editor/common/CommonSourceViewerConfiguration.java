@@ -177,7 +177,7 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("unchecked")
     protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer) {
         Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
         targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$

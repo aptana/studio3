@@ -78,7 +78,7 @@ public class ReaderXMLHandler extends DefaultHandler
 	/**
 	 * Vector to hold the different data nodes
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	private Vector storageObjects = new Vector();
 
 	/**
@@ -319,7 +319,7 @@ public class ReaderXMLHandler extends DefaultHandler
 	 * @param _value
 	 *            Object
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void setProperty(String _key, Object _value)
 	{
 		// Get the last element from the data storage
@@ -369,7 +369,7 @@ public class ReaderXMLHandler extends DefaultHandler
 	 * @param _array
 	 *            boolean - new level is an array level (true) or a dict level (false)
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private void levelUp(boolean _array)
 	{
 		// Handle arrays
@@ -406,7 +406,7 @@ public class ReaderXMLHandler extends DefaultHandler
 	 * @param _array
 	 *            boolean - True for arrays and false for dictionaries.
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	private void levelDown(boolean _array)
 	{
 		// Determine if there's more than one element

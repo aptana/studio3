@@ -160,7 +160,7 @@ public abstract class AbstractWriter {
    * @param _props PlistProperties
    * @param _tabIndex int
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
 private void writeDictionary(PrintWriter _out, PlistProperties _props,
                                int _tabIndex) {
     //Vectors for the keys and the fields
@@ -193,7 +193,7 @@ private void writeDictionary(PrintWriter _out, PlistProperties _props,
    * @param _vector Vector
    * @param _tabIndex int
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
 private void writeArray(PrintWriter _out, Vector _vector, int _tabIndex) {
 
     //Define the tabstring
@@ -226,7 +226,7 @@ private void writeArray(PrintWriter _out, Vector _vector, int _tabIndex) {
    * @param tab String
    * @param _value Object
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
 private void printValue(PrintWriter _out, int _tabIndex, String tab, Object _value) {
     //Recurse if it is a PlistProperties
     if (_value instanceof PlistProperties) {
