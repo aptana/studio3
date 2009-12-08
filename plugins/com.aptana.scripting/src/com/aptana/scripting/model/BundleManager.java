@@ -40,6 +40,9 @@ public class BundleManager
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static BundleManager INSTANCE;
 
+	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
+	private static final String SCHEME_FILE = "file"; //$NON-NLS-1$
+	
 	private List<Bundle> _bundles;
 	private Map<String, Bundle> _bundlesByPath;
 	
@@ -105,7 +108,8 @@ public class BundleManager
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
+			// CAW: URIUtil is a 3.5+ class, so I copied the necessary util method over here
+			URI fileURI = toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
 			File file = new File(fileURI);
 
 			result = file.getAbsolutePath();
@@ -130,6 +134,42 @@ public class BundleManager
 		}
 
 		return result;
+	}
+	
+	private static URI toURI(URL url) throws URISyntaxException {
+		//URL behaves differently across platforms so for file: URLs we parse from string form
+		if (SCHEME_FILE.equals(url.getProtocol())) {
+			String pathString = url.toExternalForm().substring(5);
+			//ensure there is a leading slash to handle common malformed URLs such as file:c:/tmp
+			if (pathString.indexOf('/') != 0)
+				pathString = '/' + pathString;
+			else if (pathString.startsWith(UNC_PREFIX) && !pathString.startsWith(UNC_PREFIX, 2)) {
+				//URL encodes UNC path with two slashes, but URI uses four (see bug 207103)
+				pathString = ensureUNCPath(pathString);
+			}
+			return new URI(SCHEME_FILE, null, pathString, null);
+		}
+		try {
+			return new URI(url.toExternalForm());
+		} catch (URISyntaxException e) {
+			//try multi-argument URI constructor to perform encoding
+			return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+		}
+	}
+	
+	/**
+	 * Ensures the given path string starts with exactly four leading slashes.
+	 */
+	private static String ensureUNCPath(String path) {
+		int len = path.length();
+		StringBuffer result = new StringBuffer(len);
+		for (int i = 0; i < 4; i++) {
+			//	if we have hit the first non-slash character, add another leading slash
+			if (i >= len || result.length() > 0 || path.charAt(i) != '/')
+				result.append('/');
+		}
+		result.append(path);
+		return result.toString();
 	}
 
 	/**
