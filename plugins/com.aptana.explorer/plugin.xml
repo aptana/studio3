@@ -41,4 +41,24 @@
          </includes>
       </viewerActionBinding>
 	</extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.core.resources.IResource"
+            class="com.aptana.explorer.AdapterFactory">
+         <adapter
+               type="org.eclipse.ui.model.IWorkbenchAdapter2">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <fontDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="com.aptana.explorer.font"
+            isEditable="true"
+            label="%appExplorerFont.label">
+      </fontDefinition>
+   </extension>
 </plugin>
