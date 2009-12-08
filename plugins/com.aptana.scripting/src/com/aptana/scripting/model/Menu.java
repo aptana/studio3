@@ -98,9 +98,9 @@ public class Menu extends AbstractNode
 	 * 
 	 * @return
 	 */
-	public TriggerableNode getCommand()
+	public Command getCommand()
 	{
-		TriggerableNode result = null;
+		Command result = null;
 		
 		if (this.isLeafMenu() && this._owningBundle != null)
 		{
