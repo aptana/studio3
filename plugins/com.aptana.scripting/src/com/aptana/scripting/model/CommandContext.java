@@ -12,6 +12,15 @@ public class CommandContext
 	/**
 	 * CommandContext
 	 * 
+	 * @deprecated
+	 */
+	public CommandContext()
+	{
+	}
+	
+	/**
+	 * CommandContext
+	 * 
 	 * @param input
 	 */
 	public CommandContext(String input)
