@@ -87,6 +87,8 @@ public class ResourceToWorkbenchAdapter2Factory implements IAdapterFactory
 					{
 						fd = JFaceResources.getTextFontDescriptor();
 					}
+					if (fd == null || fd.getFontData() == null || fd.getFontData().length == 0)
+						return null;
 					return fd.getFontData()[0];
 				}
 
