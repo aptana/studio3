@@ -33,6 +33,10 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -51,7 +55,7 @@ public class SingleProjectView extends CommonNavigator
 {
 
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
-	
+
 	private Combo projectCombo;
 	protected IProject selectedProject;
 	private ResourceListener fResourceListener;
@@ -166,8 +170,36 @@ public class SingleProjectView extends CommonNavigator
 		super.createPartControl(viewer);
 
 		// Hook up to themes
+		hookToThemes();
+	}
+
+	private void hookToThemes()
+	{
 		getCommonViewer().getTree().setBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+		final Tree tree = getCommonViewer().getTree();
+		// Override selection color to match what is set in theme
+		tree.addListener(SWT.EraseItem, new Listener()
+		{
+			private TreeItem lastSelected;
+
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					if (lastSelected != null)
+					{
+						lastSelected.setBackground(null);
+					}
+					TreeItem item = (TreeItem) event.item;
+					lastSelected = item;
+					item.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+							ThemeUtil.getActiveTheme().getSelection()));
+					event.detail &= ~SWT.SELECTED;
+				}
+			}
+		});
+		// Listen to theme changes
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(
 				new IPreferenceChangeListener()
 				{
