@@ -153,9 +153,10 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			return;
 		final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
 				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
+		// Don't auto toggle the current line highlight if it's off (so it should remain off)
 		if (!defaultHighlightCurrentLine)
 			return;
-		// Don't auto toggle the current line highlight, since user has it off (so it should remain off)
+
 		selectionListener = new ISelectionChangedListener()
 		{
 
@@ -167,6 +168,14 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 				{
 					// Auto turn off line highlight when there's a selection > 0
 					ITextSelection textSelection = (ITextSelection) selection;
+					if (textSelection.getLength() > 0)
+					{
+						final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(
+								EditorsUI.PLUGIN_ID,
+								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
+						if (!defaultHighlightCurrentLine)
+							return;
+					}
 					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
 							.getLength() == 0);
@@ -265,12 +274,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			fCaretImage.dispose();
 			fCaretImage = null;
 		}
+		removeLineHighlightListener();
+		super.dispose();
+	}
+
+	private void removeLineHighlightListener()
+	{
 		if (getSelectionProvider() != null)
 		{
 			getSelectionProvider().removeSelectionChangedListener(selectionListener);
-			selectionListener = null;
 		}
-		super.dispose();
+		selectionListener = null;
 	}
 
 	@Override
@@ -284,6 +298,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void initializeViewerColors(ISourceViewer viewer)
 	{
 		ThemeUtil.getActiveTheme();
+		if (viewer == null || viewer.getTextWidget() == null)
+			return;
 		super.initializeViewerColors(viewer);
 	}
 
@@ -295,6 +311,13 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		{
 			overrideThemeColors();
 			getSourceViewer().invalidateTextPresentation();
+		}
+		if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
+		{
+			if (selectionListener == null)
+			{
+				overrideSelectionColor();
+			}
 		}
 	}
 
