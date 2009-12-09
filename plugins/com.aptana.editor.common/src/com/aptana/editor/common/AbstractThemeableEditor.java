@@ -7,9 +7,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -18,6 +22,7 @@ import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.osgi.service.prefs.BackingStoreException;
@@ -72,6 +77,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private Image fCaretImage;
 	private RGB fCaretColor;
 
+	private ISelectionChangedListener selectionListener;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -101,8 +108,14 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		Composite findBarComposite = getFindBarDecorator().createFindBarComposite(parent);
 		super.createPartControl(findBarComposite);
 		getFindBarDecorator().createFindBar(getSourceViewer());
-		overrideCaretColor();
+		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer());
+	}
+
+	private void overrideThemeColors()
+	{
+		overrideSelectionColor();
+		overrideCaretColor();
 	}
 
 	@Override
@@ -124,6 +137,51 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		support.setCharacterPairMatcher(new CharacterPairMatcher(PAIR_MATCHING_CHARS));
 		support.setMatchingCharacterPainterPreferenceKeys(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
+	}
+
+	protected void overrideSelectionColor()
+	{
+		if (getSourceViewer().getTextWidget() == null)
+			return;
+
+		// Force selection color
+		getSourceViewer().getTextWidget().setSelectionBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getSelection()));
+		// Auto turn off line highlight when there's a selection > 0
+		if (selectionListener != null)
+			return;
+		selectionListener = new ISelectionChangedListener()
+		{
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+				ISelection selection = event.getSelection();
+				if (selection instanceof ITextSelection)
+				{
+					ITextSelection textSelection = (ITextSelection) selection;
+					if (textSelection.getLength() == 0)
+					{
+						// FIXME Set to the old value, whatever that was
+						prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, true);
+					}
+					else
+					{
+						prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false);
+					}
+					try
+					{
+						prefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						// ignore
+					}
+				}
+			}
+		};
+		getSelectionProvider().addSelectionChangedListener(selectionListener);
 	}
 
 	protected void overrideCaretColor()
@@ -187,7 +245,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private void setCharacterPairColor(RGB rgb)
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format("{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format(
+				"{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();
@@ -205,6 +264,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		{
 			fCaretImage.dispose();
 			fCaretImage = null;
+		}
+		if (getSelectionProvider() != null)
+		{
+			getSelectionProvider().removeSelectionChangedListener(selectionListener);
+			selectionListener = null;
 		}
 		super.dispose();
 	}
@@ -229,7 +293,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		super.handlePreferenceStoreChanged(event);
 		if (event.getProperty().equals(ThemeUtil.THEME_CHANGED))
 		{
-			overrideCaretColor();
+			overrideThemeColors();
 			getSourceViewer().invalidateTextPresentation();
 		}
 	}
