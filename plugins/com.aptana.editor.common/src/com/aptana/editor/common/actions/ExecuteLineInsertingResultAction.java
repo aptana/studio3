@@ -1,6 +1,5 @@
 package com.aptana.editor.common.actions;
 
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.eclipse.jface.action.IAction;
@@ -11,9 +10,11 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.scripting.commands.Filter;
-import com.aptana.editor.common.scripting.commands.VARIABLES_NAMES;
+import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.model.OutputType;
 
 public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	
@@ -46,28 +47,14 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	public void run() {
 		if (textWidget != null) {
 			ITextEditor textEditor = getTextEditor();
-			Map<String, String> environment = Filter.computeEnvironment(textEditor.getEditorSite().getWorkbenchWindow(), textEditor);
-			Filter.StringOutputConsumer filterOutputConsumer = new Filter.StringOutputConsumer();
-			Filter.launch(environment.get(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name()), environment, Filter.EOF, filterOutputConsumer);
-			try {
-				String output = filterOutputConsumer.getOutput();
-				StyledText styledText = (StyledText) textViewer.getTextWidget();
-				int caretOffset = styledText.getCaretOffset();
-				int lineAtCaret = styledText.getLineAtOffset(caretOffset);
-				int lineCount = styledText.getLineCount();
-				int startOffsetOfLineAtCaret = -1;
-				String prefix = ""; //$NON-NLS-1$
-				if (lineAtCaret == (lineCount - 1)) {
-					// We are on the last line
-					startOffsetOfLineAtCaret = styledText.getCharCount();
-					prefix = styledText.getLineDelimiter();
-				} else {
-					startOffsetOfLineAtCaret = styledText.getOffsetAtLine(lineAtCaret+1);					
-				}
-				styledText.replaceTextRange(startOffsetOfLineAtCaret, 0, prefix + output);
-			} catch (InterruptedException e) {
-				CommonEditorPlugin.logError("Failed to read output.", e); //$NON-NLS-1$
-			}
+			CommandElement command = new CommandElement(""); //$NON-NLS-1$
+			command.setInputType(InputType.LINE.getName());
+			command.setOutputType(OutputType.REPLACE_LINE.getName());
+			int caretOffset = textWidget.getCaretOffset();
+			int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+			command.setInvoke(textWidget.getLine(lineAtCaret));
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
+			CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 		}
 	}
 

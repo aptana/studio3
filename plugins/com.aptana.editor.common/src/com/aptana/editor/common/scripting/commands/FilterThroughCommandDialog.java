@@ -276,7 +276,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		consoleName = consoleNameText.getText();
 		if (consoleName.trim().length() == 0)
 		{
-			consoleName = Filter.DEFAULT_CONSOLE_NAME;
+			consoleName = CommandExecutionUtils.DEFAULT_CONSOLE_NAME;
 		}
 		
 		saveState();
@@ -350,7 +350,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		
 		consoleNameText.setEnabled(outputToConsoleButton.getSelection());
 		if (lastConsoleName == null || lastConsoleName.trim().equals("")) { //$NON-NLS-1$
-			consoleNameText.setText(Filter.DEFAULT_CONSOLE_NAME);
+			consoleNameText.setText(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
 		} else {
 			consoleNameText.setText(lastConsoleName);
 		}
@@ -366,7 +366,7 @@ public class FilterThroughCommandDialog extends Dialog {
 		lastInputType = inputType;
 		lastOutputType = outputType;
 		lastConsoleName = consoleName;
-		if (lastConsoleName.equals(Filter.DEFAULT_CONSOLE_NAME)) {
+		if (lastConsoleName.equals(CommandExecutionUtils.DEFAULT_CONSOLE_NAME)) {
 			lastConsoleName = ""; //$NON-NLS-1$
 		}
 	}
