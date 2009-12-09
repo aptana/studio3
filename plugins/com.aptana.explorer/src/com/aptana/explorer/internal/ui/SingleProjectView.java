@@ -26,6 +26,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -36,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -181,21 +182,23 @@ public class SingleProjectView extends CommonNavigator
 		// Override selection color to match what is set in theme
 		tree.addListener(SWT.EraseItem, new Listener()
 		{
-			private TreeItem lastSelected;
-
 			public void handleEvent(Event event)
 			{
 				if ((event.detail & SWT.SELECTED) != 0)
 				{
-					if (lastSelected != null)
-					{
-						lastSelected.setBackground(null);
-					}
-					TreeItem item = (TreeItem) event.item;
-					lastSelected = item;
-					item.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+					Tree tree = (Tree) event.widget;
+					int clientWidth = tree.getClientArea().width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
 							ThemeUtil.getActiveTheme().getSelection()));
+					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
 					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
 				}
 			}
 		});
