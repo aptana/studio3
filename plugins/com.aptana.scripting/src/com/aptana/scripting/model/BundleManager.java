@@ -174,9 +174,21 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (this._elementListeners != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			boolean sendEvent = true;
+			
+			if (element instanceof AbstractBundleElement)
 			{
-				listener.elementModified(element);
+				sendEvent = (((AbstractBundleElement) element).getOwningBundle() != null);
+			}
+			
+			if (sendEvent)
+			{
+				for (ElementChangeListener listener : this._elementListeners)
+				{
+					listener.elementDeleted(element);
+					listener.elementAdded(element);
+//					listener.elementModified(element);
+				}
 			}
 		}
 	}
