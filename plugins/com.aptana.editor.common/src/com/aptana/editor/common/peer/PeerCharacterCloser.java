@@ -74,10 +74,16 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 		try
 		{
-			// TODO Don't auto-close if we have an open pair!
 			if (length > 0)
 			{
 				wrapSelection(event, document, offset, length);
+				return;
+			}
+
+			// Don't auto-close if we have an open pair!
+			if (isUnclosedPair(event, document, offset)) // We have an open string or pair, just insert the single
+															// character, don't do anything special
+			{
 				return;
 			}
 
@@ -153,6 +159,28 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
+	{
+		final char closingCharacter = getPeerCharacter(event.character);
+		char c = event.character;
+		String previous = document.get(0, offset);
+		boolean open = false;
+		int index = -1;
+		while ((index = previous.indexOf(c, index + 1)) != -1)
+		{
+			open = !open;
+			if (open)
+			{
+				c = closingCharacter;
+			}
+			else
+			{
+				c = event.character;
+			}
+		}
+		return open;
 	}
 
 	/**
