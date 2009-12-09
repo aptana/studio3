@@ -8,12 +8,15 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -80,6 +83,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	private ISelectionChangedListener selectionListener;
 
+	private LineNumberRulerColumn fLineColumn;
+	private IVerticalRulerColumn col;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -117,17 +123,37 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		overrideSelectionColor();
 		overrideCaretColor();
+		overrideRulerColors();
+	}
+
+	private void overrideRulerColors()
+	{
+		// Use normal parent gray bg
+		// fLineColumn.setBackground(parent.getBackground());
+
+		// Use theme colors
+		Color bg = CommonEditorPlugin.getDefault().getColorManager().getColor(
+				ThemeUtil.getActiveTheme().getBackground());
+		fLineColumn.setBackground(bg);
+		fLineColumn.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+				ThemeUtil.getActiveTheme().getForeground()));
+
+		col.getControl().setBackground(bg);
+		col.getControl().redraw();
 	}
 
 	@Override
 	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
 	{
 		super.initializeLineNumberRulerColumn(rulerColumn);
-		rulerColumn.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-				ThemeUtil.getActiveTheme().getBackground()));
-		rulerColumn.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-				ThemeUtil.getActiveTheme().getForeground()));
-		rulerColumn.redraw();
+		this.fLineColumn = rulerColumn;
+	}
+
+	@Override
+	protected IVerticalRulerColumn createAnnotationRulerColumn(CompositeRuler ruler)
+	{
+		this.col = super.createAnnotationRulerColumn(ruler);
+		return col;
 	}
 
 	@Override
