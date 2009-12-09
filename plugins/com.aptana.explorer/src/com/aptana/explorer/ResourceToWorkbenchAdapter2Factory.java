@@ -64,7 +64,7 @@ public class ResourceToWorkbenchAdapter2Factory implements IAdapterFactory
 		});
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType)
 	{
@@ -102,7 +102,7 @@ public class ResourceToWorkbenchAdapter2Factory implements IAdapterFactory
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
 	public Class[] getAdapterList()
 	{
