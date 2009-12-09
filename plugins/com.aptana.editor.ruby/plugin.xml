@@ -6,7 +6,7 @@
       <editor
             class="com.aptana.editor.ruby.RubySourceEditor"
             default="true"
-            icon="icons/rb.gif"
+            icon="icons/rb.png"
             id="com.aptana.editor.ruby"
             name="%editor.rb.name">
          <contentTypeBinding
