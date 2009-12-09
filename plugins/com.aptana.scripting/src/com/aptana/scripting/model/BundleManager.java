@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,14 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager implements IResourceChangeListener, IResourceDeltaVisitor
 {
+	public class FileNameComparator implements Comparator<File>
+	{
+		public int compare(File o1, File o2)
+		{
+			return o1.getName().compareTo(o2.getName());
+		}
+	}
+	
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
@@ -518,6 +528,8 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 					}
 				});
 				
+				Arrays.sort(bundles, new FileNameComparator());
+				
 				for (File bundle : bundles)
 				{
 					this.processBundle(bundle, true);
@@ -733,6 +745,8 @@ public class BundleManager implements IResourceChangeListener, IResourceDeltaVis
 					return name.toLowerCase().endsWith(RUBY_FILE_EXTENSION);
 				}
 			});
+			
+			Arrays.sort(files, new FileNameComparator());
 			
 			for (File file: files)
 			{
