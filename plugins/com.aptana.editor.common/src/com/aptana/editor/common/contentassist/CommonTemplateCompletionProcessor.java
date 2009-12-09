@@ -47,7 +47,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 
 public class CommonTemplateCompletionProcessor extends TemplateCompletionProcessor {
 
-    private static final String IMAGE_PATH = "icons/template.gif"; //$NON-NLS-1$
+    private static final String IMAGE_PATH = "icons/template.png"; //$NON-NLS-1$
 
     private String fContextTypeId;
     private ContributionContextTypeRegistry fContextTypeRegistry;

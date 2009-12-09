@@ -6,7 +6,7 @@
       <editor
             class="com.aptana.editor.js.JSSourceEditor"
             default="true"
-            icon="icons/js.gif"
+            icon="icons/js.png"
             id="com.aptana.editor.js"
             name="%editor.js.name">
          <contentTypeBinding
