@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
@@ -147,29 +148,28 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		// Force selection color
 		getSourceViewer().getTextWidget().setSelectionBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getSelection()));
-		// Auto turn off line highlight when there's a selection > 0
+
 		if (selectionListener != null)
 			return;
+		final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
+		if (!defaultHighlightCurrentLine)
+			return;
+		// Don't auto toggle the current line highlight, since user has it off (so it should remain off)
 		selectionListener = new ISelectionChangedListener()
 		{
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event)
 			{
-				IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 				ISelection selection = event.getSelection();
 				if (selection instanceof ITextSelection)
 				{
+					// Auto turn off line highlight when there's a selection > 0
 					ITextSelection textSelection = (ITextSelection) selection;
-					if (textSelection.getLength() == 0)
-					{
-						// FIXME Set to the old value, whatever that was
-						prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, true);
-					}
-					else
-					{
-						prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false);
-					}
+					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
+							.getLength() == 0);
 					try
 					{
 						prefs.flush();
