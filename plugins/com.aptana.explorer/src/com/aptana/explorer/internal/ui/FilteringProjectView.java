@@ -47,6 +47,8 @@ import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 
 /**
@@ -92,8 +94,6 @@ public class FilteringProjectView extends GitProjectView
 	protected Object[] fExpandedElements;
 
 	private Composite focus;
-	private Color fHoverBGColor;
-	protected Color fLastBGColor;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -190,8 +190,6 @@ public class FilteringProjectView extends GitProjectView
 				if (data != null && (data.getType() == IResource.FILE))
 				{
 					hoveredItem = t;
-					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
-						fLastBGColor = hoveredItem.getBackground();
 					hoveredItem.setBackground(getHoverBackgroundColor());
 					Display.getDefault().asyncExec(new Runnable()
 					{
@@ -719,7 +717,7 @@ public class FilteringProjectView extends GitProjectView
 		if (hoveredItem == null)
 			return;
 		final Rectangle bounds = hoveredItem.getBounds();
-		hoveredItem.setBackground(fLastBGColor);
+		hoveredItem.setBackground(null);
 		hoveredItem = null;
 		Display.getDefault().asyncExec(new Runnable()
 		{
@@ -733,19 +731,8 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		if (fHoverBGColor == null)
-		{
-			fHoverBGColor = new Color(Display.getDefault(), 240, 250, 255);
-		}
-		return fHoverBGColor;
-	}
-
-	@Override
-	public void dispose()
-	{
-		if (fHoverBGColor != null)
-			fHoverBGColor.dispose();
-		super.dispose();
+		return CommonEditorPlugin.getDefault().getColorManager()
+				.getColor(ThemeUtil.getActiveTheme().getLineHighlight());
 	}
 
 	private boolean filterOn()
