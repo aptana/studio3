@@ -54,9 +54,6 @@ public class FilterThroughCommandDialog extends Dialog {
 	private Button createNewDocumentButton;
 	
 	private Button outputToConsoleButton;
-	private Text   consoleNameText;
-	private String consoleName;
-	private static String lastConsoleName;
 
 	private OutputType outputType;
 	private static OutputType lastOutputType = OutputType.OUTPUT_TO_CONSOLE;
@@ -170,39 +167,11 @@ public class FilterThroughCommandDialog extends Dialog {
 		GridData consoleLabelGridData = new GridData(SWT.LEAD, SWT.CENTER, false, false);
 		consoleLabel.setLayoutData(consoleLabelGridData);
 		
-		consoleNameText = new Text(composite, SWT.BORDER);
-		GridData consoleNameTextGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		consoleNameTextGridData.horizontalSpan = 2;
-		consoleNameText.setLayoutData(consoleNameTextGridData);
-		
-		inputFromConsoleButton.addSelectionListener(new SelectionListener() {			
-			public void widgetSelected(SelectionEvent e) {
-				adjustConsoleNameTextSate();
-			}
-			
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-		
-		outputToConsoleButton.addSelectionListener(new SelectionListener() {			
-			public void widgetSelected(SelectionEvent e) {
-				adjustConsoleNameTextSate();
-			}
-			
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-		});
-		
 		applyState();
 		
 		return composite;
 	}
 
-	private void adjustConsoleNameTextSate() {
-		consoleNameText.setEnabled(inputFromConsoleButton.getSelection() || outputToConsoleButton.getSelection());
-	}
 	
 	public String getCommand() {
 		return command;
@@ -214,10 +183,6 @@ public class FilterThroughCommandDialog extends Dialog {
 	
 	public OutputType getOuputType() {
 		return outputType;
-	}
-	
-	public String getConsoleName() {
-		return consoleName;
 	}
 	
 	@Override
@@ -271,12 +236,6 @@ public class FilterThroughCommandDialog extends Dialog {
 			outputType = OutputType.CREATE_NEW_DOCUMENT;
 		} else if (outputToConsoleButton.getSelection()) {
 			outputType = OutputType.OUTPUT_TO_CONSOLE;
-		} 
-		
-		consoleName = consoleNameText.getText();
-		if (consoleName.trim().length() == 0)
-		{
-			consoleName = Filter.DEFAULT_CONSOLE_NAME;
 		}
 		
 		saveState();
@@ -348,13 +307,6 @@ public class FilterThroughCommandDialog extends Dialog {
 			break;
 		}
 		
-		consoleNameText.setEnabled(outputToConsoleButton.getSelection());
-		if (lastConsoleName == null || lastConsoleName.trim().equals("")) { //$NON-NLS-1$
-			consoleNameText.setText(Filter.DEFAULT_CONSOLE_NAME);
-		} else {
-			consoleNameText.setText(lastConsoleName);
-		}
-		
 		if (lastCommands.size() > 0) {
 			commandCombo.setItems(lastCommands.toArray(new String[lastCommands.size()]));
 			commandCombo.select(0);
@@ -365,10 +317,6 @@ public class FilterThroughCommandDialog extends Dialog {
 	private void saveState() {
 		lastInputType = inputType;
 		lastOutputType = outputType;
-		lastConsoleName = consoleName;
-		if (lastConsoleName.equals(Filter.DEFAULT_CONSOLE_NAME)) {
-			lastConsoleName = ""; //$NON-NLS-1$
-		}
 	}
 
 }

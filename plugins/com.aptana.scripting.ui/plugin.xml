@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="com.aptana.scripting.menu"
+               label="%commandsMenu.label"
+               mnemonic="%commandsMenu.mnemonic">
+            <separator
+                  name="commands"
+                  visible="false">
+            </separator>
+            <separator
+                  name="additions"
+                  visible="true">
+            </separator>
+            <separator
+                  name="management"
+                  visible="true">
+            </separator>
+         </menu>
+      </menuContribution>
+   </extension>
+
+</plugin>
