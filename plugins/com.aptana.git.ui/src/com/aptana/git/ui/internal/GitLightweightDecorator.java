@@ -162,11 +162,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		ChangedFile changed = repo.getChangedFileForResource(file);
 		if (changed == null)
 		{
-			decoration.addOverlay(trackedImage);
 			return;
 		}
 
-		ImageDescriptor overlay = trackedImage;
+		ImageDescriptor overlay = null;
 		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
 		if (changed.hasUnstagedChanges())
 		{
@@ -195,7 +194,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			}
 		}
 		decoration.addPrefix(DIRTY_PREFIX);
-		decoration.addOverlay(overlay);
+		if (overlay != null)
+			decoration.addOverlay(overlay);
 	}
 
 	private void decorateProject(IDecoration decoration, final IResource resource)
