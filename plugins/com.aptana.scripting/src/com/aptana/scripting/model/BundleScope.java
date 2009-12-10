@@ -4,10 +4,11 @@ import java.util.Comparator;
 
 public enum BundleScope implements Comparator<BundleScope>
 {
-	APPLICATION(1),
-	USER(2),
-	PROJECT(3);
+	APPLICATION(0),
+	USER(1),
+	PROJECT(2);
 	
+	private static int maxValue = 0;
 	private int _index;
 	
 	/**
@@ -17,7 +18,37 @@ public enum BundleScope implements Comparator<BundleScope>
 	 */
 	private BundleScope(int value)
 	{
+		if (value < 0)
+		{
+			throw new IllegalArgumentException("BundleScope enumeration value must be greater than or equal to zero");
+		}
+		
 		this._index = value;
+		
+		setMaxValue(value);
+	}
+	
+	/**
+	 * getMaxValue
+	 * 
+	 * @return
+	 */
+	public static int getMaxValue()
+	{
+		return maxValue;
+	}
+	
+	/**
+	 * setMaxValue
+	 * 
+	 * @param value
+	 */
+	private static void setMaxValue(int value)
+	{
+		if (value > maxValue)
+		{
+			maxValue = value;
+		}
 	}
 
 	/**
