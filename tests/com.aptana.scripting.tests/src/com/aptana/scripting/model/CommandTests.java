@@ -19,8 +19,8 @@ public class CommandTests
 		assertTrue(bundleFile.exists());
 		
 		// load bundle
-		manager.processBundle(bundleFile, false);
-		BundleElement bundle = manager.getBundleFromPath(bundleFile.getAbsolutePath());
+		manager.loadBundle(bundleFile);
+		BundleElement bundle = manager.getBundle(bundleName);
 		assertNotNull(bundle);
 
 		// get command
