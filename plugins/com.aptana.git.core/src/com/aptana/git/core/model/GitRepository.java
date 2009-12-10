@@ -30,6 +30,7 @@ import org.eclipse.team.core.TeamException;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.util.ProcessUtil;
+import com.aptana.util.StringUtil;
 
 public class GitRepository
 {
@@ -250,7 +251,7 @@ public class GitRepository
 
 		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref", //$NON-NLS-1$
 				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs"); //$NON-NLS-1$ //$NON-NLS-2$
-		List<String> lines = StringUtil.componentsSeparatedByString(output, "\n"); //$NON-NLS-1$
+		List<String> lines = StringUtil.tokenize(output, "\n"); //$NON-NLS-1$
 
 		for (String line : lines)
 		{
@@ -258,7 +259,7 @@ public class GitRepository
 			if (line.length() == 0)
 				continue;
 
-			List<String> components = StringUtil.componentsSeparatedByString(line, " "); //$NON-NLS-1$
+			List<String> components = StringUtil.tokenize(line, " "); //$NON-NLS-1$
 
 			// First do the ref matching. If this ref is new, add it to our ref list
 			GitRef newRef = GitRef.refFromString(components.get(0));
