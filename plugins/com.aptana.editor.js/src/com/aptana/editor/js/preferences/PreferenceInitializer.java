@@ -35,16 +35,20 @@
 package com.aptana.editor.js.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import com.aptana.editor.js.Activator;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+    public static final boolean DEFAULT_COMMENT_INDENT_USE_STAR = true;
+    public static final boolean DEFAULT_AUTO_INDENT_ON_RETURN = true;
+
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-        prefs.setDefault(IPreferenceConstants.COMMENT_INDENT_USE_STAR, true);
-        prefs.setDefault(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, true);
+        IEclipsePreferences prefs = (new DefaultScope()).getNode(Activator.PLUGIN_ID);
+        prefs.putBoolean(IPreferenceConstants.COMMENT_INDENT_USE_STAR, DEFAULT_COMMENT_INDENT_USE_STAR);
+        prefs.putBoolean(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, DEFAULT_AUTO_INDENT_ON_RETURN);
     }
 }

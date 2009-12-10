@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.internal;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -42,6 +43,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import com.aptana.editor.common.CommonAutoIndentStrategy;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
+import com.aptana.editor.js.preferences.PreferenceInitializer;
 
 public class JSAutoIndentStrategy extends CommonAutoIndentStrategy {
 
@@ -62,7 +64,8 @@ public class JSAutoIndentStrategy extends CommonAutoIndentStrategy {
     }
 
     private static boolean shouldAutoIndent() {
-        return Activator.getDefault().getPreferenceStore().getBoolean(
-                IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN);
+        return Platform.getPreferencesService().getBoolean(Activator.PLUGIN_ID,
+                IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN,
+                PreferenceInitializer.DEFAULT_AUTO_INDENT_ON_RETURN, null);
     }
 }
