@@ -3,11 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Util Tests
 Bundle-SymbolicName: com.aptana.util.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.util.tests.Activator
 Bundle-Vendor: APTANA
+Fragment-Host: com.aptana.util;bundle-version="1.0.0"
 Require-Bundle: org.eclipse.core.runtime,
- org.junit;bundle-version="3.8.2",
- com.aptana.util;bundle-version="1.0.0"
+ org.junit;bundle-version="[3.8.1,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/cglib-nodep-2.1_3.jar,
