@@ -3,8 +3,6 @@ package com.aptana.scripting.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jruby.anno.JRubyMethod;
-
 public class BundleElement extends AbstractElement
 {
 	private String _author;
@@ -14,6 +12,7 @@ public class BundleElement extends AbstractElement
 	private String _licenseUrl;
 	private String _gitRepo;
 	
+	private BundleScope _bundleScope;
 	private List<MenuElement> _menus;
 	private List<SnippetElement> _snippets;
 	private List<CommandElement> _commands;
@@ -26,6 +25,8 @@ public class BundleElement extends AbstractElement
 	public BundleElement(String path)
 	{
 		super(path);
+		
+		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
 	}
 
 	/**
@@ -33,7 +34,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param command
 	 */
-	@JRubyMethod(name = "add_command")
 	public void addCommand(CommandElement command)
 	{
 		if (command != null)
@@ -57,7 +57,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param snippet
 	 */
-	@JRubyMethod(name = "add_menu")
 	public void addMenu(MenuElement menu)
 	{
 		if (menu != null)
@@ -81,7 +80,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param snippet
 	 */
-	@JRubyMethod(name = "add_snippet")
 	public void addSnippet(SnippetElement snippet)
 	{
 		if (snippet != null)
@@ -177,12 +175,21 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "author")
 	public String getAuthor()
 	{
 		return this._author;
 	}
 
+	/**
+	 * getBundleScope
+	 * 
+	 * @return
+	 */
+	public BundleScope getBundleScope()
+	{
+		return this._bundleScope;
+	}
+	
 	/**
 	 * getCommandByName
 	 * 
@@ -229,7 +236,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "copyright")
 	public String getCopyright()
 	{
 		return this._copyright;
@@ -240,7 +246,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "description")
 	public String getDescription()
 	{
 		return this._description;
@@ -251,7 +256,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "git_repo")
 	public String getGitRepo()
 	{
 		return this._gitRepo;
@@ -262,7 +266,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "license")
 	public String getLicense()
 	{
 		return this._license;
@@ -273,7 +276,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "license_url")
 	public String getLicenseUrl()
 	{
 		return this._licenseUrl;
@@ -353,7 +355,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param command
 	 */
-	@JRubyMethod(name = "remove_command")
 	public void removeCommand(CommandElement command)
 	{
 		if (this._commands != null && this._commands.remove(command))
@@ -368,7 +369,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param command
 	 */
-	@JRubyMethod(name = "remove_menu")
 	public void removeMenu(MenuElement menu)
 	{
 		if (this._menus != null && this._menus.remove(menu))
@@ -383,7 +383,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param snippet
 	 */
-	@JRubyMethod(name = "remove_snippet")
 	public void removeSnippet(SnippetElement snippet)
 	{
 		if (this._snippets != null && this._snippets.remove(snippet))
@@ -398,7 +397,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param author
 	 */
-	@JRubyMethod(name = "author=")
 	public void setAuthor(String author)
 	{
 		this._author = author;
@@ -409,7 +407,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param copyright
 	 */
-	@JRubyMethod(name = "copyright=")
 	public void setCopyright(String copyright)
 	{
 		this._copyright = copyright;
@@ -420,7 +417,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param description
 	 */
-	@JRubyMethod(name = "description=")
 	public void setDescription(String description)
 	{
 		this._description = description;
@@ -431,7 +427,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param gitRepo
 	 */
-	@JRubyMethod(name = "git_repo=")
 	public void setGitRepo(String gitRepo)
 	{
 		this._gitRepo = gitRepo;
@@ -442,7 +437,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param license
 	 */
-	@JRubyMethod(name = "license=")
 	public void setLicense(String license)
 	{
 		this._license = license;
@@ -453,7 +447,6 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param licenseUrl
 	 */
-	@JRubyMethod(name = "license_url=")
 	public void setLicenseUrl(String licenseUrl)
 	{
 		this._licenseUrl = licenseUrl;

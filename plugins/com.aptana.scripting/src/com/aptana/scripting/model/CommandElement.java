@@ -10,7 +10,6 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
-import org.jruby.anno.JRubyMethod;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -160,7 +159,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "input")
 	public String getInputType()
 	{
 		return this._inputType.getName();
@@ -171,7 +169,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "invoke")
 	public String getInvoke()
 	{
 		return this._invoke;
@@ -182,7 +179,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "invoke_block")
 	public RubyProc getInvokeBlock()
 	{
 		return this._invokeBlock;
@@ -193,7 +189,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "key_binding")
 	public String getKeyBinding()
 	{
 		return this._keyBinding;
@@ -204,7 +199,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "output")
 	public String getOutputType()
 	{
 		return this._outputType.getName();
@@ -245,7 +239,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param input
 	 */
-	@JRubyMethod(name = "input=")
 	public void setInputType(String input)
 	{
 		this._inputType = InputType.get(input);
@@ -256,7 +249,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param invoke
 	 */
-	@JRubyMethod(name = "invoke=")
 	public void setInvoke(String invoke)
 	{
 		this._invoke = invoke;
@@ -267,7 +259,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param block
 	 */
-	@JRubyMethod(name = "invoke_block=")
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
@@ -278,7 +269,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param keyBinding
 	 */
-	@JRubyMethod(name = "key_binding=")
 	public void setKeyBinding(String keyBinding)
 	{
 		this._keyBinding = keyBinding;
@@ -289,7 +279,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param output
 	 */
-	@JRubyMethod(name = "output=")
 	public void setOutputType(String output)
 	{
 		this._outputType = OutputType.get(output);

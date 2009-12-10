@@ -1,7 +1,5 @@
 package com.aptana.scripting.model;
 
-import org.jruby.anno.JRubyMethod;
-
 public class SnippetElement extends TriggerableElement
 {
 	private String _expansion;
@@ -21,34 +19,32 @@ public class SnippetElement extends TriggerableElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "expansion")
 	public String getExpansion()
 	{
 		return this._expansion;
 	}
-	
+
 	/**
 	 * setExpansion
 	 * 
 	 * @param expansion
 	 */
-	@JRubyMethod(name = "expansion=")
 	public void setExpansion(String expansion)
 	{
 		this._expansion = expansion;
 	}
-	
+
 	/**
 	 * toSource
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
 		printer.printWithIndent("snippet \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
 		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
-		
+
 		printer.decreaseIndent().printlnWithIndent("}");
 	}
 }
