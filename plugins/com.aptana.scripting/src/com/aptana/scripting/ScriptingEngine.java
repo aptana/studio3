@@ -19,7 +19,7 @@ import com.aptana.scripting.model.Messages;
 
 public class ScriptingEngine
 {
-	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
+	private static final String BUILTIN_LIBRARY = "framework"; //$NON-NLS-1$
 	
 	private static ScriptingEngine instance;
 	private static ScriptingContainer scriptingContainer;
@@ -53,36 +53,60 @@ public class ScriptingEngine
 	 */
 	public static String getBuiltinsLoadPath()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-		String result = null;
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_LIBRARY), null);
+		
+		return resourcePathToString(url);
+	}
+	
+	/**
+	 * getBuiltinsLoadPath
+	 * 
+	 * @return
+	 */
+	public static String getApplicationBundlesPath()
+	{
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_LIBRARY), null);
+		
+		return resourcePathToString(url);
+	}
 
+	/**
+	 * resourcePathToString
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private static String resourcePathToString(URL url)
+	{
+		String result = null;
+		
 		try
 		{
 			URL fileURL = FileLocator.toFileURL(url);
 			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
 			File file = new File(fileURI);
-
+			
 			result = file.getAbsolutePath();
 		}
 		catch (IOException e)
 		{
 			String message = MessageFormat.format(
-				Messages.BundleManager_Cannot_Locate_Built_Ins_Directory,
-				new Object[] { url.toString() }
+					Messages.BundleManager_Cannot_Locate_Built_Ins_Directory,
+					new Object[] { url.toString() }
 			);
-
+			
 			Activator.logError(message, e);
 		}
 		catch (URISyntaxException e)
 		{
 			String message = MessageFormat.format(
-				Messages.BundleManager_Malformed_Built_Ins_URI,
-				new Object[] { url.toString() }
+					Messages.BundleManager_Malformed_Built_Ins_URI,
+					new Object[] { url.toString() }
 			);
-
+			
 			Activator.logError(message, e);
 		}
-
+		
 		return result;
 	}
 	
