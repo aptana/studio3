@@ -5,3 +5,4 @@ Bundle-SymbolicName: plistreader
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: University of Antwerp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: plistreader
