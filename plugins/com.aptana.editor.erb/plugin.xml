@@ -5,6 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.erb.html.RHTMLEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
             extensions="rhtml"
             icon="icons/erb.png"
@@ -16,6 +17,7 @@
       </editor>
       <editor
             class="com.aptana.editor.erb.xml.RXMLEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             extensions="rxml"
             icon="icons/erb.png"
             id="com.aptana.editor.erb.xml"
