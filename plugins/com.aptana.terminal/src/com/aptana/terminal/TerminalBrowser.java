@@ -4,6 +4,9 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -18,6 +21,8 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.terminal.server.HttpServer;
 
 @SuppressWarnings("restriction")
@@ -25,12 +30,13 @@ public class TerminalBrowser
 {
 	private static final String SHELL_KEY_BINDING_SCHEME = "com.aptana.terminal.scheme"; //$NON-NLS-1$
 	private static final String TERMINAL_URL = "http://{0}:{1}/webterm/"; //$NON-NLS-1$
-	
+
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
 	private String _id;
 	private IServiceLocator _serviceLocator;
-	
+	private IPreferenceChangeListener _themeChangeListener;
+
 	/**
 	 * TerminalBrowser
 	 * 
@@ -42,7 +48,7 @@ public class TerminalBrowser
 		this._serviceLocator = owningPart.getSite();
 		this._id = UUID.randomUUID().toString();
 	}
-	
+
 	/**
 	 * createControl
 	 * 
@@ -51,16 +57,18 @@ public class TerminalBrowser
 	public void createControl(Composite parent)
 	{
 		this._browser = new Browser(parent, SWT.NONE);
-		
+
 		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
-		String url = NLS.bind(TERMINAL_URL, new Object[] {HttpServer.getInstance().getHost(), HttpServer.getInstance().getPort()}) + "?id=" + this._id;  //$NON-NLS-1$
+		String url = NLS.bind(TERMINAL_URL, new Object[] { HttpServer.getInstance().getHost(),
+				HttpServer.getInstance().getPort() })
+				+ "?id=" + this._id; //$NON-NLS-1$
 		this.setUrl(url);
-		
+
 		IPartService service = (IPartService) this._owningPart.getSite().getService(IPartService.class);
 		service.addPartListener(new IPartListener()
 		{
 			Scheme oldScheme = null;
-		
+
 			/*
 			 * (non-Javadoc)
 			 * @see org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
@@ -69,14 +77,15 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-//					System.out.println("Activating shell scheme");
-					
+					// System.out.println("Activating shell scheme");
+
 					try
 					{
-						BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
+						BindingService bindingService = (BindingService) _serviceLocator
+								.getService(IBindingService.class);
 						Scheme currentScheme = bindingService.getActiveScheme();
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
-						
+
 						// NOTE: During debugging I saw two activation events in a row with no
 						// interleaved deactivate. That could cause oldScheme to be overwritten
 						// with our shell scheme, so we now only save the old scheme if we don't
@@ -91,10 +100,9 @@ public class TerminalBrowser
 					catch (NotDefinedException e)
 					{
 						String message = MessageFormat.format(
-							Messages.TerminalBrowser_Key_Binding_Scheme_Does_Not_Exist,
-							new Object[] { SHELL_KEY_BINDING_SCHEME }
-						);
-						
+								Messages.TerminalBrowser_Key_Binding_Scheme_Does_Not_Exist,
+								new Object[] { SHELL_KEY_BINDING_SCHEME });
+
 						Activator.logError(message, e);
 					}
 				}
@@ -108,7 +116,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Shell brought to top");
+					// System.out.println("Shell brought to top");
 				}
 			}
 
@@ -128,17 +136,18 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-//					System.out.println("Deactivating shell scheme");
-					
+					// System.out.println("Deactivating shell scheme");
+
 					try
 					{
 						if (oldScheme != null)
 						{
-							BindingService bindingService = (BindingService) _serviceLocator.getService(IBindingService.class);
-							
+							BindingService bindingService = (BindingService) _serviceLocator
+									.getService(IBindingService.class);
+
 							// re-activate original key binding scheme
 							bindingService.getBindingManager().setActiveScheme(oldScheme);
-							
+
 							// erase reference to scheme
 							oldScheme = null;
 						}
@@ -158,12 +167,31 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					//System.out.println("Shell opened");
+					// System.out.println("Shell opened");
 				}
 			}
 		});
+		// Force refresh of CSS when theme changes
+		_themeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (_browser == null)
+					return;
+				if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+				{
+					final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
+							+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
+							+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
+					_browser.execute(reloadCSSScript);
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(_themeChangeListener);
 	}
-	
+
 	/**
 	 * dispose
 	 */
@@ -171,6 +199,12 @@ public class TerminalBrowser
 	{
 		try
 		{
+			if (this._themeChangeListener != null)
+			{
+				new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+						_themeChangeListener);
+				_themeChangeListener = null;
+			}
 			if (this._browser != null)
 			{
 				this._browser.dispose();
@@ -181,7 +215,7 @@ public class TerminalBrowser
 		{
 		}
 	}
-	
+
 	/**
 	 * getControl
 	 * 
@@ -191,7 +225,7 @@ public class TerminalBrowser
 	{
 		return this._browser;
 	}
-	
+
 	/**
 	 * getStartingDirectory
 	 * 
@@ -200,15 +234,15 @@ public class TerminalBrowser
 	public String getStartingDirectory()
 	{
 		String result = null;
-		
+
 		if (this._owningPart instanceof IStartingDirectory)
 		{
 			result = ((IStartingDirectory) this._owningPart).getStartingDirectory();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * setFocus
 	 */
