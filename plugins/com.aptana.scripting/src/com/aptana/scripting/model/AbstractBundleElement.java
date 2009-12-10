@@ -1,13 +1,12 @@
 package com.aptana.scripting.model;
 
-import org.jruby.anno.JRubyMethod;
-
 import com.aptana.scope.ScopeSelector;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
 	protected BundleElement _owningBundle;
 	protected String _scope;
+	protected ScopeSelector _scopeSelector;
 
 	/**
 	 * AbstractBundleElement
@@ -34,7 +33,6 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "scope")
 	public String getScope()
 	{
 		return this._scope;
@@ -47,8 +45,12 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public ScopeSelector getScopeSelector()
 	{
-		// TODO: cache this
-		return new ScopeSelector(this._scope);
+		if (this._scopeSelector == null)
+		{
+			this._scopeSelector = new ScopeSelector(this._scope);
+		}
+		
+		return this._scopeSelector;
 	}
 	
 	/**
@@ -88,9 +90,10 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 * 
 	 * @param scope
 	 */
-	@JRubyMethod(name = "scope=")
 	public void setScope(String scope)
 	{
+		// TODO: only reset scope selector is scope actually changes
 		this._scope = scope;
+		this._scopeSelector = null;
 	}
 }
