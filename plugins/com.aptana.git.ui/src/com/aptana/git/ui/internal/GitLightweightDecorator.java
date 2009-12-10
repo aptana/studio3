@@ -64,7 +64,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 	}
 
-	private static ImageDescriptor trackedImage;
 	private static ImageDescriptor conflictImage;
 	private static ImageDescriptor untrackedImage;
 	private static ImageDescriptor stagedAddedImage;
@@ -72,7 +71,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	static
 	{
-		trackedImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CHECKEDIN_OVR));
 		conflictImage = new CachedImageDescriptor(TeamImages.getImageDescriptor(ISharedImages.IMG_CONFLICT_OVR));
 		untrackedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault().getBundle()
 				.getEntry("icons/ovr/untracked.gif"))); //$NON-NLS-1$
