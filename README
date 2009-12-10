@@ -1,0 +1,6 @@
+RED Core makes use of a modified version of the plitsreader open source software found at http://sourceforge.net/projects/javaplistreader/.
+The license for this software can be found inside the plugin at plugins/plistreader/GPLv2.txt
+
+RED Core also packages and makes use of the OpenType Font Inconsolata, found at http://www.levien.com/type/myfonts/inconsolata.html
+The license for this font can be found inside the plugin at plugins/com.aptana.editor.common/OFL.txt
+
