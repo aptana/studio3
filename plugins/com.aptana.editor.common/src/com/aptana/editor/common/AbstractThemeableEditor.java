@@ -1,11 +1,14 @@
 package com.aptana.editor.common;
 
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.action.StatusLineLayoutData;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -16,19 +19,25 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.IStatusField;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.ShowScopesAction;
@@ -379,6 +388,14 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	private IFindBarDecorator findBarDecorator;
 
+	/**
+	 * HACK! We force the position status line to recalculate it's length and relayout properly when the string it holds
+	 * changes length. Standard Eclipse hard-codes an assumed length of 14 characters. So I guess if you have line and
+	 * column number length > 11 (since they add " : " between them) it'll truncate. By providing a much more verbose
+	 * string we hit that length really quickly.
+	 */
+	private int lastPositionLength = -1;
+
 	private IFindBarDecorator getFindBarDecorator()
 	{
 		if (findBarDecorator == null)
@@ -386,5 +403,61 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			findBarDecorator = FindBarDecoratorFactory.createFindBarDecorator(this, getStatusLineManager());
 		}
 		return findBarDecorator;
+	}
+
+	/**
+	 * Returns a description of the cursor position.
+	 * 
+	 * @return a description of the cursor position
+	 */
+	protected String getCursorPosition()
+	{
+		String raw = super.getCursorPosition();
+		StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
+		String line = tokenizer.nextToken();
+		String column = tokenizer.nextToken();
+		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+	}
+
+	@Override
+	protected void updateStatusField(String category)
+	{
+		super.updateStatusField(category);
+		// HACK!!!! We force the width to get recalculated on the line and column #
+		if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category))
+		{
+			IStatusField field = getStatusField(category);
+			String text = getCursorPosition();
+			if (text.length() != lastPositionLength)
+			{
+				lastPositionLength = text.length();
+				try
+				{
+					Field label = StatusLineContributionItem.class.getDeclaredField("fLabel"); //$NON-NLS-1$
+					label.setAccessible(true);
+					CLabel clabel = (CLabel) label.get(field);
+					StatusLineLayoutData data = (StatusLineLayoutData) clabel.getLayoutData();
+
+					Control control = clabel.getParent();
+
+					GC gc = new GC(control);
+					gc.setFont(control.getFont());
+					int widthHint = gc.getFontMetrics().getAverageCharWidth() * text.length();
+					widthHint += 3 * 2;
+					gc.dispose();
+					data.widthHint = widthHint;
+
+					if (control instanceof Composite)
+					{
+						((Composite) control).layout();
+					}
+					// control.redraw();
+				}
+				catch (Exception e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
+		}
 	}
 }
