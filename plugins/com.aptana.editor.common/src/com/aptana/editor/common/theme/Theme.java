@@ -442,4 +442,29 @@ public class Theme
 		deleteCustomVersion();
 		deleteDefaultVersion();
 	}
+
+	/**
+	 * Returns the RGB value for a specific token.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public RGB getRGB(String tokenType)
+	{
+		TextAttribute attr = getTextAttribute(tokenType);
+		if (attr == null)
+			return null;
+		return attr.getForeground().getRGB();
+	}
+
+	/**
+	 * Determines if the theme defines this exact token type (not checking parents by dropping periods).
+	 * 
+	 * @param tokenType
+	 * @return
+	 */
+	public boolean hasEntry(String tokenType)
+	{
+		return map.containsKey(tokenType);
+	}
 }

@@ -103,6 +103,17 @@ public class HttpWorker implements Runnable
 		variables.put("\\{caret\\}", toCSSRGB(ThemeUtil.getActiveTheme().getCaret())); //$NON-NLS-1$
 		variables.put("\\{foreground\\}", toCSSRGB(ThemeUtil.getActiveTheme().getForeground())); //$NON-NLS-1$
 		variables.put("\\{background\\}", toCSSRGB(ThemeUtil.getActiveTheme().getBackground())); //$NON-NLS-1$
+
+		// ANSI Colors
+		addAnsiColor(variables, "ansi.black", "0,0,0"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.red", "255,0,0"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.green", "0,255,0"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.yellow", "255,242,0"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.blue", "0,0,255"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.magenta", "236,0,140"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.cyan", "0,174,239"); //$NON-NLS-1$ //$NON-NLS-2$
+		addAnsiColor(variables, "ansi.white", "255,255,255"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		// Now add the text editor font
 		FontDescriptor fd = JFaceResources.getTextFontDescriptor();
 		if (fd != null && fd.getFontData() != null && fd.getFontData().length > 0)
@@ -116,6 +127,21 @@ public class HttpWorker implements Runnable
 			}
 		}
 		return StringUtil.replaceAll(content, variables);
+	}
+
+	private void addAnsiColor(Map<String, String> variables, String tokenName, String defaultValue)
+	{
+		String value = null;
+		if (ThemeUtil.getActiveTheme().hasEntry(tokenName))
+		{
+			value = toCSSRGB(ThemeUtil.getActiveTheme().getRGB(tokenName));
+		}
+		else
+		{
+			// Use default color if there is no specific override!
+			value = defaultValue;
+		}
+		variables.put("\\{" + tokenName + "\\}", value); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
