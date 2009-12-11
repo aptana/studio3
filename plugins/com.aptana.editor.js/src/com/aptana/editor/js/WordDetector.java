@@ -39,22 +39,26 @@ import org.eclipse.jface.text.rules.IWordDetector;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WordDetector implements IWordDetector {
+public class WordDetector implements IWordDetector
+{
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	public boolean isWordPart(char c) {
-		return Character.isJavaIdentifierStart(c);
+	public boolean isWordPart(char c)
+	{
+		return Character.isJavaIdentifierPart(c);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
 	 */
-	public boolean isWordStart(char c) {
-		return Character.isJavaIdentifierPart(c);
+	public boolean isWordStart(char c)
+	{
+		return Character.isJavaIdentifierStart(c);
 	}
 
 }
