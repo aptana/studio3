@@ -41,6 +41,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IGitRepositoryListener
 {
 	/**
+	 * Default colors to use for staged/unstaged files when the theme doesn't define overrides.
+	 */
+	private static final RGB DEFAULT_RED_BG = new RGB(255, 238, 238);
+	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
+	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
+	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
+
+	/**
 	 * The token used from the theme for staged file decorations.
 	 */
 	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
@@ -237,7 +245,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return ThemeUtil.getActiveTheme().getForeground(STAGED_TOKEN);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(60, 168, 60));
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
 
 	private Color greenBG()
@@ -246,7 +254,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return ThemeUtil.getActiveTheme().getBackground(STAGED_TOKEN);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(221, 255, 221));
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
 	private Color redFG()
@@ -255,7 +263,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return ThemeUtil.getActiveTheme().getForeground(UNSTAGED_TOKEN);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(154, 11, 11));
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
 
 	private Color redBG()
@@ -264,7 +272,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return ThemeUtil.getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(255, 238, 238));
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
 	}
 
 	@Override
