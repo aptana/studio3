@@ -63,20 +63,21 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	private void processFile(IResourceDelta delta)
 	{
-		IResource file = delta.getResource();
+		IResource resource = delta.getResource();
 
-		if (file != null && file.getLocation() != null)
+		if (resource != null && resource.getLocation() != null)
 		{
 			BundleManager manager = BundleManager.getInstance();
+			File file = resource.getLocation().toFile();
 			
 			switch (delta.getKind())
 			{
 				case IResourceDelta.ADDED:
-					//manager.processSnippetOrCommand(file);
+					manager.loadScript(file);
 					break;
 
 				case IResourceDelta.REMOVED:
-					//manager.removeSnippetOrCommand(file);
+					manager.unloadScript(file);
 					break;
 
 				case IResourceDelta.CHANGED:
@@ -87,8 +88,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						
 						if (movedFrom != null && movedFrom instanceof IFile)
 						{
-							//manager.removeSnippetOrCommand(movedFrom);
-							//manager.processSnippetOrCommand(file);
+							manager.loadScript(movedFrom.getLocation().toFile());
+							manager.loadScript(file);
 						}
 					}
 					else if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
@@ -98,19 +99,17 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						
 						if (movedTo != null && movedTo instanceof IFile)
 						{
-							//manager.removeSnippetOrCommand(file);
-							//manager.processSnippetOrCommand(movedTo);
+							manager.unloadScript(file);
+							manager.loadScript(movedTo.getLocation().toFile());
 						}
 					}
 					else if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
 					{
-						//manager.removeSnippetOrCommand(file);
-						//manager.processSnippetOrCommand(file);
+						manager.reloadScript(file);
 					}
 					else if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
 					{
-						//manager.removeSnippetOrCommand(file);
-						//manager.processSnippetOrCommand(file);
+						manager.reloadScript(file);
 					}
 					break;
 			}

@@ -234,24 +234,6 @@ public class BundleManager
 	}
 	
 	/**
-	 * getBundle
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public BundleEntry getBundleEntry(String name)
-	{
-		BundleEntry result = null;
-		
-		if (this._entriesByName != null)
-		{
-			result = this._entriesByName.get(name);
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * getBundleCommands
 	 * 
 	 * @param name
@@ -287,6 +269,48 @@ public class BundleManager
 		}
 		
 		return result.toArray(new CommandElement[result.size()]);
+	}
+	
+	/**
+	 * getBundles
+	 * 
+	 * @param bundlesDirectory
+	 * @return
+	 */
+	protected File[] getBundleDirectories(File bundlesDirectory)
+	{
+		File[] result = NO_FILES;
+		
+		if (bundlesDirectory != null && bundlesDirectory.isDirectory() && bundlesDirectory.canRead())
+		{
+			result = bundlesDirectory.listFiles(new FileFilter()
+			{
+				public boolean accept(File pathname)
+				{
+					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false);
+				}
+			});
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundle
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public BundleEntry getBundleEntry(String name)
+	{
+		BundleEntry result = null;
+		
+		if (this._entriesByName != null)
+		{
+			result = this._entriesByName.get(name);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -356,30 +380,6 @@ public class BundleManager
 			result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
 			
 			Arrays.sort(result);
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * getBundles
-	 * 
-	 * @param bundlesDirectory
-	 * @return
-	 */
-	protected File[] getBundleDirectories(File bundlesDirectory)
-	{
-		File[] result = NO_FILES;
-		
-		if (bundlesDirectory != null && bundlesDirectory.isDirectory() && bundlesDirectory.canRead())
-		{
-			result = bundlesDirectory.listFiles(new FileFilter()
-			{
-				public boolean accept(File pathname)
-				{
-					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false);
-				}
-			});
 		}
 		
 		return result;
@@ -847,23 +847,11 @@ public class BundleManager
 			
 			for (File script : bundleScripts)
 			{
-				if (script.canRead())
-				{
-					ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), bundleLoadPaths);
-				}
-				else
-				{
-					String message = MessageFormat.format(
-						"Skipping script because its current access privileges make it unreadable: {0}",
-						new Object[] { script.getAbsolutePath() }
-					);
-					
-					this.logError(message);
-				}
+				this.loadScript(script, bundleLoadPaths);
 			}
 		}
 	}
-	
+
 	/**
 	 * loadBundles
 	 */
@@ -890,6 +878,55 @@ public class BundleManager
 			{
 				this.loadBundle(bundle);
 			}
+		}
+	}
+	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 */
+	public void loadScript(File script)
+	{
+		// determine bundle root directory
+		String scriptPath = script.getAbsolutePath();
+		File bundleDirectory = null;
+		
+		if (scriptPath.endsWith(BUNDLE_FILE))
+		{
+			bundleDirectory = script.getParentFile();
+		}
+		else
+		{
+			bundleDirectory = script.getParentFile().getParentFile();
+		}
+
+		// get bundle load paths
+		List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
+		
+		// execute script
+		this.loadScript(script, bundleLoadPaths);
+	}
+	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 */
+	public void loadScript(File script, List<String> loadPaths)
+	{
+		if (script.canRead())
+		{
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				"Skipping script because its current access privileges make it unreadable: {0}",
+				new Object[] { script.getAbsolutePath() }
+			);
+			
+			this.logError(message);
 		}
 	}
 
@@ -931,10 +968,31 @@ public class BundleManager
 	}
 	
 	/**
+	 * reloadScript
+	 * 
+	 * @param script
+	 */
+	public void reloadScript(File script)
+	{
+		this.unloadScript(script);
+		this.loadScript(script);
+	}
+	
+	/**
 	 * reset
 	 */
 	protected void reset()
 	{
 		// TODO: not implemented
+	}
+	
+	/**
+	 * unloadScript
+	 * 
+	 * @param script
+	 */
+	public void unloadScript(File script)
+	{
+		
 	}
 }
