@@ -72,7 +72,9 @@ public class BundleManager
 	private BundleManager()
 	{
 		// initialize app's bundle path
-		this.applicationBundlesPath = this.getApplicationBundlesPath();
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+		
+		this.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
 		
 		// initialize user's bundle path
 		String OS = Platform.getOS();
@@ -228,9 +230,7 @@ public class BundleManager
 	 */
 	public String getApplicationBundlesPath()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-		
-		return ResourceUtils.resourcePathToString(url);
+		return this.applicationBundlesPath;
 	}
 	
 	/**
@@ -745,21 +745,7 @@ public class BundleManager
 	 */
 	public String getUserBundlesPath()
 	{
-		String OS = Platform.getOS();
-		String userHome = System.getProperty(USER_HOME_PROPERTY);
-		String result = null;
-		
-		// TODO: define user bundle paths for other platforms
-		if (OS.equals(Platform.OS_MACOSX))
-		{
-			result = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
-		}
-		else
-		{
-			result = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
-		}
-		
-		return result;
+		return this.userBundlesPath;
 	}
 	
 	/**
@@ -984,6 +970,26 @@ public class BundleManager
 	protected void reset()
 	{
 		// TODO: not implemented
+	}
+	
+	/**
+	 * setApplicationBundlesPath - for unit testing
+	 * 
+	 * @param path
+	 */
+	void setApplicationBundlesPath(String path)
+	{
+		this.applicationBundlesPath = path;
+	}
+	
+	/**
+	 * setUserBundlesPath - for unit testing
+	 * 
+	 * @param path
+	 */
+	void setUserBundlesPath(String path)
+	{
+		this.userBundlesPath = path;
 	}
 	
 	/**
