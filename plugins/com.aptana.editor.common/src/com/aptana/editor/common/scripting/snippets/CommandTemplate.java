@@ -20,5 +20,14 @@ public class CommandTemplate extends Template {
 	public CommandElement getCommand() {
 		return command;
 	}
+	
+	@Override
+	public boolean matches(String prefix, String contextTypeId) {
+		boolean matches = super.matches(prefix, contextTypeId);
+		if (!matches) {
+			return matches;
+		}
+		return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
+	}
 
 }
