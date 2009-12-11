@@ -40,7 +40,6 @@ import java.util.List;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
@@ -97,29 +96,6 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		// Add word rule for keywords, types, and constants.
-		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
-		addWordRules(wordRule, ThemeUtil.getToken("keyword.control.js"), KEYWORD_CONTROL); //$NON-NLS-1$
-		addWordRules(wordRule, ThemeUtil.getToken("keyword.operator.js"), KEYWORD_OPERATORS); //$NON-NLS-1$
-		addWordRules(wordRule, ThemeUtil.getToken("storage.type.js"), STORAGE_TYPES); //$NON-NLS-1$
-		addWordRules(wordRule, ThemeUtil.getToken("storage.modifier.js"), STORAGE_MODIFIERS); //$NON-NLS-1$
-		addWordRules(wordRule, ThemeUtil.getToken("support.class.js"), SUPPORT_CLASSES); //$NON-NLS-1$
-		addWordRules(wordRule, ThemeUtil.getToken("support.constant.dom.js"), SUPPORT_DOM_CONSTANTS); //$NON-NLS-1$
-
-		wordRule.addWord("true", ThemeUtil.getToken("constant.language.boolean.true.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("false", ThemeUtil.getToken("constant.language.boolean.false.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("null", ThemeUtil.getToken("constant.language.null.js")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		wordRule.addWord("Infinity", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("NaN", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("undefined", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		wordRule.addWord("super", ThemeUtil.getToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("this", ThemeUtil.getToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		wordRule.addWord("debugger", ThemeUtil.getToken("keyword.other.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(wordRule);
-
 		rules
 				.add(new RegexpRule(
 						"!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|(?<!\\()/=|%=|\\+=|\\-=|&=|\\^=|\\b(in|instanceof|new|delete|typeof|void)\\b", //$NON-NLS-1$
@@ -153,6 +129,29 @@ public class JSCodeScanner extends RuleBasedScanner
 				.add(new RegexpRule(
 						"\\bon(R(ow(s(inserted|delete)|e(nter|xit))|e(s(ize(start|end)?|et)|adystatechange))|Mouse(o(ut|ver)|down|up|move)|B(efore(cut|deactivate|u(nload|pdate)|p(aste|rint)|editfocus|activate)|lur)|S(croll|top|ubmit|elect(start|ionchange)?)|H(over|elp)|C(hange|ont(extmenu|rolselect)|ut|ellchange|l(ick|ose))|D(eactivate|ata(setc(hanged|omplete)|available)|r(op|ag(start|over|drop|en(ter|d)|leave)?)|blclick)|Unload|P(aste|ropertychange)|Error(update)?|Key(down|up|press)|Focus|Load|A(ctivate|fter(update|print)|bort))\\b", //$NON-NLS-1$
 						ThemeUtil.getToken("support.function.event-handler.js"))); //$NON-NLS-1$
+
+		// Add word rule for keywords, types, and constants.
+		WordRule wordRule = new WordRule(new WordDetector(), ThemeUtil.getToken("source.js")); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("keyword.control.js"), KEYWORD_CONTROL); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("keyword.operator.js"), KEYWORD_OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("storage.type.js"), STORAGE_TYPES); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("storage.modifier.js"), STORAGE_MODIFIERS); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("support.class.js"), SUPPORT_CLASSES); //$NON-NLS-1$
+		addWordRules(wordRule, ThemeUtil.getToken("support.constant.dom.js"), SUPPORT_DOM_CONSTANTS); //$NON-NLS-1$
+
+		wordRule.addWord("true", ThemeUtil.getToken("constant.language.boolean.true.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("false", ThemeUtil.getToken("constant.language.boolean.false.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("null", ThemeUtil.getToken("constant.language.null.js")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		wordRule.addWord("Infinity", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("NaN", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("undefined", ThemeUtil.getToken("constant.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		wordRule.addWord("super", ThemeUtil.getToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("this", ThemeUtil.getToken("variable.language.js")); //$NON-NLS-1$ //$NON-NLS-2$
+
+		wordRule.addWord("debugger", ThemeUtil.getToken("keyword.other.js")); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(wordRule);
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
