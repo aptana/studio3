@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -78,6 +79,14 @@ import com.aptana.editor.common.theme.ThemeUtil;
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
+	/**
+	 * Key to store the dialog settings for the initial directory to open when importing themes (saves last directory).
+	 */
+	private static final String THEME_DIRECTORY = "themeDirectory"; //$NON-NLS-1$
+
+	/**
+	 * The list of "standard" token types to set up for a theme.
+	 */
 	private static List<String> tokenTypeNames = new ArrayList<String>();
 	static
 	{
@@ -263,12 +272,21 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+				IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+				String value = editorSettings.get(THEME_DIRECTORY);
+				if (value != null)
+				{
+					fileDialog.setFilterPath(value);
+				}
 				fileDialog.setFilterExtensions(new String[] { "*.tmTheme" }); //$NON-NLS-1$
 				String path = fileDialog.open();
 				if (path == null)
 					return;
 
-				Theme theme = new TextmateImporter().convert(new File(path));
+				File themeFile = new File(path);
+				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
+
+				Theme theme = new TextmateImporter().convert(themeFile);
 				ThemeUtil.addTheme(theme);
 				ThemeUtil.setActiveTheme(theme);
 				loadThemeNames();
@@ -648,7 +666,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return ""; //$NON-NLS-1$
 			}
 		});
-		
+
 		final TableColumn fontStyle = new TableColumn(table, SWT.NONE);
 		fontStyle.setResizable(true);
 		fontStyle.setText(Messages.ThemePreferencePage_FontStyleColumnLabel);
