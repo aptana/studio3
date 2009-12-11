@@ -1,0 +1,52 @@
+package com.aptana.editor.common;
+
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.texteditor.ITextEditor;
+
+/**
+ * This holds the TextEditor related utilities.
+ * 
+ * @author schitale
+ *
+ */
+public class TextEditorUtils {
+	
+    /**
+     * Tries to get the accurate location of the caret relative to the document.
+     * <p>
+     * It tries to use the caret position in the StyledText and the selection
+     * to determine if the non-zero length selection is forward (LtoR) or
+     * backward (RtoL) and uses that info to compute the location.
+     * 
+     * @param textEditor
+     * @return
+     */
+    public static int getCaretOffset(ITextEditor textEditor) {
+    	// Assume forward (LtoR) selection
+        boolean forwardSelection = true;
+        Object adapter = textEditor.getAdapter(Control.class);
+        if (adapter instanceof StyledText) {
+            // Accurate
+            StyledText styledText = (StyledText)adapter;
+            int caretOffset = styledText.getCaretOffset();
+            Point selection = styledText.getSelection();
+            forwardSelection = (caretOffset == selection.y);
+        }
+        ISelection selection = textEditor.getSelectionProvider().getSelection();
+        if (selection instanceof ITextSelection) {
+            ITextSelection textSelection = (ITextSelection) selection;
+            // Inaccurate. This can happen when the selection is
+            // reverse i.e. from higher offset to lower offset
+            if (forwardSelection) {
+                return textSelection.getOffset()+textSelection.getLength();
+            } else {
+                return textSelection.getOffset();
+            }
+        }
+        return -1;
+    }
+}
