@@ -955,6 +955,17 @@ public class BundleManager
 	}
 
 	/**
+	 * reloadScript
+	 * 
+	 * @param script
+	 */
+	public void reloadScript(File script)
+	{
+		this.unloadScript(script);
+		this.loadScript(script);
+	}
+	
+	/**
 	 * removeElementChangeListener
 	 * 
 	 * @param listener
@@ -965,17 +976,6 @@ public class BundleManager
 		{
 			this._elementListeners.remove(listener);
 		}
-	}
-	
-	/**
-	 * reloadScript
-	 * 
-	 * @param script
-	 */
-	public void reloadScript(File script)
-	{
-		this.unloadScript(script);
-		this.loadScript(script);
 	}
 	
 	/**
@@ -993,6 +993,28 @@ public class BundleManager
 	 */
 	public void unloadScript(File script)
 	{
+		String scriptPath = script.getAbsolutePath();
 		
+		// NOTE: Actually, we can't do this since bundles can be defined anywhere.
+		// Perhaps we should load different libraries for the differing contexts to
+		// avoid this issue?
+		if (scriptPath.endsWith(BUNDLE_FILE))
+		{
+			File bundleDirectory = script.getParentFile();
+			
+			if (this._bundlesByPath.containsKey(bundleDirectory))
+			{
+				for (BundleElement bundle : this._bundlesByPath.get(bundleDirectory))
+				{
+					bundle.clearMetadata();
+				}
+			}
+			// else error?
+		}
+		else
+		{
+			// TODO: Either need master lists of all elements by path
+			// or we walk all bundles
+		}
 	}
 }
