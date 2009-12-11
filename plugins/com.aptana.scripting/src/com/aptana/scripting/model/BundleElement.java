@@ -171,6 +171,18 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
+	 * clear - note that this only clears the bundle properties and not the bundle elements
+	 */
+	public void clearMetadata()
+	{
+		this._author = null;
+		this._copyright = null;
+		this._description = null;
+		this._license = null;
+		this._licenseUrl = null;
+	}
+	
+	/**
 	 * getAuthor
 	 * 
 	 * @return
@@ -315,6 +327,62 @@ public class BundleElement extends AbstractElement
 		return result;
 	}
 
+	/**
+	 * hasCommands
+	 * 
+	 * @return
+	 */
+	public boolean hasCommands()
+	{
+		return this._commands != null && this._commands.size() > 0;
+	}
+	
+	/**
+	 * hasMetadata
+	 * 
+	 * @return
+	 */
+	public boolean hasMetadata()
+	{
+		return (
+			this._author != null ||
+			this._copyright != null ||
+			this._description != null ||
+			this._license != null ||
+			this._licenseUrl != null
+		);
+	}
+	
+	/**
+	 * hasMenus
+	 * 
+	 * @return
+	 */
+	public boolean hasMenus()
+	{
+		return this._menus != null && this._menus.size() > 0;
+	}
+	
+	/**
+	 * hasSnippets
+	 * 
+	 * @return
+	 */
+	public boolean hasSnippets()
+	{
+		return this._snippets != null && this._snippets.size() > 0;
+	}
+	
+	/**
+	 * isEmpty
+	 * 
+	 * @return
+	 */
+	public boolean isEmpty()
+	{
+		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false && this.hasSnippets() == false;
+	}
+	
 	/**
 	 * moveTo
 	 * 
