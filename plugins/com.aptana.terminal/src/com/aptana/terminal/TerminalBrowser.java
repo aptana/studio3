@@ -266,4 +266,9 @@ public class TerminalBrowser
 			this._browser.setUrl(string);
 		}
 	}
+
+	public String getId()
+	{
+		return _id;
+	}
 }

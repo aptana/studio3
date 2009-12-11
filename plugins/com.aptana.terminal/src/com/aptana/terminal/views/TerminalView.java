@@ -40,6 +40,12 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 		this(null);
 	}
 	
+	@Override
+	public void setPartName(String partName)
+	{
+		super.setPartName(partName);
+	}
+	
 	/**
 	 * TerminalView
 	 * 
@@ -198,6 +204,11 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	public void setFocus()
 	{
 		browser.setFocus();
+	}
+
+	public String getId()
+	{
+		return browser.getId();
 	}
 
 //	/**
