@@ -17,7 +17,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.terminal.Activator;
@@ -123,7 +125,24 @@ public class HttpWorker implements Runnable
 			{
 				variables.put("\\{font-name\\}", data.getName()); //$NON-NLS-1$
 				variables.put("\\{font-size\\}", Integer.toString(data.getHeight())); //$NON-NLS-1$
-				variables.put("\\{line-height\\}", Integer.toString(data.getHeight() + 2)); //$NON-NLS-1$
+				Display display = Display.getCurrent();
+				if (display == null)
+					display = Display.getDefault();
+				final Display theDisplay = display;
+				final int lineHeight[] = new int[] { data.getHeight() + 2 };
+				display.syncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						GC gc = new GC(theDisplay);
+						gc.setFont(JFaceResources.getTextFont());
+						lineHeight[0] = gc.getFontMetrics().getHeight();
+						gc.dispose();
+					}
+				});
+				variables.put("\\{line-height\\}", Integer.toString(lineHeight[0])); //$NON-NLS-1$
 			}
 		}
 		return StringUtil.replaceAll(content, variables);
