@@ -53,6 +53,7 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	 */
 	public TerminalView(String startingDirectory)
 	{
+		// TODO Remove. This constructor can never be called!
 		this.startingDirectory = startingDirectory;
 	}
 
