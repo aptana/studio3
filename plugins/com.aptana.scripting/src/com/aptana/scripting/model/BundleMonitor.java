@@ -57,70 +57,13 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	}
 	
 	/**
-	 * processBundle
-	 * 
-	 * @param delta
-	 */
-	private boolean processBundle(IResourceDelta delta)
-	{
-		IResource file = delta.getResource();
-		boolean visitChildren = true;
-
-		if (file != null && file.getLocation() != null)
-		{
-			IResource bundleFolder = file.getParent();
-			File bundleDirectory = bundleFolder.getLocation().toFile();
-			BundleManager manager = BundleManager.getInstance();
-
-			switch (delta.getKind())
-			{
-				case IResourceDelta.ADDED:
-					//manager.processBundle(bundleDirectory, false);
-					break;
-
-				case IResourceDelta.REMOVED:
-					//manager.removeBundle(bundleDirectory);
-					break;
-
-				case IResourceDelta.CHANGED:
-					if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
-					{
-						String oldPath = delta.getMovedFromPath().toPortableString();
-						
-						//manager.moveBundle(oldPath, bundleFolderPath);
-					}
-					if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
-					{
-						String newPath = delta.getMovedToPath().toString();
-						
-						//manager.moveBundle(bundleFolderPath, newPath);
-					}
-					if ((delta.getFlags() & IResourceDelta.REPLACED) != 0)
-					{
-						//manager.removeBundle(bundleFolderPath);
-						//manager.processBundle(bundleFolder, false);
-					}
-					if ((delta.getFlags() & IResourceDelta.CONTENT) != 0)
-					{
-						//manager.removeBundle(bundleFolderPath);
-						//manager.processBundle(bundleFolder, false);
-					}
-					break;
-			}
-		}
-
-		return visitChildren;
-	}
-	
-	/**
 	 * processFile
 	 * 
 	 * @param delta
 	 */
-	private boolean processFile(IResourceDelta delta)
+	private void processFile(IResourceDelta delta)
 	{
 		IResource file = delta.getResource();
-		boolean visitChildren = true;
 
 		if (file != null && file.getLocation() != null)
 		{
@@ -172,8 +115,6 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 					break;
 			}
 		}
-
-		return visitChildren;
 	}
 	
 	/*
@@ -200,17 +141,16 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 		String fullPath = delta.getResource().getLocation().toPortableString();
-		boolean visitChildren = true;
 		
 		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches() || USER_BUNDLE_PATTERN.matcher(fullPath).matches())
 		{
-			visitChildren = this.processBundle(delta);
+			this.processFile(delta);
 		}
 		else if (FILE_PATTERN.matcher(fullProjectPath).matches() || USER_FILE_PATTERN.matcher(fullPath).matches())
 		{
-			visitChildren = this.processFile(delta);
+			this.processFile(delta);
 		}
 
-		return visitChildren;
+		return true;
 	}
 }

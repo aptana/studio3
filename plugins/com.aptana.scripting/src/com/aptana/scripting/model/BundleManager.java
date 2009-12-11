@@ -25,28 +25,13 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
-	public interface BundleProcessor
-	{
-		public void processBundle(BundleElement bundle);
-	}
-	
-	/**
-	 * FileNameComparator
-	 */
-	public class FileNameComparator implements Comparator<File>
-	{
-		public int compare(File o1, File o2)
-		{
-			return o1.getName().compareTo(o2.getName());
-		}
-	}
-
-	private static final File[] NO_FILES = new File[0];
-	private static final String[] NO_STRINGS = new String[0];
-	
+	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
 	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	
+	private static final File[] NO_FILES = new File[0];
+	private static final String[] NO_STRINGS = new String[0];
 	
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
@@ -77,7 +62,7 @@ public class BundleManager
 	private String applicationBundlesPath;
 	private String userBundlesPath;
 	private Map<File, List<BundleElement>> _bundlesByPath;
-	private Map<String, List<BundleElement>> _bundlesByName;
+	private Map<String, BundleEntry> _entriesByName;
 
 	private List<ElementChangeListener> _elementListeners;
 
@@ -138,37 +123,25 @@ public class BundleManager
 			
 			// store bundle by name
 			String name = bundle.getDisplayName();
-			BundleScope scope = this.getBundleScopeFromPath(path);
 			
-			if (this._bundlesByName == null)
+			if (this._entriesByName == null)
 			{
-				this._bundlesByName = new HashMap<String, List<BundleElement>>();
+				this._entriesByName = new HashMap<String, BundleEntry>();
 			}
 			
-			if (this._bundlesByName.containsKey(name) == false)
+			if (this._entriesByName.containsKey(name) == false)
 			{
-				List<BundleElement> bundles = new ArrayList<BundleElement>();
+				BundleEntry entry = new BundleEntry(name);
 				
-				bundles.add(bundle);
+				entry.addBundle(bundle);
 				
-				this._bundlesByName.put(name, bundles);
+				this._entriesByName.put(name, entry);
 			}
 			else
 			{
-				List<BundleElement> bundles = this._bundlesByName.get(name);
-				int insertIndex;
+				BundleEntry entry = this._entriesByName.get(name);
 				
-				for (insertIndex = 0; insertIndex < bundles.size(); insertIndex++)
-				{
-					BundleScope candidateScope = this.getBundleScopeFromPath(bundles.get(insertIndex).getPath());
-					
-					if (candidateScope.compare(candidateScope, scope) > 0)
-					{
-						break;
-					}
-				}
-				
-				bundles.add(insertIndex, bundle);
+				entry.addBundle(bundle);
 			}
 		}
 	}
@@ -266,19 +239,13 @@ public class BundleManager
 	 * @param name
 	 * @return
 	 */
-	public BundleElement getBundle(String name)
+	public BundleEntry getBundleEntry(String name)
 	{
-		BundleElement result = null;
+		BundleEntry result = null;
 		
-		if (this._bundlesByName != null && this._bundlesByName.containsKey(name))
+		if (this._entriesByName != null)
 		{
-			List<BundleElement> bundles = this._bundlesByName.get(name);
-			int size = bundles.size();
-			
-			if (size > 0)
-			{
-				result = bundles.get(size - 1);
-			}
+			result = this._entriesByName.get(name);
 		}
 		
 		return result;
@@ -295,23 +262,29 @@ public class BundleManager
 		final Set<String> names = new HashSet<String>();
 		final List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		this.processBundle(name, new BundleProcessor()
+		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
-			public void processBundle(BundleElement bundle)
+			// grab all bundles of the given name
+			BundleEntry entry = this._entriesByName.get(name);
+			
+			entry.processMembers(new BundleProcessor()
 			{
-				for (CommandElement command : bundle.getCommands())
+				public void processBundle(BundleElement bundle)
 				{
-					String name = command.getDisplayName();
-					
-					if (names.contains(name) == false)
+					for (CommandElement command : bundle.getCommands())
 					{
-						names.add(name);
-						result.add(command);
+						String name = command.getDisplayName();
+						
+						if (names.contains(name) == false)
+						{
+							names.add(name);
+							result.add(command);
+						}
 					}
 				}
-			}
-			
-		});
+				
+			});
+		}
 		
 		return result.toArray(new CommandElement[result.size()]);
 	}
@@ -343,23 +316,28 @@ public class BundleManager
 		final Set<String> names = new HashSet<String>();
 		final List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		this.processBundle(name, new BundleProcessor()
+		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
-			public void processBundle(BundleElement bundle)
+			// grab all bundles of the given name
+			BundleEntry entry = this._entriesByName.get(name);
+			
+			entry.processMembers(new BundleProcessor()
 			{
-				for (MenuElement menu : bundle.getMenus())
+				public void processBundle(BundleElement bundle)
 				{
-					String name = menu.getDisplayName();
-					
-					if (names.contains(name) == false)
+					for (MenuElement menu : bundle.getMenus())
 					{
-						names.add(name);
-						result.add(menu);
+						String name = menu.getDisplayName();
+						
+						if (names.contains(name) == false)
+						{
+							names.add(name);
+							result.add(menu);
+						}
 					}
 				}
-			}
-			
-		});
+			});
+		}
 		
 		return result.toArray(new MenuElement[result.size()]);
 	}
@@ -373,9 +351,9 @@ public class BundleManager
 	{
 		String[] result = NO_STRINGS;
 		
-		if (this._bundlesByName != null && this._bundlesByName.size() > 0)
+		if (this._entriesByName != null && this._entriesByName.size() > 0)
 		{
-			result = this._bundlesByName.keySet().toArray(new String[this._bundlesByName.size()]);
+			result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
 			
 			Arrays.sort(result);
 		}
@@ -489,23 +467,29 @@ public class BundleManager
 		final Set<String> names = new HashSet<String>();
 		final List<SnippetElement> result = new ArrayList<SnippetElement>();
 		
-		this.processBundle(name, new BundleProcessor()
+		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
-			public void processBundle(BundleElement bundle)
+			// grab all bundles of the given name
+			BundleEntry entry = this._entriesByName.get(name);
+			
+			entry.processMembers(new BundleProcessor()
 			{
-				for (SnippetElement snippet : bundle.getSnippets())
+				public void processBundle(BundleElement bundle)
 				{
-					String name = snippet.getDisplayName();
-					
-					if (names.contains(name) == false)
+					for (SnippetElement snippet : bundle.getSnippets())
 					{
-						names.add(name);
-						result.add(snippet);
+						String name = snippet.getDisplayName();
+						
+						if (names.contains(name) == false)
+						{
+							names.add(name);
+							result.add(snippet);
+						}
 					}
 				}
-			}
-			
-		});
+				
+			});
+		}
 		
 		return result.toArray(new SnippetElement[result.size()]);
 	}
@@ -597,7 +581,7 @@ public class BundleManager
 		
 		return result.toArray(new CommandElement[result.size()]);
 	}
-
+	
 	/**
 	 * getMenusFromScope
 	 * 
@@ -681,7 +665,13 @@ public class BundleManager
 			});
 		}
 
-		Arrays.sort(result, new FileNameComparator());
+		Arrays.sort(result, new Comparator<File>()
+		{
+			public int compare(File o1, File o2)
+			{
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
 
 		return result;
 	}
@@ -925,29 +915,6 @@ public class BundleManager
 	{
 		// TODO: create and write to bundle console
 		System.out.println("error: " + message);
-	}
-
-	/**
-	 * processBundle
-	 * 
-	 * @param name
-	 * @param processor
-	 */
-	protected void processBundle(String name, BundleProcessor processor)
-	{
-		if (this._bundlesByName != null && this._bundlesByName.containsKey(name) && processor != null)
-		{
-			// grab all bundles of the given name
-			List<BundleElement> bundles = this._bundlesByName.get(name);
-			
-			// walk all bundles for a given name in reverse order to preserve overrides
-			for (int i = bundles.size() - 1; i >= 0; i--)
-			{
-				BundleElement bundle = bundles.get(i);
-				
-				processor.processBundle(bundle);
-			}
-		}
 	}
 
 	/**

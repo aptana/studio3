@@ -20,8 +20,11 @@ public class CommandTests
 		
 		// load bundle
 		manager.loadBundle(bundleFile);
-		BundleElement bundle = manager.getBundle(bundleName);
-		assertNotNull(bundle);
+		BundleEntry entry = manager.getBundleEntry(bundleName);
+		BundleElement[] bundles = entry.getBundles();
+		assertEquals(1, bundles.length);
+		
+		BundleElement bundle = bundles[0];
 
 		// get command
 		CommandElement command = bundle.getCommandByName(commandName);
