@@ -63,6 +63,31 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 36);
 	}
 	
+	public void testDivisionIsntPickedUpAsRegexp()
+	{
+		String source =
+//                     1         2         3         4         5
+//           012345678901234567890123456789012345678901234567890
+			"var width = Math.floor(viewWidth / characterWidth);\n";
+
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 1);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 35);
+	}
+	
+	public void testComplexRegexp()
+	{
+		String source =
+//                     1         2         3         4         5
+//           012345678901234567890123456789012345678901234567890
+			"var regexp = /^\\/\\*-secure-([\\s\\S]*)\\*\\/\\s*$/;\n";
+
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 13);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 44);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 45);
+	}
+		
 	public void testPartitioningOfCommentSpanningMultipleLines()
 	{
 		String source = 
