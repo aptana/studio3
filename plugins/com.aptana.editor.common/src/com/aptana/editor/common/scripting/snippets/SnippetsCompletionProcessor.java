@@ -34,7 +34,6 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerOnlyFilter;
-import com.aptana.scripting.model.TriggerableElement;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 
@@ -77,14 +76,11 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 			templatesList.add(new SnippetTemplate(snippet, contextTypeId));
 		}
 		
-		TriggerableElement[] commandsFromScope =
+		CommandElement[] commandsFromScope =
 			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
-		for (TriggerableElement triggerableNode : commandsFromScope) {
-			if (triggerableNode instanceof CommandElement) {
-				CommandElement command = (CommandElement) triggerableNode;
-				if (command.getTrigger() != null) {
-					templatesList.add (new CommandTemplate((CommandElement)triggerableNode, contextTypeId));
-				}
+		for (CommandElement commandElement : commandsFromScope) {
+			if (commandElement.getTrigger() != null) {
+				templatesList.add (new CommandTemplate((CommandElement)commandElement, contextTypeId));
 			}
 		}
 		Collections.sort(templatesList, new Comparator<Template>() {
@@ -163,11 +159,13 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 	
 	// Allow any non-whitespace as a prefix.
 	protected String extractPrefix(ITextViewer viewer, int offset) {
-		int i= offset;
-		IDocument document= viewer.getDocument();
-		if (i > document.getLength())
+		return extractPrefixFromDocument(viewer.getDocument(), offset);
+	}
+	
+	static String extractPrefixFromDocument(IDocument document, int offset) {
+		if (offset > document.getLength())
 			return ""; //$NON-NLS-1$
-
+		int i= offset;
 		try {
 			while (i > 0) {
 				char ch= document.getChar(i - 1);
@@ -175,7 +173,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 					break;
 				i--;
 			}
-
 			return document.get(i, offset - i);
 		} catch (BadLocationException e) {
 			return ""; //$NON-NLS-1$

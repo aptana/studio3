@@ -12,6 +12,14 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.ITextEditorExtension2;
 
+import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TriggerOnlyFilter;
+
 public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 
 	private final ITextEditor textEditor;
@@ -47,17 +55,42 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 		if (canModifyEditor) {
 			if (event.doit) {
 				if (event.character == '\t') {
-					ITextSelection selection = (ITextSelection) textEditor
-					.getSelectionProvider().getSelection();
+					ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
 					if (selection.getLength() == 0) {
 						int offset = selection.getOffset() - 1;
 						try {
 							String previousChar = document.get(offset, 1);
-							if (previousChar.matches("\\S")) { //$NON-NLS-1$
-								// TODO Check if there is at least one snippet
-								if (contentAssistant != null) {
-									contentAssistant.showPossibleCompletions();
-									event.doit = false;									
+							if (!Character.isWhitespace(previousChar.charAt(0))) {
+								int caretOffset = textViewer.getTextWidget().getCaretOffset();
+								String contextTypeId = getContextType(document, caretOffset);
+								SnippetElement[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
+								if (snippetsFromScope.length > 0) {
+									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
+									boolean found = false;
+									for (SnippetElement snippetElement : snippetsFromScope) {
+										String trigger = snippetElement.getTrigger();
+										if (trigger != null && trigger.startsWith(prefix)) {
+											found = true;
+											break;
+										}
+									}
+									if (!found) {
+										CommandElement[] commandsFromScope =
+											BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+										for (CommandElement commandElement : commandsFromScope) {
+											String trigger = commandElement.getTrigger();
+											if (trigger != null && trigger.startsWith(prefix)) {
+												found = true;
+												break;
+											}
+										}
+									}
+									if (found) {
+										if (contentAssistant != null) {
+											contentAssistant.showPossibleCompletions();
+											event.doit = false;									
+										}
+									}
 								}
 							}
 						} catch (BadLocationException e) {
@@ -78,5 +111,23 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 			return editor.isEditable();
 		else
 			return false;
+	}
+	
+	private static String getContextType(IDocument document, int offset) {
+		String contentTypeString = ""; //$NON-NLS-1$
+		try {
+			contentTypeString = getContentTypeAtOffset(document, offset);
+		} catch (BadLocationException e) {
+			// TODO
+		}
+		return contentTypeString;
+	}
+	
+	private static String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException {
+		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
+		if (contentType != null) {
+			return ContentTypeTranslation.getDefault().translate(contentType).toString();
+		}
+		return document.getContentType(offset);
 	}
 }
