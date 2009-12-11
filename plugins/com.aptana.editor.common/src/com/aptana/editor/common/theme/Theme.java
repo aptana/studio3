@@ -444,20 +444,6 @@ public class Theme
 	}
 
 	/**
-	 * Returns the RGB value for a specific token.
-	 * 
-	 * @param string
-	 * @return
-	 */
-	public RGB getRGB(String tokenType)
-	{
-		TextAttribute attr = getTextAttribute(tokenType);
-		if (attr == null)
-			return null;
-		return attr.getForeground().getRGB();
-	}
-
-	/**
 	 * Determines if the theme defines this exact token type (not checking parents by dropping periods).
 	 * 
 	 * @param tokenType
@@ -467,4 +453,43 @@ public class Theme
 	{
 		return map.containsKey(tokenType);
 	}
+
+	public Color getForeground(String tokenType)
+	{
+		TextAttribute attr = getTextAttribute(tokenType);
+		if (attr == null)
+			return null;
+		return attr.getForeground();
+	}
+
+	/**
+	 * Returns the RGB value for the foreground of a specific token.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public RGB getForegroundAsRGB(String tokenType)
+	{
+		return getForeground(tokenType).getRGB();
+	}
+
+	public Color getBackground(String tokenType)
+	{
+		TextAttribute attr = getTextAttribute(tokenType);
+		if (attr == null)
+			return null;
+		return attr.getBackground();
+	}
+
+	/**
+	 * Returns the RGB value for the background of a specific token.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public RGB getBackgroundAsRGB(String tokenType)
+	{
+		return getBackground(tokenType).getRGB();
+	}
+
 }

@@ -20,11 +20,14 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -37,6 +40,16 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
+	/**
+	 * The token used from the theme for staged file decorations.
+	 */
+	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
+
+	/**
+	 * The token used from the theme for unstaged file decorations.
+	 */
+	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
+
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
 
@@ -79,11 +92,6 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		stagedRemovedImage = new CachedImageDescriptor(ImageDescriptor.createFromURL(GitUIPlugin.getDefault()
 				.getBundle().getEntry("icons/ovr/staged_removed.gif"))); //$NON-NLS-1$
 	}
-
-	private static Color greenFG;
-	private static Color greenBG;
-	private static Color redFG;
-	private static Color redBG;
 
 	public GitLightweightDecorator()
 	{
@@ -225,63 +233,43 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	private Color greenFG()
 	{
-		if (greenFG == null)
+		if (ThemeUtil.getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
-			Display display = Display.getCurrent();
-			if (display == null)
-				display = Display.getDefault();
-			greenFG = new Color(display, 60, 168, 60);
+			return ThemeUtil.getActiveTheme().getForeground(STAGED_TOKEN);
 		}
-		return greenFG;
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(60, 168, 60));
 	}
 
 	private Color greenBG()
 	{
-		if (greenBG == null)
+		if (ThemeUtil.getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
-			Display display = Display.getCurrent();
-			if (display == null)
-				display = Display.getDefault();
-			greenBG = new Color(display, 221, 255, 221);
+			return ThemeUtil.getActiveTheme().getBackground(STAGED_TOKEN);
 		}
-		return greenBG;
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(221, 255, 221));
 	}
 
 	private Color redFG()
 	{
-		if (redFG == null)
+		if (ThemeUtil.getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
-			Display display = Display.getCurrent();
-			if (display == null)
-				display = Display.getDefault();
-			redFG = new Color(display, 154, 11, 11);
+			return ThemeUtil.getActiveTheme().getForeground(UNSTAGED_TOKEN);
 		}
-		return redFG;
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(154, 11, 11));
 	}
 
 	private Color redBG()
 	{
-		if (redBG == null)
+		if (ThemeUtil.getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
-			Display display = Display.getCurrent();
-			if (display == null)
-				display = Display.getDefault();
-			redBG = new Color(display, 255, 238, 238);
+			return ThemeUtil.getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
-		return redBG;
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(255, 238, 238));
 	}
 
 	@Override
 	public void dispose()
 	{
-		if (greenFG != null)
-			greenFG.dispose();
-		if (greenBG != null)
-			greenBG.dispose();
-		if (redFG != null)
-			redFG.dispose();
-		if (redBG != null)
-			redBG.dispose();
 		GitRepository.removeListener(this);
 		super.dispose();
 	}

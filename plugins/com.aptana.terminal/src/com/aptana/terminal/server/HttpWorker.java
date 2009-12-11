@@ -134,7 +134,7 @@ public class HttpWorker implements Runnable
 		String value = null;
 		if (ThemeUtil.getActiveTheme().hasEntry(tokenName))
 		{
-			value = toCSSRGB(ThemeUtil.getActiveTheme().getRGB(tokenName));
+			value = toCSSRGB(ThemeUtil.getActiveTheme().getForegroundAsRGB(tokenName));
 		}
 		else
 		{
