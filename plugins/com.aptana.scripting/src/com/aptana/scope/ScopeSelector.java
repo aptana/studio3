@@ -1,5 +1,7 @@
 package com.aptana.scope;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
@@ -140,5 +142,31 @@ public class ScopeSelector
 	public String toString()
 	{
 		return this._root.toString();
+	}
+	
+	private static final String[] EMPTY_SPLIT_SCOPE = new String[0];
+	public static String[] splitScope(String scope) {
+		if (scope != null) {
+			String[] ands = and_split.split(scope);
+			if (ands.length == 0) {
+				return EMPTY_SPLIT_SCOPE;
+			} else if (ands.length == 1) {
+				return new String[] {scope};
+			} else {
+				List<String> splitScopeList = new LinkedList<String>();
+				for (int i = 0; i < ands.length; i++) {
+					StringBuilder sb = new StringBuilder();
+					for (int j = 0; j <= i; j++) {
+						if (j > 0) {
+							sb.append(" "); //$NON-NLS-1$
+						}
+						sb.append(ands[j]);
+					}
+					splitScopeList.add(sb.toString());
+				}
+				return splitScopeList.toArray(EMPTY_SPLIT_SCOPE);
+			}
+		}
+		return null;
 	}
 }
