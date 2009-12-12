@@ -253,7 +253,7 @@ public class TerminalBrowser
 	 * 
 	 * @return
 	 */
-	public String getStartingDirectory()
+	private String getStartingDirectory()
 	{
 		return grabStartDirectory();
 	}
