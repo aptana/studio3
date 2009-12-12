@@ -51,6 +51,9 @@ import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
+import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -175,6 +178,18 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         return presenter;
     }
 
+    @Override
+    public IReconciler getReconciler(ISourceViewer sourceViewer) {
+        IReconcilingStrategy strategy = getReconcilingStrategy();
+        if (strategy == null) {
+            return null;
+        }
+        MonoReconciler reconciler = new MonoReconciler(strategy, false);
+        reconciler.setDelay(1000);
+
+        return reconciler;
+    }
+
     /**
      * @return the default indentation string (either tab or spaces which
      *         represents a tab)
@@ -233,6 +248,10 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
             String contentType) {
         return new CommonInformationProvider();
+    }
+
+    protected IReconcilingStrategy getReconcilingStrategy() {
+        return new CommonReconcilingStrategy();
     }
 
     protected IContentAssistProcessor addTemplateCompleteProcessor(
