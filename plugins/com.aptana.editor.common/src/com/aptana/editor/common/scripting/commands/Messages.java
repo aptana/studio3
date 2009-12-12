@@ -4,6 +4,8 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.scripting.commands.messages"; //$NON-NLS-1$
+	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
+	public static String EditorCommandsMenuContributor_TITLE_CommandNotDefined;
 	public static String FilterThroughCommandDialog_LBL_Command;
 	public static String FilterThroughCommandDialog_LBL_ConsoleName;
 	public static String FilterThroughCommandDialog_LBL_CreateNewDocument;

@@ -2,9 +2,9 @@ package com.aptana.editor.common.scripting.commands;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -19,12 +19,20 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.TextEditorUtils;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.MenuElement;
 
+/**
+ * This contributes the menus for editor scope to the Commands menu.
+ * 
+ * @author schitale
+ *
+ */
 public class EditorCommandsMenuContributor extends ContributionItem {
 
 	public EditorCommandsMenuContributor() {
@@ -42,21 +50,35 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 		if (evaluationService != null) {
 			IEvaluationContext currentState = evaluationService.getCurrentState();
 			Object activePart = currentState.getVariable(ISources.ACTIVE_PART_NAME);
+			// Is this an Aptana Editor
 			if (activePart instanceof AbstractThemeableEditor) {
 				AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) activePart;
-				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
-				ITextSelection selection = (ITextSelection) abstractThemeableEditor.getSelectionProvider().getSelection();
 				MenuElement[] menusFromScope;
 				try {
-					menusFromScope = BundleManager.getInstance().getMenusFromScope(getContentTypeAtOffset(document, selection.getOffset()));
-					buildMenu(menu, menusFromScope, abstractThemeableEditor);
+					IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
+					int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
+					String contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
+					String[] splitContentTypeAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
+					menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypeAtOffset);
+					buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
 				} catch (BadLocationException e) {
+					CommonEditorPlugin.logError(e);
 				}
+				
+				// TODO Build the menus for other languages in the same file
 			}
 		}
 	}
 	
-	private void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor) {
+	/**
+	 * This recursively builds the menu contribution.
+	 * 
+	 * @param menu
+	 * @param menusFromScope
+	 * @param textEditor
+	 * @param contentTypeAtOffset
+	 */
+	private void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String contentTypeAtOffset) {
 		for (MenuElement menuForScope : menusFromScope) {
 			if (menuForScope.isHierarchicalMenu()) {
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
@@ -66,30 +88,43 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 				menuItemForMenuForScope.setMenu(menuForMenuForScope);
 				
 				// Recursive
-				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor);
+				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset);
 			} else if (menuForScope.isSeparator()) {
 				new MenuItem(menu, SWT.SEPARATOR);
 			} else {
 				final CommandElement command = menuForScope.getCommand();
-				MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
+				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 				menuItem.setText(menuForScope.getDisplayName());
 				menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.COMMAND));
 				menuItem.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
-						if (command != null) {
+						if (command == null) {
+							// There is no associated command. Show a message to the user.
+							MessageDialog.openError(menuItem.getParent().getShell(),
+									Messages.EditorCommandsMenuContributor_TITLE_CommandNotDefined,
+									Messages.bind(Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined, menuItem.getText()));
+						} else {
 							CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
 							CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 						}
 					}
-					
+
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {}
 				});
+				// Enable the menu item if:
+				// 1. There is no associated command so that we can show a message to the user when they invoke the menu item
+				// 2. The command did not specify the scope
+				// 3. The command specified the scope and it matches the current scope
+				menuItem.setEnabled(command == null || command.getScope() == null || command.getScopeSelector().matches(contentTypeAtOffset));
 			}
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
+	 */
 	@Override
 	public boolean isDynamic() {
 		return true;
