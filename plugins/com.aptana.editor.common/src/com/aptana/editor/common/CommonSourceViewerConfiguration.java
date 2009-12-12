@@ -39,12 +39,15 @@ import java.util.Map;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
@@ -78,6 +81,11 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     }
 
     @Override
+    public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
+        return ICommonConstants.DEFAULT_PARTITIONING;
+    }
+
+    @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
         ContentAssistant assistant = new ContentAssistant();
 
@@ -102,6 +110,13 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
         return assistant;
+    }
+
+    @Override
+    public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+        MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+                getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+        return formatter;
     }
 
     @Override
@@ -143,16 +158,19 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
         InformationPresenter presenter = new InformationPresenter(
                 getInformationPresenterControlCreator(sourceViewer));
+
         presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+        presenter.setSizeConstraints(60, 10, true, true);
 
         // registers information provider
-        IInformationProvider provider = new CommonInformationProvider();
         String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        IInformationProvider provider;
         for (String type : contentTypes) {
-            presenter.setInformationProvider(provider, type);
+            provider = getInformationProvider(sourceViewer, type);
+            if (provider != null) {
+                presenter.setInformationProvider(provider, type);
+            }
         }
-
-        presenter.setSizeConstraints(60, 10, true, true);
 
         return presenter;
     }
@@ -184,9 +202,37 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         return targets;
     }
 
+    /**
+     * Returns the content assist processor that will be used for content assist
+     * in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the content assist processor is
+     *            applicable
+     * @return IContentAssistProcessor or null if the content type is not
+     *         supported
+     */
     protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
             String contentType) {
         return null;
+    }
+
+    /**
+     * Returns the information provider that will be used for information
+     * presentation in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the information provider is
+     *            applicable
+     * @return IInformationProvider or null if the content type is not supported
+     */
+    protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
+            String contentType) {
+        return new CommonInformationProvider();
     }
 
     protected IContentAssistProcessor addTemplateCompleteProcessor(
