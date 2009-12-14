@@ -983,9 +983,19 @@ public class BundleManager
 	/**
 	 * reset
 	 */
-	protected void reset()
+	public void reset()
 	{
-		// TODO: not implemented
+		// TODO: should unload all commands, menus, and snippets so events fire, but
+		// this is used for test only right now.
+		if (this._bundlesByPath != null)
+		{
+			this._bundlesByPath.clear();
+		}
+		
+		if (this._entriesByName != null)
+		{
+			this._entriesByName.clear();
+		}
 	}
 	
 	/**
