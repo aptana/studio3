@@ -102,13 +102,8 @@
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
 		</delete>
-		<!--
-		<delete verbose="true">
-			<fileset dir="${buildDirectory}/plugins">
-				<include name="**/*" />
-			</fileset>
-		</delete>
-		-->
+		<!-- Wipe the non-test plugins-->
+		<antcall target="wipe.plugins" />
 		<!-- Copy test plugins into plugins dir -->
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="${buildDirectory}/tests">
@@ -116,12 +111,27 @@
 			</fileset>
 		</copy>
 		<!-- Install Red Core feature -->
-		<!--
+		<antcall target="install.red.core" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: install.red.core                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="install.red.core" unless="dont.install.red.core">
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
 			<param name="p2.repo" value="${red-core.p2.repo}" />
 		</antcall>
-		-->
+	</target>
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: wipe.plugins                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="wipe.plugins" unless="dont.wipe.plugins">
+		<delete verbose="true">
+			<fileset dir="${buildDirectory}/plugins">
+				<include name="**/*" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
