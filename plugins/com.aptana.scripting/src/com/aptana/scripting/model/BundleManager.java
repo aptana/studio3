@@ -43,6 +43,60 @@ public class BundleManager
 
 	private static BundleManager INSTANCE;
 	
+	private String applicationBundlesPath;
+	private String userBundlesPath;
+	private Map<File, List<BundleElement>> _bundlesByPath;
+	private Map<String, BundleEntry> _entriesByName;
+	
+	private List<ElementChangeListener> _elementListeners;
+	
+	/**
+	 * getInstance - used for unit testing
+	 * 
+	 * @param applicationBundlesPath
+	 * @param userBundlesPath
+	 * @return
+	 */
+	public static BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
+	{
+		if (INSTANCE == null)
+		{
+			// create new instance
+			INSTANCE = new BundleManager();
+			
+			// setup default application bundles path
+			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+			INSTANCE.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
+			
+			String OS = Platform.getOS();
+			String userHome = System.getProperty(USER_HOME_PROPERTY);
+			
+			// setup default user bundles path
+			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			{
+				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+			}
+			else
+			{
+				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+			}
+		}
+			
+		// setup application bundles path
+		if (applicationBundlesPath != null && applicationBundlesPath.length() > 0)
+		{
+			INSTANCE.applicationBundlesPath = applicationBundlesPath;
+		}
+
+		// setup user bundles path
+		if (userBundlesPath != null && userBundlesPath.length() > 0)
+		{
+			INSTANCE.userBundlesPath = userBundlesPath;
+		}
+
+		return INSTANCE;
+	}
+	
 	/**
 	 * getInstance
 	 * 
@@ -50,42 +104,14 @@ public class BundleManager
 	 */
 	public static BundleManager getInstance()
 	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new BundleManager();
-		}
-
-		return INSTANCE;
+		return getInstance(null, null);
 	}
-	private String applicationBundlesPath;
-	private String userBundlesPath;
-	private Map<File, List<BundleElement>> _bundlesByPath;
-	private Map<String, BundleEntry> _entriesByName;
-
-	private List<ElementChangeListener> _elementListeners;
 
 	/**
 	 * BundleManager
 	 */
 	private BundleManager()
 	{
-		// initialize app's bundle path
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-		
-		this.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
-		
-		// initialize user's bundle path
-		String OS = Platform.getOS();
-		String userHome = System.getProperty(USER_HOME_PROPERTY);
-		
-		if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
-		{
-			this.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
-		}
-		else
-		{
-			this.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
-		}
 	}
 	
 	/**
@@ -289,6 +315,48 @@ public class BundleManager
 		if (this._entriesByName != null)
 		{
 			result = this._entriesByName.get(name);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public BundleElement getBundleFromPath(String path)
+	{
+		BundleElement result = null;
+		
+		if (path != null)
+		{
+			result = this.getBundleFromPath(new File(path));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public BundleElement getBundleFromPath(File bundleFile)
+	{
+		BundleElement result = null;
+		
+		if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
+		{
+			List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
+			int size = bundles.size();
+			
+			if (size > 0)
+			{
+				result = bundles.get(size - 1);
+			}
 		}
 		
 		return result;
@@ -611,16 +679,16 @@ public class BundleManager
 					return pathname.isFile() && pathname.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION);
 				}
 			});
-		}
-
-		Arrays.sort(result, new Comparator<File>()
-		{
-			public int compare(File o1, File o2)
+			
+			Arrays.sort(result, new Comparator<File>()
 			{
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
-
+				public int compare(File o1, File o2)
+				{
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+		}
+		
 		return result;
 	}
 
@@ -918,26 +986,6 @@ public class BundleManager
 	protected void reset()
 	{
 		// TODO: not implemented
-	}
-	
-	/**
-	 * setApplicationBundlesPath - for unit testing
-	 * 
-	 * @param path
-	 */
-	void setApplicationBundlesPath(String path)
-	{
-		this.applicationBundlesPath = path;
-	}
-	
-	/**
-	 * setUserBundlesPath - for unit testing
-	 * 
-	 * @param path
-	 */
-	void setUserBundlesPath(String path)
-	{
-		this.userBundlesPath = path;
 	}
 	
 	/**
