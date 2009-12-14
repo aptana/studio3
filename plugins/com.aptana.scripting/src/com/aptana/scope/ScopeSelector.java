@@ -1,5 +1,6 @@
 package com.aptana.scope;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -164,6 +165,8 @@ public class ScopeSelector
 					}
 					splitScopeList.add(sb.toString());
 				}
+				// Most specific scope is first in the array
+				Collections.reverse(splitScopeList);
 				return splitScopeList.toArray(EMPTY_SPLIT_SCOPE);
 			}
 		}
