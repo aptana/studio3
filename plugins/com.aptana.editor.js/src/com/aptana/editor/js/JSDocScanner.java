@@ -42,10 +42,8 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
@@ -93,9 +91,6 @@ public class JSDocScanner extends RuleBasedScanner {
 
         // Add rule for links.
         list.add(new SingleLineRule("{", "}", link)); //$NON-NLS-2$ //$NON-NLS-1$
-
-        // Add generic whitespace rule.
-        list.add(new WhitespaceRule(new WhitespaceDetector()));
 
         // Add word rule for keywords.
         WordRule wordRule = new WordRule(new JSDocWordDetector());
