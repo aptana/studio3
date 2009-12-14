@@ -62,12 +62,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	
 	public final static String PREFIX = "__html_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String HTML_COMMENT = "__html_comment"; //$NON-NLS-1$
-	public final static String CDATA = "__html_cdata"; //$NON-NLS-1$
-	public final static String HTML_DOCTYPE = "__html_doctype"; //$NON-NLS-1$
-	public final static String HTML_SCRIPT = "__html_script"; //$NON-NLS-1$
-	public final static String HTML_STYLE = "__html_style"; //$NON-NLS-1$
-	public final static String HTML_TAG = "__html_tag"; //$NON-NLS-1$
+	public final static String HTML_COMMENT = PREFIX + "comment"; //$NON-NLS-1$
+	public final static String CDATA = PREFIX + "cdata"; //$NON-NLS-1$
+	public final static String HTML_DOCTYPE = PREFIX + "doctype"; //$NON-NLS-1$
+	public final static String HTML_SCRIPT = PREFIX + "script"; //$NON-NLS-1$
+	public final static String HTML_STYLE = PREFIX + "style"; //$NON-NLS-1$
+	public final static String HTML_TAG = PREFIX + "tag"; //$NON-NLS-1$
 
 	protected static final String[] CONTENT_TYPES = new String[] {
 		DEFAULT,
