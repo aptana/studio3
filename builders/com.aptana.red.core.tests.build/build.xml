@@ -112,6 +112,7 @@
 		</copy>
 		<!-- Install Red Core feature -->
 		<antcall target="install.red.core" />
+		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -169,6 +170,7 @@
 	</target>
 
 	<target name="test" depends="build">
+		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
 			<param name="p2.repo" value="file:${p2.repo.dir}" />
