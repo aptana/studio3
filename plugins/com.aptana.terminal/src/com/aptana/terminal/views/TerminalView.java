@@ -18,36 +18,22 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.IStartingDirectory;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.HttpServer;
 
-public class TerminalView extends ViewPart implements IStartingDirectory
+public class TerminalView extends ViewPart
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
-	
+
 	private TerminalBrowser browser;
 	private Action openEditor;
-	private String startingDirectory;
 
-	/**
-	 * The constructor.
-	 */
-	public TerminalView()
+	@Override
+	public void setPartName(String partName)
 	{
-		this(null);
-	}
-	
-	/**
-	 * TerminalView
-	 * 
-	 * @param startingDirectory
-	 */
-	public TerminalView(String startingDirectory)
-	{
-		this.startingDirectory = startingDirectory;
+		super.setPartName(partName);
 	}
 
 	/**
@@ -56,7 +42,7 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	private void contributeToActionBars()
 	{
 		IActionBars bars = getViewSite().getActionBars();
-		
+
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
@@ -68,10 +54,10 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	{
 		this.browser = new TerminalBrowser(this);
 		this.browser.createControl(parent);
-		
+
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this.browser.getControl(), ID);
-		
+
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
@@ -89,7 +75,7 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 			this.browser.dispose();
 			this.browser = null;
 		}
-		
+
 		super.dispose();
 	}
 
@@ -101,9 +87,9 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	private void fillContextMenu(IMenuManager manager)
 	{
 		manager.add(openEditor);
-		
+
 		// Other plug-ins can contribute there actions here
-		
+
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -128,20 +114,12 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	}
 
 	/**
-	 * getStartingDirectory
-	 */
-	public String getStartingDirectory()
-	{
-		return this.startingDirectory;
-	}
-	
-	/**
 	 * hookContextMenu
 	 */
 	private void hookContextMenu()
 	{
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		
+
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener()
 		{
@@ -150,11 +128,11 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 				TerminalView.this.fillContextMenu(manager);
 			}
 		});
-		
+
 		Control browserControl = browser.getControl();
 		Menu menu = menuMgr.createContextMenu(browserControl);
 		browserControl.setMenu(menu);
-//		getSite().registerContextMenu(menuMgr, viewer);
+		// getSite().registerContextMenu(menuMgr, viewer);
 	}
 
 	/**
@@ -164,9 +142,9 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	public void init(IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		
+
 		HttpServer server = HttpServer.getInstance();
-		
+
 		if (server == null)
 		{
 			System.out.println(Messages.TerminalView_Could_Not_Start_Server);
@@ -179,7 +157,7 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 	private void makeActions()
 	{
 		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png"); //$NON-NLS-1$
-		
+
 		openEditor = new Action()
 		{
 			public void run()
@@ -200,13 +178,8 @@ public class TerminalView extends ViewPart implements IStartingDirectory
 		browser.setFocus();
 	}
 
-//	/**
-//	 * showMessage
-//	 * 
-//	 * @param message
-//	 */
-//	private void showMessage(String message)
-//	{
-//		MessageDialog.openInformation(browser.getShell(), "Terminal View", message);
-//	}
+	public String getId()
+	{
+		return browser.getId();
+	}
 }

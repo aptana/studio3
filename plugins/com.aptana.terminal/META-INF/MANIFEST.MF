@@ -12,3 +12,6 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.util;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.terminal,
+ com.aptana.terminal.server,
+ com.aptana.terminal.views

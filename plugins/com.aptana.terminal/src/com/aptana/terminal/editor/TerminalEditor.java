@@ -11,33 +11,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.IStartingDirectory;
 import com.aptana.terminal.TerminalBrowser;
 
-public class TerminalEditor extends EditorPart implements IStartingDirectory, IPersistableEditor
+public class TerminalEditor extends EditorPart implements IPersistableEditor
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalBrowser _browser;
-	private String _startingDirectory;
-
-	/**
-	 * TerminalEditor
-	 */
-	public TerminalEditor()
-	{
-		this(null);
-	}
-
-	/**
-	 * TerminalEditor
-	 * 
-	 * @param startingDirectory
-	 */
-	public TerminalEditor(String startingDirectory)
-	{
-		this._startingDirectory = startingDirectory;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -85,14 +65,6 @@ public class TerminalEditor extends EditorPart implements IStartingDirectory, IP
 	@Override
 	public void doSaveAs()
 	{
-	}
-
-	/**
-	 * getStartingDirectory
-	 */
-	public String getStartingDirectory()
-	{
-		return this._startingDirectory;
 	}
 
 	/*

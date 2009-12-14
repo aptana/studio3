@@ -1,6 +1,8 @@
 package com.aptana.terminal;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.core.commands.common.NotDefinedException;
@@ -37,6 +39,26 @@ public class TerminalBrowser
 	private IServiceLocator _serviceLocator;
 	private IPreferenceChangeListener _themeChangeListener;
 
+	private static List<String> startDirectories = new ArrayList<String>(2);
+	
+	public static void setStartingDirectory(String startingDirectory)
+	{
+		synchronized (startDirectories)
+		{
+			startDirectories.add(startingDirectory);
+		}
+	}
+
+	private static String grabStartDirectory()
+	{
+		synchronized (startDirectories)
+		{
+			if (!startDirectories.isEmpty())
+				return startDirectories.remove(0);
+		}
+		return null;
+	}
+	
 	/**
 	 * TerminalBrowser
 	 * 
@@ -231,16 +253,9 @@ public class TerminalBrowser
 	 * 
 	 * @return
 	 */
-	public String getStartingDirectory()
+	private String getStartingDirectory()
 	{
-		String result = null;
-
-		if (this._owningPart instanceof IStartingDirectory)
-		{
-			result = ((IStartingDirectory) this._owningPart).getStartingDirectory();
-		}
-
-		return result;
+		return grabStartDirectory();
 	}
 
 	/**
@@ -265,5 +280,10 @@ public class TerminalBrowser
 		{
 			this._browser.setUrl(string);
 		}
+	}
+
+	public String getId()
+	{
+		return _id;
 	}
 }
