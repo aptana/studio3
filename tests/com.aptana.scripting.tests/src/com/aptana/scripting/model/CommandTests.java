@@ -1,34 +1,17 @@
 package com.aptana.scripting.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
-import org.junit.Test;
-
-public class CommandTests
+public class CommandTests extends BundleTestBase
 {
-	private static final String PROJECT_BUNDLES = "project-bundles";
-	
+	/**
+	 * executeCommand
+	 * 
+	 * @param bundleName
+	 * @param commandName
+	 * @return
+	 */
 	protected String executeCommand(String bundleName, String commandName)
 	{
-		BundleManager manager = BundleManager.getInstance(PROJECT_BUNDLES, null);
-		
-		// make sure we have a test bundle
-		File bundleFile = new File(PROJECT_BUNDLES + File.separator + bundleName);
-		assertTrue(bundleFile.exists());
-		
-		// load bundle
-		manager.loadBundle(bundleFile);
-		BundleEntry entry = manager.getBundleEntry(bundleName);
-		assertNotNull(entry);
-		
-		BundleElement[] bundles = entry.getBundles();
-		assertEquals(1, bundles.length);
-		
-		BundleElement bundle = bundles[0];
+		BundleElement bundle = this.loadBundle(bundleName, BundleScope.PROJECT);
 
 		// get command
 		CommandElement command = bundle.getCommandByName(commandName);
@@ -42,16 +25,20 @@ public class CommandTests
 		return result.getOutputString();
 	}
 	
-	@Test
-	public void invokeStringCommand()
+	/**
+	 * invokeStringCommandTest
+	 */
+	public void testInvokeStringCommandTest()
 	{
 		String resultText = this.executeCommand("invokeString", "Test");
 		
 		assertEquals("hello\n", resultText);
 	}
 
-	@Test
-	public void invokeBlockCommand()
+	/**
+	 * invokeBlockCommandTest
+	 */
+	public void tsetInvokeBlockCommandTest()
 	{
 		String resultText = this.executeCommand("invokeBlock", "Test");
 		

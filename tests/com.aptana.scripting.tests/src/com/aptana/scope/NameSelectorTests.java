@@ -1,14 +1,13 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
-import org.junit.Test;
-
-public class NameSelectorTests
+public class NameSelectorTests extends TestCase
 {
-	@Test
-	public void nameIsPrefix()
+	/**
+	 * testNameIsPrefix
+	 */
+	public void testNameIsPrefix()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -16,8 +15,10 @@ public class NameSelectorTests
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsIdentical()
+	/**
+	 * testNameIsIdentical
+	 */
+	public void testNameIsIdentical()
 	{
 		NameSelector name = new NameSelector("source.ruby");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -25,8 +26,10 @@ public class NameSelectorTests
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsPartial()
+	/**
+	 * testNameIsPartial
+	 */
+	public void testNameIsPartial()
 	{
 		NameSelector name = new NameSelector("sourc");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -34,8 +37,10 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void nameIsEmpty()
+	/**
+	 * testNameIsEmpty
+	 */
+	public void testNameIsEmpty()
 	{
 		NameSelector name = new NameSelector("");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -43,8 +48,10 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void scopeIsEmpty()
+	/**
+	 * testScopeIsEmpty
+	 */
+	public void testScopeIsEmpty()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
@@ -52,8 +59,10 @@ public class NameSelectorTests
 		assertFalse(selector.matches(""));
 	}
 	
-	@Test
-	public void nameIsNull()
+	/**
+	 * testNameIsNull
+	 */
+	public void testNameIsNull()
 	{
 		NameSelector name = new NameSelector(null);
 		ScopeSelector selector = new ScopeSelector(name);
@@ -61,8 +70,10 @@ public class NameSelectorTests
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-	@Test
-	public void scopeIsNull()
+	/**
+	 * testScopeIsNull
+	 */
+	public void testScopeIsNull()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
