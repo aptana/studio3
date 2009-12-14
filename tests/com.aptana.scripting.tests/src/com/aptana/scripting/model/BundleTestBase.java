@@ -6,9 +6,9 @@ import junit.framework.TestCase;
 
 public class BundleTestBase extends TestCase
 {
-	private static final String APPLICATION_BUNDLES = "application-bundles";
-	private static final String PROJECT_BUNDLES = "project-bundles";
-	private static final String USER_BUNDLES = "user-bundles";
+	private static final String APPLICATION_BUNDLES = new File("application-bundles").getAbsolutePath();
+	private static final String PROJECT_BUNDLES = new File("project-bundles").getAbsolutePath();
+	private static final String USER_BUNDLES = new File("user-bundles").getAbsolutePath();
 	
 	/**
 	 * loadBundleEntry
