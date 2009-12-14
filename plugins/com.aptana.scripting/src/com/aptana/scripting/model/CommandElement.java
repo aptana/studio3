@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
-import org.jruby.anno.JRubyMethod;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -70,6 +72,98 @@ public class CommandElement extends TriggerableElement
 		return new CommandResult(resultText);
 	}
 
+	/**
+	 * getInput
+	 * 
+	 * @return
+	 */
+	public String getInputType()
+	{
+		return this._inputType.getName();
+	}
+	
+	/**
+	 * getInvoke
+	 * 
+	 * @return
+	 */
+	public String getInvoke()
+	{
+		return this._invoke;
+	}
+	
+	/**
+	 * getInvokeBlock
+	 * 
+	 * @return
+	 */
+	public RubyProc getInvokeBlock()
+	{
+		return this._invokeBlock;
+	}
+	
+	/**
+	 * getKeyBinding
+	 * 
+	 * @return
+	 */
+	public String getKeyBinding()
+	{
+		return this._keyBinding;
+	}
+
+	/**
+	 * getKeySequence
+	 * 
+	 * @return
+	 */
+	public KeySequence getKeySequence()
+	{
+		KeySequence result = null;
+		
+		try
+		{
+			result = KeySequence.getInstance(this._keyBinding);
+		}
+		catch (ParseException e)
+		{
+			// log?
+		}
+		
+		return result;
+	}
+
+	/**
+	 * getKeyStroke
+	 * 
+	 * @return
+	 */
+	public KeyStroke getKeyStroke()
+	{
+		KeyStroke result = null;
+		
+		try
+		{
+			result = KeyStroke.getInstance(this._keyBinding);
+		}
+		catch (ParseException e)
+		{
+			// log?
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getOutput
+	 * 
+	 * @return
+	 */
+	public String getOutputType()
+	{
+		return this._outputType.getName();
+	}
+	
 	/**
 	 * invokeStringCommand
 	 * 
@@ -156,58 +250,13 @@ public class CommandElement extends TriggerableElement
 	}
 	
 	/**
-	 * getInput
+	 * isBlockCommand
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "input")
-	public String getInputType()
+	public boolean isBlockCommand()
 	{
-		return this._inputType.getName();
-	}
-	
-	/**
-	 * getInvoke
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "invoke")
-	public String getInvoke()
-	{
-		return this._invoke;
-	}
-	
-	/**
-	 * getInvokeBlock
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "invoke_block")
-	public RubyProc getInvokeBlock()
-	{
-		return this._invokeBlock;
-	}
-
-	/**
-	 * getKeyBinding
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "key_binding")
-	public String getKeyBinding()
-	{
-		return this._keyBinding;
-	}
-
-	/**
-	 * getOutput
-	 * 
-	 * @return
-	 */
-	@JRubyMethod(name = "output")
-	public String getOutputType()
-	{
-		return this._outputType.getName();
+		return (this._invokeBlock != null);
 	}
 	
 	/**
@@ -218,16 +267,6 @@ public class CommandElement extends TriggerableElement
 	public boolean isExecutable()
 	{
 		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
-	}
-	
-	/**
-	 * isBlockCommand
-	 * 
-	 * @return
-	 */
-	public boolean isBlockCommand()
-	{
-		return (this._invokeBlock != null);
 	}
 	
 	/**
@@ -245,7 +284,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param input
 	 */
-	@JRubyMethod(name = "input=")
 	public void setInputType(String input)
 	{
 		this._inputType = InputType.get(input);
@@ -256,7 +294,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param invoke
 	 */
-	@JRubyMethod(name = "invoke=")
 	public void setInvoke(String invoke)
 	{
 		this._invoke = invoke;
@@ -267,7 +304,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param block
 	 */
-	@JRubyMethod(name = "invoke_block=")
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
@@ -278,7 +314,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param keyBinding
 	 */
-	@JRubyMethod(name = "key_binding=")
 	public void setKeyBinding(String keyBinding)
 	{
 		this._keyBinding = keyBinding;
@@ -289,7 +324,6 @@ public class CommandElement extends TriggerableElement
 	 * 
 	 * @param output
 	 */
-	@JRubyMethod(name = "output=")
 	public void setOutputType(String output)
 	{
 		this._outputType = OutputType.get(output);

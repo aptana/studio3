@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.jruby.anno.JRubyMethod;
-
 import com.aptana.scope.ScopeSelector;
 
 public class MenuElement extends AbstractBundleElement
@@ -31,7 +29,6 @@ public class MenuElement extends AbstractBundleElement
 	 * 
 	 * @param menu
 	 */
-	@JRubyMethod(name = "add_menu")
 	public void addMenu(MenuElement menu)
 	{
 		if (menu != null)
@@ -116,7 +113,6 @@ public class MenuElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "command")
 	public String getCommandName()
 	{
 		return this._commandName;
@@ -267,7 +263,6 @@ public class MenuElement extends AbstractBundleElement
 	 * 
 	 * @param name
 	 */
-	@JRubyMethod(name = "command=")
 	public void setCommandName(String name)
 	{
 		this._commandName = name;

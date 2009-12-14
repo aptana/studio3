@@ -1,7 +1,5 @@
 package com.aptana.scripting.model;
 
-import org.jruby.anno.JRubyMethod;
-
 public abstract class TriggerableElement extends AbstractBundleElement
 {
 	protected String _trigger;
@@ -21,7 +19,6 @@ public abstract class TriggerableElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "trigger")
 	public String getTrigger()
 	{
 		return this._trigger;
@@ -32,7 +29,6 @@ public abstract class TriggerableElement extends AbstractBundleElement
 	 * 
 	 * @param trigger
 	 */
-	@JRubyMethod(name = "trigger=")
 	public void setTrigger(String trigger)
 	{
 		this._trigger = trigger;
