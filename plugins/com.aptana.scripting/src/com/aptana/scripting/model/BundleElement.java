@@ -1,10 +1,13 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BundleElement extends AbstractElement
 {
+	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rr-bundle";
+	
 	private String _author;
 	private String _copyright;
 	private String _description;
@@ -264,6 +267,30 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getDisplayName
+	 * 
+	 * @return
+	 */
+	public String getDisplayName()
+	{
+		String result = this._displayName;
+		
+		if (result == null || result.length() == 0)
+		{
+			File path = new File(this._path);
+			
+			result = path.getName();
+			
+			if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
+			{
+				result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getGitRepo
 	 * 
 	 * @return
@@ -381,6 +408,16 @@ public class BundleElement extends AbstractElement
 	public boolean isEmpty()
 	{
 		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false && this.hasSnippets() == false;
+	}
+	
+	/**
+	 * isReference
+	 * 
+	 * @return
+	 */
+	public boolean isReference()
+	{
+		return this._displayName != null && this._displayName.length() > 0;
 	}
 	
 	/**
