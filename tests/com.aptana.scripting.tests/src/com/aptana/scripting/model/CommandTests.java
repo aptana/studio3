@@ -10,17 +10,21 @@ import org.junit.Test;
 
 public class CommandTests
 {
+	private static final String PROJECT_BUNDLES = "project-bundles";
+	
 	protected String executeCommand(String bundleName, String commandName)
 	{
-		BundleManager manager = BundleManager.getInstance();
+		BundleManager manager = BundleManager.getInstance(PROJECT_BUNDLES, null);
 		
 		// make sure we have a test bundle
-		File bundleFile = new File("project-bundles" + File.separator + bundleName);
+		File bundleFile = new File(PROJECT_BUNDLES + File.separator + bundleName);
 		assertTrue(bundleFile.exists());
 		
 		// load bundle
 		manager.loadBundle(bundleFile);
 		BundleEntry entry = manager.getBundleEntry(bundleName);
+		assertNotNull(entry);
+		
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);
 		
