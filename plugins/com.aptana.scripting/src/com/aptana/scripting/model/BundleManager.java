@@ -8,10 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -241,34 +239,17 @@ public class BundleManager
 	 */
 	public CommandElement[] getBundleCommands(String name)
 	{
-		final Set<String> names = new HashSet<String>();
-		final List<CommandElement> result = new ArrayList<CommandElement>();
+		CommandElement[] result = NO_COMMANDS;
 		
 		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
 			// grab all bundles of the given name
 			BundleEntry entry = this._entriesByName.get(name);
 			
-			entry.processMembers(new BundleProcessor()
-			{
-				public void processBundle(BundleElement bundle)
-				{
-					for (CommandElement command : bundle.getCommands())
-					{
-						String name = command.getDisplayName();
-						
-						if (names.contains(name) == false)
-						{
-							names.add(name);
-							result.add(command);
-						}
-					}
-				}
-				
-			});
+			result = entry.getCommands();
 		}
 		
-		return result.toArray(new CommandElement[result.size()]);
+		return result;
 	}
 	
 	/**
@@ -337,33 +318,17 @@ public class BundleManager
 	 */
 	public MenuElement[] getBundleMenus(String name)
 	{
-		final Set<String> names = new HashSet<String>();
-		final List<MenuElement> result = new ArrayList<MenuElement>();
+		MenuElement[] result = NO_MENUS;
 		
 		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
 			// grab all bundles of the given name
 			BundleEntry entry = this._entriesByName.get(name);
 			
-			entry.processMembers(new BundleProcessor()
-			{
-				public void processBundle(BundleElement bundle)
-				{
-					for (MenuElement menu : bundle.getMenus())
-					{
-						String name = menu.getDisplayName();
-						
-						if (names.contains(name) == false)
-						{
-							names.add(name);
-							result.add(menu);
-						}
-					}
-				}
-			});
+			result = entry.getMenus();
 		}
 		
-		return result.toArray(new MenuElement[result.size()]);
+		return result;
 	}
 	
 	/**
@@ -464,34 +429,17 @@ public class BundleManager
 	 */
 	public SnippetElement[] getBundleSnippets(String name)
 	{
-		final Set<String> names = new HashSet<String>();
-		final List<SnippetElement> result = new ArrayList<SnippetElement>();
+		SnippetElement[] result = NO_SNIPPETS;
 		
 		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
 			// grab all bundles of the given name
 			BundleEntry entry = this._entriesByName.get(name);
 			
-			entry.processMembers(new BundleProcessor()
-			{
-				public void processBundle(BundleElement bundle)
-				{
-					for (SnippetElement snippet : bundle.getSnippets())
-					{
-						String name = snippet.getDisplayName();
-						
-						if (names.contains(name) == false)
-						{
-							names.add(name);
-							result.add(snippet);
-						}
-					}
-				}
-				
-			});
+			result = entry.getSnippets();
 		}
 		
-		return result.toArray(new SnippetElement[result.size()]);
+		return result;
 	}
 	
 	/**

@@ -2,5 +2,11 @@ package com.aptana.scripting.model;
 
 public interface BundleProcessor
 {
-	public void processBundle(BundleElement bundle);
+	/**
+	 * processBundle
+	 * 
+	 * @param bundle
+	 * @return Returns true if processing should continue
+	 */
+	public boolean processBundle(BundleEntry entry, BundleElement bundle);
 }

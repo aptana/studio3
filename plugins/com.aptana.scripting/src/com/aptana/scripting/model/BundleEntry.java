@@ -3,13 +3,14 @@ package com.aptana.scripting.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BundleEntry
 {
 	private String _name;
 	private List<BundleElement> _bundles;
-	private boolean _sorted;
 
 	/**
 	 * BundleEntry
@@ -20,7 +21,6 @@ public class BundleEntry
 	{
 		this._name = name;
 		this._bundles = new ArrayList<BundleElement>();
-		this._sorted = true;
 	}
 
 	/**
@@ -31,7 +31,47 @@ public class BundleEntry
 	public void addBundle(BundleElement bundle)
 	{
 		this._bundles.add(bundle);
-		this._sorted = false;
+		
+		// keep bundles in canonical order
+		Collections.sort(this._bundles, new Comparator<BundleElement>()
+		{
+			public int compare(BundleElement o1, BundleElement o2)
+			{
+				int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+				
+				if (result == 0)
+				{
+					if (o1.isReference() == o2.isReference())
+					{
+						result = o1.getPath().compareTo(o2.getPath());
+					}
+					else
+					{
+						result = (o1.isReference()) ? -1 : 1;
+					}
+				}
+				
+				return result;
+			}
+		});
+	}
+	
+	/**
+	 * getActiveScope
+	 * 
+	 * @return
+	 */
+	public BundleScope getActiveScope()
+	{
+		BundleScope result = BundleScope.UNKNOWN;
+		int size = this._bundles.size();
+		
+		if (size > 0)
+		{
+			result = this._bundles.get(size - 1).getBundleScope();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -41,8 +81,6 @@ public class BundleEntry
 	 */
 	public BundleElement[] getBundles()
 	{
-		this.sortBundles();
-		
 		return this._bundles.toArray(new BundleElement[this._bundles.size()]);
 	}
 
@@ -53,9 +91,29 @@ public class BundleEntry
 	 */
 	public CommandElement[] getCommands()
 	{
-		CommandElement[] result = BundleManager.NO_COMMANDS;
-
-		return result;
+		final Set<String> names = new HashSet<String>();
+		final List<CommandElement> result = new ArrayList<CommandElement>();
+		
+		this.processMembers(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (CommandElement command : bundle.getCommands())
+				{
+					String name = command.getDisplayName();
+					
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(command);
+					}
+				}
+				
+				return true;
+			}
+		});
+		
+		return result.toArray(new CommandElement[result.size()]);
 	}
 
 	/**
@@ -65,9 +123,29 @@ public class BundleEntry
 	 */
 	public MenuElement[] getMenus()
 	{
-		MenuElement[] result = BundleManager.NO_MENUS;
+		final Set<String> names = new HashSet<String>();
+		final List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		return result;
+		this.processMembers(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (MenuElement menu : bundle.getMenus())
+				{
+					String name = menu.getDisplayName();
+					
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(menu);
+					}
+				}
+				
+				return true;
+			}
+		});
+		
+		return result.toArray(new MenuElement[result.size()]);
 	}
 	
 	/**
@@ -87,9 +165,30 @@ public class BundleEntry
 	 */
 	public SnippetElement[] getSnippets()
 	{
-		SnippetElement[] result = BundleManager.NO_SNIPPETS;
+		final Set<String> names = new HashSet<String>();
+		final List<SnippetElement> result = new ArrayList<SnippetElement>();
 		
-		return result;
+		this.processMembers(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (SnippetElement snippet : bundle.getSnippets())
+				{
+					String name = snippet.getDisplayName();
+					
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(snippet);
+					}
+				}
+				
+				return true;
+			}
+			
+		});
+		
+		return result.toArray(new SnippetElement[result.size()]);
 	}
 	
 	/**
@@ -99,31 +198,43 @@ public class BundleEntry
 	 */
 	protected void processMembers(BundleProcessor processor)
 	{
+		BundleScope activeScope = this.getActiveScope();
+		boolean processingReferences = true;
+		
+		// walk the list of bundles from highest bundle scope precedence to lowest
 		for (int i = this._bundles.size() - 1; i >= 0; i--)
 		{
 			BundleElement bundle = this._bundles.get(i);
+		
+			// we're done processing if we've left the active scope or if we've processed all
+			// bundle references and one bundle
+			if (bundle.getBundleScope() != activeScope || processingReferences == false)
+			{
+				break;
+			}
 			
-			processor.processBundle(bundle);
+			// go ahead and process this first non-ref bundle, but turn on a
+			// flag to let us know to quit processing next time around
+			if (bundle.isReference() == false)
+			{
+				processingReferences = false;
+			}
+			
+			// do something with the bundle and exit if told to do so
+			if (processor.processBundle(this, bundle) == false)
+			{
+				break;
+			}
 		}
 	}
 	
 	/**
-	 * sortBundles
+	 * 
+	 * @param bundle
+	 * @return
 	 */
-	protected void sortBundles()
+	public boolean removeBundle(BundleElement bundle)
 	{
-		if (this._sorted == false)
-		{
-			Collections.sort(this._bundles, new Comparator<BundleElement>()
-			{
-				public int compare(BundleElement o1, BundleElement o2)
-				{
-					// TODO Auto-generated method stub
-					return 0;
-				}
-			});
-			
-			this._sorted = true;
-		}
+		return this._bundles.remove(bundle);
 	}
 }
