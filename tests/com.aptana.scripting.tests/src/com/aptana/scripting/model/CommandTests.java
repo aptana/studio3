@@ -15,7 +15,7 @@ public class CommandTests
 		BundleManager manager = BundleManager.getInstance();
 		
 		// make sure we have a test bundle
-		File bundleFile = new File("bundles" + File.separator + bundleName);
+		File bundleFile = new File("project-bundles" + File.separator + bundleName);
 		assertTrue(bundleFile.exists());
 		
 		// load bundle
