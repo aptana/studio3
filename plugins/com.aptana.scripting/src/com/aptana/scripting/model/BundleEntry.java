@@ -1,12 +1,15 @@
 package com.aptana.scripting.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class BundleEntry
 {
 	private String _name;
-	private BundleList[] _scopedBundleLists;
+	private List<BundleElement> _bundles;
+	private boolean _sorted;
 
 	/**
 	 * BundleEntry
@@ -16,7 +19,8 @@ public class BundleEntry
 	public BundleEntry(String name)
 	{
 		this._name = name;
-		this._scopedBundleLists = new BundleList[BundleScope.getMaxValue() + 1];
+		this._bundles = new ArrayList<BundleElement>();
+		this._sorted = true;
 	}
 
 	/**
@@ -26,18 +30,8 @@ public class BundleEntry
 	 */
 	public void addBundle(BundleElement bundle)
 	{
-		BundleScope scope = bundle.getBundleScope();
-		int index = scope.getIndex();
-		BundleList list = this._scopedBundleLists[index];
-		
-		if (list == null)
-		{
-			list = new BundleList();
-			
-			this._scopedBundleLists[index] = list;
-		}
-		
-		list.add(bundle);
+		this._bundles.add(bundle);
+		this._sorted = false;
 	}
 	
 	/**
@@ -47,30 +41,9 @@ public class BundleEntry
 	 */
 	public BundleElement[] getBundles()
 	{
-		List<BundleElement> result = new ArrayList<BundleElement>();
+		this.sortBundles();
 		
-		for (int i = 0; i < this._scopedBundleLists.length; i++)
-		{
-			BundleList list = this._scopedBundleLists[i];
-			
-			if (list != null)
-			{
-				result.addAll(list.getList());
-			}
-		}
-		
-		return result.toArray(new BundleElement[result.size()]);
-	}
-	
-	/**
-	 * getBundlesForScope
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	public BundleElement[] getBundlesForScope(BundleScope scope)
-	{
-		return this._scopedBundleLists[scope.getIndex()].toArray();
+		return this._bundles.toArray(new BundleElement[this._bundles.size()]);
 	}
 
 	/**
@@ -86,6 +59,18 @@ public class BundleEntry
 	}
 
 	/**
+	 * geMenus
+	 * 
+	 * @return
+	 */
+	public MenuElement[] getMenus()
+	{
+		MenuElement[] result = BundleManager.NO_MENUS;
+		
+		return result;
+	}
+	
+	/**
 	 * getName
 	 * 
 	 * @return
@@ -96,22 +81,49 @@ public class BundleEntry
 	}
 
 	/**
+	 * getSnippets
+	 * 
+	 * @return
+	 */
+	public SnippetElement[] getSnippets()
+	{
+		SnippetElement[] result = BundleManager.NO_SNIPPETS;
+		
+		return result;
+	}
+	
+	/**
 	 * processMembers
 	 * 
 	 * @param processor
 	 */
 	protected void processMembers(BundleProcessor processor)
 	{
-		for (int i = this._scopedBundleLists.length - 1; i >= 0; i--)
+		for (int i = this._bundles.size() - 1; i >= 0; i--)
 		{
-			BundleList list = this._scopedBundleLists[i];
-
-			for (int j = list.size(); j >= 0; j--)
+			BundleElement bundle = this._bundles.get(i);
+			
+			processor.processBundle(bundle);
+		}
+	}
+	
+	/**
+	 * sortBundles
+	 */
+	protected void sortBundles()
+	{
+		if (this._sorted == false)
+		{
+			Collections.sort(this._bundles, new Comparator<BundleElement>()
 			{
-				BundleElement bundle = list.get(j);
-
-				processor.processBundle(bundle);
-			}
+				public int compare(BundleElement o1, BundleElement o2)
+				{
+					// TODO Auto-generated method stub
+					return 0;
+				}
+			});
+			
+			this._sorted = true;
 		}
 	}
 }
