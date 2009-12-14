@@ -1,14 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Tests
+Bundle-Name: CSS Editor Tests
 Bundle-SymbolicName: com.aptana.editor.css.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.editor.css.Activator
 Bundle-Vendor: APTANA
+Fragment-Host: com.aptana.editor.css;bundle-version="1.0.0"
 Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="3.0.0",
  org.eclipse.jface.text,
- com.aptana.editor.common;bundle-version="1.0.0",
- com.aptana.editor.css;bundle-version="1.0.0"
+ com.aptana.editor.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
