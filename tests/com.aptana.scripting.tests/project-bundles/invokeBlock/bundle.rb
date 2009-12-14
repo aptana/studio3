@@ -1,6 +1,6 @@
 require "radrails"
 
-bundle "invokeBlock" do |b|
+bundle "invokeBlock" do
   command "Test" do |cmd|
     cmd.invoke do
       "hello"
