@@ -568,6 +568,7 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("bundle \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
+		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
 		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
 		printer.printWithIndent("name: ").println(this._displayName); //$NON-NLS-1$
 		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
