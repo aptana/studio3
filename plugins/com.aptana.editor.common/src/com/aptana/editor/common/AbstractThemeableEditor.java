@@ -436,6 +436,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 					Field label = StatusLineContributionItem.class.getDeclaredField("fLabel"); //$NON-NLS-1$
 					label.setAccessible(true);
 					CLabel clabel = (CLabel) label.get(field);
+					if (clabel == null)
+					{
+						lastPositionLength = -1;
+						return;
+					}
 					StatusLineLayoutData data = (StatusLineLayoutData) clabel.getLayoutData();
 
 					Control control = clabel.getParent();
