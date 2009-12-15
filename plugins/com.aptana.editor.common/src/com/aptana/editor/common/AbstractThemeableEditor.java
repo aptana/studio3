@@ -141,6 +141,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private void overrideRulerColors()
 	{
 		// Use normal parent gray bg
+		if (parent == null || fLineColumn == null)
+			return;
 		fLineColumn.setBackground(parent.getBackground());
 	}
 
