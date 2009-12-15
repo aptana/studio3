@@ -15,6 +15,7 @@ public class BundleElement extends AbstractElement
 	private String _licenseUrl;
 	private String _gitRepo;
 	
+	private File _bundleDirectory;
 	private BundleScope _bundleScope;
 	private List<MenuElement> _menus;
 	private List<SnippetElement> _snippets;
@@ -29,6 +30,19 @@ public class BundleElement extends AbstractElement
 	{
 		super(path);
 		
+		// calculate bundle's root directory
+		File pathFile = new File(path);
+		File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
+		String parentName = parentDirectory.getName();
+		
+		if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+		{
+			parentDirectory = parentDirectory.getParentFile();
+		}
+		
+		this._bundleDirectory = parentDirectory.getAbsoluteFile();
+		
+		// calculate the bundle scope
 		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
 	}
 
@@ -195,6 +209,16 @@ public class BundleElement extends AbstractElement
 		return this._author;
 	}
 
+	/**
+	 * getBundleDirectory
+	 * 
+	 * @return
+	 */
+	public File getBundleDirectory()
+	{
+		return this._bundleDirectory;
+	}
+	
 	/**
 	 * getBundleScope
 	 * 
@@ -464,8 +488,31 @@ public class BundleElement extends AbstractElement
 	{
 		if (this._commands != null && this._commands.remove(command))
 		{
+			AbstractElement.unregisterElement(command);
+			
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(command);
+		}
+	}
+	
+	/**
+	 * removeElement
+	 * 
+	 * @param element
+	 */
+	public void removeElement(AbstractBundleElement element)
+	{
+		if (element instanceof CommandElement)
+		{
+			this.removeCommand((CommandElement) element);
+		}
+		else if (element instanceof MenuElement)
+		{
+			this.removeMenu((MenuElement) element);
+		}
+		else if (element instanceof SnippetElement)
+		{
+			this.removeSnippet((SnippetElement) element);
 		}
 	}
 	
@@ -478,6 +525,10 @@ public class BundleElement extends AbstractElement
 	{
 		if (this._menus != null && this._menus.remove(menu))
 		{
+			AbstractElement.unregisterElement(menu);
+			
+			menu.removeChildren();
+			
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
@@ -492,6 +543,8 @@ public class BundleElement extends AbstractElement
 	{
 		if (this._snippets != null && this._snippets.remove(snippet))
 		{
+			AbstractElement.unregisterElement(snippet);
+			
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(snippet);
 		}
