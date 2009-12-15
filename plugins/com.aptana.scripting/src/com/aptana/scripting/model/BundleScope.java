@@ -18,11 +18,6 @@ public enum BundleScope implements Comparator<BundleScope>
 	 */
 	private BundleScope(int value)
 	{
-		if (value < 0)
-		{
-			throw new IllegalArgumentException("BundleScope enumeration value must be greater than or equal to zero");
-		}
-		
 		this._index = value;
 	}
 
