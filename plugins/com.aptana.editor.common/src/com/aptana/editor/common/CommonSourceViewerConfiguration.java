@@ -144,7 +144,7 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     @Override
     public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType) {
-        return new CommonTextHover();
+        return new CommonTextHover(getLanguageService());
     }
 
     @Override
@@ -247,11 +247,15 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
      */
     protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
             String contentType) {
-        return new CommonInformationProvider();
+        return new CommonInformationProvider(getLanguageService());
     }
 
     protected IReconcilingStrategy getReconcilingStrategy() {
         return new CommonReconcilingStrategy();
+    }
+
+    protected ILanguageService getLanguageService() {
+        return null;
     }
 
     protected IContentAssistProcessor addTemplateCompleteProcessor(

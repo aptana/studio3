@@ -32,53 +32,22 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.internal;
+package com.aptana.editor.css;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.aptana.editor.common.ILanguageService;
+import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.ILexemeModel;
 
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-
-public class CSSContentAssistProcessor implements IContentAssistProcessor {
-
-    private IContextInformationValidator fValidator;
+public class CSSLanguageService implements ILanguageService {
 
     @Override
-    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
-        // TODO: returns a list of proposed code completions
-        List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-        return proposals.toArray(new ICompletionProposal[proposals.size()]);
+    public String getContentAssistText(ILexeme lexeme) {
+        // TODO: returns the real documentation for content assist
+        return lexeme.getText();
     }
 
     @Override
-    public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
-        return null;
-    }
-
-    @Override
-    public char[] getCompletionProposalAutoActivationCharacters() {
-        return new char[] { ':', '\t', '{', ';' };
-    }
-
-    @Override
-    public char[] getContextInformationAutoActivationCharacters() {
-        return null;
-    }
-
-    @Override
-    public IContextInformationValidator getContextInformationValidator() {
-        if (fValidator == null) {
-            fValidator = new CSSContextInformationValidator();
-        }
-        return fValidator;
-    }
-
-    @Override
-    public String getErrorMessage() {
+    public ILexemeModel getLexemeModel() {
         return null;
     }
 }

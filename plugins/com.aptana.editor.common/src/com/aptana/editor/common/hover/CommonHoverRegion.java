@@ -32,53 +32,31 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.internal;
+package com.aptana.editor.common.hover;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.jface.text.IRegion;
 
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import com.aptana.parsing.lexer.ILexeme;
 
-public class CSSContentAssistProcessor implements IContentAssistProcessor {
+public class CommonHoverRegion implements IRegion {
 
-    private IContextInformationValidator fValidator;
+    private ILexeme fLexeme;
 
-    @Override
-    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset) {
-        // TODO: returns a list of proposed code completions
-        List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-        return proposals.toArray(new ICompletionProposal[proposals.size()]);
+    public CommonHoverRegion(ILexeme lexeme) {
+        fLexeme = lexeme;
+    }
+
+    public ILexeme getLexeme() {
+        return fLexeme;
     }
 
     @Override
-    public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
-        return null;
+    public int getLength() {
+        return fLexeme == null ? 0 : fLexeme.getLength();
     }
 
     @Override
-    public char[] getCompletionProposalAutoActivationCharacters() {
-        return new char[] { ':', '\t', '{', ';' };
-    }
-
-    @Override
-    public char[] getContextInformationAutoActivationCharacters() {
-        return null;
-    }
-
-    @Override
-    public IContextInformationValidator getContextInformationValidator() {
-        if (fValidator == null) {
-            fValidator = new CSSContextInformationValidator();
-        }
-        return fValidator;
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return null;
+    public int getOffset() {
+        return fLexeme == null ? 0 : fLexeme.getOffset();
     }
 }
