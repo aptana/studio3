@@ -86,7 +86,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new TagRule("script", new Token(HTML_SCRIPT)), //$NON-NLS-1$
 			new TagRule("style", new Token(HTML_STYLE)), //$NON-NLS-1$
 			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
-			new TagRule(new Token(HTML_TAG)),
+			new TagRule(new Token(HTML_TAG))
 	};
 
 	private HTMLScanner htmlScanner;

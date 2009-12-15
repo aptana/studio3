@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  org.eclipse.ui.workbench.texteditor,
  plistreader;bundle-version="1.0.0",
- com.aptana.parsing
+ com.aptana.parsing,
+ org.eclipse.jdt.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
