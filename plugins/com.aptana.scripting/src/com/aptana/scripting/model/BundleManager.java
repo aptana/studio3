@@ -23,6 +23,8 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class BundleManager
 {
+	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
@@ -35,8 +37,6 @@ public class BundleManager
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
 	private static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
-	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
-	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Bundles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Bundles"; //$NON-NLS-1$
@@ -123,8 +123,7 @@ public class BundleManager
 	{
 		if (bundle != null)
 		{
-			String path = bundle.getPath();
-			File bundleFile = new File(path);
+			File bundleFile = bundle.getBundleDirectory();
 			
 			// store bundle by path
 			if (this._bundlesByPath == null)
@@ -344,18 +343,22 @@ public class BundleManager
 	 * @param path
 	 * @return
 	 */
-	public BundleElement getBundleFromPath(File bundleFile)
+	public BundleElement getBundleFromPath(File bundleDirectory)
 	{
 		BundleElement result = null;
 		
-		if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
+		if (this._bundlesByPath != null)
 		{
-			List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
-			int size = bundles.size();
+			List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
 			
-			if (size > 0)
+			if (bundles != null)
 			{
-				result = bundles.get(size - 1);
+				int size = bundles.size();
+				
+				if (size > 0)
+				{
+					result = bundles.get(size - 1);
+				}
 			}
 		}
 		
@@ -1007,27 +1010,33 @@ public class BundleManager
 	public void unloadScript(File script)
 	{
 		String scriptPath = script.getAbsolutePath();
+		AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
 		
-		// NOTE: Actually, we can't do this since bundles can be defined anywhere.
-		// Perhaps we should load different libraries for the differing contexts to
-		// avoid this issue?
-		if (scriptPath.endsWith(BUNDLE_FILE))
+		// remove bundle members in pass 1
+		for (AbstractElement element : elements)
 		{
-			File bundleDirectory = script.getParentFile();
-			
-			if (this._bundlesByPath.containsKey(bundleDirectory))
+			if (element instanceof AbstractBundleElement)
 			{
-				for (BundleElement bundle : this._bundlesByPath.get(bundleDirectory))
+				AbstractBundleElement bundleElement = (AbstractBundleElement) element;
+				
+				bundleElement.getOwningBundle().removeElement(bundleElement);
+			}
+		}
+		
+		// clear (and possibly remove) bundles in pass 2
+		for (AbstractElement element : elements)
+		{
+			if (element instanceof BundleElement)
+			{
+				BundleElement bundle = (BundleElement) element;
+				
+				bundle.clearMetadata();
+				
+				if (bundle.isEmpty())
 				{
-					bundle.clearMetadata();
+					AbstractElement.unregisterElement(bundle);
 				}
 			}
-			// else error?
-		}
-		else
-		{
-			// TODO: Either need master lists of all elements by path
-			// or we walk all bundles
 		}
 	}
 }
