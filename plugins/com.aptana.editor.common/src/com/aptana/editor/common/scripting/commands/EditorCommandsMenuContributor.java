@@ -80,19 +80,9 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 				SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor.getSourceViewerConfigurationNonFinal();
 				if (sourceViewerConfiguration instanceof ITopContentTypesProvider) {
 					String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
-					NEXT: for (String[] topContentType : topContentTypes) {
+					for (String[] topContentType : topContentTypes) {
 						QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
 						String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
-
-						// Check if the menus have been already added
-						if (splitContentTypesAtOffset != null) {
-							for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
-								if (splitContentTypesAtOffset[i].equals(contentType)) {
-									continue NEXT;
-								}
-							}
-						}
-
 						// Get menus
 						menusFromScope = BundleManager.getInstance().getMenusFromScope(contentType);
 						if (menusFromScope.length > 0) {
