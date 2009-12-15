@@ -84,11 +84,6 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     }
 
     @Override
-    public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
-        return ICommonConstants.DEFAULT_PARTITIONING;
-    }
-
-    @Override
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
         ContentAssistant assistant = new ContentAssistant();
 
