@@ -34,44 +34,13 @@
  */
 package com.aptana.editor.common;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.jface.text.reconciler.MonoReconciler;
+import org.eclipse.ui.texteditor.ITextEditor;
 
-public class CommonReconcilingStrategy implements IReconcilingStrategy,
-        IReconcilingStrategyExtension {
+public class CommonReconciler extends MonoReconciler {
 
-    private IDocument fDocument;
-
-    @Override
-    public void reconcile(IRegion partition) {
-        reconcile(false);
-    }
-
-    @Override
-    public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
-        reconcile(false);
-    }
-
-    @Override
-    public void setDocument(IDocument document) {
-        fDocument = document;
-    }
-
-    @Override
-    public void initialReconcile() {
-        reconcile(true);
-    }
-
-    @Override
-    public void setProgressMonitor(IProgressMonitor monitor) {
-    }
-
-    private void reconcile(boolean initialReconcile) {
-
+    public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental) {
+        super(strategy, isIncremental);
     }
 }

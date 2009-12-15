@@ -36,6 +36,7 @@ package com.aptana.editor.common;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -52,8 +53,6 @@ import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -67,6 +66,7 @@ import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.reconciler.CommonCompositeReconcilingStrategy;
 
 public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
@@ -180,14 +180,18 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     @Override
     public IReconciler getReconciler(ISourceViewer sourceViewer) {
-        IReconcilingStrategy strategy = getReconcilingStrategy();
-        if (strategy == null) {
-            return null;
-        }
-        MonoReconciler reconciler = new MonoReconciler(strategy, false);
-        reconciler.setDelay(1000);
+        if (fTextEditor != null && fTextEditor.isEditable()) {
+            CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(
+                    fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
+            CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
+            reconciler.setIsIncrementalReconciler(false);
+            reconciler.setIsAllowedToModifyDocument(false);
+            reconciler.setProgressMonitor(new NullProgressMonitor());
+            reconciler.setDelay(500);
 
-        return reconciler;
+            return reconciler;
+        }
+        return null;
     }
 
     /**
@@ -248,10 +252,6 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
             String contentType) {
         return new CommonInformationProvider(getLanguageService());
-    }
-
-    protected IReconcilingStrategy getReconcilingStrategy() {
-        return new CommonReconcilingStrategy();
     }
 
     protected ILanguageService getLanguageService() {
