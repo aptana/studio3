@@ -15,9 +15,8 @@ public class BundleTestBase extends TestCase
 	 * 
 	 * @param bundleName
 	 * @param scope
-	 * @return
 	 */
-	protected BundleEntry loadBundleEntry(String bundleName, BundleScope scope)
+	protected void loadBundleEntry(String bundleName, BundleScope scope)
 	{
 		BundleManager manager = BundleManager.getInstance(APPLICATION_BUNDLES, USER_BUNDLES);
 		String baseDirectory = null;
@@ -46,7 +45,21 @@ public class BundleTestBase extends TestCase
 		
 		// load bundle
 		manager.loadBundle(bundleFile);
-		BundleEntry entry = manager.getBundleEntry(bundleName);
+	}
+	
+	/**
+	 * getBundleEntry
+	 * 
+	 * @param bundleName
+	 * @param scope
+	 * @return
+	 */
+	protected BundleEntry getBundleEntry(String bundleName, BundleScope scope)
+	{
+		this.loadBundleEntry(bundleName, scope);
+		
+		// get bundle entry
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 		
 		return entry;
@@ -61,7 +74,7 @@ public class BundleTestBase extends TestCase
 	 */
 	protected BundleElement loadBundle(String bundleName, BundleScope scope)
 	{
-		BundleEntry entry = this.loadBundleEntry(bundleName, scope);
+		BundleEntry entry = this.getBundleEntry(bundleName, scope);
 		
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);

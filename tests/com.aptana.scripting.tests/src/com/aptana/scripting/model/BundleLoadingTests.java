@@ -14,15 +14,15 @@ public class BundleLoadingTests extends BundleTestBase
 	 */
 	private void compareScopedBundles(String bundleName, BundleScope scope1, BundleScope scope2, String command1, String command2)
 	{
-		// confirm app bundle loaded properly
-		BundleEntry entry = this.loadBundleEntry(bundleName, scope1);
+		// confirm first bundle loaded properly
+		BundleEntry entry = this.getBundleEntry(bundleName, scope1);
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals(command1, commands[0].getInvoke());
 		
-		// confirm user bundle overrides application
-		entry = this.loadBundleEntry(bundleName, scope2);
+		// confirm second bundle overrides application
+		entry = this.getBundleEntry(bundleName, scope2);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -81,7 +81,7 @@ public class BundleLoadingTests extends BundleTestBase
 	public void testLoadBundleWithCommand()
 	{
 		String bundleName = "bundleWithCommand";
-		BundleEntry entry = this.loadBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
 		CommandElement[] commands = entry.getCommands();
 		
 		assertNotNull(commands);
@@ -94,7 +94,7 @@ public class BundleLoadingTests extends BundleTestBase
 	public void testLoadBundleWithMenu()
 	{
 		String bundleName = "bundleWithMenu";
-		BundleEntry entry = this.loadBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
 		MenuElement[] menus = entry.getMenus();
 		
 		assertNotNull(menus);
@@ -107,7 +107,7 @@ public class BundleLoadingTests extends BundleTestBase
 	public void testLoadBundleWithSnippet()
 	{
 		String bundleName = "bundleWithSnippet";
-		BundleEntry entry = this.loadBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
 		SnippetElement[] snippets = entry.getSnippets();
 		
 		assertNotNull(snippets);
@@ -238,5 +238,80 @@ public class BundleLoadingTests extends BundleTestBase
 			"cd ..",
 			"cd /"
 		);
+	}
+	
+	/**
+	 * testSamePrecedenceOverride
+	 */
+	public void testSamePrecedenceOverride()
+	{
+		// confirm first bundle loaded properly
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.USER);
+		CommandElement[] commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("cd ..", commands[0].getInvoke());
+		
+		// confirm second bundle overrides application
+		this.loadBundleEntry("bundleWithSameCommand", BundleScope.USER);
+		commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("cd", commands[0].getInvoke());
+	}
+	
+	/**
+	 * testSamePrecedenceOverride2
+	 */
+	public void testSamePrecedenceOverride2()
+	{
+		// confirm first bundle loaded properly
+		this.loadBundleEntry("bundleWithSameCommand", BundleScope.USER);
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		CommandElement[] commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("cd", commands[0].getInvoke());
+		
+		// confirm second bundle overrides application
+		this.loadBundleEntry("bundleWithCommand", BundleScope.USER);
+		commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("cd", commands[0].getInvoke());
+	}
+	
+	
+	/**
+	 * testSamePrecedenceAugmentation
+	 */
+	public void testSamePrecedenceAugmentation()
+	{
+		// confirm first bundle loaded properly
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.USER);
+		CommandElement[] commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("cd ..", commands[0].getInvoke());
+		
+		// confirm second bundle overrides application
+		this.loadBundleEntry("bundleWithDifferentCommand", BundleScope.USER);
+		commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(2, commands.length);
+		
+		CommandElement command1 = commands[0];
+		CommandElement command2 = commands[1];
+		
+		if (command1.getDisplayName().equals("MyCommand"))
+		{
+			assertEquals("cd ..", command1.getInvoke());
+			assertEquals("cd", command2.getInvoke());
+		}
+		else
+		{
+			assertEquals("cd", command1.getInvoke());
+			assertEquals("cd ..", command2.getInvoke());
+		}
 	}
 }
