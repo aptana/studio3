@@ -52,12 +52,60 @@
       </key>
    </extension>
    <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.editor.common.scripting.commands.ShowCommandsMenuHandler"
+            id="com.aptana.editor.common.scripting.commands.show"
+            name="Show Commands Menu">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.editor.common.scripting.commands.show"
+            icon="icons/command.png">
+      </image>
+   </extension>
+   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="menu:com.aptana.scripting.menu?after=additions">
          <dynamic
                class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
                id="com.aptana.editor.common.dynamic">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:com.aptana.scripting.trim.toolbar">
+         <command
+                commandId="com.aptana.editor.common.scripting.commands.show"
+                id="com.aptana.editor.common.scripting.commands.trim.toolbar.pulldown"
+                style="pulldown">
+             <visibleWhen
+                   checkEnabled="false">
+                <with
+                      variable="activePart">
+                   <instanceof
+                         value="com.aptana.editor.common.AbstractThemeableEditor">
+                   </instanceof>
+                </with>
+             </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.editor.common.scripting.commands.trim.toolbar.pulldown">
+         <dynamic
+               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
+               id="com.aptana.editor.common.trim.menu.dynamic">
             <visibleWhen
                   checkEnabled="false">
                <with
