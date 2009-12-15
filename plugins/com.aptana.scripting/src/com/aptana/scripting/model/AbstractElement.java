@@ -1,7 +1,5 @@
 package com.aptana.scripting.model;
 
-import org.jruby.anno.JRubyMethod;
-
 public abstract class AbstractElement
 {
 	protected String _path;
@@ -22,7 +20,6 @@ public abstract class AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "display_name")
 	public String getDisplayName()
 	{
 		return this._displayName;
@@ -33,7 +30,6 @@ public abstract class AbstractElement
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "path")
 	public String getPath()
 	{
 		return this._path;
@@ -44,7 +40,6 @@ public abstract class AbstractElement
 	 * 
 	 * @param displayName
 	 */
-	@JRubyMethod(name = "display_name=")
 	public void setDisplayName(String displayName)
 	{
 		this._displayName = displayName;
@@ -68,12 +63,12 @@ public abstract class AbstractElement
 	public String toSource()
 	{
 		SourcePrinter printer = new SourcePrinter();
-		
+
 		this.toSource(printer);
-		
+
 		return printer.toString();
 	}
-	
+
 	/**
 	 * toSource
 	 * 

@@ -1,15 +1,13 @@
 package com.aptana.scope;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import junit.framework.TestCase;
 
-import org.junit.Test;
-
-public class ScopeSelectorTests
+public class ScopeSelectorTests extends TestCase
 {
-	@Test()
-	public void parseSimpleName()
+	/**
+	 * testParseSimpleName
+	 */
+	public void testParseSimpleName()
 	{
 		String scope = "source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
@@ -25,111 +23,120 @@ public class ScopeSelectorTests
 		assertTrue(root instanceof NameSelector);
 	}
 
-	@Test()
-	public void parseSimpleAndSelector()
+	/**
+	 * testParseSimpleAndSelector
+	 */
+	public void testParseSimpleAndSelector()
 	{
 		String scope = "text.html source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
-		
+
 		// convert selector back to source and compare
 		assertEquals(scope, selector.toString());
-		
+
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
 		assertTrue(root instanceof AndSelector);
-		
+
 		// check children
 		AndSelector andSelector = (AndSelector) root;
 		assertTrue(andSelector.getLeftChild() instanceof NameSelector);
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
-	
-	@Test()
-	public void parseSimpleOrSelector()
+
+	/**
+	 * testParseSimpleOrSelector
+	 */
+	public void testParseSimpleOrSelector()
 	{
 		String scope = "text.html, source.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
-		
+
 		// make sure we parsed successfully
 		assertNotNull(selector);
-		
+
 		// convert selector back to source and compare
 		assertEquals(scope, selector.toString());
-		
+
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
 		assertTrue(root instanceof OrSelector);
-		
+
 		// check children
 		OrSelector orSelector = (OrSelector) root;
 		assertTrue(orSelector.getLeftChild() instanceof NameSelector);
 		assertTrue(orSelector.getRightChild() instanceof NameSelector);
 	}
 
-	@Test()
-	public void parseMultiAndSelector()
+	/**
+	 * testParseMultiAndSelector
+	 */
+	public void testParseMultiAndSelector()
 	{
 		String scope = "text.html source.ruby string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
-		
+
 		// convert selector back to source and compare
 		assertEquals(scope, selector.toString());
-		
+
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
 		assertTrue(root instanceof AndSelector);
-		
+
 		// check children
 		AndSelector andSelector = (AndSelector) root;
 		assertTrue(andSelector.getLeftChild() instanceof AndSelector);
 		assertTrue(andSelector.getRightChild() instanceof NameSelector);
 	}
-	
-	@Test()
-	public void parseMultiOrSelector()
+
+	/**
+	 * testParseMultiOrSelector
+	 */
+	public void testParseMultiOrSelector()
 	{
 		String scope = "text.html, source.ruby, string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
-		
+
 		// make sure we parsed successfully
 		assertNotNull(selector);
-		
+
 		// convert selector back to source and compare
 		assertEquals(scope, selector.toString());
-		
+
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
 		assertTrue(root instanceof OrSelector);
-		
+
 		// check children
 		OrSelector orSelector = (OrSelector) root;
 		assertTrue(orSelector.getLeftChild() instanceof OrSelector);
 		assertTrue(orSelector.getRightChild() instanceof NameSelector);
 	}
-	
 
-	@Test()
-	public void parseMultiMixedSelector()
+	/**
+	 * testParseMultiMixedSelector
+	 */
+	public void testParseMultiMixedSelector()
 	{
 		String scope = "text.html source.ruby, text.erb source.ruby, source.ruby string.ruby";
 		ScopeSelector selector = new ScopeSelector(scope);
 
 		// make sure we parsed successfully
 		assertNotNull(selector);
-		
+
 		// convert selector back to source and compare
 		assertEquals(scope, selector.toString());
-		
+
 		// make sure we have the right selector type
 		ISelectorNode root = selector.getRoot();
 		assertTrue(root instanceof OrSelector);
-		
+
 		// check children
 		OrSelector orSelector = (OrSelector) root;
 		assertTrue(orSelector.getLeftChild() instanceof OrSelector);

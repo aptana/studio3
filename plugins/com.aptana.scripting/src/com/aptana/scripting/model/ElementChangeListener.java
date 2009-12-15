@@ -15,11 +15,4 @@ public interface ElementChangeListener
 	 * @param element
 	 */
 	void elementDeleted(AbstractElement element);
-	
-	/**
-	 * ElementModified
-	 * 
-	 * @param element
-	 */
-	void elementModified(AbstractElement element);
 }

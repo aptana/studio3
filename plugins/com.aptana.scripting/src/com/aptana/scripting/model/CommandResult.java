@@ -6,13 +6,8 @@ public class CommandResult
 {
 	private String _outputString;
 	private OutputStream _outputStream;
-
-	/**
-	 * CommandResult
-	 */
-	public CommandResult()
-	{
-	}
+	private String _errorString;
+	private OutputStream _errorStream;
 	
 	/**
 	 * CommandResult
@@ -27,13 +22,67 @@ public class CommandResult
 	/**
 	 * CommandResult
 	 * 
+	 * @param output
+	 * @param errors
+	 */
+	public CommandResult(String output, String errors)
+	{
+		this._outputString = output;
+		this._errorString = errors;
+	}
+	
+	/**
+	 * CommandResult
+	 * 
 	 * @param stream
 	 */
 	public CommandResult(OutputStream stream)
 	{
 		this._outputStream = stream;
 	}
+	
+	/**
+	 * CommandResult
+	 * 
+	 * @param outputStream
+	 * @param errorStream
+	 */
+	public CommandResult(OutputStream outputStream, OutputStream errorStream)
+	{
+		this._outputStream = outputStream;
+		this._errorStream = errorStream;
+	}
 
+	/**
+	 * getOutputStream
+	 * 
+	 * @return
+	 */
+	public OutputStream getErrorStream()
+	{
+		return this._errorStream;
+	}
+	
+	/**
+	 * getErrorString
+	 * 
+	 * @return
+	 */
+	public String getErrorString()
+	{
+		return this._errorString;
+	}
+	
+	/**
+	 * getReturnValue
+	 * 
+	 * @return
+	 */
+	public int getReturnValue()
+	{
+		return 0;
+	}
+	
 	/**
 	 * getOutputStream
 	 * 

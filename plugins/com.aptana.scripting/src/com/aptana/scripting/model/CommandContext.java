@@ -1,19 +1,23 @@
 package com.aptana.scripting.model;
 
 import java.io.InputStream;
+import java.util.Map;
 
 public class CommandContext
 {
 	private String _input;
 	private InputStream _inputStream;
+	private Map<String,String> _environment;
 
 	/**
 	 * CommandContext
+	 * 
+	 * @deprecated
 	 */
 	public CommandContext()
 	{
 	}
-
+	
 	/**
 	 * CommandContext
 	 * 
@@ -21,7 +25,19 @@ public class CommandContext
 	 */
 	public CommandContext(String input)
 	{
+		this(input, null);
+	}
+	
+	/**
+	 * CommandContext
+	 * 
+	 * @param input
+	 * @param environment
+	 */
+	public CommandContext(String input, Map<String,String> environment)
+	{
 		this._input = input;
+		this._environment = environment;
 	}
 	
 	/**
@@ -31,7 +47,23 @@ public class CommandContext
 	 */
 	public CommandContext(InputStream stream)
 	{
+		this(stream, null);
+	}
+	
+	public CommandContext(InputStream stream, Map<String,String> environment)
+	{
 		this._inputStream = stream;
+		this._environment = environment;
+	}
+	
+	/**
+	 * getEnvironment
+	 * 
+	 * @return
+	 */
+	public Map<String,String> getEnviroment()
+	{
+		return this._environment;
 	}
 	
 	/**
