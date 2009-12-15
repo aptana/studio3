@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
@@ -40,7 +41,7 @@ public class TerminalBrowser
 	private IPreferenceChangeListener _themeChangeListener;
 
 	private static List<String> startDirectories = new ArrayList<String>(2);
-	
+
 	public static void setStartingDirectory(String startingDirectory)
 	{
 		synchronized (startDirectories)
@@ -58,7 +59,7 @@ public class TerminalBrowser
 		}
 		return null;
 	}
-	
+
 	/**
 	 * TerminalBrowser
 	 * 
@@ -204,10 +205,18 @@ public class TerminalBrowser
 					return;
 				if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
 				{
-					final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
-							+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
-							+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
-					_browser.execute(reloadCSSScript);
+					Display.getCurrent().syncExec(new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
+									+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
+									+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
+							_browser.execute(reloadCSSScript);
+						}
+					});
 				}
 			}
 		};
