@@ -259,6 +259,35 @@ public class MenuElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * removeChildren
+	 */
+	public void removeChildren()
+	{
+		if (this.isHierarchicalMenu())
+		{
+			for (MenuElement child : this.getChildren())
+			{
+				this.removeMenu(child);
+			}
+		}
+	}
+	
+	/**
+	 * removeMenu
+	 * 
+	 * @param menu
+	 */
+	public void removeMenu(MenuElement menu)
+	{
+		if (this._children != null && this._children.remove(menu))
+		{
+			AbstractElement.unregisterElement(menu);
+			
+			menu.removeChildren();
+		}
+	}
+	
+	/**
 	 * setCommandName
 	 * 
 	 * @param name
