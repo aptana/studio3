@@ -36,6 +36,7 @@ package com.aptana.editor.common;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -52,8 +53,6 @@ import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -67,226 +66,214 @@ import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.reconciler.CommonCompositeReconcilingStrategy;
 
-public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration
-{
+public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
 
-	private ITextEditor fTextEditor;
+    private ITextEditor fTextEditor;
 
-	public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor)
-	{
-		super(preferenceStore);
-		fTextEditor = editor;
-	}
+    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor) {
+        super(preferenceStore);
+        fTextEditor = editor;
+    }
 
-	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
-	{
-		return new IAutoEditStrategy[] { new CommonAutoIndentStrategy(contentType, this, sourceViewer) };
-	}
+    @Override
+    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+        return new IAutoEditStrategy[] { new CommonAutoIndentStrategy(contentType, this,
+                sourceViewer) };
+    }
 
-	@Override
-	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
-	{
-		ContentAssistant assistant = new ContentAssistant();
+    @Override
+    public String getConfiguredDocumentPartitioning(ISourceViewer sourceViewer) {
+        return ICommonConstants.DEFAULT_PARTITIONING;
+    }
 
-		assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+    @Override
+    public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+        ContentAssistant assistant = new ContentAssistant();
 
-		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		IContentAssistProcessor processor;
-		for (String type : contentTypes)
-		{
-			processor = getContentAssistProcessor(sourceViewer, type);
-			if (processor != null)
-			{
-				assistant.setContentAssistProcessor(processor, type);
-			}
-		}
+        assistant.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 
-		assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
-		if (fPreferenceStore != null)
-		{
-			assistant.enableAutoActivation(fPreferenceStore
-					.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
-			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
-		}
-		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        IContentAssistProcessor processor;
+        for (String type : contentTypes) {
+            processor = getContentAssistProcessor(sourceViewer, type);
+            if (processor != null) {
+                assistant.setContentAssistProcessor(processor, type);
+            }
+        }
 
-		return assistant;
-	}
+        assistant.setInformationControlCreator(getInformationControlCreator(sourceViewer));
+        if (fPreferenceStore != null) {
+            assistant.enableAutoActivation(fPreferenceStore
+                    .getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+            assistant.setAutoActivationDelay(fPreferenceStore
+                    .getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+        }
+        assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
-	@Override
-	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
-	{
-		MultiPassContentFormatter formatter = new MultiPassContentFormatter(
-				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
-		return formatter;
-	}
+        return assistant;
+    }
 
-	@Override
-	public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer)
-	{
-		return new CommonAnnotationHover(false)
-		{
+    @Override
+    public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+        MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+                getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+        return formatter;
+    }
 
-			protected boolean isIncluded(Annotation annotation)
-			{
-				return isShowInVerticalRuler(annotation);
-			}
-		};
-	}
+    @Override
+    public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
+        return new CommonAnnotationHover(false) {
 
-	@Override
-	public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer)
-	{
-		return new CommonAnnotationHover(true)
-		{
+            protected boolean isIncluded(Annotation annotation) {
+                return isShowInVerticalRuler(annotation);
+            }
+        };
+    }
 
-			protected boolean isIncluded(Annotation annotation)
-			{
-				return isShowInOverviewRuler(annotation);
-			}
-		};
-	}
+    @Override
+    public IAnnotationHover getOverviewRulerAnnotationHover(ISourceViewer sourceViewer) {
+        return new CommonAnnotationHover(true) {
 
-	@Override
-	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
-	{
-		return new CommonTextHover();
-	}
+            protected boolean isIncluded(Annotation annotation) {
+                return isShowInOverviewRuler(annotation);
+            }
+        };
+    }
 
-	@Override
-	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
-	{
-		return new IInformationControlCreator()
-		{
+    @Override
+    public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType) {
+        return new CommonTextHover(getLanguageService());
+    }
 
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new DefaultInformationControl(parent, false);
-			}
-		};
-	}
+    @Override
+    public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer) {
+        return new IInformationControlCreator() {
 
-	@Override
-	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
-	{
-		InformationPresenter presenter = new InformationPresenter(getInformationPresenterControlCreator(sourceViewer));
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, false);
+            }
+        };
+    }
 
-		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-		presenter.setSizeConstraints(60, 10, true, true);
+    @Override
+    public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
+        InformationPresenter presenter = new InformationPresenter(
+                getInformationPresenterControlCreator(sourceViewer));
 
-		// registers information provider
-		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		IInformationProvider provider;
-		for (String type : contentTypes)
-		{
-			provider = getInformationProvider(sourceViewer, type);
-			if (provider != null)
-			{
-				presenter.setInformationProvider(provider, type);
-			}
-		}
+        presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
+        presenter.setSizeConstraints(60, 10, true, true);
 
-		return presenter;
-	}
+        // registers information provider
+        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        IInformationProvider provider;
+        for (String type : contentTypes) {
+            provider = getInformationProvider(sourceViewer, type);
+            if (provider != null) {
+                presenter.setInformationProvider(provider, type);
+            }
+        }
 
-	@Override
-	public IReconciler getReconciler(ISourceViewer sourceViewer)
-	{
-		IReconcilingStrategy strategy = getReconcilingStrategy();
-		if (strategy == null)
-		{
-			return null;
-		}
-		MonoReconciler reconciler = new MonoReconciler(strategy, false);
-		reconciler.setDelay(1000);
+        return presenter;
+    }
 
-		return reconciler;
-	}
+    @Override
+    public IReconciler getReconciler(ISourceViewer sourceViewer) {
+        if (fTextEditor != null && fTextEditor.isEditable()) {
+            CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(
+                    fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
+            CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
+            reconciler.setIsIncrementalReconciler(false);
+            reconciler.setIsAllowedToModifyDocument(false);
+            reconciler.setProgressMonitor(new NullProgressMonitor());
+            reconciler.setDelay(500);
 
-	/**
-	 * @return the default indentation string (either tab or spaces which represents a tab)
-	 */
-	public String getIndent()
-	{
-		boolean useSpaces = fPreferenceStore
-				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-		if (useSpaces)
-		{
-			int tabWidth = fPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-			StringBuilder buf = new StringBuilder();
-			for (int i = 0; i < tabWidth; ++i)
-			{
-				buf.append(" "); //$NON-NLS-1$
-			}
-			return buf.toString();
-		}
-		return "\t"; //$NON-NLS-1$
-	}
+            return reconciler;
+        }
+        return null;
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
-	{
-		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
-		targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
-		return targets;
-	}
+    /**
+     * @return the default indentation string (either tab or spaces which
+     *         represents a tab)
+     */
+    public String getIndent() {
+        boolean useSpaces = fPreferenceStore
+                .getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+        if (useSpaces) {
+            int tabWidth = fPreferenceStore
+                    .getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < tabWidth; ++i) {
+                buf.append(" "); //$NON-NLS-1$
+            }
+            return buf.toString();
+        }
+        return "\t"; //$NON-NLS-1$
+    }
 
-	/**
-	 * Returns the content assist processor that will be used for content assist in the given source viewer and for the
-	 * given partition type.
-	 * 
-	 * @param sourceViewer
-	 *            the source viewer to be configured by this configuration
-	 * @param contentType
-	 *            the partition type for which the content assist processor is applicable
-	 * @return IContentAssistProcessor or null if the content type is not supported
-	 */
-	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
-	{
-		return null;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer) {
+        Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+        targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
+        return targets;
+    }
 
-	/**
-	 * Returns the information provider that will be used for information presentation in the given source viewer and
-	 * for the given partition type.
-	 * 
-	 * @param sourceViewer
-	 *            the source viewer to be configured by this configuration
-	 * @param contentType
-	 *            the partition type for which the information provider is applicable
-	 * @return IInformationProvider or null if the content type is not supported
-	 */
-	protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer, String contentType)
-	{
-		return new CommonInformationProvider();
-	}
+    /**
+     * Returns the content assist processor that will be used for content assist
+     * in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the content assist processor is
+     *            applicable
+     * @return IContentAssistProcessor or null if the content type is not
+     *         supported
+     */
+    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
+            String contentType) {
+        return null;
+    }
 
-	protected IReconcilingStrategy getReconcilingStrategy()
-	{
-		return new CommonReconcilingStrategy();
-	}
+    /**
+     * Returns the information provider that will be used for information
+     * presentation in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the information provider is
+     *            applicable
+     * @return IInformationProvider or null if the content type is not supported
+     */
+    protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
+            String contentType) {
+        return new CommonInformationProvider(getLanguageService());
+    }
 
-	protected IContentAssistProcessor addTemplateCompleteProcessor(IContentAssistProcessor processor, String contentType)
-	{
-		if (processor == null)
-		{
-			return new CommonTemplateCompletionProcessor(contentType);
-		}
-		return new CompositeContentAssistProcessor(processor, new CommonTemplateCompletionProcessor(contentType));
-	}
+    protected ILanguageService getLanguageService() {
+        return null;
+    }
 
-	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)
-	{
-		return new IInformationControlCreator()
-		{
+    protected IContentAssistProcessor addTemplateCompleteProcessor(
+            IContentAssistProcessor processor, String contentType) {
+        if (processor == null) {
+            return new CommonTemplateCompletionProcessor(contentType);
+        }
+        return new CompositeContentAssistProcessor(processor,
+                new CommonTemplateCompletionProcessor(contentType));
+    }
 
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				return new DefaultInformationControl(parent, true);
-			}
-		};
-	}
+    private IInformationControlCreator getInformationPresenterControlCreator(
+            ISourceViewer sourceViewer) {
+        return new IInformationControlCreator() {
+
+            public IInformationControl createInformationControl(Shell parent) {
+                return new DefaultInformationControl(parent, true);
+            }
+        };
+    }
 }

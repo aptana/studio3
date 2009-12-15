@@ -44,11 +44,14 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.css.internal.CSSContentAssistProcessor;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+
+    private ILanguageService fLanguageService;
 
     public CSSSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
         super(preferences, editor);
@@ -92,5 +95,13 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
     protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
             String contentType) {
         return new CSSContentAssistProcessor();
+    }
+
+    @Override
+    protected ILanguageService getLanguageService() {
+        if (fLanguageService == null) {
+            fLanguageService = new CSSLanguageService();
+        }
+        return fLanguageService;
     }
 }
