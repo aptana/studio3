@@ -70,6 +70,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 						if (menusFromScope.length > 0) {
 							// Build the menu
 							buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
+							break;
 						}
 					}
 				} catch (BadLocationException e) {
