@@ -38,6 +38,7 @@ package com.aptana.editor.erb.html;
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
+import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
@@ -49,6 +50,14 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 
 	protected RHTMLSourceViewerConfiguration() {
 		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()
+	 */
+	@Override
+	protected String getTopContentType() {
+		return IERBConstants.CONTENT_TYPE_HTML_ERB;
 	}
 
 	/* (non-Javadoc)

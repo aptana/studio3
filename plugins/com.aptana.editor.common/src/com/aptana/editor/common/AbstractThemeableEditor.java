@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -185,6 +186,10 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			overrideCaretColor();
 			getSourceViewer().invalidateTextPresentation();
 		}
+	}
+
+	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal() {
+		return getSourceViewerConfiguration();
 	}
 
 	@Override

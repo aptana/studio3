@@ -42,7 +42,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
  * @author Max Stepanov
  *
  */
-public interface ISourceViewerConfiguration {
+public interface ISourceViewerConfiguration extends ITopContentTypesProvider {
 
 	public String[] getContentTypes();
 	

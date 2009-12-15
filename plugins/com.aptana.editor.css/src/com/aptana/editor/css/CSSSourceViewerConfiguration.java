@@ -69,4 +69,10 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
+
+	@Override
+	public String[][] getTopContentTypes() {
+		return CSSSourceConfiguration.getDefault().getTopContentTypes();
+	}
+
 }

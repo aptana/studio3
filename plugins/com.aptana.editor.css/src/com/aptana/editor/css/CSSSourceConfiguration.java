@@ -73,6 +73,8 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		STRING
 	};
 	
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] {{ICSSConstants.CONTENT_TYPE_CSS}};
+
 	/**
 	 * Detector for empty comments.
 	 */
@@ -164,6 +166,10 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public String[] getContentTypes() {
 		return CONTENT_TYPES;
+	}
+
+	public String[][] getTopContentTypes() {
+		return TOP_CONTENT_TYPES;
 	}
 
 	/* (non-Javadoc)
