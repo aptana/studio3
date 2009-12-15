@@ -64,6 +64,13 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 			});
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return JSSourceConfiguration.getDefault().getTopContentTypes();
+	}
+
     /* (non-Javadoc)
      * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
      */

@@ -64,6 +64,21 @@ public final class TextUtils {
 		}
 		return list.toArray(new String[list.size()]);
 	}
+
+	public static String[][] combineArrays(String[][]... arraysArray) {
+		List<String[]> list = new ArrayList<String[]>();
+		for (String[][] arrays : arraysArray) {
+			for (String[] array : arrays) {
+				list.add(array);
+			}
+		}
+		String[][] arrays = new String[list.size()][1];
+		for (int i = 0; i < list.size(); i++) {
+			arrays[i] = list.get(i);
+		}
+
+		return arrays;
+	}
 	
 	public static char[][] removeDuplicates(char[][] arrays) {
 		List<char[]> list = new ArrayList<char[]>();

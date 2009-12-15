@@ -50,7 +50,7 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 
-public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
 
     public CommonSourceViewerConfiguration() {
     }

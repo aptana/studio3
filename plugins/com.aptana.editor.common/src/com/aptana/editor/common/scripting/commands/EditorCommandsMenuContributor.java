@@ -5,6 +5,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -18,6 +19,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.TextEditorUtils;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
@@ -53,19 +55,65 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			// Is this an Aptana Editor
 			if (activePart instanceof AbstractThemeableEditor) {
 				AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) activePart;
+				String[] splitContentTypesAtOffset = null;
 				MenuElement[] menusFromScope;
 				try {
 					IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
 					int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
+					// Get the scope at caret offset
 					String contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
-					String[] splitContentTypeAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-					menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypeAtOffset);
-					buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
+
+					// Split scope into successively outer scope
+					splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
+					for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
+						menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypesAtOffset[i]);
+						if (menusFromScope.length > 0) {
+							// Build the menu
+							buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
+						}
+					}
 				} catch (BadLocationException e) {
 					CommonEditorPlugin.logError(e);
 				}
 				
-				// TODO Build the menus for other languages in the same file
+				boolean separatorAdded = false;
+				SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor.getSourceViewerConfigurationNonFinal();
+				if (sourceViewerConfiguration instanceof ITopContentTypesProvider) {
+					String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
+					NEXT: for (String[] topContentType : topContentTypes) {
+						QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
+						String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
+
+						// Check if the menus have been already added
+						if (splitContentTypesAtOffset != null) {
+							for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
+								if (splitContentTypesAtOffset[i].equals(contentType)) {
+									continue NEXT;
+								}
+							}
+						}
+
+						// Get menus
+						menusFromScope = BundleManager.getInstance().getMenusFromScope(contentType);
+						if (menusFromScope.length > 0) {
+							// Add separator if needed
+							if (!separatorAdded) {
+								separatorAdded = true;
+								new MenuItem(menu, SWT.SEPARATOR);
+							}
+							buildMenu(menu, menusFromScope, abstractThemeableEditor, contentType);
+						}
+					}
+				}
+
+				new MenuItem(menu, SWT.SEPARATOR);
+
+				MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+				menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
+
+				Menu menuForOtherScopes = new Menu(menu);
+				menuItemForOtherScopes.setMenu(menuForOtherScopes);
+				// TODO Need API in Bundle Manager to implement this.
 			}
 		}
 	}

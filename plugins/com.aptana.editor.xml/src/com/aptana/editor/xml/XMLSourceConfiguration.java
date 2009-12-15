@@ -76,6 +76,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 			PRE_PROCESSOR
 		};
 
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] {{IXMLConstants.CONTENT_TYPE_XML}};
+
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
@@ -107,6 +109,13 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	public String[] getContentTypes()
 	{
 		return CONTENT_TYPES;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return TOP_CONTENT_TYPES;
 	}
 
 	/*

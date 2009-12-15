@@ -79,6 +79,8 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			JS_REGEXP
 		};
 
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] {{IJSConstants.CONTENT_TYPE_JS}};
+
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
 			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,6 +115,13 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	public String[] getContentTypes()
 	{
 		return CONTENT_TYPES;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return TOP_CONTENT_TYPES;
 	}
 
 	/*

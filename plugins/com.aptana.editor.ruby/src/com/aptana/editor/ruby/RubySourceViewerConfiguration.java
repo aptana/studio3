@@ -61,6 +61,13 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 	}
 
 	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return RubySourceConfiguration.getDefault().getTopContentTypes();
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override

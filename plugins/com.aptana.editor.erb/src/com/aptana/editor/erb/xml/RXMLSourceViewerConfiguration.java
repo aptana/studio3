@@ -38,6 +38,7 @@ package com.aptana.editor.erb.xml;
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
+import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 import com.aptana.editor.xml.XMLSourceConfiguration;
 
@@ -49,6 +50,14 @@ public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	
 	protected RXMLSourceViewerConfiguration() {
 		super(XMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()
+	 */
+	@Override
+	protected String getTopContentType() {
+		return IERBConstants.CONTENT_TYPE_XML_ERB;
 	}
 
 	/* (non-Javadoc)

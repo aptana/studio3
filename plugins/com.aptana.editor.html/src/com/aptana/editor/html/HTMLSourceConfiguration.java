@@ -52,6 +52,8 @@ import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
 
 /**
@@ -78,6 +80,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		HTML_STYLE,
 		HTML_TAG
 	};
+
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] {
+		{IHTMLConstants.CONTENT_TYPE_HTML},
+		{IHTMLConstants.CONTENT_TYPE_HTML, IJSConstants.CONTENT_TYPE_JS},
+		{IHTMLConstants.CONTENT_TYPE_HTML, ICSSConstants.CONTENT_TYPE_CSS},
+		};
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
@@ -111,6 +119,13 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				JSSourceConfiguration.CONTENT_TYPES,
 				CSSSourceConfiguration.CONTENT_TYPES
 		});
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return TOP_CONTENT_TYPES;
 	}
 
 	/* (non-Javadoc)

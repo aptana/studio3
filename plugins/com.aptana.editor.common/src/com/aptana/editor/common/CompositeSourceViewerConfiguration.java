@@ -54,12 +54,14 @@ import com.aptana.editor.common.theme.ThemeUtil;
  * @author Max Stepanov
  *
  */
-public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration implements ITopContentTypesProvider {
 
 	private ITokenScanner startEndTokenScanner;
 	private ISourceViewerConfiguration defaultSourceViewerConfiguration;
 	private ISourceViewerConfiguration primarySourceViewerConfiguration;
 	
+	private String[][] topContentTypesArray;
+
 	/**
 	 * @param defaultSourceViewerConfiguration
 	 * @param primarySourceViewerConfiguration
@@ -77,6 +79,22 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
         super(preferences);
         this.defaultSourceViewerConfiguration = defaultSourceViewerConfiguration;
         this.primarySourceViewerConfiguration = primarySourceViewerConfiguration;
+
+        // Compute the top contents types
+        String[][] defaultTopContentTypesArray = defaultSourceViewerConfiguration.getTopContentTypes();
+		for (int i = 0; i < defaultTopContentTypesArray.length; i++) {
+			defaultTopContentTypesArray[i][0] = getTopContentType();
+		}
+		String[][] primaryContentTypesArray = primarySourceViewerConfiguration.getTopContentTypes();
+		for (int i = 0; i < primaryContentTypesArray.length; i++) {
+			String[] topContentTypes = primaryContentTypesArray[i];
+			primaryContentTypesArray[i] = new String[topContentTypes.length+1];
+			primaryContentTypesArray[i][0] = getTopContentType();
+			System.arraycopy(topContentTypes, 0, primaryContentTypesArray[i], 1, topContentTypes.length);
+		}
+		topContentTypesArray = TextUtils.combineArrays(
+				defaultTopContentTypesArray,
+				primaryContentTypesArray);
     }
 
 	/* (non-Javadoc)
@@ -90,6 +108,16 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 				defaultSourceViewerConfiguration.getContentTypes()
 		});
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	@Override
+	public String[][] getTopContentTypes() {
+		return topContentTypesArray;
+	}
+
+	protected abstract String getTopContentType();
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)

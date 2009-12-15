@@ -78,6 +78,8 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     		STRING
     	};
 
+    private static final String[][] TOP_CONTENT_TYPES = new String[][] {{IRubyConstants.CONTENT_TYPE_RUBY}};
+
     private IToken stringToken = new Token(STRING);
 
     private IPredicateRule[] partitioningRules = new IPredicateRule[] {
@@ -109,6 +111,13 @@ public class RubySourceConfiguration implements IPartitioningConfiguration,
     public String[] getContentTypes() {
         return CONTENT_TYPES;
     }
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return TOP_CONTENT_TYPES;
+	}
 
     /**
      * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()

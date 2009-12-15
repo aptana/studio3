@@ -60,6 +60,11 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 			});
 	}
 
+	@Override
+	public String[][] getTopContentTypes() {
+		return XMLSourceConfiguration.getDefault().getTopContentTypes();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
