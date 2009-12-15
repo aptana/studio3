@@ -875,8 +875,9 @@ public class BundleManager
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
 			File projectDirectory = project.getLocation().toFile();
+			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
 			
-			for (File bundle : this.getBundleDirectories(projectDirectory))
+			for (File bundle : this.getBundleDirectories(bundlesDirectory))
 			{
 				this.loadBundle(bundle);
 			}
