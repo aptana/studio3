@@ -260,20 +260,20 @@ public class CommandExecutionUtils {
 					}
 					catch (BadLocationException e)
 					{
-						CommonEditorPlugin.logError("", e); //$NON-NLS-1$
+						CommonEditorPlugin.logError(e);
 					}
 				}
 
 			}
 			catch (PartInitException e)
 			{
-				CommonEditorPlugin.logError(e); //$NON-NLS-1$
+				CommonEditorPlugin.logError(e);
 			}
 			break;
 		}
 	}
 	
-	static final String DEFAULT_CONSOLE_NAME = "Command Ouput"; //$NON-NLS-1$
+	static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
 
 	public static Map<String, String> computeEnvironment(ITextEditor textEditor) {
 		Map<String, String> environment = new HashMap<String, String>();

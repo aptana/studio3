@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.scripting.commands.messages"; //$NON-NLS-1$
 	public static String CommandExecutionUtils_CouldNotCreateTemporaryFile;
+	public static String CommandExecutionUtils_DefaultConsoleName;
 	public static String CommandExecutionUtils_TypeEscapeToDismiss;
 	public static String EditorCommandsMenuContributor_CommandsForOtherScopes;
 	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
