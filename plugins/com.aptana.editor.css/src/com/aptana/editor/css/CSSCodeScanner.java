@@ -47,7 +47,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			wordRule.addWord(word, keyword);
 		}
 		rules.add(wordRule);
-		rules.add(new RegexpRule("(#)([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
+		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
 				createToken("constant.other.color.rgb-value.css"))); //$NON-NLS-1$
 		rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", ids)); //$NON-NLS-1$
 		rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", classes)); //$NON-NLS-1$
@@ -97,11 +97,20 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 				.add(new RegexpRule(
 						"\\b(aliceblue|antiquewhite|aquamarine|azure|beige|bisque|blanchedalmond|blueviolet|brown|burlywood|cadetblue|chartreuse|chocolate|coral|cornflowerblue|cornsilk|crimson|cyan|darkblue|darkcyan|darkgoldenrod|darkgray|darkgreen|darkgrey|darkkhaki|darkmagenta|darkolivegreen|darkorange|darkorchid|darkred|darksalmon|darkseagreen|darkslateblue|darkslategray|darkslategrey|darkturquoise|darkviolet|deeppink|deepskyblue|dimgray|dimgrey|dodgerblue|firebrick|floralwhite|forestgreen|gainsboro|ghostwhite|gold|goldenrod|greenyellow|grey|honeydew|hotpink|indianred|indigo|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightseagreen|lightskyblue|lightslategray|lightslategrey|lightsteelblue|lightyellow|limegreen|linen|magenta|mediumaquamarine|mediumblue|mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumspringgreen|mediumturquoise|mediumvioletred|midnightblue|mintcream|mistyrose|moccasin|navajowhite|oldlace|olivedrab|orangered|orchid|palegoldenrod|palegreen|paleturquoise|palevioletred|papayawhip|peachpuff|peru|pink|plum|powderblue|rosybrown|royalblue|saddlebrown|salmon|sandybrown|seagreen|seashell|sienna|skyblue|slateblue|slategray|slategrey|snow|springgreen|steelblue|tan|thistle|tomato|turquoise|violet|wheat|whitesmoke|yellowgreen)\\b", //$NON-NLS-1$
 						createToken("invalid.deprecated.color.w3c-non-standard-color-name.css"))); //$NON-NLS-1$
-
+		// curly braces
+		rules.add(new RegexpRule("(\\{|\\})", //$NON-NLS-1$
+				createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		
+		// colon
+		rules.add(new RegexpRule(":", //$NON-NLS-1$
+				createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
+		// semicolon
+		rules.add(new RegexpRule(";", //$NON-NLS-1$
+				createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
-	private IToken createToken(String string)
+	protected IToken createToken(String string)
 	{
 		return ThemeUtil.getToken(string);
 	}
