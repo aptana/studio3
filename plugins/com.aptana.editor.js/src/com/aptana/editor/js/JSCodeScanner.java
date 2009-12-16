@@ -45,6 +45,7 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.WordDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
