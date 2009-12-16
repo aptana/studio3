@@ -12,7 +12,7 @@ public class CommandTemplate extends Template {
 		super(command.getTrigger(),
 				command.getDisplayName(), 
 				contextTypeId,
-				command.getInvoke(),
+				(command.getInvoke() == null ? command.getDisplayName(): command.getInvoke()),
 				true);
 		this.command = command;
 	}
