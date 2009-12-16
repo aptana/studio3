@@ -55,20 +55,20 @@ import com.aptana.scripting.model.OutputType;
 public class CommandExecutionUtils {
 	
 	public static CommandResult executeCommand(CommandElement command, ITextEditor textEditor) {
-		InputType inputType = InputType.get(command.getInputType());
-		
 		ITextViewer textViewer = null;
-		StyledText textWidget = null;;
 		
 		if (textEditor instanceof AbstractTextEditor) {
 			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) textEditor;
 			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
 			if (adapter instanceof ITextViewer) {
 				textViewer = (ITextViewer) adapter;
-				textWidget = textViewer.getTextWidget();
 			}
 		}
-		
+		return executeCommand(command, textViewer);
+	}
+
+	public static CommandResult executeCommand(CommandElement command, ITextViewer textViewer) {
+		StyledText textWidget = textViewer.getTextWidget();
 		Point selectionRange = textWidget.getSelection();
 		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
 		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
@@ -78,6 +78,8 @@ public class CommandExecutionUtils {
 			textWidget.getOffsetAtLine(selectionEndOffsetLine) + textWidget.getLine(selectionEndOffsetLine).length();
 		
 		FilterInputProvider filterInputProvider = CommandExecutionUtils.EOF;
+
+		InputType inputType = InputType.get(command.getInputType());
 		switch (inputType) {
 		case SELECTION:
 			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
@@ -101,25 +103,25 @@ public class CommandExecutionUtils {
 		}
 
 		CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream());
-		Map<String, String> computeEnvironment = computeEnvironment(textEditor);
 		// TODO Use the map
+		// Map<String, String> computeEnvironment = computeEnvironment(textEditor);
 		return command.execute(commandContext);
 	}
 	
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor) {
-		OutputType ouputType = OutputType.get(command.getOutputType());
-		
 		ITextViewer textViewer = null;
-		StyledText textWidget = null;;
-		
 		if (textEditor instanceof AbstractTextEditor) {
 			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) textEditor;
 			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
 			if (adapter instanceof ITextViewer) {
 				textViewer = (ITextViewer) adapter;
-				textWidget = textViewer.getTextWidget();
 			}
 		}
+		processCommandResult(command, commandResult, textViewer);
+	}
+
+	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer) {
+		StyledText textWidget = textViewer.getTextWidget();
 		
 		final int caretOffset = textWidget.getCaretOffset();
 		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
@@ -147,6 +149,7 @@ public class CommandExecutionUtils {
 //			break;
 //		}
 		
+		OutputType ouputType = OutputType.get(command.getOutputType());
 		switch (ouputType) {
 		case DISCARD:
 			break;
@@ -184,7 +187,7 @@ public class CommandExecutionUtils {
 			try {
 				tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
 			} catch (IOException e) {
-				CommonEditorPlugin.logError("Could not create temporary file.", e);
+				CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
 			}
 			if (tempHmtlFile != null) {
 				String output = commandResult.getOutputString();
@@ -215,16 +218,16 @@ public class CommandExecutionUtils {
 							support.getExternalBrowser().openURL(url);
 						}
 					} catch (PartInitException e) {
-						CommonEditorPlugin.logError("Could not launch browser.", e); //$NON-NLS-1$
+						CommonEditorPlugin.logError(e);
 					} catch (MalformedURLException e) {
-						CommonEditorPlugin.logError("Malformed URL: "+tempHmtlFile.toURI(), e); //$NON-NLS-1$
+						CommonEditorPlugin.logError(e);
 					}
 				}
 			}
 			break;
 		case SHOW_AS_TOOLTIP:													
-			DefaultInformationControl tooltip = new DefaultInformationControl(textEditor.getSite().getShell(),
-					"Type escape to dismiss.", null); //$NON-NLS-1$
+			DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					Messages.CommandExecutionUtils_TypeEscapeToDismiss, null);
 			tooltip.setInformation(commandResult.getOutputString());
 			Point p = tooltip.computeSizeHint();
 			tooltip.setSize(p.x, p.y);
@@ -241,7 +244,7 @@ public class CommandExecutionUtils {
 			String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
 			try
 			{
-				IEditorPart part = textEditor.getSite().getWorkbenchWindow().getActivePage().openEditor(input, editorId);
+				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, editorId);
 				if (part instanceof ITextEditor)
 				{
 					ITextEditor openedTextEditor = (ITextEditor) part;
@@ -264,7 +267,7 @@ public class CommandExecutionUtils {
 			}
 			catch (PartInitException e)
 			{
-				CommonEditorPlugin.logError("Error opening editor.", e); //$NON-NLS-1$
+				CommonEditorPlugin.logError(e); //$NON-NLS-1$
 			}
 			break;
 		}
