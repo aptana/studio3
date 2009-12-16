@@ -41,18 +41,17 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 
-public class RubySourceEditor extends AbstractThemeableEditor
-{
+@SuppressWarnings("restriction")
+public class RubySourceEditor extends AbstractThemeableEditor {
 
-	@Override
-	protected void initializeEditor()
-	{
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
-				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() }));
+    @Override
+    protected void initializeEditor() {
+        setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
+                Activator.getDefault().getPreferenceStore(),
+                CommonEditorPlugin.getDefault().getPreferenceStore(),
+                EditorsPlugin.getDefault().getPreferenceStore() }));
 
-		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore()));
-		setDocumentProvider(new RubyDocumentProvider());
-
-	}
+        setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
+        setDocumentProvider(new RubyDocumentProvider());
+    }
 }

@@ -24,89 +24,106 @@ import com.aptana.editor.common.NullSubPartitionScanner;
 public class CSSSourcePartitionScannerTest extends TestCase
 {
 
+	private IDocumentPartitioner partitioner;
+
 	private void assertContentType(String contentType, String code, int offset)
 	{
 		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
 				getContentType(code, offset));
 	}
+	
+	@Override
+	protected void tearDown() throws Exception
+	{
+		partitioner = null;
+		super.tearDown();
+	}
 
 	private String getContentType(String content, int offset)
 	{
-		IDocument document = new Document(content);
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-				CSSSourceConfiguration.getDefault().createSubPartitionScanner(),
-				new NullSubPartitionScanner(),
-				new NullPartitionerSwitchStrategy());
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
-				CSSSourceConfiguration.getDefault().getContentTypes());
-		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-		DocumentContentTypeManager.getInstance().setDocumentContentType(document, ICSSConstants.CONTENT_TYPE_CSS);
-		DocumentContentTypeManager.getInstance().registerConfiguration(document, CSSSourceConfiguration.getDefault());
+		if (partitioner == null)
+		{
+			IDocument document = new Document(content);
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(CSSSourceConfiguration
+					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
+					new NullPartitionerSwitchStrategy());
+			partitioner = new ExtendedFastPartitioner(partitionScanner, CSSSourceConfiguration.getDefault()
+					.getContentTypes());
+			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ICSSConstants.CONTENT_TYPE_CSS);
+			DocumentContentTypeManager.getInstance().registerConfiguration(document,
+					CSSSourceConfiguration.getDefault());
+		}
 		return partitioner.getContentType(offset);
 	}
 
 	public void testPartitioningOfDefaultPartition()
 	{
 		String source =
-//                     1         2         3          4         5
-//           0123456789012345678901234567890123456 78901234567890
-			" /* This is CSS comment on one Line */ \n";
+		// 1 2 3 4 5
+		// 0123456789012345678901234567890123456 78901234567890
+		" /* This is CSS comment on one Line */ \n";
 
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 0);
-		for (int i = 1; i <= 37; i++) {
+		for (int i = 1; i <= 37; i++)
+		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 38);
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 39);
 	}
-	
+
 	public void testPartitioningOfCommentSpanningSingleLine()
 	{
 		String source =
-//                     1         2         3          4         5
-//           0123456789012345678901234567890123456 78901234567890
-			"/* This is CSS comment on one Line */\n";
+		// 1 2 3 4 5
+		// 0123456789012345678901234567890123456 78901234567890
+		"/* This is CSS comment on one Line */\n";
 
-		for (int i = 0; i <= 36; i++) {
+		for (int i = 0; i <= 36; i++)
+		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
 	}
-	
+
 	public void testPartitioningOfCommentSpanningMultipleLines()
 	{
-		String source = 
-//                     1         2          3         4          5
-//           01234567890123456789012 345678901234567890123456789 0
-			"/* This is CSS comment\nspanning multiple lines */\n";
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012 345678901234567890123456789 0
+		"/* This is CSS comment\nspanning multiple lines */\n";
 
-		for (int i = 0; i <= 48; i++) {
+		for (int i = 0; i <= 48; i++)
+		{
 			assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 49);
 	}
-	
+
 	public void testPartitioningOfSingleQuotedString()
 	{
-		String source = 
-//                     1         2         3          4         5
-//           01234567890123456789012345678901234567 8901234567890
-			"' This is a single quoted CSS string'\n";
-		for (int i = 0; i <= 36; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012345678901234567 8901234567890
+		"' This is a single quoted CSS string'\n";
+		for (int i = 0; i <= 36; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
 	}
-	
+
 	public void testPartitioningOfEmptySingleQuotedString()
 	{
-		String source = 
-//                     1         2         3          4         5
-//           01234567890123456789012345678901234567 8901234567890
-			"''\n";
-		for (int i = 0; i <= 1; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012345678901234567 8901234567890
+		"''\n";
+		for (int i = 0; i <= 1; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
@@ -114,37 +131,40 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 	public void testPartitioningOfSingleQuotedStringWithEscape()
 	{
-		String source = 
-//                     1         2         3          4          5
-//           01234567890123456789012345678901234567 89012345678 9012
-			"' This is a single quoted CSS string with escape \\' '\n";
-		
-		for (int i = 0; i <= 52; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012345678901234567 89012345678 9012
+		"' This is a single quoted CSS string with escape \\' '\n";
+
+		for (int i = 0; i <= 52; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
 	}
-	
+
 	public void testPartitioningOfSingleQuotedStringWithDoubleQuote()
 	{
-		String source = 
-//                     1         2         3          4          5
-//           01234567890123456789012345678901234567 89012345678 9012
-			"' This is a single quoted CSS string with double quote \" '\n";
-		
-		for (int i = 0; i <= 57; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012345678901234567 89012345678 9012
+		"' This is a single quoted CSS string with double quote \" '\n";
+
+		for (int i = 0; i <= 57; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
 	}
-	
+
 	public void testPartitioningOfDoubleQuotedString()
 	{
-		String source = 
-//                      1         2         3           4         5
-//           0 123456789012345678901234567890123456 7 8901234567890
-			"\" This is a single quoted CSS string\"\n";
-		for (int i = 0; i <= 36; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 0 123456789012345678901234567890123456 7 8901234567890
+		"\" This is a double quoted CSS string\"\n";
+		for (int i = 0; i <= 36; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 37);
@@ -152,48 +172,51 @@ public class CSSSourcePartitionScannerTest extends TestCase
 
 	public void testPartitioningOfEmptyDoubleQuotedString()
 	{
-		String source = 
-//                     1         2         3          4         5
-//           01234567890123456789012345678901234567 8901234567890
-			"\"\"\n";
-		for (int i = 0; i <= 1; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 01234567890123456789012345678901234567 8901234567890
+		"\"\"\n";
+		for (int i = 0; i <= 1; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 2);
 	}
-	
+
 	public void testPartitioningOfDoubleQuotedStringWithEscape()
 	{
-		String source = 
-//                      1         2         3          4           5
-//           0 1234567890123456789012345678901234567 89012345678 9 012
-			"\" This is a single quoted CSS string with escape \\\" \"\n";
-		
-		for (int i = 0; i <= 52; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 0 1234567890123456789012345678901234567 89012345678 9 012
+		"\" This is a double quoted CSS string with escape \\\" \"\n";
+
+		for (int i = 0; i <= 52; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53);
 	}
-	
+
 	public void testPartitioningOfDoubleQuotedStringWithSingleQuote()
 	{
-		String source = 
-//                      1         2         3          4           5
-//           0 1234567890123456789012345678901234567 89012345678 9 012
-			"\" This is a single quoted CSS string with single quote ' \"\n";
-		
-		for (int i = 0; i <= 57; i++) {
+		String source =
+		// 1 2 3 4 5
+		// 0 1234567890123456789012345678901234567 89012345678 9 012
+		"\" This is a double quoted CSS string with single quote ' \"\n";
+
+		for (int i = 0; i <= 57; i++)
+		{
 			assertContentType(CSSSourceConfiguration.STRING, source, i);
 		}
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 58);
 	}
-	
+
 	public void testPartitioningOfAllPartitions()
 	{
 		String source =
-//                     1         2         3          4         5
-//           0123456789012345678901234567890123456 78901234567890
-			" /* */ /**/ ' ' \" \" \n";
+		// 1 2 3 4 5
+		// 0123456789012345678901234567890123456 78901234567890
+		" /* */ /**/ ' ' \" \" \n";
 
 		assertContentType(CSSSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(CSSSourceConfiguration.MULTILINE_COMMENT, source, 1);

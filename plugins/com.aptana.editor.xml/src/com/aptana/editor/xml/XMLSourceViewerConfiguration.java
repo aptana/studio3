@@ -39,15 +39,16 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
 public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
 
-	public XMLSourceViewerConfiguration(IPreferenceStore preferences) {
-	    super(preferences);
-	}
+    public XMLSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(preferences, editor);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)

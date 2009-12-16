@@ -43,4 +43,5 @@ public interface ICommonConstants {
 
 	public String CONTENT_TYPE_UKNOWN = "com.aptana.contenttype.unknown"; //$NON-NLS-1$
 
+	public String DEFAULT_PARTITIONING = "com.aptana.editor.default_partitioning"; //$NON-NLS-1$
 }

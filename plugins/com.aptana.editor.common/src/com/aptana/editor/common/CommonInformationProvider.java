@@ -44,17 +44,39 @@ import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.hover.CommonHoverRegion;
+import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.ILexemeModel;
+
 @SuppressWarnings("restriction")
 public class CommonInformationProvider implements IInformationProvider,
         IInformationProviderExtension2 {
 
+    private ILanguageService fLanguageService;
+
+    public CommonInformationProvider(ILanguageService service) {
+        fLanguageService = service;
+    }
+
     public String getInformation(ITextViewer textViewer, IRegion subject) {
-        // TODO
-        return null;
+        if (fLanguageService != null && subject instanceof CommonHoverRegion) {
+            CommonHoverRegion region = (CommonHoverRegion) subject;
+            ILexeme lexeme = region.getLexeme();
+            if (lexeme != null) {
+                return fLanguageService.getContentAssistText(lexeme);
+            }
+        }
+        return ""; //$NON-NLS-1$
     }
 
     public IRegion getSubject(ITextViewer textViewer, int offset) {
-        // TODO
+        if (fLanguageService != null) {
+            ILexemeModel model = fLanguageService.getLexemeModel();
+            if (model != null) {
+                ILexeme lexeme = model.getLexemeFromOffset(offset);
+                return new CommonHoverRegion(lexeme);
+            }
+        }
         return null;
     }
 

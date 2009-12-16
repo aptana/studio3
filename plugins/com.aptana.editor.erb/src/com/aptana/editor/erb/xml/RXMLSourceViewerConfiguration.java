@@ -35,6 +35,9 @@
 
 package com.aptana.editor.erb.xml;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.texteditor.ITextEditor;
+
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
@@ -47,10 +50,11 @@ import com.aptana.editor.xml.XMLSourceConfiguration;
  *
  */
 public class RXMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
-	
-	protected RXMLSourceViewerConfiguration() {
-		super(XMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault());
-	}
+
+    public RXMLSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(XMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(),
+                preferences, editor);
+    }
 
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()

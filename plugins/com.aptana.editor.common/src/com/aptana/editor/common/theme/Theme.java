@@ -41,14 +41,14 @@ import com.aptana.editor.common.CommonEditorPlugin;
 public class Theme
 {
 
-	private static final String DELIMETER = ","; //$NON-NLS-1$
+	static final String DELIMETER = ","; //$NON-NLS-1$
 
 	private static final String UNDERLINE = "underline"; //$NON-NLS-1$
 	private static final String BOLD = "bold"; //$NON-NLS-1$
 	private static final String ITALIC = "italic"; //$NON-NLS-1$
 
-	private static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
-	private static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
+	static final String THEME_NAME_PROP_KEY = "name"; //$NON-NLS-1$
+	static final String FOREGROUND_PROP_KEY = "foreground"; //$NON-NLS-1$
 	private static final String BACKGROUND_PROP_KEY = "background"; //$NON-NLS-1$
 	private static final String SELECTION_PROP_KEY = "selection"; //$NON-NLS-1$
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
@@ -138,11 +138,14 @@ public class Theme
 	{
 		if (token == null)
 			return new RGB(0, 0, 0);
-		if (token.length() != 7)
+		if (token.length() != 7 && token.length() != 9)
 		{
+			// TODO Handle RGBa values by mixing against BG, etc?
 			CommonEditorPlugin.logError(
 					MessageFormat.format("Received RGB Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
-			return defaultFG;
+			if (defaultFG != null)
+				return defaultFG;
+			return new RGB(0, 0, 0);
 		}
 		String s = token.substring(1, 3);
 		int r = Integer.parseInt(s, 16);
@@ -439,4 +442,54 @@ public class Theme
 		deleteCustomVersion();
 		deleteDefaultVersion();
 	}
+
+	/**
+	 * Determines if the theme defines this exact token type (not checking parents by dropping periods).
+	 * 
+	 * @param tokenType
+	 * @return
+	 */
+	public boolean hasEntry(String tokenType)
+	{
+		return map.containsKey(tokenType);
+	}
+
+	public Color getForeground(String tokenType)
+	{
+		TextAttribute attr = getTextAttribute(tokenType);
+		if (attr == null)
+			return null;
+		return attr.getForeground();
+	}
+
+	/**
+	 * Returns the RGB value for the foreground of a specific token.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public RGB getForegroundAsRGB(String tokenType)
+	{
+		return getForeground(tokenType).getRGB();
+	}
+
+	public Color getBackground(String tokenType)
+	{
+		TextAttribute attr = getTextAttribute(tokenType);
+		if (attr == null)
+			return null;
+		return attr.getBackground();
+	}
+
+	/**
+	 * Returns the RGB value for the background of a specific token.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public RGB getBackgroundAsRGB(String tokenType)
+	{
+		return getBackground(tokenType).getRGB();
+	}
+
 }

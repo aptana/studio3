@@ -119,4 +119,44 @@
       </menuContribution>
    </extension>
 
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.common.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            class="com.aptana.editor.common.hyperlinks.CommonHyperlinkDetector"
+            id="com.aptana.editor.common.hyperlinkDetector"
+            name="Aptana Editor Detector"
+            targetId="com.aptana.editor.ui.hyperlinkTarget">
+      </hyperlinkDetector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.ui.hyperlinkTarget"
+            name="Aptana Editor">
+         <context
+               type="org.eclipse.ui.texteditor.ITextEditor">
+         </context>
+      </target>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <theme
+            id="com.aptana.editor.common.theme"
+            name="%customThemeName">
+         <fontOverride
+               id="org.eclipse.jface.textfont"
+               value="Inconsolata-regular-14">
+         </fontOverride>
+         <fontOverride
+               id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
+               value="Inconsolata-regular-14">
+         </fontOverride>
+      </theme>
+   </extension>
 </plugin>

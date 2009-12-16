@@ -26,6 +26,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -33,9 +35,14 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
@@ -47,6 +54,8 @@ import com.aptana.filewatcher.FileWatcher;
  */
 public class SingleProjectView extends CommonNavigator
 {
+
+	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	private Combo projectCombo;
 	protected IProject selectedProject;
@@ -160,6 +169,56 @@ public class SingleProjectView extends CommonNavigator
 		data2.left = new FormAttachment(0, 0);
 		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
+
+		// Hook up to themes
+		hookToThemes();
+	}
+
+	private void hookToThemes()
+	{
+		getCommonViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+		final Tree tree = getCommonViewer().getTree();
+		// Override selection color to match what is set in theme
+		tree.addListener(SWT.EraseItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					Tree tree = (Tree) event.widget;
+					int clientWidth = tree.getClientArea().width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+							ThemeUtil.getActiveTheme().getSelection()));
+					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
+					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			}
+		});
+		// Listen to theme changes
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				new IPreferenceChangeListener()
+				{
+
+					@Override
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+						{
+							getCommonViewer().refresh();
+							getCommonViewer().getTree().setBackground(
+									CommonEditorPlugin.getDefault().getColorManager().getColor(
+											ThemeUtil.getActiveTheme().getBackground()));
+						}
+					}
+				});
 	}
 
 	private IProject[] createProjectCombo(Composite parent)

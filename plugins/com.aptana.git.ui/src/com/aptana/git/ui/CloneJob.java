@@ -34,6 +34,7 @@ import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
 
 //FIXME Move to some different package?
+@SuppressWarnings("restriction")
 public class CloneJob extends Job
 {
 

@@ -26,8 +26,16 @@
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.junit4" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="com.aptana.red.core" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
+   <plugin
+         id="com.aptana.editor.common.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+         
    <plugin
          id="com.aptana.editor.ruby.tests"
          download-size="0"
@@ -37,6 +45,34 @@
 
    <plugin
          id="com.aptana.util.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.css.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.html.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.js.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.scripting.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"

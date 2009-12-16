@@ -47,6 +47,8 @@ import java.util.Set;
  */
 public final class TextUtils {
 
+	// TODO Move to util plugin
+	
 	/**
 	 * 
 	 */

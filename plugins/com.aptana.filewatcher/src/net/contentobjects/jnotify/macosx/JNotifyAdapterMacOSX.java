@@ -14,6 +14,7 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+@SuppressWarnings("nls")
 public class JNotifyAdapterMacOSX implements IJNotify
 {
 	/**

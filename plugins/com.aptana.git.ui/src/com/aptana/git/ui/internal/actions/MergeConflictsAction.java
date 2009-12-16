@@ -21,6 +21,7 @@ import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.GitAction;
 import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 
+@SuppressWarnings("restriction")
 public class MergeConflictsAction extends GitAction
 {
 

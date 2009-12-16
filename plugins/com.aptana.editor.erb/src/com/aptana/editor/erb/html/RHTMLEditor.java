@@ -47,10 +47,10 @@ public class RHTMLEditor extends AbstractThemeableEditor {
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor() {
-		super.initializeEditor();
-		setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration());
-		setDocumentProvider(new RHTMLDocumentProvider());
-	}
+    protected void initializeEditor() {
+        super.initializeEditor();
 
+        setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
+        setDocumentProvider(new RHTMLDocumentProvider());
+    }
 }

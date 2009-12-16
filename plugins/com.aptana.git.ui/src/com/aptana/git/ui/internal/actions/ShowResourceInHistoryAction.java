@@ -18,6 +18,7 @@ import org.eclipse.team.ui.TeamUI;
 /**
  * An action to update the history view for the selected resource. If the history view is not visible it will be shown.
  */
+@SuppressWarnings("restriction")
 public class ShowResourceInHistoryAction extends TeamAction
 {
 	// TODO Extend GitAction?

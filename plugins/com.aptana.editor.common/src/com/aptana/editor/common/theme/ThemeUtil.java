@@ -106,10 +106,8 @@ public abstract class ThemeUtil
 	{
 		fgTheme = theme;
 		adaptTokens();
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
-		prefs.put(ACTIVE_THEME, theme.getName());
 
+		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
@@ -122,13 +120,16 @@ public abstract class ThemeUtil
 
 		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
 				.getLineHighlight()));
+
+		prefs.put(ACTIVE_THEME, theme.getName());
+		prefs.putLong(THEME_CHANGED, System.currentTimeMillis());
 		try
 		{
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
 		{
-			// ignore
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
@@ -266,6 +267,7 @@ public abstract class ThemeUtil
 	public static void addTheme(Theme newTheme)
 	{
 		fgThemeMap.put(newTheme.getName(), newTheme);
+		newTheme.save();
 		saveThemeList();
 	}
 

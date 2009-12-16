@@ -14,8 +14,6 @@ import java.util.List;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.git.ui.internal.GitLightweightDecorator;
-
 /**
  * Action to disassociate a project from its Git repository.
  * 
@@ -23,6 +21,7 @@ import com.aptana.git.ui.internal.GitLightweightDecorator;
  */
 public class DisconnectAction extends AbstractOperationAction
 {
+	@SuppressWarnings("unchecked")
 	protected IWorkspaceRunnable createOperation(final IAction act, final List sel)
 	{
 		return sel.isEmpty() ? null : new DisconnectProviderOperation(sel);

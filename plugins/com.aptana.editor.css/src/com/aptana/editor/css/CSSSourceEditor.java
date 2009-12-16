@@ -42,7 +42,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor {
     protected void initializeEditor() {
         super.initializeEditor();
 
-        setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore()));
+        setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new CSSDocumentProvider());
     }
 }

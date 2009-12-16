@@ -17,6 +17,7 @@ import org.eclipse.ui.internal.misc.StringMatcher;
 
 import com.aptana.explorer.ExplorerPlugin;
 
+@SuppressWarnings("restriction")
 class PathFilter extends ViewerFilter
 {
 

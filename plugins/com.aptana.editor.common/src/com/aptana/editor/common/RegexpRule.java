@@ -13,15 +13,69 @@ public class RegexpRule implements IPredicateRule
 
 	private Pattern regexp;
 	private IToken successToken;
+	private char firstChar = Character.MIN_VALUE;
 
 	public RegexpRule(String regexp, IToken successToken)
 	{
+		this(regexp, successToken, false);
+	}
+
+	/**
+	 * This takes an additional flag to optimize the rule matching.
+	 * 
+	 * @param regexp
+	 * @param successToken
+	 * @param matchFirstCharFirst
+	 *            - a value of true is a hint to match the first char of the regexp first before proceeding to to
+	 *            Pattern match.
+	 */
+	public RegexpRule(String regexp, IToken successToken, boolean matchFirstCharFirst)
+	{
 		this.regexp = Pattern.compile(regexp);
 		this.successToken = successToken;
+		if (matchFirstCharFirst && regexp.length() > 0)
+		{ // TODO always use this optimization if the first character is a non-special one? (i.e. not ".*([-\?+{" )
+			switch (regexp.charAt(0))
+			{ // FIXME We also need to see if there's any special character in same group! i.e. to handle "chris|sandip"
+				case '*':
+				case '.':
+				case '+':
+				case '|':
+				case '(':
+				case '[':
+				case '{':
+				case '\\':
+				case '-':
+				case '^':
+				case '$':
+				case ')':
+				case ']':
+				case '}':
+				case '?':
+					break;
+				default:
+					firstChar = regexp.charAt(0);
+					break;
+			}
+		}
 	}
 
 	public IToken evaluate(ICharacterScanner scanner, boolean resume)
 	{
+		// Should we try to match the first char first?
+		if (firstChar != Character.MIN_VALUE)
+		{
+			int readChar = scanner.read();
+			scanner.unread();
+			if (readChar == ICharacterScanner.EOF)
+			{
+				return Token.EOF;
+			}
+			if (firstChar != readChar)
+			{
+				return Token.UNDEFINED;
+			}
+		}
 		String line = readNextLine(scanner);
 		if (line == null)
 			return Token.EOF;

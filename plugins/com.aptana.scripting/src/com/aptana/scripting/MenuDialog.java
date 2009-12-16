@@ -29,12 +29,10 @@ public class MenuDialog extends PopupDialog
 	private static final String SEPARATOR = "separator"; //$NON-NLS-1$
 	private static final String IMAGE = "image"; //$NON-NLS-1$
 
-	@SuppressWarnings("unchecked")
-	private List<Map> menuItems;
+	private List<Map<String, Object>> menuItems;
 	private Table completionsTable;
 
-	@SuppressWarnings("unchecked")
-	public MenuDialog(Shell parent, Map... menuItems)
+	public MenuDialog(Shell parent, Map<String, Object>... menuItems)
 	{
 		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
 		this.menuItems = Arrays.asList(menuItems);
@@ -95,8 +93,7 @@ public class MenuDialog extends PopupDialog
 	 *            The lexicographically sorted map of partial matches for the current state; must not be
 	 *            <code>null</code> or empty.
 	 */
-	@SuppressWarnings("unchecked")
-	private final void createTableDialogArea(final Composite parent, final List<Map> partialMatches)
+	private final void createTableDialogArea(final Composite parent, final List<Map<String, Object>> partialMatches)
 	{
 		// Layout the table.
 		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
@@ -108,12 +105,12 @@ public class MenuDialog extends PopupDialog
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
 		// Initialize the columns and rows.
-		Map rep = partialMatches.iterator().next();
+		Map<String, Object> rep = partialMatches.iterator().next();
 		if (rep.containsKey(TITLE))
 		{
 			// just a list
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
-			for (Map map : partialMatches)
+			for (Map<String, Object> map : partialMatches)
 			{
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
 				if (map.containsKey(SEPARATOR))
@@ -129,7 +126,7 @@ public class MenuDialog extends PopupDialog
 			// image, display, insert, tool_tip
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
 			columns.add(new TableColumn(completionsTable, SWT.LEFT, 1));
-			for (Map map : partialMatches)
+			for (Map<String, Object> map : partialMatches)
 			{
 				final TableItem item = new TableItem(completionsTable, SWT.NULL);
 				if (map.containsKey(SEPARATOR))

@@ -3,7 +3,7 @@ require "java"
 # FIXME For some reason when the file is executed the second time (after a save) it hangs on the first job execution!
 module RadRails
   # Wraps an Eclipse Job and allows us to use a block to implement the one abstract method we need
-  class RubyJob < org.eclipse.core.runtime.jobs.Job
+  class Job < org.eclipse.core.runtime.jobs.Job
     def initialize(name, &blk)
       super(name)
       @block = blk
@@ -39,7 +39,7 @@ module RadRails
         return_proj = find(name)
         return return_proj if return_proj.exists?
         # FIXME Allow setting a non-standard location or default set of nature Ids using the options hash!
-        job = RubyJob.new("Create project") {|monitor| find(name).project.create(monitor) }
+        job = Job.new("Create project") {|monitor| find(name).project.create(monitor) }
         job.schedule
         job.join
         return_proj
@@ -79,7 +79,7 @@ module RadRails
     # Add a new nature to the project. +nature_id+ is a String 
     def add_nature(nature_id)
       return unless project.exists?
-      job = RubyJob.new("Add Nature to project") do |monitor| 
+      job = Job.new("Add Nature to project") do |monitor| 
         description = project.description
         new_natures = natures + [nature_id]
         description.nature_ids = new_natures.to_java(:string)
@@ -110,7 +110,7 @@ module RadRails
     
     def open
       return if is_open?
-      job = RubyJob.new("Open project") {|monitor| project.open(monitor) }
+      job = Job.new("Open project") {|monitor| project.open(monitor) }
       job.schedule
       job.join
     end
@@ -119,20 +119,23 @@ module RadRails
       !is_open?
     end
     
+    # Close the project
     def close
       return if is_closed?
-      job = RubyJob.new("Close project") {|monitor| project.close(monitor) }
+      job = Job.new("Close project") {|monitor| project.close(monitor) }
       job.schedule
       job.join
     end
     
+    # Delete the project
     def delete
       return if !exists?
-      job = RubyJob.new("Delete project") {|monitor| project.delete(true, true, monitor) }
+      job = Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
       job.schedule
       job.join
     end
     
+    # Make the project the current/active one highlighted by the App Explorer
     def make_current
       scope = org.eclipse.core.runtime.preferences.InstanceScope.new
       prefs = scope.getNode(com.aptana.explorer.ExplorerPlugin::PLUGIN_ID)
@@ -140,15 +143,26 @@ module RadRails
       prefs.flush
     end
    
-    # TODO Be able to register as a listener so we can get notified when a file changes in a project or subdir!
+    # Adds a listener to be notified of file changes in the project
+    def add_listener(recursive = true, &blk)
+      com.aptana.scripting.FileChangeNotifier.add_listener(project.location.toOSString, recursive, &blk)
+    end
+    
+    # Query method to tell if a project has a rails nature
+    def rails?
+      has_nature? org.radrails.rails.core.RailsProjectNature::ID
+    end
+    
   end
 end
+
+# TODO Override the file operations methods like delete/move/copy so that if they're in the workspace we use the Eclipse APIs?
 
 class Dir
   # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
   def refresh(shallow = false)
     depth = shallow ? org.eclipse.core.resources.IResource::DEPTH_ONE : org.eclipse.core.resources.IResource::DEPTH_INFINITE
-    job = RubyJob.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
+    job = Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end
@@ -158,21 +172,50 @@ class Dir
     ipath = org.eclipse.core.runtime.Path.new(path)
     org.eclipse.core.resources.ResourcesPlugin.workspace.root.getContainerForLocation(ipath)
   end
+  
+  # Adds a listener to be notified of file changes in the directory
+  def add_listener(recursive = true, &blk)
+    com.aptana.scripting.FileChangeNotifier.add_listener(File.expand_path(path), recursive, &blk)
+  end
 end
 
 class File
 
   # Forces a refresh of the file
   def refresh
+    return if resource.nil?
     depth = org.eclipse.core.resources.IResource::DEPTH_ZERO
-    job = RubyJob.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
+    job = Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end
   
   # Grabs the IResource (IFile) that Eclipse uses that we then operate on
   def resource
-    ipath = org.eclipse.core.runtime.Path.new(path)
+    ipath = org.eclipse.core.runtime.Path.new(File.expand_path(path))
     org.eclipse.core.resources.ResourcesPlugin.workspace.root.getFileForLocation(ipath)
+  end
+  
+  # Adds a listener to be notified of file changes
+  def add_listener(&blk)
+    com.aptana.scripting.FileChangeNotifier.add_listener(File.expand_path(path), false, &blk)
+  end
+end
+
+# Re-open the event class
+class com.aptana.scripting.FileChangeNotifier::FileModificationEvent
+  alias :old_type :type
+  # Coerce the java integer type into a symbol to make it more ruby-like
+  def type
+    case old_type
+    when CREATED
+      :created
+    when DELETED
+      :deleted
+    when RENAMED
+      :renamed
+    else
+      :modified
+    end
   end
 end

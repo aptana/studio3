@@ -50,6 +50,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
+import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.SubPartitionScanner;
 import com.aptana.editor.common.theme.ThemeUtil;
 
@@ -87,7 +88,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("/", "/", new Token(JS_REGEXP), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
+			new RegexpRule("/.*?[^\\\\]+/[igm]*", new Token(JS_REGEXP), true) }; //$NON-NLS-1$
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;

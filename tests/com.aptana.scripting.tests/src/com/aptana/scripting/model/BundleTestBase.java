@@ -4,7 +4,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-public class BundleTestBase extends TestCase
+public abstract class BundleTestBase extends TestCase
 {
 	private static final String APPLICATION_BUNDLES = new File("application-bundles").getAbsolutePath();
 	private static final String PROJECT_BUNDLES = new File("project-bundles").getAbsolutePath();

@@ -19,6 +19,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.GitAction;
 
+@SuppressWarnings("restriction")
 public class GithubNetworkAction extends GitAction
 {
 	@SuppressWarnings("unchecked")
