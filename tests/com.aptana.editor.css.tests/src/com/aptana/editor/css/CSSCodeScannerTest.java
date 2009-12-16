@@ -20,7 +20,7 @@ public class CSSCodeScannerTest extends TestCase
 		{
 			protected IToken createToken(String string)
 			{
-				return new Token(string);
+				return getToken(string);
 			};
 		};
 	}
