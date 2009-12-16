@@ -22,8 +22,10 @@ import com.aptana.filewatcher.FileWatcher;
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
-	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$"); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets)/[^/]+\\.rb$"); //$NON-NLS-1$
+	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?/(?:commands|snippets)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 
 	private static BundleMonitor INSTANCE;
 
@@ -91,9 +93,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileCreated(int wd, String rootPath, String name)
 	{
-		File file = new File(rootPath + File.separator + name);
-
-		BundleManager.getInstance().loadScript(file);
+		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		{
+			File file = new File(rootPath + File.separator + name);
+			
+			BundleManager.getInstance().loadScript(file);
+		}
 	}
 
 	/**
@@ -105,9 +110,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		File file = new File(rootPath + File.separator + name);
-
-		BundleManager.getInstance().unloadScript(file);
+		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		{
+			File file = new File(rootPath + File.separator + name);
+			
+			BundleManager.getInstance().unloadScript(file);
+		}
 	}
 
 	/**
@@ -119,9 +127,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileModified(int wd, String rootPath, String name)
 	{
-		File file = new File(rootPath + File.separator + name);
-
-		BundleManager.getInstance().reloadScript(file);
+		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		{
+			File file = new File(rootPath + File.separator + name);
+			
+			BundleManager.getInstance().reloadScript(file);
+		}
 	}
 
 	/**
@@ -134,11 +145,19 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		File oldFile = new File(rootPath + File.separator + oldName);
-		File newFile = new File(rootPath + File.separator + newName);
-
-		BundleManager.getInstance().unloadScript(oldFile);
-		BundleManager.getInstance().loadScript(newFile);
+		if (USER_BUNDLE_PATTERN.matcher(oldName).matches() || USER_FILE_PATTERN.matcher(oldName).matches())
+		{
+			File oldFile = new File(rootPath + File.separator + oldName);
+			
+			BundleManager.getInstance().unloadScript(oldFile);
+		}
+		
+		if (USER_BUNDLE_PATTERN.matcher(newName).matches() || USER_FILE_PATTERN.matcher(newName).matches())
+		{
+			File newFile = new File(rootPath + File.separator + newName);
+			
+			BundleManager.getInstance().loadScript(newFile);
+		}
 	}
 
 	/**
