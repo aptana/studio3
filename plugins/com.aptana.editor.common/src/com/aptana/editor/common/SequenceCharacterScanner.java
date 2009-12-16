@@ -45,7 +45,6 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 
 	private ICharacterScanner characterScanner;
 	private char[][] sequences;
-	private char[][][] escapes;
 	private boolean found = false;
 	private boolean eof = false;
 	
@@ -55,7 +54,6 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
 		this.characterScanner = characterScanner;
 		this.sequences = switchStrategy.getSwitchSequences();
-		this.escapes = switchStrategy.getEscapeSequences();
 	}
 
 	/* (non-Javadoc)
