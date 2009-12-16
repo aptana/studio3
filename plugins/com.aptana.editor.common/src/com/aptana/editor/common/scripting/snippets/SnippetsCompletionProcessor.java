@@ -47,7 +47,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 		try {
 			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength() );
 		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
+			CommonEditorPlugin.logError(e);
 		}
 		return new SnippetTemplateContextType(contentTypeString);
 	}
