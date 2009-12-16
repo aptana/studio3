@@ -7,10 +7,9 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
-import com.aptana.scripting.model.OutputType;
 
 public class CommandProposal extends SnippetTemplateProposal {
 
@@ -31,13 +30,8 @@ public class CommandProposal extends SnippetTemplateProposal {
 		if (template instanceof CommandTemplate) {
 			CommandTemplate commandTemplate = (CommandTemplate) template;
 			CommandElement command = commandTemplate.getCommand();
-			CommandResult commandResult = command.execute(new CommandContext());
-			try {
-				OutputType output = OutputType.valueOf(command.getOutputType().toUpperCase());
-				System.out.println(commandResult.getOutputString());
-			} catch (IllegalArgumentException iae) {
-				System.err.println(commandResult.getOutputString());
-			}
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer);
+			CommandExecutionUtils.processCommandResult(command, commandResult, viewer);
 		}
 	}
 
