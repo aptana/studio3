@@ -429,6 +429,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category))
 		{
 			IStatusField field = getStatusField(category);
+			if (field == null)
+				return;
 			String text = getCursorPosition();
 			if (text.length() != lastPositionLength)
 			{
