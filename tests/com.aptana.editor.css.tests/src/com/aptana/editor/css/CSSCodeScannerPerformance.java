@@ -13,7 +13,7 @@ public class CSSCodeScannerPerformance
 
 	public static void main(String[] args) throws Exception
 	{
-		InputStream stream = CSSCodeScannerTest.class.getResourceAsStream("yui.css");
+		InputStream stream = CSSCodeScannerPerformance.class.getResourceAsStream("yui.css");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)

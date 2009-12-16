@@ -66,7 +66,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 * A flag to turn on or off the optimization of eligible regexp rules. Seems to make a measurable difference on
 	 * large files. (yui.css took average 760ms vs 1120ms)
 	 */
-	private static final boolean OPTIMIZE_REGEXP_RULES = false;
+	private static final boolean OPTIMIZE_REGEXP_RULES = true;
 
 	/**
 	 * CodeScanner
