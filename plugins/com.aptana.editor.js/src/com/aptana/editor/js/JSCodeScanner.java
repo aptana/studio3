@@ -54,13 +54,14 @@ import com.aptana.editor.common.theme.ThemeUtil;
  */
 public class JSCodeScanner extends RuleBasedScanner
 {
+	@SuppressWarnings("nls")
+	private static final String[] KEYWORD_OPERATORS = new String[] { "delete", "in", "instanceof", "new", "typeof",
+			"with" };
 
-	private static final String[] KEYWORD_OPERATORS = new String[] { "delete", "in", "instanceof", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"new", "typeof", "with" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-	private static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			"continue", "default", "do", "else", "finally", "for", "goto", "if", "import", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
-			"package", "return", "switch", "throw", "try", "while" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+	@SuppressWarnings("nls")
+	private static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", "continue", "default",
+			"do", "else", "finally", "for", "goto", "if", "import", "package", "return", "switch", "throw", "try",
+			"while" };
 
 	@SuppressWarnings("nls")
 	private static final String[] STORAGE_TYPES = new String[] { "boolean", "byte", "char", "class", "double", "enum",
@@ -156,7 +157,14 @@ public class JSCodeScanner extends RuleBasedScanner
 
 		// semicolon
 		rules.add(new RegexpRule(";", createToken("punctuation.terminator.statement.js"))); //$NON-NLS-1$ //$NON-NLS-2$
-
+		// Parens
+		rules.add(new RegexpRule("\\(|\\)", createToken("meta.brace.round.js"))); //$NON-NLS-1$ //$NON-NLS-2$
+		// Square braces
+		rules.add(new RegexpRule("\\[|\\]", createToken("meta.brace.square.js"))); //$NON-NLS-1$ //$NON-NLS-2$
+		// Curly braces
+		rules.add(new RegexpRule("\\{|\\}", createToken("meta.brace.curly.js"))); //$NON-NLS-1$ //$NON-NLS-2$
+		// Comma
+		rules.add(new RegexpRule(",", createToken("meta.delimiter.object.comma.js"))); //$NON-NLS-1$ //$NON-NLS-2$
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 

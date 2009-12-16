@@ -47,6 +47,107 @@ public class JSCodeScannerTest extends TestCase
 		assertToken(getToken("constant.numeric.js"), 10, 1);
 		assertToken(getToken("punctuation.terminator.statement.js"), 11, 1);
 	}
+	
+	public void testPrototypeSnippet()
+	{
+		String src = "var Class = {\n" +
+"  create: function() {\n" +
+"    var parent = null, properties = $A(arguments);\n" +
+"    if (Object.isFunction(properties[0]))\n" +
+"      parent = properties.shift();\n" +
+"    \n" +
+"    function klass() {\n" +
+"      this.initialize.apply(this, arguments);\n" +
+"    }\n" +
+"    \n" +
+"    Object.extend(klass, Class.Methods);\n" +
+"    klass.superclass = parent;\n" +
+"    klass.subclasses = [];\n" +
+"    \n" +
+"    if (parent) {\n" +
+"      var subclass = function() { };\n" +
+"      subclass.prototype = parent.prototype;\n" +
+"      klass.prototype = new subclass;\n" +
+"      parent.subclasses.push(klass);\n" +
+"    }\n" +
+"    \n" +
+"    for (var i = 0; i < properties.length; i++)\n" +
+"      klass.addMethods(properties[i]);\n" +
+"    \n" +
+"    if (!klass.prototype.initialize)\n" +
+"      klass.prototype.initialize = Prototype.emptyFunction;\n" +
+"    \n" +
+"    klass.prototype.constructor = klass;\n" +
+"    \n" +
+"    return klass;\n" +
+"  }\n" +
+"};";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+		// line 1
+		assertToken(getToken("storage.type.js"), 0, 3);
+		assertToken(Token.WHITESPACE, 3, 1);
+		assertToken(getToken("source.js"), 4, 5);
+		assertToken(Token.WHITESPACE, 9, 1);
+		assertToken(getToken("keyword.operator.js"), 10, 1);
+		assertToken(Token.WHITESPACE, 11, 1);
+		assertToken(getToken("meta.brace.curly.js"), 12, 1);
+		assertToken(Token.WHITESPACE, 13, 3);
+		
+		// line 2
+		// Textmate rule should apply, but we can't support it yet:
+		// \b([a-zA-Z_?.$][\w?.$]*)\s*:\s*\b(function)?\s*(\()(.*?)(\))';
+		assertToken(getToken("source.js"), 16, 6); // create FIXME Should be entity.name.function.js
+		assertToken(getToken(null), 22, 1); // ':'
+		assertToken(Token.WHITESPACE, 23, 1); // ' '
+		assertToken(getToken("storage.type.js"), 24, 8); // function
+		assertToken(getToken("meta.brace.round.js"), 32, 1); // '(' FIXME Should be punctuation.definition.parameters.begin.js
+		assertToken(getToken("meta.brace.round.js"), 33, 1);// ')' FIXME Should be punctuation.definition.parameters.end.js
+		assertToken(Token.WHITESPACE, 34, 1); // ' '
+		assertToken(getToken("meta.brace.curly.js"), 35, 1); // {
+		assertToken(Token.WHITESPACE, 36, 5);
+		
+		// line 3
+		assertToken(getToken("storage.type.js"), 41, 3); // var
+		assertToken(Token.WHITESPACE, 44, 1);
+		assertToken(getToken("source.js"), 45, 6); // parent
+		assertToken(Token.WHITESPACE, 51, 1);
+		assertToken(getToken("keyword.operator.js"), 52, 1); // =
+		assertToken(Token.WHITESPACE, 53, 1);
+		assertToken(getToken("constant.language.null.js"), 54, 4); // null
+		assertToken(getToken("meta.delimiter.object.comma.js"), 58, 1); // ,
+		assertToken(Token.WHITESPACE, 59, 1);
+		assertToken(getToken("source.js"), 60, 10); // properties
+		assertToken(Token.WHITESPACE, 70, 1);
+		assertToken(getToken("keyword.operator.js"), 71, 1); // =
+		assertToken(Token.WHITESPACE, 72, 1);
+		assertToken(getToken("keyword.operator.js"), 73, 1); // $
+		assertToken(getToken("source.js"), 74, 1); // A
+		assertToken(getToken("meta.brace.round.js"), 75, 1); // (
+		assertToken(getToken("source.js"), 76, 9); // arguments
+		assertToken(getToken("meta.brace.round.js"), 85, 1); // )
+		assertToken(getToken("punctuation.terminator.statement.js"), 86, 1);
+		assertToken(Token.WHITESPACE, 87, 5);
+		
+		// line 4
+		// if (Object.isFunction(properties[0]))\n
+		assertToken(getToken("keyword.control.js"), 92, 2);
+		assertToken(Token.WHITESPACE, 94, 1);
+		assertToken(getToken("meta.brace.round.js"), 95, 1);
+		assertToken(getToken("support.class.js"), 96, 6);
+		assertToken(getToken(null), 102, 1);
+		assertToken(getToken("source.js"), 103, 10);
+		assertToken(getToken("meta.brace.round.js"), 113, 1);
+		assertToken(getToken("source.js"), 114, 10);
+		assertToken(getToken("meta.brace.square.js"), 124, 1);
+		assertToken(getToken("constant.numeric.js"), 125, 1);
+		assertToken(getToken("meta.brace.square.js"), 126, 1);
+		assertToken(getToken("meta.brace.round.js"), 127, 1);
+		assertToken(getToken("meta.brace.round.js"), 128, 1);
+		assertToken(Token.WHITESPACE, 129, 7);
+		
+		// TODO Test all the rest of the lines! (Or at least the "interesting" parts with new token types
+	}
 
 	private IToken getToken(String string)
 	{
