@@ -31,8 +31,8 @@ public class RegexpRule implements IPredicateRule
 	{
 		this.regexp = Pattern.compile(regexp);
 		this.successToken = successToken;
-		if (regexp.length() > 0)
-		{
+		if (matchFirstCharFirst && regexp.length() > 0)
+		{ // TODO always use this optimization of the first character is a non-sepcial one? (i.e. not ".*([-\?+{" )
 			firstChar = regexp.charAt(0);
 		}
 	}
