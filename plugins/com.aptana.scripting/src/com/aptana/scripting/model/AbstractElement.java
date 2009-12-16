@@ -95,7 +95,7 @@ public abstract class AbstractElement
 	{
 		if (path == null || path.length() == 0)
 		{
-			throw new IllegalArgumentException("path must be defined");
+			throw new IllegalArgumentException(Messages.AbstractElement_PATH_NOT_DEFINED);
 		}
 		
 		this._path = path;

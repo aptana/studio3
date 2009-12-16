@@ -293,7 +293,7 @@ public class BundleManager
 			{
 				public boolean accept(File pathname)
 				{
-					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false);
+					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false); //$NON-NLS-1$
 				}
 			});
 		}
@@ -800,19 +800,19 @@ public class BundleManager
 				}
 				else
 				{
-					message = MessageFormat.format("The specified bundle file is not a directory: {0}",
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
 							new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format("The specified bundle file is not a directory: {0}",
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
 						new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format("The specified bundle directory does not exist: {0}",
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
 					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
@@ -928,7 +928,7 @@ public class BundleManager
 		else
 		{
 			String message = MessageFormat.format(
-				"Skipping script because its current access privileges make it unreadable: {0}",
+				Messages.BundleManager_UNREADABLE_SCRIPT,
 				new Object[] { script.getAbsolutePath() }
 			);
 			
@@ -957,7 +957,7 @@ public class BundleManager
 	void logError(String message)
 	{
 		// TODO: create and write to bundle console
-		System.out.println("error: " + message);
+		System.out.println("error: " + message); //$NON-NLS-1$
 	}
 
 	/**

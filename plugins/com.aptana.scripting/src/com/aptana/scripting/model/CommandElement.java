@@ -47,7 +47,7 @@ public class CommandElement extends TriggerableElement
 	 */
 	public CommandResult execute(CommandContext context)
 	{
-		String resultText = "";
+		String resultText = ""; //$NON-NLS-1$
 		
 		if (this.isExecutable())
 		{
@@ -176,14 +176,14 @@ public class CommandElement extends TriggerableElement
 		
 		String OS = Platform.getOS();
 		File tempFile = null;
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		
 		try
 		{
 			// create temporary file for execution
 			tempFile = File.createTempFile(
-				"command_temp_",
-				(OS.equals(Platform.OS_WIN32) ? ".bat" : ".sh")
+				"command_temp_", //$NON-NLS-1$
+				(OS.equals(Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			
 			// dump "invoke" content into temp file
@@ -196,11 +196,11 @@ public class CommandElement extends TriggerableElement
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 			{
-				commands.add("/bin/bash");
+				commands.add("/bin/bash"); //$NON-NLS-1$
 			}
 			else
 			{
-				commands.add("cmd");
+				commands.add("cmd"); //$NON-NLS-1$
 			}
 			commands.add(tempFile.getAbsolutePath());
 			
@@ -350,6 +350,6 @@ public class CommandElement extends TriggerableElement
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
 		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
 		
-		printer.decreaseIndent().printlnWithIndent("}");
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }

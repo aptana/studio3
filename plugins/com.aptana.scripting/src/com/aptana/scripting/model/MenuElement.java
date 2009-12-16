@@ -8,7 +8,7 @@ import com.aptana.scope.ScopeSelector;
 
 public class MenuElement extends AbstractBundleElement
 {
-	private static final String SEPARATOR_TEXT = "-";
+	private static final String SEPARATOR_TEXT = "-"; //$NON-NLS-1$
 	
 	private MenuElement _parent;
 	private List<MenuElement> _children;

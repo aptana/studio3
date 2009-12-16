@@ -45,6 +45,6 @@ public class SnippetElement extends TriggerableElement
 		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
 		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
 
-		printer.decreaseIndent().printlnWithIndent("}");
+		printer.decreaseIndent().printlnWithIndent(Messages.SnippetElement_0);
 	}
 }
