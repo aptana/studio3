@@ -64,9 +64,9 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 								int caretOffset = textViewer.getTextWidget().getCaretOffset();
 								String contextTypeId = getContextType(document, caretOffset);
 								SnippetElement[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
+								boolean found = false;
 								if (snippetsFromScope.length > 0) {
 									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
-									boolean found = false;
 									for (SnippetElement snippetElement : snippetsFromScope) {
 										String trigger = snippetElement.getTrigger();
 										if (trigger != null && trigger.startsWith(prefix)) {
@@ -74,9 +74,12 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 											break;
 										}
 									}
-									if (!found) {
-										CommandElement[] commandsFromScope =
-											BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+								}
+								if (!found) {
+									CommandElement[] commandsFromScope =
+										BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+									if (commandsFromScope.length > 0) {
+										String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
 										for (CommandElement commandElement : commandsFromScope) {
 											String trigger = commandElement.getTrigger();
 											if (trigger != null && trigger.startsWith(prefix)) {
@@ -85,11 +88,11 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 											}
 										}
 									}
-									if (found) {
-										if (contentAssistant != null) {
-											contentAssistant.showPossibleCompletions();
-											event.doit = false;									
-										}
+								}
+								if (found) {
+									if (contentAssistant != null) {
+										contentAssistant.showPossibleCompletions();
+										event.doit = false;
 									}
 								}
 							}
