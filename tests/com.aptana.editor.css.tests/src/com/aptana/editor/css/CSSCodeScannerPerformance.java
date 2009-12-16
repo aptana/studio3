@@ -45,6 +45,6 @@ public class CSSCodeScannerPerformance
 		}
 		long diff = System.currentTimeMillis() - start;
 		System.out.println("Total time: " + diff + "ms");
-		System.out.println("Avergae time: " + (diff / numRuns) + "ms");
+		System.out.println("Average time: " + (diff / numRuns) + "ms");
 	}
 }
