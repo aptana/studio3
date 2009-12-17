@@ -70,6 +70,8 @@ module RadRails
     
     class << self
       def define_snippet(path, &block)
+        logInfo("loading snippet #{name}")
+        
         snippet = Snippet.new(path)
         block.call(snippet) if block_given?
         

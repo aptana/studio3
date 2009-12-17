@@ -30,4 +30,10 @@
          </toolbar>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="EarlyStartup">
+      </startup>
+   </extension>
 </plugin>

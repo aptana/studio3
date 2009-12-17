@@ -65,6 +65,8 @@ module RadRails
     
     class << self
       def define_menu(name, &block)
+        logInfo("loading menu #{name}")
+        
         new_menu = Menu.new(name)
         block.call(new_menu) if block_given?
         

@@ -1,5 +1,6 @@
 require "radrails/bundle"
 require "radrails/command"
+require "radrails/logger"
 require "radrails/menu"
 require "radrails/snippet"
 
@@ -9,6 +10,22 @@ end
 
 def command(name, &block)
   RadRails::Command.define_command(name, &block)
+end
+
+def logError(error)
+  RadRails::Logger.logError(error)
+end
+
+def logInfo(info)
+  RadRails::Logger.logInfo(info)
+end
+
+def logWarning(warning)
+  RadRails::Logger.logWarning(warning)
+end
+
+def trace(message)
+  RadRails::Logger.trace(message)
 end
 
 def menu(name, &block)

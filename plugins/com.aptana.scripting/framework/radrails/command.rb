@@ -101,6 +101,8 @@ module RadRails
     
     class << self
       def define_command(name, &block)
+        logInfo("loading command #{name}")
+        
         command = Command.new(name)
         block.call(command) if block_given?
         
