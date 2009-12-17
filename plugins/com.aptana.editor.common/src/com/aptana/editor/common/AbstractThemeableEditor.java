@@ -217,7 +217,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 		private ISourceViewer fViewer;
 		private boolean fIsActive;
-		private IPaintPositionManager fPositionManager;
 
 		public LineBackgroundPainter(ISourceViewer viewer)
 		{
@@ -260,7 +259,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		@Override
 		public void setPositionManager(IPaintPositionManager manager)
 		{
-			fPositionManager = manager;
+			// do nothing
 		}
 
 		@Override
