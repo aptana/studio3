@@ -5,23 +5,23 @@ module RadRails
   
   class Logger
     class << self
-      def logError(error)
+      def log_error(error)
         com.aptana.scripting.ScriptLogger.logError(error)
       end
       
-      def logLevel
+      def log_level
         com.aptana.scripting.ScriptLogger.instance.logLevel.name.to_sym
       end
       
-      def logLevel=(level)
+      def log_level=(level)
         com.aptana.scripting.ScriptLogger.instance.logLevel = level.to_s
       end
       
-      def logInfo(info)
+      def log_info(info)
         com.aptana.scripting.ScriptLogger.logInfo(info)
       end
       
-      def logWarning(warning)
+      def log_warning(warning)
         com.aptana.scripting.ScriptLogger.logWarning(warning)
       end
       

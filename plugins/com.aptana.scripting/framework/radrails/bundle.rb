@@ -128,7 +128,7 @@ module RadRails
     
     class << self
       def define_bundle(name, values, &block)
-        logInfo("loading bundle #{name}")
+        log_info("loading bundle #{name}")
         
         # create new bundle and add to bundle manager so the block, if given
         # can lookup the bundle by path name

@@ -12,16 +12,16 @@ def command(name, &block)
   RadRails::Command.define_command(name, &block)
 end
 
-def logError(error)
-  RadRails::Logger.logError(error)
+def log_error(error)
+  RadRails::Logger.log_error(error)
 end
 
-def logInfo(info)
-  RadRails::Logger.logInfo(info)
+def log_info(info)
+  RadRails::Logger.log_info(info)
 end
 
-def logWarning(warning)
-  RadRails::Logger.logWarning(warning)
+def log_warning(warning)
+  RadRails::Logger.log_warning(warning)
 end
 
 def trace(message)
