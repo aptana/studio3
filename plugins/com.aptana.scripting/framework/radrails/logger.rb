@@ -9,6 +9,14 @@ module RadRails
         com.aptana.scripting.ScriptLogger.logError(error)
       end
       
+      def logLevel
+        com.aptana.scripting.ScriptLogger.instance.logLevel.name.to_sym
+      end
+      
+      def logLevel=(level)
+        com.aptana.scripting.ScriptLogger.instance.logLevel = level.to_s
+      end
+      
       def logInfo(info)
         com.aptana.scripting.ScriptLogger.logInfo(info)
       end

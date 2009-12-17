@@ -8,6 +8,7 @@ public class ScriptLogger
 	private static ScriptLogger INSTANCE;
 	
 	private List<ScriptLogListener> _logListeners;
+	private LogLevel _logLevel;
 	
 	/**
 	 * logError
@@ -65,8 +66,12 @@ public class ScriptLogger
 		return INSTANCE;
 	}
 	
+	/**
+	 * ScriptLogger
+	 */
 	private ScriptLogger()
 	{
+		this._logLevel = LogLevel.ERROR;
 	}
 	
 	/**
@@ -94,7 +99,7 @@ public class ScriptLogger
 	 */
 	public void fireLogErrorEvent(String error)
 	{
-		if (this._logListeners != null)
+		if (this._logListeners != null && this._logLevel.getIndex() <= LogLevel.ERROR.getIndex())
 		{
 			for (ScriptLogListener listener : this._logListeners)
 			{
@@ -110,7 +115,7 @@ public class ScriptLogger
 	 */
 	public void fireLogInfoEvent(String info)
 	{
-		if (this._logListeners != null)
+		if (this._logListeners != null && this._logLevel.getIndex() <= LogLevel.INFO.getIndex())
 		{
 			for (ScriptLogListener listener : this._logListeners)
 			{
@@ -126,7 +131,7 @@ public class ScriptLogger
 	 */
 	public void fireLogWarningEvent(String warning)
 	{
-		if (this._logListeners != null)
+		if (this._logListeners != null && this._logLevel.getIndex() <= LogLevel.WARNING.getIndex())
 		{
 			for (ScriptLogListener listener : this._logListeners)
 			{
@@ -142,13 +147,23 @@ public class ScriptLogger
 	 */
 	public void fireTraceEvent(String message)
 	{
-		if (this._logListeners != null)
+		if (this._logListeners != null && this._logLevel.getIndex() <= LogLevel.TRACE.getIndex())
 		{
 			for (ScriptLogListener listener : this._logListeners)
 			{
 				listener.trace(message);
 			}
 		}
+	}
+	
+	/**
+	 * getLogLevel
+	 * 
+	 * @return
+	 */
+	public LogLevel getLogLevel()
+	{
+		return this._logLevel;
 	}
 	
 	/**
@@ -162,5 +177,25 @@ public class ScriptLogger
 		{
 			this._logListeners.remove(listener);
 		}
+	}
+	
+	/**
+	 * setLogLevel
+	 * 
+	 * @param level
+	 */
+	public void setLogLevel(LogLevel level)
+	{
+		this._logLevel = level;
+	}
+	
+	/**
+	 * setLogLevel
+	 * 
+	 * @param level
+	 */
+	public void setLogLevel(String level)
+	{
+		this._logLevel = LogLevel.get(level);
 	}
 }
