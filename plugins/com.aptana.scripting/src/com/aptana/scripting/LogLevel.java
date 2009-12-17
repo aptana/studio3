@@ -6,11 +6,11 @@ import java.util.Map;
 
 public enum LogLevel
 {
-	NONE(0, "none"),
-	TRACE(1, "trace"),
-	INFO(2, "info"),
-	WARNING(3, "warning"),
-	ERROR(4, "error");
+	NONE(0, "none"), //$NON-NLS-1$
+	TRACE(1, "trace"), //$NON-NLS-1$
+	INFO(2, "info"), //$NON-NLS-1$
+	WARNING(3, "warning"), //$NON-NLS-1$
+	ERROR(4, "error"); //$NON-NLS-1$
 	
 	private static Map<String, LogLevel> NAME_MAP;
 	private int _index;

@@ -18,8 +18,8 @@ public class EarlyStartup implements IStartup
 	{
 		// create console
 		this._console = new MessageConsole(
-			"RadRails Scripting Console",
-			ScriptingUIPlugin.getImageDescriptor("icons/console.png")
+			Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
+			ScriptingUIPlugin.getImageDescriptor("icons/console.png") //$NON-NLS-1$
 		);
 		
 		// grab message stream
@@ -33,22 +33,22 @@ public class EarlyStartup implements IStartup
 		{
 			public void logError(String error)
 			{
-				_consoleStream.println("error: " + error);
+				_consoleStream.println(Messages.EarlyStartup_ERROR_PREFIX + error);
 			}
 
 			public void logInfo(String info)
 			{
-				_consoleStream.println("info: " + info);
+				_consoleStream.println(Messages.EarlyStartup_INFO_PREFIX + info);
 			}
 
 			public void logWarning(String warning)
 			{
-				_consoleStream.println("warning: " + warning);
+				_consoleStream.println(Messages.EarlyStartup_WARNING_PREFIX + warning);
 			}
 
 			public void trace(String message)
 			{
-				_consoleStream.println("trace: " + message);
+				_consoleStream.println(Messages.EarlyStartup_TRACE_PREFIX + message);
 			}
 		};
 		

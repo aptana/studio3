@@ -11,7 +11,7 @@ import org.osgi.framework.BundleContext;
  */
 public class ScriptingUIPlugin extends AbstractUIPlugin
 {
-	public static final String PLUGIN_ID = "com.aptana.scripting.ui";
+	public static final String PLUGIN_ID = "com.aptana.scripting.ui"; //$NON-NLS-1$
 	private static ScriptingUIPlugin plugin;
 
 	/**
