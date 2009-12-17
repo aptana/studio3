@@ -32,7 +32,7 @@ public abstract class AbstractElement
 		{
 			String path = element.getPath();
 			
-			if (path != null)
+			if (path != null && path.length() > 0)
 			{
 				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 				
@@ -79,7 +79,7 @@ public abstract class AbstractElement
 		{
 			String path = element.getPath();
 			
-			if (path != null)
+			if (path != null && path.length() > 0)
 			{
 				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 				
@@ -101,11 +101,9 @@ public abstract class AbstractElement
 	 */
 	public AbstractElement(String path)
 	{
-		if (path != null && path.length() > 0)
-		{
-			this._path = path;
-			registerElement(this);
-		}
+		this._path = path;
+		
+		registerElement(this);
 	}
 	
 	/**
