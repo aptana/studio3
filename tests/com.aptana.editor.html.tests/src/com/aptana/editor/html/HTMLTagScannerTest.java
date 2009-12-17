@@ -60,6 +60,36 @@ public class HTMLTagScannerTest extends TestCase
 		assertToken(getToken("string.quoted.double.html"), 37, 5);
 		assertToken(getToken("punctuation.definition.tag.end.html"), 42, 1);
 	}
+	
+	public void testMultiLineSingleQuoteString()
+	{
+		String src = "<html attribute='\nchris'>";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
+		assertToken(getToken("string.quoted.single.html"), 16, 8);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
+	}
+	
+	public void testMultiLineDoubleQuoteString()
+	{
+		String src = "<html attribute=\"\nchris\">";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("punctuation.definition.tag.begin.html"), 0, 1);
+		assertToken(getToken("entity.name.tag.structure.any.html"), 1, 4);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("entity.other.attribute-name.html"), 6, 9);
+		assertToken(getToken("punctuation.separator.key-value.html"), 15, 1);
+		assertToken(getToken("string.quoted.double.html"), 16, 8);
+		assertToken(getToken("punctuation.definition.tag.end.html"), 24, 1);
+	}
 
 	private void assertToken(IToken token, int offset, int length)
 	{
