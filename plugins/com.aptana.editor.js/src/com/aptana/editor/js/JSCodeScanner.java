@@ -37,8 +37,6 @@ package com.aptana.editor.js;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -48,6 +46,7 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.WordDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
@@ -284,47 +283,6 @@ public class JSCodeScanner extends RuleBasedScanner
 		for (String word : words)
 		{
 			wordRule.addWord(word, keywordOperators);
-		}
-	}
-
-	/**
-	 * Optimized rule to match a single character. Faster than a RegexpRule for one char.
-	 * 
-	 * @author cwilliams
-	 */
-	private static class SingleCharacterRule implements IPredicateRule
-	{
-
-		private IToken successToken;
-		private char c;
-
-		SingleCharacterRule(char c, IToken successToken)
-		{
-			this.c = c;
-			this.successToken = successToken;
-		}
-
-		@Override
-		public IToken evaluate(ICharacterScanner scanner, boolean resume)
-		{
-			if (c == (char) scanner.read())
-			{
-				return getSuccessToken();
-			}
-			scanner.unread();
-			return Token.UNDEFINED;
-		}
-
-		@Override
-		public IToken getSuccessToken()
-		{
-			return successToken;
-		}
-
-		@Override
-		public IToken evaluate(ICharacterScanner scanner)
-		{
-			return evaluate(scanner, false);
 		}
 	}
 
