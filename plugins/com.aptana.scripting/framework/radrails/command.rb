@@ -9,10 +9,7 @@ module RadRails
       @jobj.display_name = name;
       
       bundle = BundleManager.bundle_from_path(path)
-      
-      if bundle.nil? == false
-        bundle.apply_defaults(self)
-      end
+      bundle.apply_defaults(self) unless bundle.nil?
     end
     
     def display_name
@@ -108,10 +105,7 @@ module RadRails
         
         # add command to bundle
         bundle = BundleManager.bundle_from_path(command.path)
-        
-        if bundle.nil? == false
-          bundle.add_command(command)
-        end
+        bundle.add_command(command) unless bundle.nil?
       end
     end
   end

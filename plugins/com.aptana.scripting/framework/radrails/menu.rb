@@ -72,10 +72,7 @@ module RadRails
         
         # add command to bundle
         bundle = BundleManager.bundle_from_path(new_menu.path)
-        
-        if bundle.nil? == false
-          bundle.add_menu(new_menu)
-        end
+        bundle.add_menu(new_menu) unless bundle.nil?
       end
     end
   end
