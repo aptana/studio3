@@ -78,15 +78,19 @@ public abstract class AbstractElement
 		if (element != null)
 		{
 			String path = element.getPath();
-			List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 			
-			if (elements == null)
+			if (path != null)
 			{
-				elements = new ArrayList<AbstractElement>();
-				ELEMENTS_BY_PATH.put(path, elements);
+				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
+				
+				if (elements == null)
+				{
+					elements = new ArrayList<AbstractElement>();
+					ELEMENTS_BY_PATH.put(path, elements);
+				}
+				
+				elements.add(element);
 			}
-			
-			elements.add(element);
 		}
 	}
 	
