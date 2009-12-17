@@ -1,8 +1,9 @@
+package com.aptana.scripting.ui;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.scripting.ui.messages"; //$NON-NLS-1$
 	public static String EarlyStartup_ERROR_PREFIX;
 	public static String EarlyStartup_INFO_PREFIX;
 	public static String EarlyStartup_SCRIPTING_CONSOLE_NAME;

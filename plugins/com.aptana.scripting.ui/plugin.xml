@@ -33,7 +33,7 @@
    <extension
          point="org.eclipse.ui.startup">
       <startup
-            class="EarlyStartup">
+            class="com.aptana.scripting.ui.EarlyStartup">
       </startup>
    </extension>
 </plugin>
