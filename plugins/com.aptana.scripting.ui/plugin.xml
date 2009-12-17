@@ -23,12 +23,6 @@
             </separator>
          </menu>
       </menuContribution>
- 	  <menuContribution
-            locationURI="toolbar:org.eclipse.ui.trim.command2?after=additions">
-         <toolbar
-            id="com.aptana.scripting.trim.toolbar">
-         </toolbar>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.startup">

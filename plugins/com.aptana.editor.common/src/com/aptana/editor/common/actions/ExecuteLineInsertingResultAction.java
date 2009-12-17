@@ -6,7 +6,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
@@ -33,13 +32,10 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	protected ExecuteLineInsertingResultAction(ResourceBundle bundle, String prefix, ITextEditor editor) {
 		super(bundle, prefix, editor);
 		setActionDefinitionId(COMMAND_ID);
-		if (editor instanceof AbstractTextEditor) {
-			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) editor;
-			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
-			if (adapter instanceof ITextViewer) {
-				textViewer = (ITextViewer) adapter;
-				textWidget = textViewer.getTextWidget();
-			}
+		Object adapter = editor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer) {
+			textViewer = (ITextViewer) adapter;
+			textWidget = textViewer.getTextWidget();
 		}
 	}
 	
@@ -47,7 +43,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 	public void run() {
 		if (textWidget != null) {
 			ITextEditor textEditor = getTextEditor();
-			CommandElement command = new CommandElement(""); //$NON-NLS-1$
+			CommandElement command = new CommandElement(null); // Use null value for path to create a one off command
 			command.setInputType(InputType.LINE.getName());
 			command.setOutputType(OutputType.REPLACE_LINE.getName());
 			int caretOffset = textWidget.getCaretOffset();

@@ -7,5 +7,6 @@ package com.aptana.editor.common;
  *
  */
 public interface ITopContentTypesProvider {
+	// TODO Use generic collections instead of arrays
 	String[][] getTopContentTypes();
 }

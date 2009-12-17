@@ -9,7 +9,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
 
@@ -35,13 +34,10 @@ public class FilterThroughCommandAction extends TextEditorAction {
 	protected FilterThroughCommandAction(ResourceBundle bundle, String prefix, ITextEditor editor) {
 		super(bundle, prefix, editor);
 		setActionDefinitionId(COMMAND_ID);
-		if (editor instanceof AbstractTextEditor) {
-			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) editor;
-			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
-			if (adapter instanceof ITextViewer) {
-				textViewer = (ITextViewer) adapter;
-				textWidget = textViewer.getTextWidget();
-			}
+		Object adapter = editor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer) {
+			textViewer = (ITextViewer) adapter;
+			textWidget = textViewer.getTextWidget();
 		}
 	}
 	
@@ -53,7 +49,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 		Map<String, String> environment = CommandExecutionUtils.computeEnvironment(textEditor);
 		FilterThroughCommandDialog filterThroughCommandDialog = new FilterThroughCommandDialog(workbenchWindow.getShell(), environment);
 		if (filterThroughCommandDialog.open() == Window.OK) {
-			CommandElement command = new CommandElement(""); //$NON-NLS-1$
+			CommandElement command = new CommandElement(null); // Use null value for path to create a one off command
 			command.setInputType(filterThroughCommandDialog.getInputType().getName());
 			command.setOutputType(filterThroughCommandDialog.getOuputType().getName());
 			command.setInvoke(filterThroughCommandDialog.getCommand());

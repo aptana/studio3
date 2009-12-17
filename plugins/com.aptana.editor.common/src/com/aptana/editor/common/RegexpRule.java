@@ -53,8 +53,26 @@ public class RegexpRule implements IPredicateRule
 				case '?':
 					break;
 				case '\\':
-					firstChar = regexp.charAt(1);
-					// FIXME Don't allow if next char is special too (like b,s,w,d,etc)
+					// Don't allow if next char is special too (like b,s,w,d,etc)
+					switch (regexp.charAt(1))
+					{
+						case 'b':
+						case 'B':
+						case 'd':
+						case 'D':
+						case 's':
+						case 'S':
+						case 'w':
+						case 'W':
+						case 'A':
+						case 'G':
+						case 'Z':
+						case 'z':
+							break;
+						default:
+							firstChar = regexp.charAt(1);
+							break;
+					}
 					break;
 				default:
 					firstChar = regexp.charAt(0);

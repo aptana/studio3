@@ -84,39 +84,6 @@
             </visibleWhen>
          </dynamic>
       </menuContribution>
-      <menuContribution
-            locationURI="toolbar:com.aptana.scripting.trim.toolbar">
-         <command
-                commandId="com.aptana.editor.common.scripting.commands.show"
-                id="com.aptana.editor.common.scripting.commands.trim.toolbar.pulldown"
-                style="pulldown">
-             <visibleWhen
-                   checkEnabled="false">
-                <with
-                      variable="activePart">
-                   <instanceof
-                         value="com.aptana.editor.common.AbstractThemeableEditor">
-                   </instanceof>
-                </with>
-             </visibleWhen>
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.editor.common.scripting.commands.trim.toolbar.pulldown">
-         <dynamic
-               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
-               id="com.aptana.editor.common.trim.menu.dynamic">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <instanceof
-                        value="com.aptana.editor.common.AbstractThemeableEditor">
-                  </instanceof>
-               </with>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
    </extension>
 
    <extension

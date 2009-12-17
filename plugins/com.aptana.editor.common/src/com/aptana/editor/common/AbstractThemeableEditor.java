@@ -10,8 +10,11 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.StatusLineLayoutData;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IPaintPositionManager;
+import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -22,6 +25,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.LineBackgroundEvent;
+import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -103,6 +110,12 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private Composite parent;
 
 	/**
+	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
+	 * things like block comments with a different bg color look more like Textmate.
+	 */
+	private LineBackgroundPainter fFullLineBackgroundPainter;
+
+	/**
 	 * AbstractThemeableEditor
 	 */
 	public AbstractThemeableEditor()
@@ -174,6 +187,16 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
+		if (fFullLineBackgroundPainter == null)
+		{
+			if (viewer instanceof ITextViewerExtension2)
+			{
+				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
+				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
+				extension.addPainter(fFullLineBackgroundPainter);
+			}
+		}
+
 		return viewer;
 	}
 
@@ -185,6 +208,96 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		support.setCharacterPairMatcher(new CharacterPairMatcher(PAIR_MATCHING_CHARS));
 		support.setMatchingCharacterPainterPreferenceKeys(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
+	}
+
+	/**
+	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
+	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
+	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
+	 * 
+	 * @author cwilliams
+	 */
+	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
+	{
+
+		private ISourceViewer fViewer;
+		private boolean fIsActive;
+
+		public LineBackgroundPainter(ISourceViewer viewer)
+		{
+			this.fViewer = viewer;
+		}
+
+		@Override
+		public void deactivate(boolean redraw)
+		{
+			// do nothing
+		}
+
+		/*
+		 * @see IPainter#dispose()
+		 */
+		public void dispose()
+		{
+		}
+
+		/*
+		 * @see IPainter#paint(int)
+		 */
+		public void paint(int reason)
+		{
+			if (fViewer.getDocument() == null)
+			{
+				deactivate(false);
+				return;
+			}
+
+			StyledText textWidget = fViewer.getTextWidget();
+			// initialization
+			if (!fIsActive)
+			{
+				textWidget.addLineBackgroundListener(this);
+				fIsActive = true;
+			}
+		}
+
+		@Override
+		public void setPositionManager(IPaintPositionManager manager)
+		{
+			// do nothing
+		}
+
+		@Override
+		public void lineGetBackground(LineBackgroundEvent event)
+		{
+			// FIXME What about when there's other style ranges but we begin and end on same bg color? Do we color the
+			// line background anyways and force style ranges with null bg colors to specify the editor bg?
+			StyledText textWidget = fViewer.getTextWidget();
+			if (textWidget == null)
+				return;
+			String text = event.lineText;
+			if (text == null || text.length() == 0)
+				return;
+			int offset = event.lineOffset;
+			int leadingWhitespace = 0;
+			while (Character.isWhitespace(text.charAt(0)))
+			{
+				leadingWhitespace++;
+				text = text.substring(1);
+				if (text.length() <= 0)
+					break;
+			}
+			int length = text.length();
+			if (length > 0)
+			{
+				StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
+
+				if (ranges != null && ranges.length == 1)
+				{
+					event.lineBackground = ranges[0].background;
+				}
+			}
+		}
 	}
 
 	protected void overrideSelectionColor()
@@ -379,7 +492,10 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
-		((ITextViewerExtension)getSourceViewer()).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension) {
+			((ITextViewerExtension)sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		}
 		getFindBarDecorator().installActions();
 	}
 

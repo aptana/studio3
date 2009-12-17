@@ -53,79 +53,84 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 	@Override
 	public void fill(Menu menu, int index) {
 		super.fill(menu, index);
-		
 		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(IEvaluationService.class);
 		if (evaluationService != null) {
 			IEvaluationContext currentState = evaluationService.getCurrentState();
 			Object activePart = currentState.getVariable(ISources.ACTIVE_PART_NAME);
-			// Is this an Aptana Editor
-			if (activePart instanceof AbstractThemeableEditor) {
-				AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) activePart;
-				String[] splitContentTypesAtOffset = null;
-				String contentTypeAtOffset = null;
-				MenuElement[] menusFromScope;
-				try {
-					IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
-					int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
-					// Get the scope at caret offset
-					contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
-					// Split scope into successively outer scope
-					splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-					for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
-						menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypesAtOffset[i]);
-						if (menusFromScope.length > 0) {
-							// Build the menu
-							buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
-							break;
-						}
+			if (activePart instanceof ITextEditor) {
+				fill(menu, (ITextEditor) activePart);
+			}
+		}
+	}
+	
+	public static void fill(Menu menu, ITextEditor textEditor) {
+		// Is this an Aptana Editor
+		if (textEditor instanceof AbstractThemeableEditor) {
+			AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) textEditor;
+			String[] splitContentTypesAtOffset = null;
+			String contentTypeAtOffset = null;
+			MenuElement[] menusFromScope;
+			try {
+				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
+				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
+				// Get the scope at caret offset
+				contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
+				// Split scope into successively outer scope
+				splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
+				for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
+					menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypesAtOffset[i]);
+					if (menusFromScope.length > 0) {
+						// Build the menu
+						buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
+						break;
 					}
-				} catch (BadLocationException e) {
-					CommonEditorPlugin.logError(e);
+				}
+			} catch (BadLocationException e) {
+				CommonEditorPlugin.logError(e);
+			}
+			
+			SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor.getSourceViewerConfigurationNonFinal();
+			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
+			if (sourceViewerConfiguration instanceof ITopContentTypesProvider) {
+				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
+				for (String[] topContentType : topContentTypes) {
+					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
+					String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
+					// Get menus
+					menusFromScope = BundleManager.getInstance().getMenusFromScope(contentType);
+					if (menusFromScope.length > 0) {
+						// Collect
+						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+					}
 				}
 				
-				SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor.getSourceViewerConfigurationNonFinal();
-				List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
-				if (sourceViewerConfiguration instanceof ITopContentTypesProvider) {
-					String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
-					for (String[] topContentType : topContentTypes) {
-						QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-						String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
-						// Get menus
-						menusFromScope = BundleManager.getInstance().getMenusFromScope(contentType);
-						if (menusFromScope.length > 0) {
-							// Collect
-							menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+				// Do we have some menus?
+				if (menusFromScopeList.size() > 0) {
+					// Sort them
+					Collections.sort(menusFromScopeList, new Comparator<MenuElement>() {
+						@Override
+						public int compare(MenuElement menuElement1, MenuElement menuElement2) {
+							return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
 						}
-					}
+					});
+					menusFromScope = new MenuElement[menusFromScopeList.size()];
+					menusFromScopeList.toArray(menusFromScope);
+					// Add separator
+					new MenuItem(menu, SWT.SEPARATOR);
 					
-					// Do we have some menus?
-					if (menusFromScopeList.size() > 0) {
-						// Sort them
-						Collections.sort(menusFromScopeList, new Comparator<MenuElement>() {
-							@Override
-							public int compare(MenuElement menuElement1, MenuElement menuElement2) {
-								return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
-							}
-						});
-						menusFromScope = new MenuElement[menusFromScopeList.size()];
-						menusFromScopeList.toArray(menusFromScope);
-						// Add separator
-						new MenuItem(menu, SWT.SEPARATOR);
-						
-						// Now build the menu
-						buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
-					}
+					// Now build the menu
+					buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
 				}
-
-				new MenuItem(menu, SWT.SEPARATOR);
-
-				MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
-				menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
-
-				Menu menuForOtherScopes = new Menu(menu);
-				menuItemForOtherScopes.setMenu(menuForOtherScopes);
-				// TODO Need API in Bundle Manager to implement this.
 			}
+
+			new MenuItem(menu, SWT.SEPARATOR);
+
+			MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+			menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
+
+			Menu menuForOtherScopes = new Menu(menu);
+			menuItemForOtherScopes.setMenu(menuForOtherScopes);
+			// TODO Need API in Bundle Manager to implement this.
 		}
 	}
 	
@@ -137,7 +142,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 	 * @param textEditor
 	 * @param contentTypeAtOffset
 	 */
-	private void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String contentTypeAtOffset) {
+	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String contentTypeAtOffset) {
 		for (MenuElement menuForScope : menusFromScope) {
 			if (menuForScope.isHierarchicalMenu()) {
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
