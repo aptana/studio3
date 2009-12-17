@@ -1,0 +1,111 @@
+package com.aptana.editor.common;
+
+import java.util.Iterator;
+
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.Token;
+import org.eclipse.jface.text.rules.WordRule;
+
+public class ExtendedWordRule extends WordRule
+{
+
+	/** Buffer used for pattern detection. */
+	private StringBuffer fBuffer = new StringBuffer();
+	/**
+	 * Tells whether this rule is case sensitive.
+	 * 
+	 * @since 3.3
+	 */
+	private boolean fIgnoreCase = false;
+
+	/**
+	 * Creates a rule which, with the help of a word detector, will return the token associated with the detected word.
+	 * If no token has been associated, the specified default token will be returned.
+	 * 
+	 * @param detector
+	 *            the word detector to be used by this rule, may not be <code>null</code>
+	 * @param defaultToken
+	 *            the default token to be returned on success if nothing else is specified, may not be <code>null</code>
+	 * @param ignoreCase
+	 *            the case sensitivity associated with this rule
+	 * @see #addWord(String, IToken)
+	 */
+	public ExtendedWordRule(IWordDetector detector, IToken defaultToken, boolean ignoreCase)
+	{
+		super(detector, defaultToken, ignoreCase);
+	}
+
+	/*
+	 * @see IRule#evaluate(ICharacterScanner)
+	 */
+	public IToken evaluate(ICharacterScanner scanner)
+	{
+		int c = scanner.read();
+		if (c != ICharacterScanner.EOF && fDetector.isWordStart((char) c))
+		{
+			if (fColumn == UNDEFINED || (fColumn == scanner.getColumn() - 1))
+			{
+
+				fBuffer.setLength(0);
+				do
+				{
+					fBuffer.append((char) c);
+					c = scanner.read();
+				}
+				while (c != ICharacterScanner.EOF && fDetector.isWordPart((char) c));
+				scanner.unread();
+
+				String buffer = fBuffer.toString();
+				if (!wordOK(buffer, scanner))
+				{
+					unreadBuffer(scanner);
+					return Token.UNDEFINED;
+				}
+				IToken token = (IToken) fWords.get(buffer);
+
+				if (token == null && fIgnoreCase)
+				{
+					Iterator iter = fWords.keySet().iterator();
+					while (iter.hasNext())
+					{
+						String key = (String) iter.next();
+						if (buffer.equalsIgnoreCase(key))
+						{
+							token = (IToken) fWords.get(key);
+							break;
+						}
+					}
+				}
+
+				if (token != null)
+					return token;
+
+				if (fDefaultToken.isUndefined())
+					unreadBuffer(scanner);
+
+				return fDefaultToken;
+			}
+		}
+
+		scanner.unread();
+		return Token.UNDEFINED;
+	}
+
+	protected boolean wordOK(String word, ICharacterScanner scanner)
+	{
+		return true;
+	}
+	
+	/**
+	 * Returns the characters in the buffer to the scanner.
+	 *
+	 * @param scanner the scanner to be used
+	 */
+	protected void unreadBuffer(ICharacterScanner scanner) {
+		for (int i= fBuffer.length() - 1; i >= 0; i--)
+			scanner.unread();
+	}
+
+}
