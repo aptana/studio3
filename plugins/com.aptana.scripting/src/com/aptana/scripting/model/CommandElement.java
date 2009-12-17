@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
@@ -124,27 +123,6 @@ public class CommandElement extends TriggerableElement
 		try
 		{
 			result = KeySequence.getInstance(this._keyBinding);
-		}
-		catch (ParseException e)
-		{
-			// log?
-		}
-		
-		return result;
-	}
-
-	/**
-	 * getKeyStroke
-	 * 
-	 * @return
-	 */
-	public KeyStroke getKeyStroke()
-	{
-		KeyStroke result = null;
-		
-		try
-		{
-			result = KeyStroke.getInstance(this._keyBinding);
 		}
 		catch (ParseException e)
 		{
