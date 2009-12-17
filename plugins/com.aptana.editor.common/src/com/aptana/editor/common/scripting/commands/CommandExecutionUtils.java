@@ -39,7 +39,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -53,264 +52,10 @@ import com.aptana.scripting.model.OutputType;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils {
-	
-	public static CommandResult executeCommand(CommandElement command, ITextEditor textEditor) {
-		ITextViewer textViewer = null;
-		
-		if (textEditor instanceof AbstractTextEditor) {
-			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) textEditor;
-			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
-			if (adapter instanceof ITextViewer) {
-				textViewer = (ITextViewer) adapter;
-			}
-		}
-		return executeCommand(command, textViewer);
-	}
 
-	public static CommandResult executeCommand(CommandElement command, ITextViewer textViewer) {
-		StyledText textWidget = textViewer.getTextWidget();
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+	public static final FilterInputProvider EOF = new StringInputProvider();
 
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = 
-			textWidget.getOffsetAtLine(selectionEndOffsetLine) + textWidget.getLine(selectionEndOffsetLine).length();
-		
-		FilterInputProvider filterInputProvider = CommandExecutionUtils.EOF;
-
-		InputType inputType = InputType.get(command.getInputType());
-		switch (inputType) {
-		case SELECTION:
-			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
-			break;
-		case SELECTED_LINES:
-			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText(selectionStartOffsetLineStartOffset,
-					selectionEndOffsetLineEndOffset));
-			break;
-		case DOCUMENT:
-			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText());
-			break;
-		case LINE:
-			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget.getLineAtOffset(textWidget.getCaretOffset())));
-			break;
-		case WORD:
-			filterInputProvider = CommandExecutionUtils.EOF;
-			break;
-		case INPUT_FROM_CONSOLE:
-			filterInputProvider = new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
-			break;
-		}
-
-		CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream());
-		// TODO Use the map
-		// Map<String, String> computeEnvironment = computeEnvironment(textEditor);
-		return command.execute(commandContext);
-	}
-	
-	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor) {
-		ITextViewer textViewer = null;
-		if (textEditor instanceof AbstractTextEditor) {
-			AbstractTextEditor abstractTextEditor = (AbstractTextEditor) textEditor;
-			Object adapter = abstractTextEditor.getAdapter(ITextOperationTarget.class);
-			if (adapter instanceof ITextViewer) {
-				textViewer = (ITextViewer) adapter;
-			}
-		}
-		processCommandResult(command, commandResult, textViewer);
-	}
-
-	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer) {
-		StyledText textWidget = textViewer.getTextWidget();
-		
-		final int caretOffset = textWidget.getCaretOffset();
-		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-		String lineText = textWidget.getLine(lineAtCaret);
-		int lineLength = lineText.length();
-		
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
-
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = 
-			textWidget.getOffsetAtLine(selectionEndOffsetLine) + textWidget.getLine(selectionEndOffsetLine).length();
-		
-//		CommandExecutionUtils.FilterOutputConsumer filterOutputConsumer = null;
-//		switch (ouputType) {
-//		case DISCARD:
-//			filterOutputConsumer = CommandExecutionUtils.DISCARD;
-//			break;
-//		case OUTPUT_TO_CONSOLE:
-//			filterOutputConsumer = new CommandExecutionUtils.EclipseConsolePrintStreamOutputConsumer(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
-//			break;
-//		default:
-//			filterOutputConsumer = new CommandExecutionUtils.StringOutputConsumer();
-//			break;
-//		}
-		
-		OutputType ouputType = OutputType.get(command.getOutputType());
-		switch (ouputType) {
-		case DISCARD:
-			break;
-		case REPLACE_SELECTION:
-			int start = Math.min(selectionRange.x, selectionRange.y);
-			int end = Math.max(selectionRange.x, selectionRange.y);
-			textWidget.replaceTextRange(start, end - start, 
-					commandResult.getOutputString());
-			break;
-		case REPLACE_SELECTED_LINES:
-			textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, 
-					selectionEndOffsetLineEndOffset - selectionStartOffsetLineStartOffset, 
-					commandResult.getOutputString());
-			break;
-		case REPLACE_LINE:
-			int startOffsetOfLineAtCaret = textWidget.getOffsetAtLine(lineAtCaret);
-			textWidget.replaceTextRange(startOffsetOfLineAtCaret, lineLength, 
-					commandResult.getOutputString());
-			break;
-		case REPLACE_DOCUMENT:
-			textWidget.setText( 
-					commandResult.getOutputString());
-			break;
-		case INSERT_AS_TEXT:
-			textWidget.replaceTextRange(caretOffset, 0, 
-					commandResult.getOutputString());
-			break;
-		case INSERT_AS_SNIPPET:
-			SnippetsCompletionProcessor.insertAsTemplate(textViewer,
-					caretOffset,
-					commandResult.getOutputString());
-			break;
-		case SHOW_AS_HTML:
-			File tempHmtlFile = null;
-			try {
-				tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
-			} catch (IOException e) {
-				CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
-			}
-			if (tempHmtlFile != null) {
-				String output = commandResult.getOutputString();
-				tempHmtlFile.deleteOnExit();
-				PrintWriter pw = null;
-				try {
-					pw = new PrintWriter(tempHmtlFile);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				}
-				if (pw != null) {
-					pw.println(output);
-					pw.flush();
-					pw.close();
-					IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-					try {
-						URL url = tempHmtlFile.toURI().toURL();
-						if (support.isInternalWebBrowserAvailable()) {
-							support.createBrowser(
-									IWorkbenchBrowserSupport.NAVIGATION_BAR
-									| IWorkbenchBrowserSupport.LOCATION_BAR 
-									| IWorkbenchBrowserSupport.AS_EDITOR
-									| IWorkbenchBrowserSupport.STATUS,
-									"", //$NON-NLS-1$
-									"", //$NON-NLS-1$
-									command.getDisplayName()).openURL(url);
-						} else {
-							support.getExternalBrowser().openURL(url);
-						}
-					} catch (PartInitException e) {
-						CommonEditorPlugin.logError(e);
-					} catch (MalformedURLException e) {
-						CommonEditorPlugin.logError(e);
-					}
-				}
-			}
-			break;
-		case SHOW_AS_TOOLTIP:													
-			DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					Messages.CommandExecutionUtils_TypeEscapeToDismiss, null);
-			tooltip.setInformation(commandResult.getOutputString());
-			Point p = tooltip.computeSizeHint();
-			tooltip.setSize(p.x, p.y);
-
-			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
-			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
-			tooltip.setLocation(locationAtOffset);
-			tooltip.setVisible(true);
-			tooltip.setFocus();
-			break;
-		case CREATE_NEW_DOCUMENT:
-			File file = Utilities.getNonExistingFileBackingStore();
-			IEditorInput input = Utilities.createNonExistingFileEditorInput(file, "Untitled.txt");	//$NON-NLS-1$
-			String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
-			try
-			{
-				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, editorId);
-				if (part instanceof ITextEditor)
-				{
-					ITextEditor openedTextEditor = (ITextEditor) part;
-					IDocumentProvider dp = openedTextEditor.getDocumentProvider();
-					IDocument doc = dp.getDocument(openedTextEditor.getEditorInput());
-					try
-					{
-						String fileContents = commandResult.getOutputString();
-						if (fileContents != null)
-						{
-							doc.replace(0, 0, fileContents);
-						}
-					}
-					catch (BadLocationException e)
-					{
-						CommonEditorPlugin.logError(e);
-					}
-				}
-
-			}
-			catch (PartInitException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
-			break;
-		}
-	}
-	
 	static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
-
-	public static Map<String, String> computeEnvironment(ITextEditor textEditor) {
-		Map<String, String> environment = new HashMap<String, String>();
-		
-		IEditorInput editorInput = textEditor.getEditorInput();
-		if (editorInput instanceof IFileEditorInput) {
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile iFile = fileEditorInput.getFile();
-			if (iFile != null) {
-				environment.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile().getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile().getAbsolutePath());
-				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
-				ISelection selection = selectionProvider.getSelection();
-				if (selection instanceof ITextSelection) {
-					ITextSelection textSelection = (ITextSelection) selection;
-					environment.put(VARIABLES_NAMES.TM_SELECTED_TEXT.name(), textSelection.getText());
-					environment.put(VARIABLES_NAMES.TM_LINE_NUMBER.name(), String.valueOf(textSelection.getStartLine() + 1));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_OFFSET.name(), String.valueOf(textSelection.getOffset()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_LENGTH.name(), String.valueOf(textSelection.getLength()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_START_LINE_NUMBER.name(), String.valueOf(textSelection.getStartLine()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_END_LINE_NUMBER.name(), String.valueOf(textSelection.getEndLine()));
-					Object adapter = (Control) textEditor.getAdapter(Control.class);
-					if (adapter instanceof StyledText) {
-						StyledText styledText = (StyledText) adapter;
-						environment.put(VARIABLES_NAMES.TM_LINE_INDEX.name(), String.valueOf(textSelection.getOffset() - styledText.getOffsetAtLine(textSelection.getStartLine())));
-						int caretOffset = styledText.getCaretOffset();
-						int lineAtCaret = styledText.getLineAtOffset(caretOffset);
-						environment.put(VARIABLES_NAMES.TM_CARET_LINE_NUMBER.name(), String.valueOf(lineAtCaret + 1));
-						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), styledText.getLine(lineAtCaret));
-					}
-				}
-			}
-		}
-		return environment;
-	}
 	
 	public interface FilterInputProvider {
 		public InputStream getInputStream();
@@ -336,9 +81,6 @@ public class CommandExecutionUtils {
 		}
 	}
 
-	public static final FilterInputProvider EOF = new StringInputProvider();
-	
-	
 	public static class EclipseConsoleInputProvider  implements FilterInputProvider {
 		private final String consoleName;
 
@@ -391,6 +133,11 @@ public class CommandExecutionUtils {
 					} catch (IOException e) {
 					} finally {
 						printStream.close();
+						try {
+							outputStream.close();
+						} catch (IOException e) {
+							// ignore
+						}
 					}
 				}
 			}).start();
@@ -421,6 +168,11 @@ public class CommandExecutionUtils {
 					} catch (IOException e) {
 					} finally {
 						outputQueue.add(stringBuilder.toString());
+						try {
+							outputStream.close();
+						} catch (IOException e) {
+							// ignore
+						}
 					}
 				}
 			}).start();
@@ -468,7 +220,244 @@ public class CommandExecutionUtils {
 	public static final FilterOutputConsumer TO_SYSERR = new PrintStreamOutputConsumer(System.err);	
 	
 	private static Map<String, IOConsole> nameToMessageConsole = new WeakHashMap<String, IOConsole>();
+	
+	public static CommandResult executeCommand(CommandElement command, ITextEditor textEditor) {
+		ITextViewer textViewer = null;
+		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer) {
+			textViewer = (ITextViewer) adapter;
+		}
+		return executeCommand(command, textViewer);
+	}
 
+	public static CommandResult executeCommand(CommandElement command, ITextViewer textViewer) {
+		StyledText textWidget = textViewer.getTextWidget();
+		Point selectionRange = textWidget.getSelection();
+		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
+		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+
+		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
+		int selectionEndOffsetLineEndOffset = 
+			textWidget.getOffsetAtLine(selectionEndOffsetLine) + textWidget.getLine(selectionEndOffsetLine).length();
+		
+		FilterInputProvider filterInputProvider = CommandExecutionUtils.EOF;
+
+		InputType inputType = InputType.get(command.getInputType());
+		switch (inputType) {
+		case SELECTION:
+			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
+			break;
+		case SELECTED_LINES:
+			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText(selectionStartOffsetLineStartOffset,
+					selectionEndOffsetLineEndOffset));
+			break;
+		case DOCUMENT:
+			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText());
+			break;
+		case LINE:
+			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget.getLineAtOffset(textWidget.getCaretOffset())));
+			break;
+		case WORD:
+			filterInputProvider = CommandExecutionUtils.EOF;
+			break;
+		case INPUT_FROM_CONSOLE:
+			filterInputProvider = new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
+			break;
+		}
+
+		CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream());
+		// TODO Use the map
+		// Map<String, String> computeEnvironment = computeEnvironment(textEditor);
+		return command.execute(commandContext);
+	}
+	
+	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor) {
+		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer) {
+			processCommandResult(command, commandResult, (ITextViewer) adapter);
+		}
+	}
+
+	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer) {
+		StyledText textWidget = textViewer.getTextWidget();
+		
+		final int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		String lineText = textWidget.getLine(lineAtCaret);
+		int lineLength = lineText.length();
+		
+		Point selectionRange = textWidget.getSelection();
+		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
+		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+
+		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
+		int selectionEndOffsetLineEndOffset = 
+			textWidget.getOffsetAtLine(selectionEndOffsetLine) + textWidget.getLine(selectionEndOffsetLine).length();
+		
+		OutputType ouputType = OutputType.get(command.getOutputType());
+		switch (ouputType) {
+		case DISCARD:
+			break;
+		case REPLACE_SELECTION:
+			int start = Math.min(selectionRange.x, selectionRange.y);
+			int end = Math.max(selectionRange.x, selectionRange.y);
+			textWidget.replaceTextRange(start, end - start, 
+					commandResult.getOutputString());
+			break;
+		case REPLACE_SELECTED_LINES:
+			textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, 
+					selectionEndOffsetLineEndOffset - selectionStartOffsetLineStartOffset, 
+					commandResult.getOutputString());
+			break;
+		case REPLACE_LINE:
+			int startOffsetOfLineAtCaret = textWidget.getOffsetAtLine(lineAtCaret);
+			textWidget.replaceTextRange(startOffsetOfLineAtCaret, lineLength, 
+					commandResult.getOutputString());
+			break;
+		case REPLACE_DOCUMENT:
+			textWidget.setText( 
+					commandResult.getOutputString());
+			break;
+		case INSERT_AS_TEXT:
+			textWidget.replaceTextRange(caretOffset, 0, 
+					commandResult.getOutputString());
+			break;
+		case INSERT_AS_SNIPPET:
+			SnippetsCompletionProcessor.insertAsTemplate(textViewer,
+					caretOffset,
+					commandResult.getOutputString());
+			break;
+		case SHOW_AS_HTML:
+			// TODO Refactor into a method
+			File tempHmtlFile = null;
+			try {
+				tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
+			} catch (IOException e) {
+				CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
+			}
+			if (tempHmtlFile != null) {
+				String output = commandResult.getOutputString();
+				tempHmtlFile.deleteOnExit();
+				PrintWriter pw = null;
+				try {
+					pw = new PrintWriter(tempHmtlFile);
+				} catch (FileNotFoundException fne) {
+					CommonEditorPlugin.logError(fne);
+				}
+				if (pw != null) {
+					pw.println(output);
+					pw.flush();
+					pw.close();
+					IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+					try {
+						URL url = tempHmtlFile.toURI().toURL();
+						if (support.isInternalWebBrowserAvailable()) {
+							support.createBrowser(
+									IWorkbenchBrowserSupport.NAVIGATION_BAR
+									| IWorkbenchBrowserSupport.LOCATION_BAR 
+									| IWorkbenchBrowserSupport.AS_EDITOR
+									| IWorkbenchBrowserSupport.STATUS,
+									"", //$NON-NLS-1$
+									"", //$NON-NLS-1$
+									command.getDisplayName()).openURL(url);
+						} else {
+							support.getExternalBrowser().openURL(url);
+						}
+					} catch (PartInitException e) {
+						CommonEditorPlugin.logError(e);
+					} catch (MalformedURLException e) {
+						CommonEditorPlugin.logError(e);
+					}
+				}
+			}
+			break;
+		case SHOW_AS_TOOLTIP:
+			// TODO Refactor into a method
+			DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+					Messages.CommandExecutionUtils_TypeEscapeToDismiss, null);
+			tooltip.setInformation(commandResult.getOutputString());
+			Point p = tooltip.computeSizeHint();
+			tooltip.setSize(p.x, p.y);
+
+			Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
+			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y + textWidget.getLineHeight(caretOffset) + 2);
+			tooltip.setLocation(locationAtOffset);
+			tooltip.setVisible(true);
+			tooltip.setFocus();
+			break;
+		case CREATE_NEW_DOCUMENT:
+			// TODO Refactor into a method
+			File file = Utilities.getFile();
+			IEditorInput input = Utilities.createFileEditorInput(file, "Untitled.txt");	//$NON-NLS-1$
+			String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
+			try
+			{
+				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, editorId);
+				if (part instanceof ITextEditor)
+				{
+					ITextEditor openedTextEditor = (ITextEditor) part;
+					IDocumentProvider dp = openedTextEditor.getDocumentProvider();
+					IDocument doc = dp.getDocument(openedTextEditor.getEditorInput());
+					try
+					{
+						String fileContents = commandResult.getOutputString();
+						if (fileContents != null)
+						{
+							doc.replace(0, 0, fileContents);
+						}
+					}
+					catch (BadLocationException e)
+					{
+						CommonEditorPlugin.logError(e);
+					}
+				}
+
+			}
+			catch (PartInitException e)
+			{
+				CommonEditorPlugin.logError(e);
+			}
+			break;
+		}
+	}
+	
+	public static Map<String, String> computeEnvironment(ITextEditor textEditor) {
+		Map<String, String> environment = new HashMap<String, String>();
+		
+		IEditorInput editorInput = textEditor.getEditorInput();
+		if (editorInput instanceof IFileEditorInput) {
+			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			IFile iFile = fileEditorInput.getFile();
+			if (iFile != null) {
+				environment.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile().getAbsolutePath());
+				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
+				ISelection selection = selectionProvider.getSelection();
+				if (selection instanceof ITextSelection) {
+					ITextSelection textSelection = (ITextSelection) selection;
+					environment.put(VARIABLES_NAMES.TM_SELECTED_TEXT.name(), textSelection.getText());
+					environment.put(VARIABLES_NAMES.TM_LINE_NUMBER.name(), String.valueOf(textSelection.getStartLine() + 1));
+					environment.put(VARIABLES_NAMES.TM_SELECTION_OFFSET.name(), String.valueOf(textSelection.getOffset()));
+					environment.put(VARIABLES_NAMES.TM_SELECTION_LENGTH.name(), String.valueOf(textSelection.getLength()));
+					environment.put(VARIABLES_NAMES.TM_SELECTION_START_LINE_NUMBER.name(), String.valueOf(textSelection.getStartLine()));
+					environment.put(VARIABLES_NAMES.TM_SELECTION_END_LINE_NUMBER.name(), String.valueOf(textSelection.getEndLine()));
+					Object adapter = textEditor.getAdapter(Control.class);
+					if (adapter instanceof StyledText) {
+						StyledText styledText = (StyledText) adapter;
+						environment.put(VARIABLES_NAMES.TM_LINE_INDEX.name(), String.valueOf(textSelection.getOffset() - styledText.getOffsetAtLine(textSelection.getStartLine())));
+						int caretOffset = styledText.getCaretOffset();
+						int lineAtCaret = styledText.getLineAtOffset(caretOffset);
+						environment.put(VARIABLES_NAMES.TM_CARET_LINE_NUMBER.name(), String.valueOf(lineAtCaret + 1));
+						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), styledText.getLine(lineAtCaret));
+					}
+				}
+			}
+		}
+		return environment;
+	}
+	
 	@SuppressWarnings("unused")
 	private static IOConsole getMessageConsole() {
 		return getMessageConsole(DEFAULT_CONSOLE_NAME);

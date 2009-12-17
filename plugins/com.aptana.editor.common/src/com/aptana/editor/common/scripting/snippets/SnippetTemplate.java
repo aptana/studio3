@@ -31,6 +31,6 @@ public class SnippetTemplate extends Template {
 		if (!matches) {
 			return matches;
 		}
-		return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
+		return prefix != null && prefix.length() != 0 && getName() != null && getName().toLowerCase().startsWith(prefix.toLowerCase());
 	}
 }

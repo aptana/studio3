@@ -379,7 +379,10 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
-		((ITextViewerExtension)getSourceViewer()).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension) {
+			((ITextViewerExtension)sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		}
 		getFindBarDecorator().installActions();
 	}
 

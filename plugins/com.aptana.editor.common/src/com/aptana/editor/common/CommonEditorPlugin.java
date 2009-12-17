@@ -165,11 +165,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public Image getImageFromImageRegistry(String imageID) {
 		return getImageRegistry().get(imageID);
 	}
-	
-	public static String getPluginId()
-	{
-		return PLUGIN_ID;
-	}
 
 	public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry)
 	{

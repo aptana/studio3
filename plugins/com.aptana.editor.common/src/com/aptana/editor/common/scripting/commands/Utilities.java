@@ -11,7 +11,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.internal.editors.text.NonExistingFileEditorInput;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -21,7 +21,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
  * @author Sandip V. Chitale
  * 
  */
-@SuppressWarnings("restriction")
 public class Utilities {
 	
 	@SuppressWarnings("unused")
@@ -200,22 +199,27 @@ public class Utilities {
 	}
 	
 	/**
-	 * Creates a new NonExistingFileEditorInput
+	 * Creates a new file editor input.
 	 * 
 	 * @param file
 	 * @param fileName
 	 * @return IEditorInput
 	 */
-	public static IEditorInput createNonExistingFileEditorInput(File file, String fileName)
+	public static IEditorInput createFileEditorInput(File file, final String name)
 	{
 		IEditorInput input = null;
 		IFileSystem fs = EFS.getLocalFileSystem();
 		IFileStore localFile = fs.fromLocalFile(file);
-		input = new NonExistingFileEditorInput(localFile, fileName);
+		input = new FileStoreEditorInput(localFile) {
+			@Override
+			public String getName() {
+				return name;
+			}
+		};
 		return input;
 	}
 	
-	public static File getNonExistingFileBackingStore()
+	public static File getFile()
 	{
 		IPath stateLocation = CommonEditorPlugin.getDefault().getStateLocation();
 		IPath path = stateLocation.append("/_" + new Object().hashCode()); //$NON-NLS-1$ 
