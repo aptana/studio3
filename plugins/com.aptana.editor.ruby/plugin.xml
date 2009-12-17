@@ -5,7 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.ruby.RubySourceEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             icon="icons/rb.png"
             id="com.aptana.editor.ruby"
