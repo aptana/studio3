@@ -44,7 +44,6 @@ public class RegexpRule implements IPredicateRule
 				case '(':
 				case '[':
 				case '{':
-				case '\\':
 				case '-':
 				case '^':
 				case '$':
@@ -52,6 +51,10 @@ public class RegexpRule implements IPredicateRule
 				case ']':
 				case '}':
 				case '?':
+					break;
+				case '\\':
+					firstChar = regexp.charAt(1);
+					// FIXME Don't allow if next char is special too (like b,s,w,d,etc)
 					break;
 				default:
 					firstChar = regexp.charAt(0);
