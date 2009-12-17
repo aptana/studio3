@@ -31,15 +31,19 @@ public abstract class AbstractElement
 		if (element != null)
 		{
 			String path = element.getPath();
-			List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 			
-			if (elements != null)
+			if (path != null)
 			{
-				elements.remove(element);
+				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 				
-				if (elements.size() == 0)
+				if (elements != null)
 				{
-					ELEMENTS_BY_PATH.remove(path);
+					elements.remove(element);
+					
+					if (elements.size() == 0)
+					{
+						ELEMENTS_BY_PATH.remove(path);
+					}
 				}
 			}
 		}
@@ -93,14 +97,11 @@ public abstract class AbstractElement
 	 */
 	public AbstractElement(String path)
 	{
-		if (path == null || path.length() == 0)
+		if (path != null && path.length() > 0)
 		{
-			throw new IllegalArgumentException(Messages.AbstractElement_PATH_NOT_DEFINED);
+			this._path = path;
+			registerElement(this);
 		}
-		
-		this._path = path;
-		
-		registerElement(this);
 	}
 	
 	/**
