@@ -32,7 +32,7 @@ public class CSSCodeScannerPerformance
 		};
 		IDocument document = new Document(src);
 
-		int numRuns = 10;
+		int numRuns = 100;
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < numRuns; i++)
 		{

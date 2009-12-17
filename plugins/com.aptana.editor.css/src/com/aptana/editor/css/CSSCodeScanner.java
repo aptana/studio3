@@ -152,6 +152,17 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule3, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
 		rules.add(wordRule3);
 
+		// curly braces
+		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('}', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		// colon
+		rules.add(new SingleCharacterRule(':', createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
+		// semicolon
+		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
+		// parens
+		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+
 		// Now onto to more expensive regexp rules
 		// rgb values
 		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
@@ -162,30 +173,20 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// classes
 		rules.add(new RegexpRule(
 				"\\.[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.class.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
-		// FIXME name of keyword should be in token!
-		// @ rules
-		rules.add(new RegexpRule(
-				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// numbers
 		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
 				createToken("constant.numeric.css"))); //$NON-NLS-1$
 
+		// %
+		rules.add(new SingleCharacterRule('%', createToken("keyword.other.unit.css"))); //$NON-NLS-1$
 		// !important
 		rules.add(new RegexpRule(
 				"!important", createToken("support.constant.property-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
-		// curly braces
-		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('}', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		// parens
-		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		// colon
-		rules.add(new SingleCharacterRule(':', createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
-		// semicolon
-		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
-		// %
-		rules.add(new SingleCharacterRule('%', createToken("keyword.other.unit.css"))); //$NON-NLS-1$
+		// FIXME name of keyword should be in token!
+		// @ rules
+		rules.add(new RegexpRule(
+				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
