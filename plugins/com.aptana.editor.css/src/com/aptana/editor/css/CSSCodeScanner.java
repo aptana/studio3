@@ -12,6 +12,7 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.WordDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
@@ -57,36 +58,36 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "i", "iframe",
-			"img", "input", "ins", "kbd", "label", "legend", "li", "link", "map", "meta", "noframes", "noscript",
-			"object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp", "script", "select", "small",
-			"span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th",
-			"thead", "title", "tr", "tt", "ul", "var" };
+			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
+			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
+			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
+			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
+			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-color",
-			"background-image", "background-position", "background-repeat", "background", "border-bottom-color",
-			"border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse", "border-color",
-			"border-left-color", "border-left-style", "border-left-width", "border-left", "border-right-color",
-			"border-right-style", "border-right-width", "border-right", "border-spacing", "border-style",
-			"border-top-color", "border-top-style", "border-top-width", "border-top", "border-width", "border",
-			"bottom", "caption-side", "clear", "clip", "color", "content", "counter-increment", "counter-reset",
-			"cue-after", "cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float",
-			"font-family", "font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant",
-			"font-weight", "font", "height", "left", "letter-spacing", "line-height", "list-style-image",
-			"list-style-position", "list-style-type", "list-style", "margin-bottom", "margin-left", "margin-right",
-			"margin-top", "marker-offset", "margin", "marks", "max-height", "max-width", "min-height", "min-width",
-			"-moz-border-radius", "opacity", "orphans", "outline-color", "outline-style", "outline-width", "outline",
-			"overflow(-[xy])?", "padding-bottom", "padding-left", "padding-right", "padding-top", "padding",
-			"page-break-after", "page-break-before", "page-break-inside", "page", "pause-after", "pause-before",
-			"pause", "pitch-range", "pitch", "play-during", "position", "quotes", "richness", "right", "size",
-			"speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress", "table-layout",
-			"text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top", "unicode-bidi",
-			"vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width", "word-spacing",
-			"z-index" };
+			"background-image", "background-position-x", "background-position-y", "background-position",
+			"background-repeat", "background", "border-bottom-color", "border-bottom-style", "border-bottom-width",
+			"border-bottom", "border-collapse", "border-color", "border-left-color", "border-left-style",
+			"border-left-width", "border-left", "border-right-color", "border-right-style", "border-right-width",
+			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-style",
+			"border-top-width", "border-top", "border-width", "border", "bottom", "caption-side", "clear", "clip",
+			"color", "content", "counter-increment", "counter-reset", "cue-after", "cue-before", "cue", "cursor",
+			"direction", "display", "elevation", "empty-cells", "float", "font-family", "font-size-adjust",
+			"font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font", "height", "left",
+			"letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type",
+			"list-style", "margin-bottom", "margin-left", "margin-right", "margin-top", "marker-offset", "margin",
+			"marks", "max-height", "max-width", "min-height", "min-width", "-moz-border-radius", "opacity", "orphans",
+			"outline-color", "outline-style", "outline-width", "outline", "overflow-x", "overflow-y", "overflow",
+			"padding-bottom", "padding-left", "padding-right", "padding-top", "padding", "page-break-after",
+			"page-break-before", "page-break-inside", "page", "pause-after", "pause-before", "pause", "pitch-range",
+			"pitch", "play-during", "position", "quotes", "richness", "right", "size", "speak-header", "speak-numeral",
+			"speak-punctuation", "speech-rate", "speak", "stress", "table-layout", "text-align", "text-decoration",
+			"text-indent", "text-shadow", "text-transform", "top", "unicode-bidi", "vertical-align", "visibility",
+			"voice-family", "volume", "white-space", "widows", "width", "word-spacing", "z-index" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
@@ -98,24 +99,25 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"hiragana-iroha", "hiragana", "horizontal", "ideograph-alpha", "ideograph-numeric",
 			"ideograph-parenthesis", "ideograph-space", "inactive", "inherit", "inline-block", "inline", "inset",
 			"inside", "inter-ideograph", "inter-word", "italic", "justify", "katakana-iroha", "katakana", "keep-all",
-			"left", "lighter", "line-edge", "line-through", "line", "list-item", "loose", "lower-alpha", "lower-greek",
-			"lower-latin", "lower-roman", "lowercase", "lr-tb", "ltr", "medium", "middle", "move", "n-resize",
-			"ne-resize", "newspaper", "no-drop", "no-repeat", "nw-resize", "none", "normal", "not-allowed", "nowrap",
-			"oblique", "outset", "outside", "overline", "pointer", "progress", "relative", "repeat-x", "repeat-y",
-			"repeat", "right", "ridge", "row-resize", "rtl", "s-resize", "scroll", "se-resize", "separate",
-			"small-caps", "solid", "square", "static", "strict", "super", "sw-resize", "table-footer-group",
-			"table-header-group", "tb-rl", "text-bottom", "text-top", "text", "thick", "thin", "top", "transparent",
-			"underline", "upper-alpha", "upper-latin", "upper-roman", "uppercase", "vertical-ideographic",
-			"vertical-text", "visible", "w-resize", "wait", "whitespace", "zero" };
+			"larger", "large", "left", "lighter", "line-edge", "line-through", "line", "list-item", "loose",
+			"lower-alpha", "lower-greek", "lower-latin", "lower-roman", "lowercase", "lr-tb", "ltr", "medium",
+			"middle", "move", "n-resize", "ne-resize", "newspaper", "no-drop", "no-repeat", "nw-resize", "none",
+			"normal", "not-allowed", "nowrap", "oblique", "outset", "outside", "overline", "pointer", "progress",
+			"relative", "repeat-x", "repeat-y", "repeat", "right", "ridge", "row-resize", "rtl", "s-resize", "scroll",
+			"se-resize", "separate", "small-caps", "smaller", "solid", "square", "static", "strict", "super",
+			"sw-resize", "table-footer-group", "table-header-group", "tb-rl", "text-bottom", "text-top", "text",
+			"thick", "thin", "top", "transparent", "underline", "upper-alpha", "upper-latin", "upper-roman",
+			"uppercase", "vertical-ideographic", "vertical-text", "visible", "w-resize", "wait", "whitespace",
+			"xx-large", "xx-small", "x-small", "x-large", "zero" };
 
 	@SuppressWarnings("nls")
-	private static final String[] FONT_NAMES = { "arial", "century", "comic", "courier", "garamond", "georgia",
-			"helvetica", "impact", "lucida", "symbol", "system", "tahoma", "times", "trebuchet", "utopia", "verdana",
-			"webdings", "sans-serif", "serif", "monospace" };
+	private static final String[] FONT_NAMES = { "arial", "century", "comic", "courier", "garamond", "geneva",
+			"georgia", "helvetica", "impact", "lucida", "monaco", "symbol", "system", "tahoma", "times", "trebuchet",
+			"utopia", "verdana", "webdings", "sans-serif", "serif", "monospace" };
 
 	/**
 	 * A flag to turn on or off the optimization of eligible regexp rules. Seems to make a measurable difference on
-	 * large files. (yui.css took average 760ms vs 1120ms)
+	 * large files.
 	 */
 	private static final boolean OPTIMIZE_REGEXP_RULES = true;
 
@@ -139,11 +141,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
 		rules.add(wordRule);
 
-		// FIXME I think that h1-6 will get picked up by normal word detector!
-		// h1-h6 because digits won't get picked up as part of word, so we can't throw into HTML_TAGS
-		rules.add(new RegexpRule("\\b(h[1-6])\\b", //$NON-NLS-1$
-				createToken("entity.name.tag.css"))); //$NON-NLS-1$
-
 		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
 		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
 		addWordsToRule(wordRule2, PROPERTY_NAMES, "support.type.property-name.css"); //$NON-NLS-1$
@@ -155,6 +152,17 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule3, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
 		rules.add(wordRule3);
 
+		// curly braces
+		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('}', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
+		// colon
+		rules.add(new SingleCharacterRule(':', createToken("punctuation.separator.key-value.css"))); //$NON-NLS-1$
+		// semicolon
+		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
+		// parens
+		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+
 		// Now onto to more expensive regexp rules
 		// rgb values
 		rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", //$NON-NLS-1$
@@ -165,29 +173,20 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// classes
 		rules.add(new RegexpRule(
 				"\\.[_a-zA-Z0-9-]+", createToken("entity.other.attribute-name.class.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
-		// FIXME name of keyword should be in token!
-		// @ rules
-		rules.add(new RegexpRule(
-				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// numbers
 		rules.add(new RegexpRule("(\\-|\\+)?\\s*[0-9]+(\\.[0-9]+)?", //$NON-NLS-1$
 				createToken("constant.numeric.css"))); //$NON-NLS-1$
 
+		// %
+		rules.add(new SingleCharacterRule('%', createToken("keyword.other.unit.css"))); //$NON-NLS-1$
 		// !important
 		rules.add(new RegexpRule(
 				"!important", createToken("support.constant.property-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
-		// curly braces
-		rules.add(new RegexpRule("(\\{|\\})", //$NON-NLS-1$
-				createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
-		// colon
-		rules.add(new RegexpRule(":", //$NON-NLS-1$
-				createToken("punctuation.separator.key-value.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-		// semicolon
-		rules.add(new RegexpRule(";", //$NON-NLS-1$
-				createToken("punctuation.terminator.rule.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-		// %
-		rules.add(new RegexpRule("%", createToken("keyword.other.unit.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+		// FIXME name of keyword should be in token!
+		// @ rules
+		rules.add(new RegexpRule(
+				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}

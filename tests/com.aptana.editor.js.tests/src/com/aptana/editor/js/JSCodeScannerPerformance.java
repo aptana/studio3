@@ -1,4 +1,4 @@
-package com.aptana.editor.css;
+package com.aptana.editor.js;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -8,12 +8,13 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-public class CSSCodeScannerPerformance
+public class JSCodeScannerPerformance
 {
 
 	public static void main(String[] args) throws Exception
 	{
-		InputStream stream = CSSCodeScannerPerformance.class.getResourceAsStream("yui.css");
+		// read in the file
+		InputStream stream = JSCodeScannerPerformance.class.getResourceAsStream("dojo.js.uncompressed.js");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)
@@ -22,7 +23,7 @@ public class CSSCodeScannerPerformance
 		}
 		stream.close();
 		String src = new String(out.toByteArray());
-		CSSCodeScanner scanner = new CSSCodeScanner()
+		JSCodeScanner scanner = new JSCodeScanner()
 		{
 			@Override
 			protected IToken createToken(String string)
@@ -31,8 +32,8 @@ public class CSSCodeScannerPerformance
 			}
 		};
 		IDocument document = new Document(src);
-
-		int numRuns = 100;
+		// Ok now actually scan the thing, the real work
+		int numRuns = 10;
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < numRuns; i++)
 		{
