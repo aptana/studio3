@@ -58,11 +58,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	@SuppressWarnings("nls")
 	private static final String[] HTML_TAGS = { "a", "abbr", "acronym", "address", "area", "b", "base", "big",
 			"blockquote", "body", "br", "button", "caption", "cite", "code", "col", "colgroup", "dd", "del", "dfn",
-			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "i", "iframe",
-			"img", "input", "ins", "kbd", "label", "legend", "li", "link", "map", "meta", "noframes", "noscript",
-			"object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp", "script", "select", "small",
-			"span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th",
-			"thead", "title", "tr", "tt", "ul", "var" };
+			"div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
+			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
+			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
+			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
+			"textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
 
 	@SuppressWarnings("nls")
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
@@ -140,11 +140,6 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, STANDARD_COLORS, "support.constant.color.w3c-standard-color-name.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
 		rules.add(wordRule);
-
-		// FIXME I think that h1-6 will get picked up by normal word detector!
-		// h1-h6 because digits won't get picked up as part of word, so we can't throw into HTML_TAGS
-		rules.add(new RegexpRule("\\b(h[1-6])\\b", //$NON-NLS-1$
-				createToken("entity.name.tag.css"))); //$NON-NLS-1$
 
 		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
 		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
