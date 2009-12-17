@@ -16,7 +16,7 @@ public class ScriptLogger
 	 * @param msg
 	 * @param e
 	 */
-	public static void logError(String msg, Throwable e)
+	public static void logError(String msg)
 	{
 		getInstance().fireLogErrorEvent(msg);
 	}
