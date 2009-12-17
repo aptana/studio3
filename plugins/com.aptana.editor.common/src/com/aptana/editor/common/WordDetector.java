@@ -33,28 +33,32 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.css;
+package com.aptana.editor.common;
 
 import org.eclipse.jface.text.rules.IWordDetector;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WordDetector implements IWordDetector {
+public class WordDetector implements IWordDetector
+{
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	public boolean isWordPart(char c) {
-		return Character.isJavaIdentifierStart(c);
+	public boolean isWordPart(char c)
+	{
+		return Character.isJavaIdentifierPart(c);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
 	 */
-	public boolean isWordStart(char c) {
-		return Character.isJavaIdentifierPart(c);
+	public boolean isWordStart(char c)
+	{
+		return Character.isJavaIdentifierStart(c);
 	}
 
 }

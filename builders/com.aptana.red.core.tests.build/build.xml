@@ -205,6 +205,10 @@
 			<param name="test.classname" value="com.aptana.scope.AllTests" />
 		</antcall>
 		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.common.tests" />
+			<param name="test.classname" value="com.aptana.editor.common.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.ruby.tests" />
 			<param name="test.classname" value="com.aptana.editor.ruby.tests.AllTests" />
 		</antcall>

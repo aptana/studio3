@@ -543,6 +543,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category))
 		{
 			IStatusField field = getStatusField(category);
+			if (field == null)
+				return;
 			String text = getCursorPosition();
 			if (text.length() != lastPositionLength)
 			{
@@ -552,7 +554,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 					Field label = StatusLineContributionItem.class.getDeclaredField("fLabel"); //$NON-NLS-1$
 					label.setAccessible(true);
 					CLabel clabel = (CLabel) label.get(field);
-					if (clabel == null)
+					if (clabel == null || clabel.isDisposed())
 					{
 						lastPositionLength = -1;
 						return;

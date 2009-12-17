@@ -17,17 +17,31 @@
       [Enter License Description here.]
    </license>
 
+   <includes
+         id="com.aptana.red.core"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.junit" version="3.8.2" match="greaterOrEqual"/>
       <import plugin="com.aptana.util" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.junit4" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
       <import feature="com.aptana.red.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.js" version="1.0.0" match="greaterOrEqual"/>
    </requires>
+
+   <plugin
+         id="com.aptana.editor.common.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.aptana.editor.ruby.tests"

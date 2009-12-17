@@ -99,6 +99,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 			eof = false;
 			return;
 		}
+		found = false;
 		characterScanner.unread();
 	}
 		
