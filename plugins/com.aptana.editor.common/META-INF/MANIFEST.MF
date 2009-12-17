@@ -16,6 +16,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  com.aptana.scripting,
+ com.aptana.scripting.ui;bundle-version="1.0.0",
  org.eclipse.ui.workbench.texteditor,
  plistreader;bundle-version="1.0.0",
  com.aptana.parsing
