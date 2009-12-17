@@ -32,6 +32,19 @@ public class CSSCodeScannerTest extends TestCase
 		super.tearDown();
 	}
 
+	public void testH1Through6()
+	{
+		String src = "h1 h2 h3 h4 h5 h6 ";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		for (int i = 0; i < src.length(); i += 3)
+		{
+			assertToken(getToken("entity.name.tag.css"), i, 2);
+			assertToken(Token.WHITESPACE, i + 2, 1);
+		}
+	}
+
 	public void testBasicTokenizing()
 	{
 		String src = "html { color: red; background-color: #333; }";
@@ -56,41 +69,18 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 42, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 43, 1);
 	}
-	
+
 	public void testBasicTokenizing2()
 	{
-		String src = "body {\n" +
-				"  background-image: url();\n" +
-				"  background-position-x: left;\n" +
-				"  background-position-y: top;\n" +
-				"  background-repeat: repeat-x;\n" +
-				"  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;\n" +
-				"}\n" +
-				"\n" +
-				".main {\n" +
-				"  border: 1px dotted #222222;\n" +
-				"  margin: 5px;\n" +
-				"}\n" +
-				"\n" +
-				".header {\n" +
-				"  background-color: #FFFFFF;\n" +
-				"  color: #444444;\n" +
-				"  font-size: xx-large;\n" +
-				"}\n" +
-				"\n" +
-				".menu {\n" +
-				"  border-top: 2px solid #FC7F22;\n" +
-				"  background-color: #3B3B3B;\n" +
-				"  color: #FFFFFF;\n" +
-				"  text-align: right;\n" +
-				"  vertical-align: right;\n" +
-				"  font-size: small;\n" +
-				"}\n" +
-				"\n" +
-				".menu a {\n" +
-				"  color: #DDDDDD;\n" +
-				"  text-decoration: none;\n" +
-				"}\n";
+		String src = "body {\n" + "  background-image: url();\n" + "  background-position-x: left;\n"
+				+ "  background-position-y: top;\n" + "  background-repeat: repeat-x;\n"
+				+ "  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;\n" + "}\n" + "\n" + ".main {\n"
+				+ "  border: 1px dotted #222222;\n" + "  margin: 5px;\n" + "}\n" + "\n" + ".header {\n"
+				+ "  background-color: #FFFFFF;\n" + "  color: #444444;\n" + "  font-size: xx-large;\n" + "}\n" + "\n"
+				+ ".menu {\n" + "  border-top: 2px solid #FC7F22;\n" + "  background-color: #3B3B3B;\n"
+				+ "  color: #FFFFFF;\n" + "  text-align: right;\n" + "  vertical-align: right;\n"
+				+ "  font-size: small;\n" + "}\n" + "\n" + ".menu a {\n" + "  color: #DDDDDD;\n"
+				+ "  text-decoration: none;\n" + "}\n";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 		// line 1
@@ -204,7 +194,7 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("support.constant.property-value.css"), 317, 8);
 		assertToken(getToken("punctuation.terminator.rule.css"), 325, 1);
 		assertToken(Token.WHITESPACE, 326, 1);
-		// line 17 
+		// line 17
 		assertToken(getToken("punctuation.section.property-list.css"), 327, 1);
 		assertToken(Token.WHITESPACE, 328, 2);
 		// line 19 .menu {
@@ -212,7 +202,7 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 335, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
 		assertToken(Token.WHITESPACE, 337, 3);
-		// line 20 
+		// line 20
 	}
 
 	private IToken getToken(String string)
