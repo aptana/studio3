@@ -40,6 +40,7 @@ public class ExtendedWordRule extends WordRule
 	/*
 	 * @see IRule#evaluate(ICharacterScanner)
 	 */
+	@SuppressWarnings("unchecked")
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		int c = scanner.read();
@@ -67,10 +68,10 @@ public class ExtendedWordRule extends WordRule
 
 				if (token == null && fIgnoreCase)
 				{
-					Iterator iter = fWords.keySet().iterator();
+					Iterator<String> iter = fWords.keySet().iterator();
 					while (iter.hasNext())
 					{
-						String key = (String) iter.next();
+						String key = iter.next();
 						if (buffer.equalsIgnoreCase(key))
 						{
 							token = (IToken) fWords.get(key);
@@ -97,14 +98,16 @@ public class ExtendedWordRule extends WordRule
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Returns the characters in the buffer to the scanner.
-	 *
-	 * @param scanner the scanner to be used
+	 * 
+	 * @param scanner
+	 *            the scanner to be used
 	 */
-	protected void unreadBuffer(ICharacterScanner scanner) {
-		for (int i= fBuffer.length() - 1; i >= 0; i--)
+	protected void unreadBuffer(ICharacterScanner scanner)
+	{
+		for (int i = fBuffer.length() - 1; i >= 0; i--)
 			scanner.unread();
 	}
 
