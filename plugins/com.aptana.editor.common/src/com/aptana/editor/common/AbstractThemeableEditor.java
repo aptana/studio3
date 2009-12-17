@@ -104,7 +104,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private LineNumberRulerColumn fLineColumn;
 	private Composite parent;
 
-	private LineBackgroundPainter fCursorLinePainter;
+	/**
+	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
+	 * things like block comments with a different bg color look more like Textmate.
+	 */
+	private LineBackgroundPainter fFullLineBackgroundPainter;
 
 	/**
 	 * AbstractThemeableEditor
@@ -178,13 +182,13 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
-		if (fCursorLinePainter == null)
+		if (fFullLineBackgroundPainter == null)
 		{
 			if (viewer instanceof ITextViewerExtension2)
 			{
-				fCursorLinePainter = new LineBackgroundPainter(viewer);
+				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
 				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
-				extension.addPainter(fCursorLinePainter);
+				extension.addPainter(fFullLineBackgroundPainter);
 			}
 		}
 
@@ -223,8 +227,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		@Override
 		public void deactivate(boolean redraw)
 		{
-			// TODO Auto-generated method stub
-
+			// do nothing
 		}
 
 		/*
@@ -246,7 +249,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			}
 
 			StyledText textWidget = fViewer.getTextWidget();
-
 			// initialization
 			if (!fIsActive)
 			{
@@ -267,33 +269,31 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			// FIXME What about when there's other style ranges but we begin and end on same bg color? Do we color the
 			// line background anyways and force style ranges with null bg colors to specify the editor bg?
 			StyledText textWidget = fViewer.getTextWidget();
-			if (textWidget != null)
+			if (textWidget == null)
+				return;
+			String text = event.lineText;
+			if (text == null || text.length() == 0)
+				return;
+			int offset = event.lineOffset;
+			int leadingWhitespace = 0;
+			while (Character.isWhitespace(text.charAt(0)))
 			{
-				String text = event.lineText;
-				if (text == null || text.length() == 0)
-					return;
-				int offset = event.lineOffset;
-				int leadingWhitespace = 0;
-				while (Character.isWhitespace(text.charAt(0)))
-				{
-					leadingWhitespace++;
-					text = text.substring(1);
-					if (text.length() <= 0)
-						break;
-				}
-				int length = text.length();
-				if (length > 0)
-				{
-					StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
+				leadingWhitespace++;
+				text = text.substring(1);
+				if (text.length() <= 0)
+					break;
+			}
+			int length = text.length();
+			if (length > 0)
+			{
+				StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
 
-					if (ranges != null && ranges.length == 1)
-					{
-						event.lineBackground = ranges[0].background;
-					}
+				if (ranges != null && ranges.length == 1)
+				{
+					event.lineBackground = ranges[0].background;
 				}
 			}
 		}
-
 	}
 
 	protected void overrideSelectionColor()
