@@ -15,8 +15,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.editor.common.theme.ThemeUtil;
-import com.aptana.explorer.internal.ui.FilteringProjectView;
 import com.aptana.explorer.internal.ui.SingleProjectView;
 
 /**
