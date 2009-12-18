@@ -85,7 +85,7 @@ public class ScriptingEngine
 			catch (IOException e)
 			{
 				String message = MessageFormat.format(
-					"Unable to set JRuby home: {0}",
+					Messages.ScriptingEngine_Error_Setting_JRuby_Home,
 					new Object[] { e.getMessage() }
 				);
 			
@@ -129,7 +129,7 @@ public class ScriptingEngine
 		catch (ParseFailedException e)
 		{
 			String message = MessageFormat.format(
-				"An error occurred while parsing {0}: {1}",
+				Messages.ScriptingEngine_Parse_Error,
 				new Object[] { fullPath, e.getMessage() }
 			);
 			
@@ -138,7 +138,7 @@ public class ScriptingEngine
 		catch (EvalFailedException e)
 		{
 			String message = MessageFormat.format(
-				"An error occurred while executing {0}: {1}",
+				Messages.ScriptingEngine_Execution_Error,
 				new Object[] { fullPath, e.getMessage() }
 			);
 			

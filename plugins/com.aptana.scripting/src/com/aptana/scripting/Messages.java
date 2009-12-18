@@ -6,6 +6,9 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.scripting.messages"; //$NON-NLS-1$
 	public static String MenuDialog_NoMatchesFound;
+	public static String ScriptingEngine_Error_Setting_JRuby_Home;
+	public static String ScriptingEngine_Execution_Error;
+	public static String ScriptingEngine_Parse_Error;
 	static
 	{
 		// initialize resource bundle

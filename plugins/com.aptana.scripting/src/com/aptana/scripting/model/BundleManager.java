@@ -948,7 +948,7 @@ public class BundleManager
 		if (script == null)
 		{
 			String message = MessageFormat.format(
-				"Tried to execute a null script file",
+				Messages.BundleManager_Executed_Null_Script,
 				new Object[] { }
 			);
 			
@@ -1006,7 +1006,7 @@ public class BundleManager
 		else
 		{
 			String message = MessageFormat.format(
-				"Tried to reload a null script file",
+				Messages.BundleManager_Reloaded_Null_Script,
 				new Object[] {}
 			);
 			
@@ -1087,7 +1087,7 @@ public class BundleManager
 		else
 		{
 			String message = MessageFormat.format(
-				"Tried to unload a null script file",
+				Messages.BundleManager_Unloaded_Null_Script,
 				new Object[] {}
 			);
 			

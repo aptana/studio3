@@ -9,9 +9,6 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
 
-import com.aptana.scripting.Activator;
-import com.aptana.scripting.model.Messages;
-
 public class ResourceUtils
 {
 	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
@@ -43,15 +40,21 @@ public class ResourceUtils
 			}
 			catch (IOException e)
 			{
-				String message = MessageFormat.format(Messages.BundleManager_Cannot_Locate_Built_Ins_Directory, new Object[] { url.toString() });
-
-				Activator.logError(message, e);
+				String message = MessageFormat.format(
+					Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
+					new Object[] { url }
+				);
+				
+				UtilPlugin.logError(message, e);
 			}
 			catch (URISyntaxException e)
 			{
-				String message = MessageFormat.format(Messages.BundleManager_Malformed_Built_Ins_URI, new Object[] { url.toString() });
-
-				Activator.logError(message, e);
+				String message = MessageFormat.format(
+					Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
+					new Object [] { url }
+				);
+				
+				UtilPlugin.logError(message, e);
 			}
 		}
 
