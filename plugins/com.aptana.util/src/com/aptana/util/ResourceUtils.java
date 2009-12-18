@@ -1,4 +1,4 @@
-package com.aptana.scripting;
+package com.aptana.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
 
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.model.Messages;
 
 public class ResourceUtils

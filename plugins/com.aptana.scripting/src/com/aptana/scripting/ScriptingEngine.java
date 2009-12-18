@@ -15,6 +15,8 @@ import org.jruby.embed.ParseFailedException;
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
 
+import com.aptana.util.ResourceUtils;
+
 
 public class ScriptingEngine
 {
