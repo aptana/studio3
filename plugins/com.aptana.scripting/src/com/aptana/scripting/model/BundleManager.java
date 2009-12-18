@@ -18,8 +18,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.scripting.Activator;
-import com.aptana.scripting.ResourceUtils;
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.util.ResourceUtils;
 
 public class BundleManager
 {
@@ -66,7 +67,11 @@ public class BundleManager
 			
 			// setup default application bundles path
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-			INSTANCE.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
+			
+			if (url != null)
+			{
+				INSTANCE.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
+			}
 			
 			String OS = Platform.getOS();
 			String userHome = System.getProperty(USER_HOME_PROPERTY);
@@ -178,12 +183,15 @@ public class BundleManager
 	 */
 	public void addElementChangeListener(ElementChangeListener listener)
 	{
-		if (this._elementListeners == null)
+		if (listener != null)
 		{
-			this._elementListeners = new ArrayList<ElementChangeListener>();
+			if (this._elementListeners == null)
+			{
+				this._elementListeners = new ArrayList<ElementChangeListener>();
+			}
+			
+			this._elementListeners.add(listener);
 		}
-		
-		this._elementListeners.add(listener);
 	}
 	
 	/**
@@ -193,7 +201,7 @@ public class BundleManager
 	 */
 	void fireElementAddedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null)
+		if (this._elementListeners != null && element != null)
 		{
 			for (ElementChangeListener listener : this._elementListeners)
 			{
@@ -209,7 +217,7 @@ public class BundleManager
 	 */
 	void fireElementDeletedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null)
+		if (this._elementListeners != null && element != null)
 		{
 			for (ElementChangeListener listener : this._elementListeners)
 			{
@@ -225,7 +233,7 @@ public class BundleManager
 	 */
 	void fireElementModifiedEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null)
+		if (this._elementListeners != null && element != null)
 		{
 			boolean sendEvent = true;
 			
@@ -800,25 +808,31 @@ public class BundleManager
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(
+						Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() }
+					);
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(
+					Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+					new Object[] { bundleDirectory.getAbsolutePath() }
+				);
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(
+				Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+				new Object[] { bundleDirectory.getAbsolutePath() }
+			);
 		}
 
 		if (result == false && logErrors && message != null && message.length() > 0)
 		{
-			this.logError(message);
+			ScriptLogger.logError(message);
 		}
 
 		return result;
@@ -829,11 +843,16 @@ public class BundleManager
 	 */
 	public void loadApplicationBundles()
 	{
-		File applicationBundlesDirectory = new File(this.getApplicationBundlesPath());
+		String applicationBundles = this.getApplicationBundlesPath();
 		
-		for (File bundle : this.getBundleDirectories(applicationBundlesDirectory))
+		if (applicationBundles != null)
 		{
-			this.loadBundle(bundle);
+			File applicationBundlesDirectory = new File(applicationBundles);
+			
+			for (File bundle : this.getBundleDirectories(applicationBundlesDirectory))
+			{
+				this.loadBundle(bundle);
+			}
 		}
 	}
 	
@@ -894,24 +913,27 @@ public class BundleManager
 	 */
 	public void loadScript(File script)
 	{
-		// determine bundle root directory
-		String scriptPath = script.getAbsolutePath();
-		File bundleDirectory = null;
-		
-		if (scriptPath.endsWith(BUNDLE_FILE))
+		if (script != null)
 		{
-			bundleDirectory = script.getParentFile();
+			// determine bundle root directory
+			String scriptPath = script.getAbsolutePath();
+			File bundleDirectory = null;
+			
+			if (scriptPath.endsWith(BUNDLE_FILE))
+			{
+				bundleDirectory = script.getParentFile();
+			}
+			else
+			{
+				bundleDirectory = script.getParentFile().getParentFile();
+			}
+	
+			// get bundle load paths
+			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			// execute script
+			this.loadScript(script, bundleLoadPaths);
 		}
-		else
-		{
-			bundleDirectory = script.getParentFile().getParentFile();
-		}
-
-		// get bundle load paths
-		List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
-		
-		// execute script
-		this.loadScript(script, bundleLoadPaths);
 	}
 	
 	/**
@@ -921,18 +943,33 @@ public class BundleManager
 	 */
 	public void loadScript(File script, List<String> loadPaths)
 	{
-		if (script.canRead())
+		boolean execute = true;
+		
+		if (script == null)
 		{
-			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+			String message = MessageFormat.format(
+				"Tried to execute a null script file",
+				new Object[] { }
+			);
+			
+			ScriptLogger.logError(message);
+			execute = false;
 		}
-		else
+		
+		if (execute && script.canRead() == false)
 		{
 			String message = MessageFormat.format(
 				Messages.BundleManager_UNREADABLE_SCRIPT,
 				new Object[] { script.getAbsolutePath() }
 			);
 			
-			this.logError(message);
+			ScriptLogger.logError(message);
+			execute = false;
+		}
+		
+		if (execute)
+		{
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
 		}
 	}
 
@@ -941,23 +978,17 @@ public class BundleManager
 	 */
 	public void loadUserBundles()
 	{
-		File userBundlesDirectory = new File(this.getUserBundlesPath());
+		String userBundles = this.getUserBundlesPath();
 		
-		for (File bundle : this.getBundleDirectories(userBundlesDirectory))
+		if (userBundles != null)
 		{
-			this.loadBundle(bundle);
+			File userBundlesDirectory = new File(userBundles);
+			
+			for (File bundle : this.getBundleDirectories(userBundlesDirectory))
+			{
+				this.loadBundle(bundle);
+			}
 		}
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param message
-	 */
-	void logError(String message)
-	{
-		// TODO: create and write to bundle console
-		System.out.println("error: " + message); //$NON-NLS-1$
 	}
 
 	/**
@@ -967,8 +998,20 @@ public class BundleManager
 	 */
 	public void reloadScript(File script)
 	{
-		this.unloadScript(script);
-		this.loadScript(script);
+		if (script != null)
+		{
+			this.unloadScript(script);
+			this.loadScript(script);
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				"Tried to reload a null script file",
+				new Object[] {}
+			);
+			
+			ScriptLogger.logError(message);
+		}
 	}
 	
 	/**
@@ -1009,34 +1052,46 @@ public class BundleManager
 	 */
 	public void unloadScript(File script)
 	{
-		String scriptPath = script.getAbsolutePath();
-		AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
-		
-		// remove bundle members in pass 1
-		for (AbstractElement element : elements)
+		if (script != null)
 		{
-			if (element instanceof AbstractBundleElement)
+			String scriptPath = script.getAbsolutePath();
+			AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
+			
+			// remove bundle members in pass 1
+			for (AbstractElement element : elements)
 			{
-				AbstractBundleElement bundleElement = (AbstractBundleElement) element;
-				
-				bundleElement.getOwningBundle().removeElement(bundleElement);
-			}
-		}
-		
-		// clear (and possibly remove) bundles in pass 2
-		for (AbstractElement element : elements)
-		{
-			if (element instanceof BundleElement)
-			{
-				BundleElement bundle = (BundleElement) element;
-				
-				bundle.clearMetadata();
-				
-				if (bundle.isEmpty())
+				if (element instanceof AbstractBundleElement)
 				{
-					AbstractElement.unregisterElement(bundle);
+					AbstractBundleElement bundleElement = (AbstractBundleElement) element;
+					
+					bundleElement.getOwningBundle().removeElement(bundleElement);
 				}
 			}
+			
+			// clear (and possibly remove) bundles in pass 2
+			for (AbstractElement element : elements)
+			{
+				if (element instanceof BundleElement)
+				{
+					BundleElement bundle = (BundleElement) element;
+					
+					bundle.clearMetadata();
+					
+					if (bundle.isEmpty())
+					{
+						AbstractElement.unregisterElement(bundle);
+					}
+				}
+			}
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				"Tried to unload a null script file",
+				new Object[] {}
+			);
+			
+			ScriptLogger.logError(message);
 		}
 	}
 }
