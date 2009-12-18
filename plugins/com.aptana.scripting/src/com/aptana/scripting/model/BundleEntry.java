@@ -19,6 +19,11 @@ public class BundleEntry
 	 */
 	public BundleEntry(String name)
 	{
+		if (name == null || name.length() == 0)
+		{
+			throw new IllegalArgumentException("name must be defined");
+		}
+		
 		this._name = name;
 		this._bundles = new ArrayList<BundleElement>();
 	}
@@ -30,30 +35,33 @@ public class BundleEntry
 	 */
 	public void addBundle(BundleElement bundle)
 	{
-		this._bundles.add(bundle);
-		
-		// keep bundles in canonical order
-		Collections.sort(this._bundles, new Comparator<BundleElement>()
+		if (bundle != null)
 		{
-			public int compare(BundleElement o1, BundleElement o2)
+			this._bundles.add(bundle);
+			
+			// keep bundles in canonical order
+			Collections.sort(this._bundles, new Comparator<BundleElement>()
 			{
-				int result = o1.getBundleScope().compareTo(o2.getBundleScope());
-				
-				if (result == 0)
+				public int compare(BundleElement o1, BundleElement o2)
 				{
-					if (o1.isReference() == o2.isReference())
+					int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+					
+					if (result == 0)
 					{
-						result = o1.getPath().compareTo(o2.getPath());
+						if (o1.isReference() == o2.isReference())
+						{
+							result = o1.getPath().compareTo(o2.getPath());
+						}
+						else
+						{
+							result = (o1.isReference()) ? -1 : 1;
+						}
 					}
-					else
-					{
-						result = (o1.isReference()) ? -1 : 1;
-					}
+					
+					return result;
 				}
-				
-				return result;
-			}
-		});
+			});
+		}
 	}
 	
 	/**
@@ -63,8 +71,8 @@ public class BundleEntry
 	 */
 	public BundleScope getActiveScope()
 	{
-		BundleScope result = BundleScope.UNKNOWN;
 		int size = this._bundles.size();
+		BundleScope result = BundleScope.UNKNOWN;
 		
 		if (size > 0)
 		{
@@ -94,7 +102,7 @@ public class BundleEntry
 		final Set<String> names = new HashSet<String>();
 		final List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		this.processMembers(new BundleProcessor()
+		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
@@ -126,7 +134,7 @@ public class BundleEntry
 		final Set<String> names = new HashSet<String>();
 		final List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		this.processMembers(new BundleProcessor()
+		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
@@ -168,7 +176,7 @@ public class BundleEntry
 		final Set<String> names = new HashSet<String>();
 		final List<SnippetElement> result = new ArrayList<SnippetElement>();
 		
-		this.processMembers(new BundleProcessor()
+		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
@@ -192,36 +200,30 @@ public class BundleEntry
 	}
 	
 	/**
-	 * processMembers
+	 * processBundles
 	 * 
 	 * @param processor
 	 */
-	protected void processMembers(BundleProcessor processor)
+	protected void processBundles(BundleProcessor processor)
 	{
 		BundleScope activeScope = this.getActiveScope();
-		boolean processingReferences = true;
 		
 		// walk the list of bundles from highest bundle scope precedence to lowest
 		for (int i = this._bundles.size() - 1; i >= 0; i--)
 		{
 			BundleElement bundle = this._bundles.get(i);
 		
-			// we're done processing if we've left the active scope or if we've processed all
-			// bundle references and one bundle
-			if (bundle.getBundleScope() != activeScope || processingReferences == false)
-			{
-				break;
-			}
+			// we're done processing if we've left the active scope or
+			// if we've processed all bundle references and one non-ref bundle or
+			// out BundleProcessor tells us to stop
 			
-			// go ahead and process this first non-ref bundle, but turn on a
-			// flag to let us know to quit processing next time around
-			if (bundle.isReference() == false)
-			{
-				processingReferences = false;
-			}
-			
-			// do something with the bundle and exit if told to do so
-			if (processor.processBundle(this, bundle) == false)
+			// NOTE: the order of this conditional is important
+			if
+			(
+					bundle.getBundleScope() != activeScope
+				||	processor.processBundle(this, bundle) == false
+				||	bundle.isReference() == false
+			)
 			{
 				break;
 			}

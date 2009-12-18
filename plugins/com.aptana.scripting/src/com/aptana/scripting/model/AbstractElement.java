@@ -12,8 +12,8 @@ public abstract class AbstractElement
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
 	
-	protected String _path;
-	protected String _displayName;
+	private String _path;
+	private String _displayName;
 	
 	/**
 	 * static constructor

@@ -67,7 +67,7 @@ public class MenuElement extends AbstractBundleElement
 			}
 		}
 		
-		// collect into one tree
+		// TODO: collect into one tree
 		
 		
 		return result;
@@ -161,9 +161,11 @@ public class MenuElement extends AbstractBundleElement
 		
 		while (currentMenu != null)
 		{
-			if (currentMenu._owningBundle != null)
+			BundleElement bundle = currentMenu.getOwningBundle();
+			
+			if (bundle != null)
 			{
-				result = currentMenu._owningBundle;
+				result = bundle;
 				break;
 			}
 			else
@@ -191,27 +193,21 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public ScopeSelector getScopeSelector()
 	{
+		MenuElement currentMenu = this;
 		ScopeSelector result = null;
 		
-		if (this._scope != null)
+		while (currentMenu != null)
 		{
-			result = new ScopeSelector(this._scope);
-		}
-		else
-		{
-			MenuElement parent = this._parent;
+			String scope = currentMenu.getScope();
 			
-			while (parent != null)
+			if (scope != null && scope.length() > 0)
 			{
-				if (parent._scope != null)
-				{
-					result = new ScopeSelector(parent._scope);
-					break;
-				}
-				else
-				{
-					parent = parent._parent;
-				}
+				result = new ScopeSelector(scope);
+				break;
+			}
+			else
+			{
+				currentMenu = currentMenu.getParent();
 			}
 		}
 		
@@ -255,7 +251,9 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public boolean isSeparator()
 	{
-		return this._displayName != null && this._displayName.startsWith(SEPARATOR_TEXT);
+		String displayName = this.getDisplayName();
+		
+		return displayName != null && displayName.startsWith(SEPARATOR_TEXT);
 	}
 	
 	/**
@@ -263,12 +261,9 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public void removeChildren()
 	{
-		if (this.isHierarchicalMenu())
+		for (MenuElement child : this.getChildren())
 		{
-			for (MenuElement child : this.getChildren())
-			{
-				this.removeMenu(child);
-			}
+			this.removeMenu(child);
 		}
 	}
 	
@@ -302,9 +297,9 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
-		printer.printWithIndent("menu \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("menu \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
 		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
 		

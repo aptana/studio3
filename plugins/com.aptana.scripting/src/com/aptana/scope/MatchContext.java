@@ -79,6 +79,6 @@ public class MatchContext
 	 */
 	public String toString()
 	{
-		return this.getCurrentStep().toString();
+		return this.getCurrentStep();
 	}
 }

@@ -111,7 +111,10 @@ public class ScriptingEngine
 		{
 			LocalContextProvider provider = container.getProvider();
 
-			provider.setLoadPaths(loadPaths);
+			if (provider != null)
+			{
+				provider.setLoadPaths(loadPaths);
+			}
 		}
 
 		// TODO: $0 should work, but until then, we'll use this hack so scripts

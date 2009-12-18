@@ -2,7 +2,7 @@ package com.aptana.scripting.model;
 
 public abstract class TriggerableElement extends AbstractBundleElement
 {
-	protected String _trigger;
+	private String _trigger;
 
 	/**
 	 * AbstractTriggerNode

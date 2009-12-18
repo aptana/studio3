@@ -15,7 +15,10 @@ public class Messages extends NLS
 	public static String BundleManager_Unloaded_Null_Script;
 
 	public static String BundleManager_UNREADABLE_SCRIPT;
-	public static String SnippetElement_0;
+
+	public static String BundleMonitor_Error_Processing_Resource_Change;
+
+	public static String CommandElement_Error_Processing_Command_Block;
 	
 	static
 	{

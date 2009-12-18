@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.scripting.Activator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
@@ -81,6 +82,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
 			FileWatcher.removeWatch(this._watchId);
+			
+			this._registered = false;
 		}
 	}
 
@@ -240,7 +243,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		catch (CoreException e)
 		{
-			// log an error in the error log
+			Activator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
 		}
 	}
 
@@ -252,11 +255,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 
-		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
-		{
-			this.processFile(delta);
-		}
-		else if (FILE_PATTERN.matcher(fullProjectPath).matches())
+		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches() || FILE_PATTERN.matcher(fullProjectPath).matches())
 		{
 			this.processFile(delta);
 		}

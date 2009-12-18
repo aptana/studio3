@@ -45,14 +45,14 @@ public class AndSelector implements ISelectorNode
 	{
 		boolean result = false;
 		
-		context.pushCurrentStep();
-		
-		if (this._left != null && this._right != null)
+		if (context != null && this._left != null && this._right != null)
 		{
+			context.pushCurrentStep();
+			
 			result = this._right.matches(context) && this._left.matches(context);
+			
+			context.popCurrentStep(!result);
 		}
-		
-		context.popCurrentStep(!result);
 		
 		return result;
 	}
@@ -64,6 +64,9 @@ public class AndSelector implements ISelectorNode
 	@Override
 	public String toString()
 	{
-		return this._left.toString() + " " + this._right.toString(); //$NON-NLS-1$
+		String left = (this._left == null) ? "null" : this._left.toString(); //$NON-NLS-1$
+		String right = (this._right == null) ? "null" : this._right.toString(); //$NON-NLS-1$
+		
+		return left + " " + right; //$NON-NLS-1$
 	}
 }

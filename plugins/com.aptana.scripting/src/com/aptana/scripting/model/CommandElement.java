@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.jruby.RubyProc;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends TriggerableElement
@@ -57,13 +59,25 @@ public class CommandElement extends TriggerableElement
 			else if (this.isBlockCommand())
 			{
 				Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-				ThreadContext threadContext = runtime.getCurrentContext(); //ThreadContext.newContext(runtime);
+				ThreadContext threadContext = runtime.getCurrentContext();
 				
-				IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[0]);
-				
-				if (result != null)
+				try
 				{
-					resultText = result.asString().asJavaString();
+					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[0]);
+					
+					if (result != null)
+					{
+						resultText = result.asString().asJavaString();
+					}
+				}
+				catch (Exception e)
+				{
+					String message = MessageFormat.format(
+						Messages.CommandElement_Error_Processing_Command_Block,
+						new Object[] { this.getDisplayName(), this.getPath() }
+					);
+					
+					ScriptLogger.logError(message);
 				}
 			}
 		}
@@ -126,7 +140,12 @@ public class CommandElement extends TriggerableElement
 		}
 		catch (ParseException e)
 		{
-			// log?
+			String message = MessageFormat.format(
+				"Unable to convert {0} to an Eclipse key sequence in {0}: {1}",
+				new Object[] { this.getDisplayName(), this.getPath() }
+			);
+			
+			ScriptLogger.logError(message);
 		}
 		
 		return result;
@@ -186,7 +205,9 @@ public class CommandElement extends TriggerableElement
 			builder.command(commands);
 			
 			// setup working directory
-			if (this._path != null && this._path.length() > 0)
+			String path = this.getPath();
+			
+			if (path != null && path.length() > 0)
 			{
 				builder.directory(new File(this.getPath()).getParentFile());
 			}
@@ -312,10 +333,10 @@ public class CommandElement extends TriggerableElement
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
-		printer.printWithIndent("command \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
-		printer.printWithIndent("scope: ").println(this._scope); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
 		if (this._invoke != null)
 		{
 			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
@@ -326,7 +347,7 @@ public class CommandElement extends TriggerableElement
 		}
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
-		printer.printWithIndent("trigger: ").println(this._trigger); //$NON-NLS-1$
+		printer.printWithIndent("trigger: ").println(this.getTrigger()); //$NON-NLS-1$
 		
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}

@@ -5,9 +5,9 @@ import com.aptana.util.StringUtil;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
-	protected BundleElement _owningBundle;
-	protected String _scope;
-	protected ScopeSelector _scopeSelector;
+	private BundleElement _owningBundle;
+	private String _scope;
+	private ScopeSelector _scopeSelector;
 
 	/**
 	 * AbstractBundleElement
