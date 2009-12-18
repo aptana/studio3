@@ -1,5 +1,8 @@
 package com.aptana.scripting.ui;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
@@ -55,24 +58,36 @@ public class EarlyStartup implements IStartup
 		// create our scripting log listener
 		this._logListener = new ScriptLogListener()
 		{
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			
+			private String getDateTimeStamp()
+			{
+				return format.format(new Date());
+			}
+			
+			private String formatMessage(String message)
+			{
+				return "[" + this.getDateTimeStamp() + "] " + message;
+			}
+			
 			public void logError(String error)
 			{
-				_errorConsoleStream.println(Messages.EarlyStartup_ERROR_PREFIX + error);
+				_errorConsoleStream.println(this.formatMessage(error));
 			}
 
 			public void logInfo(String info)
 			{
-				_infoConsoleStream.println(Messages.EarlyStartup_INFO_PREFIX + info);
+				_infoConsoleStream.println(this.formatMessage(info));
 			}
 
 			public void logWarning(String warning)
 			{
-				_warningConsoleStream.println(Messages.EarlyStartup_WARNING_PREFIX + warning);
+				_warningConsoleStream.println(this.formatMessage(warning));
 			}
 
 			public void trace(String message)
 			{
-				_traceConsoleStream.println(Messages.EarlyStartup_TRACE_PREFIX + message);
+				_traceConsoleStream.println(this.formatMessage(message));
 			}
 		};
 		
