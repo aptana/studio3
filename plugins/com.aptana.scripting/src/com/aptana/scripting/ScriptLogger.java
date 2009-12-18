@@ -13,42 +13,41 @@ public class ScriptLogger
 	/**
 	 * logError
 	 * 
-	 * @param msg
-	 * @param e
+	 * @param message
 	 */
-	public static void logError(String msg)
+	public static void logError(String message)
 	{
-		getInstance().fireLogErrorEvent(msg);
+		getInstance().fireLogErrorEvent(message);
 	}
 
 	/**
 	 * logInfo
 	 * 
-	 * @param string
+	 * @param message
 	 */
-	public static void logInfo(String msg)
+	public static void logInfo(String message)
 	{
-		getInstance().fireLogInfoEvent(msg);
+		getInstance().fireLogInfoEvent(message);
 	}
 
 	/**
 	 * logWarning
 	 * 
-	 * @param msg
+	 * @param message
 	 */
-	public static void logWarning(String msg)
+	public static void logWarning(String message)
 	{
-		getInstance().fireLogWarningEvent(msg);
+		getInstance().fireLogWarningEvent(message);
 	}
 
 	/**
 	 * trace
 	 * 
-	 * @param string
+	 * @param message
 	 */
-	public static void trace(String msg)
+	public static void trace(String message)
 	{
-		getInstance().fireTraceEvent(msg);
+		getInstance().fireTraceEvent(message);
 	}
 	
 	/**
