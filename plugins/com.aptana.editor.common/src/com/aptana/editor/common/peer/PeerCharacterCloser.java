@@ -3,15 +3,18 @@ package com.aptana.editor.common.peer;
 import java.util.Stack;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension;
+import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.IPositionUpdater;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
@@ -91,8 +94,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			// Check if the next character in source is the closing character (and don't close if it is)!
 			if (offset < document.getLength())
 			{
-				String restOfDoc = document.get(offset, document.getLength() - offset).trim();
-				if (restOfDoc.length() > 0 && restOfDoc.charAt(0) == closingCharacter)
+				if (document.getChar(offset) == closingCharacter)
 				{
 					return;
 				}
@@ -164,8 +166,28 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
 	{
 		final char closingCharacter = getPeerCharacter(event.character);
+		// This doesn't matter if the user is not typing an "end" character.
+		if (closingCharacter != event.character)
+			return false;
 		char c = event.character;
-		String previous = document.get(0, offset);
+		int beginning = 0;
+		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
+		// partition if we can
+		if (document instanceof IDocumentExtension3)
+		{
+			try
+			{
+				IDocumentExtension3 ext = (IDocumentExtension3) document;
+				ITypedRegion region = ext.getPartition(IDocumentExtension3.DEFAULT_PARTITIONING, offset, false);
+				beginning = region.getOffset();
+			}
+			catch (BadPartitioningException e)
+			{
+				// ignore
+			}
+		}
+		// Now check leading source and see if we're an unclosed pair.
+		String previous = document.get(beginning, offset - beginning);
 		boolean open = false;
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
