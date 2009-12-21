@@ -113,7 +113,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 
 		validate();
 
-		GitRepository.addListener(this); // FIXME How do I unregister? No dispose method!
+		GitRepository.addListener(this);
 		return container;
 	}
 
@@ -533,6 +533,9 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 
 	private void refreshTables()
 	{
+		if (stagedTable == null || stagedTable.isDisposed() || unstagedTable == null || unstagedTable.isDisposed())
+			return;
+		
 		if (refreshTablesJob != null)
 			refreshTablesJob.cancel();
 
@@ -542,6 +545,8 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
+				if (stagedTable == null || stagedTable.isDisposed() || unstagedTable == null || unstagedTable.isDisposed())
+					return Status.OK_STATUS;
 				stagedTable.setRedraw(false);
 				unstagedTable.setRedraw(false);
 				stagedTable.removeAll();

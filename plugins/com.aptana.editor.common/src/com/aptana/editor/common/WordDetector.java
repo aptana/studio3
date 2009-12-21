@@ -38,6 +38,10 @@ package com.aptana.editor.common;
 import org.eclipse.jface.text.rules.IWordDetector;
 
 /**
+ * Uses the Java identifier comparison built in to Character class. This typically means words start with letters,
+ * underscore or currency symbols (like $). They can contain teh same characters plus digits. An important character
+ * that isn't allowed using this detector is the '-' hyphen.
+ * 
  * @author Max Stepanov
  */
 public class WordDetector implements IWordDetector

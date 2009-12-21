@@ -202,7 +202,7 @@
 		</antcall>
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
-			<param name="test.classname" value="com.aptana.scope.AllTests" />
+			<param name="test.classname" value="com.aptana.scripting.tests.AllTests" />
 		</antcall>
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.common.tests" />
