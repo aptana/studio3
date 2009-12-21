@@ -18,7 +18,6 @@ public class BundleElement extends AbstractElement
 	private File _bundleDirectory;
 	private BundleScope _bundleScope;
 	private List<MenuElement> _menus;
-	private List<SnippetElement> _snippets;
 	private List<CommandElement> _commands;
 
 	/**
@@ -94,30 +93,6 @@ public class BundleElement extends AbstractElement
 			
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(menu);
-		}
-	}
-
-	/**
-	 * addSnippet
-	 * 
-	 * @param snippet
-	 */
-	public void addSnippet(SnippetElement snippet)
-	{
-		if (snippet != null)
-		{
-			if (this._snippets == null)
-			{
-				this._snippets = new ArrayList<SnippetElement>();
-			}
-
-			// NOTE: Should we prevent the same element from being added twice?
-			this._snippets.add(snippet);
-			
-			snippet.setOwningBundle(this);
-			
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(snippet);
 		}
 	}
 	
@@ -301,23 +276,6 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getSnippets
-	 * 
-	 * @return
-	 */
-	public SnippetElement[] getSnippets()
-	{
-		SnippetElement[] result = BundleManager.NO_SNIPPETS;
-
-		if (this._snippets != null && this._snippets.size() > 0)
-		{
-			result = this._snippets.toArray(new SnippetElement[this._snippets.size()]);
-		}
-
-		return result;
-	}
-
-	/**
 	 * hasCommands
 	 * 
 	 * @return
@@ -354,23 +312,13 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
-	 * hasSnippets
-	 * 
-	 * @return
-	 */
-	public boolean hasSnippets()
-	{
-		return this._snippets != null && this._snippets.size() > 0;
-	}
-	
-	/**
 	 * isEmpty
 	 * 
 	 * @return
 	 */
 	public boolean isEmpty()
 	{
-		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false && this.hasSnippets() == false;
+		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false;
 	}
 	
 	/**
@@ -418,10 +366,6 @@ public class BundleElement extends AbstractElement
 		{
 			this.removeMenu((MenuElement) element);
 		}
-		else if (element instanceof SnippetElement)
-		{
-			this.removeSnippet((SnippetElement) element);
-		}
 	}
 	
 	/**
@@ -439,22 +383,6 @@ public class BundleElement extends AbstractElement
 			
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
-		}
-	}
-	
-	/**
-	 * removeSnippet
-	 * 
-	 * @param snippet
-	 */
-	public void removeSnippet(SnippetElement snippet)
-	{
-		if (this._snippets != null && this._snippets.remove(snippet))
-		{
-			AbstractElement.unregisterElement(snippet);
-			
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(snippet);
 		}
 	}
 	
@@ -551,15 +479,6 @@ public class BundleElement extends AbstractElement
 			for (MenuElement menu : this._menus)
 			{
 				menu.toSource(printer);
-			}
-		}
-		
-		// output snippets
-		if (this._snippets != null)
-		{
-			for (SnippetElement snippet : this._snippets)
-			{
-				snippet.toSource(printer);
 			}
 		}
 		

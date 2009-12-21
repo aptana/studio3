@@ -1,9 +1,7 @@
 package com.aptana.scripting.model;
 
-public class SnippetElement extends TriggerableElement
+public class SnippetElement extends CommandElement
 {
-	private String _expansion;
-
 	/**
 	 * Snippet
 	 * 
@@ -12,6 +10,17 @@ public class SnippetElement extends TriggerableElement
 	public SnippetElement(String path)
 	{
 		super(path);
+		
+		this.setInputType(InputType.NONE);
+		this.setOutputType(OutputType.INSERT_AS_SNIPPET);
+	}
+
+	/**
+	 * execute
+	 */
+	public CommandResult execute(CommandContext context)
+	{
+		return new CommandResult(this.getExpansion());
 	}
 
 	/**
@@ -21,7 +30,7 @@ public class SnippetElement extends TriggerableElement
 	 */
 	public String getExpansion()
 	{
-		return this._expansion;
+		return this.getInvoke();
 	}
 
 	/**
@@ -31,7 +40,7 @@ public class SnippetElement extends TriggerableElement
 	 */
 	public void setExpansion(String expansion)
 	{
-		this._expansion = expansion;
+		this.setInvoke(expansion);
 	}
 
 	/**
