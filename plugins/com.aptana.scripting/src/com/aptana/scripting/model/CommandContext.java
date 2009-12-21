@@ -8,15 +8,6 @@ public class CommandContext
 	private String _input;
 	private InputStream _inputStream;
 	private Map<String,String> _environment;
-
-	/**
-	 * CommandContext
-	 * 
-	 * @deprecated
-	 */
-	public CommandContext()
-	{
-	}
 	
 	/**
 	 * CommandContext
@@ -50,6 +41,12 @@ public class CommandContext
 		this(stream, null);
 	}
 	
+	/**
+	 * CommandContext
+	 * 
+	 * @param stream
+	 * @param environment
+	 */
 	public CommandContext(InputStream stream, Map<String,String> environment)
 	{
 		this._inputStream = stream;

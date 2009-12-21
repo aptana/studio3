@@ -35,7 +35,7 @@ public class EarlyStartup implements IStartup
 		}
 		catch (JNotifyException e)
 		{
-			// log error
+			Activator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 		}
 	}
 }

@@ -45,19 +45,22 @@ public class OrSelector implements ISelectorNode
 	{
 		boolean result = false;
 		
-		context.pushCurrentStep();
-		
-		if (this._right != null)
+		if (context != null)
 		{
-			result = this._right.matches(context);
+			context.pushCurrentStep();
 			
-			if (result == false && this._left != null)
+			if (this._right != null)
 			{
-				result = this._left.matches(context);
+				result = this._right.matches(context);
+				
+				if (result == false && this._left != null)
+				{
+					result = this._left.matches(context);
+				}
 			}
+			
+			context.popCurrentStep(!result);
 		}
-		
-		context.popCurrentStep(!result);
 		
 		return result;
 	}
@@ -69,6 +72,9 @@ public class OrSelector implements ISelectorNode
 	@Override
 	public String toString()
 	{
-		return this._left.toString() + ", " + this._right.toString(); //$NON-NLS-1$
+		String left = (this._left == null) ? "null" : this._left.toString(); //$NON-NLS-1$
+		String right = (this._right == null) ? "null" : this._right.toString(); //$NON-NLS-1$
+		
+		return left + ", " + right; //$NON-NLS-1$
 	}
 }

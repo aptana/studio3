@@ -30,17 +30,20 @@ public class BundleElement extends AbstractElement
 	{
 		super(path);
 		
-		// calculate bundle's root directory
-		File pathFile = new File(path);
-		File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
-		String parentName = parentDirectory.getName();
-		
-		if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+		if (path != null)
 		{
-			parentDirectory = parentDirectory.getParentFile();
+			// calculate bundle's root directory
+			File pathFile = new File(path);
+			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
+			String parentName = parentDirectory.getName();
+			
+			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+			{
+				parentDirectory = parentDirectory.getParentFile();
+			}
+			
+			this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		}
-		
-		this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		
 		// calculate the bundle scope
 		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
@@ -60,6 +63,7 @@ public class BundleElement extends AbstractElement
 				this._commands = new ArrayList<CommandElement>();
 			}
 
+			// NOTE: Should we prevent the same element from being added twice?
 			this._commands.add(command);
 
 			command.setOwningBundle(this);
@@ -83,6 +87,7 @@ public class BundleElement extends AbstractElement
 				this._menus = new ArrayList<MenuElement>();
 			}
 			
+			// NOTE: Should we prevent the same element from being added twice?
 			this._menus.add(menu);
 			
 			menu.setOwningBundle(this);
@@ -106,6 +111,7 @@ public class BundleElement extends AbstractElement
 				this._snippets = new ArrayList<SnippetElement>();
 			}
 
+			// NOTE: Should we prevent the same element from being added twice?
 			this._snippets.add(snippet);
 			
 			snippet.setOwningBundle(this);
@@ -113,78 +119,6 @@ public class BundleElement extends AbstractElement
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(snippet);
 		}
-	}
-
-	/**
-	 * findCommandsFromPath
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public CommandElement[] findCommandsFromPath(String path)
-	{
-		List<CommandElement> result = new ArrayList<CommandElement>();
-		
-		if (path != null && path.length() > 0 && this._commands != null)
-		{
-			for (CommandElement command : this._commands)
-			{
-				if (path.equals(command.getPath()))
-				{
-					result.add(command);
-				}
-			}
-		}
-		
-		return result.toArray(new CommandElement[result.size()]);
-	}
-	
-	/**
-	 * findMenusFromPath
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public MenuElement[] findMenusFromPath(String path)
-	{
-		List<MenuElement> result = new ArrayList<MenuElement>();
-		
-		if (path != null && path.length() > 0 && this._menus != null)
-		{
-			for (MenuElement menu : this._menus)
-			{
-				if (path.equals(menu.getPath()))
-				{
-					result.add(menu);
-				}
-			}
-		}
-		
-		return result.toArray(new MenuElement[result.size()]);
-	}
-	
-	/**
-	 * findSnippetsFromPath
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public SnippetElement[] findSnippetsFromPath(String path)
-	{
-		List<SnippetElement> result = new ArrayList<SnippetElement>();
-		
-		if (path != null && path.length() > 0 && this._snippets != null)
-		{
-			for (SnippetElement snippet : this._snippets)
-			{
-				if (path.equals(snippet.getPath()))
-				{
-					result.add(snippet);
-				}
-			}
-		}
-		
-		return result.toArray(new SnippetElement[result.size()]);
 	}
 	
 	/**
@@ -297,17 +231,22 @@ public class BundleElement extends AbstractElement
 	 */
 	public String getDisplayName()
 	{
-		String result = this._displayName;
+		String result = super.getDisplayName();
 		
 		if (result == null || result.length() == 0)
 		{
-			File path = new File(this._path);
+			String path = this.getPath();
 			
-			result = path.getName();
-			
-			if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
+			if (path != null && path.length() > 0)
 			{
-				result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
+				File file = new File(path);
+				
+				result = file.getName();
+				
+				if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
+				{
+					result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
+				}
 			}
 		}
 		
@@ -441,42 +380,11 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean isReference()
 	{
-		return this._displayName != null && this._displayName.length() > 0;
-	}
-	
-	/**
-	 * moveTo
-	 * 
-	 * @param path
-	 */
-	void moveTo(String path)
-	{
-		int oldPathLength = this._path.length();
-
-		// set new path
-		this._path = path;
-
-		// update command paths
-		if (this._commands != null)
-		{
-			for (CommandElement command : this._commands)
-			{
-				String newCommandPath = path + command.getPath().substring(oldPathLength);
-
-				command.setPath(newCommandPath);
-			}
-		}
-
-		// update snippet paths
-		if (this._snippets != null)
-		{
-			for (SnippetElement snippet : this._snippets)
-			{
-				String newSnippetPath = path + snippet.getPath().substring(oldPathLength);
-
-				snippet.setPath(newSnippetPath);
-			}
-		}
+		// NOTE: we need to check the actual display name field and not the
+		// calculated display name we generate in this class
+		String displayName = super.getDisplayName();
+		
+		return displayName != null && displayName.length() > 0;
 	}
 
 	/**
@@ -618,12 +526,11 @@ public class BundleElement extends AbstractElement
 	public void toSource(SourcePrinter printer)
 	{
 		// open bundle
-		printer.printWithIndent("bundle \"").print(this._displayName).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.printWithIndent("bundle \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// show body
 		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
-		printer.printWithIndent("path: ").println(this._path); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(this._displayName); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
 		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
 		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$

@@ -5,13 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.util.StringUtil;
+
 public abstract class AbstractElement
 {
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
 	
-	protected String _path;
-	protected String _displayName;
+	private String _path;
+	private String _displayName;
 	
 	/**
 	 * static constructor
@@ -143,7 +145,14 @@ public abstract class AbstractElement
 	 */
 	void setPath(String path)
 	{
-		this._path = path;
+		if (StringUtil.areEqual(this._path, path) == false)
+		{
+			unregisterElement(this);
+			
+			this._path = path;
+			
+			registerElement(this);
+		}
 	}
 
 	/**

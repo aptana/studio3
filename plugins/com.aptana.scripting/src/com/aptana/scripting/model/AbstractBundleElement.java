@@ -1,12 +1,13 @@
 package com.aptana.scripting.model;
 
 import com.aptana.scope.ScopeSelector;
+import com.aptana.util.StringUtil;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
-	protected BundleElement _owningBundle;
-	protected String _scope;
-	protected ScopeSelector _scopeSelector;
+	private BundleElement _owningBundle;
+	private String _scope;
+	private ScopeSelector _scopeSelector;
 
 	/**
 	 * AbstractBundleElement
@@ -45,7 +46,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public ScopeSelector getScopeSelector()
 	{
-		if (this._scopeSelector == null)
+		if (this._scopeSelector == null && this._scope != null && this._scope.length() > 0)
 		{
 			this._scopeSelector = new ScopeSelector(this._scope);
 		}
@@ -61,7 +62,15 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String scope)
 	{
-		return this.getScopeSelector().matches(scope);
+		ScopeSelector selector = this.getScopeSelector();
+		boolean result = false;
+		
+		if (selector != null)
+		{
+			result = selector.matches(scope);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -72,7 +81,15 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String[] scopes)
 	{
-		return this.getScopeSelector().matches(scopes);
+		ScopeSelector selector = this.getScopeSelector();
+		boolean result = false;
+		
+		if (selector != null)
+		{
+			result = this.getScopeSelector().matches(scopes);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -92,8 +109,10 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public void setScope(String scope)
 	{
-		// TODO: only reset scope selector is scope actually changes
-		this._scope = scope;
-		this._scopeSelector = null;
+		if (StringUtil.areEqual(this._scope, scope) == false)
+		{
+			this._scope = scope;
+			this._scopeSelector = null;
+		}
 	}
 }
