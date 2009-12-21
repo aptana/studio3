@@ -8,15 +8,13 @@ import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 
-public class ExtendedWordRule extends WordRule
+public abstract class ExtendedWordRule extends WordRule
 {
 
 	/** Buffer used for pattern detection. */
 	private StringBuffer fBuffer = new StringBuffer();
 	/**
 	 * Tells whether this rule is case sensitive.
-	 * 
-	 * @since 3.3
 	 */
 	private boolean fIgnoreCase = false;
 
@@ -94,10 +92,15 @@ public class ExtendedWordRule extends WordRule
 		return Token.UNDEFINED;
 	}
 
-	protected boolean wordOK(String word, ICharacterScanner scanner)
-	{
-		return true;
-	}
+	/**
+	 * This method is called when we think we've detected a full word. This allows us to get the word in whole plus the
+	 * context of the scanner to determine if the word should be accepted.
+	 * 
+	 * @param word
+	 * @param scanner
+	 * @return
+	 */
+	protected abstract boolean wordOK(String word, ICharacterScanner scanner);
 
 	/**
 	 * Returns the characters in the buffer to the scanner.
