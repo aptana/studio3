@@ -7,6 +7,7 @@ import com.aptana.editor.common.RegexpRuleTest;
 import com.aptana.editor.common.SequenceCharacterScannerTest;
 import com.aptana.editor.common.SingleCharacterRuleTest;
 import com.aptana.editor.common.SingleTagRuleTest;
+import com.aptana.editor.common.TextUtilsTest;
 import com.aptana.editor.common.WhitespaceDetectorTest;
 import com.aptana.editor.common.WordDetectorTest;
 
@@ -23,6 +24,7 @@ public class AllTests
 		suite.addTestSuite(WordDetectorTest.class);
 		suite.addTestSuite(WhitespaceDetectorTest.class);
 		suite.addTestSuite(SingleTagRuleTest.class);
+		suite.addTestSuite(TextUtilsTest.class);
 		// $JUnit-END$
 		return suite;
 	}
