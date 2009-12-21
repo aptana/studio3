@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.common.RegexpRuleTest;
 import com.aptana.editor.common.SequenceCharacterScannerTest;
+import com.aptana.editor.common.SingleCharacterRuleTest;
 
 public class AllTests
 {
@@ -15,6 +16,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(SequenceCharacterScannerTest.class);
 		suite.addTestSuite(RegexpRuleTest.class);
+		suite.addTestSuite(SingleCharacterRuleTest.class);
 		// $JUnit-END$
 		return suite;
 	}
