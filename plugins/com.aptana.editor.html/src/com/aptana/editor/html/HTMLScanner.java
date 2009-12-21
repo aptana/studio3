@@ -34,19 +34,62 @@
  */
 package com.aptana.editor.html;
 
+import java.util.regex.Pattern;
+
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.ExtendedWordRule;
+import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
+import com.aptana.editor.common.WordDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
 
-public class HTMLScanner extends RuleBasedScanner {
+public class HTMLScanner extends RuleBasedScanner
+{
 
-	public HTMLScanner() {
-		IRule[] rules = new IRule[1];
+	private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+);"); //$NON-NLS-1$
+
+	public HTMLScanner()
+	{
+		IRule[] rules = new IRule[4];
 		rules[0] = new WhitespaceRule(new WhitespaceDetector());
+		rules[1] = new ExtendedWordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '&';
+			}
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetter(c) || Character.isDigit(c) || c == ';' || c == '#';
+			}
+		}, createToken("constant.character.entity.html"), true) //$NON-NLS-1$
+		{
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				return word.length() > 2 && word.endsWith(";") && HTML_ENTITY_PATTERN.matcher(word).find(); //$NON-NLS-1$
+			}
+		};
+		// non-entity ampersands should be marked as invalid
+		rules[2] = new SingleCharacterRule('&', createToken("invalid.illegal.bad-ampersand.html")); //$NON-NLS-1$
+		rules[3] = new WordRule(new WordDetector(), createToken("text")); //$NON-NLS-1$
 		setRules(rules);
-		setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
+		setDefaultReturnToken(createToken("text")); //$NON-NLS-1$
+	}
+
+	protected IToken createToken(String string)
+	{
+		return ThemeUtil.getToken(string);
 	}
 }

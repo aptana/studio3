@@ -17,11 +17,15 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,6 +67,10 @@ public class SingleProjectView extends CommonNavigator
 	private ViewerFilter activeProjectFilter;
 
 	private Integer watcher;
+
+	private IPreferenceChangeListener fThemeChangeListener;
+
+	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -128,28 +136,33 @@ public class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
-				new IPreferenceChangeListener()
-				{
+		listenToActiveProjectPrefChanges();
+	}
 
-					public void preferenceChange(PreferenceChangeEvent event)
-					{
-						if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
-							return;
-						IProject oldActiveProject = selectedProject;
-						Object obj = event.getNewValue();
-						if (obj == null)
-							return;
-						String newProjectName = (String) obj;
-						if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
-							return;
-						IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(
-								newProjectName);
-						selectedProject = newSelectedProject;
-						projectChanged(oldActiveProject, newSelectedProject);
-						refreshViewer();
-					}
-				});
+	private void listenToActiveProjectPrefChanges()
+	{
+		fActiveProjectPrefChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
+					return;
+				IProject oldActiveProject = selectedProject;
+				Object obj = event.getNewValue();
+				if (obj == null)
+					return;
+				String newProjectName = (String) obj;
+				if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
+					return;
+				IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
+				selectedProject = newSelectedProject;
+				projectChanged(oldActiveProject, newSelectedProject);
+				refreshViewer();
+			}
+		};
+		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				fActiveProjectPrefChangeListener);
 	}
 
 	protected Composite doCreatePartControl(Composite customComposite)
@@ -170,14 +183,43 @@ public class SingleProjectView extends CommonNavigator
 		viewer.setLayoutData(data2);
 		super.createPartControl(viewer);
 
-		// Hook up to themes
 		hookToThemes();
 	}
 
+	/**
+	 * Hooks up to the active theme.
+	 */
 	private void hookToThemes()
 	{
 		getCommonViewer().getTree().setBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+		overrideSelectionColor();
+		overrideForegroundColor();
+		listenForThemeChanges();
+	}
+
+	private void listenForThemeChanges()
+	{
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+				{
+					getCommonViewer().refresh();
+					getCommonViewer().getTree().setBackground(
+							CommonEditorPlugin.getDefault().getColorManager().getColor(
+									ThemeUtil.getActiveTheme().getBackground()));
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	private void overrideSelectionColor()
+	{
 		final Tree tree = getCommonViewer().getTree();
 		// Override selection color to match what is set in theme
 		tree.addListener(SWT.EraseItem, new Listener()
@@ -202,23 +244,6 @@ public class SingleProjectView extends CommonNavigator
 				}
 			}
 		});
-		// Listen to theme changes
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(
-				new IPreferenceChangeListener()
-				{
-
-					@Override
-					public void preferenceChange(PreferenceChangeEvent event)
-					{
-						if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
-						{
-							getCommonViewer().refresh();
-							getCommonViewer().getTree().setBackground(
-									CommonEditorPlugin.getDefault().getColorManager().getColor(
-											ThemeUtil.getActiveTheme().getBackground()));
-						}
-					}
-				});
 	}
 
 	private IProject[] createProjectCombo(Composite parent)
@@ -250,6 +275,17 @@ public class SingleProjectView extends CommonNavigator
 	{
 		getCommonViewer().removeFilter(activeProjectFilter);
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
+		if (fActiveProjectPrefChangeListener != null)
+		{
+			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+					fActiveProjectPrefChangeListener);
+		}
 		super.dispose();
 	}
 
@@ -372,6 +408,30 @@ public class SingleProjectView extends CommonNavigator
 		getCommonViewer().refresh();
 	}
 
+	private void overrideForegroundColor()
+	{
+		ViewerColumn viewer = (ViewerColumn) getCommonViewer().getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
+		ColumnViewer colViewer = viewer.getViewer();
+		final CellLabelProvider provider = (CellLabelProvider) colViewer.getLabelProvider();
+		viewer.setLabelProvider(new CellLabelProvider()
+		{
+
+			@Override
+			public void update(ViewerCell cell)
+			{
+				provider.update(cell);
+				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+						ThemeUtil.getActiveTheme().getForeground()));
+			}
+		});
+	}
+
+	/**
+	 * Listens for Project addition/removal to change the active project to new project added, or off the deleted
+	 * project if it was active.
+	 * 
+	 * @author cwilliams
+	 */
 	private class ResourceListener implements IResourceChangeListener
 	{
 

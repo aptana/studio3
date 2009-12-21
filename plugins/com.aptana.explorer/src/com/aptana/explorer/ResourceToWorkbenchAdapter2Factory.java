@@ -15,7 +15,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter2;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.internal.ui.SingleProjectView;
 
 /**
@@ -76,7 +75,7 @@ public class ResourceToWorkbenchAdapter2Factory implements IAdapterFactory
 				@Override
 				public RGB getForeground(Object element)
 				{
-					return ThemeUtil.getActiveTheme().getForeground();
+					return null;
 				}
 
 				@Override
