@@ -6,6 +6,7 @@ import junit.framework.TestSuite;
 import com.aptana.editor.common.RegexpRuleTest;
 import com.aptana.editor.common.SequenceCharacterScannerTest;
 import com.aptana.editor.common.SingleCharacterRuleTest;
+import com.aptana.editor.common.WhitespaceDetectorTest;
 import com.aptana.editor.common.WordDetectorTest;
 
 public class AllTests
@@ -19,6 +20,7 @@ public class AllTests
 		suite.addTestSuite(RegexpRuleTest.class);
 		suite.addTestSuite(SingleCharacterRuleTest.class);
 		suite.addTestSuite(WordDetectorTest.class);
+		suite.addTestSuite(WhitespaceDetectorTest.class);
 		// $JUnit-END$
 		return suite;
 	}
