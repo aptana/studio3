@@ -1,6 +1,7 @@
 package com.aptana.editor.common;
 
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.StatusLineLayoutData;
 import org.eclipse.jface.action.ToolBarManager;
@@ -19,6 +20,9 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorExtension;
+import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 import com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor;
 
@@ -32,6 +36,8 @@ public class CommonTextEditorActionContributor extends BasicTextEditorActionCont
 
 	private CommandsMenuContributionItem commandsMenuContributionItem;
 
+	private StatusLineContributionItem inputPositionStatsContributionItem;
+
 	public CommonTextEditorActionContributor() {
 	}
 
@@ -40,6 +46,18 @@ public class CommonTextEditorActionContributor extends BasicTextEditorActionCont
 		commandsMenuContributionItem = new CommandsMenuContributionItem();
 		statusLineManager.add(commandsMenuContributionItem);
 		super.contributeToStatusLine(statusLineManager);
+
+		inputPositionStatsContributionItem =
+			new StatusLineContributionItem(ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION, true, 24);
+		IContributionItem[] contributionItems = statusLineManager.getItems();
+		for (int i = 0; i < contributionItems.length; i++) {
+			IContributionItem contributionItem = contributionItems[i];
+			String id = contributionItem.getId();
+			if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(id)) {
+				statusLineManager.remove(contributionItem);
+				statusLineManager.add(inputPositionStatsContributionItem);
+			}
+		}
 	}
 	
 	@Override
@@ -49,6 +67,11 @@ public class CommonTextEditorActionContributor extends BasicTextEditorActionCont
 			ITextEditor textEditor = (ITextEditor) part;
 			if (commandsMenuContributionItem != null) {
 				commandsMenuContributionItem.setTextEditor(textEditor);
+			}
+			if (inputPositionStatsContributionItem != null) {
+				inputPositionStatsContributionItem.setActionHandler(getAction(textEditor, ITextEditorActionConstants.GOTO_LINE));
+				ITextEditorExtension extension= (ITextEditorExtension) textEditor;
+				extension.setStatusField(inputPositionStatsContributionItem, ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
 			}
 		}
 	}
