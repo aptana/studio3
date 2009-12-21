@@ -145,7 +145,7 @@ public abstract class AbstractElement
 	 */
 	void setPath(String path)
 	{
-		if (StringUtil.areEqual(this._path, path) == false)
+		if (StringUtil.areNotEqual(this._path, path))
 		{
 			unregisterElement(this);
 			
