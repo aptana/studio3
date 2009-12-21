@@ -165,39 +165,6 @@ public class BundleEntry
 	{
 		return this._name;
 	}
-
-	/**
-	 * getSnippets
-	 * 
-	 * @return
-	 */
-	public SnippetElement[] getSnippets()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<SnippetElement> result = new ArrayList<SnippetElement>();
-		
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (SnippetElement snippet : bundle.getSnippets())
-				{
-					String name = snippet.getDisplayName();
-					
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(snippet);
-					}
-				}
-				
-				return true;
-			}
-			
-		});
-		
-		return result.toArray(new SnippetElement[result.size()]);
-	}
 	
 	/**
 	 * processBundles

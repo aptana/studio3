@@ -102,7 +102,7 @@ public abstract class StringUtil
 	 * @param s2
 	 * @return
 	 */
-	public static boolean areEqual(String s1, String s2)
+	public static boolean areNotEqual(String s1, String s2)
 	{
 		return (s1 == null) ? (s2 != null) : (s2 == null) ? (s1 != null) : s1.equals(s2);
 	}

@@ -17,7 +17,6 @@ import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.TriggerOnlyFilter;
 
 public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
@@ -63,18 +62,18 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 							if (!Character.isWhitespace(previousChar.charAt(0))) {
 								int caretOffset = textViewer.getTextWidget().getCaretOffset();
 								String contextTypeId = getContextType(document, caretOffset);
-								SnippetElement[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
+//								SnippetElement[] snippetsFromScope = BundleManager.getInstance().getSnippetsFromScope(contextTypeId);
 								boolean found = false;
-								if (snippetsFromScope.length > 0) {
-									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
-									for (SnippetElement snippetElement : snippetsFromScope) {
-										String trigger = snippetElement.getTrigger();
-										if (trigger != null && trigger.startsWith(prefix)) {
-											found = true;
-											break;
-										}
-									}
-								}
+//								if (snippetsFromScope.length > 0) {
+//									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
+//									for (SnippetElement snippetElement : snippetsFromScope) {
+//										String trigger = snippetElement.getTrigger();
+//										if (trigger != null && trigger.startsWith(prefix)) {
+//											found = true;
+//											break;
+//										}
+//									}
+//								}
 								if (!found) {
 									CommandElement[] commandsFromScope =
 										BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());

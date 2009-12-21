@@ -108,10 +108,11 @@ public class BundleLoadingTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithSnippet";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
-		SnippetElement[] snippets = entry.getSnippets();
+		CommandElement[] snippets = entry.getCommands();
 		
 		assertNotNull(snippets);
 		assertEquals(1, snippets.length);
+		assertTrue(snippets[0] instanceof SnippetElement);
 	}
 	
 	/**

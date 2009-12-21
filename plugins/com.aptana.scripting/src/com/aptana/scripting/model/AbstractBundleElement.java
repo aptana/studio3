@@ -5,9 +5,10 @@ import com.aptana.util.StringUtil;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
-	private BundleElement _owningBundle;
 	private String _scope;
 	private ScopeSelector _scopeSelector;
+	
+	protected BundleElement owningBundle;
 
 	/**
 	 * AbstractBundleElement
@@ -26,7 +27,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public BundleElement getOwningBundle()
 	{
-		return this._owningBundle;
+		return this.owningBundle;
 	}
 
 	/**
@@ -86,7 +87,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 		
 		if (selector != null)
 		{
-			result = this.getScopeSelector().matches(scopes);
+			result = selector.matches(scopes);
 		}
 		
 		return result;
@@ -99,7 +100,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	void setOwningBundle(BundleElement bundle)
 	{
-		this._owningBundle = bundle;
+		this.owningBundle = bundle;
 	}
 
 	/**
@@ -109,7 +110,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public void setScope(String scope)
 	{
-		if (StringUtil.areEqual(this._scope, scope) == false)
+		if (StringUtil.areNotEqual(this._scope, scope))
 		{
 			this._scope = scope;
 			this._scopeSelector = null;

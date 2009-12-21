@@ -501,27 +501,6 @@ public class BundleManager
 	}
 	
 	/**
-	 * getBundleCommands
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public SnippetElement[] getBundleSnippets(String name)
-	{
-		SnippetElement[] result = NO_SNIPPETS;
-		
-		if (this._entriesByName != null && this._entriesByName.containsKey(name))
-		{
-			// grab all bundles of the given name
-			BundleEntry entry = this._entriesByName.get(name);
-			
-			result = entry.getSnippets();
-		}
-		
-		return result;
-	}
-	
-	/**
 	 * getCommands
 	 * 
 	 * @return
@@ -703,68 +682,6 @@ public class BundleManager
 		return result;
 	}
 
-	/**
-	 * getSnippetsFromScope
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	public SnippetElement[] getSnippetsFromScope(String scope)
-	{
-		return this.getSnippetsFromScopes(new String[] { scope }, null);
-	}
-
-	/**
-	 * getSnippetsFromScope
-	 * 
-	 * @param scope
-	 * @param filter
-	 * @return
-	 */
-	public SnippetElement[] getSnippetsFromScope(String scope, IModelFilter filter)
-	{
-		return this.getSnippetsFromScopes(new String[] { scope }, filter);
-	}
-
-	/**
-	 * getSnippetsFromScopes
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public SnippetElement[] getSnippetsFromScopes(String[] scopes)
-	{
-		return this.getSnippetsFromScopes(scopes, null);
-	}
-
-	/**
-	 * getSnippetsFromScopes
-	 * 
-	 * @param scopes
-	 * @param filter
-	 * @return
-	 */
-	public SnippetElement[] getSnippetsFromScopes(String[] scopes, IModelFilter filter)
-	{
-		List<SnippetElement> result = new ArrayList<SnippetElement>();
-		
-		if (scopes != null && scopes.length > 0)
-		{
-			for (String name : this.getBundleNames())
-			{
-				for (SnippetElement snippet : this.getBundleSnippets(name))
-				{
-					if (snippet.matches(scopes) && ((filter != null) ? filter.include(snippet) : true))
-					{
-						result.add(snippet);
-					}
-				}
-			}
-		}
-		
-		return result.toArray(new SnippetElement[result.size()]);
-	}
-	
 	/**
 	 * getUserBundlePath
 	 * 
