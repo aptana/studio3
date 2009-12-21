@@ -64,7 +64,18 @@ public class HTMLScannerTest extends TestCase
 		assertToken(getToken("text"), 41, 8);
 		assertToken(getToken("text"), 49, 1);
 	}
+	
+	public void testEntityAndNormalWordWithNoSpaceBetween()
+	{
+		String src = "good&nbsp;good";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
 
+		assertToken(getToken("text"), 0, 4);
+		assertToken(getToken("constant.character.entity.html"), 4, 6);
+		assertToken(getToken("text"), 10, 4);
+	}
+	
 	private void assertToken(IToken token, int offset, int length)
 	{
 		assertToken(null, token, offset, length);
