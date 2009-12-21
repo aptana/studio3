@@ -980,8 +980,16 @@ public class BundleManager
 				if (element instanceof AbstractBundleElement)
 				{
 					AbstractBundleElement bundleElement = (AbstractBundleElement) element;
+					BundleElement bundle = bundleElement.getOwningBundle();
 					
-					bundleElement.getOwningBundle().removeElement(bundleElement);
+					if (bundle != null)
+					{
+						bundle.removeElement(bundleElement);
+					}
+					else
+					{
+						// TODO: this should not be happening
+					}
 				}
 			}
 			
