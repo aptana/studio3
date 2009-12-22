@@ -49,6 +49,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
+import com.aptana.editor.common.TagRule;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.css.CSSSourceConfiguration;

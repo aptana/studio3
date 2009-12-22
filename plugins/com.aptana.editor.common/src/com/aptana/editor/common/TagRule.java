@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.html;
+package com.aptana.editor.common;
 
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.ICharacterScanner;
@@ -43,7 +43,7 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-/* package */ class TagRule extends MultiLineRule {
+public class TagRule extends MultiLineRule {
 	
 	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
 	private static final IPredicateRule singleQuoteStringRule = new SingleLineRule("'", "'", singleQuoteStringTOKEN); //$NON-NLS-1$ //$NON-NLS-2$
