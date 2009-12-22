@@ -66,15 +66,15 @@ module RadRails
     end
     
     class << self
-      def define_snippet(path, &block)
+      def define_snippet(name, &block)
         log_info("loading snippet #{name}")
         
-        snippet = Snippet.new(path)
+        snippet = Snippet.new(name)
         block.call(snippet) if block_given?
         
         # add snippet to bundle
         bundle = BundleManager.bundle_from_path(snippet.path)
-        bundle.add_snippet(snippet) unless bundle.nil?
+        bundle.add_command(snippet) unless bundle.nil?
       end
     end
   end

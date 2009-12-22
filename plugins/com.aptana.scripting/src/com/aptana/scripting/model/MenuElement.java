@@ -161,7 +161,7 @@ public class MenuElement extends AbstractBundleElement
 		
 		while (currentMenu != null)
 		{
-			BundleElement bundle = currentMenu.getOwningBundle();
+			BundleElement bundle = currentMenu.owningBundle;
 			
 			if (bundle != null)
 			{

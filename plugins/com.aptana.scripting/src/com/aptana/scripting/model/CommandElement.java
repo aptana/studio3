@@ -19,8 +19,9 @@ import org.jruby.runtime.builtin.IRubyObject;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 
-public class CommandElement extends TriggerableElement
+public class CommandElement extends AbstractBundleElement
 {
+	private String _trigger;
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
@@ -162,6 +163,16 @@ public class CommandElement extends TriggerableElement
 	}
 	
 	/**
+	 * getTrigger
+	 * 
+	 * @return
+	 */
+	public String getTrigger()
+	{
+		return this._trigger;
+	}
+
+	/**
 	 * invokeStringCommand
 	 * 
 	 * @return
@@ -289,6 +300,16 @@ public class CommandElement extends TriggerableElement
 	}
 	
 	/**
+	 * setInputType
+	 * 
+	 * @param type
+	 */
+	public void setInputType(InputType type)
+	{
+		this._inputType = type;
+	}
+	
+	/**
 	 * setInvoke
 	 * 
 	 * @param invoke
@@ -326,6 +347,26 @@ public class CommandElement extends TriggerableElement
 	public void setOutputType(String output)
 	{
 		this._outputType = OutputType.get(output);
+	}
+	
+	/**
+	 * setOutputType
+	 * 
+	 * @param type
+	 */
+	public void setOutputType(OutputType type)
+	{
+		this._outputType = type;
+	}
+	
+	/**
+	 * setTrigger
+	 * 
+	 * @param trigger
+	 */
+	public void setTrigger(String trigger)
+	{
+		this._trigger = trigger;
 	}
 	
 	/**
