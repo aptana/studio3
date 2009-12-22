@@ -23,6 +23,30 @@
             </separator>
          </menu>
       </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
+         <menu
+               id="com.aptana.scripting.popup.menu"
+               label="%commandsMenu.label"
+               mnemonic="%commandsMenu.mnemonic">
+            <separator
+                  name="commands"
+                  visible="false">
+            </separator>
+            <separator
+                  name="additions"
+                  visible="true">
+            </separator>
+            <separator
+                  name="management"
+                  visible="true">
+            </separator>
+         </menu>
+         <separator
+               name="com.aptana.scripting.ui.separator"
+               visible="true">
+         </separator>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
