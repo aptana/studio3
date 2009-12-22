@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
 import org.eclipse.jface.text.IRegion;
@@ -123,6 +124,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 				// End because we're transitioning out of a partition on this character
 				isForward = false;
 			}
+			else if (isUnclosedPair(prevChar, doc, charOffset))
+			{
+				isForward = false;
+			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
 		final int searchStartPosition = isForward ? caretOffset : caretOffset - 2;
@@ -137,6 +142,36 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		if (adjustedEndOffset == adjustedOffset)
 			return null;
 		return new Region(Math.min(adjustedOffset, adjustedEndOffset), Math.abs(adjustedEndOffset - adjustedOffset));
+	}
+
+	private boolean isUnclosedPair(char c, IDocument document, int offset) throws BadLocationException
+	{
+		// TODO Refactor and combine this copy-pasted code from PeerCharacterCloser
+		int beginning = 0;
+		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
+		// partition if we can
+		if (document instanceof IDocumentExtension3)
+		{
+			try
+			{
+				IDocumentExtension3 ext = (IDocumentExtension3) document;
+				ITypedRegion region = ext.getPartition(IDocumentExtension3.DEFAULT_PARTITIONING, offset, false);
+				beginning = region.getOffset();
+			}
+			catch (BadPartitioningException e)
+			{
+				// ignore
+			}
+		}
+		// Now check leading source and see if we're an unclosed pair.
+		String previous = document.get(beginning, offset - beginning);
+		boolean open = false;
+		int index = -1;
+		while ((index = previous.indexOf(c, index + 1)) != -1)
+		{
+			open = !open;
+		}
+		return open;
 	}
 
 	/**

@@ -47,7 +47,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 
-	private PeerCharacterCloser(ITextViewer textViewer)
+	PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
 	}
