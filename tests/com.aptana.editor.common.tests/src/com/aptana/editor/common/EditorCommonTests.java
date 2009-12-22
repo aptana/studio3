@@ -17,6 +17,7 @@ public class EditorCommonTests
 		suite.addTestSuite(TextUtilsTest.class);
 		suite.addTestSuite(WhitespaceDetectorTest.class);
 		suite.addTestSuite(SingleTagRuleTest.class);
+		suite.addTestSuite(TagRuleTest.class);
 		//$JUnit-END$
 		return suite;
 	}

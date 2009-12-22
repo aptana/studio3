@@ -40,72 +40,85 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
-public class TagRule extends MultiLineRule {
-	
-	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
-	private static final IPredicateRule singleQuoteStringRule = new SingleLineRule("'", "'", singleQuoteStringTOKEN); //$NON-NLS-1$ //$NON-NLS-2$
-	private static final IPredicateRule singleQuoteStringEOLRule = new EndOfLineRule("'",  singleQuoteStringTOKEN); //$NON-NLS-1$
-	
-	private static final IToken doubleQuoteStringTOKEN = new Token("DQS"); //$NON-NLS-1$
-	private static final IPredicateRule doubleQuoteStringRule = new SingleLineRule("\"", "\"", doubleQuoteStringTOKEN); //$NON-NLS-1$ //$NON-NLS-2$
-	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN); //$NON-NLS-1$
+public class TagRule extends MultiLineRule
+{
 
-	public TagRule(IToken token) {
+	private static final IToken singleQuoteStringTOKEN = new Token("SQS"); //$NON-NLS-1$
+	private static final IPredicateRule singleQuoteStringRule = new MultiLineRule("'", "'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final IPredicateRule singleQuoteStringEOLRule = new EndOfLineRule("'", singleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
+
+	private static final IToken doubleQuoteStringTOKEN = new Token("DQS"); //$NON-NLS-1$
+	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule("\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
+
+	public TagRule(IToken token)
+	{
 		this("", token); //$NON-NLS-1$
 	}
 
-	public TagRule(String tag, IToken token) {
-        super("<"+tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
-        
-    }
+	public TagRule(String tag, IToken token)
+	{
+		super("<" + tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$        
+	}
 
 	@Override
-	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
+	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed)
+	{
 		boolean detected = super.sequenceDetected(scanner, sequence, eofAllowed);
-		if (!detected) {
+		if (!detected)
+		{
 			return detected;
 		}
-		if ((sequence.length == 1 && sequence[0] == '<') || (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/')){
+		if ((sequence.length == 1 && sequence[0] == '<')
+				|| (sequence.length == 2 && sequence[0] == '<' && sequence[1] == '/'))
+		{
 			int nextChar = scanner.read();
-			if (nextChar == ICharacterScanner.EOF) {
+			if (nextChar == ICharacterScanner.EOF)
+			{
 				return false;
 			}
 			scanner.unread();
 			return Character.isJavaIdentifierStart(nextChar);
-		} 
+		}
 		return detected;
 	}
-	
-	
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
-     */
-    protected boolean endSequenceDetected(ICharacterScanner scanner) {
-	    int c;
-        while ((c = scanner.read()) != ICharacterScanner.EOF) {
-        	if (c == '\'') {
-        		scanner.unread();
-        		IToken token = singleQuoteStringRule.evaluate(scanner);
-        		if (token.isUndefined()) {
-        			token = singleQuoteStringEOLRule.evaluate(scanner);
-        		}
-            } else if (c == '"') {
-            	scanner.unread();
-        		IToken token = doubleQuoteStringRule.evaluate(scanner);
-        		if (token.isUndefined()) {
-        			token = doubleQuoteStringEOLRule.evaluate(scanner);
-        		} 
-    		} else if (c == '>') {
-    			return true;
-    		}
-        }
-        
-        scanner.unread();
-        return false;
-    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.PatternRule#endSequenceDetected(org.eclipse.jface.text.rules.ICharacterScanner)
+	 */
+	protected boolean endSequenceDetected(ICharacterScanner scanner)
+	{
+		int c;
+		while ((c = scanner.read()) != ICharacterScanner.EOF)
+		{
+			if (c == '\'')
+			{
+				scanner.unread();
+				IToken token = singleQuoteStringRule.evaluate(scanner);
+				if (token.isUndefined())
+				{
+					token = singleQuoteStringEOLRule.evaluate(scanner);
+				}
+			}
+			else if (c == '"')
+			{
+				scanner.unread();
+				IToken token = doubleQuoteStringRule.evaluate(scanner);
+				if (token.isUndefined())
+				{
+					token = doubleQuoteStringEOLRule.evaluate(scanner);
+				}
+			}
+			else if (c == '>')
+			{
+				return true;
+			}
+		}
+
+		scanner.unread();
+		return false;
+	}
 }
