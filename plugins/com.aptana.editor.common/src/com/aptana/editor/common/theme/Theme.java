@@ -288,7 +288,7 @@ public class Theme
 		return string;
 	}
 
-	private void storeDefaults()
+	protected void storeDefaults()
 	{
 		// Only save to defaults if it has never been saved there. Basically take a snapshot of first version and
 		// use that as the "default"

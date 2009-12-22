@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
 import com.aptana.editor.common.peer.PeerTests;
+import com.aptana.editor.common.theme.ThemeTests;
 
 public class AllTests
 {
@@ -15,6 +16,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTest(EditorCommonTests.suite());
 		suite.addTest(PeerTests.suite());
+		suite.addTest(ThemeTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
