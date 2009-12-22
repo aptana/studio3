@@ -75,7 +75,7 @@ public class CommandElement extends AbstractBundleElement
 				{
 					String message = MessageFormat.format(
 						Messages.CommandElement_Error_Processing_Command_Block,
-						new Object[] { this.getDisplayName(), this.getPath() }
+						new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
 					);
 					
 					ScriptLogger.logError(message);

@@ -14,7 +14,9 @@ module RadRails
       @jobj.add_menu menu.java_object
     end
     
-    def command(name)
+    def command(name, &block)
+      RadRails::Command.define_command(name, &block) if block_given?
+    
       child_menu = Menu.new(name)
       add_menu(child_menu)
     end
