@@ -34,17 +34,13 @@
  */
 package com.aptana.editor.html;
 
-import java.util.regex.Pattern;
-
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.EntityRule;
 import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.WordDetector;
@@ -53,44 +49,11 @@ import com.aptana.editor.common.theme.ThemeUtil;
 public class HTMLScanner extends RuleBasedScanner
 {
 
-	private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("^&([a-zA-Z0-9]+|#[0-9]+|#x[0-9a-fA-F]+);\\z"); //$NON-NLS-1$
-
 	public HTMLScanner()
 	{
 		IRule[] rules = new IRule[4];
 		rules[0] = new WhitespaceRule(new WhitespaceDetector());
-		rules[1] = new SingleLineRule("&", ";", createToken("constant.character.entity.html")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		{
-			protected IToken doEvaluate(ICharacterScanner scanner, boolean resume)
-			{
-				int column = scanner.getColumn();
-				IToken token = super.doEvaluate(scanner, resume);
-				if (token.isUndefined())
-					return token;
-
-				// Make sure whole thing matches pattern
-				int read = scanner.getColumn() - column;
-				for (int i = 0; i < read; i++)
-				{
-					scanner.unread();
-				}
-				StringBuilder builder = new StringBuilder();
-				for (int i = 0; i < read; i++)
-				{
-					builder.append((char) scanner.read());
-				}
-				String word = builder.toString();
-				if (word.length() > 2 && HTML_ENTITY_PATTERN.matcher(word).find())
-				{
-					return token;
-				}
-				for (int i = 0; i < read; i++)
-				{
-					scanner.unread();
-				}
-				return Token.UNDEFINED;
-			};
-		};
+		rules[1] = new EntityRule(createToken("constant.character.entity.html")); //$NON-NLS-1$
 		// non-entity ampersands should be marked as invalid
 		rules[2] = new SingleCharacterRule('&', createToken("invalid.illegal.bad-ampersand.html")); //$NON-NLS-1$
 		rules[3] = new WordRule(new WordDetector(), createToken("text")); //$NON-NLS-1$
