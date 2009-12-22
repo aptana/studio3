@@ -8,6 +8,9 @@ module RadRails
       @jobj = com.aptana.scripting.model.MenuElement.new($fullpath)
       @jobj.command_name = name;
       @jobj.display_name = name;
+      
+      bundle = BundleManager.bundle_from_path(path)
+      bundle.apply_defaults(self) unless bundle.nil?
     end
     
     def add_menu(menu)
