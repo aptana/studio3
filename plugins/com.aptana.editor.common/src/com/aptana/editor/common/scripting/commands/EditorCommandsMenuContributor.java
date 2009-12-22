@@ -34,6 +34,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.model.SnippetElement;
 
 /**
  * This contributes the menus for editor scope to the Commands menu.
@@ -159,7 +160,11 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 				final CommandElement command = menuForScope.getCommand();
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 				menuItem.setText(menuForScope.getDisplayName());
-				menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.COMMAND));
+				if (command instanceof SnippetElement) {
+					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.SNIPPET));
+				} else {
+					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.COMMAND));
+				}
 				menuItem.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
