@@ -42,7 +42,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -51,6 +50,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.TagRule;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
@@ -61,35 +61,26 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	public final static String PREFIX = "__xml_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__xml" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String XML_COMMENT = "__xml_comment"; //$NON-NLS-1$
-	public final static String STRING_DOUBLE = "__xml_string_double"; //$NON-NLS-1$
-	public final static String STRING_SINGLE = "__xml_string_single"; //$NON-NLS-1$
-	public final static String CDATA = "__xml_cdata"; //$NON-NLS-1$
-	public final static String PRE_PROCESSOR = "__xml_pre_processor"; //$NON-NLS-1$
+	public final static String XML_COMMENT = PREFIX + "comment"; //$NON-NLS-1$
+	public final static String CDATA = PREFIX + "cdata"; //$NON-NLS-1$
+	public final static String PRE_PROCESSOR = PREFIX + "pre_processor"; //$NON-NLS-1$
+	public final static String XML_TAG = PREFIX + "tag"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] {
-			DEFAULT,
-			XML_COMMENT,
-			STRING_SINGLE,
-			STRING_DOUBLE,
-			CDATA,
-			PRE_PROCESSOR
-		};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, XML_COMMENT, CDATA, PRE_PROCESSOR, XML_TAG };
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] {{IXMLConstants.CONTENT_TYPE_XML}};
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IXMLConstants.CONTENT_TYPE_XML } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new SingleLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA))}; //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
+			new TagRule("/", new Token(XML_TAG)), //$NON-NLS-1$
+			new TagRule(new Token(XML_TAG)) };
 
 	private XMLScanner xmlScanner;
-	private RuleBasedScanner doubleQuotedStringScanner;
-	private RuleBasedScanner singleQuotedStringScanner;
 	private RuleBasedScanner cdataScanner;
 	private RuleBasedScanner preProcessorScanner;
+	private XMLTagScanner xmlTagScanner;
 
 	private static XMLSourceConfiguration instance;
 
@@ -111,10 +102,12 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return CONTENT_TYPES;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -127,18 +120,23 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IXMLConstants.CONTENT_TYPE_XML;
 		}
 		return null;
@@ -146,8 +144,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
 	 * .presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
@@ -162,18 +159,14 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		dr = new DefaultDamagerRepairer(getPreProcessorScanner());
 		reconciler.setDamager(dr, PRE_PROCESSOR);
 		reconciler.setRepairer(dr, PRE_PROCESSOR);
-		
+
 		dr = new DefaultDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
-		reconciler.setDamager(dr, STRING_SINGLE);
-		reconciler.setRepairer(dr, STRING_SINGLE);
-
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
-		reconciler.setDamager(dr, STRING_DOUBLE);
-		reconciler.setRepairer(dr, STRING_DOUBLE);
+		dr = new DefaultDamagerRepairer(getXMLTagScanner());
+		reconciler.setDamager(dr, XML_TAG);
+		reconciler.setRepairer(dr, XML_TAG);
 
 		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.xml")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, XMLSourceConfiguration.XML_COMMENT);
@@ -184,12 +177,12 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 	{
 		if (preProcessorScanner == null)
 		{
-			preProcessorScanner = new RuleBasedScanner();
+			preProcessorScanner = new XMLTagScanner();
 			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		}
 		return preProcessorScanner;
 	}
-	
+
 	private ITokenScanner getCDATAScanner()
 	{
 		if (cdataScanner == null)
@@ -200,26 +193,6 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return cdataScanner;
 	}
 
-	private ITokenScanner getDoubleQuotedStringScanner()
-	{
-		if (doubleQuotedStringScanner == null)
-		{
-			doubleQuotedStringScanner = new RuleBasedScanner();
-			doubleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.double.xml")); //$NON-NLS-1$
-		}
-		return doubleQuotedStringScanner;
-	}
-
-	private ITokenScanner getSingleQuotedStringScanner()
-	{
-		if (singleQuotedStringScanner == null)
-		{
-			singleQuotedStringScanner = new RuleBasedScanner();
-			singleQuotedStringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.xml")); //$NON-NLS-1$
-		}
-		return singleQuotedStringScanner;
-	}
-
 	protected ITokenScanner getXMLScanner()
 	{
 		if (xmlScanner == null)
@@ -227,6 +200,15 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 			xmlScanner = new XMLScanner();
 		}
 		return xmlScanner;
+	}
+
+	protected ITokenScanner getXMLTagScanner()
+	{
+		if (xmlTagScanner == null)
+		{
+			xmlTagScanner = new XMLTagScanner();
+		}
+		return xmlTagScanner;
 	}
 
 }

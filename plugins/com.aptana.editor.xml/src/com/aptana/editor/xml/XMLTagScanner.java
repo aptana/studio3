@@ -34,30 +34,75 @@
  */
 package com.aptana.editor.xml;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.EntityRule;
+import com.aptana.editor.common.ExtendedWordRule;
+import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.theme.ThemeUtil;
 
-public class XMLScanner extends RuleBasedScanner
+public class XMLTagScanner extends RuleBasedScanner
 {
 
-	public XMLScanner()
+	public XMLTagScanner()
 	{
-		IRule[] rules = new IRule[4];
-		rules[0] = new WhitespaceRule(new WhitespaceDetector());
-		rules[1] = new EntityRule(createToken("constant.character.entity.xml")); //$NON-NLS-1$
-		// non-entity ampersands should be marked as invalid
-		rules[2] = new SingleCharacterRule('&', createToken("invalid.illegal.bad-ampersand.xml")); //$NON-NLS-1$
-		rules[3] = new WordRule(new WordDetector(), createToken("text")); //$NON-NLS-1$
-		setRules(rules);
+		List<IRule> rules = new ArrayList<IRule>();
+
+		// Add rule for double quotes
+		rules.add(new MultiLineRule("\"", "\"", createToken("string.quoted.double.xml"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Add a rule for single quotes
+		rules.add(new MultiLineRule("'", "'", createToken("string.quoted.single.xml"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Add generic whitespace rule.
+		rules.add(new WhitespaceRule(new WhitespaceDetector()));
+
+		// Attributes
+		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
+		{
+
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetter(c) || c == '-' || c == ':';
+			}
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return Character.isLetter(c);
+			}
+
+		}, createToken("entity.other.attribute-name.xml"), true) {//$NON-NLS-1$
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				int c = scanner.read();
+				scanner.unread();
+				return ((char) c) == '=';
+			}
+		};
+		rules.add(wordRule);
+
+		rules.add(new SingleCharacterRule('>', createToken("punctuation.definition.tag.xml"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('=', createToken("punctuation.separator.key-value.xml"))); //$NON-NLS-1$
+		rules.add(new RegexpRule("<(/)?", createToken("punctuation.definition.tag.xml"), true)); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Tag names
+		rules.add(new WordRule(new WordDetector(), createToken("entity.name.tag.xml"), true)); //$NON-NLS-1$
+
+		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(createToken("text")); //$NON-NLS-1$
 	}
 
@@ -87,4 +132,5 @@ public class XMLScanner extends RuleBasedScanner
 			return Character.isLetterOrDigit(c);
 		}
 	}
+
 }
