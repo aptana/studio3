@@ -32,15 +32,17 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.reconciler;
 
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-public class CommonReconciler extends MonoReconciler {
+public class CommonReconciler extends MonoReconciler
+{
 
-    public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental) {
-        super(strategy, isIncremental);
-    }
+	public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental)
+	{
+		super(strategy, isIncremental);
+	}
 }

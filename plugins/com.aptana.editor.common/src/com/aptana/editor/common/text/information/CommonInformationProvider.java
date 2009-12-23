@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.information;
 
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -44,49 +44,59 @@ import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.IInformationProviderExtension2;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.hover.CommonHoverRegion;
 import com.aptana.parsing.lexer.ILexeme;
 import com.aptana.parsing.lexer.ILexemeModel;
 
 @SuppressWarnings("restriction")
-public class CommonInformationProvider implements IInformationProvider,
-        IInformationProviderExtension2 {
+public class CommonInformationProvider implements IInformationProvider, IInformationProviderExtension2
+{
 
-    private ILanguageService fLanguageService;
+	private ILanguageService fLanguageService;
 
-    public CommonInformationProvider(ILanguageService service) {
-        fLanguageService = service;
-    }
+	public CommonInformationProvider(ILanguageService service)
+	{
+		fLanguageService = service;
+	}
 
-    public String getInformation(ITextViewer textViewer, IRegion subject) {
-        if (fLanguageService != null && subject instanceof CommonHoverRegion) {
-            CommonHoverRegion region = (CommonHoverRegion) subject;
-            ILexeme lexeme = region.getLexeme();
-            if (lexeme != null) {
-                return fLanguageService.getContentAssistText(lexeme);
-            }
-        }
-        return ""; //$NON-NLS-1$
-    }
+	public String getInformation(ITextViewer textViewer, IRegion subject)
+	{
+		if (fLanguageService != null && subject instanceof CommonHoverRegion)
+		{
+			CommonHoverRegion region = (CommonHoverRegion) subject;
+			ILexeme lexeme = region.getLexeme();
+			if (lexeme != null)
+			{
+				return fLanguageService.getContentAssistText(lexeme);
+			}
+		}
+		return ""; //$NON-NLS-1$
+	}
 
-    public IRegion getSubject(ITextViewer textViewer, int offset) {
-        if (fLanguageService != null) {
-            ILexemeModel model = fLanguageService.getLexemeModel();
-            if (model != null) {
-                ILexeme lexeme = model.getLexemeFromOffset(offset);
-                return new CommonHoverRegion(lexeme);
-            }
-        }
-        return null;
-    }
+	public IRegion getSubject(ITextViewer textViewer, int offset)
+	{
+		if (fLanguageService != null)
+		{
+			ILexemeModel model = fLanguageService.getLexemeModel();
+			if (model != null)
+			{
+				ILexeme lexeme = model.getLexemeFromOffset(offset);
+				return new CommonHoverRegion(lexeme);
+			}
+		}
+		return null;
+	}
 
-    public IInformationControlCreator getInformationPresenterControlCreator() {
-        return new IInformationControlCreator() {
+	public IInformationControlCreator getInformationPresenterControlCreator()
+	{
+		return new IInformationControlCreator()
+		{
 
-            public IInformationControl createInformationControl(Shell parent) {
-                return new DefaultInformationControl(parent, (String) null, new HTMLTextPresenter(
-                        false));
-            }
-        };
-    }
+			public IInformationControl createInformationControl(Shell parent)
+			{
+				return new DefaultInformationControl(parent, (String) null, new HTMLTextPresenter(false));
+			}
+		};
+	}
 }
