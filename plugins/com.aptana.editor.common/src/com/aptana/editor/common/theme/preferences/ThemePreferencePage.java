@@ -162,7 +162,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
 
-		setTheme(getThemeManager().getActiveTheme().getName());
+		setTheme(getThemeManager().getCurrentTheme().getName());
 		return composite;
 	}
 
@@ -184,7 +184,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				setTheme(fThemeCombo.getText());
-				getThemeManager().setActiveTheme(getTheme());
+				getThemeManager().setCurrentTheme(getTheme());
 				super.widgetSelected(e);
 			}
 		});
@@ -216,7 +216,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme newTheme = getTheme().copy(dialog.getValue());
 					// Add theme to theme list, make current theme this one
-					getThemeManager().setActiveTheme(newTheme);
+					getThemeManager().setCurrentTheme(newTheme);
 					loadThemeNames();
 					setTheme(newTheme.getName());
 				}
@@ -239,7 +239,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme oldTheme = getTheme();
 					Theme newTheme = oldTheme.copy(dialog.getValue());
-					getThemeManager().setActiveTheme(newTheme);
+					getThemeManager().setCurrentTheme(newTheme);
 					oldTheme.delete();
 					loadThemeNames();
 					setTheme(newTheme.getName());
@@ -262,7 +262,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 				getTheme().delete();
 				loadThemeNames();
-				setTheme(getThemeManager().getActiveTheme().getName());
+				setTheme(getThemeManager().getCurrentTheme().getName());
 			}
 		});
 
@@ -293,7 +293,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme theme = new TextmateImporter().convert(themeFile);
 					getThemeManager().addTheme(theme);
-					getThemeManager().setActiveTheme(theme);
+					getThemeManager().setCurrentTheme(theme);
 					loadThemeNames();
 					setTheme(theme.getName());
 				}
@@ -1002,7 +1002,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		getThemeManager().setActiveTheme(getTheme());
+		getThemeManager().setCurrentTheme(getTheme());
 		return super.performOk();
 	}
 
@@ -1013,7 +1013,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			Theme theme = getTheme();
 			theme.loadFromDefaults();
-			getThemeManager().setActiveTheme(theme);
+			getThemeManager().setCurrentTheme(theme);
 			setTheme(fSelectedTheme);
 		}
 		catch (Exception e)

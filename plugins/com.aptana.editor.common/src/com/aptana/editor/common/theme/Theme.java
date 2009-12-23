@@ -309,8 +309,8 @@ public class Theme
 	public void save()
 	{
 		save(new InstanceScope());
-		if (getThemeManager().getActiveTheme().equals(this))
-			getThemeManager().setActiveTheme(this);
+		if (getThemeManager().getCurrentTheme().equals(this))
+			getThemeManager().setCurrentTheme(this);
 	}
 
 	protected IThemeManager getThemeManager()

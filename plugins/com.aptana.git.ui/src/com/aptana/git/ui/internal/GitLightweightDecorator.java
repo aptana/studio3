@@ -278,7 +278,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	protected Theme getActiveTheme()
 	{
-		return getThemeManager().getActiveTheme();
+		return getThemeManager().getCurrentTheme();
 	}
 
 	protected IThemeManager getThemeManager()

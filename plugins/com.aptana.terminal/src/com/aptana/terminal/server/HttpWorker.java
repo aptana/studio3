@@ -103,9 +103,9 @@ public class HttpWorker implements Runnable
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		// Add theme colors
-		variables.put("\\{caret\\}", toCSSRGB(getThemeManager().getActiveTheme().getCaret())); //$NON-NLS-1$
-		variables.put("\\{foreground\\}", toCSSRGB(getThemeManager().getActiveTheme().getForeground())); //$NON-NLS-1$
-		variables.put("\\{background\\}", toCSSRGB(getThemeManager().getActiveTheme().getBackground())); //$NON-NLS-1$
+		variables.put("\\{caret\\}", toCSSRGB(getThemeManager().getCurrentTheme().getCaret())); //$NON-NLS-1$
+		variables.put("\\{foreground\\}", toCSSRGB(getThemeManager().getCurrentTheme().getForeground())); //$NON-NLS-1$
+		variables.put("\\{background\\}", toCSSRGB(getThemeManager().getCurrentTheme().getBackground())); //$NON-NLS-1$
 
 		// ANSI Colors
 		addAnsiColor(variables, "ansi.black", "0,0,0"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -152,9 +152,9 @@ public class HttpWorker implements Runnable
 	private void addAnsiColor(Map<String, String> variables, String tokenName, String defaultValue)
 	{
 		String value = null;
-		if (getThemeManager().getActiveTheme().hasEntry(tokenName))
+		if (getThemeManager().getCurrentTheme().hasEntry(tokenName))
 		{
-			value = toCSSRGB(getThemeManager().getActiveTheme().getForegroundAsRGB(tokenName));
+			value = toCSSRGB(getThemeManager().getCurrentTheme().getForegroundAsRGB(tokenName));
 		}
 		else
 		{

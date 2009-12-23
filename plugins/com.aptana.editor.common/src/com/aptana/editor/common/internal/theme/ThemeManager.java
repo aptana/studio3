@@ -78,12 +78,12 @@ public class ThemeManager implements IThemeManager
 
 	private TextAttribute getTextAttribute(String name)
 	{
-		if (getActiveTheme() != null)
-			return getActiveTheme().getTextAttribute(name);
+		if (getCurrentTheme() != null)
+			return getCurrentTheme().getTextAttribute(name);
 		return new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
-	public Theme getActiveTheme()
+	public Theme getCurrentTheme()
 	{
 		if (fCurrentTheme == null)
 		{
@@ -92,12 +92,12 @@ public class ThemeManager implements IThemeManager
 			if (activeThemeName != null)
 				fCurrentTheme = getTheme(activeThemeName);
 			if (fCurrentTheme == null)
-				setActiveTheme(getThemeMap().values().iterator().next());
+				setCurrentTheme(getThemeMap().values().iterator().next());
 		}
 		return fCurrentTheme;
 	}
 
-	public void setActiveTheme(Theme theme)
+	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
 		adaptTokens();
@@ -289,13 +289,13 @@ public class ThemeManager implements IThemeManager
 
 	public void removeTheme(Theme theme)
 	{
-		Theme activeTheme = getActiveTheme();
+		Theme activeTheme = getCurrentTheme();
 		fThemeMap.remove(theme.getName());
 		saveThemeList();
 		// change active theme if we just removed it
 		if (activeTheme.getName().equals(theme.getName()))
 		{
-			setActiveTheme(fThemeMap.values().iterator().next());
+			setCurrentTheme(fThemeMap.values().iterator().next());
 		}
 	}
 

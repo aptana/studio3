@@ -793,7 +793,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Theme getActiveTheme()
 	{
-		return getThemeManager().getActiveTheme();
+		return getThemeManager().getCurrentTheme();
 	}
 
 	private boolean filterOn()

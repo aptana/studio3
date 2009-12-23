@@ -300,7 +300,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		// Force selection color
 		getSourceViewer().getTextWidget().setSelectionBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getActiveTheme().getSelection()));
+						getThemeManager().getCurrentTheme().getSelection()));
 
 		if (selectionListener != null)
 			return;
@@ -357,7 +357,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			return;
 
 		Caret caret = getSourceViewer().getTextWidget().getCaret();
-		RGB caretColor = getThemeManager().getActiveTheme().getCaret();
+		RGB caretColor = getThemeManager().getCurrentTheme().getCaret();
 		if (caretColor == null)
 			return;
 
@@ -455,7 +455,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
 	protected void initializeViewerColors(ISourceViewer viewer)
 	{
-		getThemeManager().getActiveTheme();
+		getThemeManager().getCurrentTheme();
 		if (viewer == null || viewer.getTextWidget() == null)
 			return;
 		super.initializeViewerColors(viewer);

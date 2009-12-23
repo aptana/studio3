@@ -18,9 +18,9 @@ public interface IThemeManager
 	// this interface like Eclipse's IThemeManager
 
 	// TODO Make arg the string id, rather than the theme object
-	public void setActiveTheme(Theme theme);
+	public void setCurrentTheme(Theme theme);
 
-	public Theme getActiveTheme();
+	public Theme getCurrentTheme();
 
 	public void addTheme(Theme theme);
 
