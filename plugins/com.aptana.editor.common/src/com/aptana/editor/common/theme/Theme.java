@@ -30,7 +30,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.internal.theme.ThemeUtil;
+import com.aptana.editor.common.internal.theme.ThemeManager;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,
@@ -296,7 +296,7 @@ public class Theme
 		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		if (prefs == null)
 			return; // TODO Log something?
-		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		if (preferences == null)
 			return;
 		String value = preferences.get(getName(), null);
@@ -325,7 +325,7 @@ public class Theme
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			toProps().storeToXML(os, null);
 			IEclipsePreferences prefs = scope.getNode(CommonEditorPlugin.PLUGIN_ID);
-			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 			preferences.put(getName(), os.toString());
 			prefs.flush();
 		}
@@ -338,7 +338,7 @@ public class Theme
 	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		String xmlProps = preferences.get(getName(), null);
 		if (xmlProps == null)
 			return;
@@ -367,7 +367,7 @@ public class Theme
 		try
 		{
 			IEclipsePreferences prefs = context.getNode(CommonEditorPlugin.PLUGIN_ID);
-			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 			preferences.remove(getName());
 			preferences.flush();
 		}
