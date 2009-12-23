@@ -24,5 +24,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
- com.aptana.editor.common.theme,
- com.aptana.editor.common.tmp
+ com.aptana.editor.common.theme
