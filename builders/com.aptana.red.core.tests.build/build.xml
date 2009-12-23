@@ -78,10 +78,12 @@
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
 		<!-- Do a git checkout -f of the build directory -->
+		<!-- This I think is messing up the build machine's setting of correct branch contents to build against
 		<exec executable="/bin/bash" dir="${buildDirectory}">
 			<arg value="-c" />
 			<arg value="${git.executable} checkout -f" />
 		</exec>
+		-->
 		<delete file="build.properties" failonerror="false" />
 	</target>
 
