@@ -60,12 +60,12 @@ public class MergeBranchAction extends MenuAction
 
 	protected void mergeBranch(final GitRepository repo, final String branchName)
 	{
-		Job job = new Job(NLS.bind("git merge {0}", branchName))
+		Job job = new Job(NLS.bind("git merge {0}", branchName)) //$NON-NLS-1$
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge",
+				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge", //$NON-NLS-1$
 						branchName);
 				while (!launch.isTerminated())
 				{

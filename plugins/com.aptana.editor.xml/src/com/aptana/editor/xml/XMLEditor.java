@@ -42,7 +42,7 @@ public class XMLEditor extends AbstractThemeableEditor {
     protected void initializeEditor() {
         super.initializeEditor();
 
-        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore()));
+        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new XMLDocumentProvider());
     }
 }

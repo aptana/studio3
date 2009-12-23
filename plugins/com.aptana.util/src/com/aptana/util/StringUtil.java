@@ -31,7 +31,7 @@ public abstract class StringUtil
 				value = ""; //$NON-NLS-1$
 			else
 				value = value.replace('$', (char) 1); // To avoid illegal group reference issues if the text has
-														// dollars!
+			// dollars!
 			template = template.replaceAll(entry.getKey(), value).replace((char) 1, '$');
 		}
 		return template;
@@ -46,7 +46,6 @@ public abstract class StringUtil
 	 */
 	public static List<String> tokenize(String inputString, String delim)
 	{
-		// TODO Replace Git Core's StringUtil class and method with this
 		List<String> tokens = new ArrayList<String>();
 		StringTokenizer tokenizer = new StringTokenizer(inputString, delim);
 		while (tokenizer.hasMoreTokens())
@@ -85,7 +84,7 @@ public abstract class StringUtil
 		return null;
 	}
 
-	/**
+/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * 
 	 * @param raw
@@ -94,5 +93,17 @@ public abstract class StringUtil
 	public static String sanitizeHTML(String raw)
 	{
 		return raw.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+	
+	/**
+	 * Compares two strings for equality taking into account that none, one, or both may be null
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static boolean areNotEqual(String s1, String s2)
+	{
+		return (s1 == null) ? (s2 != null) : (s2 == null) ? (s1 != null) : s1.equals(s2);
 	}
 }

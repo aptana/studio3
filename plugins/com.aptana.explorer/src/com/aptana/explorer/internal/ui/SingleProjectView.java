@@ -17,15 +17,25 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -33,9 +43,15 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
@@ -48,12 +64,22 @@ import com.aptana.filewatcher.FileWatcher;
 public class SingleProjectView extends CommonNavigator
 {
 
+	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
+
+	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
+
 	private Combo projectCombo;
 	protected IProject selectedProject;
 	private ResourceListener fResourceListener;
 	private ViewerFilter activeProjectFilter;
 
 	private Integer watcher;
+
+	private IPreferenceChangeListener fThemeChangeListener;
+
+	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
+
+	private IPropertyChangeListener fontListener;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -65,9 +91,59 @@ public class SingleProjectView extends CommonNavigator
 		Composite bottom = doCreatePartControl(customComposite);
 		createNavigator(customComposite, bottom);
 
-		fResourceListener = new ResourceListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
+		addProjectResourceListener();
 		detectSelectedProject();
+		addSingleProjectFilter();
+		listenToActiveProjectPrefChanges();
+
+		hookToThemes();
+	}
+
+	protected Composite doCreatePartControl(Composite customComposite)
+	{
+		createProjectCombo(customComposite);
+		return projectCombo;
+	}
+
+	private IProject[] createProjectCombo(Composite parent)
+	{
+		projectCombo = new Combo(parent, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
+		FormData projectData = new FormData();
+		projectData.left = new FormAttachment(0, 5);
+		projectData.top = new FormAttachment(0, 5);
+		projectData.right = new FormAttachment(100, -5);
+		projectCombo.setLayoutData(projectData);
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject iProject : projects)
+		{
+			projectCombo.add(iProject.getName());
+		}
+		projectCombo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				setActiveProject(projectCombo.getText());
+			}
+		});
+		return projects;
+	}
+
+	private void createNavigator(Composite myComposite, Composite top)
+	{
+		Composite viewer = new Composite(myComposite, SWT.NONE);
+		viewer.setLayout(new FillLayout());
+		FormData data2 = new FormData();
+		data2.top = new FormAttachment(top);
+		data2.bottom = new FormAttachment(100, 0);
+		data2.right = new FormAttachment(100, 0);
+		data2.left = new FormAttachment(0, 0);
+		viewer.setLayoutData(data2);
+		super.createPartControl(viewer);
+	}
+
+	private void addSingleProjectFilter()
+	{
 		activeProjectFilter = new ViewerFilter()
 		{
 
@@ -118,97 +194,181 @@ public class SingleProjectView extends CommonNavigator
 				getCommonViewer().addFilter(activeProjectFilter);
 			}
 		});
-
-		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
-				new IPreferenceChangeListener()
-				{
-
-					public void preferenceChange(PreferenceChangeEvent event)
-					{
-						if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
-							return;
-						IProject oldActiveProject = selectedProject;
-						Object obj = event.getNewValue();
-						if (obj == null)
-							return;
-						String newProjectName = (String) obj;
-						if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
-							return;
-						IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(
-								newProjectName);
-						selectedProject = newSelectedProject;
-						projectChanged(oldActiveProject, newSelectedProject);
-						refreshViewer();
-					}
-				});
 	}
 
-	protected Composite doCreatePartControl(Composite customComposite)
+	private void addProjectResourceListener()
 	{
-		createProjectCombo(customComposite);
-		return projectCombo;
+		fResourceListener = new ResourceListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
-	private void createNavigator(Composite myComposite, Composite top)
+	private void listenToActiveProjectPrefChanges()
 	{
-		Composite viewer = new Composite(myComposite, SWT.NONE);
-		viewer.setLayout(new FillLayout());
-		FormData data2 = new FormData();
-		data2.top = new FormAttachment(top);
-		data2.bottom = new FormAttachment(100, 0);
-		data2.right = new FormAttachment(100, 0);
-		data2.left = new FormAttachment(0, 0);
-		viewer.setLayoutData(data2);
-		super.createPartControl(viewer);
-	}
-
-	private IProject[] createProjectCombo(Composite parent)
-	{
-		projectCombo = new Combo(parent, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
-		FormData projectData = new FormData();
-		projectData.left = new FormAttachment(0, 5);
-		projectData.top = new FormAttachment(0, 5);
-		projectData.right = new FormAttachment(100, -5);
-		projectCombo.setLayoutData(projectData);
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		for (IProject iProject : projects)
+		fActiveProjectPrefChangeListener = new IPreferenceChangeListener()
 		{
-			projectCombo.add(iProject.getName());
-		}
-		projectCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
+
+			public void preferenceChange(PreferenceChangeEvent event)
 			{
-				setActiveProject(projectCombo.getText());
+				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
+					return;
+				IProject oldActiveProject = selectedProject;
+				Object obj = event.getNewValue();
+				if (obj == null)
+					return;
+				String newProjectName = (String) obj;
+				if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
+					return;
+				IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
+				selectedProject = newSelectedProject;
+				projectChanged(oldActiveProject, newSelectedProject);
+				refreshViewer();
 			}
-		});
-		return projects;
-	}
-
-	@Override
-	public void dispose()
-	{
-		getCommonViewer().removeFilter(activeProjectFilter);
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
-		super.dispose();
+		};
+		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+				fActiveProjectPrefChangeListener);
 	}
 
 	/**
-	 * Returns the name for the given element. Used as the name for the current frame.
+	 * Hooks up to the active theme.
 	 */
-	String getFrameName(Object element)
+	private void hookToThemes()
 	{
-		if (element instanceof IResource)
+		getCommonViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
+		overrideTreeDrawing();
+		overrideLabelProvider();
+		listenForThemeChanges();
+	}
+
+	private void overrideTreeDrawing()
+	{
+		final Tree tree = getCommonViewer().getTree();
+		// Override selection color to match what is set in theme
+		tree.addListener(SWT.EraseItem, new Listener()
 		{
-			return ((IResource) element).getName();
-		}
-		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
-		if (text == null)
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					Tree tree = (Tree) event.widget;
+					int clientWidth = tree.getClientArea().width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+							getThemeManager().getCurrentTheme().getSelection()));
+					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
+					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			}
+		});
+
+		// Hack to force a specific row height and width based on font
+		tree.addListener(SWT.MeasureItem, new Listener()
 		{
-			return "";//$NON-NLS-1$
-		}
-		return text;
+			public void handleEvent(Event event)
+			{
+				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				if (font == null)
+				{
+					font = JFaceResources.getTextFont();
+				}
+				if (font != null)
+				{
+					event.gc.setFont(font);
+					FontMetrics metrics = event.gc.getFontMetrics();
+					int height = metrics.getHeight() + 2;
+					TreeItem item = (TreeItem) event.item;
+					int width = event.gc.stringExtent(item.getText()).x + 24;
+					event.height = height;
+					if (width > event.width)
+						event.width = width;
+				}
+			}
+		});
+
+		fontListener = new IPropertyChangeListener()
+		{
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (!event.getProperty().equals(APP_EXPLORER_FONT_NAME))
+					return;
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
+						refreshViewer();
+						tree.redraw();
+						tree.update();
+					}
+				});
+
+			}
+		};
+		JFaceResources.getFontRegistry().addListener(fontListener);
+	}
+
+	private void overrideLabelProvider()
+	{
+		ViewerColumn viewer = (ViewerColumn) getCommonViewer().getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
+		ColumnViewer colViewer = viewer.getViewer();
+		final CellLabelProvider provider = (CellLabelProvider) colViewer.getLabelProvider();
+		viewer.setLabelProvider(new CellLabelProvider()
+		{
+
+			@Override
+			public void update(ViewerCell cell)
+			{
+				provider.update(cell);
+				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				if (font == null)
+				{
+					font = JFaceResources.getTextFont();
+				}
+				if (font != null)
+				{
+					cell.setFont(font);
+				}
+
+				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getForeground()));
+			}
+		});
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
+	private void listenForThemeChanges()
+	{
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					getCommonViewer().refresh();
+					getCommonViewer().getTree().setBackground(
+							CommonEditorPlugin.getDefault().getColorManager().getColor(
+									getThemeManager().getCurrentTheme().getBackground()));
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	private void detectSelectedProject()
@@ -313,6 +473,63 @@ public class SingleProjectView extends CommonNavigator
 		getCommonViewer().refresh();
 	}
 
+	@Override
+	public void dispose()
+	{
+		removeFontListener();
+		removeProjectResourceListener();
+		removeActiveProjectPrefListener();
+		removeSingleProjectFilter();
+		removeThemeListener();
+		super.dispose();
+	}
+
+	private void removeFontListener()
+	{
+		if (fontListener != null)
+		{
+			JFaceResources.getFontRegistry().removeListener(fontListener);
+			fontListener = null;
+		}
+	}
+
+	private void removeProjectResourceListener()
+	{
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
+		fResourceListener = null;
+	}
+
+	private void removeActiveProjectPrefListener()
+	{
+		if (fActiveProjectPrefChangeListener != null)
+		{
+			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+					fActiveProjectPrefChangeListener);
+		}
+	}
+
+	private void removeSingleProjectFilter()
+	{
+		getCommonViewer().removeFilter(activeProjectFilter);
+		activeProjectFilter = null;
+	}
+
+	private void removeThemeListener()
+	{
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
+	}
+
+	/**
+	 * Listens for Project addition/removal to change the active project to new project added, or off the deleted
+	 * project if it was active.
+	 * 
+	 * @author cwilliams
+	 */
 	private class ResourceListener implements IResourceChangeListener
 	{
 

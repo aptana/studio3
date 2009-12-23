@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.internal;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
@@ -44,9 +45,10 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.editor.common.CommonAutoIndentStrategy;
+import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
+import com.aptana.editor.js.preferences.PreferenceInitializer;
 
 public class JSCommentIndentStrategy extends CommonAutoIndentStrategy {
 
@@ -103,8 +105,9 @@ public class JSCommentIndentStrategy extends CommonAutoIndentStrategy {
             StringBuilder buf = new StringBuilder(c.text);
 
             // get line prefix
-            boolean useStar = Activator.getDefault().getPreferenceStore().getBoolean(
-                    IPreferenceConstants.COMMENT_INDENT_USE_STAR);
+            boolean useStar = Platform.getPreferencesService().getBoolean(Activator.PLUGIN_ID,
+                    IPreferenceConstants.COMMENT_INDENT_USE_STAR,
+                    PreferenceInitializer.DEFAULT_COMMENT_INDENT_USE_STAR, null);
             String linePrefix = useStar ? "* " : " "; //$NON-NLS-1$ //$NON-NLS-2$
 
             IRegion prefix = findPrefixRange(d, line, linePrefix);

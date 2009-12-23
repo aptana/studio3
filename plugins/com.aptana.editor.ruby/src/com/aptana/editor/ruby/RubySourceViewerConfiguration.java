@@ -39,14 +39,15 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
 
-    public RubySourceViewerConfiguration(IPreferenceStore preferences) {
-        super(preferences);
+    public RubySourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(preferences, editor);
     }
 
 	/* (non-Javadoc)
@@ -58,6 +59,13 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 				{ IDocument.DEFAULT_CONTENT_TYPE },
 				RubySourceConfiguration.CONTENT_TYPES
 			});
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return RubySourceConfiguration.getDefault().getTopContentTypes();
 	}
 
 	/* (non-Javadoc)

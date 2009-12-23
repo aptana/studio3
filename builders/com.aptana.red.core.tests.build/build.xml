@@ -27,7 +27,7 @@
 		</fileset>
 	</path>
 	<path id="source.path">
-		<dirset dir="${src.dir}/plugins">
+		<dirset dir="${buildDirectory}/plugins">
 			<include name="*/src" />
 		</dirset>
 	</path>
@@ -35,7 +35,7 @@
 	<!-- ================================= 
           target: build              
          ================================= -->
-	<target name="build" description="Builds the RED_Core feature" depends="generate.build.properties,generate.base">
+	<target name="build" description="Builds the RED_Core Test feature" depends="generate.build.properties,generate.base">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="yes">
 			<arg line="-application org.eclipse.ant.core.antRunner -buildfile ${baseLocation}/plugins/${builder.plugin}/scripts/build.xml -Dbuilder=${basedir} -Dbuild.revision=${build.revision} -nosplash" />
 		</java>
@@ -97,23 +97,42 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="generate.base" depends="copy.base.windows,copy.base">
 		<!-- Workaround for https://bugs.eclipse.org/241430 shouldn't be necessary when we move to 3.5 -->
-		<delete>
+		<delete failonerror="false">
 			<fileset dir="${baseLocation}/configuration/.settings">
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
 		</delete>
-		<!-- Install Red Core feature -->
-		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
-			<param name="p2.repo" value="${red-core.p2.repo}" />
-		</antcall>
-		<!-- TODO Rename plugins to something else, and then rename 'tests' to 'plugins' -->
+		<!-- Wipe the non-test plugins-->
+		<antcall target="wipe.plugins" />
 		<!-- Copy test plugins into plugins dir -->
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="${buildDirectory}/tests">
 				<include name="**/*" />
 			</fileset>
 		</copy>
+		<!-- Install Red Core feature -->
+		<antcall target="install.red.core" />
+		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: install.red.core                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="install.red.core" unless="dont.install.red.core">
+		<antcall target="run.director">
+			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
+			<param name="p2.repo" value="${red-core.p2.repo}" />
+		</antcall>
+	</target>
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: wipe.plugins                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="wipe.plugins" unless="dont.wipe.plugins">
+		<delete verbose="true">
+			<fileset dir="${buildDirectory}/plugins">
+				<include name="**/*" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -141,7 +160,7 @@
 		 - - - - - - - - - - - - - - - - - -->
 	<target name="run.director" description="Runs the p2 director installs">
 		<java jar="${baseLocation}/plugins/${launcher.plugin}.jar" fork="true" failonerror="true" dir="${baseLocation}" timeout="900000">
-			<arg line="-application org.eclipse.equinox.p2.director.app.application" />
+			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-nosplash" />
 			<arg line="-consoleLog" />
 			<arg line="-metadataRepository ${p2.repo}" />
@@ -151,16 +170,17 @@
 	</target>
 
 	<target name="test" depends="build">
+		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
-			<param name="p2.repo" value="${p2.artifact.repo}" />
+			<param name="p2.repo" value="file:${p2.repo.dir}" />
 		</antcall>
 		<!-- Add Eclipse Testing Framework -->
-		<unzip src="eclipse-test-framework-3.4.2.zip" dest="${buildDirectory}/test-framework" />
-		<copy todir="${baseLocation}/dropins">
-			<fileset dir="${buildDirectory}/test-framework" defaultexcludes="false" />
-		</copy>
-		<delete dir="${buildDirectory}/test-framework" />
+		<unzip src="eclipse-test-framework-3.5.zip" dest="${baseLocation}/test-framework" />
+		<antcall target="run.director">
+			<param name="p2.installIU" value="org.eclipse.test.feature.group" />
+			<param name="p2.repo" value="file:${baseLocation}/test-framework/eclipse" />
+		</antcall>
 
 		<!-- Modify the plugin_custimization.ini to set initial properties for tests! -->
 		<concat append="true" destfile="${baseLocation}/plugins/org.eclipse.sdk_3.4.2.v200902111700/plugin_customization.ini">
@@ -174,21 +194,39 @@
 			</instr>
 		</emma>
 
-		<property name="library-file" value="${baseLocation}/dropins/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
+		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
 		<!-- Run the tests. -->
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.util.tests" />
 			<param name="test.classname" value="com.aptana.util.tests.AllTests" />
 		</antcall>
-		<!-- FIXME BRoken
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
-			<param name="test.classname" value="com.aptana.scope.AllTests" />
+			<param name="test.classname" value="com.aptana.scripting.tests.AllTests" />
 		</antcall>
-		-->
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.common.tests" />
+			<param name="test.classname" value="com.aptana.editor.common.tests.AllTests" />
+		</antcall>
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.ruby.tests" />
 			<param name="test.classname" value="com.aptana.editor.ruby.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.js.tests" />
+			<param name="test.classname" value="com.aptana.editor.js.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.css.tests" />
+			<param name="test.classname" value="com.aptana.editor.css.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.html.tests" />
+			<param name="test.classname" value="com.aptana.editor.html.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.xml.tests" />
+			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
 		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->

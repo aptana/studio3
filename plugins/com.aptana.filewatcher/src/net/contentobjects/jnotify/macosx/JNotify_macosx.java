@@ -2,6 +2,7 @@ package net.contentobjects.jnotify.macosx;
 
 import net.contentobjects.jnotify.JNotifyException;
 
+@SuppressWarnings("nls")
 public class JNotify_macosx
 {
 	private static Object initCondition = new Object();

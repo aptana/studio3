@@ -5,8 +5,9 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.js.JSSourceEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            icon="icons/js.gif"
+            icon="icons/js.png"
             id="com.aptana.editor.js"
             name="%editor.js.name">
          <contentTypeBinding

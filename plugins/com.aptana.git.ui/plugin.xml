@@ -67,6 +67,14 @@
                tooltip="%CommitAction_tooltip">
          </action>
          <action
+               class="com.aptana.git.ui.internal.actions.DeleteBranchAction"
+               id="com.aptana.git.ui.actions.DeleteBranchAction"
+               definitionId="com.aptana.git.ui.command.delete_branch"
+               label="%DeleteBranchAction_label"
+               menubarPath="team.main/group2"
+               tooltip="%DeleteBranchAction_tooltip">
+         </action>
+         <action
                class="com.aptana.git.ui.internal.actions.MergeBranchAction"
                id="com.aptana.git.ui.actions.MergeBranchAction"
                definitionId="com.aptana.git.ui.command.merge_branch"
@@ -263,6 +271,11 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.delete_branch"
+            name="%DeleteBranchAction_tooltip">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
@@ -329,8 +342,14 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">
       </key>
-       <key
+      <key
             commandId="com.aptana.git.ui.command.merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.delete_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M2+G">

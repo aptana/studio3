@@ -1,5 +1,6 @@
 package net.contentobjects.jnotify;
 
+@SuppressWarnings("nls")
 public class Util
 {
 	public static String getMaskDesc(int mask)
@@ -25,9 +26,6 @@ public class Util
 		{
 			return s.substring(0, s.length() - 1);
 		}
-		else
-		{
-			return "UNKNOWN";
-		}
+		return "UNKNOWN";
 	}
 }

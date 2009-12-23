@@ -35,18 +35,40 @@
 package com.aptana.editor.html;
 
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
+import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.WhitespaceDetector;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.EntityRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.text.rules.WordDetector;
+import com.aptana.editor.common.theme.IThemeManager;
 
-public class HTMLScanner extends RuleBasedScanner {
+public class HTMLScanner extends RuleBasedScanner
+{
 
-	public HTMLScanner() {
-		IRule[] rules = new IRule[1];
+	public HTMLScanner()
+	{
+		IRule[] rules = new IRule[4];
 		rules[0] = new WhitespaceRule(new WhitespaceDetector());
+		rules[1] = new EntityRule(createToken("constant.character.entity.html")); //$NON-NLS-1$
+		// non-entity ampersands should be marked as invalid
+		rules[2] = new SingleCharacterRule('&', createToken("invalid.illegal.bad-ampersand.html")); //$NON-NLS-1$
+		rules[3] = new WordRule(new WordDetector(), createToken("text")); //$NON-NLS-1$
 		setRules(rules);
-		setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
+		setDefaultReturnToken(createToken("text")); //$NON-NLS-1$
+	}
+
+	protected IToken createToken(String string)
+	{
+		return getThemeManager().getToken(string);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 }

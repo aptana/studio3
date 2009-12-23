@@ -40,6 +40,7 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -47,11 +48,13 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.SubPartitionScanner;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * @author Max Stepanov
@@ -62,22 +65,17 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	public final static String PREFIX = "__js_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__js" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String JS_MULTILINE_COMMENT = "__js_multiline_comment"; //$NON-NLS-1$
-	public final static String JS_SINGLELINE_COMMENT = "__js_singleline_comment"; //$NON-NLS-1$
-	public final static String JS_DOC = "__js_sdoc"; //$NON-NLS-1$
-	public final static String STRING_DOUBLE = "__js_string_double"; //$NON-NLS-1$
-	public final static String STRING_SINGLE = "__js_string_single"; //$NON-NLS-1$
-	public final static String JS_REGEXP = "__js_regexp"; //$NON-NLS-1$
+	public final static String JS_MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
+	public final static String JS_SINGLELINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
+	public final static String JS_DOC = PREFIX + "sdoc"; //$NON-NLS-1$
+	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
+	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public final static String JS_REGEXP = PREFIX + "regexp"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] {
-			DEFAULT,
-			JS_MULTILINE_COMMENT,
-			JS_SINGLELINE_COMMENT,
-			JS_DOC,
-			STRING_DOUBLE,
-			STRING_SINGLE,
-			JS_REGEXP
-		};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, JS_MULTILINE_COMMENT, JS_SINGLELINE_COMMENT,
+			JS_DOC, STRING_DOUBLE, STRING_SINGLE, JS_REGEXP };
+
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSConstants.CONTENT_TYPE_JS } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("//", new Token(JS_SINGLELINE_COMMENT)), //$NON-NLS-1$
@@ -85,7 +83,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new SingleLineRule("/", "/", new Token(JS_REGEXP), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
+			new RegexpRule("/.*?[^\\\\]+/[igm]*", new Token(JS_REGEXP), true) }; //$NON-NLS-1$
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
@@ -117,6 +115,15 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes()
+	{
+		return TOP_CONTENT_TYPES;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
 	public IPredicateRule[] getPartitioningRules()
@@ -124,18 +131,23 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IJSConstants.CONTENT_TYPE_JS;
 		}
 		return null;
@@ -143,8 +155,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text
 	 * .presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
@@ -152,7 +163,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		
+
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
@@ -186,7 +197,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (multiLineCommentScanner == null)
 		{
 			multiLineCommentScanner = new RuleBasedScanner();
-			multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.js")); //$NON-NLS-1$
+			multiLineCommentScanner.setDefaultReturnToken(getToken("comment.block.js")); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -196,7 +207,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		if (singleLineCommentScanner == null)
 		{
 			singleLineCommentScanner = new RuleBasedScanner();
-			singleLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.line.double-slash.js")); //$NON-NLS-1$
+			singleLineCommentScanner.setDefaultReturnToken(getToken("comment.line.double-slash.js")); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}
@@ -246,4 +257,13 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		return codeScanner;
 	}
 
+	protected IToken getToken(String tokenName)
+	{
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }

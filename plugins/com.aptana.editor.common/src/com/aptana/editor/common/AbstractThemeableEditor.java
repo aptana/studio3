@@ -1,29 +1,54 @@
 package com.aptana.editor.common;
 
+import java.text.MessageFormat;
+import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IPaintPositionManager;
+import org.eclipse.jface.text.IPainter;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewerExtension;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.LineNumberRulerColumn;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.custom.LineBackgroundEvent;
+import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Layout;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
+import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.ShowScopesAction;
-import com.aptana.editor.common.peer.CharacterPairMatcher;
-import com.aptana.editor.common.peer.PeerCharacterCloser;
+import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
+import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
@@ -38,19 +63,21 @@ import com.aptana.editor.findbar.api.IFindBarDecorator;
 @SuppressWarnings("restriction")
 public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
 {
+	private static final int RULER_EDITOR_GAP = 5;
+
 	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'',
 			'"', '"' };
 
 	// Adapter factory to adapt to IFindBarDecorated
 	private static IAdapterFactory factory = new IAdapterFactory()
 	{
-		@SuppressWarnings({ "rawtypes" })
+		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList()
 		{
 			return new Class[] { AbstractThemeableEditor.class, IFindBarDecorated.class };
 		}
 
-		@SuppressWarnings({ "rawtypes" })
+		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType)
 		{
 			if (adaptableObject instanceof AbstractThemeableEditor)
@@ -69,6 +96,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private Image fCaretImage;
 	private RGB fCaretColor;
 
+	private ISelectionChangedListener selectionListener;
+
+	private LineNumberRulerColumn fLineColumn;
+	private Composite parent;
+
+	/**
+	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
+	 * things like block comments with a different bg color look more like Textmate.
+	 */
+	private LineBackgroundPainter fFullLineBackgroundPainter;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -77,7 +115,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		super();
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object getAdapter(Class required)
 	{
@@ -95,11 +133,63 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
 	public void createPartControl(Composite parent)
 	{
+		this.parent = parent;
 		Composite findBarComposite = getFindBarDecorator().createFindBarComposite(parent);
 		super.createPartControl(findBarComposite);
 		getFindBarDecorator().createFindBar(getSourceViewer());
-		overrideCaretColor();
+		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer());
+	}
+
+	private void overrideThemeColors()
+	{
+		overrideSelectionColor();
+		overrideCaretColor();
+		overrideRulerColors();
+	}
+
+	private void overrideRulerColors()
+	{
+		// Use normal parent gray bg
+		if (parent == null || fLineColumn == null)
+			return;
+		fLineColumn.setBackground(parent.getBackground());
+	}
+
+	@Override
+	protected void initializeLineNumberRulerColumn(LineNumberRulerColumn rulerColumn)
+	{
+		super.initializeLineNumberRulerColumn(rulerColumn);
+		this.fLineColumn = rulerColumn;
+	}
+
+	@Override
+	protected ISourceViewer createSourceViewer(Composite parent, final IVerticalRuler ruler, int styles)
+	{
+		fAnnotationAccess = getAnnotationAccess();
+		fOverviewRuler = createOverviewRuler(getSharedColors());
+
+		ISourceViewer viewer = new SourceViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
+		{
+			protected Layout createLayout()
+			{
+				return new RulerLayout(RULER_EDITOR_GAP);
+			}
+		};
+		// ensure decoration support has been created and configured.
+		getSourceViewerDecorationSupport(viewer);
+
+		if (fFullLineBackgroundPainter == null)
+		{
+			if (viewer instanceof ITextViewerExtension2)
+			{
+				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
+				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
+				extension.addPainter(fFullLineBackgroundPainter);
+			}
+		}
+
+		return viewer;
 	}
 
 	@Override
@@ -112,13 +202,162 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
 	}
 
+	/**
+	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
+	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
+	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
+	 * 
+	 * @author cwilliams
+	 */
+	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
+	{
+
+		private ISourceViewer fViewer;
+		private boolean fIsActive;
+
+		public LineBackgroundPainter(ISourceViewer viewer)
+		{
+			this.fViewer = viewer;
+		}
+
+		@Override
+		public void deactivate(boolean redraw)
+		{
+			// do nothing
+		}
+
+		/*
+		 * @see IPainter#dispose()
+		 */
+		public void dispose()
+		{
+		}
+
+		/*
+		 * @see IPainter#paint(int)
+		 */
+		public void paint(int reason)
+		{
+			if (fViewer.getDocument() == null)
+			{
+				deactivate(false);
+				return;
+			}
+
+			StyledText textWidget = fViewer.getTextWidget();
+			// initialization
+			if (!fIsActive)
+			{
+				textWidget.addLineBackgroundListener(this);
+				fIsActive = true;
+			}
+		}
+
+		@Override
+		public void setPositionManager(IPaintPositionManager manager)
+		{
+			// do nothing
+		}
+
+		@Override
+		public void lineGetBackground(LineBackgroundEvent event)
+		{
+			// FIXME What about when there's other style ranges but we begin and end on same bg color? Do we color the
+			// line background anyways and force style ranges with null bg colors to specify the editor bg?
+			StyledText textWidget = fViewer.getTextWidget();
+			if (textWidget == null)
+				return;
+			String text = event.lineText;
+			if (text == null || text.length() == 0)
+				return;
+			int offset = event.lineOffset;
+			int leadingWhitespace = 0;
+			while (Character.isWhitespace(text.charAt(0)))
+			{
+				leadingWhitespace++;
+				text = text.substring(1);
+				if (text.length() <= 0)
+					break;
+			}
+			int length = text.length();
+			if (length > 0)
+			{
+				StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
+
+				if (ranges != null && ranges.length == 1)
+				{
+					event.lineBackground = ranges[0].background;
+				}
+			}
+		}
+	}
+
+	protected void overrideSelectionColor()
+	{
+		if (getSourceViewer().getTextWidget() == null)
+			return;
+
+		// Force selection color
+		getSourceViewer().getTextWidget().setSelectionBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getSelection()));
+
+		if (selectionListener != null)
+			return;
+		final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(EditorsUI.PLUGIN_ID,
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
+		// Don't auto toggle the current line highlight if it's off (so it should remain off)
+		if (!defaultHighlightCurrentLine)
+			return;
+
+		selectionListener = new ISelectionChangedListener()
+		{
+
+			@Override
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+				ISelection selection = event.getSelection();
+				if (selection instanceof ITextSelection)
+				{
+					// Auto turn off line highlight when there's a selection > 0
+					ITextSelection textSelection = (ITextSelection) selection;
+					if (textSelection.getLength() > 0)
+					{
+						final boolean defaultHighlightCurrentLine = Platform.getPreferencesService().getBoolean(
+								EditorsUI.PLUGIN_ID,
+								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, false, null);
+						if (!defaultHighlightCurrentLine)
+							return;
+					}
+					IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+					prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE, textSelection
+							.getLength() == 0);
+					try
+					{
+						prefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						// ignore
+					}
+				}
+			}
+		};
+		getSelectionProvider().addSelectionChangedListener(selectionListener);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
 	protected void overrideCaretColor()
 	{
 		if (getSourceViewer().getTextWidget() == null)
 			return;
 
 		Caret caret = getSourceViewer().getTextWidget().getCaret();
-		RGB caretColor = ThemeUtil.getActiveTheme().getCaret();
+		RGB caretColor = getThemeManager().getCurrentTheme().getCaret();
 		if (caretColor == null)
 			return;
 
@@ -173,7 +412,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private void setCharacterPairColor(RGB rgb)
 	{
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, rgb.red + "," + rgb.green + "," + rgb.blue);
+		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, MessageFormat.format(
+				"{0},{1},{2}", rgb.red, rgb.green, rgb.blue)); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();
@@ -192,7 +432,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 			fCaretImage.dispose();
 			fCaretImage = null;
 		}
+		removeLineHighlightListener();
 		super.dispose();
+	}
+
+	private void removeLineHighlightListener()
+	{
+		if (getSelectionProvider() != null)
+		{
+			getSelectionProvider().removeSelectionChangedListener(selectionListener);
+		}
+		selectionListener = null;
 	}
 
 	@Override
@@ -205,7 +455,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
 	protected void initializeViewerColors(ISourceViewer viewer)
 	{
-		ThemeUtil.getActiveTheme();
+		getThemeManager().getCurrentTheme();
+		if (viewer == null || viewer.getTextWidget() == null)
+			return;
 		super.initializeViewerColors(viewer);
 	}
 
@@ -213,11 +465,23 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(ThemeUtil.THEME_CHANGED))
+		if (event.getProperty().equals(IThemeManager.THEME_CHANGED))
 		{
-			overrideCaretColor();
+			overrideThemeColors();
 			getSourceViewer().invalidateTextPresentation();
 		}
+		if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
+		{
+			if (selectionListener == null)
+			{
+				overrideSelectionColor();
+			}
+		}
+	}
+
+	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal()
+	{
+		return getSourceViewerConfiguration();
 	}
 
 	@Override
@@ -225,6 +489,13 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
+		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
+		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension)
+		{
+			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		}
 		getFindBarDecorator().installActions();
 	}
 
@@ -255,4 +526,19 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		}
 		return findBarDecorator;
 	}
+
+	/**
+	 * Returns a description of the cursor position.
+	 * 
+	 * @return a description of the cursor position
+	 */
+	protected String getCursorPosition()
+	{
+		String raw = super.getCursorPosition();
+		StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
+		String line = tokenizer.nextToken();
+		String column = tokenizer.nextToken();
+		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+	}
+
 }

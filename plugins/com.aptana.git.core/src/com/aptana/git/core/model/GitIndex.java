@@ -25,6 +25,7 @@ import org.eclipse.osgi.util.NLS;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.util.ProcessUtil;
+import com.aptana.util.StringUtil;
 
 public class GitIndex
 {
@@ -228,7 +229,7 @@ public class GitIndex
 		if (string.length() == 0)
 			return Collections.emptyList();
 
-		return StringUtil.componentsSeparatedByString(string, "\0"); //$NON-NLS-1$
+		return StringUtil.tokenize(string, "\0"); //$NON-NLS-1$
 	}
 
 	private Map<String, List<String>> dictionaryForLines(List<String> lines)
@@ -244,7 +245,7 @@ public class GitIndex
 		{
 			String fileStatus = iter.next();
 			String fileName = iter.next();
-			dictionary.put(fileName, StringUtil.componentsSeparatedByString(fileStatus, " ")); //$NON-NLS-1$
+			dictionary.put(fileName, StringUtil.tokenize(fileStatus, " ")); //$NON-NLS-1$
 		}
 
 		return dictionary;

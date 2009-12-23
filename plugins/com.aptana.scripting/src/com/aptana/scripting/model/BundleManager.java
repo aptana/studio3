@@ -2,61 +2,114 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.URIUtil;
-import org.jruby.anno.JRubyMethod;
 
 import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.util.ResourceUtils;
 
 public class BundleManager
 {
-	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Red Bundles"; //$NON-NLS-1$
-	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Red Bundles"; //$NON-NLS-1$
+	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
+	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
+	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
+	static final MenuElement[] NO_MENUS = new MenuElement[0];
+	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	
+	private static final File[] NO_FILES = new File[0];
+	private static final String[] NO_STRINGS = new String[0];
+	
+	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
-	private static final String BUNDLES_FOLDER_NAME = "bundles"; //$NON-NLS-1$
-	private static final String SNIPPETS_FOLDER_NAME = "snippets"; //$NON-NLS-1$
-	private static final String COMMANDS_FOLDER_NAME = "commands"; //$NON-NLS-1$
+	private static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
-	private static BundleManager INSTANCE;
+	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "RadRails Bundles"; //$NON-NLS-1$
+	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/RadRails Bundles"; //$NON-NLS-1$
 
-	private List<Bundle> _bundles;
-	private Map<String, Bundle> _bundlesByPath;
+	private static BundleManager INSTANCE;
+	
+	private String applicationBundlesPath;
+	private String userBundlesPath;
+	private Map<File, List<BundleElement>> _bundlesByPath;
+	private Map<String, BundleEntry> _entriesByName;
+	
+	private List<ElementChangeListener> _elementListeners;
+	
+	/**
+	 * getInstance - used for unit testing
+	 * 
+	 * @param applicationBundlesPath
+	 * @param userBundlesPath
+	 * @return
+	 */
+	public static BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
+	{
+		if (INSTANCE == null)
+		{
+			// create new instance
+			INSTANCE = new BundleManager();
+			
+			// setup default application bundles path
+			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+			
+			if (url != null)
+			{
+				INSTANCE.applicationBundlesPath = ResourceUtils.resourcePathToString(url);
+			}
+			
+			String OS = Platform.getOS();
+			String userHome = System.getProperty(USER_HOME_PROPERTY);
+			
+			// setup default user bundles path
+			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			{
+				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+			}
+			else
+			{
+				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+			}
+		}
+			
+		// setup application bundles path
+		if (applicationBundlesPath != null && applicationBundlesPath.length() > 0)
+		{
+			INSTANCE.applicationBundlesPath = applicationBundlesPath;
+		}
+
+		// setup user bundles path
+		if (userBundlesPath != null && userBundlesPath.length() > 0)
+		{
+			INSTANCE.userBundlesPath = userBundlesPath;
+		}
+
+		return INSTANCE;
+	}
 	
 	/**
 	 * getInstance
 	 * 
 	 * @return
 	 */
-	@JRubyMethod(name = "instance")
 	public static BundleManager getInstance()
 	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new BundleManager();
-		}
-
-		return INSTANCE;
+		return getInstance(null, null);
 	}
 
 	/**
@@ -65,30 +118,139 @@ public class BundleManager
 	private BundleManager()
 	{
 	}
-
+	
 	/**
 	 * addBundle
 	 * 
 	 * @param bundle
 	 */
-	@JRubyMethod(name = "add_bundle")
-	public void addBundle(Bundle bundle)
+	public void addBundle(BundleElement bundle)
 	{
 		if (bundle != null)
 		{
-			if (this._bundles == null)
-			{
-				this._bundles = new ArrayList<Bundle>();
-			}
-
-			this._bundles.add(bundle);
-
+			File bundleFile = bundle.getBundleDirectory();
+			
+			// store bundle by path
 			if (this._bundlesByPath == null)
 			{
-				this._bundlesByPath = new HashMap<String, Bundle>();
+				this._bundlesByPath = new HashMap<File, List<BundleElement>>();
 			}
-
-			this._bundlesByPath.put(bundle.getPath(), bundle);
+			
+			if (this._bundlesByPath.containsKey(bundleFile) == false)
+			{
+				List<BundleElement> bundles = new ArrayList<BundleElement>();
+				
+				bundles.add(bundle);
+				
+				this._bundlesByPath.put(bundleFile, bundles);
+			}
+			else
+			{
+				List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
+				
+				bundles.add(bundle);
+			}
+			
+			// store bundle by name
+			String name = bundle.getDisplayName();
+			
+			if (this._entriesByName == null)
+			{
+				this._entriesByName = new HashMap<String, BundleEntry>();
+			}
+			
+			if (this._entriesByName.containsKey(name) == false)
+			{
+				BundleEntry entry = new BundleEntry(name);
+				
+				entry.addBundle(bundle);
+				
+				this._entriesByName.put(name, entry);
+			}
+			else
+			{
+				BundleEntry entry = this._entriesByName.get(name);
+				
+				entry.addBundle(bundle);
+			}
+		}
+	}
+	
+	/**
+	 * addElementChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void addElementChangeListener(ElementChangeListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._elementListeners == null)
+			{
+				this._elementListeners = new ArrayList<ElementChangeListener>();
+			}
+			
+			this._elementListeners.add(listener);
+		}
+	}
+	
+	/**
+	 * fireElementAddedEvent
+	 * 
+	 * @param element
+	 */
+	void fireElementAddedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null && element != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.elementAdded(element);
+			}
+		}
+	}
+	
+	/**
+	 * fireElementDeletedEvent
+	 * 
+	 * @param element
+	 */
+	void fireElementDeletedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null && element != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.elementDeleted(element);
+			}
+		}
+	}
+	
+	/**
+	 * fireElementModifiedEvent
+	 * 
+	 * @param element
+	 */
+	void fireElementModifiedEvent(AbstractElement element)
+	{
+		if (this._elementListeners != null && element != null)
+		{
+			boolean sendEvent = true;
+			
+			if (element instanceof AbstractBundleElement)
+			{
+				sendEvent = (((AbstractBundleElement) element).getOwningBundle() != null);
+			}
+			
+			if (sendEvent)
+			{
+				for (ElementChangeListener listener : this._elementListeners)
+				{
+					listener.elementDeleted(element);
+					listener.elementAdded(element);
+//					listener.elementModified(element);
+				}
+			}
 		}
 	}
 
@@ -97,141 +259,427 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	private String getBuiltinsLoadPath()
+	public String getApplicationBundlesPath()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUNDLES_FOLDER_NAME), null);
-		String result = null;
-
-		try
+		return this.applicationBundlesPath;
+	}
+	
+	/**
+	 * getBundleCommands
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CommandElement[] getBundleCommands(String name)
+	{
+		CommandElement[] result = NO_COMMANDS;
+		
+		if (this._entriesByName != null && this._entriesByName.containsKey(name))
 		{
-			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = URIUtil.toURI(fileURL);	// Use Eclipse to get around Java 1.5 bug on Windows
-			File file = new File(fileURI);
-
-			result = file.getAbsolutePath();
+			// grab all bundles of the given name
+			BundleEntry entry = this._entriesByName.get(name);
+			
+			result = entry.getCommands();
 		}
-		catch (IOException e)
-		{
-			String message = MessageFormat.format(
-				Messages.BundleManager_Cannot_Locate_Built_Ins_Directory,
-				new Object[] { url.toString() }
-			);
-
-			Activator.logError(message, e);
-		}
-		catch (URISyntaxException e)
-		{
-			String message = MessageFormat.format(
-				Messages.BundleManager_Malformed_Built_Ins_URI,
-				new Object[] { url.toString() }
-			);
-
-			Activator.logError(message, e);
-		}
-
+		
 		return result;
 	}
-
+	
+	/**
+	 * getBundles
+	 * 
+	 * @param bundlesDirectory
+	 * @return
+	 */
+	protected File[] getBundleDirectories(File bundlesDirectory)
+	{
+		File[] result = NO_FILES;
+		
+		if (bundlesDirectory != null && bundlesDirectory.isDirectory() && bundlesDirectory.canRead())
+		{
+			result = bundlesDirectory.listFiles(new FileFilter()
+			{
+				public boolean accept(File pathname)
+				{
+					return (pathname.isDirectory() && pathname.getName().startsWith(".") == false); //$NON-NLS-1$
+				}
+			});
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundle
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public BundleEntry getBundleEntry(String name)
+	{
+		BundleEntry result = null;
+		
+		if (this._entriesByName != null)
+		{
+			result = this._entriesByName.get(name);
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getBundleFromPath
 	 * 
 	 * @param path
 	 * @return
 	 */
-	@JRubyMethod(name = "bundle_from_path")
-	public Bundle getBundleFromPath(String path)
+	public BundleElement getBundleFromPath(String path)
 	{
-		Bundle result = null;
-
-		if (this._bundlesByPath != null)
+		BundleElement result = null;
+		
+		if (path != null)
 		{
-			result = this._bundlesByPath.get(path);
+			result = this.getBundleFromPath(new File(path));
 		}
-
+		
 		return result;
 	}
+	
+	/**
+	 * getBundleFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public BundleElement getBundleFromPath(File bundleDirectory)
+	{
+		BundleElement result = null;
+		
+		if (this._bundlesByPath != null)
+		{
+			List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
+			
+			if (bundles != null)
+			{
+				int size = bundles.size();
+				
+				if (size > 0)
+				{
+					result = bundles.get(size - 1);
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleLoadPaths
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected List<String> getBundleLoadPaths(File bundleDirectory)
+	{
+		List<String> result = new ArrayList<String>();
+		
+		result.add(ScriptingEngine.getBuiltinsLoadPath());
+		result.add(bundleDirectory.getAbsolutePath() + File.separator + LIB_DIRECTORY_NAME);
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleCommands
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public MenuElement[] getBundleMenus(String name)
+	{
+		MenuElement[] result = NO_MENUS;
+		
+		if (this._entriesByName != null && this._entriesByName.containsKey(name))
+		{
+			// grab all bundles of the given name
+			BundleEntry entry = this._entriesByName.get(name);
+			
+			result = entry.getMenus();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleNames
+	 * 
+	 * @return
+	 */
+	public String[] getBundleNames()
+	{
+		String[] result = NO_STRINGS;
+		
+		if (this._entriesByName != null && this._entriesByName.size() > 0)
+		{
+			result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
+			
+			Arrays.sort(result);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleScopeFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public BundleScope getBundleScopeFromPath(File path)
+	{
+		return this.getBundleScopeFromPath(path.getAbsolutePath());
+	}
+	
+	/**
+	 * getBundleScopeFromPath
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public BundleScope getBundleScopeFromPath(String path)
+	{
+		BundleScope result = BundleScope.PROJECT;
+		
+		if (path != null)
+		{
+			if (path.startsWith(this.applicationBundlesPath))
+			{
+				result = BundleScope.APPLICATION;
+			}
+			else if (path.startsWith(this.userBundlesPath))
+			{
+				result = BundleScope.USER;
+			}
+		}
+			
+		return result;
+	}
+	
+	/**
+	 * getBundleScripts
+	 * 
+	 * @return
+	 */
+	protected File[] getBundleScripts(File bundleDirectory)
+	{
+		List<File> result = new ArrayList<File>();
 
+		if (this.isValidBundleDirectory(bundleDirectory))
+		{
+			String bundlePath = bundleDirectory.getAbsolutePath();
+
+			// check for a top-level bundle.rb file
+			File bundleFile = new File(bundlePath + File.separator + BUNDLE_FILE);
+
+			if (bundleFile.exists())
+			{
+				result.add(bundleFile);
+			}
+
+			// check for scripts inside "commands" directory
+			File commandsDirectory = new File(bundlePath + File.separator + COMMANDS_DIRECTORY_NAME);
+
+			result.addAll(Arrays.asList(this.getScriptsFromDirectory(commandsDirectory)));
+			
+			// check for scripts inside "snippets" directory
+			File snippetsDirectory = new File(bundlePath + File.separator + SNIPPETS_DIRECTORY_NAME);
+			
+			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
+		}
+
+		return result.toArray(new File[result.size()]);
+	}
+	
+	/**
+	 * getCommands
+	 * 
+	 * @return
+	 */
+	public CommandElement[] getCommands()
+	{
+		CommandElement[] result = NO_COMMANDS;
+		
+		String[] bundleNames = this.getBundleNames();
+		
+		if (bundleNames != null && bundleNames.length > 0)
+		{
+			List<CommandElement> commands = new ArrayList<CommandElement>();
+			
+			for (String name : bundleNames)
+			{
+				commands.addAll(Arrays.asList(this.getBundleCommands(name)));
+			}
+			
+			result = commands.toArray(new CommandElement[commands.size()]);
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * getCommandsFromScope
 	 * 
 	 * @param scope
 	 * @return
 	 */
-	public Command[] getCommandsFromScope(String scope)
+	public CommandElement[] getCommandsFromScope(String scope)
 	{
-		if (this._bundles == null)
-			return new Command[0];
-		
-		List<Command> result = new ArrayList<Command>();
-		for (Bundle bundle : this._bundles)
-		{
-			for (Command command : bundle.getCommands())
-			{
-				if (command.getScopeSelector().matches(scope))
-				{
-					result.add(command);
-				}
-			}
-		}
-		return result.toArray(new Command[result.size()]);
+		return this.getCommandsFromScopes(new String[] { scope }, null);
 	}
 	
 	/**
-	 * getLoadPaths
+	 * getCommandsFromScope
 	 * 
-	 * @param resource
+	 * @param scope
+	 * @param filter
 	 * @return
 	 */
-	private List<String> getLoadPaths(File resource)
+	public CommandElement[] getCommandsFromScope(String scope, IModelFilter filter)
 	{
-		File folder = (resource != null && resource.isDirectory()) ? resource : resource.getParentFile();
-		List<String> loadPaths = new ArrayList<String>();
-		File bundleFolder = folder.getParentFile();
-		File bundlesFolder = bundleFolder.getParentFile();
-		
-		loadPaths.add(this.getBuiltinsLoadPath());
-		loadPaths.add(bundlesFolder.getAbsolutePath());
-		loadPaths.add(bundleFolder.getAbsolutePath());
-		loadPaths.add("."); //$NON-NLS-1$
-		
-		return loadPaths;
+		return this.getCommandsFromScopes(new String[] { scope }, filter);
 	}
-
+	
 	/**
-	 * getLoadPaths
+	 * getCommandsFromScopes
 	 * 
-	 * @param resource
+	 * @param scopes
 	 * @return
 	 */
-	private List<String> getLoadPaths(IResource resource)
+	public CommandElement[] getCommandsFromScopes(String[] scopes)
 	{
-		return this.getLoadPaths(resource.getLocation().toFile());
+		return this.getCommandsFromScopes(scopes, null);
 	}
-
+	
 	/**
-	 * getSnippetsFromScope
+	 * getCommandsFromScopes
+	 * 
+	 * @param scopes
+	 * @param filter
+	 * @return
+	 */
+	public CommandElement[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	{
+		List<CommandElement> result = new ArrayList<CommandElement>();
+		
+		if (scopes != null && scopes.length > 0)
+		{
+			for (String name : this.getBundleNames())
+			{
+				for (CommandElement command : this.getBundleCommands(name))
+				{
+					if (command.matches(scopes) && ((filter != null) ? filter.include(command) : true))
+					{
+						result.add(command);
+					}
+				}
+			}
+		}
+		
+		return result.toArray(new CommandElement[result.size()]);
+	}
+	
+	/**
+	 * getMenusFromScope
 	 * 
 	 * @param scope
 	 * @return
 	 */
-	public Snippet[] getSnippetsFromScope(String scope)
+	public MenuElement[] getMenusFromScope(String scope)
 	{
-		if (this._bundles == null)
-			return new Snippet[0];
+		return this.getMenusFromScopes(new String[] { scope }, null);
+	}
+	
+	/**
+	 * getMenusFromScope
+	 * 
+	 * @param scope
+	 * @param filter
+	 * @return
+	 */
+	public MenuElement[] getMenusFromScope(String scope, IModelFilter filter)
+	{
+		return this.getMenusFromScopes(new String[] { scope }, filter);
+	}
+	
+	/**
+	 * getMenusFromScope
+	 * 
+	 * @param scopes
+	 * @return
+	 */
+	public MenuElement[] getMenusFromScope(String[] scopes)
+	{
+		return this.getMenusFromScopes(scopes, null);
+	}
+
+	/**
+	 * getMenusFromScopes
+	 * 
+	 * @param scopes
+	 * @param filter
+	 * @return
+	 */
+	public MenuElement[] getMenusFromScopes(String[] scopes, IModelFilter filter)
+	{
+		List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		List<Snippet> result = new ArrayList<Snippet>();
-		for (Bundle bundle : this._bundles)
+		if (scopes != null && scopes.length > 0)
 		{
-			for (Snippet snippet : bundle.getSnippets())
+			for (String name : this.getBundleNames())
 			{
-				if (snippet.getScopeSelector().matches(scope))
+				for (MenuElement menu : this.getBundleMenus(name))
 				{
-					result.add(snippet);
+					if (menu.matches(scopes) && ((filter != null) ? filter.include(menu) : true))
+					{
+						result.add(menu);
+					}
 				}
 			}
 		}
+		
+		return result.toArray(new MenuElement[result.size()]);
+	}
+	
+	/**
+	 * getScriptsFromDirectory
+	 * 
+	 * @param directory
+	 * @return
+	 */
+	protected File[] getScriptsFromDirectory(File directory)
+	{
+		File[] result = NO_FILES;
 
-		return result.toArray(new Snippet[result.size()]);
+		if (directory.exists() && directory.canRead())
+		{
+			result = directory.listFiles(new FileFilter()
+			{
+				public boolean accept(File pathname)
+				{
+					return pathname.isFile() && pathname.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION);
+				}
+			});
+			
+			Arrays.sort(result, new Comparator<File>()
+			{
+				public int compare(File o1, File o2)
+				{
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+		}
+		
+		return result;
 	}
 
 	/**
@@ -239,301 +687,336 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	public String getUserBundlePath()
+	public String getUserBundlesPath()
 	{
-		String OS = Platform.getOS();
-		String userHome = System.getProperty(USER_HOME_PROPERTY);
-		String result = null;
-		
-		// TODO: define user bundle paths for other platforms
-		if (OS.equals(Platform.OS_MACOSX))
+		return this.userBundlesPath;
+	}
+	
+	/**
+	 * isValidBundleDirectory
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected boolean isValidBundleDirectory(File bundleDirectory)
+	{
+		return this.isValidBundleDirectory(bundleDirectory, true);
+	}
+	
+	/**
+	 * isValidBundleDirectory
+	 * 
+	 * @param bundleDirectory
+	 * @param logErrors
+	 * @return
+	 */
+	protected boolean isValidBundleDirectory(File bundleDirectory, boolean logErrors)
+	{
+		String message = null;
+		boolean result = false;
+
+		if (bundleDirectory.exists())
 		{
-			result = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+			if (bundleDirectory.isDirectory())
+			{
+				if (bundleDirectory.canRead())
+				{
+					result = true;
+				}
+				else
+				{
+					message = MessageFormat.format(
+						Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() }
+					);
+				}
+			}
+			else
+			{
+				message = MessageFormat.format(
+					Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+					new Object[] { bundleDirectory.getAbsolutePath() }
+				);
+			}
 		}
 		else
 		{
-			result = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+			message = MessageFormat.format(
+				Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+				new Object[] { bundleDirectory.getAbsolutePath() }
+			);
 		}
-		
+
+		if (result == false && logErrors && message != null && message.length() > 0)
+		{
+			ScriptLogger.logError(message);
+		}
+
 		return result;
 	}
 	
+	/**
+	 * loadApplicationBundles
+	 */
+	public void loadApplicationBundles()
+	{
+		String applicationBundles = this.getApplicationBundlesPath();
+		
+		if (applicationBundles != null)
+		{
+			File applicationBundlesDirectory = new File(applicationBundles);
+			
+			for (File bundle : this.getBundleDirectories(applicationBundlesDirectory))
+			{
+				this.loadBundle(bundle);
+			}
+		}
+	}
+	
+	/**
+	 * loadBundle
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void loadBundle(File bundleDirectory)
+	{
+		File[] bundleScripts = this.getBundleScripts(bundleDirectory);
+
+		if (bundleScripts.length > 0)
+		{
+			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			for (File script : bundleScripts)
+			{
+				this.loadScript(script, bundleLoadPaths);
+			}
+		}
+	}
+
 	/**
 	 * loadBundles
 	 */
 	public void loadBundles()
 	{
-		this.loadProjectBundles();
+		// clear out any existing bundles since we're rebuilding from scratch
+		this.reset();
+
+		this.loadApplicationBundles();
 		this.loadUserBundles();
+		this.loadProjectBundles();
 	}
 	
 	/**
 	 * loadProjectBundles
 	 */
-	private void loadProjectBundles()
+	public void loadProjectBundles()
 	{
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			this.processProject(project);
+			File projectDirectory = project.getLocation().toFile();
+			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
+			
+			for (File bundle : this.getBundleDirectories(bundlesDirectory))
+			{
+				this.loadBundle(bundle);
+			}
 		}
 	}
 	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 */
+	public void loadScript(File script)
+	{
+		if (script != null)
+		{
+			// determine bundle root directory
+			String scriptPath = script.getAbsolutePath();
+			File bundleDirectory = null;
+			
+			if (scriptPath.endsWith(BUNDLE_FILE))
+			{
+				bundleDirectory = script.getParentFile();
+			}
+			else
+			{
+				bundleDirectory = script.getParentFile().getParentFile();
+			}
+	
+			// get bundle load paths
+			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			// execute script
+			this.loadScript(script, bundleLoadPaths);
+		}
+	}
+	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 */
+	public void loadScript(File script, List<String> loadPaths)
+	{
+		boolean execute = true;
+		
+		if (script == null)
+		{
+			String message = MessageFormat.format(
+				Messages.BundleManager_Executed_Null_Script,
+				new Object[] { }
+			);
+			
+			ScriptLogger.logError(message);
+			execute = false;
+		}
+		
+		if (execute && script.canRead() == false)
+		{
+			String message = MessageFormat.format(
+				Messages.BundleManager_UNREADABLE_SCRIPT,
+				new Object[] { script.getAbsolutePath() }
+			);
+			
+			ScriptLogger.logError(message);
+			execute = false;
+		}
+		
+		if (execute)
+		{
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+		}
+	}
+
 	/**
 	 * loadUserBundles
 	 */
-	private void loadUserBundles()
+	public void loadUserBundles()
 	{
-		String userBundlesPath = this.getUserBundlePath();
+		String userBundles = this.getUserBundlesPath();
 		
-		if (userBundlesPath != null && userBundlesPath.length() > 0)
+		if (userBundles != null)
 		{
-			File userBundles = new File(userBundlesPath);
+			File userBundlesDirectory = new File(userBundles);
 			
-			if (userBundles.exists() && userBundles.isDirectory() && userBundles.canRead())
+			for (File bundle : this.getBundleDirectories(userBundlesDirectory))
 			{
-				File[] bundles = userBundles.listFiles(new FileFilter()
-				{
-					public boolean accept(File pathname)
-					{
-						return pathname.isDirectory() && pathname.canRead();
-					}
-				});
-				
-				for (File bundle : bundles)
-				{
-					this.processBundle(bundle, true);
-				}
+				this.loadBundle(bundle);
 			}
 		}
 	}
 
 	/**
-	 * moveBundle
+	 * reloadScript
 	 * 
-	 * @param oldFolder
-	 * @param newFolder
+	 * @param script
 	 */
-	public void moveBundle(String oldFolder, String newFolder)
+	public void reloadScript(File script)
 	{
-		if (newFolder != null && newFolder.length() > 0)
+		if (script != null)
 		{
-			Bundle bundle = this.getBundleFromPath(oldFolder);
-
-			if (bundle != null)
-			{
-				// remove bundle path reference
-				this._bundlesByPath.remove(oldFolder);
-
-				// update bundle path
-				bundle.moveTo(newFolder);
-
-				// add new path reference
-				this._bundlesByPath.put(newFolder, bundle);
-			}
+			this.unloadScript(script);
+			this.loadScript(script);
 		}
-	}
-
-	/**
-	 * processBundle
-	 * 
-	 * @param bundleRoot
-	 * @param processChildren
-	 */
-	public void processBundle(IResource bundleRoot, boolean processChildren)
-	{
-		this.processBundle(bundleRoot.getLocation().toFile(), processChildren);
+		else
+		{
+			String message = MessageFormat.format(
+				Messages.BundleManager_Reloaded_Null_Script,
+				new Object[] {}
+			);
+			
+			ScriptLogger.logError(message);
+		}
 	}
 	
 	/**
-	 * processBundle
+	 * removeElementChangeListener
 	 * 
-	 * @param bundleRoot
-	 * @param processChildren
+	 * @param listener
 	 */
-	public void processBundle(File bundleRoot, boolean processChildren)
+	public void removeElementChangeListener(ElementChangeListener listener)
 	{
-		String bundlePath = bundleRoot.getAbsolutePath();
-		File bundleFile = new File(bundlePath + File.separator + BUNDLE_FILE);
-		
-		if (bundleFile.exists() && bundleFile.canRead())
+		if (this._elementListeners != null)
 		{
-			String fullPath = bundleFile.getAbsolutePath();
-			List<String> loadPaths = new ArrayList<String>();
+			this._elementListeners.remove(listener);
+		}
+	}
+	
+	/**
+	 * reset
+	 */
+	public void reset()
+	{
+		// TODO: should unload all commands, menus, and snippets so events fire, but
+		// this is used for test only right now.
+		if (this._bundlesByPath != null)
+		{
+			this._bundlesByPath.clear();
+		}
+		
+		if (this._entriesByName != null)
+		{
+			this._entriesByName.clear();
+		}
+	}
+	
+	/**
+	 * unloadScript
+	 * 
+	 * @param script
+	 */
+	public void unloadScript(File script)
+	{
+		if (script != null)
+		{
+			String scriptPath = script.getAbsolutePath();
+			AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
 			
-			loadPaths.add(this.getBuiltinsLoadPath());
-			loadPaths.add("."); //$NON-NLS-1$
-			
-			ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-			
-			if (processChildren)
+			// remove bundle members in pass 1
+			for (AbstractElement element : elements)
 			{
-				// process snippets and command folders
-				this.processFolder(new File(bundlePath + File.separator + SNIPPETS_FOLDER_NAME));
-				this.processFolder(new File(bundlePath + File.separator + COMMANDS_FOLDER_NAME));
+				if (element instanceof AbstractBundleElement)
+				{
+					AbstractBundleElement bundleElement = (AbstractBundleElement) element;
+					BundleElement bundle = bundleElement.getOwningBundle();
+					
+					if (bundle != null)
+					{
+						bundle.removeElement(bundleElement);
+					}
+					else
+					{
+						// TODO: this should not be happening
+					}
+				}
+			}
+			
+			// clear (and possibly remove) bundles in pass 2
+			for (AbstractElement element : elements)
+			{
+				if (element instanceof BundleElement)
+				{
+					BundleElement bundle = (BundleElement) element;
+					
+					bundle.clearMetadata();
+					
+					if (bundle.isEmpty())
+					{
+						AbstractElement.unregisterElement(bundle);
+					}
+				}
 			}
 		}
 		else
 		{
-			System.out.println(Messages.BundleManager_Missing_Bundle_File + bundlePath);
-		}
-	}
-	
-	/**
-	 * processFolder
-	 * 
-	 * @param folder
-	 */
-	private void processFolder(File folder)
-	{
-		if (folder != null && folder.isDirectory() && folder.canRead())
-		{
-			List<String> loadPaths = this.getLoadPaths(folder);
-			File[] files = folder.listFiles(new FilenameFilter()
-			{
-				public boolean accept(File dir, String name)
-				{
-					return name.toLowerCase().endsWith(RUBY_FILE_EXTENSION);
-				}
-			});
+			String message = MessageFormat.format(
+				Messages.BundleManager_Unloaded_Null_Script,
+				new Object[] {}
+			);
 			
-			for (File file: files)
-			{
-				String fullPath = file.getAbsolutePath();
-				
-				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-			}
-		}
-	}
-
-	/**
-	 * processProject
-	 * 
-	 * @param project
-	 */
-	private void processProject(IProject project)
-	{
-		IFolder bundlesFolder = project.getFolder(BUNDLES_FOLDER_NAME);
-
-		if (bundlesFolder != null)
-		{
-			try
-			{
-				for (IResource resource : bundlesFolder.members())
-				{
-					if (resource instanceof IFolder)
-					{
-						this.processBundle(resource, true);
-					}
-				}
-			}
-			catch (CoreException e)
-			{
-			}
-		}
-	}
-
-	/**
-	 * processFile
-	 * 
-	 * @param file
-	 */
-	public void processSnippetOrCommand(IResource file)
-	{
-		if (file != null)
-		{
-			if (file.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION))
-			{
-				List<String> loadPaths = this.getLoadPaths(file);
-				String fullPath = file.getLocation().toPortableString();
-
-				ScriptingEngine.getInstance().runScript(fullPath, loadPaths);
-			}
-		}
-	}
-
-	/**
-	 * removeBundle
-	 * 
-	 * @param bundle
-	 */
-	public void removeBundle(Bundle bundle)
-	{
-		if (bundle != null)
-		{
-			if (this._bundles != null)
-			{
-				this._bundles.remove(bundle);
-			}
-		}
-	}
-
-	/**
-	 * removeBundle
-	 * 
-	 * @param bundleFolder
-	 */
-	public void removeBundle(String bundleFolder)
-	{
-		Bundle bundle = this.getBundleFromPath(bundleFolder);
-
-		if (bundle != null)
-		{
-			this.removeBundle(bundle);
-		}
-	}
-
-	/**
-	 * removeSnippetOrCommand
-	 * 
-	 * @param file
-	 */
-	public void removeSnippetOrCommand(IResource file)
-	{
-		if (file != null)
-		{
-			IContainer parentFolder = file.getParent();
-			IContainer bundleFolder = parentFolder.getParent();
-			Bundle bundle = this.getBundleFromPath(bundleFolder.getLocation().toPortableString());
-			
-			if (bundle != null)
-			{
-				if (parentFolder.getName().equals(SNIPPETS_FOLDER_NAME))
-				{
-					Snippet[] snippets = bundle.findSnippetsFromPath(file.getLocation().toPortableString());
-					
-					for (Snippet snippet : snippets)
-					{
-						bundle.removeSnippet(snippet);
-					}
-				}
-				else if (parentFolder.getName().equals(COMMANDS_FOLDER_NAME))
-				{
-					Command[] commands = bundle.findCommandsFromPath(file.getLocation().toPortableString());
-					
-					for (Command command : commands)
-					{
-						bundle.removeCommand(command);
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * showBundles
-	 */
-	public void showBundles()
-	{
-		if (this._bundles != null)
-		{
-			for (Bundle bundle : this._bundles)
-			{
-				System.out.println(bundle);
-			}
-		}
-		else
-		{
-			System.out.println(Messages.BundleManager_NO_BUNDLES);
+			ScriptLogger.logError(message);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package com.aptana.editor.common.theme.preferences;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -38,6 +42,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -45,6 +51,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -56,6 +63,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -66,12 +74,21 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
+	/**
+	 * Key to store the dialog settings for the initial directory to open when importing themes (saves last directory).
+	 */
+	private static final String THEME_DIRECTORY = "themeDirectory"; //$NON-NLS-1$
+
+	/**
+	 * The list of "standard" token types to set up for a theme.
+	 */
 	private static List<String> tokenTypeNames = new ArrayList<String>();
 	static
 	{
@@ -145,14 +162,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
 
-		setTheme(ThemeUtil.getActiveTheme().getName());
+		setTheme(getThemeManager().getCurrentTheme().getName());
 		return composite;
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void createThemeListControls(Composite composite)
 	{
 		Composite themesComp = new Composite(composite, SWT.NONE);
-		themesComp.setLayout(new GridLayout(4, false));
+		themesComp.setLayout(new GridLayout(5, false));
 
 		fThemeCombo = new Combo(themesComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		loadThemeNames();
@@ -162,7 +184,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				setTheme(fThemeCombo.getText());
-				ThemeUtil.setActiveTheme(getTheme());
+				getThemeManager().setCurrentTheme(getTheme());
 				super.widgetSelected(e);
 			}
 		});
@@ -172,14 +194,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			public String isValid(String newText)
 			{
-				if (newText == null || newText.trim().length() == 0)
-					return Messages.ThemePreferencePage_NameNonEmptyMsg;
-				if (ThemeUtil.getThemeNames().contains(newText.trim()))
-					return Messages.ThemePreferencePage_NameAlreadyExistsMsg;
-				if (newText.contains(ThemeUtil.THEME_NAMES_DELIMETER))
-					return MessageFormat.format(Messages.ThemePreferencePage_InvalidCharInThemeName,
-							ThemeUtil.THEME_NAMES_DELIMETER);
-				return null;
+				IStatus status = getThemeManager().validateThemeName(newText);
+				if (status.isOK())
+					return null;
+				return status.getMessage();
 			}
 		};
 
@@ -198,7 +216,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme newTheme = getTheme().copy(dialog.getValue());
 					// Add theme to theme list, make current theme this one
-					ThemeUtil.setActiveTheme(newTheme);
+					getThemeManager().setCurrentTheme(newTheme);
 					loadThemeNames();
 					setTheme(newTheme.getName());
 				}
@@ -221,7 +239,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme oldTheme = getTheme();
 					Theme newTheme = oldTheme.copy(dialog.getValue());
-					ThemeUtil.setActiveTheme(newTheme);
+					getThemeManager().setCurrentTheme(newTheme);
 					oldTheme.delete();
 					loadThemeNames();
 					setTheme(newTheme.getName());
@@ -244,7 +262,45 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 				getTheme().delete();
 				loadThemeNames();
-				setTheme(ThemeUtil.getActiveTheme().getName());
+				setTheme(getThemeManager().getCurrentTheme().getName());
+			}
+		});
+
+		// Textmate Import
+		Button importButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		importButton.setText(Messages.ThemePreferencePage_ImportLabel);
+		importButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+				IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+				String value = editorSettings.get(THEME_DIRECTORY);
+				if (value != null)
+				{
+					fileDialog.setFilterPath(value);
+				}
+				fileDialog.setFilterExtensions(new String[] { "*.tmTheme" }); //$NON-NLS-1$
+				String path = fileDialog.open();
+				if (path == null)
+					return;
+
+				File themeFile = new File(path);
+				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
+
+				try
+				{
+					Theme theme = new TextmateImporter().convert(themeFile);
+					getThemeManager().addTheme(theme);
+					getThemeManager().setCurrentTheme(theme);
+					loadThemeNames();
+					setTheme(theme.getName());
+				}
+				catch (FileNotFoundException e1)
+				{
+					CommonEditorPlugin.logError(e1);
+				}
 			}
 		});
 	}
@@ -252,7 +308,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void loadThemeNames()
 	{
 		fThemeCombo.removeAll();
-		List<String> themeNames = new ArrayList<String>(ThemeUtil.getThemeNames());
+		List<String> themeNames = new ArrayList<String>(getThemeManager().getThemeNames());
 		Collections.sort(themeNames, new Comparator<String>()
 		{
 			public int compare(String o1, String o2)
@@ -457,7 +513,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			}
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings("unchecked")
 			public Object[] getElements(Object inputElement)
 			{
 				Map<String, TextAttribute> tokens = theme.getTokens();
@@ -771,7 +827,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
-		if (ThemeUtil.isBuiltinTheme(themeName))
+		if (getThemeManager().isBuiltinTheme(themeName))
 		{
 			renameThemeButton.setEnabled(false);
 			deleteThemeButton.setEnabled(false);
@@ -797,9 +853,34 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			createButton(table, items[i], 1, commit.getValue().getForeground());
 			if (commit.getValue().getBackground() != null)
 				createButton(table, items[i], 2, commit.getValue().getBackground());
-
 			createFontStyle(table, items[i], commit.getValue());
 		}
+		table.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				// If user is clicking in the BG column when it's empty, pop open a color dialog
+				int myX = table.getColumn(0).getWidth();
+				myX += table.getColumn(1).getWidth();
+				int width = table.getColumn(2).getWidth() + 2;
+				if (!(e.x > myX && e.x < (myX + width)))
+					return;
+				TableItem tableItem = table.getItem(new Point(e.x, e.y));
+				ColorDialog colorDialog = new ColorDialog(table.getShell());
+				colorDialog.setRGB(getTheme().getBackground());
+				RGB newRGB = colorDialog.open();
+				if (newRGB == null)
+					return;
+				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				Color fg = token.getValue().getForeground();
+				Color bg = CommonEditorPlugin.getDefault().getColorManager().getColor(newRGB);
+
+				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
+				getTheme().update(token.getKey(), at);
+				setTheme(fSelectedTheme);
+			}
+		});
 	}
 
 	private void clearTableEditors()
@@ -921,7 +1002,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		ThemeUtil.setActiveTheme(getTheme());
+		getThemeManager().setCurrentTheme(getTheme());
 		return super.performOk();
 	}
 
@@ -932,7 +1013,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			Theme theme = getTheme();
 			theme.loadFromDefaults();
-			ThemeUtil.setActiveTheme(theme);
+			getThemeManager().setCurrentTheme(theme);
 			setTheme(fSelectedTheme);
 		}
 		catch (Exception e)
@@ -944,7 +1025,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected Theme getTheme()
 	{
-		return ThemeUtil.getTheme(fSelectedTheme);
+		return getThemeManager().getTheme(fSelectedTheme);
 	}
 
 	@Override

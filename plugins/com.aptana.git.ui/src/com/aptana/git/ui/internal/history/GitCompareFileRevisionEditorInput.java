@@ -267,7 +267,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 	/* (non-Javadoc)
 	 * @see org.eclipse.compare.CompareEditorInput#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IFile.class || adapter == IResource.class) {
 			if (getLocalElement() != null) {

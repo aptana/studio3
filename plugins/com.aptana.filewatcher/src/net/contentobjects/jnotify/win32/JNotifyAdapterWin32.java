@@ -39,6 +39,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 import net.contentobjects.jnotify.Util;
 
+@SuppressWarnings("nls")
 public class JNotifyAdapterWin32 implements IJNotify
 {
 	private Hashtable<Integer, WatchData> _id2Data;
@@ -82,10 +83,7 @@ public class JNotifyAdapterWin32 implements IJNotify
 				JNotify_win32.removeWatch(wd);
 				return true;
 			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 	}
 

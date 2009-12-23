@@ -148,7 +148,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		}
 		setOffset(getAdjustedOffset());
 		setLength(0);
-		IToken returnValue = new Token(RubySourceConfiguration.DEFAULT);
+		IToken returnValue = new Token(fContentType);
 		boolean isEOF = false;
 		try
 		{
@@ -515,7 +515,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		fContentType = oldContentType;
 		fOpeningString = oldOpening;
 	}
-	
+
 	private void setLexerPastHeredocBeginning(String rawBeginning) throws IOException
 	{
 		String heredocMarker = HEREDOC_MARKER_PREFIX;
@@ -533,7 +533,6 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		push(new QueuedToken(new Token(RubySourceConfiguration.STRING), afterHeredoc, getAdjustedOffset()
 				- afterHeredoc));
 	}
-
 
 	private void generateHackedSource(String beginning) throws IOException
 	{
@@ -595,6 +594,10 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				return new Token(RubySourceConfiguration.STRING);
 			}
 		}
+		if (fContentType.equals(RubySourceConfiguration.MULTI_LINE_COMMENT) && i != Tokens.tWHITESPACE)
+		{
+			fContentType = RubySourceConfiguration.DEFAULT;
+		}
 
 		switch (i)
 		{
@@ -603,6 +606,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tCOMMENT:
 				return new Token(RubySourceConfiguration.SINGLE_LINE_COMMENT);
 			case Tokens.tDOCUMENTATION:
+				fContentType = RubySourceConfiguration.MULTI_LINE_COMMENT;
 				return new Token(RubySourceConfiguration.MULTI_LINE_COMMENT);
 			case Tokens.tSTRING_CONTENT:
 				return new Token(fContentType);

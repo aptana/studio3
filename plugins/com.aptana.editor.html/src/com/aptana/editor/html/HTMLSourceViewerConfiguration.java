@@ -40,10 +40,11 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.CommonDoubleClickStrategy;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.js.JSSourceConfiguration;
 
@@ -51,9 +52,9 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	
 	private CommonDoubleClickStrategy doubleClickStrategy;
 
-	public HTMLSourceViewerConfiguration(IPreferenceStore preferences) {
-	    super(preferences);
-	}
+    public HTMLSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(preferences, editor);
+    }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
@@ -66,6 +67,13 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 				JSSourceConfiguration.CONTENT_TYPES,
 				CSSSourceConfiguration.CONTENT_TYPES
 			});
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return HTMLSourceConfiguration.getDefault().getTopContentTypes();
 	}
 
 	/* (non-Javadoc)

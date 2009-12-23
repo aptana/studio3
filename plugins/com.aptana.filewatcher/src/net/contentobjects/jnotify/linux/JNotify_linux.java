@@ -33,6 +33,7 @@ package net.contentobjects.jnotify.linux;
 
 import net.contentobjects.jnotify.JNotifyException;
 
+@SuppressWarnings("nls")
 public class JNotify_linux
 {
 	static final boolean DEBUG = false;

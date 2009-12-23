@@ -45,32 +45,11 @@ public final class QualifiedContentType {
 
 	private final String[] contentTypes;
 	private String toString;
-	
-	/**
-	 * 
-	 */
-	public QualifiedContentType(String contentType) {
-		this(new String[] { contentType });
-	}
 
 	/**
 	 * 
 	 */
-	public QualifiedContentType(String contentType1, String contentType2) {
-		this(new String[] { contentType1, contentType2 });
-	}
-
-	/**
-	 * 
-	 */
-	public QualifiedContentType(String contentType1, String contentType2, String contentType3) {
-		this(new String[] { contentType1, contentType2, contentType3 });
-	}
-
-	/**
-	 * 
-	 */
-	public QualifiedContentType(String[] contentTypes) {
+	public QualifiedContentType(String... contentTypes) {
 		this.contentTypes = contentTypes;
 	}
 

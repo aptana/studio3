@@ -35,7 +35,7 @@ package net.contentobjects.jnotify.win32;
 
 import net.contentobjects.jnotify.JNotifyException;
 
-
+@SuppressWarnings("nls")
 public class JNotify_win32
 {
 	static

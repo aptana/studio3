@@ -165,26 +165,28 @@ public class ProcessWrapper
 		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 		{
 			URL url;
-			if (OS.equals(Platform.OS_MACOSX)) {
+
+			if (OS.equals(Platform.OS_MACOSX))
+			{
 				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
-			} else {
-				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty."+ OS + "." + OSARCH), null); //$NON-NLS-1$ //$NON-NLS-2$
 			}
+			else
+			{
+				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty." + OS + "." + OSARCH), null); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			
 			try
 			{
 				URL fileURL = FileLocator.toFileURL(url);
-				
+
 				File file = new File(new Path(fileURL.getPath()).toOSString());
-				
+
 				result = file.getAbsolutePath();
 			}
 			catch (IOException e)
 			{
-				String message = MessageFormat.format(
-					Messages.ProcessWrapper_Error_Locating_Terminal_Executable,
-					new Object[] { url.toString() }
-				);
-				
+				String message = MessageFormat.format(Messages.ProcessWrapper_Error_Locating_Terminal_Executable, new Object[] { url.toString() });
+
 				Activator.logError(message, e);
 			}
 		}

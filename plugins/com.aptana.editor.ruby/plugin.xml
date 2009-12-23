@@ -5,8 +5,9 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.ruby.RubySourceEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            icon="icons/rb.gif"
+            icon="icons/rb.png"
             id="com.aptana.editor.ruby"
             name="%editor.rb.name">
          <contentTypeBinding

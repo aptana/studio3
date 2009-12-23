@@ -44,7 +44,7 @@ abstract class AbstractOperationAction implements IObjectActionDelegate {
 		// work performed in setActivePart
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public void setActivePart(final IAction act, final IWorkbenchPart part) {
 		wp = part;
 		ISelection sel = part.getSite().getPage().getSelection();
@@ -65,7 +65,7 @@ abstract class AbstractOperationAction implements IObjectActionDelegate {
 	 * @param selection
 	 * @return a {@link IWorkspaceRunnable} for invoking this operation later on
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	protected abstract IWorkspaceRunnable createOperation(final IAction act,
 			final List selection);
 

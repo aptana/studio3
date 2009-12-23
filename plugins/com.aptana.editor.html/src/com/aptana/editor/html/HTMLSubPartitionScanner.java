@@ -39,11 +39,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.CompositeSubPartitionScanner;
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
-import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.PartitionScannerSwitchStrategy;
-import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.CompositeSubPartitionScanner;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.js.JSSourceConfiguration;
 

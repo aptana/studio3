@@ -64,6 +64,7 @@ public class SwitchBranchAction extends MenuAction
 		BranchDialog dialog = new BranchDialog(Display.getDefault().getActiveShell(), repo, true, false);
 		if (dialog.open() == Window.OK)
 			repo.switchBranch(dialog.getBranch());
+		// FIXME Doesn't seem to update the labels (at least not quickly)
 	}
 
 }

@@ -15,11 +15,9 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_FontStyleColumnLabel;
 	public static String ThemePreferencePage_ForegroundColumnLabel;
 	public static String ThemePreferencePage_ForegroundLabel;
-	public static String ThemePreferencePage_InvalidCharInThemeName;
+	public static String ThemePreferencePage_ImportLabel;
 	public static String ThemePreferencePage_ItalicButtonLabel;
 	public static String ThemePreferencePage_LineHighlightLabel;
-	public static String ThemePreferencePage_NameAlreadyExistsMsg;
-	public static String ThemePreferencePage_NameNonEmptyMsg;
 	public static String ThemePreferencePage_NewThemeDefaultName;
 	public static String ThemePreferencePage_NewThemeMsg;
 	public static String ThemePreferencePage_NewThemeTitle;

@@ -21,7 +21,7 @@ import org.eclipse.jface.action.IAction;
  */
 public class DisconnectAction extends AbstractOperationAction
 {
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	protected IWorkspaceRunnable createOperation(final IAction act, final List sel)
 	{
 		return sel.isEmpty() ? null : new DisconnectProviderOperation(sel);

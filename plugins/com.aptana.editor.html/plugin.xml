@@ -5,6 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.aptana.editor.html.HTMLEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             icon="icons/html.png"
             id="com.aptana.editor.html"

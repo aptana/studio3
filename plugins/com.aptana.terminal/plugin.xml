@@ -9,11 +9,12 @@
             id="com.aptana.terminal">
       </category>
       <view
-            name="%view.name"
-            icon="icons/terminal.png"
+            allowMultiple="true"
             category="com.aptana.terminal"
             class="com.aptana.terminal.views.TerminalView"
-            id="com.aptana.terminal.views.TerminalView">
+            icon="icons/terminal.png"
+            id="com.aptana.terminal.views.TerminalView"
+            name="%view.name">
       </view>
    </extension>
    <extension

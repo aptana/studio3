@@ -70,7 +70,7 @@ public class GitHistoryPage extends HistoryPage
 		if (input instanceof IResource[])
 		{
 			IResource[] resources = (IResource[]) input;
-			if (resources == null || resources.length == 0)
+			if (resources.length == 0)
 				return false;
 			resource = resources[0];
 		}
@@ -267,7 +267,7 @@ public class GitHistoryPage extends HistoryPage
 		if (input instanceof IResource[])
 		{
 			IResource[] resources = (IResource[]) input;
-			if (resources == null || resources.length == 0)
+			if (resources.length == 0)
 				return ""; //$NON-NLS-1$
 			resource = resources[0];
 		}
@@ -291,7 +291,7 @@ public class GitHistoryPage extends HistoryPage
 		// TODO Force a reload of the index and the refs and set input.
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Class adapter)
 	{
 		return null;

@@ -37,18 +37,24 @@ package com.aptana.editor.css;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
+import com.aptana.editor.css.internal.CSSContentAssistProcessor;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
-	
-    public CSSSourceViewerConfiguration(IPreferenceStore preferences) {
-        super(preferences);
+
+    private ILanguageService fLanguageService;
+
+    public CSSSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+        super(preferences, editor);
     }
 
 	/* (non-Javadoc)
@@ -62,6 +68,13 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 			});
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes() {
+		return CSSSourceConfiguration.getDefault().getTopContentTypes();
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
 	 */
@@ -83,5 +96,19 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
                     contentType, this, sourceViewer) };
         }
         return super.getAutoEditStrategies(sourceViewer, contentType);
+    }
+
+    @Override
+    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
+            String contentType) {
+        return new CSSContentAssistProcessor();
+    }
+
+    @Override
+    protected ILanguageService getLanguageService() {
+        if (fLanguageService == null) {
+            fLanguageService = new CSSLanguageService();
+        }
+        return fLanguageService;
     }
 }

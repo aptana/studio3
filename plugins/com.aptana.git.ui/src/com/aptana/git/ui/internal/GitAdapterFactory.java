@@ -23,7 +23,7 @@ public class GitAdapterFactory implements IAdapterFactory
 
 	private Object historyPageSource = new GitHistoryPageSource();
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(Object adaptableObject, Class adapterType)
 	{
 		if (adapterType.isAssignableFrom(IHistoryPageSource.class))
@@ -33,7 +33,7 @@ public class GitAdapterFactory implements IAdapterFactory
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public Class[] getAdapterList()
 	{
 		return new Class[] { IHistoryPageSource.class };

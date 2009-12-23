@@ -37,82 +37,120 @@ package com.aptana.editor.html;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.WhitespaceDetector;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.theme.IThemeManager;
 
-public class HTMLTagScanner extends RuleBasedScanner {
-	private static String[] STRUCTURE_DOT_ANY = {
-		"html" //$NON-NLS-1$
-		,"head" //$NON-NLS-1$
-		,"body" //$NON-NLS-1$
-	};
-	
-	private static String[] BLOCK_DOT_ANY = {
-		"div" //$NON-NLS-1$
-		,"form" //$NON-NLS-1$
-		,"ul" //$NON-NLS-1$
-		,"ol" //$NON-NLS-1$
-		,"p" //$NON-NLS-1$
-		,"table" //$NON-NLS-1$
-		,"h1" //$NON-NLS-1$
-		,"h2" //$NON-NLS-1$
-		,"h3" //$NON-NLS-1$
-		,"h4" //$NON-NLS-1$
-		,"h5" //$NON-NLS-1$
-		,"h6" //$NON-NLS-1$
-		,"hr" //$NON-NLS-1$
-	};
-	
-	public HTMLTagScanner() {
+public class HTMLTagScanner extends RuleBasedScanner
+{
+	@SuppressWarnings("nls")
+	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body" };
+
+	@SuppressWarnings("nls")
+	private static String[] BLOCK_DOT_ANY = { "address", "blockquote", "dd", "div", "dl", "dt", "fieldset", "form",
+			"frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "iframe", "noframes", "object", "ol", "p", "ul",
+			"applet", "center", "dir", "hr", "menu", "pre" };
+
+	@SuppressWarnings("nls")
+	private static String[] TAG_INLINE_ANY = { "a", "abbr", "acronym", "area", "b", "base", "basefont", "bdo", "big",
+			"br", "button", "caption", "cite", "code", "col", "colgroup", "del", "dfn", "em", "font", "i", "img",
+			"input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup",
+			"option", "param", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style",
+			"sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "u", "var" };
+
+	public HTMLTagScanner()
+	{
 		List<IRule> rules = new ArrayList<IRule>();
-		
+
 		// Add rule for double quotes
-		rules.add(new SingleLineRule("\"", "\"", ThemeUtil.getToken("string.quoted.double.html"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("\"", "\"", createToken("string.quoted.double.html"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Add a rule for single quotes
-		rules.add(new SingleLineRule("'", "'", ThemeUtil.getToken("string.quoted.single.html"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new MultiLineRule("'", "'", createToken("string.quoted.single.html"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-		
-		rules.add(new RegexpRule("[a-zA-Z0-9]+=", ThemeUtil.getToken("entity.other.attribute-name.html"))); //$NON-NLS-1$ //$NON-NLS-2$
-		WordRule wordRule = new WordRule(new WordDetector(), ThemeUtil.getToken("entity.name.tag.inline.any.html")); //$NON-NLS-1$
 
-		// script tag
-		wordRule.addWord("script", ThemeUtil.getToken("entity.name.tag.script.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("style", ThemeUtil.getToken("entity.name.tag.style.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("body", ThemeUtil.getToken("entity.name.tag.structure.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		wordRule.addWord("table", ThemeUtil.getToken("entity.name.tag.style.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		// Attributes
+		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
+		{
 
-		IToken structureDotAnyToken = ThemeUtil.getToken("entity.name.tag.structure.any.html");		 //$NON-NLS-1$
-		for (String structureDotAnyTag : STRUCTURE_DOT_ANY) {
-			wordRule.addWord(structureDotAnyTag, structureDotAnyToken);
-		}
-		
-		IToken blockDotAnyToken = ThemeUtil.getToken("entity.name.tag.block.any.html");		 //$NON-NLS-1$
-		for (String blockDotAnyTag : BLOCK_DOT_ANY) {
-			wordRule.addWord(blockDotAnyTag, blockDotAnyToken);
-		}
-		
+			@Override
+			public boolean isWordPart(char c)
+			{
+				return Character.isLetter(c) || c == '-' || c == ':';
+			}
+
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return Character.isLetter(c);
+			}
+
+		}, createToken("entity.other.attribute-name.html"), true) {//$NON-NLS-1$
+			@Override
+			protected boolean wordOK(String word, ICharacterScanner scanner)
+			{
+				int c = scanner.read();
+				scanner.unread();
+				return ((char) c) == '=';
+			}
+		};
+		wordRule.addWord("id", createToken("entity.other.attribute-name.id.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("class", createToken("entity.other.attribute-name.class.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(wordRule);
-		
-		rules.add(new RegexpRule("</|<", ThemeUtil.getToken("punctuation.definition.tag.begin.html"))); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new RegexpRule(">", ThemeUtil.getToken("punctuation.definition.tag.end.html"))); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
+		// Tags
+		wordRule = new WordRule(new WordDetector(), createToken("meta.tag.other.html"), true); //$NON-NLS-1$
+		wordRule.addWord("script", createToken("entity.name.tag.script.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		wordRule.addWord("style", createToken("entity.name.tag.style.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		IToken structureDotAnyToken = createToken("entity.name.tag.structure.any.html"); //$NON-NLS-1$
+		for (String tag : STRUCTURE_DOT_ANY)
+		{
+			wordRule.addWord(tag, structureDotAnyToken);
+		}
+		IToken blockDotAnyToken = createToken("entity.name.tag.block.any.html"); //$NON-NLS-1$
+		for (String tag : BLOCK_DOT_ANY)
+		{
+			wordRule.addWord(tag, blockDotAnyToken);
+		}
+		IToken inlineAnyToken = createToken("entity.name.tag.inline.any.html"); //$NON-NLS-1$
+		for (String tag : TAG_INLINE_ANY)
+		{
+			wordRule.addWord(tag, inlineAnyToken);
+		}
+		rules.add(wordRule);
+
+		rules.add(new SingleCharacterRule('>', createToken("punctuation.definition.tag.end.html"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('=', createToken("punctuation.separator.key-value.html"))); //$NON-NLS-1$
+		rules.add(new RegexpRule("<(/)?", createToken("punctuation.definition.tag.begin.html"), true)); //$NON-NLS-1$ //$NON-NLS-2$
+
 		setRules(rules.toArray(new IRule[rules.size()]));
-		
-		setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
+		setDefaultReturnToken(createToken("text")); //$NON-NLS-1$
 	}
-	
+
+	protected IToken createToken(String string)
+	{
+		return getThemeManager().getToken(string);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
 	/**
 	 * A key word detector.
 	 */

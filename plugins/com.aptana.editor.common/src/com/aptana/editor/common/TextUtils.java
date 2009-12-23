@@ -40,42 +40,83 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * @author Max Stepanov
- *
  */
-public final class TextUtils {
+public final class TextUtils
+{
+
+	// TODO Move to util plugin
 
 	/**
 	 * 
 	 */
-	private TextUtils() {
+	private TextUtils()
+	{
 	}
-	
-	public static String[] combine(String[][] arrays) {
+
+	/**
+	 * Combines by flattening the string arrays into a single string array. Does not add duplicate strings!
+	 * 
+	 * @param arrays
+	 * @return
+	 */
+	public static String[] combine(String[][] arrays)
+	{
 		List<String> list = new ArrayList<String>();
-		for (String[] array : arrays) {
-			for (String i : array) {
-				if (!list.contains(i)) {
+		for (String[] array : arrays)
+		{
+			for (String i : array)
+			{
+				if (!list.contains(i))
+				{
 					list.add(i);
 				}
-			}			
+			}
 		}
 		return list.toArray(new String[list.size()]);
 	}
-	
-	public static char[][] removeDuplicates(char[][] arrays) {
+
+	/**
+	 * Flattens each 2d String array into a single 2D array containing them all. {{"1", "2"}, {"3", "4"}} and {{"5",
+	 * "6"}} becomes {"1", "2"}, {"3", "4"}, {"5", "6"}}. Duplicates are retained.
+	 * 
+	 * @param arraysArray
+	 * @return
+	 */
+	public static String[][] combineArrays(String[][]... arraysArray)
+	{
+		List<String[]> list = new ArrayList<String[]>();
+		for (String[][] arrays : arraysArray)
+		{
+			for (String[] array : arrays)
+			{
+				list.add(array);
+			}
+		}
+		String[][] arrays = new String[list.size()][1];
+		for (int i = 0; i < list.size(); i++)
+		{
+			arrays[i] = list.get(i);
+		}
+
+		return arrays;
+	}
+
+	public static char[][] removeDuplicates(char[][] arrays)
+	{
 		List<char[]> list = new ArrayList<char[]>();
 		Set<String> strings = new HashSet<String>();
-		for (char[] i : arrays) {
+		for (char[] i : arrays)
+		{
 			String string = String.valueOf(i);
-			if (!strings.contains(string)) {
+			if (!strings.contains(string))
+			{
 				list.add(i);
 				strings.add(string);
 			}
 		}
 		return list.toArray(new char[list.size()][]);
 	}
-	
+
 }

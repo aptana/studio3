@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -25,6 +26,7 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -47,6 +49,8 @@ import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.explorer.ExplorerPlugin;
 
 /**
@@ -92,8 +96,6 @@ public class FilteringProjectView extends GitProjectView
 	protected Object[] fExpandedElements;
 
 	private Composite focus;
-	private Color fHoverBGColor;
-	protected Color fLastBGColor;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -137,89 +139,21 @@ public class FilteringProjectView extends GitProjectView
 		 * NOTE: MeasureItem and PaintItem are called repeatedly. Therefore it is critical for performance that these
 		 * methods be as efficient as possible.
 		 */
-		tree.addListener(SWT.MeasureItem, new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				TreeItem item = (TreeItem) event.item;
-				if (hoveredItem == null || !hoveredItem.equals(item))
-					return;
-				if (eyeball != null)
-				{
-					event.width += eyeball.getBounds().width + IMAGE_MARGIN;
-				}
-			}
-		});
-		tree.addListener(SWT.PaintItem, new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				TreeItem item = (TreeItem) event.item;
-				if (hoveredItem == null || !hoveredItem.equals(item))
-					return;
-				if (eyeball != null)
-				{
-					int itemWidth = item.getParent().getClientArea().width;
-					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
-					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;
-					int y = event.y + (itemHeight - imageHeight) / 2;
-					event.gc.drawImage(eyeball, lastDrawnX, y);
-				}
-			}
-		});
+		// Do our hover bg coloring
+		tree.addListener(SWT.EraseItem, createHoverBGColorer());
+		// Paint Eyeball
+		tree.addListener(SWT.PaintItem, createEyeballPainter(eyeball, IMAGE_MARGIN, tree));
+		// Track hovered item and force it's coloring
+		getCommonViewer().getControl().addMouseMoveListener(createHoverTracker());
+		// Remove hover on exit of tree
+		getCommonViewer().getControl().addMouseTrackListener(createTreeExitHoverRemover());
+		// handle Eyeball Focus action
+		getCommonViewer().getTree().addMouseListener(createEyeballFocusClickHandler(eyeball));
+	}
 
-		getCommonViewer().getControl().addMouseMoveListener(new MouseMoveListener()
-		{
-
-			public void mouseMove(MouseEvent e)
-			{
-				// If the filter is already on, we shouldn't do this stuff
-				if (filterOn())
-					return;
-				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
-				// hovered item didn't change
-				if (hoveredItem != null && hoveredItem.equals(t))
-					return;
-				// remove old hover
-				removeHoveredItem();
-
-				if (t == null)
-					return;
-				IResource data = getResource(t);
-				if (data != null && (data.getType() == IResource.FILE))
-				{
-					hoveredItem = t;
-					if (fHoverBGColor != null && !hoveredItem.getBackground().equals(fHoverBGColor))
-						fLastBGColor = hoveredItem.getBackground();
-					hoveredItem.setBackground(getHoverBackgroundColor());
-					Display.getDefault().asyncExec(new Runnable()
-					{
-						public void run()
-						{
-							if (hoveredItem == null || getCommonViewer() == null || getCommonViewer().getTree() == null
-									|| hoveredItem.getBounds() == null)
-								return;
-							getCommonViewer().getTree().redraw(hoveredItem.getBounds().x, hoveredItem.getBounds().y,
-									hoveredItem.getBounds().width, hoveredItem.getBounds().height, true);
-						}
-					});
-				}
-			}
-		});
-		getCommonViewer().getControl().addMouseTrackListener(new MouseTrackAdapter()
-		{
-			@Override
-			public void mouseExit(MouseEvent e)
-			{
-				super.mouseExit(e);
-				if (hoveredItem == null)
-					return;
-				removeHoveredItem();
-			}
-		});
-
-		getCommonViewer().getTree().addMouseListener(new MouseListener()
+	protected MouseListener createEyeballFocusClickHandler(final Image eyeball)
+	{
+		return new MouseListener()
 		{
 
 			public void mouseUp(MouseEvent e)
@@ -254,7 +188,111 @@ public class FilteringProjectView extends GitProjectView
 			public void mouseDoubleClick(MouseEvent e)
 			{
 			}
-		});
+		};
+	}
+
+	protected MouseTrackAdapter createTreeExitHoverRemover()
+	{
+		return new MouseTrackAdapter()
+		{
+			@Override
+			public void mouseExit(MouseEvent e)
+			{
+				super.mouseExit(e);
+				if (hoveredItem == null)
+					return;
+				removeHoveredItem();
+			}
+		};
+	}
+
+	protected MouseMoveListener createHoverTracker()
+	{
+		return new MouseMoveListener()
+		{
+
+			public void mouseMove(MouseEvent e)
+			{
+				// If the filter is already on, we shouldn't do this stuff
+				if (filterOn())
+					return;
+				final TreeItem t = getCommonViewer().getTree().getItem(new Point(e.x, e.y));
+				// hovered item didn't change
+				if (hoveredItem != null && hoveredItem.equals(t))
+					return;
+				// remove old hover
+				removeHoveredItem();
+
+				if (t == null)
+					return;
+				IResource data = getResource(t);
+				if (data != null && (data.getType() == IResource.FILE))
+				{
+					hoveredItem = t;
+					hoveredItem.setBackground(getHoverBackgroundColor());
+					Display.getDefault().asyncExec(new Runnable()
+					{
+						public void run()
+						{
+							if (hoveredItem == null || getCommonViewer() == null || getCommonViewer().getTree() == null
+									|| hoveredItem.getBounds() == null)
+								return;
+							getCommonViewer().getTree().redraw(hoveredItem.getBounds().x, hoveredItem.getBounds().y,
+									hoveredItem.getBounds().width, hoveredItem.getBounds().height, true);
+						}
+					});
+				}
+			}
+		};
+	}
+
+	protected Listener createEyeballPainter(final Image eyeball, final int IMAGE_MARGIN, final Tree tree)
+	{
+		return new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				TreeItem item = (TreeItem) event.item;
+				if (hoveredItem == null || !hoveredItem.equals(item))
+					return;
+				if (eyeball != null)
+				{
+					int itemWidth = item.getParent().getClientArea().width;
+					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
+					int itemHeight = tree.getItemHeight();
+					int imageHeight = eyeball.getBounds().height;
+					int y = event.y + (itemHeight - imageHeight) / 2;
+					event.gc.drawImage(eyeball, lastDrawnX, y);
+				}
+			}
+		};
+	}
+
+	protected Listener createHoverBGColorer()
+	{
+		return new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.BACKGROUND) != 0)
+				{
+					TreeItem item = (TreeItem) event.item;
+					if (hoveredItem == null || !hoveredItem.equals(item))
+						return;
+					Tree tree = (Tree) event.widget;
+					int clientWidth = tree.getClientArea().width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+					gc.setBackground(getHoverBackgroundColor());
+
+					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			}
+		};
 	}
 
 	private Composite createFocusComposite(Composite myComposite, Composite top)
@@ -421,6 +459,23 @@ public class FilteringProjectView extends GitProjectView
 				viewer.setSelection(new StructuredSelection(list));
 			}
 		}
+	}
+
+	/**
+	 * Returns the name for the given element. Used as the name for the current frame.
+	 */
+	private String getFrameName(Object element)
+	{
+		if (element instanceof IResource)
+		{
+			return ((IResource) element).getName();
+		}
+		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
+		if (text == null)
+		{
+			return "";//$NON-NLS-1$
+		}
+		return text;
 	}
 
 	@Override
@@ -719,7 +774,7 @@ public class FilteringProjectView extends GitProjectView
 		if (hoveredItem == null)
 			return;
 		final Rectangle bounds = hoveredItem.getBounds();
-		hoveredItem.setBackground(fLastBGColor);
+		hoveredItem.setBackground(null);
 		hoveredItem = null;
 		Display.getDefault().asyncExec(new Runnable()
 		{
@@ -733,19 +788,12 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		if (fHoverBGColor == null)
-		{
-			fHoverBGColor = new Color(Display.getDefault(), 240, 250, 255);
-		}
-		return fHoverBGColor;
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
 	}
 
-	@Override
-	public void dispose()
+	protected Theme getActiveTheme()
 	{
-		if (fHoverBGColor != null)
-			fHoverBGColor.dispose();
-		super.dispose();
+		return getThemeManager().getCurrentTheme();
 	}
 
 	private boolean filterOn()

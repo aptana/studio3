@@ -34,38 +34,50 @@
  */
 package com.aptana.editor.common;
 
+import java.util.Map;
+
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
+import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
 import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.text.CommonAutoIndentStrategy;
+import com.aptana.editor.common.text.information.CommonInformationProvider;
+import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
+import com.aptana.editor.common.text.reconciler.CommonReconciler;
 
-public class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration {
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
 
-    public CommonSourceViewerConfiguration() {
-    }
+    private ITextEditor fTextEditor;
 
-    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore) {
+    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor) {
         super(preferenceStore);
+        fTextEditor = editor;
     }
 
     @Override
@@ -102,6 +114,13 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     }
 
     @Override
+    public IContentFormatter getContentFormatter(ISourceViewer sourceViewer) {
+        MultiPassContentFormatter formatter = new MultiPassContentFormatter(
+                getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+        return formatter;
+    }
+
+    @Override
     public IAnnotationHover getAnnotationHover(ISourceViewer sourceViewer) {
         return new CommonAnnotationHover(false) {
 
@@ -123,7 +142,7 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
 
     @Override
     public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType) {
-        return new CommonTextHover();
+        return new CommonTextHover(getLanguageService());
     }
 
     @Override
@@ -140,18 +159,37 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
     public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer) {
         InformationPresenter presenter = new InformationPresenter(
                 getInformationPresenterControlCreator(sourceViewer));
+
         presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
-
-        // registers information provider
-        IInformationProvider provider = new CommonInformationProvider();
-        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-        for (String type : contentTypes) {
-            presenter.setInformationProvider(provider, type);
-        }
-
         presenter.setSizeConstraints(60, 10, true, true);
 
+        // registers information provider
+        String[] contentTypes = getConfiguredContentTypes(sourceViewer);
+        IInformationProvider provider;
+        for (String type : contentTypes) {
+            provider = getInformationProvider(sourceViewer, type);
+            if (provider != null) {
+                presenter.setInformationProvider(provider, type);
+            }
+        }
+
         return presenter;
+    }
+
+    @Override
+    public IReconciler getReconciler(ISourceViewer sourceViewer) {
+        if (fTextEditor != null && fTextEditor.isEditable()) {
+            CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(
+                    fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
+            CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
+            reconciler.setIsIncrementalReconciler(false);
+            reconciler.setIsAllowedToModifyDocument(false);
+            reconciler.setProgressMonitor(new NullProgressMonitor());
+            reconciler.setDelay(500);
+
+            return reconciler;
+        }
+        return null;
     }
 
     /**
@@ -173,8 +211,48 @@ public class CommonSourceViewerConfiguration extends TextSourceViewerConfigurati
         return "\t"; //$NON-NLS-1$
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer) {
+        Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+        targets.put("com.aptana.editor.ui.hyperlinkTarget", fTextEditor); //$NON-NLS-1$
+        return targets;
+    }
+
+    /**
+     * Returns the content assist processor that will be used for content assist
+     * in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the content assist processor is
+     *            applicable
+     * @return IContentAssistProcessor or null if the content type is not
+     *         supported
+     */
     protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
             String contentType) {
+        return null;
+    }
+
+    /**
+     * Returns the information provider that will be used for information
+     * presentation in the given source viewer and for the given partition type.
+     * 
+     * @param sourceViewer
+     *            the source viewer to be configured by this configuration
+     * @param contentType
+     *            the partition type for which the information provider is
+     *            applicable
+     * @return IInformationProvider or null if the content type is not supported
+     */
+    protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer,
+            String contentType) {
+        return new CommonInformationProvider(getLanguageService());
+    }
+
+    protected ILanguageService getLanguageService() {
         return null;
     }
 
