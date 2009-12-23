@@ -54,6 +54,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
@@ -249,6 +250,11 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	protected IToken getToken(String name)
 	{
-		return ThemeUtil.instance().getToken(name);
+		return getThemeManager().getToken(name);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 }

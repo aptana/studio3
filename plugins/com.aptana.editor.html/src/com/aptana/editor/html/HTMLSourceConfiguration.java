@@ -52,6 +52,7 @@ import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.TagRule;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
@@ -235,7 +236,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String tokenName)
 	{
-		return ThemeUtil.instance().getToken(tokenName);
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 
 }

@@ -72,6 +72,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.ThemeUtil;
@@ -160,8 +161,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
 
-		setTheme(ThemeUtil.instance().getActiveTheme().getName());
+		setTheme(getThemeManager().getActiveTheme().getName());
 		return composite;
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 
 	private void createThemeListControls(Composite composite)
@@ -177,7 +183,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				setTheme(fThemeCombo.getText());
-				ThemeUtil.instance().setActiveTheme(getTheme());
+				getThemeManager().setActiveTheme(getTheme());
 				super.widgetSelected(e);
 			}
 		});
@@ -189,7 +195,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				if (newText == null || newText.trim().length() == 0)
 					return Messages.ThemePreferencePage_NameNonEmptyMsg;
-				if (ThemeUtil.instance().getThemeNames().contains(newText.trim()))
+				if (getThemeManager().getThemeNames().contains(newText.trim()))
 					return Messages.ThemePreferencePage_NameAlreadyExistsMsg;
 				if (newText.contains(ThemeUtil.THEME_NAMES_DELIMETER))
 					return MessageFormat.format(Messages.ThemePreferencePage_InvalidCharInThemeName,
@@ -213,7 +219,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme newTheme = getTheme().copy(dialog.getValue());
 					// Add theme to theme list, make current theme this one
-					ThemeUtil.instance().setActiveTheme(newTheme);
+					getThemeManager().setActiveTheme(newTheme);
 					loadThemeNames();
 					setTheme(newTheme.getName());
 				}
@@ -236,7 +242,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme oldTheme = getTheme();
 					Theme newTheme = oldTheme.copy(dialog.getValue());
-					ThemeUtil.instance().setActiveTheme(newTheme);
+					getThemeManager().setActiveTheme(newTheme);
 					oldTheme.delete();
 					loadThemeNames();
 					setTheme(newTheme.getName());
@@ -259,7 +265,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 				getTheme().delete();
 				loadThemeNames();
-				setTheme(ThemeUtil.instance().getActiveTheme().getName());
+				setTheme(getThemeManager().getActiveTheme().getName());
 			}
 		});
 
@@ -287,8 +293,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
 
 				Theme theme = new TextmateImporter().convert(themeFile);
-				ThemeUtil.instance().addTheme(theme);
-				ThemeUtil.instance().setActiveTheme(theme);
+				getThemeManager().addTheme(theme);
+				getThemeManager().setActiveTheme(theme);
 				loadThemeNames();
 				setTheme(theme.getName());
 			}
@@ -298,7 +304,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void loadThemeNames()
 	{
 		fThemeCombo.removeAll();
-		List<String> themeNames = new ArrayList<String>(ThemeUtil.instance().getThemeNames());
+		List<String> themeNames = new ArrayList<String>(getThemeManager().getThemeNames());
 		Collections.sort(themeNames, new Comparator<String>()
 		{
 			public int compare(String o1, String o2)
@@ -817,7 +823,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
-		if (ThemeUtil.instance().isBuiltinTheme(themeName))
+		if (getThemeManager().isBuiltinTheme(themeName))
 		{
 			renameThemeButton.setEnabled(false);
 			deleteThemeButton.setEnabled(false);
@@ -992,7 +998,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		ThemeUtil.instance().setActiveTheme(getTheme());
+		getThemeManager().setActiveTheme(getTheme());
 		return super.performOk();
 	}
 
@@ -1003,7 +1009,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			Theme theme = getTheme();
 			theme.loadFromDefaults();
-			ThemeUtil.instance().setActiveTheme(theme);
+			getThemeManager().setActiveTheme(theme);
 			setTheme(fSelectedTheme);
 		}
 		catch (Exception e)
@@ -1015,7 +1021,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected Theme getTheme()
 	{
-		return ThemeUtil.instance().getTheme(fSelectedTheme);
+		return getThemeManager().getTheme(fSelectedTheme);
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.git.core.model.BranchChangedEvent;
@@ -278,7 +279,12 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	protected Theme getActiveTheme()
 	{
-		return ThemeUtil.instance().getActiveTheme();
+		return getThemeManager().getActiveTheme();
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 
 	@Override

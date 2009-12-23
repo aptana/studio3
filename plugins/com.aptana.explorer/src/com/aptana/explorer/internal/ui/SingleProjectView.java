@@ -51,6 +51,7 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
@@ -234,7 +235,7 @@ public class SingleProjectView extends CommonNavigator
 	private void hookToThemes()
 	{
 		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.instance().getActiveTheme().getBackground()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(getThemeManager().getActiveTheme().getBackground()));
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -257,7 +258,7 @@ public class SingleProjectView extends CommonNavigator
 					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							ThemeUtil.instance().getActiveTheme().getSelection()));
+							getThemeManager().getActiveTheme().getSelection()));
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
@@ -340,9 +341,14 @@ public class SingleProjectView extends CommonNavigator
 				}
 
 				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						ThemeUtil.instance().getActiveTheme().getForeground()));
+						getThemeManager().getActiveTheme().getForeground()));
 			}
 		});
+	}
+	
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 
 	private void listenForThemeChanges()
@@ -358,7 +364,7 @@ public class SingleProjectView extends CommonNavigator
 					getCommonViewer().refresh();
 					getCommonViewer().getTree().setBackground(
 							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									ThemeUtil.instance().getActiveTheme().getBackground()));
+									getThemeManager().getActiveTheme().getBackground()));
 				}
 			}
 		};

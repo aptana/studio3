@@ -52,6 +52,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
@@ -241,6 +242,11 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IToken getToken(String tokenName)
 	{
-		return ThemeUtil.instance().getToken(tokenName);
+		return getThemeManager().getToken(tokenName);
+	}
+	
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 }

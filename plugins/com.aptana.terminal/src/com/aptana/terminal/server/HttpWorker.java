@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.terminal.Activator;
 import com.aptana.util.StringUtil;
@@ -102,9 +103,9 @@ public class HttpWorker implements Runnable
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		// Add theme colors
-		variables.put("\\{caret\\}", toCSSRGB(ThemeUtil.instance().getActiveTheme().getCaret())); //$NON-NLS-1$
-		variables.put("\\{foreground\\}", toCSSRGB(ThemeUtil.instance().getActiveTheme().getForeground())); //$NON-NLS-1$
-		variables.put("\\{background\\}", toCSSRGB(ThemeUtil.instance().getActiveTheme().getBackground())); //$NON-NLS-1$
+		variables.put("\\{caret\\}", toCSSRGB(getThemeManager().getActiveTheme().getCaret())); //$NON-NLS-1$
+		variables.put("\\{foreground\\}", toCSSRGB(getThemeManager().getActiveTheme().getForeground())); //$NON-NLS-1$
+		variables.put("\\{background\\}", toCSSRGB(getThemeManager().getActiveTheme().getBackground())); //$NON-NLS-1$
 
 		// ANSI Colors
 		addAnsiColor(variables, "ansi.black", "0,0,0"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -151,9 +152,9 @@ public class HttpWorker implements Runnable
 	private void addAnsiColor(Map<String, String> variables, String tokenName, String defaultValue)
 	{
 		String value = null;
-		if (ThemeUtil.instance().getActiveTheme().hasEntry(tokenName))
+		if (getThemeManager().getActiveTheme().hasEntry(tokenName))
 		{
-			value = toCSSRGB(ThemeUtil.instance().getActiveTheme().getForegroundAsRGB(tokenName));
+			value = toCSSRGB(getThemeManager().getActiveTheme().getForegroundAsRGB(tokenName));
 		}
 		else
 		{
@@ -161,6 +162,11 @@ public class HttpWorker implements Runnable
 			value = defaultValue;
 		}
 		variables.put("\\{" + tokenName + "\\}", value); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 
 	/**

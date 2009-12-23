@@ -44,6 +44,7 @@ import com.aptana.editor.common.EntityRule;
 import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.WordDetector;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemeUtil;
 
 public class HTMLScanner extends RuleBasedScanner
@@ -63,6 +64,11 @@ public class HTMLScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return ThemeUtil.instance().getToken(string);
+		return getThemeManager().getToken(string);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return ThemeUtil.instance();
 	}
 }
