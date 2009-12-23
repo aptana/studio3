@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +14,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.TextAttribute;
@@ -33,8 +36,7 @@ public class ThemeUtil implements IThemeManager
 	/**
 	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
 	 */
-	public static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
-	// TODO have the consumer of this call a method to determine if theme name is valid rather than access this directly
+	private static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
 
 	/**
 	 * Preference key used to store the list of known themes.
@@ -299,5 +301,18 @@ public class ThemeUtil implements IThemeManager
 	public boolean isBuiltinTheme(String themeName)
 	{
 		return fBuiltins.contains(themeName);
+	}
+
+	@Override
+	public IStatus validateThemeName(String name)
+	{
+		if (name == null || name.trim().length() == 0)
+			return new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, Messages.ThemeManager_NameNonEmptyMsg);
+		if (getThemeNames().contains(name.trim()))
+			return new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, Messages.ThemeManager_NameAlreadyExistsMsg);
+		if (name.contains(THEME_NAMES_DELIMETER))
+			return new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.ThemeManager_InvalidCharInThemeName, THEME_NAMES_DELIMETER));
+		return Status.OK_STATUS;
 	}
 }

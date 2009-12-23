@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -73,7 +74,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.internal.theme.ThemeUtil;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
@@ -194,14 +194,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			public String isValid(String newText)
 			{
-				if (newText == null || newText.trim().length() == 0)
-					return Messages.ThemePreferencePage_NameNonEmptyMsg;
-				if (getThemeManager().getThemeNames().contains(newText.trim()))
-					return Messages.ThemePreferencePage_NameAlreadyExistsMsg;
-				if (newText.contains(ThemeUtil.THEME_NAMES_DELIMETER))
-					return MessageFormat.format(Messages.ThemePreferencePage_InvalidCharInThemeName,
-							ThemeUtil.THEME_NAMES_DELIMETER);
-				return null;
+				IStatus status = getThemeManager().validateThemeName(newText);
+				if (status.isOK())
+					return null;
+				return status.getMessage();
 			}
 		};
 
