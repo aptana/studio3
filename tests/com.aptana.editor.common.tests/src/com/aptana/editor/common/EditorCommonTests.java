@@ -1,8 +1,5 @@
 package com.aptana.editor.common;
 
-import com.aptana.editor.common.text.rules.WhitespaceDetectorTest;
-import com.aptana.editor.common.text.rules.WordDetectorTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
