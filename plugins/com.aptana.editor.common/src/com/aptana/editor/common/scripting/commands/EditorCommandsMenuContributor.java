@@ -27,7 +27,6 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.TextEditorUtils;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
