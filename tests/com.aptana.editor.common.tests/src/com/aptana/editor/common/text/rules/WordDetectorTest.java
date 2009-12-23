@@ -1,8 +1,10 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.rules;
 
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.rules.IWordDetector;
+
+import com.aptana.editor.common.text.rules.WordDetector;
 
 public class WordDetectorTest extends TestCase
 {

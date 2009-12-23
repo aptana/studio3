@@ -1,5 +1,8 @@
 package com.aptana.editor.common;
 
+import com.aptana.editor.common.text.rules.WhitespaceDetectorTest;
+import com.aptana.editor.common.text.rules.WordDetectorTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -11,9 +14,7 @@ public class EditorCommonTests
 		TestSuite suite = new TestSuite(EditorCommonTests.class.getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SequenceCharacterScannerTest.class);
-		suite.addTestSuite(WordDetectorTest.class);
 		suite.addTestSuite(TextUtilsTest.class);
-		suite.addTestSuite(WhitespaceDetectorTest.class);
 		//$JUnit-END$
 		return suite;
 	}

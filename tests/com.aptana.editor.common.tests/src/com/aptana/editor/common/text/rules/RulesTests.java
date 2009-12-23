@@ -12,8 +12,10 @@ public class RulesTests
 		//$JUnit-BEGIN$
 		suite.addTestSuite(TagRuleTest.class);
 		suite.addTestSuite(RegexpRuleTest.class);
-		suite.addTestSuite(SingleTagRuleTest.class);
+		suite.addTestSuite(WordDetectorTest.class);
+		suite.addTestSuite(WhitespaceDetectorTest.class);
 		suite.addTestSuite(SingleCharacterRuleTest.class);
+		suite.addTestSuite(SingleTagRuleTest.class);
 		//$JUnit-END$
 		return suite;
 	}
