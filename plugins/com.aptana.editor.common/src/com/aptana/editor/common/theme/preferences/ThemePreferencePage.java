@@ -1,6 +1,7 @@
 package com.aptana.editor.common.theme.preferences;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -292,11 +293,18 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				File themeFile = new File(path);
 				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
 
-				Theme theme = new TextmateImporter().convert(themeFile);
-				getThemeManager().addTheme(theme);
-				getThemeManager().setActiveTheme(theme);
-				loadThemeNames();
-				setTheme(theme.getName());
+				try
+				{
+					Theme theme = new TextmateImporter().convert(themeFile);
+					getThemeManager().addTheme(theme);
+					getThemeManager().setActiveTheme(theme);
+					loadThemeNames();
+					setTheme(theme.getName());
+				}
+				catch (FileNotFoundException e1)
+				{
+					CommonEditorPlugin.logError(e1);
+				}
 			}
 		});
 	}

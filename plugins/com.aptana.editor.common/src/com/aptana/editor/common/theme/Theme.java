@@ -293,7 +293,11 @@ public class Theme
 		// Only save to defaults if it has never been saved there. Basically take a snapshot of first version and
 		// use that as the "default"
 		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		if (prefs == null)
+			return; // TODO Log something?
 		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		if (preferences == null)
+			return;
 		String value = preferences.get(getName(), null);
 		if (value == null)
 		{

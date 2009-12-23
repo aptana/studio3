@@ -10,6 +10,7 @@ public class ThemeTests
 	{
 		TestSuite suite = new TestSuite(ThemeTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(TextmateImporterTest.class);
 		suite.addTestSuite(ThemeTest.class);
 		//$JUnit-END$
 		return suite;
