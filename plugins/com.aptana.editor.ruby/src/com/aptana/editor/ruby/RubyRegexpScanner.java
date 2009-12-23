@@ -8,7 +8,7 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.RegexpRule;
+import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.theme.IThemeManager;
 
 public class RubyRegexpScanner extends BufferedRuleBasedScanner

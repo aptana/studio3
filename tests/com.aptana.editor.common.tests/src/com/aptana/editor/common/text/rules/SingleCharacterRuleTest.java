@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.rules;
 
 import junit.framework.TestCase;
 
@@ -7,6 +7,7 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
+
 
 public class SingleCharacterRuleTest extends TestCase
 {

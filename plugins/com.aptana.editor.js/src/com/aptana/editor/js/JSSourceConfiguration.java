@@ -52,8 +52,8 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.theme.IThemeManager;
 
 /**

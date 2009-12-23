@@ -52,7 +52,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.SubPartitionScanner;
-import com.aptana.editor.common.TagRule;
+import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.theme.IThemeManager;
 
 /**

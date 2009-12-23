@@ -44,6 +44,8 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.text.rules.SingleTagRule;
+
 /**
  * @author Max Stepanov
  *
