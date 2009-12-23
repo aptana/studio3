@@ -44,7 +44,6 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.ShowScopesAction;
-import com.aptana.editor.common.internal.theme.ThemeUtil;
 import com.aptana.editor.common.peer.CharacterPairMatcher;
 import com.aptana.editor.common.peer.PeerCharacterCloser;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -300,7 +299,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 		// Force selection color
 		getSourceViewer().getTextWidget().setSelectionBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(getThemeManager().getActiveTheme().getSelection()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getActiveTheme().getSelection()));
 
 		if (selectionListener != null)
 			return;
@@ -345,7 +345,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		};
 		getSelectionProvider().addSelectionChangedListener(selectionListener);
 	}
-	
+
 	protected IThemeManager getThemeManager()
 	{
 		return CommonEditorPlugin.getDefault().getThemeManager();
@@ -465,7 +465,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(ThemeUtil.THEME_CHANGED))
+		if (event.getProperty().equals(IThemeManager.THEME_CHANGED))
 		{
 			overrideThemeColors();
 			getSourceViewer().invalidateTextPresentation();
@@ -479,7 +479,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		}
 	}
 
-	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal() {
+	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal()
+	{
 		return getSourceViewerConfiguration();
 	}
 
@@ -491,8 +492,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
 		ISourceViewer sourceViewer = getSourceViewer();
-		if (sourceViewer instanceof ITextViewerExtension) {
-			((ITextViewerExtension)sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		if (sourceViewer instanceof ITextViewerExtension)
+		{
+			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
 		}
 		getFindBarDecorator().installActions();
 	}

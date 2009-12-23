@@ -51,7 +51,6 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.internal.theme.ThemeUtil;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
@@ -235,7 +234,8 @@ public class SingleProjectView extends CommonNavigator
 	private void hookToThemes()
 	{
 		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(getThemeManager().getActiveTheme().getBackground()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getActiveTheme().getBackground()));
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -345,7 +345,7 @@ public class SingleProjectView extends CommonNavigator
 			}
 		});
 	}
-	
+
 	protected IThemeManager getThemeManager()
 	{
 		return CommonEditorPlugin.getDefault().getThemeManager();
@@ -359,7 +359,7 @@ public class SingleProjectView extends CommonNavigator
 			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
-				if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
 					getCommonViewer().refresh();
 					getCommonViewer().getTree().setBackground(

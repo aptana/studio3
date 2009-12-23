@@ -1,4 +1,4 @@
-package com.aptana.editor.common.theme;
+package com.aptana.editor.common.internal.theme;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,13 +28,13 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 
-// TODO Hide this implementation as package level and expose the interface in a public package and ia plugin or something
 public class ThemeUtil implements IThemeManager
 {
 	/**
 	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
 	 */
 	public static final String THEME_NAMES_DELIMETER = ","; //$NON-NLS-1$
+	// TODO have the consumer of this call a method to determine if theme name is valid rather than access this directly
 
 	/**
 	 * Preference key used to store the list of known themes.
@@ -47,16 +47,10 @@ public class ThemeUtil implements IThemeManager
 	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
-	 * Preference key used to store the timestamp of last theme change. Used to force a redraw of editors when theme
-	 * changes (even if it remains same theme, but has been edited).
-	 */
-	public static final String THEME_CHANGED = "THEME_CHANGED"; //$NON-NLS-1$
-
-	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
-	static final String THEMES_NODE = "themes"; //$NON-NLS-1$
+	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
 
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
