@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.reconciler;
+package com.aptana.editor.common.text.reconciler;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -42,44 +42,54 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-public class CommonReconcilingStrategy implements IReconcilingStrategy,
-        IReconcilingStrategyExtension {
+public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
+{
 
-    public CommonReconcilingStrategy(ITextEditor editor) {
-    }
+	public CommonReconcilingStrategy(ITextEditor editor)
+	{
+	}
 
-    @Override
-    public void reconcile(IRegion partition) {
-        reconcile(false);
-    }
+	@Override
+	public void reconcile(IRegion partition)
+	{
+		reconcile(false);
+	}
 
-    @Override
-    public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
-        reconcile(false);
-    }
+	@Override
+	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
+	{
+		reconcile(false);
+	}
 
-    @Override
-    public void setDocument(IDocument document) {
-    }
+	@Override
+	public void setDocument(IDocument document)
+	{
+	}
 
-    @Override
-    public void initialReconcile() {
-        reconcile(true);
-    }
+	@Override
+	public void initialReconcile()
+	{
+		reconcile(true);
+	}
 
-    @Override
-    public void setProgressMonitor(IProgressMonitor monitor) {
-    }
+	@Override
+	public void setProgressMonitor(IProgressMonitor monitor)
+	{
+	}
 
-    public void aboutToBeReconciled() {
-    }
+	public void aboutToBeReconciled()
+	{
+	}
 
-    public void notifyListeners(boolean notify) {
-    }
+	public void notifyListeners(boolean notify)
+	{
+	}
 
-    public void reconciled() {
-    }
+	public void reconciled()
+	{
+	}
 
-    private void reconcile(boolean initialReconcile) {
-    }
+	private void reconcile(boolean initialReconcile)
+	{
+	}
 }
