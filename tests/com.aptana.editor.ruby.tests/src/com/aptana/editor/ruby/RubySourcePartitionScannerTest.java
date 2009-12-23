@@ -640,4 +640,11 @@ public class RubySourcePartitionScannerTest extends TestCase
 		// end
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 329); // e
 	}
+	
+	public void testBlockComment()
+	{
+		String code = "=begin\n=end";
+		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, 0);
+		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, code.length() - 1);
+	}
 }

@@ -39,19 +39,32 @@ import java.util.List;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.theme.IThemeManager;
 
-public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner {
+public class JSSingleQuotedStringScanner extends BufferedRuleBasedScanner
+{
 
-    public JSSingleQuotedStringScanner() {
-        List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule(
-                "\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
-                ThemeUtil.getToken("constant.character.escape.js"))); //$NON-NLS-1$
-        setRules(rules.toArray(new IRule[rules.size()]));
+	public JSSingleQuotedStringScanner()
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+		rules.add(new RegexpRule("\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
+				getToken("constant.character.escape.js"))); //$NON-NLS-1$
+		setRules(rules.toArray(new IRule[rules.size()]));
 
-        setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.js")); //$NON-NLS-1$
-    }
+		setDefaultReturnToken(getToken("string.quoted.single.js")); //$NON-NLS-1$
+	}
+
+	protected IToken getToken(String tokenName)
+	{
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }

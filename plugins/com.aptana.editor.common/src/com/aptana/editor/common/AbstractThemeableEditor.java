@@ -1,6 +1,5 @@
 package com.aptana.editor.common;
 
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
@@ -8,43 +7,48 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.action.StatusLineLayoutData;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IPaintPositionManager;
+import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewerExtension;
+import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.custom.LineBackgroundEvent;
+import org.eclipse.swt.custom.LineBackgroundListener;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
-import org.eclipse.ui.texteditor.IStatusField;
-import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
-import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
+import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.ShowScopesAction;
-import com.aptana.editor.common.peer.CharacterPairMatcher;
-import com.aptana.editor.common.peer.PeerCharacterCloser;
+import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
+import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
@@ -98,6 +102,12 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private Composite parent;
 
 	/**
+	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
+	 * things like block comments with a different bg color look more like Textmate.
+	 */
+	private LineBackgroundPainter fFullLineBackgroundPainter;
+
+	/**
 	 * AbstractThemeableEditor
 	 */
 	public AbstractThemeableEditor()
@@ -141,6 +151,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private void overrideRulerColors()
 	{
 		// Use normal parent gray bg
+		if (parent == null || fLineColumn == null)
+			return;
 		fLineColumn.setBackground(parent.getBackground());
 	}
 
@@ -167,6 +179,16 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
+		if (fFullLineBackgroundPainter == null)
+		{
+			if (viewer instanceof ITextViewerExtension2)
+			{
+				fFullLineBackgroundPainter = new LineBackgroundPainter(viewer);
+				ITextViewerExtension2 extension = (ITextViewerExtension2) viewer;
+				extension.addPainter(fFullLineBackgroundPainter);
+			}
+		}
+
 		return viewer;
 	}
 
@@ -180,6 +202,96 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
 	}
 
+	/**
+	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
+	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
+	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
+	 * 
+	 * @author cwilliams
+	 */
+	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
+	{
+
+		private ISourceViewer fViewer;
+		private boolean fIsActive;
+
+		public LineBackgroundPainter(ISourceViewer viewer)
+		{
+			this.fViewer = viewer;
+		}
+
+		@Override
+		public void deactivate(boolean redraw)
+		{
+			// do nothing
+		}
+
+		/*
+		 * @see IPainter#dispose()
+		 */
+		public void dispose()
+		{
+		}
+
+		/*
+		 * @see IPainter#paint(int)
+		 */
+		public void paint(int reason)
+		{
+			if (fViewer.getDocument() == null)
+			{
+				deactivate(false);
+				return;
+			}
+
+			StyledText textWidget = fViewer.getTextWidget();
+			// initialization
+			if (!fIsActive)
+			{
+				textWidget.addLineBackgroundListener(this);
+				fIsActive = true;
+			}
+		}
+
+		@Override
+		public void setPositionManager(IPaintPositionManager manager)
+		{
+			// do nothing
+		}
+
+		@Override
+		public void lineGetBackground(LineBackgroundEvent event)
+		{
+			// FIXME What about when there's other style ranges but we begin and end on same bg color? Do we color the
+			// line background anyways and force style ranges with null bg colors to specify the editor bg?
+			StyledText textWidget = fViewer.getTextWidget();
+			if (textWidget == null)
+				return;
+			String text = event.lineText;
+			if (text == null || text.length() == 0)
+				return;
+			int offset = event.lineOffset;
+			int leadingWhitespace = 0;
+			while (Character.isWhitespace(text.charAt(0)))
+			{
+				leadingWhitespace++;
+				text = text.substring(1);
+				if (text.length() <= 0)
+					break;
+			}
+			int length = text.length();
+			if (length > 0)
+			{
+				StyleRange[] ranges = textWidget.getStyleRanges(offset + leadingWhitespace, length);
+
+				if (ranges != null && ranges.length == 1)
+				{
+					event.lineBackground = ranges[0].background;
+				}
+			}
+		}
+	}
+
 	protected void overrideSelectionColor()
 	{
 		if (getSourceViewer().getTextWidget() == null)
@@ -187,7 +299,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 		// Force selection color
 		getSourceViewer().getTextWidget().setSelectionBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getSelection()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getSelection()));
 
 		if (selectionListener != null)
 			return;
@@ -233,13 +346,18 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getSelectionProvider().addSelectionChangedListener(selectionListener);
 	}
 
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
 	protected void overrideCaretColor()
 	{
 		if (getSourceViewer().getTextWidget() == null)
 			return;
 
 		Caret caret = getSourceViewer().getTextWidget().getCaret();
-		RGB caretColor = ThemeUtil.getActiveTheme().getCaret();
+		RGB caretColor = getThemeManager().getCurrentTheme().getCaret();
 		if (caretColor == null)
 			return;
 
@@ -337,7 +455,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	@Override
 	protected void initializeViewerColors(ISourceViewer viewer)
 	{
-		ThemeUtil.getActiveTheme();
+		getThemeManager().getCurrentTheme();
 		if (viewer == null || viewer.getTextWidget() == null)
 			return;
 		super.initializeViewerColors(viewer);
@@ -347,7 +465,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void handlePreferenceStoreChanged(PropertyChangeEvent event)
 	{
 		super.handlePreferenceStoreChanged(event);
-		if (event.getProperty().equals(ThemeUtil.THEME_CHANGED))
+		if (event.getProperty().equals(IThemeManager.THEME_CHANGED))
 		{
 			overrideThemeColors();
 			getSourceViewer().invalidateTextPresentation();
@@ -361,11 +479,23 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		}
 	}
 
+	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal()
+	{
+		return getSourceViewerConfiguration();
+	}
+
 	@Override
 	protected void createActions()
 	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
+		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
+		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer instanceof ITextViewerExtension)
+		{
+			((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(new ExpandSnippetVerifyKeyListener(this));
+		}
 		getFindBarDecorator().installActions();
 	}
 
@@ -387,14 +517,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	}
 
 	private IFindBarDecorator findBarDecorator;
-
-	/**
-	 * HACK! We force the position status line to recalculate it's length and relayout properly when the string it holds
-	 * changes length. Standard Eclipse hard-codes an assumed length of 14 characters. So I guess if you have line and
-	 * column number length > 11 (since they add " : " between them) it'll truncate. By providing a much more verbose
-	 * string we hit that length really quickly.
-	 */
-	private int lastPositionLength = -1;
 
 	private IFindBarDecorator getFindBarDecorator()
 	{
@@ -419,45 +541,4 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
 	}
 
-	@Override
-	protected void updateStatusField(String category)
-	{
-		super.updateStatusField(category);
-		// HACK!!!! We force the width to get recalculated on the line and column #
-		if (ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION.equals(category))
-		{
-			IStatusField field = getStatusField(category);
-			String text = getCursorPosition();
-			if (text.length() != lastPositionLength)
-			{
-				lastPositionLength = text.length();
-				try
-				{
-					Field label = StatusLineContributionItem.class.getDeclaredField("fLabel"); //$NON-NLS-1$
-					label.setAccessible(true);
-					CLabel clabel = (CLabel) label.get(field);
-					StatusLineLayoutData data = (StatusLineLayoutData) clabel.getLayoutData();
-
-					Control control = clabel.getParent();
-
-					GC gc = new GC(control);
-					gc.setFont(control.getFont());
-					int widthHint = gc.getFontMetrics().getAverageCharWidth() * text.length();
-					widthHint += 3 * 2;
-					gc.dispose();
-					data.widthHint = widthHint;
-
-					if (control instanceof Composite)
-					{
-						((Composite) control).layout();
-					}
-					// control.redraw();
-				}
-				catch (Exception e)
-				{
-					CommonEditorPlugin.logError(e);
-				}
-			}
-		}
-	}
 }

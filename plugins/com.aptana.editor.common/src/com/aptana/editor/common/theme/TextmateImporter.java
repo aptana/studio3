@@ -1,8 +1,10 @@
 package com.aptana.editor.common.theme;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.List;
@@ -47,12 +49,18 @@ public class TextmateImporter
 	 * 
 	 * @param file
 	 * @return
+	 * @throws FileNotFoundException 
 	 */
-	public Theme convert(File file)
+	public Theme convert(File file) throws FileNotFoundException
+	{
+		return convert(new FileInputStream(file));
+	}
+
+	public Theme convert(InputStream stream)
 	{
 		try
 		{
-			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), convertToProperties(file));
+			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), convertToProperties(stream));
 		}
 		catch (Exception e)
 		{
@@ -62,9 +70,10 @@ public class TextmateImporter
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Properties convertToProperties(File file) throws FileNotFoundException, PlistReaderException
+	private static Properties convertToProperties(InputStream stream) throws FileNotFoundException,
+			PlistReaderException
 	{
-		Reader characterStream = new FileReader(file);
+		Reader characterStream = new InputStreamReader(stream);
 		InputSource source = new InputSource(characterStream);
 		AbstractReader plistReader = PlistFactory.createReader();
 		plistReader.setSource(source);

@@ -15,7 +15,9 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.editor.common.internal.theme.ThemeManager;
 import com.aptana.editor.common.theme.ColorManager;
+import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -24,6 +26,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
 	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
+	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
+	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
@@ -33,9 +37,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	// The shared instance
 	private static CommonEditorPlugin plugin;
 
-	private ColorManager _colorManager;
-
-	private Map<String, Image> images = new HashMap<String, Image>();
+	private ColorManager fColorManager;
+	private Map<String, Image> fImages = new HashMap<String, Image>();
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 
 	/**
@@ -63,9 +66,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		if (_colorManager != null)
-			_colorManager.dispose();
-		_colorManager = null;
+		if (fColorManager != null)
+			fColorManager.dispose();
+		fColorManager = null;
 		plugin = null;
 		super.stop(context);
 	}
@@ -87,12 +90,17 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	 */
 	public ColorManager getColorManager()
 	{
-		if (this._colorManager == null)
+		if (this.fColorManager == null)
 		{
-			this._colorManager = new ColorManager();
+			this.fColorManager = new ColorManager();
 		}
 
-		return this._colorManager;
+		return this.fColorManager;
+	}
+
+	public IThemeManager getThemeManager()
+	{
+		return ThemeManager.instance();
 	}
 
 	public static void logError(Exception e)
@@ -134,7 +142,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	public Image getImage(String path)
 	{
-		Image image = images.get(path);
+		Image image = fImages.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -144,7 +152,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 
 			image = id.createImage();
-			images.put(path, image);
+			fImages.put(path, image);
 		}
 		return image;
 	}
@@ -152,6 +160,19 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static ImageDescriptor getImageDescriptor(String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	@Override
+	protected void initializeImageRegistry(ImageRegistry reg)
+	{
+		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
+		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
+		reg.put(COMMAND, imageDescriptorFromPlugin(PLUGIN_ID, COMMAND));
+	}
+
+	public Image getImageFromImageRegistry(String imageID)
+	{
+		return getImageRegistry().get(imageID);
 	}
 
 	public ContributionTemplateStore getTemplateStore(ContextTypeRegistry contextTypeRegistry)

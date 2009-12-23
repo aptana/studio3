@@ -40,7 +40,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.editor.common.CommonAutoIndentStrategy;
+import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.editor.js.preferences.PreferenceInitializer;

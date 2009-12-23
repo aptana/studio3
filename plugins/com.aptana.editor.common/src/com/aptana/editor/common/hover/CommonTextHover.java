@@ -41,21 +41,26 @@ import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
-import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.ILanguageService;
+import com.aptana.editor.common.text.information.CommonInformationProvider;
+
 @SuppressWarnings("restriction")
-public class CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
+public class CommonTextHover extends CommonInformationProvider implements ITextHover,
+        ITextHoverExtension {
+
+    public CommonTextHover(ILanguageService service) {
+        super(service);
+    }
 
     public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.getInformation(textViewer, hoverRegion);
     }
 
     public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.getSubject(textViewer, offset);
     }
 
     public IInformationControlCreator getHoverControlCreator() {
@@ -66,10 +71,5 @@ public class CommonTextHover implements ITextHover, ITextHoverExtension, ITextHo
                         new HTMLTextPresenter(false));
             }
         };
-    }
-
-    public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

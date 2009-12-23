@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -49,7 +50,7 @@ import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.explorer.ExplorerPlugin;
 
 /**
@@ -460,6 +461,23 @@ public class FilteringProjectView extends GitProjectView
 		}
 	}
 
+	/**
+	 * Returns the name for the given element. Used as the name for the current frame.
+	 */
+	private String getFrameName(Object element)
+	{
+		if (element instanceof IResource)
+		{
+			return ((IResource) element).getName();
+		}
+		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
+		if (text == null)
+		{
+			return "";//$NON-NLS-1$
+		}
+		return text;
+	}
+
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
@@ -770,8 +788,12 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager()
-				.getColor(ThemeUtil.getActiveTheme().getLineHighlight());
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+	}
+
+	protected Theme getActiveTheme()
+	{
+		return getThemeManager().getCurrentTheme();
 	}
 
 	private boolean filterOn()

@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.html;
 
-import com.aptana.editor.common.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
 public class HTMLPartitionScanner extends SourceConfigurationPartitionScanner {
 	

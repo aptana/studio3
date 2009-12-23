@@ -22,27 +22,22 @@ public class NameSelector implements ISelectorNode
 	{
 		boolean result = false;
 		
-		if (this._name != null)
+		if (context != null && this._name != null && this._name.length() > 0)
 		{
 			String step = context.getCurrentStep();
 			
-			if (step != null)
+			if (step != null && step.startsWith(this._name))
 			{
-				if (step.startsWith(this._name))
+				// step matches as a prefix, now make sure we matched the whole step
+				// or up to a period
+				int nameLength = this._name.length();
+				int scopeLength = step.length();
+				
+				if (result = (scopeLength == nameLength || step.charAt(nameLength) == '.'))
 				{
-					// step matches as a prefix, now make sure we matched the whole step
-					// or up to a period
-					int nameLength = this._name.length();
-					int scopeLength = step.length();
-					
-					result = (scopeLength == nameLength || step.charAt(nameLength) == '.');
+					context.advance();
 				}
 			}
-		}
-		
-		if (result)
-		{
-			context.advance();
 		}
 		
 		return result;

@@ -17,6 +17,18 @@
             id="com.aptana.editor.common.showscopes"
             name="%command.scope.name">
       </command>
+      <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="%command.execute.description"
+            id="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
+            name="%command.execute.name">
+      </command>
+       <command
+       		categoryId="org.eclipse.ui.category.edit"
+            description="%command.filter.description"
+            id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
+            name="%command.filter.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -26,7 +38,70 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+P">
       </key>
+      <key
+            commandId="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+R">
+      </key>
+      <key
+            commandId="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
+            contextId="org.eclipse.ui.textEditorScope"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Shift+R">
+      </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.editor.common.scripting.commands.ShowCommandsMenuHandler"
+            id="com.aptana.editor.common.scripting.commands.show"
+            name="Show Commands Menu">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.editor.common.scripting.commands.show"
+            icon="icons/command.png">
+      </image>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:com.aptana.scripting.menu?after=additions">
+         <dynamic
+               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
+               id="com.aptana.editor.common.dynamic">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:com.aptana.scripting.popup.menu?after=commands">
+         <dynamic
+               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
+               id="com.aptana.editor.common.dynamic">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
+
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer

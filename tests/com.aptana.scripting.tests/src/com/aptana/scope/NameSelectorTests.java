@@ -4,7 +4,9 @@ import junit.framework.TestCase;
 
 public class NameSelectorTests extends TestCase
 {
-
+	/**
+	 * testNameIsPrefix
+	 */
 	public void testNameIsPrefix()
 	{
 		NameSelector name = new NameSelector("source");
@@ -13,7 +15,9 @@ public class NameSelectorTests extends TestCase
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-
+	/**
+	 * testNameIsIdentical
+	 */
 	public void testNameIsIdentical()
 	{
 		NameSelector name = new NameSelector("source.ruby");
@@ -22,7 +26,9 @@ public class NameSelectorTests extends TestCase
 		assertTrue(selector.matches("source.ruby"));
 	}
 	
-
+	/**
+	 * testNameIsPartial
+	 */
 	public void testNameIsPartial()
 	{
 		NameSelector name = new NameSelector("sourc");
@@ -31,7 +37,9 @@ public class NameSelectorTests extends TestCase
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-
+	/**
+	 * testNameIsEmpty
+	 */
 	public void testNameIsEmpty()
 	{
 		NameSelector name = new NameSelector("");
@@ -40,7 +48,9 @@ public class NameSelectorTests extends TestCase
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-
+	/**
+	 * testScopeIsEmpty
+	 */
 	public void testScopeIsEmpty()
 	{
 		NameSelector name = new NameSelector("source");
@@ -49,7 +59,9 @@ public class NameSelectorTests extends TestCase
 		assertFalse(selector.matches(""));
 	}
 	
-
+	/**
+	 * testNameIsNull
+	 */
 	public void testNameIsNull()
 	{
 		NameSelector name = new NameSelector(null);
@@ -58,12 +70,14 @@ public class NameSelectorTests extends TestCase
 		assertFalse(selector.matches("source.ruby"));
 	}
 	
-
+	/**
+	 * testScopeIsNull
+	 */
 	public void testScopeIsNull()
 	{
 		NameSelector name = new NameSelector("source");
 		ScopeSelector selector = new ScopeSelector(name);
 		
-		assertFalse(selector.matches(null));
+		assertFalse(selector.matches((String) null));
 	}
 }

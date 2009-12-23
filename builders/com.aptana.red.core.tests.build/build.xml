@@ -102,13 +102,8 @@
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
 		</delete>
-		<!--
-		<delete verbose="true">
-			<fileset dir="${buildDirectory}/plugins">
-				<include name="**/*" />
-			</fileset>
-		</delete>
-		-->
+		<!-- Wipe the non-test plugins-->
+		<antcall target="wipe.plugins" />
 		<!-- Copy test plugins into plugins dir -->
 		<copy todir="${buildDirectory}/plugins">
 			<fileset dir="${buildDirectory}/tests">
@@ -116,12 +111,28 @@
 			</fileset>
 		</copy>
 		<!-- Install Red Core feature -->
-		<!--
+		<antcall target="install.red.core" />
+		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: install.red.core                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="install.red.core" unless="dont.install.red.core">
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
 			<param name="p2.repo" value="${red-core.p2.repo}" />
 		</antcall>
-		-->
+	</target>
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: wipe.plugins                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="wipe.plugins" unless="dont.wipe.plugins">
+		<delete verbose="true">
+			<fileset dir="${buildDirectory}/plugins">
+				<include name="**/*" />
+			</fileset>
+		</delete>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -159,6 +170,7 @@
 	</target>
 
 	<target name="test" depends="build">
+		<!-- Install the test feature we just built -->
 		<antcall target="run.director">
 			<param name="p2.installIU" value="${topLevelElementId}.feature.group" />
 			<param name="p2.repo" value="file:${p2.repo.dir}" />
@@ -190,7 +202,11 @@
 		</antcall>
 		<antcall target="run-core-test">
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
-			<param name="test.classname" value="com.aptana.scope.AllTests" />
+			<param name="test.classname" value="com.aptana.scripting.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.common.tests" />
+			<param name="test.classname" value="com.aptana.editor.common.tests.AllTests" />
 		</antcall>
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.ruby.tests" />
@@ -207,6 +223,10 @@
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.html.tests" />
 			<param name="test.classname" value="com.aptana.editor.html.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.xml.tests" />
+			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
 		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->

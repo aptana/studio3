@@ -50,29 +50,28 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.SubPartitionScanner;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * @author Max Stepanov
- *
  */
-public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
+public class CSSSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
 	public final static String PREFIX = "__css_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
 	public final static String MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] {
-		DEFAULT,
-		MULTILINE_COMMENT,
-		STRING
-	};
-	
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING };
+
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
+
 	/**
 	 * Detector for empty comments.
 	 */
@@ -132,75 +131,94 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	}
 
 	private IToken stringToken = new Token(STRING);
-	
+
 	private IPredicateRule[] partitioningRules;
 
 	private RuleBasedScanner multilineCommentScanner;
 	private RuleBasedScanner stringScanner;
 
 	private static CSSSourceConfiguration instance;
-	
-	public static CSSSourceConfiguration getDefault() {
-		if (instance == null) {
+
+	public static CSSSourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new CSSSourceConfiguration();
 		}
 		return instance;
 	}
-	
-	private CSSSourceConfiguration() {
-		
+
+	private CSSSourceConfiguration()
+	{
+
 		IToken comment = new Token(MULTILINE_COMMENT);
-		
-		partitioningRules = new IPredicateRule[] {
-				new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+
+		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new WordPredicateRule(comment),
-				new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
+				new WordPredicateRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 		};
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes() {
+	public String[] getContentTypes()
+	{
 		return CONTENT_TYPES;
 	}
 
-	/* (non-Javadoc)
+	public String[][] getTopContentTypes()
+	{
+		return TOP_CONTENT_TYPES;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
 		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return ICSSConstants.CONTENT_TYPE_CSS;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		
+
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
-		
+
 		dr = new DefaultDamagerRepairer(getWordScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
@@ -210,20 +228,33 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, STRING);
 	}
 
-	protected ITokenScanner getWordScanner() {
-		if (multilineCommentScanner == null) {
+	protected ITokenScanner getWordScanner()
+	{
+		if (multilineCommentScanner == null)
+		{
 			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.css")); //$NON-NLS-1$
+			multilineCommentScanner.setDefaultReturnToken(getToken("comment.block.css")); //$NON-NLS-1$
 		}
 		return multilineCommentScanner;
 	}
-	
-	protected ITokenScanner getStringScanner() {
-		if (stringScanner == null) {
+
+	protected ITokenScanner getStringScanner()
+	{
+		if (stringScanner == null)
+		{
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.css")); //$NON-NLS-1$
+			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.css")); //$NON-NLS-1$
 		}
 		return stringScanner;
 	}
 
+	protected IToken getToken(String name)
+	{
+		return getThemeManager().getToken(name);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }
