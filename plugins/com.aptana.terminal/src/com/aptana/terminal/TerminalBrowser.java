@@ -25,7 +25,7 @@ import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.services.IServiceLocator;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.internal.theme.ThemeUtil;
 import com.aptana.terminal.server.HttpServer;
 
 @SuppressWarnings("restriction")

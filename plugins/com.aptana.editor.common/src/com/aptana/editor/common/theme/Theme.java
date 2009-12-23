@@ -30,6 +30,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.internal.theme.ThemeUtil;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,

@@ -25,6 +25,8 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
 
 // TODO Hide this implementation as package level and expose the interface in a public package and ia plugin or something
 public class ThemeUtil implements IThemeManager
