@@ -33,80 +33,28 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.rules;
 
 import java.util.Collection;
-import java.util.Collections;
 
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
 
-/**
- * @author Max Stepanov
- *
- */
-public class NullSubPartitionScanner implements ISubPartitionScanner {
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 
-	private static final IToken DEFAULT_TOKEN = new Token(IDocument.DEFAULT_CONTENT_TYPE);
+public interface ISubPartitionScanner {
 
-	private ICharacterScanner characterScanner;
+	public Collection<IPredicateRule> getRules();
+	public IToken getDefaultToken();
 	
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#doResetRules()
-	 */
-	public boolean doResetRules() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#foundSequence()
-	 */
-	public boolean foundSequence() {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#getCharacterScanner()
-	 */
-	public ICharacterScanner getCharacterScanner() {
-		return characterScanner;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#getDefaultToken()
-	 */
-	public IToken getDefaultToken() {
-		return DEFAULT_TOKEN;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#getRules()
-	 */
-	public Collection<IPredicateRule> getRules() {
-		return Collections.emptyList();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#hasContentType(java.lang.String)
-	 */
-	public boolean hasContentType(String contentType) {
-		return false;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.editor.common.IPartitionScannerSwitchStrategy)
-	 */
-	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
-		characterScanner = baseCharacterScanner;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
-	 */
-	public void setLastToken(IToken token) {
-	}
-
+	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy);
+	public ICharacterScanner getCharacterScanner();
+	public boolean foundSequence();
+	public boolean doResetRules();
+	
+	public boolean hasContentType(String contentType);
+	
+	public void setLastToken(IToken token);
+	
 }

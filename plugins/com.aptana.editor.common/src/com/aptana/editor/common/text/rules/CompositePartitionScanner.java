@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.rules;
 
 import java.text.MessageFormat;
 
@@ -44,7 +44,9 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.text.rules.SingleTagRule;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.IPartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov

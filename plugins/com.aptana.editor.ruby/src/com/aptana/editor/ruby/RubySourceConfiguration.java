@@ -51,8 +51,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.SubPartitionScanner;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
 
 /**

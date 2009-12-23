@@ -7,6 +7,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 
+import com.aptana.editor.common.text.rules.SequenceCharacterScanner;
+
 public class SequenceCharacterScannerTest extends TestCase
 {
 
