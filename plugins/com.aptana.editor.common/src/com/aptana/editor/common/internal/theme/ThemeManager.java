@@ -31,7 +31,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 
-public class ThemeUtil implements IThemeManager
+public class ThemeManager implements IThemeManager
 {
 	/**
 	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
@@ -59,18 +59,18 @@ public class ThemeUtil implements IThemeManager
 	private HashSet<String> fBuiltins;
 	private Map<WeakReference<Token>, String> fTokens;
 
-	private static ThemeUtil fgInstance;
+	private static ThemeManager fgInstance;
 
-	private ThemeUtil()
+	private ThemeManager()
 	{
 		fTokens = new HashMap<WeakReference<Token>, String>();
 	}
 
-	public static ThemeUtil instance()
+	public static ThemeManager instance()
 	{
 		if (fgInstance == null)
 		{
-			fgInstance = new ThemeUtil();
+			fgInstance = new ThemeManager();
 		}
 		return fgInstance;
 	}
