@@ -1,4 +1,4 @@
-package com.aptana.editor.common.peer;
+package com.aptana.editor.common.internal.peer;
 
 import junit.framework.TestCase;
 
@@ -6,6 +6,8 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
+
+import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 
 public class CharacterPairMatcherTest extends TestCase
 {

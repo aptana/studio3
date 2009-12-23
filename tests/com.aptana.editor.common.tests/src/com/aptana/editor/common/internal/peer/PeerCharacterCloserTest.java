@@ -1,4 +1,4 @@
-package com.aptana.editor.common.peer;
+package com.aptana.editor.common.internal.peer;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -8,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+
+import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 
 import junit.framework.TestCase;
 

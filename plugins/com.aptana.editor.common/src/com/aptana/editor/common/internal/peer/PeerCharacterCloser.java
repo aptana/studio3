@@ -1,4 +1,4 @@
-package com.aptana.editor.common.peer;
+package com.aptana.editor.common.internal.peer;
 
 import java.util.Stack;
 

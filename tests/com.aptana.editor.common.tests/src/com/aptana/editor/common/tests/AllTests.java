@@ -4,7 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
-import com.aptana.editor.common.peer.PeerTests;
+import com.aptana.editor.common.internal.peer.PeerTests;
 import com.aptana.editor.common.theme.ThemeTests;
 
 public class AllTests
