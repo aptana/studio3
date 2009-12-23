@@ -142,14 +142,14 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	private ITokenScanner getStartEndTokenScanner() {
 		if (startEndTokenScanner == null) {
 			RuleBasedScanner ts = new RuleBasedScanner();
-			IToken seqToken = ThemeUtil.getToken(getStartEndTokenType());
+			IToken seqToken = ThemeUtil.instance().getToken(getStartEndTokenType());
 			List<IRule> rules = new ArrayList<IRule>();
 			for (String[] pair : getPartitionerSwitchStrategy().getSwitchTagPairs()) {
 				rules.add(new SingleTagRule(pair[0], seqToken));
 				rules.add(new SingleTagRule(pair[1], seqToken));
 			}
 			ts.setRules(rules.toArray(new IRule[rules.size()]));
-			ts.setDefaultReturnToken(ThemeUtil.getToken("text")); //$NON-NLS-1$
+			ts.setDefaultReturnToken(ThemeUtil.instance().getToken("text")); //$NON-NLS-1$
 			startEndTokenScanner = ts;
 		}
 		return startEndTokenScanner;

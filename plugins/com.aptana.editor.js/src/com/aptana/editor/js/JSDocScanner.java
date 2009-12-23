@@ -49,59 +49,69 @@ import com.aptana.editor.common.theme.ThemeUtil;
 /**
  * A rule based JavaDoc scanner.
  */
-public class JSDocScanner extends RuleBasedScanner {
-    /**
-     * A key word detector.
-     */
-    static class JSDocWordDetector implements IWordDetector {
-        /*
-         * (non-Javadoc) Method declared on IWordDetector
-         */
-        public boolean isWordStart(char c) {
-            return (c == '@');
-        }
+public class JSDocScanner extends RuleBasedScanner
+{
+	/**
+	 * A key word detector.
+	 */
+	static class JSDocWordDetector implements IWordDetector
+	{
+		/*
+		 * (non-Javadoc) Method declared on IWordDetector
+		 */
+		public boolean isWordStart(char c)
+		{
+			return (c == '@');
+		}
 
-        /*
-         * (non-Javadoc) Method declared on IWordDetector
-         */
-        public boolean isWordPart(char c) {
-            return Character.isLetter(c);
-        }
-    }
+		/*
+		 * (non-Javadoc) Method declared on IWordDetector
+		 */
+		public boolean isWordPart(char c)
+		{
+			return Character.isLetter(c);
+		}
+	}
 
-    private static String[] KEYWORDS = { "@author", "@deprecated", "@exception", "@param", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-            "@return", "@see", "@serial", "@serialData", "@serialField", "@since", "@throws", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-            "@version" }; //$NON-NLS-1$
+	private static String[] KEYWORDS = { "@author", "@deprecated", "@exception", "@param", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"@return", "@see", "@serial", "@serialData", "@serialField", "@since", "@throws", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+			"@version" }; //$NON-NLS-1$
 
-    /**
-     * Create a new javadoc scanner for the given color provider.
-     * 
-     */
-    public JSDocScanner() {
-        super();
+	/**
+	 * Create a new javadoc scanner for the given color provider.
+	 */
+	public JSDocScanner()
+	{
+		super();
 
-        IToken keyword = ThemeUtil.getToken("meta.documentation.tag.js"); //$NON-NLS-1$
-        IToken tag = ThemeUtil.getToken("text.html.basic"); //$NON-NLS-1$
-        IToken link = ThemeUtil.getToken("markup.underline.link"); //$NON-NLS-1$
+		IToken keyword = getToken("meta.documentation.tag.js"); //$NON-NLS-1$
+		IToken tag = getToken("text.html.basic"); //$NON-NLS-1$
+		IToken link = getToken("markup.underline.link"); //$NON-NLS-1$
 
-        List<IRule> list = new ArrayList<IRule>();
+		List<IRule> list = new ArrayList<IRule>();
 
-        // Add rule for tags.
-        list.add(new SingleLineRule("<", ">", tag)); //$NON-NLS-2$ //$NON-NLS-1$
+		// Add rule for tags.
+		list.add(new SingleLineRule("<", ">", tag)); //$NON-NLS-2$ //$NON-NLS-1$
 
-        // Add rule for links.
-        list.add(new SingleLineRule("{", "}", link)); //$NON-NLS-2$ //$NON-NLS-1$
+		// Add rule for links.
+		list.add(new SingleLineRule("{", "}", link)); //$NON-NLS-2$ //$NON-NLS-1$
 
-        // Add word rule for keywords.
-        WordRule wordRule = new WordRule(new JSDocWordDetector());
+		// Add word rule for keywords.
+		WordRule wordRule = new WordRule(new JSDocWordDetector());
 
-        for (String word : KEYWORDS) {
-            wordRule.addWord(word, keyword);
-        }
+		for (String word : KEYWORDS)
+		{
+			wordRule.addWord(word, keyword);
+		}
 
-        list.add(wordRule);
+		list.add(wordRule);
 
-        setDefaultReturnToken(ThemeUtil.getToken("comment.block.documentation.js")); //$NON-NLS-1$
-        setRules(list.toArray(new IRule[list.size()]));
-    }
+		setDefaultReturnToken(getToken("comment.block.documentation.js")); //$NON-NLS-1$
+		setRules(list.toArray(new IRule[list.size()]));
+	}
+
+	protected IToken getToken(String tokenName)
+	{
+		return ThemeUtil.instance().getToken(tokenName);
+	}
 }

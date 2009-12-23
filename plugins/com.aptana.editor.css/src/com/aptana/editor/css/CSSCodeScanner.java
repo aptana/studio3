@@ -202,7 +202,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return ThemeUtil.getToken(string);
+		return ThemeUtil.instance().getToken(string);
 	}
 
 	/**

@@ -160,7 +160,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
 
-		setTheme(ThemeUtil.getActiveTheme().getName());
+		setTheme(ThemeUtil.instance().getActiveTheme().getName());
 		return composite;
 	}
 
@@ -177,7 +177,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				setTheme(fThemeCombo.getText());
-				ThemeUtil.setActiveTheme(getTheme());
+				ThemeUtil.instance().setActiveTheme(getTheme());
 				super.widgetSelected(e);
 			}
 		});
@@ -189,7 +189,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			{
 				if (newText == null || newText.trim().length() == 0)
 					return Messages.ThemePreferencePage_NameNonEmptyMsg;
-				if (ThemeUtil.getThemeNames().contains(newText.trim()))
+				if (ThemeUtil.instance().getThemeNames().contains(newText.trim()))
 					return Messages.ThemePreferencePage_NameAlreadyExistsMsg;
 				if (newText.contains(ThemeUtil.THEME_NAMES_DELIMETER))
 					return MessageFormat.format(Messages.ThemePreferencePage_InvalidCharInThemeName,
@@ -213,7 +213,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme newTheme = getTheme().copy(dialog.getValue());
 					// Add theme to theme list, make current theme this one
-					ThemeUtil.setActiveTheme(newTheme);
+					ThemeUtil.instance().setActiveTheme(newTheme);
 					loadThemeNames();
 					setTheme(newTheme.getName());
 				}
@@ -236,7 +236,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					Theme oldTheme = getTheme();
 					Theme newTheme = oldTheme.copy(dialog.getValue());
-					ThemeUtil.setActiveTheme(newTheme);
+					ThemeUtil.instance().setActiveTheme(newTheme);
 					oldTheme.delete();
 					loadThemeNames();
 					setTheme(newTheme.getName());
@@ -259,7 +259,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 				getTheme().delete();
 				loadThemeNames();
-				setTheme(ThemeUtil.getActiveTheme().getName());
+				setTheme(ThemeUtil.instance().getActiveTheme().getName());
 			}
 		});
 
@@ -287,8 +287,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
 
 				Theme theme = new TextmateImporter().convert(themeFile);
-				ThemeUtil.addTheme(theme);
-				ThemeUtil.setActiveTheme(theme);
+				ThemeUtil.instance().addTheme(theme);
+				ThemeUtil.instance().setActiveTheme(theme);
 				loadThemeNames();
 				setTheme(theme.getName());
 			}
@@ -298,7 +298,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private void loadThemeNames()
 	{
 		fThemeCombo.removeAll();
-		List<String> themeNames = new ArrayList<String>(ThemeUtil.getThemeNames());
+		List<String> themeNames = new ArrayList<String>(ThemeUtil.instance().getThemeNames());
 		Collections.sort(themeNames, new Comparator<String>()
 		{
 			public int compare(String o1, String o2)
@@ -817,7 +817,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fThemeCombo.setText(themeName);
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
-		if (ThemeUtil.isBuiltinTheme(themeName))
+		if (ThemeUtil.instance().isBuiltinTheme(themeName))
 		{
 			renameThemeButton.setEnabled(false);
 			deleteThemeButton.setEnabled(false);
@@ -992,7 +992,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
-		ThemeUtil.setActiveTheme(getTheme());
+		ThemeUtil.instance().setActiveTheme(getTheme());
 		return super.performOk();
 	}
 
@@ -1003,7 +1003,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			Theme theme = getTheme();
 			theme.loadFromDefaults();
-			ThemeUtil.setActiveTheme(theme);
+			ThemeUtil.instance().setActiveTheme(theme);
 			setTheme(fSelectedTheme);
 		}
 		catch (Exception e)
@@ -1015,7 +1015,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected Theme getTheme()
 	{
-		return ThemeUtil.getTheme(fSelectedTheme);
+		return ThemeUtil.instance().getTheme(fSelectedTheme);
 	}
 
 	@Override

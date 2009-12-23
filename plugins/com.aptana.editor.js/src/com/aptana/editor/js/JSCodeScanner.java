@@ -275,7 +275,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return ThemeUtil.getToken(string);
+		return ThemeUtil.instance().getToken(string);
 	}
 
 	private void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)

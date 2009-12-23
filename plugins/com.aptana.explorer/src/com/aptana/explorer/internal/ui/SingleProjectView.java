@@ -234,7 +234,7 @@ public class SingleProjectView extends CommonNavigator
 	private void hookToThemes()
 	{
 		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.instance().getActiveTheme().getBackground()));
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -257,7 +257,7 @@ public class SingleProjectView extends CommonNavigator
 					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							ThemeUtil.getActiveTheme().getSelection()));
+							ThemeUtil.instance().getActiveTheme().getSelection()));
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
@@ -340,7 +340,7 @@ public class SingleProjectView extends CommonNavigator
 				}
 
 				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						ThemeUtil.getActiveTheme().getForeground()));
+						ThemeUtil.instance().getActiveTheme().getForeground()));
 			}
 		});
 	}
@@ -358,7 +358,7 @@ public class SingleProjectView extends CommonNavigator
 					getCommonViewer().refresh();
 					getCommonViewer().getTree().setBackground(
 							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									ThemeUtil.getActiveTheme().getBackground()));
+									ThemeUtil.instance().getActiveTheme().getBackground()));
 				}
 			}
 		};

@@ -50,6 +50,7 @@ import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 
@@ -477,7 +478,7 @@ public class FilteringProjectView extends GitProjectView
 		}
 		return text;
 	}
-	
+
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
@@ -788,8 +789,12 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager()
-				.getColor(ThemeUtil.getActiveTheme().getLineHighlight());
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+	}
+
+	protected Theme getActiveTheme()
+	{
+		return ThemeUtil.instance().getActiveTheme();
 	}
 
 	private boolean filterOn()

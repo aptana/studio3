@@ -27,6 +27,7 @@ import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
@@ -241,38 +242,43 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	private Color greenFG()
 	{
-		if (ThemeUtil.getActiveTheme().hasEntry(STAGED_TOKEN))
+		if (getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
-			return ThemeUtil.getActiveTheme().getForeground(STAGED_TOKEN);
+			return getActiveTheme().getForeground(STAGED_TOKEN);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
 
 	private Color greenBG()
 	{
-		if (ThemeUtil.getActiveTheme().hasEntry(STAGED_TOKEN))
+		if (getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
-			return ThemeUtil.getActiveTheme().getBackground(STAGED_TOKEN);
+			return getActiveTheme().getBackground(STAGED_TOKEN);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
 	private Color redFG()
 	{
-		if (ThemeUtil.getActiveTheme().hasEntry(UNSTAGED_TOKEN))
+		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
-			return ThemeUtil.getActiveTheme().getForeground(UNSTAGED_TOKEN);
+			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
 
 	private Color redBG()
 	{
-		if (ThemeUtil.getActiveTheme().hasEntry(UNSTAGED_TOKEN))
+		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
-			return ThemeUtil.getActiveTheme().getBackground(UNSTAGED_TOKEN);
+			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
+	}
+
+	protected Theme getActiveTheme()
+	{
+		return ThemeUtil.instance().getActiveTheme();
 	}
 
 	@Override

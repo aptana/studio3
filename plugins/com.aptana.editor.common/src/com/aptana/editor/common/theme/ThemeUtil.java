@@ -26,7 +26,8 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
-public abstract class ThemeUtil
+// TODO Hide this implementation as package level and expose the interface in a public package and ia plugin or something
+public class ThemeUtil implements IThemeManager
 {
 	/**
 	 * Character used to separate listing of theme names stored under {@link #THEME_LIST_PREF_KEY}
@@ -44,7 +45,7 @@ public abstract class ThemeUtil
 	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
-	 * Preference key used to store teh timestamp of last theme change. Used to force a redraw of editors when theme
+	 * Preference key used to store the timestamp of last theme change. Used to force a redraw of editors when theme
 	 * changes (even if it remains same theme, but has been edited).
 	 */
 	public static final String THEME_CHANGED = "THEME_CHANGED"; //$NON-NLS-1$
@@ -53,58 +54,53 @@ public abstract class ThemeUtil
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
-	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
+	static final String THEMES_NODE = "themes"; //$NON-NLS-1$
 
-	private static Theme fgTheme;
-	private static HashMap<String, Theme> fgThemeMap;
-	private static HashSet<String> fgBuiltins;
-	private static Map<WeakReference<Token>, String> fgTokens = new HashMap<WeakReference<Token>, String>();
+	private Theme fCurrentTheme;
+	private HashMap<String, Theme> fThemeMap;
+	private HashSet<String> fBuiltins;
+	private Map<WeakReference<Token>, String> fTokens;
 
-	private static Theme loadTheme(InputStream stream) throws IOException
+	private static ThemeUtil fgInstance;
+
+	private ThemeUtil()
 	{
-		try
-		{
-			Properties props = new Properties();
-			props.load(stream);
-			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), props);
-		}
-		finally
-		{
-			try
-			{
-				stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
+		fTokens = new HashMap<WeakReference<Token>, String>();
 	}
 
-	private static TextAttribute getTextAttribute(String name)
+	public static ThemeUtil instance()
+	{
+		if (fgInstance == null)
+		{
+			fgInstance = new ThemeUtil();
+		}
+		return fgInstance;
+	}
+
+	private TextAttribute getTextAttribute(String name)
 	{
 		if (getActiveTheme() != null)
 			return getActiveTheme().getTextAttribute(name);
 		return new TextAttribute(CommonEditorPlugin.getDefault().getColorManager().getColor(new RGB(255, 255, 255)));
 	}
 
-	public static Theme getActiveTheme()
+	public Theme getActiveTheme()
 	{
-		if (fgTheme == null)
+		if (fCurrentTheme == null)
 		{
 			String activeThemeName = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
 					ACTIVE_THEME, null, null);
 			if (activeThemeName != null)
-				fgTheme = getTheme(activeThemeName);
-			if (fgTheme == null)
+				fCurrentTheme = getTheme(activeThemeName);
+			if (fCurrentTheme == null)
 				setActiveTheme(getThemeMap().values().iterator().next());
 		}
-		return fgTheme;
+		return fCurrentTheme;
 	}
 
-	public static void setActiveTheme(Theme theme)
+	public void setActiveTheme(Theme theme)
 	{
-		fgTheme = theme;
+		fCurrentTheme = theme;
 		adaptTokens();
 
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
@@ -141,28 +137,28 @@ public abstract class ThemeUtil
 		return builder.toString();
 	}
 
-	public static Theme getTheme(String name)
+	public Theme getTheme(String name)
 	{
 		return getThemeMap().get(name);
 	}
 
-	private static Map<String, Theme> getThemeMap()
+	private Map<String, Theme> getThemeMap()
 	{
-		if (fgThemeMap == null)
+		if (fThemeMap == null)
 		{
 			loadThemes();
 		}
-		return fgThemeMap;
+		return fThemeMap;
 	}
 
-	public static Set<String> getThemeNames()
+	public Set<String> getThemeNames()
 	{
 		return getThemeMap().keySet();
 	}
 
-	private static void loadThemes()
+	private void loadThemes()
 	{
-		fgThemeMap = new HashMap<String, Theme>();
+		fThemeMap = new HashMap<String, Theme>();
 		// Load builtin themes stored in properties files
 		loadBuiltinThemes();
 		// Load themes from the preferences
@@ -171,10 +167,10 @@ public abstract class ThemeUtil
 		saveThemeList();
 	}
 
-	private static void saveThemeList()
+	private void saveThemeList()
 	{
 		StringBuilder builder = new StringBuilder();
-		for (String themeName : fgThemeMap.keySet())
+		for (String themeName : fThemeMap.keySet())
 		{
 			// FIXME What if the themeName contains our delimeter?!
 			builder.append(themeName).append(THEME_NAMES_DELIMETER);
@@ -192,7 +188,7 @@ public abstract class ThemeUtil
 		}
 	}
 
-	private static void loadUserThemes()
+	private void loadUserThemes()
 	{
 		String themeNames = Platform.getPreferencesService().getString(CommonEditorPlugin.PLUGIN_ID,
 				THEME_LIST_PREF_KEY, null, null);
@@ -211,7 +207,7 @@ public abstract class ThemeUtil
 				Properties props = new Properties();
 				props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
 				Theme theme = new Theme(CommonEditorPlugin.getDefault().getColorManager(), props);
-				fgThemeMap.put(theme.getName(), theme);
+				fThemeMap.put(theme.getName(), theme);
 			}
 			catch (Exception e)
 			{
@@ -221,9 +217,9 @@ public abstract class ThemeUtil
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void loadBuiltinThemes()
+	private void loadBuiltinThemes()
 	{
-		fgBuiltins = new HashSet<String>();
+		fBuiltins = new HashSet<String>();
 		Enumeration<URL> urls = CommonEditorPlugin.getDefault().getBundle()
 				.findEntries("themes", "*.properties", false); //$NON-NLS-1$ //$NON-NLS-2$
 		if (urls == null)
@@ -236,8 +232,8 @@ public abstract class ThemeUtil
 				Theme theme = loadTheme(url.openStream());
 				if (theme != null)
 				{
-					fgThemeMap.put(theme.getName(), theme);
-					fgBuiltins.add(theme.getName());
+					fThemeMap.put(theme.getName(), theme);
+					fBuiltins.add(theme.getName());
 				}
 			}
 			catch (Exception e)
@@ -247,16 +243,37 @@ public abstract class ThemeUtil
 		}
 	}
 
-	public static IToken getToken(String string)
+	private static Theme loadTheme(InputStream stream) throws IOException
+	{
+		try
+		{
+			Properties props = new Properties();
+			props.load(stream);
+			return new Theme(CommonEditorPlugin.getDefault().getColorManager(), props);
+		}
+		finally
+		{
+			try
+			{
+				stream.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
+	}
+
+	public IToken getToken(String string)
 	{
 		Token token = new Token(getTextAttribute(string));
-		fgTokens.put(new WeakReference<Token>(token), string);
+		fTokens.put(new WeakReference<Token>(token), string);
 		return token;
 	}
 
-	private static void adaptTokens()
+	private void adaptTokens()
 	{
-		for (Map.Entry<WeakReference<Token>, String> entry : fgTokens.entrySet())
+		for (Map.Entry<WeakReference<Token>, String> entry : fTokens.entrySet())
 		{
 			Token token = entry.getKey().get();
 			if (token != null)
@@ -264,27 +281,27 @@ public abstract class ThemeUtil
 		}
 	}
 
-	public static void addTheme(Theme newTheme)
+	public void addTheme(Theme newTheme)
 	{
-		fgThemeMap.put(newTheme.getName(), newTheme);
+		fThemeMap.put(newTheme.getName(), newTheme);
 		newTheme.save();
 		saveThemeList();
 	}
 
-	public static void removeTheme(Theme theme)
+	public void removeTheme(Theme theme)
 	{
 		Theme activeTheme = getActiveTheme();
-		fgThemeMap.remove(theme.getName());
+		fThemeMap.remove(theme.getName());
 		saveThemeList();
 		// change active theme if we just removed it
 		if (activeTheme.getName().equals(theme.getName()))
 		{
-			setActiveTheme(fgThemeMap.values().iterator().next());
+			setActiveTheme(fThemeMap.values().iterator().next());
 		}
 	}
 
-	public static boolean isBuiltinTheme(String themeName)
+	public boolean isBuiltinTheme(String themeName)
 	{
-		return fgBuiltins.contains(themeName);
+		return fBuiltins.contains(themeName);
 	}
 }

@@ -39,6 +39,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
@@ -168,7 +169,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, XML_TAG);
 		reconciler.setRepairer(dr, XML_TAG);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.xml")); //$NON-NLS-1$
+		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(getToken("comment.block.xml")); //$NON-NLS-1$
 		reconciler.setDamager(ndr, XMLSourceConfiguration.XML_COMMENT);
 		reconciler.setRepairer(ndr, XMLSourceConfiguration.XML_COMMENT);
 	}
@@ -178,7 +179,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (preProcessorScanner == null)
 		{
 			preProcessorScanner = new XMLTagScanner();
-			preProcessorScanner.setDefaultReturnToken(ThemeUtil.getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
+			preProcessorScanner.setDefaultReturnToken(getToken("meta.tag.preprocessor.xml")); //$NON-NLS-1$
 		}
 		return preProcessorScanner;
 	}
@@ -188,7 +189,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		if (cdataScanner == null)
 		{
 			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
+			cdataScanner.setDefaultReturnToken(getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
 		}
 		return cdataScanner;
 	}
@@ -211,4 +212,8 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return xmlTagScanner;
 	}
 
+	protected IToken getToken(String tokenName)
+	{
+		return ThemeUtil.instance().getToken(tokenName);
+	}
 }
