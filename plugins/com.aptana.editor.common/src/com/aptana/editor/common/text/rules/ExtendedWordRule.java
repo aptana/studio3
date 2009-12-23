@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.text.rules;
 
 import java.util.Iterator;
 
