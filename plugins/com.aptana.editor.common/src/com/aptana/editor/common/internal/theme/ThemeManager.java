@@ -46,13 +46,14 @@ public class ThemeManager implements IThemeManager
 	/**
 	 * Preference key used to save the active theme.
 	 */
-	public static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
+	private static final String ACTIVE_THEME = "ACTIVE_THEME"; //$NON-NLS-1$
 
 	/**
 	 * Node in preferences used to store themes under. Each theme is a key value pair under this node. The key is the
 	 * theme name, value is XML format java Properties object.
 	 */
 	public static final String THEMES_NODE = "themes"; //$NON-NLS-1$
+	// TODO Don't expose this node name. Fold saving/loading of themes into this impl
 
 	private Theme fCurrentTheme;
 	private HashMap<String, Theme> fThemeMap;
