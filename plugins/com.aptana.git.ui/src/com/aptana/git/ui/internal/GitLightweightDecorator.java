@@ -29,7 +29,6 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
-import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -284,7 +283,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	@Override

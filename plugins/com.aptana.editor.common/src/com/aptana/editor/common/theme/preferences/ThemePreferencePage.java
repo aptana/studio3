@@ -168,7 +168,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void createThemeListControls(Composite composite)

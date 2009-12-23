@@ -48,12 +48,12 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
 import com.aptana.editor.common.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
@@ -244,9 +244,9 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		return getThemeManager().getToken(tokenName);
 	}
-	
+
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 }

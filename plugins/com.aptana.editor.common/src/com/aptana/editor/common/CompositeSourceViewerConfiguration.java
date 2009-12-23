@@ -50,13 +50,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Max Stepanov
  */
-public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration implements
-		ITopContentTypesProvider
+public abstract class CompositeSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
 
 	private ITokenScanner startEndTokenScanner;
@@ -171,6 +169,6 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 }

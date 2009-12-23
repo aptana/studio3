@@ -7,9 +7,9 @@ import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 public class RubyRegexpScanner extends BufferedRuleBasedScanner
 {
@@ -30,6 +30,6 @@ public class RubyRegexpScanner extends BufferedRuleBasedScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 }

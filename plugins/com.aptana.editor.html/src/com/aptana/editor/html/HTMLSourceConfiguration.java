@@ -46,6 +46,7 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.ISubPartitionScanner;
@@ -53,7 +54,6 @@ import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.TagRule;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
@@ -241,7 +241,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 }

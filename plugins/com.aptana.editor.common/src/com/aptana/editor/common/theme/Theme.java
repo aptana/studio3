@@ -314,7 +314,7 @@ public class Theme
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void save(IScopeContext scope)

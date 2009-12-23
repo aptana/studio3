@@ -21,8 +21,8 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.terminal.Activator;
 import com.aptana.util.StringUtil;
 
@@ -166,7 +166,7 @@ public class HttpWorker implements Runnable
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	/**

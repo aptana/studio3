@@ -45,12 +45,12 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.RegexpRule;
 import com.aptana.editor.common.SingleCharacterRule;
 import com.aptana.editor.common.WhitespaceDetector;
 import com.aptana.editor.common.WordDetector;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 /**
  * @author Kevin Lindsey
@@ -281,7 +281,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)

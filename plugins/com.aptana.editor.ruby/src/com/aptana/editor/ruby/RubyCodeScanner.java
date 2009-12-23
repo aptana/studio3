@@ -8,8 +8,8 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.parser.Tokens;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemeUtil;
 
 public class RubyCodeScanner implements ITokenScanner
 {
@@ -214,7 +214,7 @@ public class RubyCodeScanner implements ITokenScanner
 
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private IToken pop()

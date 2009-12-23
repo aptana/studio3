@@ -348,7 +348,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	protected void overrideCaretColor()

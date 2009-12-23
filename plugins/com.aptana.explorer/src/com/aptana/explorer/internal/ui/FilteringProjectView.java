@@ -50,9 +50,7 @@ import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
-import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 
 /**
@@ -796,11 +794,6 @@ public class FilteringProjectView extends GitProjectView
 	protected Theme getActiveTheme()
 	{
 		return getThemeManager().getActiveTheme();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return ThemeUtil.instance();
 	}
 
 	private boolean filterOn()

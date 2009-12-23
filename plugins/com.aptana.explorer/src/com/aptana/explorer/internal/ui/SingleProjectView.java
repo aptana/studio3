@@ -348,7 +348,7 @@ public class SingleProjectView extends CommonNavigator
 	
 	protected IThemeManager getThemeManager()
 	{
-		return ThemeUtil.instance();
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void listenForThemeChanges()
