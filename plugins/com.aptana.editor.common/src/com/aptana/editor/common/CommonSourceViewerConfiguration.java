@@ -67,6 +67,7 @@ import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.reconciler.CommonCompositeReconcilingStrategy;
+import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 
 public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
 
