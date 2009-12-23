@@ -64,11 +64,11 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 
 	public final static String PREFIX = "__rb_"; //$NON-NLS-1$
 	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public static final String SINGLE_LINE_COMMENT = "__rb_singleline_comment"; //$NON-NLS-1$
-	public static final String MULTI_LINE_COMMENT = "__rb_multiline_comment"; //$NON-NLS-1$
-	public static final String REGULAR_EXPRESSION = "__rb_regular_expression"; //$NON-NLS-1$
-	public static final String COMMAND = "__rb_command"; //$NON-NLS-1$
-	public final static String STRING = "__rb_string"; //$NON-NLS-1$
+	public static final String SINGLE_LINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
+	public static final String MULTI_LINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
+	public static final String REGULAR_EXPRESSION = PREFIX + "regular_expression"; //$NON-NLS-1$
+	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
+	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLE_LINE_COMMENT, MULTI_LINE_COMMENT,
 			REGULAR_EXPRESSION, COMMAND, STRING };
