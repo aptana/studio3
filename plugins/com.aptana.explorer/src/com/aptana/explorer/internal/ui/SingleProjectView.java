@@ -29,22 +29,35 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.search.ui.NewSearchUI;
+import org.eclipse.search.ui.text.FileTextSearchScope;
+import org.eclipse.search.ui.text.TextSearchQueryProvider;
+import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -61,17 +74,26 @@ import com.aptana.filewatcher.FileWatcher;
  * 
  * @author cwilliams
  */
-public class SingleProjectView extends CommonNavigator
+public abstract class SingleProjectView extends CommonNavigator
 {
 
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
 
-	private Combo projectCombo;
+	private ToolItem projectToolItem;
+	
 	protected IProject selectedProject;
 	private ResourceListener fResourceListener;
 	private ViewerFilter activeProjectFilter;
+	
+	/**
+	 * The text to initially show in the filter text control.
+	 */
+	protected String initialText = Messages.GitProjectView_InitialFileFilterText;
+	private Text searchText;
+	protected boolean caseSensitiveSearch;
+	protected boolean regularExpressionSearch;
 
 	private Integer watcher;
 
@@ -81,15 +103,44 @@ public class SingleProjectView extends CommonNavigator
 
 	private IPropertyChangeListener fontListener;
 
-	@Override
-	public void createPartControl(Composite aParent)
-	{
-		// Create our own parent
-		Composite customComposite = new Composite(aParent, SWT.NONE);
-		customComposite.setLayout(new FormLayout());
+	private Menu projectsMenu;
 
-		Composite bottom = doCreatePartControl(customComposite);
-		createNavigator(customComposite, bottom);
+	@Override
+	public void createPartControl(Composite parent)
+	{
+		// Create toolbar
+		Composite toolbarComposite = new Composite(parent, SWT.NONE);	
+		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		toolbarComposite.setLayoutData(toolbarGridData);
+		
+		
+		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		toolbarGridLayout.marginWidth = 2;
+		toolbarGridLayout.marginHeight = 0;
+		toolbarGridLayout.horizontalSpacing = 0;
+		toolbarComposite.setLayout(toolbarGridLayout);
+
+		Label applicationLabel = new Label(toolbarComposite, SWT.NONE);
+		applicationLabel.setText("App : ");
+		applicationLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		
+		// Projects combo
+		createProjectCombo(toolbarComposite);
+		
+		// Let sub classes add to the toolbar
+		doCreateToolbar(toolbarComposite);
+		
+		// Now create Commands menu
+		ToolBar toolBar = new ToolBar(toolbarComposite, SWT.FLAT);
+		ToolItem commands = new ToolItem(toolBar, SWT.DROP_DOWN);
+		commands.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png"));
+		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
+		toolBar.setLayoutData(branchComboData);
+		
+		// Create search
+		createSearchComposite(parent);
+		
+		createNavigator(parent);
 
 		addProjectResourceListener();
 		detectSelectedProject();
@@ -99,46 +150,176 @@ public class SingleProjectView extends CommonNavigator
 		hookToThemes();
 	}
 
-	protected Composite doCreatePartControl(Composite customComposite)
-	{
-		createProjectCombo(customComposite);
-		return projectCombo;
-	}
-
+	protected abstract void doCreateToolbar(Composite toolbarComposite);
+	
 	private IProject[] createProjectCombo(Composite parent)
 	{
-		projectCombo = new Combo(parent, SWT.DROP_DOWN | SWT.MULTI | SWT.READ_ONLY);
-		FormData projectData = new FormData();
-		projectData.left = new FormAttachment(0, 5);
-		projectData.top = new FormAttachment(0, 5);
-		projectData.right = new FormAttachment(100, -5);
-		projectCombo.setLayoutData(projectData);
+		final ToolBar projectsToolbar = new ToolBar(parent, SWT.FLAT);
+		projectToolItem = new ToolItem(projectsToolbar, SWT.DROP_DOWN);
+		GridData projectsToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		projectsToolbar.setLayoutData(projectsToolbarGridData);
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : projects)
 		{
-			projectCombo.add(iProject.getName());
-		}
-		projectCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
+			// Construct the menu to attach to the above button.
+			final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
+			projectNameMenuItem.setText(iProject.getName());
+			projectNameMenuItem.setSelection(false);
+			projectNameMenuItem.addSelectionListener(new SelectionAdapter()
 			{
-				setActiveProject(projectCombo.getText());
+				public void widgetSelected(SelectionEvent e)
+				{
+					String projectName = projectNameMenuItem.getText();
+					projectToolItem.setText(projectName);
+					setActiveProject(projectName);
+				}
+			});
+		}
+		
+		projectToolItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent selectionEvent)
+			{
+				Point toolbarLocation = projectsToolbar.getLocation();
+				toolbarLocation = projectsToolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+				Point toolbarSize = projectsToolbar.getSize();
+				projectsMenu.setLocation(toolbarLocation.x, toolbarLocation.y
+						+ toolbarSize.y + 2);
+				projectsMenu.setVisible(true);
 			}
 		});
 		return projects;
 	}
-
-	private void createNavigator(Composite myComposite, Composite top)
+	
+	private Composite createSearchComposite(Composite myComposite)
 	{
-		Composite viewer = new Composite(myComposite, SWT.NONE);
-		viewer.setLayout(new FillLayout());
-		FormData data2 = new FormData();
-		data2.top = new FormAttachment(top);
-		data2.bottom = new FormAttachment(100, 0);
-		data2.right = new FormAttachment(100, 0);
-		data2.left = new FormAttachment(0, 0);
-		viewer.setLayoutData(data2);
+		Composite search = new Composite(myComposite, SWT.NONE);
+		GridLayout searchGridLayout = new GridLayout(2, false);
+		searchGridLayout.marginWidth = 2;
+		searchGridLayout.marginHeight = 0;
+		search.setLayout(searchGridLayout);
+
+		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		search.setLayoutData(searchGridData);
+		
+		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		searchText.setText(initialText);
+		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		searchText.addFocusListener(new FocusListener()
+		{
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				if (searchText.getText().length() == 0)
+				{
+					searchText.setText(initialText);
+				}
+				searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e)
+			{
+				if (searchText.getText().equals(initialText))
+				{
+					searchText.setText("");
+				}
+				searchText.setForeground(null);
+			}
+		});
+		
+		searchText.addKeyListener(new KeyListener()
+		{
+			@Override
+			public void keyReleased(KeyEvent e) {}
+			
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				if (!e.doit)
+				{
+					return;
+				}
+				
+				if (e.keyCode == 0x0D)
+				{
+					searchText();
+					e.doit = false;
+				}
+			}
+		});
+
+		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+//		// if the text widget supported cancel then it will have it's own
+//		// integrated button. We can take all of the space.
+//		if ((searchText.getStyle() & SWT.ICON_CANCEL) != 0)
+//			gridData.horizontalSpan = 2;
+		searchText.setLayoutData(gridData);
+
+		
+		// Button for search options
+		final ToolBar toolbar = new ToolBar(search, SWT.NONE);
+		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		toolbar.setLayoutData(toolbarGridData);
+		
+		final ToolItem menuButton = new ToolItem(toolbar, SWT.PUSH);
+		menuButton.setImage(ExplorerPlugin.getImage("icons/full/elcl16/down.png")); //$NON-NLS-1$
+		
+		// Construct the menu to attach to the above button.
+		final Menu menu = new Menu(toolbar);
+		
+		final MenuItem caseSensitiveMenuItem = new MenuItem(menu, SWT.CHECK);
+		caseSensitiveMenuItem.setText("Case Sensitive");
+		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
+		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				setCaseSensitiveSearch(caseSensitiveMenuItem.getSelection());
+				searchText.setFocus();
+			}
+		});
+		
+		final MenuItem regularExressionMenuItem = new MenuItem(menu, SWT.CHECK);
+		regularExressionMenuItem.setText("Regular Expression");
+		regularExressionMenuItem.setSelection(regularExpressionSearch);
+		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				setRegularExpressionSearch(regularExressionMenuItem.getSelection());
+				searchText.setFocus();
+			}
+		});
+		
+		menuButton.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent selectionEvent)
+			{
+				Point toolbarLocation = toolbar.getLocation();
+				toolbarLocation = toolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+				Point toolbarSize = toolbar.getSize();
+				menu.setLocation(toolbarLocation.x, toolbarLocation.y
+						+ toolbarSize.y);
+				menu.setVisible(true);
+			}
+		});
+		
+		return search;
+	}
+
+	protected void createNavigator(Composite myComposite)
+	{
+		Composite viewer = new Composite(myComposite, SWT.BORDER);
+		FillLayout fillLayout = new FillLayout();
+		fillLayout.marginWidth = 0;;
+		fillLayout.marginHeight = 0;;
+		viewer.setLayout(fillLayout);
+		
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		viewer.setLayoutData(gridData);
+
 		super.createPartControl(viewer);
 	}
 
@@ -383,7 +564,13 @@ public class SingleProjectView extends CommonNavigator
 		}
 		if (project != null)
 		{
-			projectCombo.setText(project.getName());
+			projectToolItem.setText(project.getName());
+			MenuItem[] menuItems = projectsMenu.getItems();
+			for (MenuItem menuItem : menuItems)
+			{
+				menuItem.setSelection(menuItem.getText().equals(project.getName()));
+			}
+			projectToolItem.getParent().pack(true);
 			setActiveProject(project.getName());
 			return;
 		}
@@ -549,29 +736,51 @@ public class SingleProjectView extends CommonNavigator
 							// a project was added, removed, or changed!
 							if (delta.getKind() == IResourceDelta.ADDED)
 							{
-								// Add to the combo and then switch to it!
+								// Add to the projects menu and then switch to it!
 								final String projectName = resource.getName();
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
 									public void run()
 									{
-										projectCombo.add(projectName);
-										projectCombo.setText(projectName);
+										projectToolItem.setText(projectName);
+										// Construct the menu item to for this project
+										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
+										projectNameMenuItem.setText(projectName);
+										projectNameMenuItem.setSelection(true);
+										projectNameMenuItem.addSelectionListener(new SelectionAdapter()
+										{
+											public void widgetSelected(SelectionEvent e)
+											{
+												String projectName = projectNameMenuItem.getText();
+												projectToolItem.setText(projectName);
+												setActiveProject(projectName);
+											}
+										});
+										projectToolItem.getParent().pack(true);
 										setActiveProject(projectName);
 									}
 								});
 							}
 							else if (delta.getKind() == IResourceDelta.REMOVED)
 							{
-								// Remove from combo and if it was the active project, switch away from it!
+								// Remove from menu and if it was the active project, switch away from it!
 								final String projectName = resource.getName();
 								Display.getDefault().asyncExec(new Runnable()
 								{
 
 									public void run()
 									{
-										projectCombo.remove(projectName);
+										MenuItem[] menuItems = projectsMenu.getItems();
+										for (MenuItem menuItem : menuItems)
+										{
+											if (menuItem.getText().equals(projectName))
+											{
+												// Remove the menu item
+												menuItem.dispose();
+												break;
+											}
+										}
 										if (selectedProject != null && selectedProject.getName().equals(projectName))
 										{
 											IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
@@ -581,9 +790,15 @@ public class SingleProjectView extends CommonNavigator
 											{
 												newActiveProject = projects[0].getName();
 											}
-											projectCombo.setText(newActiveProject);
+											projectToolItem.setText(newActiveProject);
+											menuItems = projectsMenu.getItems();
+											for (MenuItem menuItem : menuItems)
+											{
+												menuItem.setSelection(menuItem.getText().equals(newActiveProject));
+											}
 											setActiveProject(newActiveProject);
 										}
+										projectToolItem.getParent().pack(true);
 									}
 								});
 							}
@@ -598,5 +813,92 @@ public class SingleProjectView extends CommonNavigator
 			}
 		}
 	}
+	
+	private boolean isCaseSensitiveSearch()
+	{
+		return caseSensitiveSearch;
+	}
+	
+	private void setCaseSensitiveSearch(boolean caseSensitiveSearch)
+	{
+		this.caseSensitiveSearch = caseSensitiveSearch;
+	}
+	
+	private boolean isRegularExpressionSearch()
+	{
+		return regularExpressionSearch;
+	}
+	
+	private void setRegularExpressionSearch(boolean regularExpressionSearch)
+	{
+		this.regularExpressionSearch = regularExpressionSearch;
+	}
+	
+    /**
+     * Search the text in project.
+     */
+    protected void searchText()
+    {
+    	if (selectedProject == null)
+    	{
+    		return;
+    	}
+        String textToSearch = searchText.getText();
+        if (textToSearch.length() == 0)
+        {
+            return;
+        }
+        
+        IResource searchResource = selectedProject;
+        TextSearchPageInput input= new TextSearchPageInput(textToSearch,
+        		isCaseSensitiveSearch(),
+        		isRegularExpressionSearch(),
+        		FileTextSearchScope.newSearchScope(new IResource[] {searchResource}, new String[] {"*"}, false)); //$NON-NLS-1$
+        try
+        {
+            NewSearchUI.runQueryInBackground(TextSearchQueryProvider.getPreferred().createQuery(input));
+        }
+        catch (CoreException e)
+        {
+            ExplorerPlugin.logError(e);
+        }
+    }
+   
+    private static class TextSearchPageInput extends TextSearchInput
+    {
+
+        private final String fSearchText;
+        private final boolean fIsCaseSensitive;
+        private final boolean fIsRegEx;
+        private final FileTextSearchScope fScope;
+
+        public TextSearchPageInput(String searchText, boolean isCaseSensitive, boolean isRegEx, FileTextSearchScope scope)
+        {
+        	fSearchText= searchText;
+            fIsCaseSensitive= isCaseSensitive;
+            fIsRegEx= isRegEx;
+            fScope= scope;
+        }
+
+        public String getSearchText()
+        {
+            return fSearchText;
+        }
+
+        public boolean isCaseSensitiveSearch()
+        {
+            return fIsCaseSensitive;
+        }
+
+        public boolean isRegExSearch()
+        {
+            return fIsRegEx;
+        }
+
+        public FileTextSearchScope getScope()
+        {
+            return fScope;
+        }
+    }
 
 }
