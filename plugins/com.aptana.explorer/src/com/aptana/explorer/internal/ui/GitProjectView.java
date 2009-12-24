@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -20,6 +21,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -86,6 +88,13 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				branchesMenu.setVisible(true);
 			}
 		});
+	}
+
+	@Override
+	protected void fillCommandsMenu(MenuManager menuManager) {
+		super.fillCommandsMenu(menuManager);
+		Menu menu = menuManager.getMenu();
+		// Fill the menu
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -60,6 +61,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -105,6 +108,10 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private Menu projectsMenu;
 
+	private CommandContributionItem runLastCIP;
+
+	private CommandContributionItem debugLastCIP;
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -112,7 +119,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		Composite toolbarComposite = new Composite(parent, SWT.NONE);	
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		toolbarComposite.setLayoutData(toolbarGridData);
-		
 		
 		GridLayout toolbarGridLayout = new GridLayout(3, false);
 		toolbarGridLayout.marginWidth = 2;
@@ -123,23 +129,56 @@ public abstract class SingleProjectView extends CommonNavigator
 		Label applicationLabel = new Label(toolbarComposite, SWT.NONE);
 		applicationLabel.setText("App : ");
 		applicationLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		
+
 		// Projects combo
 		createProjectCombo(toolbarComposite);
-		
+
 		// Let sub classes add to the toolbar
 		doCreateToolbar(toolbarComposite);
-		
+
 		// Now create Commands menu
-		ToolBar toolBar = new ToolBar(toolbarComposite, SWT.FLAT);
-		ToolItem commands = new ToolItem(toolBar, SWT.DROP_DOWN);
-		commands.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png"));
+		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
+		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
+		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png"));
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
-		toolBar.setLayoutData(branchComboData);
+		commandsToolBar.setLayoutData(branchComboData);
+
+		final MenuManager commandsMenuManager = new MenuManager();
+		final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
+		commandsToolItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent selectionEvent)
+			{
+				Point toolbarLocation = commandsToolBar.getLocation();
+				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+				Point toolbarSize = commandsToolBar.getSize();
+				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y
+						+ toolbarSize.y + 2);
+				commandsMenu.setVisible(true);
+			}
+		});
+
+		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(),
+				"RunLast",
+				"org.eclipse.debug.ui.commands.RunLast",
+				SWT.PUSH);
+		runLastCIP = new CommandContributionItem(runLastCCIP);
+		commandsMenuManager.add(runLastCIP);
 		
+		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(),
+				"DebugLast",
+				"org.eclipse.debug.ui.commands.DebugLast",
+				SWT.PUSH);
+		debugLastCIP = new CommandContributionItem(debugLastCCIP);
+		commandsMenuManager.add(debugLastCIP);
+
+		new MenuItem(commandsMenu, SWT.SEPARATOR);
+
+		fillCommandsMenu(commandsMenuManager);
+
 		// Create search
 		createSearchComposite(parent);
-		
+
 		createNavigator(parent);
 
 		addProjectResourceListener();
@@ -152,6 +191,9 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
 	
+	protected void fillCommandsMenu(MenuManager menuManager) {
+	}
+
 	private IProject[] createProjectCombo(Composite parent)
 	{
 		final ToolBar projectsToolbar = new ToolBar(parent, SWT.FLAT);
