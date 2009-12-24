@@ -35,16 +35,19 @@ import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -108,9 +111,11 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private Menu projectsMenu;
 
-	private CommandContributionItem runLastCIP;
-
-	private CommandContributionItem debugLastCIP;
+	private CommandContributionItem runLastCCI;
+	private CommandContributionItem debugLastCCI;
+	
+	private CLabel filterLabel;
+	private GridData filterLayoutData;
 
 	@Override
 	public void createPartControl(Composite parent)
@@ -162,15 +167,15 @@ public abstract class SingleProjectView extends CommonNavigator
 				"RunLast",
 				"org.eclipse.debug.ui.commands.RunLast",
 				SWT.PUSH);
-		runLastCIP = new CommandContributionItem(runLastCCIP);
-		commandsMenuManager.add(runLastCIP);
+		runLastCCI = new CommandContributionItem(runLastCCIP);
+		commandsMenuManager.add(runLastCCI);
 		
 		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(),
 				"DebugLast",
 				"org.eclipse.debug.ui.commands.DebugLast",
 				SWT.PUSH);
-		debugLastCIP = new CommandContributionItem(debugLastCCIP);
-		commandsMenuManager.add(debugLastCIP);
+		debugLastCCI = new CommandContributionItem(debugLastCCIP);
+		commandsMenuManager.add(debugLastCCI);
 
 		new MenuItem(commandsMenu, SWT.SEPARATOR);
 
@@ -180,7 +185,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		createSearchComposite(parent);
 
 		createNavigator(parent);
-
+		
+		createFilterComposite(parent);
+		
 		addProjectResourceListener();
 		detectSelectedProject();
 		addSingleProjectFilter();
@@ -365,6 +372,65 @@ public abstract class SingleProjectView extends CommonNavigator
 		super.createPartControl(viewer);
 	}
 
+	private Composite createFilterComposite(final Composite myComposite)
+	{
+		Composite filter = new Composite(myComposite, SWT.NONE);
+		GridLayout gridLayout = new GridLayout(2, false);
+		gridLayout.marginWidth = 2;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginBottom = 2;
+		filter.setLayout(gridLayout);
+
+		filterLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		filterLayoutData.exclude = true;
+		filter.setLayoutData(filterLayoutData);
+
+		filterLabel = new CLabel(filter, SWT.LEFT);
+
+		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		filterLabel.setLayoutData(gridData);
+		
+		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
+		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+		
+		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
+		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png"));
+		toolItem.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				removeFilter();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+		
+		return filter;
+	}
+
+	protected void hideFilterLable() {
+		filterLabel.setVisible(false);
+		filterLayoutData.exclude = true;
+		filterLabel.setVisible(false);
+		filterLabel.getParent().layout();
+		filterLabel.getParent().getParent().layout();
+	}
+	
+	protected void showFilterLabel(Image image, String text) {
+		filterLabel.setImage(image);
+		filterLabel.setText(text);
+		filterLabel.pack(true);
+		filterLayoutData.exclude = false;
+		filterLabel.setVisible(true);
+		filterLabel.getParent().layout();
+		filterLabel.getParent().getParent().layout();
+	}
+	
+	protected void removeFilter() {
+		hideFilterLable();
+	}
+	
 	private void addSingleProjectFilter()
 	{
 		activeProjectFilter = new ViewerFilter()

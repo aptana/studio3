@@ -5,7 +5,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,6 +31,11 @@ import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
+import com.aptana.git.ui.actions.CommitAction;
+import com.aptana.git.ui.actions.PullAction;
+import com.aptana.git.ui.actions.PushAction;
+import com.aptana.git.ui.actions.StashAction;
+import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 /**
@@ -46,6 +54,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	private ToolItem branchesToolItem;
 	private Menu branchesMenu;
+	
+	private GitChangedFilesFilter fChangedFilesFilter;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -91,10 +101,48 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	}
 
 	@Override
-	protected void fillCommandsMenu(MenuManager menuManager) {
+	protected void fillCommandsMenu(MenuManager menuManager)
+	{
 		super.fillCommandsMenu(menuManager);
-		Menu menu = menuManager.getMenu();
-		// Fill the menu
+		menuManager.add(new ContributionItem()
+		{
+			
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				if (selectedProject != null)
+				{
+					GitRepository repository = GitRepository.getAttached(selectedProject);
+					if (repository == null)
+					{
+						
+					}
+					else
+					{
+						new MenuItem(menu, SWT.SEPARATOR);
+						createFilterMenuItem(menu);
+						createCommitMenuItem(menu);
+						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
+						if (commitsAhead != null && commitsAhead.length > 0)
+						{
+							createPushMenuItem(menu);
+						}
+						if (repository.trackingRemote(repository.currentBranch()))
+						{
+							createPullMenuItem(menu);
+						}
+						createStashMenuItem(menu);
+						createUnstashMenuItem(menu);
+					}
+				}
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 	}
 
 	@Override
@@ -102,6 +150,175 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	{
 		GitRepository.removeListener(this);
 		super.dispose();
+	}
+	
+	private void createFilterMenuItem(Menu menu)
+	{
+		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
+		gitFilter.setSelection(fChangedFilesFilter != null);
+		gitFilter.setText(Messages.GitProjectView_ChangedFilesFilterTooltip);
+		gitFilter.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (fChangedFilesFilter == null)
+				{
+					fChangedFilesFilter = new GitChangedFilesFilter();
+					getCommonViewer().addFilter(fChangedFilesFilter);
+					getCommonViewer().expandAll();
+					showFilterLabel(ExplorerPlugin.getImage("icons/full/elcl16/filter.png"), Messages.GitProjectView_ChangedFilesFilterTooltip);
+				}
+				else
+				{
+					removeFilter();
+				}
+			}
+		});
+	}
+	
+	@Override
+	protected void removeFilter() {
+		getCommonViewer().removeFilter(fChangedFilesFilter);
+		fChangedFilesFilter = null;
+		super.removeFilter();
+	}
+
+	private void createCommitMenuItem(Menu menu)
+	{
+		MenuItem commit = new MenuItem(menu, SWT.PUSH);
+		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png")); //$NON-NLS-1$
+		commit.setText(Messages.GitProjectView_CommitTooltip);
+		commit.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				CommitAction action = new CommitAction();
+				ISelection selection = new StructuredSelection(selectedProject);
+				action.selectionChanged(null, selection);
+				action.run();
+			}
+		});
+	}
+	
+	private void createPushMenuItem(Menu menu)
+	{
+		MenuItem push = new MenuItem(menu, SWT.PUSH);
+		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png")); //$NON-NLS-1$
+		push.setText(Messages.GitProjectView_PushTooltip);
+		push.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final PushAction action = new PushAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job(Messages.GitProjectView_PushJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+	
+	private void createPullMenuItem(Menu menu)
+	{
+		MenuItem pull = new MenuItem(menu, SWT.PUSH);
+		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png")); //$NON-NLS-1$
+		pull.setText(Messages.GitProjectView_PullTooltip);
+		pull.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final PullAction action = new PullAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job(Messages.GitProjectView_PullJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+	
+	private void createStashMenuItem(Menu menu)
+	{
+		MenuItem stash = new MenuItem(menu, SWT.PUSH);
+		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png")); //$NON-NLS-1$
+		stash.setText(Messages.GitProjectView_StashTooltip);
+		stash.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final StashAction action = new StashAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job(Messages.GitProjectView_StashJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createUnstashMenuItem(Menu menu)
+	{
+		MenuItem unstash = new MenuItem(menu, SWT.PUSH);
+		unstash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_up.png")); //$NON-NLS-1$
+		unstash.setText(Messages.GitProjectView_UnstashTooltip);
+		unstash.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final UnstashAction action = new UnstashAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job(Messages.GitProjectView_UnstashJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
 	}
 
 	protected boolean setNewBranch(String branchName)

@@ -17,27 +17,21 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
@@ -59,7 +53,6 @@ import com.aptana.explorer.ExplorerPlugin;
 @SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
-
 	/**
 	 * Memento names for saving state of view and restoring it across launches.
 	 */
@@ -88,8 +81,7 @@ public class FilteringProjectView extends GitProjectView
 	protected Object[] fExpandedElements;
 	private Image eyeball;
 
-	private CLabel filterLabel;
-	private GridData filterLayoutData;
+
 	
 	private Composite customComposite;
 
@@ -103,8 +95,6 @@ public class FilteringProjectView extends GitProjectView
 		customComposite.setLayout(gridLayout);
 		
 		super.createPartControl(customComposite);
-		
-		createFilterComposite(customComposite);
 		
 		patternFilter = new PathFilter();
 		getCommonViewer().addFilter(patternFilter);
@@ -291,61 +281,11 @@ public class FilteringProjectView extends GitProjectView
 			}
 		};
 	}
-
-	private Composite createFilterComposite(final Composite myComposite)
-	{
-		Composite filter = new Composite(myComposite, SWT.NONE);
-		GridLayout gridLayout = new GridLayout(2, false);
-		gridLayout.marginWidth = 2;
-		gridLayout.marginHeight = 0;
-		gridLayout.marginBottom = 2;
-		filter.setLayout(gridLayout);
-
-		filterLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		filterLayoutData.exclude = true;
-		filter.setLayoutData(filterLayoutData);
-
-		filterLabel = new CLabel(filter, SWT.LEFT);
-		filterLabel.setImage(eyeball);
-
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		filterLabel.setLayoutData(gridData);
-		
-		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
-		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		
-		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
-		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png"));
-		toolItem.addSelectionListener(new SelectionListener() {
-			
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				clearText();
-				hideFilterLable();
-			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
-		});
-		
-		return filter;
-	}
 	
-	private void hideFilterLable() {
-		filterLabel.setVisible(false);
-		filterLayoutData.exclude = true;
-		filterLabel.pack(true);
-		customComposite.layout();
-	}
-	
-	private void showFilterLabel(Image image, String text) {
-		filterLabel.setImage(eyeball);
-		filterLabel.setText(text);
-		filterLabel.pack(true);
-		filterLayoutData.exclude = false;
-		filterLabel.setVisible(true);
-		customComposite.layout();
-		filterLabel.redraw();
+	@Override
+	protected void removeFilter() {
+		clearText();
+		super.removeFilter();
 	}
 	
 	@Override
