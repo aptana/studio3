@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -34,7 +35,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -88,7 +88,7 @@ public class FilteringProjectView extends GitProjectView
 	protected Object[] fExpandedElements;
 	private Image eyeball;
 
-	private Label filterLabel;
+	private CLabel filterLabel;
 	private GridData filterLayoutData;
 	
 	private Composite customComposite;
@@ -305,8 +305,8 @@ public class FilteringProjectView extends GitProjectView
 		filterLayoutData.exclude = true;
 		filter.setLayoutData(filterLayoutData);
 
-		filterLabel = new Label(filter, SWT.NONE);
-		filterLabel.setText("");
+		filterLabel = new CLabel(filter, SWT.LEFT);
+		filterLabel.setImage(eyeball);
 
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		filterLabel.setLayoutData(gridData);
@@ -332,17 +332,20 @@ public class FilteringProjectView extends GitProjectView
 	}
 	
 	private void hideFilterLable() {
-		filterLabel.setImage(null);
-		filterLabel.setText("");
+		filterLabel.setVisible(false);
 		filterLayoutData.exclude = true;
+		filterLabel.pack(true);
 		customComposite.layout();
 	}
 	
 	private void showFilterLabel(Image image, String text) {
-		filterLabel.setImage(image);
+		filterLabel.setImage(eyeball);
 		filterLabel.setText(text);
+		filterLabel.pack(true);
 		filterLayoutData.exclude = false;
+		filterLabel.setVisible(true);
 		customComposite.layout();
+		filterLabel.redraw();
 	}
 	
 	@Override
