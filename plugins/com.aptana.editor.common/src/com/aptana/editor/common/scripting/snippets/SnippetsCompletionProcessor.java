@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,6 +99,34 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 		// cursor $ or ${0} to ${cursor}
 		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		// transform ${n:value1/value2/value3} to ${choices:n('value1',value2','value3)} where n is a digit
+		Pattern p = Pattern.compile( "\\$\\{"        //$NON-NLS-1$
+				+ SPACES
+				+ "(\\d)"         //$NON-NLS-1$
+				+ SPACES
+				+ ":"             //$NON-NLS-1$
+				+ SPACES
+				+ "(([^\\}/]+/)+([^\\}/]+))"        //$NON-NLS-1$
+				+ "\\}"           //$NON-NLS-1$
+				);
+		Matcher m = p.matcher(expansion);
+		if (m.find())
+		{
+			String values = m.group(2);
+			StringBuilder replacement = new StringBuilder("${choices:"); //$NON-NLS-1$
+			replacement.append(m.group(1));
+			replacement.append("("); //$NON-NLS-1$
+			StringTokenizer tokenizer = new StringTokenizer(values, "/"); //$NON-NLS-1$
+			while(tokenizer.hasMoreTokens())
+			{
+				replacement.append("'"); //$NON-NLS-1$
+				replacement.append(tokenizer.nextToken());
+				replacement.append("',"); //$NON-NLS-1$
+			}
+			replacement.deleteCharAt(replacement.length() - 1);
+			replacement.append(")}"); //$NON-NLS-1$
+			expansion = expansion.substring(0, m.start()) + replacement.toString() + expansion.substring(m.end());
+		}
 		
 		// transform ${n:default value} to ${default value:n} where n is a digit
 		expansion = expansion.replaceAll(
@@ -107,7 +136,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 				+ SPACES
 				+ ":"             //$NON-NLS-1$
 				+ SPACES
-				+ "(\\w+)"        //$NON-NLS-1$
+				+ "([^\\}]+)"        //$NON-NLS-1$
 				+ "\\}"           //$NON-NLS-1$
 				,"\\${$2:$1}");   //$NON-NLS-1$
 		return expansion;
