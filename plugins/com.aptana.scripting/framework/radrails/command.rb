@@ -60,7 +60,12 @@ module RadRails
     end
     
     def output=(output)
-      @jobj.output_type = output.to_s
+      if output.kind_of? Symbol
+        @jobj.output_type = output.to_s
+      else
+        @jobj.output_type = "output_to_file"
+        @jobj.output_path = output.to_s
+      end
     end
     
     def path
@@ -75,15 +80,29 @@ module RadRails
       @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
     end
     
+    def working_directory=(dir)
+      if dir.kind_of? Symbol
+        @jobj.working_directory_type = dir.to_s
+      else
+        @jobj.working_directory_type = "path"
+        @jobj.working_directory_path = dir.to_s
+      end
+    end
+
+    def working_directory
+      @jobj.working_directory
+    end
+
     def to_s
       <<-EOS
       command(
-        path:   #{path}
-        name:   #{display_name}
-        invoke: #{invoke}
-        keys:   #{key_binding}
-        output: #{output}
-        scope:  #{scope}
+        path:               #{path}
+        name:               #{display_name}
+        scope:              #{scope}
+        working_directory:  #{working_directory}
+        invoke:             #{invoke}
+        key_binding:        #{key_binding}
+        output:             #{output}
       )
       EOS
     end
