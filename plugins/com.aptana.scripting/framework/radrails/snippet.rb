@@ -30,7 +30,7 @@ module RadRails
     end
     
     def trigger=(trigger)
-      @jobj.trigger = trigger
+      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger;
     end
     
     def expansion

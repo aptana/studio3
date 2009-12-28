@@ -369,6 +369,11 @@ public class CommandElement extends AbstractBundleElement
 		this._triggers = new String[] { trigger };
 	}
 	
+	/**
+	 * setTrigger
+	 * 
+	 * @param triggers
+	 */
 	public void setTrigger(String[] triggers)
 	{
 		this._triggers = triggers;
