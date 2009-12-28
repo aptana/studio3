@@ -47,8 +47,10 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 {
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
 	
-	private Label branchLabel;
-	private GridData branchLabelGridData;
+	private Label leftLabel;
+	private GridData leftLabelGridData;
+	private Label rightLabel;
+	private GridData rightLabelGridData;
 	private ToolBar branchesToolbar;
 	private GridData branchesToolbarGridData;
 
@@ -71,13 +73,13 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	private void createGitBranchCombo(Composite parent)
 	{
-		((GridLayout) parent.getLayout()).numColumns += 2;
+		// Increment number of columns of the layout
+		((GridLayout) parent.getLayout()).numColumns += 3;
 		
-		branchLabel = new Label(parent, SWT.NONE);
-		branchLabel.setText("Branch : ");
-		branchLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		branchLabelGridData.horizontalIndent = 2;
-		branchLabel.setLayoutData(branchLabelGridData);
+		leftLabel = new Label(parent, SWT.NONE);
+		leftLabel.setText("["); //$NON-NLS-1$
+		leftLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		leftLabel.setLayoutData(leftLabelGridData);
 		
 		branchesToolbar = new ToolBar(parent, SWT.FLAT);
 		branchesToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
@@ -98,6 +100,11 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				branchesMenu.setVisible(true);
 			}
 		});
+		
+		rightLabel = new Label(parent, SWT.NONE);
+		rightLabel.setText("]"); //$NON-NLS-1$
+		rightLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		rightLabel.setLayoutData(rightLabelGridData);
 	}
 
 	@Override
@@ -463,18 +470,22 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				populateBranches(repository);
 				if (repository == null)
 				{
+					leftLabelGridData.exclude = true;
+					leftLabel.setVisible(false);
 					branchesToolbarGridData.exclude = true;
 					branchesToolbar.setVisible(false);
-					branchLabelGridData.exclude = true;
-					branchLabel.setVisible(false);
+					rightLabelGridData.exclude = true;
+					rightLabel.setVisible(false);
 				}
 				else
 				{
 					repository.commitsAhead(repository.currentBranch());
+					leftLabelGridData.exclude = false;
+					leftLabel.setVisible(true);
 					branchesToolbarGridData.exclude = false;
 					branchesToolbar.setVisible(true);
-					branchLabelGridData.exclude = false;
-					branchLabel.setVisible(true);
+					rightLabelGridData.exclude = false;
+					rightLabel.setVisible(true);
 				}
 				branchesToolbar.getParent().layout();
 				return Status.OK_STATUS;
