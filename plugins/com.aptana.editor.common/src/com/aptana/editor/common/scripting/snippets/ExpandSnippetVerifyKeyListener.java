@@ -68,7 +68,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 								if (commandsFromScope.length > 0) {
 									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
 									for (CommandElement commandElement : commandsFromScope) {
-										String trigger = commandElement.getTrigger();
+										String trigger = commandElement.getTriggers();
 										if (trigger != null && trigger.startsWith(prefix)) {
 											found = true;
 											break;

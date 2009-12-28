@@ -4,6 +4,8 @@ require "radrails/logger"
 require "radrails/menu"
 require "radrails/snippet"
 
+RadRails::Logger.log_level = :trace
+
 def bundle(name, &block)
   RadRails::Bundle.define_bundle(name, {}, &block)
 end

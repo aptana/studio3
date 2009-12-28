@@ -9,7 +9,7 @@ public class CommandTemplate extends Template {
 	private final CommandElement command;
 
 	public CommandTemplate(CommandElement command, String contextTypeId) {
-		super(command.getTrigger(),
+		super(command.getTriggers(),
 				command.getDisplayName(), 
 				contextTypeId,
 				(command.getInvoke() == null ? command.getDisplayName(): command.getInvoke()),

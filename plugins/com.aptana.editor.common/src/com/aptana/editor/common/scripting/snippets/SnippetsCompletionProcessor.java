@@ -74,7 +74,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 		CommandElement[] commandsFromScope =
 			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
 		for (CommandElement commandElement : commandsFromScope) {
-			if (commandElement.getTrigger() != null) {
+			if (commandElement.getTriggers() != null) {
 				if (commandElement instanceof SnippetElement) {
 					templatesList.add(new SnippetTemplate((SnippetElement) commandElement, contextTypeId));
 				} else {

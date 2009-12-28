@@ -21,7 +21,7 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private String _trigger;
+	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
@@ -167,9 +167,9 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getTrigger()
+	public String[] getTriggers()
 	{
-		return this._trigger;
+		return this._triggers;
 	}
 
 	/**
@@ -366,7 +366,12 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setTrigger(String trigger)
 	{
-		this._trigger = trigger;
+		this._triggers = new String[] { trigger };
+	}
+	
+	public void setTrigger(String[] triggers)
+	{
+		this._triggers = triggers;
 	}
 	
 	/**
@@ -388,7 +393,29 @@ public class CommandElement extends AbstractBundleElement
 		}
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
-		printer.printWithIndent("trigger: ").println(this.getTrigger()); //$NON-NLS-1$
+		
+		String[] triggers = this.getTriggers();
+		
+		if (triggers != null && triggers.length > 0)
+		{
+			boolean first = true;
+			
+			printer.printWithIndent("triggers: "); //$NON-NLS-1$
+			
+			for (String trigger : triggers)
+			{
+				if (first == false)
+				{
+					printer.print(", ");
+				}
+				
+				printer.print(trigger);
+				
+				first = false;
+			}
+			
+			printer.println();
+		}
 		
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}

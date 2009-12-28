@@ -14,7 +14,7 @@ public class SnippetTemplate extends Template {
 	}
 	
 	public SnippetTemplate(SnippetElement snippet, String contextTypeId) {
-		this(snippet.getTrigger(),
+		this(snippet.getTriggers(),
 				snippet.getDisplayName(),
 				contextTypeId,
 				SnippetsCompletionProcessor.processExpansion(snippet.getExpansion()));
