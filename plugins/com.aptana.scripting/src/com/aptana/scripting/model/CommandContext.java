@@ -3,21 +3,15 @@ package com.aptana.scripting.model;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.jruby.Ruby;
+import org.jruby.RubyIO;
+
 public class CommandContext
 {
 	private String _input;
 	private InputStream _inputStream;
 	private Map<String,String> _environment;
-	
-	/**
-	 * CommandContext
-	 * 
-	 * @param input
-	 */
-	public CommandContext(String input)
-	{
-		this(input, null);
-	}
+	private Ruby runtime;
 	
 	/**
 	 * CommandContext
@@ -29,16 +23,6 @@ public class CommandContext
 	{
 		this._input = input;
 		this._environment = environment;
-	}
-	
-	/**
-	 * CommandContext
-	 * 
-	 * @param stream
-	 */
-	public CommandContext(InputStream stream)
-	{
-		this(stream, null);
 	}
 	
 	/**
@@ -58,7 +42,7 @@ public class CommandContext
 	 * 
 	 * @return
 	 */
-	public Map<String,String> getEnviroment()
+	public Map<String,String> getEnvironment()
 	{
 		return this._environment;
 	}
@@ -81,5 +65,15 @@ public class CommandContext
 	public InputStream getInputStream()
 	{
 		return this._inputStream;
+	}
+
+	void setRuntime(Ruby runtime)
+	{
+		this.runtime = runtime;		
+	}
+	
+	public RubyIO in()
+	{
+		return new RubyIO(runtime, getInputStream());
 	}
 }

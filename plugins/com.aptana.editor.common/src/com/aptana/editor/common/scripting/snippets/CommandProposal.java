@@ -30,7 +30,7 @@ public class CommandProposal extends SnippetTemplateProposal {
 		if (template instanceof CommandTemplate) {
 			CommandTemplate commandTemplate = (CommandTemplate) template;
 			CommandElement command = commandTemplate.getCommand();
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer, null);
 			CommandExecutionUtils.processCommandResult(command, commandResult, viewer);
 		}
 	}
