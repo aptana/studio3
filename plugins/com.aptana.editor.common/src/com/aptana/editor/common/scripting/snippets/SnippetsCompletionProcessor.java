@@ -127,6 +127,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor {
 			replacement.append(")}"); //$NON-NLS-1$
 			expansion = expansion.substring(0, m.start()) + replacement.toString() + expansion.substring(m.end());
 		}
+		// TODO When the name/value has an invalid character, we should wrap it as an arg and have it get translated verbatim. We can probably use choices hack above.
 		
 		// transform ${n:default value} to ${default value:n} where n is a digit
 		expansion = expansion.replaceAll(
