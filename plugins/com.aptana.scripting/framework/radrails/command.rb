@@ -49,9 +49,7 @@ module RadRails
     end
     
     def key_binding=(key_binding)
-      as_strings = key_binding.map do |x|
-        x.to_s
-      end
+      as_strings = key_binding.map {|x| x.to_s }
       @jobj.key_binding = as_strings.join(" ")
     end
     
