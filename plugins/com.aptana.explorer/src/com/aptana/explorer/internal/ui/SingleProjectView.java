@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -55,7 +56,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -74,6 +74,7 @@ import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.git.core.model.GitRepository;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -125,15 +126,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		toolbarComposite.setLayoutData(toolbarGridData);
 		
-		GridLayout toolbarGridLayout = new GridLayout(3, false);
+		GridLayout toolbarGridLayout = new GridLayout(2, false);
 		toolbarGridLayout.marginWidth = 2;
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
 		toolbarComposite.setLayout(toolbarGridLayout);
-
-		Label applicationLabel = new Label(toolbarComposite, SWT.NONE);
-		applicationLabel.setText("App : ");
-		applicationLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
 		// Projects combo
 		createProjectCombo(toolbarComposite);
@@ -144,7 +141,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		// Now create Commands menu
 		final ToolBar commandsToolBar = new ToolBar(toolbarComposite, SWT.FLAT);
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
-		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png"));
+		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
 		commandsToolBar.setLayoutData(branchComboData);
 
@@ -164,15 +161,15 @@ public abstract class SingleProjectView extends CommonNavigator
 		});
 
 		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(),
-				"RunLast",
-				"org.eclipse.debug.ui.commands.RunLast",
+				"RunLast", //$NON-NLS-1$
+				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
 				SWT.PUSH);
 		runLastCCI = new CommandContributionItem(runLastCCIP);
 		commandsMenuManager.add(runLastCCI);
 		
 		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(),
-				"DebugLast",
-				"org.eclipse.debug.ui.commands.DebugLast",
+				"DebugLast", //$NON-NLS-1$
+				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
 				SWT.PUSH);
 		debugLastCCI = new CommandContributionItem(debugLastCCIP);
 		commandsMenuManager.add(debugLastCCI);
@@ -198,7 +195,49 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
 	
-	protected void fillCommandsMenu(MenuManager menuManager) {
+	protected void fillCommandsMenu(MenuManager menuManager)
+	{
+		final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		if (projects.length > 0)
+		{
+			
+			menuManager.add(new ContributionItem()
+			{
+				
+				@Override
+				public void fill(Menu menu, int index)
+				{
+					new MenuItem(menu, SWT.SEPARATOR);
+					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
+					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication); // TODO
+
+					Menu projectsMenu = new Menu(menu);
+					for (IProject iProject : projects)
+					{
+						// Construct the menu to attach to the above button.
+						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
+						projectNameMenuItem.setText(iProject.getName());
+						projectNameMenuItem.setSelection(iProject.getName().equals(selectedProject.getName()));
+						projectNameMenuItem.addSelectionListener(new SelectionAdapter()
+						{
+							public void widgetSelected(SelectionEvent e)
+							{
+								String projectName = projectNameMenuItem.getText();
+								projectToolItem.setText(projectName);
+								setActiveProject(projectName);
+							}
+						});
+					}
+					projectsMenuItem.setMenu(projectsMenu);					
+				}
+
+				@Override
+				public boolean isDynamic()
+				{
+					return true;
+				}
+			});
+		}
 	}
 
 	private IProject[] createProjectCombo(Composite parent)
@@ -272,7 +311,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				if (searchText.getText().equals(initialText))
 				{
-					searchText.setText("");
+					searchText.setText(""); //$NON-NLS-1$
 				}
 				searchText.setForeground(null);
 			}
@@ -319,7 +358,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		final Menu menu = new Menu(toolbar);
 		
 		final MenuItem caseSensitiveMenuItem = new MenuItem(menu, SWT.CHECK);
-		caseSensitiveMenuItem.setText("Case Sensitive");
+		caseSensitiveMenuItem.setText(Messages.SingleProjectView_CaseSensitive);
 		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
 		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -331,7 +370,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		});
 		
 		final MenuItem regularExressionMenuItem = new MenuItem(menu, SWT.CHECK);
-		regularExressionMenuItem.setText("Regular Expression");
+		regularExressionMenuItem.setText(Messages.SingleProjectView_RegularExpression);
 		regularExressionMenuItem.setSelection(regularExpressionSearch);
 		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -394,7 +433,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		
 		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
-		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png"));
+		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png")); //$NON-NLS-1$
 		toolItem.addSelectionListener(new SelectionListener() {
 			
 			@Override
