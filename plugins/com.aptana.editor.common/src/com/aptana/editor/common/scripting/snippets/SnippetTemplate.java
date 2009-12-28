@@ -13,8 +13,8 @@ public class SnippetTemplate extends Template {
 		this.snippet = null;
 	}
 	
-	public SnippetTemplate(SnippetElement snippet, String contextTypeId) {
-		this(snippet.getTriggers(),
+	public SnippetTemplate(SnippetElement snippet, String trigger, String contextTypeId) {
+		this(trigger,
 				snippet.getDisplayName(),
 				contextTypeId,
 				SnippetsCompletionProcessor.processExpansion(snippet.getExpansion()));

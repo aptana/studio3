@@ -8,8 +8,8 @@ public class CommandTemplate extends Template {
 
 	private final CommandElement command;
 
-	public CommandTemplate(CommandElement command, String contextTypeId) {
-		super(command.getTriggers(),
+	public CommandTemplate(CommandElement command, String trigger, String contextTypeId) {
+		super(trigger,
 				command.getDisplayName(), 
 				contextTypeId,
 				(command.getInvoke() == null ? command.getDisplayName(): command.getInvoke()),
