@@ -67,13 +67,14 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 									BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
 								if (commandsFromScope.length > 0) {
 									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
-									for (CommandElement commandElement : commandsFromScope) {
+									LOOP: for (CommandElement commandElement : commandsFromScope) {
 										String[] triggers = commandElement.getTriggers();
 										if (triggers != null) {
 											for (String trigger : triggers) {
 												if (trigger != null && trigger.startsWith(prefix)) {
 													found = true;
-													break;
+													// Break out of the main outer for loop
+													break LOOP;
 												}
 											}
 										}
