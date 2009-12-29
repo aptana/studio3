@@ -398,6 +398,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
+		// output command type
 		if (this.isSnippet())
 		{
 			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -407,19 +408,28 @@ public class CommandElement extends AbstractBundleElement
 			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
+		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		
+		// output invoke/expansion, if it is defined
 		if (this._invoke != null)
 		{
 			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
 		}
+		
+		// output invoke block, if it is defined
 		if (this._invokeBlock != null)
 		{
 			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
 		}
+		
+		// output key binding, intput, and output settings
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
+		printer.printWithIndent("input: ").println(this._inputType.getName()); //$NON-NLS-1$
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
 		
+		// output a comma-delimited list of triggers, if any are defined
 		String[] triggers = this.getTriggers();
 		
 		if (triggers != null && triggers.length > 0)
@@ -443,6 +453,7 @@ public class CommandElement extends AbstractBundleElement
 			printer.println();
 		}
 		
+		// close the element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }
