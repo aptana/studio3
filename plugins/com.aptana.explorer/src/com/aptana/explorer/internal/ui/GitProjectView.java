@@ -1,9 +1,11 @@
 package com.aptana.explorer.internal.ui;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -120,9 +122,13 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				if (selectedProject != null)
 				{
 					GitRepository repository = GitRepository.getAttached(selectedProject);
-					if (repository != null)
+					new MenuItem(menu, SWT.SEPARATOR);
+					if (repository == null)
 					{
-						new MenuItem(menu, SWT.SEPARATOR);
+						createRepoMenuItem(menu);
+					}
+					else
+					{
 						createCommitMenuItem(menu);
 						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 						if (commitsAhead != null && commitsAhead.length > 0)
@@ -263,6 +269,53 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			fChangedFilesFilter = null;
 		}
 		super.removeFilter();
+	}
+
+	private void createRepoMenuItem(Menu menu)
+	{
+		MenuItem createRepo = new MenuItem(menu, SWT.PUSH);
+		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
+		createRepo.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				Job job = new Job(Messages.GitProjectView_AttachGitRepo_jobTitle)
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						SubMonitor sub = SubMonitor.convert(monitor, 100);
+						try
+						{
+							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
+							if (repo == null)
+							{
+								if (sub.isCanceled())
+									return Status.CANCEL_STATUS;
+								GitRepository.create(selectedProject.getLocationURI().getPath());
+							}
+							sub.worked(50);
+							if (sub.isCanceled())
+								return Status.CANCEL_STATUS;
+							GitRepository.attachExisting(selectedProject, sub.newChild(50));
+						}
+						catch (CoreException e)
+						{
+							return e.getStatus();
+						}
+						finally
+						{
+							sub.done();
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
 	}
 
 	private void createCommitMenuItem(Menu menu)
