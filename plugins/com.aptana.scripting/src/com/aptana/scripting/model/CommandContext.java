@@ -90,7 +90,7 @@ public class CommandContext
 		
 		for (ContextContributor contributor : getContextContributors())
 		{
-			contributor.modifyContextMap(command, this._map);
+			contributor.modifyContext(command, this);
 		}
 	}
 	
