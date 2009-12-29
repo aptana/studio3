@@ -1,8 +1,6 @@
-require "radrails"
-require "radrails/ui"
-# FIXME If I just refer to the lib css file relatively, it doesn't work right
-#require 'css'
-require '/Users/cwilliams/Documents/RadRails Bundles/css/lib/css'
+require 'radrails'
+require 'radrails/ui'
+require 'properties'
 
 RadRails::Command.define_command("CodeCompletion CSS Properties") do |cmd|
   cmd.key_binding = [ "~" ] # FIXME Keybinding is incorrect

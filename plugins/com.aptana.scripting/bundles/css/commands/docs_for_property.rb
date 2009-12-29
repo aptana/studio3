@@ -1,7 +1,5 @@
-require "radrails"
-# FIXME If I just refer to the lib css file relatively, it doesn't work right
-#require 'css'
-require '/Users/cwilliams/Documents/RadRails Bundles/css/lib/css'
+require 'radrails'
+require 'properties'
  
 #
 # Lookup current word as a CSS property on w3c.org
