@@ -189,9 +189,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 						branchesMenuItem.setMenu(branchesMenu);
 
 						// Create branch
-						final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.PUSH);
+						final MenuItem branchNameMenuItem = new MenuItem(menu, SWT.PUSH);
 						branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
-						branchNameMenuItem.setSelection(true);
 						branchNameMenuItem.addSelectionListener(new SelectionAdapter()
 						{
 							public void widgetSelected(SelectionEvent e)
@@ -535,7 +534,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 		final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.PUSH);
 		branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
-		branchNameMenuItem.setSelection(true);
 		branchNameMenuItem.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)
