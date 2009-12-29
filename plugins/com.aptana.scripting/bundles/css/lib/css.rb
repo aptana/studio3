@@ -150,7 +150,7 @@
     }
 
 # The mapping below was generated using:
-# echo '$props = {'; curl -s http://www.w3.org/TR/CSS2/propidx.html|egrep "(^|<tr><td>)<a href=\".*\" class=\"noxref\"><span class=\".*\">'.*'</span></a>"|perl -pe "s|(?:<tr><td>)?<a href=\"(.*)\" class=\"noxref\"><span class=\".*\">'(.*)'</span></a>|\t\"\$2\"\t=> \"\$1\",|"; echo '}'
+# echo 'CSS_PROPERTIES = {'; curl -s http://www.w3.org/TR/CSS2/propidx.html|egrep "(^|<tr><td>)<a href=\".*\" class=\"noxref\"><span class=\".*\">'.*'</span></a>"|perl -pe "s|(?:<tr><td>)?<a href=\"(.*)\" class=\"noxref\"><span class=\".*\">'(.*)'</span></a>|\t\"\$2\"\t=> \"\$1\",|"; echo '}'
 CSS_PROPERTIES = {
   "azimuth" => "aural.html#propdef-azimuth",
   "background"  => "colors.html#propdef-background",
