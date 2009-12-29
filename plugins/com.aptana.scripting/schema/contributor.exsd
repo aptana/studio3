@@ -17,6 +17,9 @@
          </appinfo>
       </annotation>
       <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="contributor"/>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
