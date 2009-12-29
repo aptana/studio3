@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
-import org.jruby.RubyIO;
 import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
