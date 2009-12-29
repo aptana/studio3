@@ -15,6 +15,7 @@ public class SnippetsCompletionProcessorTest extends TestCase
 		expectations.put("$0", "${cursor}");
 		expectations.put("${0}", "${cursor}");
 		expectations.put("${1:name}", "${value1:1('name')}");
+		expectations.put("background-image: url($1);$0", "background-image: url(${value1:1('')});${cursor}");
 		expectations.put("font-size: ${1:100%};$0", "font-size: ${value1:1('100%')};${cursor}");
 		expectations.put("${1:sans-}serif", "${value1:1('sans-')}serif");
 		expectations.put("${2:!important}", "${value2:2('!important')}");

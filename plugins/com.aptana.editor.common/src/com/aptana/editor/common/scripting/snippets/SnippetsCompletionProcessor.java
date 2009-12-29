@@ -116,8 +116,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	static String processExpansion(String expansion)
 	{
 		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$		
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		// turn empty tab stops into something eclipse can handle
+		expansion = expansion.replaceAll("\\$(\\d)", "\\${value$1:$1('')}"); //$NON-NLS-1$  //$NON-NLS-2$
 		// transform ${n:value1/value2/value3} to ${choices:n('value1',value2','value3)} where n is a digit
 		Pattern p = Pattern.compile("\\$\\{" //$NON-NLS-1$
 				+ SPACES + "(\\d)" //$NON-NLS-1$
