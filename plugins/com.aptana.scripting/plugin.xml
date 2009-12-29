@@ -1,11 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="com.aptana.scripting.loadpath" name="Scripting Load Path" schema="schema/loadpath.exsd"/>
+   <extension-point id="com.aptana.scripting.framework_file" name="Scripting Framework File" schema="schema/framework_file.exsd"/>
+   <extension-point id="com.aptana.scripting.context_contributor" name="Context Contributor" schema="schema/contributor.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup
             class="com.aptana.scripting.EarlyStartup">
       </startup>
+   </extension>
+   <extension
+         point="com.aptana.scripting.loadpath">
+      <loadpath
+            path="framework/">
+      </loadpath>
+   </extension>
+   <extension
+         point="com.aptana.scripting.framework_file">
+      <file
+            name="radrails/bundle">
+      </file>
+      <file
+            name="radrails/command">
+      </file>
+      <file
+            name="radrails/logger">
+      </file>
+      <file
+            name="radrails/menu">
+      </file>
+      <file
+            name="radrails/snippet">
+      </file>
    </extension>
 
 </plugin>

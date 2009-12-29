@@ -44,7 +44,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
-import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
@@ -265,7 +264,9 @@ public class CommandExecutionUtils {
 			break;
 		}
 
-		CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream());
+		//CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream());
+		Map<String,Object> commandContext = command.createCommandMap();
+		commandContext.put("in", filterInputProvider.getInputStream());
 		// TODO Use the map
 		// Map<String, String> computeEnvironment = computeEnvironment(textEditor);
 		return command.execute(commandContext);

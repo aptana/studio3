@@ -1,8 +1,7 @@
-require "radrails/bundle"
-require "radrails/command"
-require "radrails/logger"
-require "radrails/menu"
-require "radrails/snippet"
+# 'require' contributed files that are considered part of the RadRails framework
+com.aptana.scripting.ScriptingEngine.instance.framework_files.each do |name|
+  require name
+end
 
 RadRails::Logger.log_level = :trace
 
