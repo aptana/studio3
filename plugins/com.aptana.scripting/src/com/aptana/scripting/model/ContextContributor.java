@@ -1,14 +1,12 @@
 package com.aptana.scripting.model;
 
-import java.util.Map;
-
 public interface ContextContributor
 {
 	/**
-	 * modifyContextMap
+	 * modifyContext
 	 * 
 	 * @param command
 	 * @param map
 	 */
-	void modifyContextMap(CommandElement command, Map<String,Object> map);
+	void modifyContext(CommandElement command, CommandContext context);
 }
