@@ -12,7 +12,7 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
-               class="com.aptana.git.ui.internal.actions.GithubNetworkAction"
+               class="com.aptana.git.ui.actions.GithubNetworkAction"
                definitionId="com.aptana.git.ui.command.github.network"
                icon="icons/obj16/github.gif"
                id="com.aptana.git.ui.actions.GithubNetworkAction"
