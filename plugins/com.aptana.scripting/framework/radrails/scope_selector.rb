@@ -5,6 +5,8 @@ module RadRails
       case selector
       when String
         @selector = selector
+      when Symbol
+        @selector = selector.to_s.tr("_", ".")
       when Array
         ors = selector.map do |orExpr|
           case orExpr
