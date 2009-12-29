@@ -6,15 +6,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -24,23 +17,17 @@ import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
-import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static final String CONTEXT_CONTRIBUTOR_ID = "context_contributor"; //$NON-NLS-1$
-	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
-	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
 	private InputType _inputType;
 	private OutputType _outputType;
-	private ContextContributor[] _contextContributors;
 	
 	/**
 	 * Snippet
@@ -54,20 +41,15 @@ public class CommandElement extends AbstractBundleElement
 		this._inputType = InputType.UNDEFINED;
 		this._outputType = OutputType.UNDEFINED;
 	}
-
+	
 	/**
-	 * createCommandMap
+	 * createCommandContext
 	 * 
 	 * @return
 	 */
-	public Map<String,Object> createCommandMap()
+	public CommandContext createCommandContext()
 	{
-		// TESTING
-		Map<String,Object> map = new HashMap<String,Object>();
-		
-		map.put("name", "testing"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		return map;
+		return new CommandContext(this);
 	}
 	
 	/**
@@ -77,7 +59,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public CommandResult execute()
 	{
-		return this.execute(this.createCommandMap());
+		return this.execute(this.createCommandContext());
 	}
 	
 	/**
@@ -86,7 +68,7 @@ public class CommandElement extends AbstractBundleElement
 	 * @param map
 	 * @return
 	 */
-	public CommandResult execute(Map<String,Object> map)
+	public CommandResult execute(CommandContext context)
 	{
 		String resultText = ""; //$NON-NLS-1$
 		
@@ -98,72 +80,17 @@ public class CommandElement extends AbstractBundleElement
 			}
 			else if (this.isShellCommand())
 			{
-				resultText = this.invokeStringCommand(map);
+				resultText = this.invokeStringCommand(context);
 			}
 			else if (this.isBlockCommand())
 			{
-				resultText = invokeBlockCommand(map);
+				resultText = invokeBlockCommand(context);
 			}
 		}
 		
 		return new CommandResult(resultText);
 	}
 
-	/**
-	 * getContextContributors
-	 * 
-	 * @return
-	 */
-	protected ContextContributor[] getContextContributors()
-	{
-		if (this._contextContributors == null)
-		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			List<ContextContributor> contributors = new ArrayList<ContextContributor>();
-
-			if (registry != null)
-			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, CONTEXT_CONTRIBUTOR_ID);
-
-				if (extensionPoint != null)
-				{
-					IExtension[] extensions = extensionPoint.getExtensions();
-
-					for (IExtension extension : extensions)
-					{
-						IConfigurationElement[] elements = extension.getConfigurationElements();
-
-						for (IConfigurationElement element : elements)
-						{
-							if (element.getName().equals(TAG_CONTRIBUTOR))
-							{
-								try
-								{
-									ContextContributor contributor = (ContextContributor) element.createExecutableExtension(ATTR_CLASS);
-									
-									contributors.add(contributor);
-								}
-								catch (CoreException e)
-								{
-									String message = MessageFormat.format(
-										Messages.CommandElement_Error_Creating_Contributor,
-										new Object[] { e.getMessage() }
-									);
-									
-									Activator.logError(message, e);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			this._contextContributors = contributors.toArray(new ContextContributor[contributors.size()]);
-		}
-		
-		return this._contextContributors;
-	}
-	
 	/**
 	 * getInput
 	 * 
@@ -256,7 +183,7 @@ public class CommandElement extends AbstractBundleElement
 	 * @param resultText
 	 * @return
 	 */
-	private String invokeBlockCommand(Map<String,Object> map)
+	private String invokeBlockCommand(CommandContext context)
 	{
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
@@ -266,7 +193,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			IRubyObject result = this._invokeBlock.call(
 				threadContext,
-				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, map) }
+				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, context.getMap() ) }
 			);
 			
 			if (result != null)
@@ -292,7 +219,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	private String invokeStringCommand(Map<String,Object> map)
+	private String invokeStringCommand(CommandContext context)
 	{
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
