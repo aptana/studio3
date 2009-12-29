@@ -64,7 +64,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	public boolean matches(String scope)
 	{
 		ScopeSelector selector = this.getScopeSelector();
-		boolean result = false;
+		boolean result = true;
 		
 		if (selector != null)
 		{
@@ -83,7 +83,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	public boolean matches(String[] scopes)
 	{
 		ScopeSelector selector = this.getScopeSelector();
-		boolean result = false;
+		boolean result = true;
 		
 		if (selector != null)
 		{
