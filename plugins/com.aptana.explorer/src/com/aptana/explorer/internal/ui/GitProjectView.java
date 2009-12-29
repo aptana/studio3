@@ -110,24 +110,17 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	@Override
 	protected void fillCommandsMenu(MenuManager menuManager)
 	{
-		super.fillCommandsMenu(menuManager);
 		menuManager.add(new ContributionItem()
 		{
-			
 			@Override
 			public void fill(Menu menu, int index)
 			{
 				if (selectedProject != null)
 				{
 					GitRepository repository = GitRepository.getAttached(selectedProject);
-					if (repository == null)
-					{
-						
-					}
-					else
-					{
+					if (repository != null)
+					{						
 						new MenuItem(menu, SWT.SEPARATOR);
-						createFilterMenuItem(menu);
 						createCommitMenuItem(menu);
 						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 						if (commitsAhead != null && commitsAhead.length > 0)
@@ -150,6 +143,81 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				return true;
 			}
 		});
+
+		super.fillCommandsMenu(menuManager);
+		
+		menuManager.add(new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				if (selectedProject != null)
+				{
+					GitRepository repository = GitRepository.getAttached(selectedProject);
+					if (repository != null)
+					{
+						// Switch to branch
+						MenuItem branchesMenuItem = new MenuItem(menu, SWT.CASCADE);
+						branchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
+
+						Menu branchesMenu = new Menu(menu);
+						String currentBranchName = repository.currentBranch();
+						for (String branchName : repository.localBranches())
+						{
+							// Construct the menu item to for this branch
+							final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.RADIO);
+							if (branchName.equals(currentBranchName) && repository.isDirty())
+							{
+								branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
+							}
+							else
+							{
+								branchNameMenuItem.setText(branchName);
+							}
+							branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
+								
+							branchNameMenuItem.addSelectionListener(new SelectionAdapter()
+							{
+								public void widgetSelected(SelectionEvent e)
+								{
+									setNewBranch(branchNameMenuItem.getText());
+								}
+							});
+							
+						}
+						branchesMenuItem.setMenu(branchesMenu);
+
+						// Create branch
+						final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.PUSH);
+						branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
+						branchNameMenuItem.setSelection(true);
+						branchNameMenuItem.addSelectionListener(new SelectionAdapter()
+						{
+							public void widgetSelected(SelectionEvent e)
+							{
+								setNewBranch(branchNameMenuItem.getText());
+							}
+						});
+
+						// TODO Merge Branch
+
+						new MenuItem(menu, SWT.SEPARATOR);
+
+						createFilterMenuItem(menu);
+						
+						// TODO Show History
+						// TODO Show GitHub Network
+					}
+				}
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
+
 	}
 
 	@Override
@@ -174,7 +242,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					fChangedFilesFilter = new GitChangedFilesFilter();
 					getCommonViewer().addFilter(fChangedFilesFilter);
 					getCommonViewer().expandAll();
-					showFilterLabel(ExplorerPlugin.getImage("icons/full/elcl16/filter.png"), Messages.GitProjectView_ChangedFilesFilterTooltip);
+					showFilterLabel(ExplorerPlugin.getImage("icons/full/elcl16/filter.png"), Messages.GitProjectView_ChangedFilesFilterTooltip); //$NON-NLS-1$
 				}
 				else
 				{
@@ -405,7 +473,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		for (MenuItem menuItem : menuItems) {
 			menuItem.dispose();
 		}		
-		branchesToolItem.setText("");
+		branchesToolItem.setText(""); //$NON-NLS-1$
 		if (repo == null)
 			return;
 		// FIXME This doesn't seem to indicate proper dirty status and changed files on initial load!

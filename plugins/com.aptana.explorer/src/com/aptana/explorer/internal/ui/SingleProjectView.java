@@ -74,7 +74,6 @@ import com.aptana.editor.common.theme.ThemeUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.git.core.model.GitRepository;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -197,17 +196,16 @@ public abstract class SingleProjectView extends CommonNavigator
 	
 	protected void fillCommandsMenu(MenuManager menuManager)
 	{
-		final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		if (projects.length > 0)
+		menuManager.add(new ContributionItem()
 		{
-			
-			menuManager.add(new ContributionItem()
+			@Override
+			public void fill(Menu menu, int index)
 			{
-				
-				@Override
-				public void fill(Menu menu, int index)
+				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+				if (projects.length > 0)
 				{
 					new MenuItem(menu, SWT.SEPARATOR);
+
 					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
 					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication); // TODO
 
@@ -217,7 +215,7 @@ public abstract class SingleProjectView extends CommonNavigator
 						// Construct the menu to attach to the above button.
 						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 						projectNameMenuItem.setText(iProject.getName());
-						projectNameMenuItem.setSelection(iProject.getName().equals(selectedProject.getName()));
+						projectNameMenuItem.setSelection(selectedProject != null && iProject.getName().equals(selectedProject.getName()));
 						projectNameMenuItem.addSelectionListener(new SelectionAdapter()
 						{
 							public void widgetSelected(SelectionEvent e)
@@ -228,16 +226,16 @@ public abstract class SingleProjectView extends CommonNavigator
 							}
 						});
 					}
-					projectsMenuItem.setMenu(projectsMenu);					
+					projectsMenuItem.setMenu(projectsMenu);
 				}
+			}
 
-				@Override
-				public boolean isDynamic()
-				{
-					return true;
-				}
-			});
-		}
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 	}
 
 	private IProject[] createProjectCombo(Composite parent)

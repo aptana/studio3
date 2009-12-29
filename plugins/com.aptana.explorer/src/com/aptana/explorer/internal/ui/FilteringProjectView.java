@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -68,7 +69,7 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 	
-	private String currentFilterText = "";
+	private String currentFilterText = ""; //$NON-NLS-1$
 
 	private PathFilter patternFilter;
 	private WorkbenchJob refreshJob;
@@ -115,7 +116,7 @@ public class FilteringProjectView extends GitProjectView
 		this.memento = aMemento;
 		super.init(aSite, aMemento);
 
-		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png");
+		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
 
 	}
 
@@ -429,7 +430,7 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected void clearText()
 	{
-		currentFilterText = "";
+		currentFilterText = ""; //$NON-NLS-1$
 		textChanged();
 	}
 
@@ -441,7 +442,7 @@ public class FilteringProjectView extends GitProjectView
 	protected void setFilterText(String string)
 	{
 		currentFilterText = string;
-		showFilterLabel(eyeball, "Filtering for '" + currentFilterText + "'");
+		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] {currentFilterText}));
 		textChanged();
 	}
 
@@ -494,7 +495,7 @@ public class FilteringProjectView extends GitProjectView
 					return Status.OK_STATUS;
 				}
 
-				boolean initial = currentFilterText == null || currentFilterText.equals("");
+				boolean initial = currentFilterText == null || currentFilterText.equals(""); //$NON-NLS-1$
 				if (initial)
 				{
 					patternFilter.setPattern(null);
