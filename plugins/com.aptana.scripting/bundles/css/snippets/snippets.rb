@@ -1,7 +1,7 @@
 require 'radrails'
 
 with_defaults :scope => "source.css" do
-  # FIXME Broken because eclipse templates can't handle '!'
+  
   snippet "!important CSS" do |s|
     s.trigger = "!"
     s.expansion = "${1:!important}"
@@ -222,7 +222,14 @@ with_defaults :scope => "source.css" do
     s.trigger = "float"
     s.expansion = 'float: ${1:left/right/none};$0'
   end
-  # FIXME Doesn't work!
+  
+  snippet "Fixed Position Bottom 100% wide IE6" do |s|
+    s.trigger = "fixed"
+    s.expansion = '${2:bottom: auto;}top: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-${1:THE HEIGHT OF THIS THING IN PIXELS}));
+${3:left: expression(eval(document.documentElement.scrollLeft));
+}${4:width: expression(eval(document.documentElement.clientWidth));}$0'
+  end
+  
   snippet "font-family: family" do |s|
     s.trigger = "font"
     s.expansion = 'font-family: ${1:Arial, "MS Trebuchet"}, ${2:sans-}serif;$0'
@@ -411,6 +418,27 @@ with_defaults :scope => "source.css" do
     /* $1 */
     $0
   '
+  end
+  
+  snippet "scrollbar" do |s|
+    s.trigger = "scrollbar"
+    s.expansion = 'scrollbar-base-color:       ${1:#CCCCCC};${2:
+scrollbar-arrow-color:      ${3:#000000};
+scrollbar-track-color:      ${4:#999999};
+scrollbar-3dlight-color:    ${5:#EEEEEE};
+scrollbar-highlight-color:  ${6:#FFFFFF};
+scrollbar-face-color:       ${7:#CCCCCC};
+scrollbar-shadow-color:     ${9:#999999};
+scrollbar-darkshadow-color: ${8:#666666};}'
+  end
+  
+  snippet "selection" do |s|
+    s.trigger = "selection"
+    s.expansion = '$1::-moz-selection,
+$1::selection {
+  color: ${2:inherit};
+  background: ${3:inherit};
+}'
   end
   
   snippet "text-align: left/center/right" do |s|
