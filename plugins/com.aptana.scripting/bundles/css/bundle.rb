@@ -4,7 +4,7 @@ require 'radrails'
 # many ruby files could add to a single bundle
 RadRails.current_bundle do |bundle|
   bundle.name = "Ruby on Rails"
-  bundle.author = "Many"
+  bundle.author = "Christopher Williams"
   bundle.copyright = <<END
 © Copyright 2009 Aptana Inc. Distributed under GPLv3 and Aptana Source license.
 END
@@ -24,5 +24,6 @@ END
     css_menu.command "Insert Color..."
     css_menu.command "Show as HTML"
     css_menu.command "Documentation for Property"
+    css_menu.command "Validate Selected CSS"
   end
 end
