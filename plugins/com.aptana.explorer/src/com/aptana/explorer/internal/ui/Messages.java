@@ -20,12 +20,14 @@ public class Messages extends NLS
 	public static String GitProjectView_Expand_tooltip;
 	public static String GitProjectView_InitialFileFilterText;
 	public static String GitProjectView_InvalidBranchNameMessage;
+	public static String GitProjectView_LBL_ShowGitHubNetwork;
 	public static String GitProjectView_NonEmptyBranchNameMessage;
 	public static String GitProjectView_NoWhitespaceBranchNameMessage;
 	public static String GitProjectView_PullJobTitle;
 	public static String GitProjectView_PullTooltip;
 	public static String GitProjectView_PushJobTitle;
 	public static String GitProjectView_PushTooltip;
+	public static String GitProjectView_ShowGitHubNetworkJobTitle;
 	public static String GitProjectView_StashJobTitle;
 	public static String GitProjectView_StashTooltip;
 

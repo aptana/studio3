@@ -32,6 +32,7 @@ import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.actions.CommitAction;
+import com.aptana.git.ui.actions.GithubNetworkAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
@@ -206,7 +207,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 						createFilterMenuItem(menu);
 						
 						// TODO Show History
-						// TODO Show GitHub Network
+
+						createShowGithubNetworkMenuItem(menu);
 					}
 				}
 			}
@@ -384,6 +386,33 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createShowGithubNetworkMenuItem(Menu menu)
+	{
+		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
+		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowGitHubNetwork);
+		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final GithubNetworkAction action = new GithubNetworkAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
+				{
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor) {
 						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
