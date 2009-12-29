@@ -3,10 +3,10 @@
 <schema targetNamespace="com.aptana.scripting" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.scripting" id="load_paths" name="Scripting Load Paths"/>
+         <meta.schema plugin="com.aptana.scripting" id="loadPaths" name="Scripting Load Paths"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows a plugin to contribute a load path to the JRuby runtime.
       </documentation>
    </annotation>
 
@@ -15,10 +15,13 @@
          <appinfo>
             <meta.element />
          </appinfo>
+         <documentation>
+            A collection of zero or more load path elements
+         </documentation>
       </annotation>
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="loadpath"/>
+            <element ref="loadPath"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,7 +50,7 @@
       </complexType>
    </element>
 
-   <element name="loadpath">
+   <element name="loadPath">
       <complexType>
          <attribute name="id" type="string">
             <annotation>

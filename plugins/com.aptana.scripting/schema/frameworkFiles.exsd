@@ -3,10 +3,10 @@
 <schema targetNamespace="com.aptana.scripting" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.scripting" id="framework_files" name="Framework File"/>
+         <meta.schema plugin="com.aptana.scripting" id="frameworkFiles" name="Framework Files"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         This extension point allows plugins to contribute ruby library files to be loaded along with the RadRails ruby framework.
       </documentation>
    </annotation>
 
@@ -15,6 +15,9 @@
          <appinfo>
             <meta.element />
          </appinfo>
+         <documentation>
+            A collection of zero or more files
+         </documentation>
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
@@ -48,6 +51,11 @@
    </element>
 
    <element name="file">
+      <annotation>
+         <documentation>
+            A reference to the name to be used in the Ruby &apos;require&apos; statement. Note that it is assumed that the developer has also defined a load path using the loadPath extension point. File are relative to the loadPath&apos;s root directory.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string">
             <annotation>

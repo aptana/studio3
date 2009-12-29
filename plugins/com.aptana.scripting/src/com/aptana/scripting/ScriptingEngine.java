@@ -26,13 +26,13 @@ import com.aptana.util.ResourceUtils;
 public class ScriptingEngine
 {
 	// framework_file extension point
-	private static final String FRAMEWORK_FILE_ID = "framework_file"; //$NON-NLS-1$
+	private static final String FRAMEWORK_FILE_ID = "frameworkFiles"; //$NON-NLS-1$
 	private static final String TAG_FILE = "file"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	
 	// loadpath extension point
-	private static final String LOADPATH_ID = "loadpath"; //$NON-NLS-1$
-	private static final String TAG_LOADPATH = "loadpath"; //$NON-NLS-1$
+	private static final String LOADPATH_ID = "loadPaths"; //$NON-NLS-1$
+	private static final String TAG_LOADPATH = "loadPath"; //$NON-NLS-1$
 	private static final String ATTR_PATH = "path"; //$NON-NLS-1$
 
 	private static ScriptingEngine instance;
