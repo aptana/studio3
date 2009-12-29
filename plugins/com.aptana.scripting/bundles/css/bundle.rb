@@ -25,5 +25,6 @@ END
     css_menu.command "Show as HTML"
     css_menu.command "Documentation for Property"
     css_menu.command "Validate Selected CSS"
+    css_menu.command "CodeCompletion CSS Properties"
   end
 end
