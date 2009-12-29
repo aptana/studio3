@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.scripting.loadpath" name="%extension-point.name" schema="schema/loadpath.exsd"/>
-   <extension-point id="com.aptana.scripting.framework_file" name="%extension-point.name.0" schema="schema/framework_file.exsd"/>
-   <extension-point id="com.aptana.scripting.context_contributor" name="%extension-point.name.1" schema="schema/contributor.exsd"/>
+   <extension-point id="com.aptana.scripting.loadPaths" name="%extension-point.name" schema="schema/loadPaths.exsd"/>
+   <extension-point id="com.aptana.scripting.frameworkFiles" name="%extension-point.name.0" schema="schema/frameworkFiles.exsd"/>
+   <extension-point id="com.aptana.scripting.contextContributors" name="%extension-point.name.1" schema="schema/contextContributors.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup
@@ -11,13 +11,13 @@
       </startup>
    </extension>
    <extension
-         point="com.aptana.scripting.loadpath">
+         point="com.aptana.scripting.loadPaths">
       <loadpath
             path="framework/">
       </loadpath>
    </extension>
    <extension
-         point="com.aptana.scripting.framework_file">
+         point="com.aptana.scripting.frameworkFiles">
       <file
             name="radrails/bundle">
       </file>

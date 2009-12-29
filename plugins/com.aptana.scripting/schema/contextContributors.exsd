@@ -3,7 +3,7 @@
 <schema targetNamespace="com.aptana.scripting" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.scripting" id="context_contributor" name="Context Contributor"/>
+         <meta.schema plugin="com.aptana.scripting" id="context_contributors" name="Context Contributor"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
