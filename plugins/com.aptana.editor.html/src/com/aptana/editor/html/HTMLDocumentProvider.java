@@ -39,12 +39,12 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.CompositePartitionScanner;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.NullSubPartitionScanner;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 
 public class HTMLDocumentProvider extends TextFileDocumentProvider {
 

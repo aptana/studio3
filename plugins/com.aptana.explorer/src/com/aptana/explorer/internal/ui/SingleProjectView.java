@@ -70,7 +70,7 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
@@ -560,7 +560,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	private void hookToThemes()
 	{
 		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(ThemeUtil.getActiveTheme().getBackground()));
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -583,7 +584,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					Color oldBackground = gc.getBackground();
 
 					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							ThemeUtil.getActiveTheme().getSelection()));
+							getThemeManager().getCurrentTheme().getSelection()));
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
@@ -666,9 +667,14 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 
 				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						ThemeUtil.getActiveTheme().getForeground()));
+						getThemeManager().getCurrentTheme().getForeground()));
 			}
 		});
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void listenForThemeChanges()
@@ -679,12 +685,12 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
-				if (event.getKey().equals(ThemeUtil.THEME_CHANGED))
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
 					getCommonViewer().refresh();
 					getCommonViewer().getTree().setBackground(
 							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									ThemeUtil.getActiveTheme().getBackground()));
+									getThemeManager().getCurrentTheme().getBackground()));
 				}
 			}
 		};

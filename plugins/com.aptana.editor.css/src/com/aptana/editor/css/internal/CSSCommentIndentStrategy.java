@@ -44,7 +44,7 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.editor.common.CommonAutoIndentStrategy;
+import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 
 /**
  * @author Ingo Muschenetz

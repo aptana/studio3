@@ -40,6 +40,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+
 /**
  * @author Max Stepanov
  *

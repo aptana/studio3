@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.xml;
 
-import com.aptana.editor.common.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
 public class XMLPartitionScanner extends SourceConfigurationPartitionScanner {
 	

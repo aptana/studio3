@@ -46,11 +46,12 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.ExtendedWordRule;
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.SingleCharacterRule;
-import com.aptana.editor.common.WhitespaceDetector;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.theme.IThemeManager;
 
 public class XMLTagScanner extends RuleBasedScanner
 {
@@ -108,7 +109,12 @@ public class XMLTagScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return ThemeUtil.getToken(string);
+		return getThemeManager().getToken(string);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	/**

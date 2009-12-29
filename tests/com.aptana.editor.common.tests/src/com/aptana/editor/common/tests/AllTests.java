@@ -3,13 +3,10 @@ package com.aptana.editor.common.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.common.RegexpRuleTest;
-import com.aptana.editor.common.SequenceCharacterScannerTest;
-import com.aptana.editor.common.SingleCharacterRuleTest;
-import com.aptana.editor.common.SingleTagRuleTest;
-import com.aptana.editor.common.TextUtilsTest;
-import com.aptana.editor.common.WhitespaceDetectorTest;
-import com.aptana.editor.common.WordDetectorTest;
+import com.aptana.editor.common.EditorCommonTests;
+import com.aptana.editor.common.internal.peer.PeerTests;
+import com.aptana.editor.common.text.rules.RulesTests;
+import com.aptana.editor.common.theme.ThemeTests;
 
 public class AllTests
 {
@@ -18,13 +15,10 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(SequenceCharacterScannerTest.class);
-		suite.addTestSuite(RegexpRuleTest.class);
-		suite.addTestSuite(SingleCharacterRuleTest.class);
-		suite.addTestSuite(WordDetectorTest.class);
-		suite.addTestSuite(WhitespaceDetectorTest.class);
-		suite.addTestSuite(SingleTagRuleTest.class);
-		suite.addTestSuite(TextUtilsTest.class);
+		suite.addTest(EditorCommonTests.suite());
+		suite.addTest(PeerTests.suite());
+		suite.addTest(RulesTests.suite());
+		suite.addTest(ThemeTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

@@ -37,6 +37,8 @@ package com.aptana.editor.common;
 
 import org.eclipse.jface.text.rules.IPredicateRule;
 
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+
 /**
  * @author Max Stepanov
  *

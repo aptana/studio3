@@ -8,7 +8,8 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.jrubyparser.parser.Tokens;
 
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 
 public class RubyCodeScanner implements ITokenScanner
 {
@@ -69,38 +70,38 @@ public class RubyCodeScanner implements ITokenScanner
 					if (nextIsClassName)
 					{
 						nextIsClassName = false;
-						return ThemeUtil.getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
+						return getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
 					}
-					return ThemeUtil.getToken("variable.language.ruby"); //$NON-NLS-1$
+					return getToken("variable.language.ruby"); //$NON-NLS-1$
 				case Tokens.kNIL:
 				case Tokens.kTRUE:
 				case Tokens.kFALSE:
-					return ThemeUtil.getToken("constant.language.ruby"); //$NON-NLS-1$
+					return getToken("constant.language.ruby"); //$NON-NLS-1$
 				case Tokens.kAND:
 				case Tokens.kNOT:
 				case Tokens.kOR:
-					return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+					return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 				case Tokens.kDO_BLOCK:
 				case Tokens.kDO:
 					lookForBlock = true;
-					return ThemeUtil.getToken("keyword.control.start-block.ruby"); //$NON-NLS-1$
+					return getToken("keyword.control.start-block.ruby"); //$NON-NLS-1$
 				case Tokens.kCLASS:
 					nextIsClassName = true;
-					return ThemeUtil.getToken("keyword.control.class.ruby"); //$NON-NLS-1$
+					return getToken("keyword.control.class.ruby"); //$NON-NLS-1$
 				case Tokens.kMODULE:
 					nextIsModuleName = true;
-					return ThemeUtil.getToken("keyword.control.module.ruby"); //$NON-NLS-1$
+					return getToken("keyword.control.module.ruby"); //$NON-NLS-1$
 				case Tokens.kDEF:
 					nextIsMethodName = true;
-					return ThemeUtil.getToken("keyword.control.def.ruby"); //$NON-NLS-1$
+					return getToken("keyword.control.def.ruby"); //$NON-NLS-1$
 				default:
-					return ThemeUtil.getToken("keyword.control.ruby"); //$NON-NLS-1$
+					return getToken("keyword.control.ruby"); //$NON-NLS-1$
 			}
 		}
 		switch (data.intValue())
 		{
 			case RubyTokenScanner.ASSIGNMENT:
-				return ThemeUtil.getToken("keyword.operator.assignment.ruby"); //$NON-NLS-1$
+				return getToken("keyword.operator.assignment.ruby"); //$NON-NLS-1$
 			case Tokens.tCMP: /* <=> */
 			case Tokens.tMATCH: /* =~ */
 			case Tokens.tNMATCH: /* !~ */
@@ -111,7 +112,7 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tLEQ:
 			case Tokens.tLT:
 			case Tokens.tGT:
-				return ThemeUtil.getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$				
+				return getToken("keyword.operator.comparison.ruby"); //$NON-NLS-1$				
 			case Tokens.tAMPER:
 			case Tokens.tPERCENT:
 			case Tokens.tPOW:
@@ -119,91 +120,101 @@ public class RubyCodeScanner implements ITokenScanner
 			case Tokens.tPLUS:
 			case Tokens.tMINUS:
 			case Tokens.tDIVIDE:
-				return ThemeUtil.getToken("keyword.operator.arithmetic.ruby"); //$NON-NLS-1$			
+				return getToken("keyword.operator.arithmetic.ruby"); //$NON-NLS-1$			
 			case Tokens.tANDOP:
 			case Tokens.tBANG:
 			case Tokens.tOROP:
 			case Tokens.tCARET:
 			case RubyTokenScanner.QUESTION:
-				return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 			case Tokens.tPIPE:
 				if (lookForBlock)
 				{
 					inPipe = !inPipe;
 					if (!inPipe)
 						lookForBlock = false;
-					return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+					return getToken("default.ruby"); //$NON-NLS-1$
 				}
-				return ThemeUtil.getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
+				return getToken("keyword.operator.logical.ruby"); //$NON-NLS-1$
 			case Tokens.tLBRACE:
 				lookForBlock = true;
-				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+				return getToken("default.ruby"); //$NON-NLS-1$
 			case Tokens.tRPAREN:
 				nextAreArgs = false;
-				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+				return getToken("default.ruby"); //$NON-NLS-1$
 			case Tokens.tLSHFT:
 				if (nextIsClassName)
 				{
-					return ThemeUtil.getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
+					return getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
 				}
-				return ThemeUtil.getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
+				return getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
 			case Tokens.tOP_ASGN:
-				return ThemeUtil.getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
+				return getToken("keyword.operator.assignment.augmented.ruby"); //$NON-NLS-1$
 			case Tokens.tASSOC:
-				return ThemeUtil.getToken("punctuation.separator.key-value"); //$NON-NLS-1$
+				return getToken("punctuation.separator.key-value"); //$NON-NLS-1$
 			case RubyTokenScanner.CHARACTER:
-				return ThemeUtil.getToken("character.ruby"); //$NON-NLS-1$
+				return getToken("character.ruby"); //$NON-NLS-1$
 			case Tokens.tCOLON2:
 			case Tokens.tCOLON3:
-				return ThemeUtil.getToken("punctuation.separator.inheritance.ruby"); //$NON-NLS-1$
+				return getToken("punctuation.separator.inheritance.ruby"); //$NON-NLS-1$
 			case Tokens.tFLOAT:
 			case Tokens.tINTEGER:
-				return ThemeUtil.getToken("constant.numeric.ruby"); //$NON-NLS-1$
+				return getToken("constant.numeric.ruby"); //$NON-NLS-1$
 			case Tokens.tSYMBEG:
-				return ThemeUtil.getToken("constant.other.symbol.ruby"); //$NON-NLS-1$
+				return getToken("constant.other.symbol.ruby"); //$NON-NLS-1$
 			case Tokens.tGVAR:
-				return ThemeUtil.getToken("variable.other.readwrite.global.ruby"); //$NON-NLS-1$
+				return getToken("variable.other.readwrite.global.ruby"); //$NON-NLS-1$
 			case Tokens.tIVAR:
-				return ThemeUtil.getToken("variable.other.readwrite.instance.ruby"); //$NON-NLS-1$
+				return getToken("variable.other.readwrite.instance.ruby"); //$NON-NLS-1$
 			case Tokens.tCVAR:
-				return ThemeUtil.getToken("variable.other.readwrite.class.ruby"); //$NON-NLS-1$
+				return getToken("variable.other.readwrite.class.ruby"); //$NON-NLS-1$
 			case Tokens.tCONSTANT:
 				if (nextIsModuleName)
 				{
 					nextIsModuleName = false;
-					return ThemeUtil.getToken("entity.name.type.module.ruby"); //$NON-NLS-1$
+					return getToken("entity.name.type.module.ruby"); //$NON-NLS-1$
 				}
 				if (nextIsClassName)
 				{
 					nextIsClassName = false;
-					return ThemeUtil.getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
+					return getToken("entity.name.type.class.ruby"); //$NON-NLS-1$
 				}
 				int nextToken = peek();
 				if (nextToken == Tokens.tCOLON2 || nextToken == Tokens.tDOT)
 				{
-					return ThemeUtil.getToken("support.class.ruby"); //$NON-NLS-1$
+					return getToken("support.class.ruby"); //$NON-NLS-1$
 				}
-				return ThemeUtil.getToken("variable.other.constant.ruby"); //$NON-NLS-1$
+				return getToken("variable.other.constant.ruby"); //$NON-NLS-1$
 			case Tokens.yyErrorCode:
-				return ThemeUtil.getToken("error.ruby"); //$NON-NLS-1$
+				return getToken("error.ruby"); //$NON-NLS-1$
 			case Tokens.tIDENTIFIER:
 			case Tokens.tFID:
 				if (nextAreArgs)
 				{
-					return ThemeUtil.getToken("variable.parameter.ruby"); //$NON-NLS-1$
+					return getToken("variable.parameter.ruby"); //$NON-NLS-1$
 				}
 				if (nextIsMethodName)
 				{
 					nextIsMethodName = false;
 					nextAreArgs = true;
-					return ThemeUtil.getToken("entity.name.function.ruby"); //$NON-NLS-1$
+					return getToken("entity.name.function.ruby"); //$NON-NLS-1$
 				}
 				if (lookForBlock && inPipe)
-					return ThemeUtil.getToken("variable.other.block.ruby"); //$NON-NLS-1$
+					return getToken("variable.other.block.ruby"); //$NON-NLS-1$
 				// intentionally fall through
 			default:
-				return ThemeUtil.getToken("default.ruby"); //$NON-NLS-1$
+				return getToken("default.ruby"); //$NON-NLS-1$
 		}
+	}
+
+	protected IToken getToken(String tokenName)
+	{
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private IToken pop()

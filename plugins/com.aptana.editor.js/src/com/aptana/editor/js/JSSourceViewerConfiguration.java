@@ -43,9 +43,9 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.CommonDoubleClickStrategy;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.js.internal.JSAutoIndentStrategy;
 import com.aptana.editor.js.internal.JSCommentIndentStrategy;
 import com.aptana.editor.js.internal.JSDocIndentStrategy;

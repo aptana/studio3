@@ -46,11 +46,12 @@ import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.ExtendedWordRule;
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.SingleCharacterRule;
-import com.aptana.editor.common.WhitespaceDetector;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.WhitespaceDetector;
+import com.aptana.editor.common.theme.IThemeManager;
 
 public class HTMLTagScanner extends RuleBasedScanner
 {
@@ -110,7 +111,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 		wordRule.addWord("id", createToken("entity.other.attribute-name.id.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		wordRule.addWord("class", createToken("entity.other.attribute-name.class.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(wordRule);
-		
+
 		// Tags
 		wordRule = new WordRule(new WordDetector(), createToken("meta.tag.other.html"), true); //$NON-NLS-1$
 		wordRule.addWord("script", createToken("entity.name.tag.script.html")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -142,7 +143,12 @@ public class HTMLTagScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return ThemeUtil.getToken(string);
+		return getThemeManager().getToken(string);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	/**

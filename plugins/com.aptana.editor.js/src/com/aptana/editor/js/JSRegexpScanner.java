@@ -39,17 +39,30 @@ import java.util.List;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.editor.common.RegexpRule;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.RegexpRule;
+import com.aptana.editor.common.theme.IThemeManager;
 
-public class JSRegexpScanner extends BufferedRuleBasedScanner {
+public class JSRegexpScanner extends BufferedRuleBasedScanner
+{
 
-    public JSRegexpScanner() {
-        List<IRule> rules = new ArrayList<IRule>();
-        rules.add(new RegexpRule("\\\\.", ThemeUtil.getToken("constant.character.escape.js"))); //$NON-NLS-1$ //$NON-NLS-2$
-        setRules(rules.toArray(new IRule[rules.size()]));
+	public JSRegexpScanner()
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+		rules.add(new RegexpRule("\\\\.", getToken("constant.character.escape.js"))); //$NON-NLS-1$ //$NON-NLS-2$
+		setRules(rules.toArray(new IRule[rules.size()]));
+		setDefaultReturnToken(getToken("string.regexp.js")); //$NON-NLS-1$
+	}
 
-        setDefaultReturnToken(ThemeUtil.getToken("string.regexp.js")); //$NON-NLS-1$
-    }
+	protected IToken getToken(String tokenName)
+	{
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }

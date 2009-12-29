@@ -44,8 +44,8 @@ import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.editor.common.CommonInformationProvider;
 import com.aptana.editor.common.ILanguageService;
+import com.aptana.editor.common.text.information.CommonInformationProvider;
 
 @SuppressWarnings("restriction")
 public class CommonTextHover extends CommonInformationProvider implements ITextHover,

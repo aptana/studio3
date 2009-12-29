@@ -48,179 +48,205 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.SubPartitionScanner;
-import com.aptana.editor.common.theme.ThemeUtil;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * @author Max Stepanov
  * @author Michael Xia
  */
-public class RubySourceConfiguration implements IPartitioningConfiguration,
-        ISourceViewerConfiguration {
+public class RubySourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
-    public final static String PREFIX = "__rb_"; //$NON-NLS-1$
-    public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-    public static final String SINGLE_LINE_COMMENT = "__rb_singleline_comment"; //$NON-NLS-1$
-    public static final String MULTI_LINE_COMMENT = "__rb_multiline_comment"; //$NON-NLS-1$
-    public static final String REGULAR_EXPRESSION = "__rb_regular_expression"; //$NON-NLS-1$
-    public static final String COMMAND = "__rb_command"; //$NON-NLS-1$
-    public final static String STRING = "__rb_string"; //$NON-NLS-1$
+	public final static String PREFIX = "__rb_"; //$NON-NLS-1$
+	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public static final String SINGLE_LINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
+	public static final String MULTI_LINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
+	public static final String REGULAR_EXPRESSION = PREFIX + "regular_expression"; //$NON-NLS-1$
+	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
+	public final static String STRING = PREFIX + "string"; //$NON-NLS-1$
 
-    public static final String[] CONTENT_TYPES = new String[] {
-    		DEFAULT,
-    		SINGLE_LINE_COMMENT,
-    		MULTI_LINE_COMMENT,
-    		REGULAR_EXPRESSION,
-    		COMMAND,
-    		STRING
-    	};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLE_LINE_COMMENT, MULTI_LINE_COMMENT,
+			REGULAR_EXPRESSION, COMMAND, STRING };
 
-    private static final String[][] TOP_CONTENT_TYPES = new String[][] {{IRubyConstants.CONTENT_TYPE_RUBY}};
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IRubyConstants.CONTENT_TYPE_RUBY } };
 
-    private IToken stringToken = new Token(STRING);
+	private IToken stringToken = new Token(STRING);
 
-    private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-            new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
-            new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-            new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-            new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-            new SingleLineRule("\'", "\'", stringToken, '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
+			new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+			new SingleLineRule("\'", "\'", stringToken, '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
 
-    private RubyCodeScanner codeScanner;
-    private RuleBasedScanner singleLineCommentScanner;
-    private RuleBasedScanner multiLineCommentScanner;
-    private RubyRegexpScanner regexpScanner;
-    private RuleBasedScanner commandScanner;
-    private RuleBasedScanner stringScanner;
+	private RubyCodeScanner codeScanner;
+	private RuleBasedScanner singleLineCommentScanner;
+	private RuleBasedScanner multiLineCommentScanner;
+	private RubyRegexpScanner regexpScanner;
+	private RuleBasedScanner commandScanner;
+	private RuleBasedScanner stringScanner;
 
-    private static RubySourceConfiguration instance;
+	private static RubySourceConfiguration instance;
 
-    public static RubySourceConfiguration getDefault() {
-        if (instance == null) {
-            instance = new RubySourceConfiguration();
-        }
-        return instance;
-    }
+	public static RubySourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
+			instance = new RubySourceConfiguration();
+		}
+		return instance;
+	}
 
-    /**
-     * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
-     */
-    public String[] getContentTypes() {
-        return CONTENT_TYPES;
-    }
+	/**
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
+	 */
+	public String[] getContentTypes()
+	{
+		return CONTENT_TYPES;
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return TOP_CONTENT_TYPES;
 	}
 
-    /**
-     * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
-     */
-    public IPredicateRule[] getPartitioningRules() {
-        return partitioningRules;
-    }
+	/**
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
+	 */
+	public IPredicateRule[] getPartitioningRules()
+	{
+		return partitioningRules;
+	}
 
-    /**
-     * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
-     */
-    public ISubPartitionScanner createSubPartitionScanner() {
-        return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
-    }
+	/**
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
+	 */
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
+	}
 
-    /* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
 			return IRubyConstants.CONTENT_TYPE_RUBY;
 		}
 		return null;
 	}
 
 	/**
-     * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler,
-     *      org.eclipse.jface.text.source.ISourceViewer)
-     */
-    public void setupPresentationReconciler(PresentationReconciler reconciler,
-            ISourceViewer sourceViewer) {
-        DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
-        reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-        reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
-        
-        reconciler.setDamager(dr, DEFAULT);
-        reconciler.setRepairer(dr, DEFAULT);
+	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler,
+	 *      org.eclipse.jface.text.source.ISourceViewer)
+	 */
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-        dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
-        reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
-        reconciler.setRepairer(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
+		reconciler.setDamager(dr, DEFAULT);
+		reconciler.setRepairer(dr, DEFAULT);
 
-        dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
-        reconciler.setDamager(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
-        reconciler.setRepairer(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
+		dr = new DefaultDamagerRepairer(getSingleLineCommentScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
+		reconciler.setRepairer(dr, RubySourceConfiguration.SINGLE_LINE_COMMENT);
 
-        dr = new DefaultDamagerRepairer(getRegexpScanner());
-        reconciler.setDamager(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
-        reconciler.setRepairer(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
+		dr = new DefaultDamagerRepairer(getMultiLineCommentScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
+		reconciler.setRepairer(dr, RubySourceConfiguration.MULTI_LINE_COMMENT);
 
-        dr = new DefaultDamagerRepairer(getCommandScanner());
-        reconciler.setDamager(dr, RubySourceConfiguration.COMMAND);
-        reconciler.setRepairer(dr, RubySourceConfiguration.COMMAND);
+		dr = new DefaultDamagerRepairer(getRegexpScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
+		reconciler.setRepairer(dr, RubySourceConfiguration.REGULAR_EXPRESSION);
 
-        dr = new DefaultDamagerRepairer(getStringScanner());
-        reconciler.setDamager(dr, RubySourceConfiguration.STRING);
-        reconciler.setRepairer(dr, RubySourceConfiguration.STRING);
-    }
+		dr = new DefaultDamagerRepairer(getCommandScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.COMMAND);
+		reconciler.setRepairer(dr, RubySourceConfiguration.COMMAND);
 
-    private ITokenScanner getCodeScanner() {
-        if (codeScanner == null) {
-            codeScanner = new RubyCodeScanner();
-        }
-        return codeScanner;
-    }
+		dr = new DefaultDamagerRepairer(getStringScanner());
+		reconciler.setDamager(dr, RubySourceConfiguration.STRING);
+		reconciler.setRepairer(dr, RubySourceConfiguration.STRING);
+	}
 
-    private ITokenScanner getMultiLineCommentScanner() {
-        if (multiLineCommentScanner == null) {
-            multiLineCommentScanner = new RuleBasedScanner();
-            multiLineCommentScanner.setDefaultReturnToken(ThemeUtil.getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
-        }
-        return multiLineCommentScanner;
-    }
+	private ITokenScanner getCodeScanner()
+	{
+		if (codeScanner == null)
+		{
+			codeScanner = new RubyCodeScanner();
+		}
+		return codeScanner;
+	}
 
-    private ITokenScanner getSingleLineCommentScanner() {
-        if (singleLineCommentScanner == null) {
-            singleLineCommentScanner = new RuleBasedScanner();
-            singleLineCommentScanner.setDefaultReturnToken(ThemeUtil
-                    .getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
-        }
-        return singleLineCommentScanner;
-    }
+	private ITokenScanner getMultiLineCommentScanner()
+	{
+		if (multiLineCommentScanner == null)
+		{
+			multiLineCommentScanner = new RuleBasedScanner();
+			multiLineCommentScanner.setDefaultReturnToken(getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
+		}
+		return multiLineCommentScanner;
+	}
 
-    private ITokenScanner getRegexpScanner() {
-        if (regexpScanner == null) {
-            regexpScanner = new RubyRegexpScanner();
-        }
-        return regexpScanner;
-    }
+	private ITokenScanner getSingleLineCommentScanner()
+	{
+		if (singleLineCommentScanner == null)
+		{
+			singleLineCommentScanner = new RuleBasedScanner();
+			singleLineCommentScanner.setDefaultReturnToken(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
+		}
+		return singleLineCommentScanner;
+	}
 
-    private ITokenScanner getCommandScanner() {
-        if (commandScanner == null) {
-            commandScanner = new RuleBasedScanner();
-            commandScanner.setDefaultReturnToken(ThemeUtil.getToken("string.interpolated.ruby")); //$NON-NLS-1$
-        }
-        return commandScanner;
-    }
+	private ITokenScanner getRegexpScanner()
+	{
+		if (regexpScanner == null)
+		{
+			regexpScanner = new RubyRegexpScanner();
+		}
+		return regexpScanner;
+	}
 
-    private ITokenScanner getStringScanner() {
-        if (stringScanner == null) {
-            stringScanner = new RuleBasedScanner();
-            stringScanner.setDefaultReturnToken(ThemeUtil.getToken("string.quoted.single.ruby")); //$NON-NLS-1$
-        }
-        return stringScanner;
-    }
+	private ITokenScanner getCommandScanner()
+	{
+		if (commandScanner == null)
+		{
+			commandScanner = new RuleBasedScanner();
+			commandScanner.setDefaultReturnToken(getToken("string.interpolated.ruby")); //$NON-NLS-1$
+		}
+		return commandScanner;
+	}
+
+	private ITokenScanner getStringScanner()
+	{
+		if (stringScanner == null)
+		{
+			stringScanner = new RuleBasedScanner();
+			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.ruby")); //$NON-NLS-1$
+		}
+		return stringScanner;
+	}
+
+	protected IToken getToken(String tokenName)
+	{
+		return getThemeManager().getToken(tokenName);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }

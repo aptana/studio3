@@ -30,6 +30,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.internal.theme.ThemeManager;
 
 /**
  * Reads in the theme from a java properties file. Intentionally similar to the Textmate themes. keys are token types,
@@ -54,7 +55,7 @@ public class Theme
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
 	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
 
-	Map<String, TextAttribute> map;
+	private Map<String, TextAttribute> map;
 	private ColorManager colorManager;
 	private RGB defaultFG;
 	private RGB lineHighlight;
@@ -288,12 +289,16 @@ public class Theme
 		return string;
 	}
 
-	private void storeDefaults()
+	protected void storeDefaults()
 	{
 		// Only save to defaults if it has never been saved there. Basically take a snapshot of first version and
 		// use that as the "default"
 		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		if (prefs == null)
+			return; // TODO Log something?
+		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
+		if (preferences == null)
+			return;
 		String value = preferences.get(getName(), null);
 		if (value == null)
 		{
@@ -304,8 +309,13 @@ public class Theme
 	public void save()
 	{
 		save(new InstanceScope());
-		if (ThemeUtil.getActiveTheme().equals(this))
-			ThemeUtil.setActiveTheme(this);
+		if (getThemeManager().getCurrentTheme().equals(this))
+			getThemeManager().setCurrentTheme(this);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	private void save(IScopeContext scope)
@@ -315,7 +325,7 @@ public class Theme
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			toProps().storeToXML(os, null);
 			IEclipsePreferences prefs = scope.getNode(CommonEditorPlugin.PLUGIN_ID);
-			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 			preferences.put(getName(), os.toString());
 			prefs.flush();
 		}
@@ -328,7 +338,7 @@ public class Theme
 	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		String xmlProps = preferences.get(getName(), null);
 		if (xmlProps == null)
 			return;
@@ -357,7 +367,7 @@ public class Theme
 		try
 		{
 			IEclipsePreferences prefs = context.getNode(CommonEditorPlugin.PLUGIN_ID);
-			Preferences preferences = prefs.node(ThemeUtil.THEMES_NODE);
+			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 			preferences.remove(getName());
 			preferences.flush();
 		}
@@ -389,6 +399,8 @@ public class Theme
 
 	public void updateCaret(RGB newColor)
 	{
+		if (newColor == null)
+			return;
 		if (caret != null && caret.equals(newColor))
 			return;
 		caret = newColor;
@@ -397,6 +409,8 @@ public class Theme
 
 	public void updateFG(RGB newColor)
 	{
+		if (newColor == null)
+			return;
 		if (defaultFG != null && defaultFG.equals(newColor))
 			return;
 		defaultFG = newColor;
@@ -405,6 +419,8 @@ public class Theme
 
 	public void updateBG(RGB newColor)
 	{
+		if (newColor == null)
+			return;
 		if (defaultBG != null && defaultBG.equals(newColor))
 			return;
 		defaultBG = newColor;
@@ -413,6 +429,8 @@ public class Theme
 
 	public void updateLineHighlight(RGB newColor)
 	{
+		if (newColor == null)
+			return;
 		if (lineHighlight != null && lineHighlight.equals(newColor))
 			return;
 		lineHighlight = newColor;
@@ -421,6 +439,8 @@ public class Theme
 
 	public void updateSelection(RGB newColor)
 	{
+		if (newColor == null)
+			return;
 		if (selection != null && selection.equals(newColor))
 			return;
 		selection = newColor;
@@ -429,18 +449,30 @@ public class Theme
 
 	public Theme copy(String value)
 	{
+		if (value == null)
+			return null;
 		Properties props = toProps();
 		props.setProperty(THEME_NAME_PROP_KEY, value);
 		Theme newTheme = new Theme(colorManager, props);
-		ThemeUtil.addTheme(newTheme);
+		addTheme(newTheme);
 		return newTheme;
+	}
+
+	protected void addTheme(Theme newTheme)
+	{
+		getThemeManager().addTheme(newTheme);
 	}
 
 	public void delete()
 	{
-		ThemeUtil.removeTheme(this);
+		removeTheme();
 		deleteCustomVersion();
 		deleteDefaultVersion();
+	}
+
+	protected void removeTheme()
+	{
+		getThemeManager().removeTheme(this);
 	}
 
 	/**
@@ -470,7 +502,10 @@ public class Theme
 	 */
 	public RGB getForegroundAsRGB(String tokenType)
 	{
-		return getForeground(tokenType).getRGB();
+		Color fg = getForeground(tokenType);
+		if (fg == null)
+			return null;
+		return fg.getRGB();
 	}
 
 	public Color getBackground(String tokenType)
@@ -489,7 +524,10 @@ public class Theme
 	 */
 	public RGB getBackgroundAsRGB(String tokenType)
 	{
-		return getBackground(tokenType).getRGB();
+		Color bg = getBackground(tokenType);
+		if (bg == null)
+			return null;
+		return bg.getRGB();
 	}
 
 }
