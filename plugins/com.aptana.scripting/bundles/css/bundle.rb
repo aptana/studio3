@@ -21,6 +21,7 @@ END
     css_menu.scope = [ "source.css" ]
     
 	  # command/snippet names must be unique within bundle and are case insensitive
+    css_menu.command "Format CSS"
     css_menu.command "Insert Color..."
     css_menu.command "Show as HTML"
     css_menu.command "Documentation for Property"
