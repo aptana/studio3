@@ -20,7 +20,6 @@ RadRails::Command.define_command("Documentation for Property") do |cmd|
 
     prop_url = CSS_PROPERTIES[prop_name]
     url = "http://www.w3.org/TR/CSS2/" + prop_url
-    RadRails::UI.simple_notification(:title => "URL", :summary => url)
     "<meta http-equiv='Refresh' content='0;URL=#{url}'>"
   end
 end
