@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -189,11 +191,14 @@ public class CommandElement extends AbstractBundleElement
 		ThreadContext threadContext = runtime.getCurrentContext();
 		String resultText = ""; //$NON-NLS-1$
 		
+		// grab map from context and make it unmodifiable
+		Map<String,Object> map = Collections.unmodifiableMap(context.getMap());
+		
 		try
 		{
 			IRubyObject result = this._invokeBlock.call(
 				threadContext,
-				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, context.getMap() ) }
+				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, map) }
 			);
 			
 			if (result != null)
