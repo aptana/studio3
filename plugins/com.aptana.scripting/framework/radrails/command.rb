@@ -5,7 +5,7 @@ module RadRails
   
   class Command
     def initialize(name)
-      @jobj = com.aptana.scripting.model.CommandElement.new($fullpath)
+      @jobj = create_java_object
       @jobj.display_name = name;
       
       bundle = BundleManager.bundle_from_path(path)
@@ -107,6 +107,12 @@ module RadRails
         bundle = BundleManager.bundle_from_path(command.path)
         bundle.add_command(command) unless bundle.nil?
       end
+    end
+    
+    private
+    
+    def create_java_object
+      com.aptana.scripting.model.CommandElement.new($fullpath)
     end
   end
   

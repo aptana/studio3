@@ -4,33 +4,9 @@ require "radrails/scope_selector"
 
 module RadRails
   
-  class Snippet
+  class Snippet < Command
     def initialize(name)
-      @jobj = com.aptana.scripting.model.SnippetElement.new($fullpath)
-      @jobj.display_name = name
-      
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
-    end
-    
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
-    end
-    
-    def java_object
-      @jobj
-    end
-    
-    def trigger
-      @jobj.trigger
-    end
-    
-    def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger;
+      super(name)
     end
     
     def expansion
@@ -41,18 +17,6 @@ module RadRails
       @jobj.expansion = expansion
     end
     
-    def path
-      @jobj.path
-    end
-  
-    def scope
-      @jobj.scope
-    end
-    
-    def scope=(scope)
-      @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
-    end
-    
     def to_s
       <<-EOS
       snippet(
@@ -60,6 +24,7 @@ module RadRails
         name:      #{display_name}
         trigger:   #{trigger}
         expansion: #{expansion}
+        keys:   #{key_binding}
         scope:     #{scope}
       )
       EOS
@@ -77,6 +42,13 @@ module RadRails
         bundle.add_command(snippet) unless bundle.nil?
       end
     end
+    
+    private
+    
+    def create_java_object
+      com.aptana.scripting.model.SnippetElement.new($fullpath)
+    end
+    
   end
   
 end

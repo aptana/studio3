@@ -42,7 +42,7 @@ def with_defaults(values, &block)
   bundle = RadRails::BundleManager.bundle_from_path(File.dirname($fullpath))
   
   if bundle.nil?
-    bundle = RadRails::Bundle.define_bundle("<unknown>", values, &block)
+    bundle = RadRails::Bundle.define_bundle("", values, &block)
   else
     bundle.defaults = values
     block.call(bundle) if block_given?
