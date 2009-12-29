@@ -83,19 +83,17 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	protected Template[] getTemplates(String contextTypeId)
 	{
 		List<Template> templatesList = new LinkedList<Template>();
-		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommandsFromScope(contextTypeId,
-				new TriggerOnlyFilter());
-		for (CommandElement commandElement : commandsFromScope)
-		{
-			if (commandElement.getTrigger() != null)
-			{
-				if (commandElement instanceof SnippetElement)
-				{
-					templatesList.add(new SnippetTemplate((SnippetElement) commandElement, contextTypeId));
-				}
-				else
-				{
-					templatesList.add(new CommandTemplate(commandElement, contextTypeId));
+		CommandElement[] commandsFromScope =
+			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+		for (CommandElement commandElement : commandsFromScope) {
+			String[] triggers = commandElement.getTriggers();
+			if (triggers != null) {
+				for (String trigger : triggers) {
+					if (commandElement instanceof SnippetElement) {
+						templatesList.add(new SnippetTemplate((SnippetElement)commandElement, trigger, contextTypeId));
+					} else {
+						templatesList.add (new CommandTemplate(commandElement, trigger, contextTypeId));
+					}
 				}
 			}
 		}

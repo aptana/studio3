@@ -22,9 +22,9 @@ public class TriggerOnlyFilter implements IModelFilter
 		if (element instanceof CommandElement)
 		{
 			CommandElement node = (CommandElement) element;
-			String trigger = node.getTrigger();
+			String[] triggers = node.getTriggers();
 			
-			result = (trigger != null && trigger.length() > 0);
+			result = (triggers != null && triggers.length > 0);
 		}
 		
 		return result;

@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
