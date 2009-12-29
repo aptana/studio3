@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.scripting.loadpath" name="Scripting Load Path" schema="schema/loadpath.exsd"/>
-   <extension-point id="com.aptana.scripting.framework_file" name="Scripting Framework File" schema="schema/framework_file.exsd"/>
-   <extension-point id="com.aptana.scripting.context_contributor" name="Context Contributor" schema="schema/contributor.exsd"/>
+   <extension-point id="com.aptana.scripting.loadpath" name="%extension-point.name" schema="schema/loadpath.exsd"/>
+   <extension-point id="com.aptana.scripting.framework_file" name="%extension-point.name.0" schema="schema/framework_file.exsd"/>
+   <extension-point id="com.aptana.scripting.context_contributor" name="%extension-point.name.1" schema="schema/contributor.exsd"/>
    <extension
          point="org.eclipse.ui.startup">
       <startup

@@ -30,9 +30,9 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static final String CONTEXT_CONTRIBUTOR_ID = "context_contributor";
-	private static final String TAG_CONTRIBUTOR = "contributor";
-	private static final String ATTR_CLASS = "class";
+	private static final String CONTEXT_CONTRIBUTOR_ID = "context_contributor"; //$NON-NLS-1$
+	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
+	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	
 	private String[] _triggers;
 	private String _invoke;
@@ -65,7 +65,7 @@ public class CommandElement extends AbstractBundleElement
 		// TESTING
 		Map<String,Object> map = new HashMap<String,Object>();
 		
-		map.put("name", "testing");
+		map.put("name", "testing"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		return map;
 	}
@@ -146,7 +146,7 @@ public class CommandElement extends AbstractBundleElement
 								catch (CoreException e)
 								{
 									String message = MessageFormat.format(
-										"Error creating context contributor: {0}",
+										Messages.CommandElement_Error_Creating_Contributor,
 										new Object[] { e.getMessage() }
 									);
 									
@@ -220,7 +220,7 @@ public class CommandElement extends AbstractBundleElement
 		catch (ParseException e)
 		{
 			String message = MessageFormat.format(
-				"Unable to convert {0} to an Eclipse key sequence in {0}: {1}",
+				Messages.CommandElement_Invalid_Key_Binding,
 				new Object[] { this.getDisplayName(), this.getPath() }
 			);
 			
@@ -260,7 +260,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
-		String resultText = "";
+		String resultText = ""; //$NON-NLS-1$
 		
 		try
 		{
@@ -553,7 +553,7 @@ public class CommandElement extends AbstractBundleElement
 			{
 				if (first == false)
 				{
-					printer.print(", ");
+					printer.print(", "); //$NON-NLS-1$
 				}
 				
 				printer.print(trigger);
