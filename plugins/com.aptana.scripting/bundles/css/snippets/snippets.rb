@@ -360,7 +360,7 @@ ${3:left: expression(eval(document.documentElement.scrollLeft));
     s.trigger = "marker"
     s.expansion = 'marker-offset: ${1:10px};$0'
   end
-  
+  # FIXME Doesn't work
   snippet "opacity: [for Safari, FF & IE]" do |s|
     s.trigger = "opacity"
     s.expansion = 'opacity: ${1:0.5};${100:
@@ -420,7 +420,7 @@ ${3:left: expression(eval(document.documentElement.scrollLeft));
     $0
   '
   end
-  
+  # FIXME Doesn't work
   snippet "scrollbar" do |s|
     s.trigger = "scrollbar"
     s.expansion = 'scrollbar-base-color:       ${1:#CCCCCC};${2:
