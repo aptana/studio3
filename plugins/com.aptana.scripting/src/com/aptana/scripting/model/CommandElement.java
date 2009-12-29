@@ -53,7 +53,11 @@ public class CommandElement extends AbstractBundleElement
 		
 		if (this.isExecutable())
 		{
-			if (this.isShellCommand())
+			if (this.isSnippet())
+			{
+				resultText = this._invoke;
+			}
+			else if (this.isShellCommand())
 			{
 				resultText = this.invokeStringCommand();
 			}
@@ -290,6 +294,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * isSnippet
+	 * 
+	 * @return
+	 */
+	public boolean isSnippet()
+	{
+		return (this._inputType == InputType.NONE && this._outputType == OutputType.INSERT_AS_SNIPPET);
+	}
+	
+	/**
 	 * setInputType
 	 * 
 	 * @param input
@@ -384,7 +398,14 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
-		printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		if (this.isSnippet())
+		{
+			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else
+		{
+			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
