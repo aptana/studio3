@@ -41,13 +41,13 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 /**
  * Adds Git UI elements to the Single Project View.
- * 
+ *
  * @author cwilliams
  */
 public class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 {
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
-	
+
 	private Label leftLabel;
 	private GridData leftLabelGridData;
 	private Label rightLabel;
@@ -57,7 +57,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	private ToolItem branchesToolItem;
 	private Menu branchesMenu;
-	
+
 	private GitChangedFilesFilter fChangedFilesFilter;
 
 	@Override
@@ -67,7 +67,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 		GitRepository.addListener(this);
 	}
-	
+
 	protected void doCreateToolbar(Composite toolbarComposite) {
 		createGitBranchCombo(toolbarComposite);
 	}
@@ -76,18 +76,18 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	{
 		// Increment number of columns of the layout
 		((GridLayout) parent.getLayout()).numColumns += 3;
-		
+
 		leftLabel = new Label(parent, SWT.NONE);
 		leftLabel.setText("["); //$NON-NLS-1$
 		leftLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		leftLabel.setLayoutData(leftLabelGridData);
-		
+
 		branchesToolbar = new ToolBar(parent, SWT.FLAT);
 		branchesToolbarGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		branchesToolbar.setLayoutData(branchesToolbarGridData);
-		
+
 		branchesToolItem = new ToolItem(branchesToolbar, SWT.DROP_DOWN);
-		
+
 		branchesMenu = new Menu(branchesToolbar);
 		branchesToolItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -101,7 +101,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				branchesMenu.setVisible(true);
 			}
 		});
-		
+
 		rightLabel = new Label(parent, SWT.NONE);
 		rightLabel.setText("]"); //$NON-NLS-1$
 		rightLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
@@ -120,7 +120,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				{
 					GitRepository repository = GitRepository.getAttached(selectedProject);
 					if (repository != null)
-					{						
+					{
 						new MenuItem(menu, SWT.SEPARATOR);
 						createCommitMenuItem(menu);
 						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
@@ -146,7 +146,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		});
 
 		super.fillCommandsMenu(menuManager);
-		
+
 		menuManager.add(new ContributionItem()
 		{
 			@Override
@@ -176,7 +176,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 								branchNameMenuItem.setText(branchName);
 							}
 							branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
-								
+
 							branchNameMenuItem.addSelectionListener(new SelectionAdapter()
 							{
 								public void widgetSelected(SelectionEvent e)
@@ -184,7 +184,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 									setNewBranch(branchNameMenuItem.getText());
 								}
 							});
-							
+
 						}
 						branchesMenuItem.setMenu(branchesMenu);
 
@@ -205,7 +205,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 						new MenuItem(menu, SWT.SEPARATOR);
 
 						createFilterMenuItem(menu);
-						
+
 						// TODO Show History
 
 						createShowGithubNetworkMenuItem(menu);
@@ -228,7 +228,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		GitRepository.removeListener(this);
 		super.dispose();
 	}
-	
+
 	private void createFilterMenuItem(Menu menu)
 	{
 		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
@@ -253,7 +253,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	@Override
 	protected void removeFilter() {
 		getCommonViewer().removeFilter(fChangedFilesFilter);
@@ -278,7 +278,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	private void createPushMenuItem(Menu menu)
 	{
 		MenuItem push = new MenuItem(menu, SWT.PUSH);
@@ -308,7 +308,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	private void createPullMenuItem(Menu menu)
 	{
 		MenuItem pull = new MenuItem(menu, SWT.PUSH);
@@ -337,7 +337,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	private void createStashMenuItem(Menu menu)
 	{
 		MenuItem stash = new MenuItem(menu, SWT.PUSH);
@@ -488,7 +488,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
-	
+
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
@@ -501,7 +501,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		MenuItem[] menuItems = branchesMenu.getItems();
 		for (MenuItem menuItem : menuItems) {
 			menuItem.dispose();
-		}		
+		}
 		branchesToolItem.setText(""); //$NON-NLS-1$
 		if (repo == null)
 			return;
@@ -520,7 +520,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				branchNameMenuItem.setText(branchName);
 			}
 			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
-				
+
 			branchNameMenuItem.addSelectionListener(new SelectionAdapter()
 			{
 				public void widgetSelected(SelectionEvent e)
@@ -528,11 +528,11 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					setNewBranch(branchNameMenuItem.getText());
 				}
 			});
-			
+
 		}
-		
+
 		new MenuItem(branchesMenu, SWT.SEPARATOR);
-		
+
 		final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.PUSH);
 		branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
 		branchNameMenuItem.setSelection(true);
@@ -543,7 +543,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				setNewBranch(branchNameMenuItem.getText());
 			}
 		});
-		
+
 		if (repo.isDirty())
 			currentBranchName += "*"; //$NON-NLS-1$
 		branchesToolItem.setText(currentBranchName);

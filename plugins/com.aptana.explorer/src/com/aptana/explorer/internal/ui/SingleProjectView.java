@@ -77,7 +77,7 @@ import com.aptana.filewatcher.FileWatcher;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
- * 
+ *
  * @author cwilliams
  */
 public abstract class SingleProjectView extends CommonNavigator
@@ -88,11 +88,11 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
 
 	private ToolItem projectToolItem;
-	
+
 	protected IProject selectedProject;
 	private ResourceListener fResourceListener;
 	private ViewerFilter activeProjectFilter;
-	
+
 	/**
 	 * The text to initially show in the filter text control.
 	 */
@@ -113,7 +113,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private CommandContributionItem runLastCCI;
 	private CommandContributionItem debugLastCCI;
-	
+
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
 
@@ -121,10 +121,10 @@ public abstract class SingleProjectView extends CommonNavigator
 	public void createPartControl(Composite parent)
 	{
 		// Create toolbar
-		Composite toolbarComposite = new Composite(parent, SWT.NONE);	
+		Composite toolbarComposite = new Composite(parent, SWT.NONE);
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		toolbarComposite.setLayoutData(toolbarGridData);
-		
+
 		GridLayout toolbarGridLayout = new GridLayout(2, false);
 		toolbarGridLayout.marginWidth = 2;
 		toolbarGridLayout.marginHeight = 0;
@@ -165,7 +165,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				SWT.PUSH);
 		runLastCCI = new CommandContributionItem(runLastCCIP);
 		commandsMenuManager.add(runLastCCI);
-		
+
 		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(),
 				"DebugLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
@@ -181,9 +181,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		createSearchComposite(parent);
 
 		createNavigator(parent);
-		
+
 		createFilterComposite(parent);
-		
+
 		addProjectResourceListener();
 		detectSelectedProject();
 		addSingleProjectFilter();
@@ -193,7 +193,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
-	
+
 	protected void fillCommandsMenu(MenuManager menuManager)
 	{
 		menuManager.add(new ContributionItem()
@@ -262,7 +262,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			});
 		}
-		
+
 		projectToolItem.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent selectionEvent)
@@ -277,7 +277,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		});
 		return projects;
 	}
-	
+
 	private Composite createSearchComposite(Composite myComposite)
 	{
 		Composite search = new Composite(myComposite, SWT.NONE);
@@ -288,7 +288,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		search.setLayoutData(searchGridData);
-		
+
 		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchText.setText(initialText);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -303,7 +303,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 				searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 			}
-			
+
 			@Override
 			public void focusGained(FocusEvent e)
 			{
@@ -314,12 +314,12 @@ public abstract class SingleProjectView extends CommonNavigator
 				searchText.setForeground(null);
 			}
 		});
-		
+
 		searchText.addKeyListener(new KeyListener()
 		{
 			@Override
 			public void keyReleased(KeyEvent e) {}
-			
+
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
@@ -327,7 +327,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				{
 					return;
 				}
-				
+
 				if (e.keyCode == 0x0D)
 				{
 					searchText();
@@ -343,18 +343,18 @@ public abstract class SingleProjectView extends CommonNavigator
 //			gridData.horizontalSpan = 2;
 		searchText.setLayoutData(gridData);
 
-		
+
 		// Button for search options
 		final ToolBar toolbar = new ToolBar(search, SWT.NONE);
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		toolbar.setLayoutData(toolbarGridData);
-		
+
 		final ToolItem menuButton = new ToolItem(toolbar, SWT.PUSH);
 		menuButton.setImage(ExplorerPlugin.getImage("icons/full/elcl16/down.png")); //$NON-NLS-1$
-		
+
 		// Construct the menu to attach to the above button.
 		final Menu menu = new Menu(toolbar);
-		
+
 		final MenuItem caseSensitiveMenuItem = new MenuItem(menu, SWT.CHECK);
 		caseSensitiveMenuItem.setText(Messages.SingleProjectView_CaseSensitive);
 		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
@@ -366,7 +366,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				searchText.setFocus();
 			}
 		});
-		
+
 		final MenuItem regularExressionMenuItem = new MenuItem(menu, SWT.CHECK);
 		regularExressionMenuItem.setText(Messages.SingleProjectView_RegularExpression);
 		regularExressionMenuItem.setSelection(regularExpressionSearch);
@@ -378,7 +378,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				searchText.setFocus();
 			}
 		});
-		
+
 		menuButton.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent selectionEvent)
@@ -391,7 +391,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				menu.setVisible(true);
 			}
 		});
-		
+
 		return search;
 	}
 
@@ -402,7 +402,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		fillLayout.marginWidth = 0;;
 		fillLayout.marginHeight = 0;;
 		viewer.setLayout(fillLayout);
-		
+
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		viewer.setLayoutData(gridData);
 
@@ -426,23 +426,23 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		filterLabel.setLayoutData(gridData);
-		
+
 		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
 		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-		
+
 		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
 		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png")); //$NON-NLS-1$
 		toolItem.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				removeFilter();
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
-		
+
 		return filter;
 	}
 
@@ -453,7 +453,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		filterLabel.getParent().layout();
 		filterLabel.getParent().getParent().layout();
 	}
-	
+
 	protected void showFilterLabel(Image image, String text) {
 		filterLabel.setImage(image);
 		filterLabel.setText(text);
@@ -463,11 +463,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		filterLabel.getParent().layout();
 		filterLabel.getParent().getParent().layout();
 	}
-	
+
 	protected void removeFilter() {
 		hideFilterLable();
 	}
-	
+
 	private void addSingleProjectFilter()
 	{
 		activeProjectFilter = new ViewerFilter()
@@ -859,7 +859,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	/**
 	 * Listens for Project addition/removal to change the active project to new project added, or off the deleted
 	 * project if it was active.
-	 * 
+	 *
 	 * @author cwilliams
 	 */
 	private class ResourceListener implements IResourceChangeListener
@@ -964,27 +964,27 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		}
 	}
-	
+
 	private boolean isCaseSensitiveSearch()
 	{
 		return caseSensitiveSearch;
 	}
-	
+
 	private void setCaseSensitiveSearch(boolean caseSensitiveSearch)
 	{
 		this.caseSensitiveSearch = caseSensitiveSearch;
 	}
-	
+
 	private boolean isRegularExpressionSearch()
 	{
 		return regularExpressionSearch;
 	}
-	
+
 	private void setRegularExpressionSearch(boolean regularExpressionSearch)
 	{
 		this.regularExpressionSearch = regularExpressionSearch;
 	}
-	
+
     /**
      * Search the text in project.
      */
@@ -999,7 +999,7 @@ public abstract class SingleProjectView extends CommonNavigator
         {
             return;
         }
-        
+
         IResource searchResource = selectedProject;
         TextSearchPageInput input= new TextSearchPageInput(textToSearch,
         		isCaseSensitiveSearch(),
@@ -1014,7 +1014,7 @@ public abstract class SingleProjectView extends CommonNavigator
             ExplorerPlugin.logError(e);
         }
     }
-   
+
     private static class TextSearchPageInput extends TextSearchInput
     {
 

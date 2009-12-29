@@ -48,7 +48,7 @@ import com.aptana.explorer.ExplorerPlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
- * 
+ *
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
@@ -68,7 +68,7 @@ public class FilteringProjectView extends GitProjectView
 	 * to at least expand the visible nodes)
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
-	
+
 	private String currentFilterText = ""; //$NON-NLS-1$
 
 	private PathFilter patternFilter;
@@ -83,7 +83,7 @@ public class FilteringProjectView extends GitProjectView
 	private Image eyeball;
 
 
-	
+
 	private Composite customComposite;
 
 	@Override
@@ -94,9 +94,9 @@ public class FilteringProjectView extends GitProjectView
 		gridLayout.marginWidth = 0;
 		gridLayout.marginHeight = 0;
 		customComposite.setLayout(gridLayout);
-		
+
 		super.createPartControl(customComposite);
-		
+
 		patternFilter = new PathFilter();
 		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
@@ -282,13 +282,13 @@ public class FilteringProjectView extends GitProjectView
 			}
 		};
 	}
-	
+
 	@Override
 	protected void removeFilter() {
 		clearText();
 		super.removeFilter();
 	}
-	
+
 	@Override
 	public void saveState(IMemento memento)
 	{
@@ -346,7 +346,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Restores the state of the receiver to the state described in the specified memento.
-	 * 
+	 *
 	 * @param memento
 	 *            the memento
 	 * @since 2.0
@@ -436,7 +436,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Set the text in the filter control.
-	 * 
+	 *
 	 * @param string
 	 */
 	protected void setFilterText(String string)
@@ -470,7 +470,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Return the time delay that should be used when scheduling the filter refresh job. Subclasses may override.
-	 * 
+	 *
 	 * @return a time delay in milliseconds before the job should run
 	 * @since 3.5
 	 */
@@ -573,7 +573,7 @@ public class FilteringProjectView extends GitProjectView
 
 			/**
 			 * Returns true if the job should be canceled (because of timeout or actual cancellation).
-			 * 
+			 *
 			 * @param items
 			 * @param monitor
 			 * @param cancelTime
@@ -736,5 +736,5 @@ public class FilteringProjectView extends GitProjectView
 		}
 		return null;
 	}
-	
+
 }
