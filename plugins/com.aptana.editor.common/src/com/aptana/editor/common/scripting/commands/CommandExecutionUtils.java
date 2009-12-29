@@ -373,6 +373,7 @@ public class CommandExecutionUtils
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
+				// FIXME Should remove selection if that was the input
 				SnippetsCompletionProcessor.insertAsTemplate(textViewer, caretOffset, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
