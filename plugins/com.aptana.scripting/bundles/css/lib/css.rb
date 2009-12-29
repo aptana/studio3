@@ -1,6 +1,3 @@
-require "colors"
-require "properties"
-
 LIPSUM = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 
 def tag_preview(selector_list)
@@ -247,14 +244,4 @@ def preview_css(str)
   </body>
 </html>
 EOT
-end
-
-# Used by docs_for_property
-def request_prop_name
-  s = `\"#{ENV['TM_SUPPORT_PATH']}/bin/CocoaDialog.app/Contents/MacOS/CocoaDialog\" inputbox --float --title 'Documentation for Property' --informative-text 'What property would you like to lookup?' --text '#{$prop_name}' --button1 'Lookup' --button2 'Cancel' --button3 'Show All Properties'`
-  case (a = s.split("\n"))[0].to_i
-    when 1 then $props[a[1].to_s] || "propidx.html"
-    when 2 then abort "<script>window.close()</script>"
-    when 3 then "propidx.html"
-  end
 end

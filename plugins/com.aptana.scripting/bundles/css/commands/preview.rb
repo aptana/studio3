@@ -1,5 +1,5 @@
 require "radrails"
-require '/Users/cwilliams/Documents/RadRails Bundles/css/lib/css'
+require 'css'
  
 RadRails::Command.define_command("Show as HTML") do |cmd|
   cmd.key_binding = [ :M1, :M2, :P ]
