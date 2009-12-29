@@ -432,10 +432,12 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
 		toolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/close.png")); //$NON-NLS-1$
-		toolItem.addSelectionListener(new SelectionListener() {
+		toolItem.addSelectionListener(new SelectionListener()
+		{
 
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void widgetSelected(SelectionEvent e)
+			{
 				removeFilter();
 			}
 
@@ -446,25 +448,24 @@ public abstract class SingleProjectView extends CommonNavigator
 		return filter;
 	}
 
-	protected void hideFilterLable() {
-		filterLabel.setVisible(false);
+	protected void hideFilterLable()
+	{
 		filterLayoutData.exclude = true;
 		filterLabel.setVisible(false);
-		filterLabel.getParent().layout();
 		filterLabel.getParent().getParent().layout();
 	}
 
-	protected void showFilterLabel(Image image, String text) {
+	protected void showFilterLabel(Image image, String text)
+	{
 		filterLabel.setImage(image);
 		filterLabel.setText(text);
-		filterLabel.pack(true);
 		filterLayoutData.exclude = false;
 		filterLabel.setVisible(true);
-		filterLabel.getParent().layout();
 		filterLabel.getParent().getParent().layout();
 	}
 
-	protected void removeFilter() {
+	protected void removeFilter()
+	{
 		hideFilterLable();
 	}
 

@@ -68,7 +68,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		GitRepository.addListener(this);
 	}
 
-	protected void doCreateToolbar(Composite toolbarComposite) {
+	protected void doCreateToolbar(Composite toolbarComposite)
+	{
 		createGitBranchCombo(toolbarComposite);
 	}
 
@@ -254,9 +255,13 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	}
 
 	@Override
-	protected void removeFilter() {
-		getCommonViewer().removeFilter(fChangedFilesFilter);
-		fChangedFilesFilter = null;
+	protected void removeFilter()
+	{
+		if (fChangedFilesFilter != null)
+		{
+			getCommonViewer().removeFilter(fChangedFilesFilter);
+			fChangedFilesFilter = null;
+		}
 		super.removeFilter();
 	}
 
@@ -411,7 +416,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
 				{
 					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
 						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
@@ -475,7 +481,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					currentBranchName += "*"; //$NON-NLS-1$
 				branchesToolItem.setText(currentBranchName);
 				MenuItem[] menuItems = branchesMenu.getItems();
-				for (MenuItem menuItem : menuItems) {
+				for (MenuItem menuItem : menuItems)
+				{
 					menuItem.setSelection(menuItem.getText().equals(currentBranchName));
 				}
 				branchesToolbar.pack(true);
@@ -498,7 +505,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void populateBranches(GitRepository repo)
 	{
 		MenuItem[] menuItems = branchesMenu.getItems();
-		for (MenuItem menuItem : menuItems) {
+		for (MenuItem menuItem : menuItems)
+		{
 			menuItem.dispose();
 		}
 		branchesToolItem.setText(""); //$NON-NLS-1$

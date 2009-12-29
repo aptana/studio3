@@ -284,7 +284,8 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	@Override
-	protected void removeFilter() {
+	protected void removeFilter()
+	{
 		clearText();
 		super.removeFilter();
 	}
