@@ -128,7 +128,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				+ "\\}" //$NON-NLS-1$
 		);
 		Matcher m = p.matcher(expansion);
-		if (m.find())
+		while (m.find())
 		{
 			String values = m.group(2);
 			StringBuilder replacement = new StringBuilder("${choices"); //$NON-NLS-1$
@@ -146,6 +146,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			replacement.deleteCharAt(replacement.length() - 1);
 			replacement.append(")}"); //$NON-NLS-1$
 			expansion = expansion.substring(0, m.start()) + replacement.toString() + expansion.substring(m.end());
+			m = p.matcher(expansion);
 		}
 		// Wrap values as an arg so we handle the invalid characters properly and give them identifiers based on tab stop so that equal values with different tab stops produce unique ids.
 		p = Pattern.compile("\\$\\{" //$NON-NLS-1$

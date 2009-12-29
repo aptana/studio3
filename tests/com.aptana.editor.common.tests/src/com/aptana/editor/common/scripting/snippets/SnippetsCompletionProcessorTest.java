@@ -10,7 +10,6 @@ public class SnippetsCompletionProcessorTest extends TestCase
 
 	public void testProcessExpansion()
 	{
-		// TODO Add test for expansion with two different tab stops having multiple choices
 		Map<String, String> expectations = new HashMap<String, String>();
 		expectations.put("$0", "${cursor}");
 		expectations.put("${0}", "${cursor}");
@@ -20,10 +19,18 @@ public class SnippetsCompletionProcessorTest extends TestCase
 		expectations.put("${1:sans-}serif", "${value1:1('sans-')}serif");
 		expectations.put("${2:!important}", "${value2:2('!important')}");
 		expectations.put("${3:fixed/scroll}", "${choices3:3('fixed','scroll')}");
-		expectations.put("margin: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0", "margin: ${value1:1('20px')} ${value2:2('0px')} ${value3:3('40px')} ${value4:4('0px')};${cursor}");
-		expectations.put("background-attachment: ${1:scroll/fixed};$0", "background-attachment: ${choices1:1('scroll','fixed')};${cursor}");
-		expectations.put("background-repeat: ${1:repeat/repeat-x/repeat-y/no-repeat};$0", "background-repeat: ${choices1:1('repeat','repeat-x','repeat-y','no-repeat')};${cursor}");
-		expectations.put("font-family: ${1:Arial, \"MS Trebuchet\"}, ${2:sans-}serif;$0", "font-family: ${value1:1('Arial, \"MS Trebuchet\"')}, ${value2:2('sans-')}serif;${cursor}");
+		expectations.put("margin: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0",
+				"margin: ${value1:1('20px')} ${value2:2('0px')} ${value3:3('40px')} ${value4:4('0px')};${cursor}");
+		expectations.put("background-attachment: ${1:scroll/fixed};$0",
+				"background-attachment: ${choices1:1('scroll','fixed')};${cursor}");
+		expectations.put("background-repeat: ${1:repeat/repeat-x/repeat-y/no-repeat};$0",
+				"background-repeat: ${choices1:1('repeat','repeat-x','repeat-y','no-repeat')};${cursor}");
+		expectations.put("font-family: ${1:Arial, \"MS Trebuchet\"}, ${2:sans-}serif;$0",
+				"font-family: ${value1:1('Arial, \"MS Trebuchet\"')}, ${value2:2('sans-')}serif;${cursor}");
+		expectations
+				.put(
+						"font: ${1:normal/italic/oblique} ${2:normal/small-caps};$0",
+						"font: ${choices1:1('normal','italic','oblique')} ${choices2:2('normal','small-caps')};${cursor}");
 		for (Map.Entry<String, String> pair : expectations.entrySet())
 		{
 			assertEquals(pair.getValue(), SnippetsCompletionProcessor.processExpansion(pair.getKey()));

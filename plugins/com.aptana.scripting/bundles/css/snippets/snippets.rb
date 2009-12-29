@@ -211,7 +211,7 @@ with_defaults :scope => "source.css" do
     s.trigger = "display"
     s.expansion = 'display: ${1:table/inline-table/table-row-group/table-header-group/table-footer-group/table-row/table-column-group/table-column/table-cell/table-caption};$0'
   end
-  
+  # FIXME This is broken
   snippet "filter: AlphaImageLoader [for IE PNGs]" do |s|
     s.trigger = "background"
     s.expansion = '${3:background-image: none;
@@ -222,10 +222,11 @@ with_defaults :scope => "source.css" do
     s.trigger = "float"
     s.expansion = 'float: ${1:left/right/none};$0'
   end
-  
+  # FIXME Tab stop ordering is not used correctly
   snippet "Fixed Position Bottom 100% wide IE6" do |s|
     s.trigger = "fixed"
-    s.expansion = '${2:bottom: auto;}top: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-${1:THE HEIGHT OF THIS THING IN PIXELS}));
+    s.expansion = '${2:bottom: auto;}
+top: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-${1:THE HEIGHT OF THIS THING IN PIXELS}));
 ${3:left: expression(eval(document.documentElement.scrollLeft));
 }${4:width: expression(eval(document.documentElement.clientWidth));}$0'
   end
@@ -254,12 +255,12 @@ ${3:left: expression(eval(document.documentElement.scrollLeft));
     s.trigger = "font"
     s.expansion = 'font-weight: ${1:normal/bold};$0'
   end
-  # FIXME Doesn't work!
+  
   snippet "font: style variant weight size/line-height font-family" do |s|
     s.trigger = "font"
     s.expansion = 'font: ${1:normal/italic/oblique} ${2:normal/small-caps} ${3:normal/bold} ${4:1em/1.5em} ${5:Arial}, ${6:sans-}serif;$0'
   end
-  # FIXME Doesn't work!
+
   snippet "font: size font" do |s|
     s.trigger = "font"
     s.expansion = 'font: ${1:75%} ${2:"Lucida Grande", "Trebuchet MS", Verdana,} ${3:sans-}serif;$0'
