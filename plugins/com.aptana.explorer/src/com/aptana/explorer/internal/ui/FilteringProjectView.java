@@ -16,30 +16,23 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
@@ -55,13 +48,12 @@ import com.aptana.explorer.ExplorerPlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
- * 
+ *
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
-
 	/**
 	 * Memento names for saving state of view and restoring it across launches.
 	 */
@@ -77,15 +69,9 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
-	private Text filterText;
-	/**
-	 * The text to initially show in the filter text control.
-	 */
-	protected String initialText = Messages.GitProjectView_InitialFileFilterText;
-	private String previousFilterText;
+	private String currentFilterText = ""; //$NON-NLS-1$
 
 	private PathFilter patternFilter;
-	private boolean narrowingDown;
 	private WorkbenchJob refreshJob;
 
 	/**
@@ -94,14 +80,24 @@ public class FilteringProjectView extends GitProjectView
 	protected TreeItem hoveredItem;
 	protected int lastDrawnX;
 	protected Object[] fExpandedElements;
+	private Image eyeball;
 
-	private Composite focus;
+
+
+	private Composite customComposite;
 
 	@Override
 	public void createPartControl(Composite aParent)
 	{
-		super.createPartControl(aParent);
+		customComposite = new Composite(aParent, SWT.NONE);
+		GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.marginWidth = 0;
+		gridLayout.marginHeight = 0;
+		customComposite.setLayout(gridLayout);
 
+		super.createPartControl(customComposite);
+
+		patternFilter = new PathFilter();
 		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
 
@@ -115,23 +111,17 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	@Override
-	protected Composite doCreatePartControl(Composite customComposite)
-	{
-		Composite bottom = super.doCreatePartControl(customComposite);
-		focus = createFocusComposite(customComposite, bottom);
-		return focus;
-	}
-
-	@Override
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
 		this.memento = aMemento;
 		super.init(aSite, aMemento);
+
+		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
+
 	}
 
 	private void addFocusHover()
 	{
-		final Image eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
 		final int IMAGE_MARGIN = 2;
 		final Tree tree = getCommonViewer().getTree();
 
@@ -155,7 +145,6 @@ public class FilteringProjectView extends GitProjectView
 	{
 		return new MouseListener()
 		{
-
 			public void mouseUp(MouseEvent e)
 			{
 			}
@@ -180,7 +169,6 @@ public class FilteringProjectView extends GitProjectView
 						fExpandedElements = getCommonViewer().getExpandedElements();
 						hoveredItem = null;
 						setFilterText(text);
-						textChanged();
 					}
 				}
 			}
@@ -295,58 +283,11 @@ public class FilteringProjectView extends GitProjectView
 		};
 	}
 
-	private Composite createFocusComposite(Composite myComposite, Composite top)
+	@Override
+	protected void removeFilter()
 	{
-		Composite focus = new Composite(myComposite, SWT.BORDER);
-		focus.setLayout(new GridLayout(2, false));
-		FormData data2 = new FormData();
-		data2.top = new FormAttachment(top);
-		data2.right = new FormAttachment(100, 0);
-		data2.left = new FormAttachment(0, 0);
-		focus.setLayoutData(data2);
-
-		patternFilter = new PathFilter();
-		filterText = new Text(focus, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		filterText.setText(initialText);
-		filterText.addModifyListener(new ModifyListener()
-		{
-			/*
-			 * (non-Javadoc)
-			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
-			 */
-			public void modifyText(ModifyEvent e)
-			{
-				textChanged();
-			}
-		});
-
-		// if we're using a field with built in cancel we need to listen for
-		// default selection changes (which tell us the cancel button has been
-		// pressed)
-		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
-		{
-			filterText.addSelectionListener(new SelectionAdapter()
-			{
-				/*
-				 * (non-Javadoc)
-				 * @see
-				 * org.eclipse.swt.events.SelectionAdapter#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-				 */
-				public void widgetDefaultSelected(SelectionEvent e)
-				{
-					if (e.detail == SWT.ICON_CANCEL)
-						clearText();
-				}
-			});
-		}
-
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		// if the text widget supported cancel then it will have it's own
-		// integrated button. We can take all of the space.
-		if ((filterText.getStyle() & SWT.ICON_CANCEL) != 0)
-			gridData.horizontalSpan = 2;
-		filterText.setLayoutData(gridData);
-		return focus;
+		clearText();
+		super.removeFilter();
 	}
 
 	@Override
@@ -406,7 +347,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Restores the state of the receiver to the state described in the specified memento.
-	 * 
+	 *
 	 * @param memento
 	 *            the memento
 	 * @since 2.0
@@ -490,33 +431,20 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected void clearText()
 	{
-		setFilterText(initialText);
+		currentFilterText = ""; //$NON-NLS-1$
 		textChanged();
 	}
 
 	/**
 	 * Set the text in the filter control.
-	 * 
+	 *
 	 * @param string
 	 */
 	protected void setFilterText(String string)
 	{
-		if (filterText != null)
-		{
-			filterText.setText(string);
-			selectAll();
-		}
-	}
-
-	/**
-	 * Select all text in the filter text field.
-	 */
-	protected void selectAll()
-	{
-		if (filterText != null)
-		{
-			filterText.selectAll();
-		}
+		currentFilterText = string;
+		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] {currentFilterText}));
+		textChanged();
 	}
 
 	/**
@@ -533,8 +461,6 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected void textChanged()
 	{
-		narrowingDown = previousFilterText == null || getFilterString().startsWith(previousFilterText);
-		previousFilterText = getFilterString();
 		// cancel currently running job first, to prevent unnecessary redraw
 		if (refreshJob != null)
 		{
@@ -545,7 +471,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Return the time delay that should be used when scheduling the filter refresh job. Subclasses may override.
-	 * 
+	 *
 	 * @return a time delay in milliseconds before the job should run
 	 * @since 3.5
 	 */
@@ -570,7 +496,7 @@ public class FilteringProjectView extends GitProjectView
 					return Status.OK_STATUS;
 				}
 
-				boolean initial = initialText != null && initialText.equals(text);
+				boolean initial = currentFilterText == null || currentFilterText.equals(""); //$NON-NLS-1$
 				if (initial)
 				{
 					patternFilter.setPattern(null);
@@ -588,17 +514,14 @@ public class FilteringProjectView extends GitProjectView
 					// we are setting redraw(false) on the composite to avoid
 					// dancing scrollbar
 					redrawFalseControl.setRedraw(false);
-					if (!narrowingDown)
+					// collapse all
+					TreeItem[] is = getCommonViewer().getTree().getItems();
+					for (int i = 0; i < is.length; i++)
 					{
-						// collapse all
-						TreeItem[] is = getCommonViewer().getTree().getItems();
-						for (int i = 0; i < is.length; i++)
+						TreeItem item = is[i];
+						if (item.getExpanded())
 						{
-							TreeItem item = is[i];
-							if (item.getExpanded())
-							{
-								getCommonViewer().setExpandedState(item.getData(), false);
-							}
+							getCommonViewer().setExpandedState(item.getData(), false);
 						}
 					}
 					getCommonViewer().refresh(true);
@@ -651,7 +574,7 @@ public class FilteringProjectView extends GitProjectView
 
 			/**
 			 * Returns true if the job should be canceled (because of timeout or actual cancellation).
-			 * 
+			 *
 			 * @param items
 			 * @param monitor
 			 * @param cancelTime
@@ -697,7 +620,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected String getFilterString()
 	{
-		return filterText != null ? filterText.getText() : null;
+		return currentFilterText;
 	}
 
 	private String getResourceNameToFilterBy()
@@ -814,4 +737,5 @@ public class FilteringProjectView extends GitProjectView
 		}
 		return null;
 	}
+
 }
