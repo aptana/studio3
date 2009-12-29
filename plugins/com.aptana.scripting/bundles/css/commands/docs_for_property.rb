@@ -17,6 +17,7 @@ RadRails::Command.define_command("Documentation for Property") do |cmd|
     prop_name = /[-\w]*#{Regexp.escape cur_word}[-\w]*/.match(cur_line)[0]
 
     prop_url = CSS_PROPERTIES[prop_name]
+    prop_url = "" if prop_url.nil?
     url = "http://www.w3.org/TR/CSS2/" + prop_url
     "<meta http-equiv='Refresh' content='0;URL=#{url}'>"
   end
