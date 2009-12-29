@@ -22,11 +22,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
@@ -573,8 +571,7 @@ public class CommandExecutionUtils
 
 		if (end == start)
 			return null;
-
-		return line.substring(start, (end - start) + 1);
+		return line.substring(start, end);
 	}
 
 	@SuppressWarnings("unused")
