@@ -48,6 +48,13 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 public class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 {
+	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
+	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
+	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
+	private static final String STASH_ICON_PATH = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
+	private static final String UNSTASH_ICON_PATH = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
+	private static final String CHAGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
+
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
 
 	private Label leftLabel;
@@ -238,6 +245,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createFilterMenuItem(Menu menu)
 	{
 		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
+		gitFilter.setImage(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH));
 		gitFilter.setSelection(fChangedFilesFilter != null);
 		gitFilter.setText(Messages.GitProjectView_ChangedFilesFilterTooltip);
 		gitFilter.addSelectionListener(new SelectionAdapter()
@@ -250,7 +258,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					fChangedFilesFilter = new GitChangedFilesFilter();
 					getCommonViewer().addFilter(fChangedFilesFilter);
 					getCommonViewer().expandAll();
-					showFilterLabel(ExplorerPlugin.getImage("icons/full/elcl16/filter.png"), Messages.GitProjectView_ChangedFilesFilterTooltip); //$NON-NLS-1$
+					showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH), Messages.GitProjectView_ChangedFilesFilterTooltip);
 				}
 				else
 				{
@@ -321,7 +329,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createCommitMenuItem(Menu menu)
 	{
 		MenuItem commit = new MenuItem(menu, SWT.PUSH);
-		commit.setImage(ExplorerPlugin.getImage("icons/full/elcl16/disk.png")); //$NON-NLS-1$
+		commit.setImage(ExplorerPlugin.getImage(COMMIT_ICON_PATH));
 		commit.setText(Messages.GitProjectView_CommitTooltip);
 		commit.addSelectionListener(new SelectionAdapter()
 		{
@@ -339,7 +347,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createPushMenuItem(Menu menu)
 	{
 		MenuItem push = new MenuItem(menu, SWT.PUSH);
-		push.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_right.png")); //$NON-NLS-1$
+		push.setImage(ExplorerPlugin.getImage(PUSH_ICON_PATH));
 		push.setText(Messages.GitProjectView_PushTooltip);
 		push.addSelectionListener(new SelectionAdapter()
 		{
@@ -369,7 +377,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createPullMenuItem(Menu menu)
 	{
 		MenuItem pull = new MenuItem(menu, SWT.PUSH);
-		pull.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_left.png")); //$NON-NLS-1$
+		pull.setImage(ExplorerPlugin.getImage(PULL_ICON_PATH));
 		pull.setText(Messages.GitProjectView_PullTooltip);
 		pull.addSelectionListener(new SelectionAdapter()
 		{
@@ -398,7 +406,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createStashMenuItem(Menu menu)
 	{
 		MenuItem stash = new MenuItem(menu, SWT.PUSH);
-		stash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_down.png")); //$NON-NLS-1$
+		stash.setImage(ExplorerPlugin.getImage(STASH_ICON_PATH));
 		stash.setText(Messages.GitProjectView_StashTooltip);
 		stash.addSelectionListener(new SelectionAdapter()
 		{
@@ -428,7 +436,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createUnstashMenuItem(Menu menu)
 	{
 		MenuItem unstash = new MenuItem(menu, SWT.PUSH);
-		unstash.setImage(ExplorerPlugin.getImage("icons/full/elcl16/arrow_up.png")); //$NON-NLS-1$
+		unstash.setImage(ExplorerPlugin.getImage(UNSTASH_ICON_PATH));
 		unstash.setText(Messages.GitProjectView_UnstashTooltip);
 		unstash.addSelectionListener(new SelectionAdapter()
 		{
