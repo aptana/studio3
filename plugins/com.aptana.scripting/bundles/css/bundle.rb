@@ -23,7 +23,7 @@ END
 	  # command/snippet names must be unique within bundle and are case insensitive
 	  css_menu.command "Documentation for Property"
     css_menu.command "Validate Selected CSS"
-    css_menu.command "Show as HTML"
+    css_menu.command "Preview"
     # Separator
     css_menu.command "Insert Color..."
     # separator    
