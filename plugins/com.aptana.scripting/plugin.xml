@@ -33,6 +33,9 @@
       <file
             name="radrails/snippet">
       </file>
+      <file
+            name="radrails/context">
+      </file>
    </extension>
 
 </plugin>
