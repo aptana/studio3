@@ -333,7 +333,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isShellCommand()
 	{
-		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+		return (this.isSnippet() == false && this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
 	}
 	
 	/**
