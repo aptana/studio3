@@ -3,5 +3,5 @@ com.aptana.scripting.ScriptingEngine.instance.framework_files.each do |name|
   require name
 end
 
-# TEMP: for debugging
-RadRails::Logger.log_level = :trace
+# used for debugging
+#RadRails::Logger.log_level = :trace
