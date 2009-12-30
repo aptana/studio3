@@ -1,6 +1,6 @@
 require 'radrails'
  
-RadRails::Command.define_command("Format CSS Single-line") do |cmd|
+command "Format CSS Single-line" do |cmd|
   cmd.key_binding = [ :M1, :M2, :F ]
   cmd.output = :replace_selection
   cmd.input = :selection 

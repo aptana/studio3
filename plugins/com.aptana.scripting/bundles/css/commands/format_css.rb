@@ -1,6 +1,6 @@
 require 'radrails'
  
-RadRails::Command.define_command("Format CSS") do |cmd|
+command "Format CSS" do |cmd|
   cmd.key_binding = [ :M1, :M2, :F ]
   cmd.output = :replace_selection
   cmd.input = :selection 

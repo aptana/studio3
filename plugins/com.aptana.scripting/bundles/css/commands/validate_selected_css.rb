@@ -1,6 +1,6 @@
 require "radrails"
 
-RadRails::Command.define_command("Validate Selected CSS") do |cmd|
+command "Validate Selected CSS" do |cmd|
   cmd.key_binding = [ :M1, :shift, :V ] # TODO Get right keybinding
   cmd.output = :show_as_html
   #cmd.input = [:selection, :scope]

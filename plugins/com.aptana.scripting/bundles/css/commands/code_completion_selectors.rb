@@ -2,7 +2,7 @@ require 'radrails'
 require 'radrails/ui'
 require 'selectors'
 
-RadRails::Command.define_command("CodeCompletion CSS") do |cmd|
+command "CodeCompletion CSS" do |cmd|
   cmd.key_binding = [ "~" ] # FIXME Keybinding is incorrect
   cmd.output = :insert_as_snippet
   #cmd.input = [:selection, :line]

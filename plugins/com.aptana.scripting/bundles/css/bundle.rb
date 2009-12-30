@@ -2,8 +2,7 @@ require 'radrails'
 
 # its ruby, so this just adds commands/snippets in bundle (or replaces those with same name)
 # many ruby files could add to a single bundle
-RadRails.current_bundle do |bundle|
-  bundle.name = "CSS"
+bundle 'CSS' do |bundle|
   bundle.author = "Christopher Williams"
   bundle.copyright = <<END
 © Copyright 2009 Aptana Inc. Distributed under GPLv3 and Aptana Source license.

@@ -2,7 +2,7 @@ require 'radrails'
 require 'radrails/ui'
 require 'colors'
  
-RadRails::Command.define_command("Insert Color...") do |cmd|
+command "Insert Color..." do |cmd|
   cmd.key_binding = [ :M1, :M2, :C ]
   cmd.output = :replace_selection
   cmd.input = :selection 
