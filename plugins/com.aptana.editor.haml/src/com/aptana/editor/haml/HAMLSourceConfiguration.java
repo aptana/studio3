@@ -52,6 +52,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
@@ -67,10 +68,13 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String DOCTYPE = PREFIX + "doctype"; //$NON-NLS-1$
 	public final static String HAML_RUBY = PREFIX + "ruby"; //$NON-NLS-1$
+	public final static String OBJECT = PREFIX + "object"; //$NON-NLS-1$
+	public final static String ATTRIBUTE = PREFIX + "attribute"; //$NON-NLS-1$
 	public final static String HTML_COMMENT = PREFIX + "html_comment"; //$NON-NLS-1$
 	public final static String HAML_COMMENT = PREFIX + "haml_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, HAML_COMMENT, DOCTYPE, HAML_RUBY };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, HAML_COMMENT, DOCTYPE,
+			HAML_RUBY, OBJECT, ATTRIBUTE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IHAMLConstants.CONTENT_TYPE_HAML },
 			{ IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY } };
@@ -79,6 +83,8 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private RuleBasedScanner fCommentScanner;
 	private RuleBasedScanner fCodeScanner;
+	private RuleBasedScanner fRubyCommentScanner;
+	private RuleBasedScanner fDocTypeScanner;
 
 	private static HAMLSourceConfiguration instance;
 
@@ -100,18 +106,16 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				new EndOfLineRule("/", new Token(HTML_COMMENT)), //$NON-NLS-1$
 				new EndOfLineRule("-#", new Token(HAML_COMMENT)), //$NON-NLS-1$
 				new EndOfLineRule("!!!", new Token(DOCTYPE)), //$NON-NLS-1$
+				// String Interpolation
+				new SingleLineRule("#{", "}", ruby, '\\'), //$NON-NLS-1$ //$NON-NLS-2$				
 				// FIXME Not sure I'm setting up the language transition properly here
 				// Ruby Single-liners
-				new EndOfLineRule("=", ruby), //$NON-NLS-1$
-				new EndOfLineRule("-", ruby), //$NON-NLS-1$
-				new EndOfLineRule("~", ruby), //$NON-NLS-1$
-				// String Interpolation
-				new SingleLineRule("#{", "}", ruby, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				new SingleCharacterRule('=', ruby), new SingleCharacterRule('-', ruby),
+				new SingleCharacterRule('~', ruby),
 				// Object
-				new SingleLineRule("[", "]", ruby), //$NON-NLS-1$ //$NON-NLS-2$
+				new SingleCharacterRule('[', new Token(OBJECT)),
 				// Attributes
-				new SingleLineRule("{", "}", ruby), //$NON-NLS-1$ //$NON-NLS-2$
-		};
+				new SingleCharacterRule('{', new Token(ATTRIBUTE)) };
 	}
 
 	/*
@@ -185,9 +189,17 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getWordScanner());
+		dr = new DefaultDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, HTML_COMMENT);
 		reconciler.setRepairer(dr, HTML_COMMENT);
+
+		dr = new DefaultDamagerRepairer(getRubyCommentScanner());
+		reconciler.setDamager(dr, HAML_COMMENT);
+		reconciler.setRepairer(dr, HAML_COMMENT);
+
+		dr = new DefaultDamagerRepairer(getDocTypeScanner());
+		reconciler.setDamager(dr, DOCTYPE);
+		reconciler.setRepairer(dr, DOCTYPE);
 	}
 
 	protected ITokenScanner getCodeScanner()
@@ -199,7 +211,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return fCodeScanner;
 	}
 
-	protected ITokenScanner getWordScanner()
+	protected ITokenScanner getCommentScanner()
 	{
 		if (fCommentScanner == null)
 		{
@@ -207,6 +219,26 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			fCommentScanner.setDefaultReturnToken(getToken("comment.block.haml")); //$NON-NLS-1$
 		}
 		return fCommentScanner;
+	}
+
+	protected ITokenScanner getRubyCommentScanner()
+	{
+		if (fRubyCommentScanner == null)
+		{
+			fRubyCommentScanner = new RuleBasedScanner();
+			fRubyCommentScanner.setDefaultReturnToken(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
+		}
+		return fRubyCommentScanner;
+	}
+
+	protected ITokenScanner getDocTypeScanner()
+	{
+		if (fDocTypeScanner == null)
+		{
+			fDocTypeScanner = new RuleBasedScanner();
+			fDocTypeScanner.setDefaultReturnToken(getToken("meta.prolog.haml")); //$NON-NLS-1$
+		}
+		return fDocTypeScanner;
 	}
 
 	protected IToken getToken(String name)
