@@ -21,12 +21,15 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private String _trigger;
+	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
 	private InputType _inputType;
 	private OutputType _outputType;
+	private String _outputPath;
+	private String _workingDirectoryPath;
+	private WorkingDirectoryType _workingDirectoryType;
 	
 	/**
 	 * Snippet
@@ -39,6 +42,7 @@ public class CommandElement extends AbstractBundleElement
 		
 		this._inputType = InputType.UNDEFINED;
 		this._outputType = OutputType.UNDEFINED;
+		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
 	}
 
 	/**
@@ -53,7 +57,11 @@ public class CommandElement extends AbstractBundleElement
 		
 		if (this.isExecutable())
 		{
-			if (this.isShellCommand())
+			if (this.isSnippet())
+			{
+				resultText = this._invoke;
+			}
+			else if (this.isShellCommand())
 			{
 				resultText = this.invokeStringCommand();
 			}
@@ -157,6 +165,31 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
+	public String getOutput()
+	{
+		if (this._outputType == OutputType.OUTPUT_TO_FILE) {
+			return this._outputPath;
+		}
+		else {
+			return this._outputType.getName();
+		}
+	}
+
+	/**
+	 * getOutputPath
+	 *
+	 * @return
+	 */
+	public String getOutputPath()
+	{
+		return this._outputPath;
+	}
+
+	/**
+	 * getOutputType
+	 *
+	 * @return
+	 */
 	public String getOutputType()
 	{
 		return this._outputType.getName();
@@ -167,9 +200,33 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getTrigger()
+	public String[] getTriggers()
 	{
-		return this._trigger;
+		return this._triggers;
+	}
+
+	/**
+	 * getWorkingDirectory
+	 *
+	 * @return
+	 */
+	public String getWorkingDirectory()
+	{
+		switch (this._workingDirectoryType) {
+		case CURRENT_BUNDLE:
+			return new File(this.getPath()).getParentFile().toString();
+
+		case PATH:
+			return this._workingDirectoryPath;
+
+		// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
+		// can't implement these yet because they require us to hook into higher level functionality in the editor.common and explorer plugins. AAAARGH.
+		case UNDEFINED:
+		case CURRENT_PROJECT:
+		case CURRENT_FILE:
+		default:
+			return new File(this.getPath()).getParentFile().toString();
+		}
 	}
 
 	/**
@@ -204,10 +261,12 @@ public class CommandElement extends AbstractBundleElement
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 			{
+				// FIXME: should we be using the user's preferred shell instead of hardcoding?
 				commands.add("/bin/bash"); //$NON-NLS-1$
 			}
 			else
 			{
+				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
 				commands.add("cmd"); //$NON-NLS-1$
 			}
 			commands.add(tempFile.getAbsolutePath());
@@ -216,11 +275,10 @@ public class CommandElement extends AbstractBundleElement
 			builder.command(commands);
 			
 			// setup working directory
-			String path = this.getPath();
-			
+			String path = this.getWorkingDirectory();
 			if (path != null && path.length() > 0)
 			{
-				builder.directory(new File(this.getPath()).getParentFile());
+				builder.directory(new File(path));
 			}
 	
 			// run process and get output
@@ -290,6 +348,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * isSnippet
+	 * 
+	 * @return
+	 */
+	public boolean isSnippet()
+	{
+		return (this._inputType == InputType.NONE && this._outputType == OutputType.INSERT_AS_SNIPPET);
+	}
+	
+	/**
 	 * setInputType
 	 * 
 	 * @param input
@@ -340,7 +408,17 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
-	 * setOutput
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setOutputPath(String path)
+	{
+		this._outputPath = path;
+	}
+
+	/**
+	 * setOutputType
 	 * 
 	 * @param output
 	 */
@@ -366,30 +444,110 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setTrigger(String trigger)
 	{
-		this._trigger = trigger;
+		this._triggers = new String[] { trigger };
 	}
 	
+	/**
+	 * setTrigger
+	 * 
+	 * @param triggers
+	 */
+	public void setTrigger(String[] triggers)
+	{
+		this._triggers = triggers;
+	}
+	
+	/**
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setWorkingDirectoryPath(String path)
+	{
+		this._workingDirectoryPath = path;
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param workingDirectory
+	 */
+	public void setWorkingDirectoryType(String workingDirectory)
+	{
+		this._workingDirectoryType = WorkingDirectoryType.get(workingDirectory);
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param type
+	 */
+	public void setWorkingDirectoryType(WorkingDirectoryType type)
+	{
+		this._workingDirectoryType = type;
+	}
+
 	/**
 	 * toSource
 	 */
 	protected void toSource(SourcePrinter printer)
 	{
-		printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		// output command type
+		if (this.isSnippet())
+		{
+			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		else
+		{
+			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		
+		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		
+		// output invoke/expansion, if it is defined
 		if (this._invoke != null)
 		{
 			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
 		}
+		
+		// output invoke block, if it is defined
 		if (this._invokeBlock != null)
 		{
 			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
 		}
-		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
-		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
-		printer.printWithIndent("trigger: ").println(this.getTrigger()); //$NON-NLS-1$
 		
+		// output key binding, intput, and output settings
+		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
+		printer.printWithIndent("input: ").println(this._inputType.getName()); //$NON-NLS-1$
+		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
+		
+		// output a comma-delimited list of triggers, if any are defined
+		String[] triggers = this.getTriggers();
+		
+		if (triggers != null && triggers.length > 0)
+		{
+			boolean first = true;
+			
+			printer.printWithIndent("triggers: "); //$NON-NLS-1$
+			
+			for (String trigger : triggers)
+			{
+				if (first == false)
+				{
+					printer.print(", ");
+				}
+				
+				printer.print(trigger);
+				
+				first = false;
+			}
+			
+			printer.println();
+		}
+		
+		// close the element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }
