@@ -132,6 +132,12 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
+		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
+		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
+		addWordsToRule(wordRule2, PROPERTY_NAMES, "support.type.property-name.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
+		rules.add(wordRule2);
+		
 		// normal words
 		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
@@ -142,11 +148,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
 		rules.add(wordRule);
 
-		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
-		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
-		addWordsToRule(wordRule2, PROPERTY_NAMES, "support.type.property-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
-		rules.add(wordRule2);
+		
 
 		// letters and hyphens, ignore case
 		WordRule wordRule3 = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);

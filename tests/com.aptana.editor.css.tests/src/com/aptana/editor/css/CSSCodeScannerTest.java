@@ -44,6 +44,25 @@ public class CSSCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
+	
+	public void testSmallCaps()
+	{
+		String src = "small { font: small-caps; }";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("entity.name.tag.css"), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 6, 1);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("support.type.property-name.css"), 8, 4);
+		assertToken(getToken("punctuation.separator.key-value.css"), 12, 1);
+		assertToken(Token.WHITESPACE, 13, 1);
+		assertToken(getToken("support.constant.property-value.css"), 14, 10);
+		assertToken(getToken("punctuation.terminator.rule.css"), 24, 1);
+		assertToken(Token.WHITESPACE, 25, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
+	}
 
 	public void testBasicTokenizing()
 	{
