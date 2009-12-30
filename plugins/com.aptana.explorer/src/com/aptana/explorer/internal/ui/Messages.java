@@ -6,9 +6,10 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.explorer.internal.ui.messages"; //$NON-NLS-1$
 
+	public static String FilteringProjectView_LBL_FilteringFor;
+
 	public static String GitProjectView_AttachGitRepo_button;
 	public static String GitProjectView_AttachGitRepo_jobTitle;
-	public static String GitProjectView_BranchAhead_msg;
 	public static String GitProjectView_BranchAlreadyExistsMessage;
 	public static String GitProjectView_ChangedFilesFilterTooltip;
 	public static String GitProjectView_Collapse_tooltip;
@@ -17,23 +18,31 @@ public class Messages extends NLS
 	public static String GitProjectView_CreateBranchDialog_Title;
 	public static String GitProjectView_createNewBranchOption;
 	public static String GitProjectView_Expand_tooltip;
-	public static String GitProjectView_FileCounts;
-	public static String GitProjectView_FileCountsLabel;
 	public static String GitProjectView_InitialFileFilterText;
 	public static String GitProjectView_InvalidBranchNameMessage;
+	public static String GitProjectView_LBL_ShowGitHubNetwork;
 	public static String GitProjectView_NonEmptyBranchNameMessage;
 	public static String GitProjectView_NoWhitespaceBranchNameMessage;
 	public static String GitProjectView_PullJobTitle;
 	public static String GitProjectView_PullTooltip;
 	public static String GitProjectView_PushJobTitle;
 	public static String GitProjectView_PushTooltip;
+	public static String GitProjectView_ShowGitHubNetworkJobTitle;
 	public static String GitProjectView_StashJobTitle;
 	public static String GitProjectView_StashTooltip;
+
+	public static String GitProjectView_SwitchToBranch;
 	public static String GitProjectView_UnresolvedMerges_msg;
 	public static String GitProjectView_UnstashJobTitle;
 	public static String GitProjectView_UnstashTooltip;
 
+	public static String SingleProjectView_CaseSensitive;
+
 	public static String SingleProjectView_RefreshJob_title;
+
+	public static String SingleProjectView_RegularExpression;
+
+	public static String SingleProjectView_SwitchToApplication;
 	static
 	{
 		// initialize resource bundle

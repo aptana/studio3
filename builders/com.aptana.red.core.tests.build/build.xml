@@ -77,10 +77,10 @@
 		<delete dir="${baseLocation}" />
 		<delete dir="${buildDirectory}/features/org.eclipse.pde.build.container.feature" failonerror="false" />
 		<delete dir="${p2.repo.dir}" failonerror="false" />
-		<!-- Do a git checkout -f of the build directory -->
+		<!-- Do a git clean of the build directory -->
 		<exec executable="/bin/bash" dir="${buildDirectory}">
 			<arg value="-c" />
-			<arg value="${git.executable} checkout -f" />
+			<arg value="${git.executable} clean -f -d -x" />
 		</exec>
 		<delete file="build.properties" failonerror="false" />
 	</target>
