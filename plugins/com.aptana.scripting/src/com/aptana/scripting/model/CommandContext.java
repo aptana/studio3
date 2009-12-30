@@ -8,17 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jruby.Ruby;
-import org.jruby.RubyIO;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.jruby.RubyIO;
 
 import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingEngine;
 
 public class CommandContext
 {
@@ -32,15 +31,13 @@ public class CommandContext
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-	private String _input;
-	private InputStream _inputStream;
-	private Map<String,String> _environment;
-	private Ruby runtime;
 	
 	private static ContextContributor[] contextContributors;
-
-	private Map<String,Object> _map;
 	
+	private Map<String,Object> _map;
+	private InputStream _inputStream;
+	//private Ruby _runtime;
+
 	/**
 	 * getContextContributors
 	 * 
@@ -96,7 +93,6 @@ public class CommandContext
 		return contextContributors;
 	}
 	
-	
 	/**
 	 * CommandContext
 	 */
@@ -133,13 +129,47 @@ public class CommandContext
 	}
 	
 	/**
+	 * Return ENV map.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, String> getEnvironmentMap()
+	{
+		return (Map<String, String>) this._map.get(ENV);
+	}
+	
+	/**
+	 * getInputStream
+	 * 
+	 * @return
+	 */
+	public InputStream getInputStream()
+	{
+		return this._inputStream;
+	}
+
+	/**
 	 * getMap
 	 * 
 	 * @return
 	 */
-	Map<String,Object> getMap()
+	public Map<String,Object> getMap()
 	{
 		return this._map;
+	}
+
+	/**
+	 * in
+	 * 
+	 * @return
+	 */
+	public RubyIO in()
+	{
+		return new RubyIO(
+			ScriptingEngine.getInstance().getScriptingContainer().getRuntime(),
+			this.getInputStream()
+		);
 	}
 	
 	/**
@@ -152,18 +182,7 @@ public class CommandContext
 	{
 		this._map.put(key, value);
 	}
-
-	/**
-	 * Return ENV map.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getEnvironmentMap()
-	{
-		return (Map<String, String>) this._map.get(ENV);
-	}
-
+	
 	/**
 	 * Set the value of environment variable.
 	 * 
@@ -191,32 +210,12 @@ public class CommandContext
 			}
 		}
 	}
-	
-	/**
-	 * getInputStream
-	 * 
-	 * @return
-	 */
-	public InputStream getInputStream()
-	{
-		return this._inputStream;
-	}
-	
+
 	/**
 	 * @param inputStream
 	 */
 	public void setInputStream(InputStream inputStream)
 	{
-		_inputStream = inputStream;
-	}
-
-	void setRuntime(Ruby runtime)
-	{
-		this.runtime = runtime;		
-	}
-	
-	public RubyIO in()
-	{
-		return new RubyIO(runtime, getInputStream());
+		this._inputStream = inputStream;
 	}
 }
