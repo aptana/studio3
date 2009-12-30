@@ -5,6 +5,7 @@ import com.aptana.util.StringUtil;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
+	private static final String ALL_SCOPES = "all"; //$NON-NLS-1$
 	private String _scope;
 	private ScopeSelector _scopeSelector;
 	
@@ -64,7 +65,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	public boolean matches(String scope)
 	{
 		ScopeSelector selector = this.getScopeSelector();
-		boolean result = false;
+		boolean result = true;
 		
 		if (selector != null)
 		{
@@ -83,7 +84,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	public boolean matches(String[] scopes)
 	{
 		ScopeSelector selector = this.getScopeSelector();
-		boolean result = false;
+		boolean result = true;
 		
 		if (selector != null)
 		{
@@ -110,6 +111,14 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public void setScope(String scope)
 	{
+		// NOTE: If a scope selector is null, then we match
+		// any scope. We convert "all" to null since they
+		// are equivalent
+		if (scope != null && scope.equals(ALL_SCOPES))
+		{
+			scope = null;
+		}
+		
 		if (StringUtil.areNotEqual(this._scope, scope))
 		{
 			this._scope = scope;
