@@ -12,9 +12,9 @@
    </extension>
    <extension
          point="com.aptana.scripting.loadPaths">
-      <loadpath
+      <loadPath
             path="framework/">
-      </loadpath>
+      </loadPath>
    </extension>
    <extension
          point="com.aptana.scripting.frameworkFiles">

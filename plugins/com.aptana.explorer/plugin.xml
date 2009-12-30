@@ -55,7 +55,7 @@
          point="com.aptana.scripting.contextContributors">
       <contributor
             class="com.aptana.explorer.ExplorerContextContributor"
-            name="Current Project Dir Contributors">
+            name="Active Project Info Contributors">
       </contributor>
    </extension>
 </plugin>

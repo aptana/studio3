@@ -25,7 +25,7 @@ public class CommandContext
 	public static final String ACTIVE_PROJECT_NAME = "ACTIVE_PROJECT_NAME"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_FOLDER = "ACTIVE_PROJECT_FOLDER"; //$NON-NLS-1$
 
-	private static final String CONTEXT_CONTRIBUTOR_ID = "context_contributor"; //$NON-NLS-1$
+	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 	
