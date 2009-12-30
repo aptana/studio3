@@ -90,7 +90,28 @@ public class CommandElement extends AbstractBundleElement
 			}
 			else if (this.isBlockCommand())
 			{
-				resultText = invokeBlockCommand(context);
+				Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+				ThreadContext threadContext = runtime.getCurrentContext();
+				
+				try
+				{
+					IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
+					context.setRuntime(runtime); // so that we can return a RubyIO to ruby code by wrapping the input stream
+					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] {obj});	
+					if (result != null)
+					{
+						resultText = result.asString().asJavaString();
+					}
+				}
+				catch (Exception e)
+				{
+					String message = MessageFormat.format(
+						Messages.CommandElement_Error_Processing_Command_Block,
+						new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
+					);
+					
+					ScriptLogger.logError(message);
+				}
 			}
 		}
 		

@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
 import com.aptana.editor.common.internal.peer.PeerTests;
+import com.aptana.editor.common.scripting.snippets.SnippetsTests;
 import com.aptana.editor.common.text.rules.RulesTests;
 import com.aptana.editor.common.theme.ThemeTests;
 
@@ -19,6 +20,7 @@ public class AllTests
 		suite.addTest(PeerTests.suite());
 		suite.addTest(RulesTests.suite());
 		suite.addTest(ThemeTests.suite());
+		suite.addTest(SnippetsTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

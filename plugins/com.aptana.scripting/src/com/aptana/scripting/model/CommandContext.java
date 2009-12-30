@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jruby.Ruby;
+import org.jruby.RubyIO;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -28,6 +31,10 @@ public class CommandContext
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+	private String _input;
+	private InputStream _inputStream;
+	private Map<String,String> _environment;
+	private Ruby runtime;
 	
 	private static ContextContributor[] contextContributors;
 
@@ -151,7 +158,7 @@ public class CommandContext
 	 * @param variableName
 	 * @return
 	 */
-	public String getEnvironment(String variableName)
+	public Map<String,String> getEnvironment()
 	{
 		Map<String, String> map = this.getEnvironmentMap();
 		String result = null;
@@ -201,5 +208,15 @@ public class CommandContext
 				}
 			}
 		}
+	}
+
+	void setRuntime(Ruby runtime)
+	{
+		this.runtime = runtime;		
+	}
+	
+	public RubyIO in()
+	{
+		return new RubyIO(runtime, getInputStream());
 	}
 }

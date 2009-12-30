@@ -171,6 +171,8 @@ module RadRails
         end
 
 		    dialog = com.aptana.scripting.MenuDialog.new(shell, options.to_java("java.util.Map"))
+		    # TODO set selection to first item
+		    # TODO Open to caret, not mouse?
 		    index = dialog.open
         return return_hash ? options[index] : index
       end
