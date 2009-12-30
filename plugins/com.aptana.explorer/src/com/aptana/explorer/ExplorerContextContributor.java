@@ -37,8 +37,8 @@ public class ExplorerContextContributor implements
 		}
 		else
 		{
-			context.put(CommandContext.ACTIVE_PROJECT_NAME, activeProjectName);
-			context.put(CommandContext.ACTIVE_PROJECT_FOLDER, project.getLocation().toOSString());
+			context.put(CommandContext.ACTIVE_PROJECT_NAME.toLowerCase(), activeProjectName);
+			context.put(CommandContext.ACTIVE_PROJECT_FOLDER.toLowerCase(), project.getLocation().toOSString());
 		}
 	}
 
