@@ -13,6 +13,7 @@ import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
+import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -72,8 +73,9 @@ public class CommandElement extends AbstractBundleElement
 				
 				try
 				{
-					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[0]);
-					
+					IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
+					context.setRuntime(runtime); // so that we can return a RubyIO to ruby code by wrapping the input stream
+					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] {obj});	
 					if (result != null)
 					{
 						resultText = result.asString().asJavaString();
