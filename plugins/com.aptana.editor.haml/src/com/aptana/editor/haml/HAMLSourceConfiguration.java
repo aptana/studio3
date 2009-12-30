@@ -38,173 +38,184 @@ package com.aptana.editor.haml;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.ISubPartitionScanner;
-import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.common.theme.ThemeUtil;
-import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.ruby.IRubyConstants;
+import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
+ * @author Chris Williams
  * @author Max Stepanov
- *
  */
-public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
-	
-	public final static String PREFIX = "__html_"; //$NON-NLS-1$
-	public final static String DEFAULT = "__html" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String HTML_COMMENT = "__html_comment"; //$NON-NLS-1$
-	public final static String CDATA = "__html_cdata"; //$NON-NLS-1$
-	public final static String HTML_DOCTYPE = "__html_doctype"; //$NON-NLS-1$
-	public final static String HTML_SCRIPT = "__html_script"; //$NON-NLS-1$
-	public final static String HTML_STYLE = "__html_style"; //$NON-NLS-1$
-	public final static String HTML_TAG = "__html_tag"; //$NON-NLS-1$
+public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
+{
 
-	protected static final String[] CONTENT_TYPES = new String[] {
-		DEFAULT,
-		HTML_COMMENT,
-		CDATA,
-		HTML_DOCTYPE,
-		HTML_SCRIPT,
-		HTML_STYLE,
-		HTML_TAG
-	};
+	public final static String PREFIX = "__haml_"; //$NON-NLS-1$
+	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
+	public final static String DOCTYPE = PREFIX + "doctype"; //$NON-NLS-1$
+	public final static String HAML_RUBY = PREFIX + "ruby"; //$NON-NLS-1$
+	public final static String HTML_COMMENT = PREFIX + "html_comment"; //$NON-NLS-1$
+	public final static String HAML_COMMENT = PREFIX + "haml_comment"; //$NON-NLS-1$
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new MultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
-			new DocTypeRule(new Token(CDATA)),
-			new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
-			new TagRule("script", new Token(HTML_SCRIPT)), //$NON-NLS-1$
-			new TagRule("style", new Token(HTML_STYLE)), //$NON-NLS-1$
-			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
-			new TagRule(new Token(HTML_TAG)),
-	};
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, HAML_COMMENT, DOCTYPE, HAML_RUBY };
 
-	private HTMLScanner htmlScanner;
-	private HTMLTagScanner tagScanner;
-	private RuleBasedScanner cdataScanner;
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IHAMLConstants.CONTENT_TYPE_HAML },
+			{ IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY } };
+
+	private IPredicateRule[] partitioningRules;
+
+	private RuleBasedScanner fCommentScanner;
+	private RuleBasedScanner fCodeScanner;
 
 	private static HAMLSourceConfiguration instance;
-	
-	public static HAMLSourceConfiguration getDefault() {
-		if (instance == null) {
+
+	public static HAMLSourceConfiguration getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new HAMLSourceConfiguration();
 		}
 		return instance;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
-	 */
-	public String[] getContentTypes() {
-		return TextUtils.combine(new String[][] {
-				CONTENT_TYPES,
-				JSSourceConfiguration.CONTENT_TYPES,
-				CSSSourceConfiguration.CONTENT_TYPES
-		});
+	private HAMLSourceConfiguration()
+	{
+		IToken ruby = new Token(HAML_RUBY);
+		partitioningRules = new IPredicateRule[] {
+				// FIXME What about indented text getting wrapped too?
+				// FIXME These have to occur at beginning of line (only can be preceded by spaces!)
+				new EndOfLineRule("/", new Token(HTML_COMMENT)), //$NON-NLS-1$
+				new EndOfLineRule("-#", new Token(HAML_COMMENT)), //$NON-NLS-1$
+				new EndOfLineRule("!!!", new Token(DOCTYPE)), //$NON-NLS-1$
+				// FIXME Not sure I'm setting up the language transition properly here
+				// Ruby Single-liners
+				new EndOfLineRule("=", ruby), //$NON-NLS-1$
+				new EndOfLineRule("-", ruby), //$NON-NLS-1$
+				new EndOfLineRule("~", ruby), //$NON-NLS-1$
+				// String Interpolation
+				new SingleLineRule("#{", "}", ruby, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+				// Object
+				new SingleLineRule("[", "]", ruby), //$NON-NLS-1$ //$NON-NLS-2$
+				// Attributes
+				new SingleLineRule("{", "}", ruby), //$NON-NLS-1$ //$NON-NLS-2$
+		};
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
+	 */
+	public String[] getContentTypes()
+	{
+		return TextUtils.combine(new String[][] { CONTENT_TYPES, RubySourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes()
+	{
+		return TOP_CONTENT_TYPES;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules() {
+	public IPredicateRule[] getPartitioningRules()
+	{
 		return partitioningRules;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner() {
-		return new HTMLSubPartitionScanner();
+	public ISubPartitionScanner createSubPartitionScanner()
+	{
+		return new HAMLSubPartitionScanner();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType) {
-		if (contentType.startsWith(PREFIX)) {
-			return IHTMLConstants.CONTENT_TYPE_HTML;
+	public String getDocumentContentType(String contentType)
+	{
+		if (contentType.startsWith(PREFIX))
+		{
+			return IHAMLConstants.CONTENT_TYPE_HAML;
 		}
-		String result = JSSourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null) {
-			return result;
-		}
-		result = CSSSourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null) {
+		String result = RubySourceConfiguration.getDefault().getDocumentContentType(contentType);
+		if (result != null)
+		{
 			return result;
 		}
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation.PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
+	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
-		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
+	{
+		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getHTMLScanner());
+		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
-		reconciler.setRepairer(dr, DEFAULT);	
+		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getHTMLTagScanner());		
-		reconciler.setDamager(dr, HAMLSourceConfiguration.HTML_SCRIPT);
-		reconciler.setRepairer(dr, HAMLSourceConfiguration.HTML_SCRIPT);
-		
-		reconciler.setDamager(dr, HAMLSourceConfiguration.HTML_STYLE);
-		reconciler.setRepairer(dr, HAMLSourceConfiguration.HTML_STYLE);
-		
-		reconciler.setDamager(dr, HAMLSourceConfiguration.HTML_TAG);
-		reconciler.setRepairer(dr, HAMLSourceConfiguration.HTML_TAG);
-		
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("comment.block.html")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, HAMLSourceConfiguration.HTML_COMMENT);
-		reconciler.setRepairer(ndr, HAMLSourceConfiguration.HTML_COMMENT);
-		
-		 ndr = new NonRuleBasedDamagerRepairer(ThemeUtil.getToken("meta.tag.sgml.doctype")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, HAMLSourceConfiguration.HTML_DOCTYPE);
-		reconciler.setRepairer(ndr, HAMLSourceConfiguration.HTML_DOCTYPE);
-		
-		dr = new DefaultDamagerRepairer(getCDATAScanner());
-		reconciler.setDamager(dr, CDATA);
-		reconciler.setRepairer(dr, CDATA);
-		
+		dr = new DefaultDamagerRepairer(getWordScanner());
+		reconciler.setDamager(dr, HTML_COMMENT);
+		reconciler.setRepairer(dr, HTML_COMMENT);
 	}
 
-	protected ITokenScanner getHTMLScanner() {
-		if (htmlScanner == null) {
-			htmlScanner = new HTMLScanner();
-		}
-		return htmlScanner;
-	}
-	
-	private ITokenScanner getCDATAScanner()
+	protected ITokenScanner getCodeScanner()
 	{
-		if (cdataScanner == null)
+		if (fCodeScanner == null)
 		{
-			cdataScanner = new RuleBasedScanner();
-			cdataScanner.setDefaultReturnToken(ThemeUtil.getToken("string.unquoted.cdata.xml")); //$NON-NLS-1$
+			fCodeScanner = new HAMLScanner();
 		}
-		return cdataScanner;
-	}
-	
-	protected ITokenScanner getHTMLTagScanner() {
-		if (tagScanner == null) {
-			tagScanner = new HTMLTagScanner();
-		}
-		return tagScanner;
+		return fCodeScanner;
 	}
 
+	protected ITokenScanner getWordScanner()
+	{
+		if (fCommentScanner == null)
+		{
+			fCommentScanner = new RuleBasedScanner();
+			fCommentScanner.setDefaultReturnToken(getToken("comment.block.haml")); //$NON-NLS-1$
+		}
+		return fCommentScanner;
+	}
+
+	protected IToken getToken(String name)
+	{
+		return getThemeManager().getToken(name);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
 }

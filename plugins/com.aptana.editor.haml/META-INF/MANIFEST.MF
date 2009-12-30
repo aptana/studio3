@@ -1,13 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Haml
-Bundle-SymbolicName: com.aptana.editor.haml
+Bundle-SymbolicName: com.aptana.editor.haml;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.haml.Activator
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.common;bundle-version="1.0.0",
  org.eclipse.jface.text;bundle-version="3.4.0",
- com.aptana.editor.ruby;bundle-version="1.0.0"
+ com.aptana.editor.ruby;bundle-version="1.0.0",
+ org.eclipse.ui.editors;bundle-version="3.4.0",
+ org.eclipse.jface;bundle-version="3.4.0",
+ org.eclipse.ui.workbench;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

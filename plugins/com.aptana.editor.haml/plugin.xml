@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.haml.HAMLEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            extensions="haml"
+            icon="icons/haml.png"
+            id="com.aptana.editor.haml"
+            name="%editor.haml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.haml">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="haml"
+            id="com.aptana.contenttype.haml"
+            name="%content-type.haml.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>
