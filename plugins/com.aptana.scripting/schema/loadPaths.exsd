@@ -51,6 +51,11 @@
    </element>
 
    <element name="loadPath">
+      <annotation>
+         <documentation>
+            A resource path that will be used as a load path for JRuby
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string">
             <annotation>
