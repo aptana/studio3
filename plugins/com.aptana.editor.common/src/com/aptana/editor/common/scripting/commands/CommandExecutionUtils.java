@@ -316,9 +316,32 @@ public class CommandExecutionUtils
 			filterInputProvider = new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
 			break;
 		}
-		
-		Map<String, String> computeEnvironment = computeEnvironment(textEditor);
-		CommandContext commandContext = new CommandContext(filterInputProvider.getInputStream(), computeEnvironment);
+
+		// Create command context
+		CommandContext commandContext = command.createCommandContext();
+
+		// Set input stream
+		commandContext.setInputStream(filterInputProvider.getInputStream());
+
+		if (command.isShellCommand())
+		{
+			Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
+			if (computedEnvironmentMap != null)
+			{
+				Map<String, String> environmentMap = commandContext.getEnvironmentMap();
+				if (environmentMap == null)
+				{
+					// missing. re-add it
+					commandContext.put(CommandContext.ENV, computedEnvironmentMap);
+				}
+				else
+				{
+					// augment it
+					environmentMap.putAll(computedEnvironmentMap);
+				}
+			}
+		}
+
 		return command.execute(commandContext);
 	}
 

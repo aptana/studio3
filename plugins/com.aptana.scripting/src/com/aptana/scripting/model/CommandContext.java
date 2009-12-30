@@ -1,5 +1,6 @@
 package com.aptana.scripting.model;
 
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,25 +154,6 @@ public class CommandContext
 	}
 
 	/**
-	 * Return the value of environment variable.
-	 *
-	 * @param variableName
-	 * @return
-	 */
-	public Map<String,String> getEnvironment()
-	{
-		Map<String, String> map = this.getEnvironmentMap();
-		String result = null;
-		
-		if (map != null)
-		{
-			result = map.get(variableName);
-		}
-		
-		return result;
-	}
-
-	/**
 	 * Return ENV map.
 	 * 
 	 * @return
@@ -208,6 +190,24 @@ public class CommandContext
 				}
 			}
 		}
+	}
+	
+	/**
+	 * getInputStream
+	 * 
+	 * @return
+	 */
+	public InputStream getInputStream()
+	{
+		return this._inputStream;
+	}
+	
+	/**
+	 * @param inputStream
+	 */
+	public void setInputStream(InputStream inputStream)
+	{
+		_inputStream = inputStream;
 	}
 
 	void setRuntime(Ruby runtime)
