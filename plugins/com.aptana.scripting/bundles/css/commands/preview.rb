@@ -1,5 +1,5 @@
 require "radrails"
-require 'css'
+require 'preview_generator'
  
 RadRails::Command.define_command("Preview") do |cmd|
   cmd.key_binding = [ :M1, :M2, :P ]
