@@ -22,8 +22,6 @@ public class SnippetConverter
 		File file = new File("/Users/cwilliams/repos/red_core/plugins/com.aptana.scripting/bundles/css/snippets");
 		File[] plistFiles = file.listFiles(new FilenameFilter()
 		{
-
-			@Override
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith("plist");
