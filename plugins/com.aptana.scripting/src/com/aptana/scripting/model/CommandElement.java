@@ -170,10 +170,12 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public String getOutput()
 	{
-		if (this._outputType == OutputType.OUTPUT_TO_FILE) {
+		if (this._outputType == OutputType.OUTPUT_TO_FILE)
+		{
 			return this._outputPath;
 		}
-		else {
+		else
+		{
 			return this._outputType.getName();
 		}
 	}
@@ -250,25 +252,27 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getWorkingDirectory
-	 *
+	 * 
 	 * @return
 	 */
 	public String getWorkingDirectory()
 	{
-		switch (this._workingDirectoryType) {
-		case CURRENT_BUNDLE:
-			return new File(this.getPath()).getParentFile().toString();
+		switch (this._workingDirectoryType)
+		{
+			case CURRENT_BUNDLE:
+				return new File(this.getPath()).getParentFile().toString();
 
-		case PATH:
-			return this._workingDirectoryPath;
+			case PATH:
+				return this._workingDirectoryPath;
 
-		// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-		// can't implement these yet because they require us to hook into higher level functionality in the editor.common and explorer plugins. AAAARGH.
-		case UNDEFINED:
-		case CURRENT_PROJECT:
-		case CURRENT_FILE:
-		default:
-			return new File(this.getPath()).getParentFile().toString();
+				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
+				// can't implement these yet because they require us to hook into higher level functionality in the
+				// editor.common and explorer plugins. AAAARGH.
+			case UNDEFINED:
+			case CURRENT_PROJECT:
+			case CURRENT_FILE:
+			default:
+				return new File(this.getPath()).getParentFile().toString();
 		}
 	}
 
