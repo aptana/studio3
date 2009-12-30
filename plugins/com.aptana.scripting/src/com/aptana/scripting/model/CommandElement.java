@@ -6,14 +6,14 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
+import org.jruby.RubyClass;
+import org.jruby.RubyModule;
 import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
@@ -80,38 +80,13 @@ public class CommandElement extends AbstractBundleElement
 		
 		if (this.isExecutable())
 		{
-			if (this.isSnippet())
-			{
-				resultText = this._invoke;
-			}
-			else if (this.isShellCommand())
+			if (this.isShellCommand())
 			{
 				resultText = this.invokeStringCommand(context);
 			}
 			else if (this.isBlockCommand())
 			{
-				Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-				ThreadContext threadContext = runtime.getCurrentContext();
-				
-				try
-				{
-					IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
-					context.setRuntime(runtime); // so that we can return a RubyIO to ruby code by wrapping the input stream
-					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] {obj});	
-					if (result != null)
-					{
-						resultText = result.asString().asJavaString();
-					}
-				}
-				catch (Exception e)
-				{
-					String message = MessageFormat.format(
-						Messages.CommandElement_Error_Processing_Command_Block,
-						new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-					);
-					
-					ScriptLogger.logError(message);
-				}
+				resultText = this.invokeBlockCommand(context);
 			}
 		}
 		
@@ -244,13 +219,19 @@ public class CommandElement extends AbstractBundleElement
 		String resultText = ""; //$NON-NLS-1$
 		
 		// grab map from context and make it unmodifiable
-		Map<String,Object> map = Collections.unmodifiableMap(context.getMap());
+		//Map<String,Object> map = Collections.unmodifiableMap(context.getMap());
 		
 		try
 		{
+			RubyModule radrails = runtime.getModule("RadRails");
+			RubyClass rclass = radrails.getClass("Context");
+			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
+			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
+			
 			IRubyObject result = this._invokeBlock.call(
 				threadContext,
-				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, map) }
+//				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, obj) }
+				new IRubyObject[] { rubyContext }
 			);
 			
 			if (result != null)
@@ -412,17 +393,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isShellCommand()
 	{
-		return (this.isSnippet() == false && this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
-	}
-	
-	/**
-	 * isSnippet
-	 * 
-	 * @return
-	 */
-	public boolean isSnippet()
-	{
-		return (this._inputType == InputType.NONE && this._outputType == OutputType.INSERT_AS_SNIPPET);
+		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
 	}
 	
 	/**
@@ -561,13 +532,13 @@ public class CommandElement extends AbstractBundleElement
 	protected void toSource(SourcePrinter printer)
 	{
 		// output command type
-		if (this.isSnippet())
+		if (this instanceof CommandElement)
 		{
-			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else
 		{
-			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		// output path and scope
