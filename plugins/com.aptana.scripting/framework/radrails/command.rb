@@ -117,3 +117,9 @@ module RadRails
   end
   
 end
+
+# define top-level convenience methods
+
+def command(name, &block)
+  RadRails::Command.define_command(name, &block)
+end

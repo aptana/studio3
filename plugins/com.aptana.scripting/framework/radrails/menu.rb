@@ -83,3 +83,9 @@ module RadRails
   end
   
 end
+
+# define top-level convenience methods
+
+def menu(name, &block)
+  RadRails::Menu.define_menu(name, &block)
+end
