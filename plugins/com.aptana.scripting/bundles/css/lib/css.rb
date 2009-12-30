@@ -148,20 +148,18 @@ def tag_preview(selector_list)
 EOT
 end
 
-def preview_css(str)
-  orig_css = str.clone
-  orig_css.gsub!(/<entity\.name\.tag\.wildcard\.css>\*<\/entity\.name\.tag\.wildcard\.css>/, '.__star_wrap')
-  orig_css.gsub!(/<entity\.name\.tag\.css>body<\/entity\.name\.tag\.css>/, '.__body_wrap')
-  orig_css.gsub!(/<entity\.name\.tag\.css>html<\/entity\.name\.tag\.css>/, '.__html_wrap')
+def preview_css(str, env = {})
+  orig_css = str.clone  
+  orig_css.gsub!(/\b\*\b/, '.__star_wrap')
+  orig_css.gsub!(/\bbody\b/, '.__body_wrap')
+  orig_css.gsub!(/\bhtml\b/, '.__html_wrap')
 
   orig_css.gsub!(/<.+?>/, '')
   orig_css.gsub!(/&lt;\/?style\b.*?&gt;/m, '')
   orig_css.strip!
 
-  #meta.selector.css -> wraps the selector
-  #meta.property-list.css -> wraps the properties
-  rules = str.scan(/<meta\.selector\.css>\s*(.+?)\s*<\/meta\.selector\.css>.*?<meta\.property-list\.css>(.+?)<\/meta\.property-list\.css>/m)
-
+  rules = str.scan(/\s*(.+?)\s*{\s*(.+?)\s*}/m)
+  
   html = ''
   css = ''
   rule_num = 0
@@ -171,7 +169,7 @@ def preview_css(str)
     styles = rule[1].gsub(/<.+?>/, '')
     styles.gsub!(/^\s*\{\n*/m, '')
     styles.gsub!(/\s*\}\s*$/m, '')
-    styles.gsub!(/\t/, ' ' * ENV['TM_TAB_SIZE'].to_i)
+    styles.gsub!(/\t/, ' ' * env['TM_TAB_SIZE'].to_i)
     selectors = selector.split(/\s*,\s*/m)
     selectors.each do | single_selector |
       rule_num += 1
@@ -183,7 +181,7 @@ def preview_css(str)
 
   filename = ENV['TM_FILENAME'] || 'untitled'
   base = ''
-  base = "<base href=\"file://#{ENV['TM_FILEPATH']}\" />" if ENV['TM_FILEPATH']
+  base = "<base href=\"file://#{env['TM_FILEPATH']}\" />" if env['TM_FILEPATH']
 
   return <<EOT
 <?xml version="1.0" encoding="utf-8"?>
