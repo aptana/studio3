@@ -3,6 +3,7 @@ package com.aptana.scripting.model;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,13 @@ import com.aptana.scripting.Activator;
 
 public class CommandContext
 {
+	// Key names for well known keys in the map
+	public static final String ENV = "ENV"; //$NON-NLS-1$
+	public static final String WORKING_DIRECTORY = "ACTIVE_PROJECT_FOLDER"; //$NON-NLS-1$
+
+	public static final String ACTIVE_PROJECT_NAME = "ACTIVE_PROJECT_NAME"; //$NON-NLS-1$
+	public static final String ACTIVE_PROJECT_FOLDER = "ACTIVE_PROJECT_FOLDER"; //$NON-NLS-1$
+
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
@@ -88,6 +96,15 @@ public class CommandContext
 	{
 		this._map = new HashMap<String,Object>();
 		
+		if (command.isShellCommand())
+		{
+			Map<String, String> envMap = new LinkedHashMap<String, String>();
+			// Inherit the environment from parent
+			envMap.putAll(new ProcessBuilder().environment());
+			// Install default environment
+			this._map.put(ENV, envMap);
+		}
+
 		for (ContextContributor contributor : getContextContributors())
 		{
 			contributor.modifyContext(command, this);
@@ -124,5 +141,57 @@ public class CommandContext
 	public void put(String key, Object value)
 	{
 		this._map.put(key, value);
+	}
+
+	/**
+	 * Return the value of environment variable.
+	 *
+	 * @param envVariableName
+	 * @return
+	 */
+	public String getEnv(String envVariableName)
+	{
+		Map<String, String> envMap = getEnvMap();
+		if (envMap != null)
+		{
+			return envMap.get(envVariableName);
+		}
+		return null;
+	}
+
+	/**
+	 * Return ENV map.
+	 *
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, String> getEnvMap()
+	{
+		if (this._map != null)
+		{
+			return (Map<String, String>) this._map.get(ENV);
+		}
+		return null;
+	}
+
+	/**
+	 * Set the value of environment variable.
+	 *
+	 * @param envVariableName Must not be null.
+	 * @param envVariableValue If not null set the value. If null, remove the env variable.
+	 */
+	public void putEnv(String envVariableName, String envVariableValue)
+	{
+		assert envVariableName != null;
+		Map<String, String> envMap = getEnvMap();
+		if (envMap != null)
+		{
+			if (envVariableValue == null)
+			{
+				envMap.remove(envVariableName);
+			} else {
+				envMap.put(envVariableName, envVariableValue);
+			}
+		}
 	}
 }
