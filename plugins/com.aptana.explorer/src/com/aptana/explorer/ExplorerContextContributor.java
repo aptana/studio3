@@ -32,8 +32,8 @@ public class ExplorerContextContributor implements
 		
 		if (command.isShellCommand())
 		{
-			context.putEnv(CommandContext.ACTIVE_PROJECT_NAME, activeProjectName);
-			context.putEnv(CommandContext.ACTIVE_PROJECT_FOLDER, project.getLocation().toOSString());
+			context.putEnvironment(CommandContext.ACTIVE_PROJECT_NAME, activeProjectName);
+			context.putEnvironment(CommandContext.ACTIVE_PROJECT_FOLDER, project.getLocation().toOSString());
 		}
 		else
 		{

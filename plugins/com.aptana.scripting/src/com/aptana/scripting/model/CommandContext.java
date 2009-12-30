@@ -99,8 +99,10 @@ public class CommandContext
 		if (command.isShellCommand())
 		{
 			Map<String, String> envMap = new LinkedHashMap<String, String>();
+			
 			// Inherit the environment from parent
 			envMap.putAll(new ProcessBuilder().environment());
+			
 			// Install default environment
 			this._map.put(ENV, envMap);
 		}
@@ -146,51 +148,57 @@ public class CommandContext
 	/**
 	 * Return the value of environment variable.
 	 *
-	 * @param envVariableName
+	 * @param variableName
 	 * @return
 	 */
-	public String getEnv(String envVariableName)
+	public String getEnvironment(String variableName)
 	{
-		Map<String, String> envMap = getEnvMap();
-		if (envMap != null)
+		Map<String, String> map = this.getEnvironmentMap();
+		String result = null;
+		
+		if (map != null)
 		{
-			return envMap.get(envVariableName);
+			result = map.get(variableName);
 		}
-		return null;
+		
+		return result;
 	}
 
 	/**
 	 * Return ENV map.
-	 *
+	 * 
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, String> getEnvMap()
+	public Map<String, String> getEnvironmentMap()
 	{
-		if (this._map != null)
-		{
-			return (Map<String, String>) this._map.get(ENV);
-		}
-		return null;
+		return (Map<String, String>) this._map.get(ENV);
 	}
 
 	/**
 	 * Set the value of environment variable.
-	 *
-	 * @param envVariableName Must not be null.
-	 * @param envVariableValue If not null set the value. If null, remove the env variable.
+	 * 
+	 * @param name
+	 *            Ignored if null.
+	 * @param value
+	 *            If not null set the value. If null, remove the environment variable.
 	 */
-	public void putEnv(String envVariableName, String envVariableValue)
+	public void putEnvironment(String name, String value)
 	{
-		assert envVariableName != null;
-		Map<String, String> envMap = getEnvMap();
-		if (envMap != null)
+		if (name != null)
 		{
-			if (envVariableValue == null)
+			Map<String, String> map = this.getEnvironmentMap();
+	
+			if (map != null)
 			{
-				envMap.remove(envVariableName);
-			} else {
-				envMap.put(envVariableName, envVariableValue);
+				if (value == null)
+				{
+					map.remove(name);
+				}
+				else
+				{
+					map.put(name, value);
+				}
 			}
 		}
 	}
