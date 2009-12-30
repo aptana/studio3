@@ -30,6 +30,9 @@ public class CommandElement extends AbstractBundleElement
 	private String _keyBinding;
 	private InputType _inputType;
 	private OutputType _outputType;
+	private String _outputPath;
+	private String _workingDirectoryPath;
+	private WorkingDirectoryType _workingDirectoryType;
 	
 	/**
 	 * Snippet
@@ -42,6 +45,7 @@ public class CommandElement extends AbstractBundleElement
 		
 		this._inputType = InputType.UNDEFINED;
 		this._outputType = OutputType.UNDEFINED;
+		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
 	}
 	
 	/**
@@ -164,6 +168,31 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
+	public String getOutput()
+	{
+		if (this._outputType == OutputType.OUTPUT_TO_FILE) {
+			return this._outputPath;
+		}
+		else {
+			return this._outputType.getName();
+		}
+	}
+
+	/**
+	 * getOutputPath
+	 *
+	 * @return
+	 */
+	public String getOutputPath()
+	{
+		return this._outputPath;
+	}
+
+	/**
+	 * getOutputType
+	 *
+	 * @return
+	 */
 	public String getOutputType()
 	{
 		return this._outputType.getName();
@@ -220,6 +249,30 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getWorkingDirectory
+	 *
+	 * @return
+	 */
+	public String getWorkingDirectory()
+	{
+		switch (this._workingDirectoryType) {
+		case CURRENT_BUNDLE:
+			return new File(this.getPath()).getParentFile().toString();
+
+		case PATH:
+			return this._workingDirectoryPath;
+
+		// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
+		// can't implement these yet because they require us to hook into higher level functionality in the editor.common and explorer plugins. AAAARGH.
+		case UNDEFINED:
+		case CURRENT_PROJECT:
+		case CURRENT_FILE:
+		default:
+			return new File(this.getPath()).getParentFile().toString();
+		}
+	}
+
+	/**
 	 * invokeStringCommand
 	 * 
 	 * @return
@@ -251,10 +304,12 @@ public class CommandElement extends AbstractBundleElement
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 			{
+				// FIXME: should we be using the user's preferred shell instead of hardcoding?
 				commands.add("/bin/bash"); //$NON-NLS-1$
 			}
 			else
 			{
+				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
 				commands.add("cmd"); //$NON-NLS-1$
 			}
 			commands.add(tempFile.getAbsolutePath());
@@ -263,11 +318,10 @@ public class CommandElement extends AbstractBundleElement
 			builder.command(commands);
 			
 			// setup working directory
-			String path = this.getPath();
-			
+			String path = this.getWorkingDirectory();
 			if (path != null && path.length() > 0)
 			{
-				builder.directory(new File(this.getPath()).getParentFile());
+				builder.directory(new File(path));
 			}
 	
 			// run process and get output
@@ -397,6 +451,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setOutputPath(String path)
+	{
+		this._outputPath = path;
+	}
+
+	/**
 	 * setOutputType
 	 * 
 	 * @param type
@@ -436,6 +500,36 @@ public class CommandElement extends AbstractBundleElement
 		this._triggers = triggers;
 	}
 	
+	/**
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setWorkingDirectoryPath(String path)
+	{
+		this._workingDirectoryPath = path;
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param workingDirectory
+	 */
+	public void setWorkingDirectoryType(String workingDirectory)
+	{
+		this._workingDirectoryType = WorkingDirectoryType.get(workingDirectory);
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param type
+	 */
+	public void setWorkingDirectoryType(WorkingDirectoryType type)
+	{
+		this._workingDirectoryType = type;
+	}
+
 	/**
 	 * toSource
 	 */
