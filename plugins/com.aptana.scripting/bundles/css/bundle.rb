@@ -1,9 +1,9 @@
 require 'radrails'
 
-# its ruby, so this just addscommands/snippets in bundle (or replaces those with same name)
+# its ruby, so this just adds commands/snippets in bundle (or replaces those with same name)
 # many ruby files could add to a single bundle
 RadRails.current_bundle do |bundle|
-  bundle.name = "Ruby on Rails"
+  bundle.name = "CSS"
   bundle.author = "Christopher Williams"
   bundle.copyright = <<END
 © Copyright 2009 Aptana Inc. Distributed under GPLv3 and Aptana Source license.
@@ -21,15 +21,18 @@ END
     css_menu.scope = [ "source.css" ]
     
 	  # command/snippet names must be unique within bundle and are case insensitive
-    css_menu.command "Format CSS"
-    css_menu.command "Insert Color..."
-    css_menu.command "Show as HTML"
-    css_menu.command "Documentation for Property"
+	  css_menu.command "Documentation for Property"
     css_menu.command "Validate Selected CSS"
+    css_menu.command "Show as HTML"
+    # Separator
+    css_menu.command "Insert Color..."
+    # separator    
     css_menu.menu "CodeCompletion" do |completion_menu|
       completion_menu.command "CodeCompletion CSS"
       completion_menu.command "CodeCompletion CSS Properties"
       completion_menu.command "CodeCompletion CSS Property Values"
     end
+    css_menu.command "Format CSS"
+    css_menu.command "Format CSS Single-line"
   end
 end
