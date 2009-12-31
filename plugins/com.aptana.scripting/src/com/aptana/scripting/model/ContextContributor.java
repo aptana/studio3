@@ -6,7 +6,7 @@ public interface ContextContributor
 	 * modifyContext
 	 * 
 	 * @param command
-	 * @param map
+	 * @param context
 	 */
 	void modifyContext(CommandElement command, CommandContext context);
 }
