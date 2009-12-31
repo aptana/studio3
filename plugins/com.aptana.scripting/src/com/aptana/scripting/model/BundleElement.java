@@ -233,7 +233,7 @@ public class BundleElement extends AbstractElement
 	 */
 	protected String getElementName()
 	{
-		return "bundle";
+		return "bundle"; //$NON-NLS-1$
 	}
 
 	/**

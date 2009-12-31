@@ -123,7 +123,7 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	protected String getElementName()
 	{
-		return "menu";
+		return "menu"; //$NON-NLS-1$
 	}
 	
 	/**
