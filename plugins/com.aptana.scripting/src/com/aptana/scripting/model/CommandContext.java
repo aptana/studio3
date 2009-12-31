@@ -21,7 +21,7 @@ import com.aptana.scripting.ScriptingEngine;
 public class CommandContext
 {
 	// Key names for well known keys in the map
-	public static final String WORKING_DIRECTORY = "active_project_folder"; //$NON-NLS-1$
+	public static final String WORKING_DIRECTORY = "working_directory"; //$NON-NLS-1$
 
 	public static final String ACTIVE_PROJECT_NAME = "active_project_name"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_FOLDER = "active_project_folder"; //$NON-NLS-1$
