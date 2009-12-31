@@ -1,13 +1,14 @@
 require "java"
+require "radrails/base_element"
 require "radrails/scope_selector"
 
 module RadRails
   
-  class Menu
+  class Menu < BaseElement
     def initialize(name)
-      @jobj = com.aptana.scripting.model.MenuElement.new($fullpath)
+      super(name)
+      
       @jobj.command_name = name;
-      @jobj.display_name = name;
       
       bundle = BundleManager.bundle_from_path(path)
       bundle.apply_defaults(self) unless bundle.nil?
@@ -79,6 +80,12 @@ module RadRails
         bundle = BundleManager.bundle_from_path(new_menu.path)
         bundle.add_menu(new_menu) unless bundle.nil?
       end
+    end
+    
+    private
+    
+    def create_java_object
+      com.aptana.scripting.model.MenuElement.new($fullpath)
     end
   end
   

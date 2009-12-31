@@ -1,21 +1,20 @@
 require "java"
+require "radrails/base_element"
 require "radrails/bundle_manager"
 
 module RadRails
   
-  class Bundle
+  class Bundle < BaseElement
     @@defaults = {}
     
     def initialize(name, default_values={})
       if name.kind_of? String
-        @jobj = com.aptana.scripting.model.BundleElement.new($fullpath)
-        @jobj.display_name = name
+        super(name)
         @@defaults[path.to_sym] = default_values
       else
         # hack to pass in java object...should test type
         @jobj = name
       end
-      
     end
     
     def add_command(command)
@@ -136,6 +135,12 @@ module RadRails
         BundleManager.add_bundle(bundle)
         block.call(bundle) if block_given?
       end
+    end
+  
+  private
+    
+    def create_java_object
+      com.aptana.scripting.model.BundleElement.new($fullpath)
     end
   end
   
