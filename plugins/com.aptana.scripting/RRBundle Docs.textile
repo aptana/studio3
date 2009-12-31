@@ -14,8 +14,8 @@ Bundles are the top-level distribution format for RadRails extensions. A bundle 
 
 In addition to the @bundle.rb@ file, there are two top-level directories within a bundle that are treated specially:
 
-| @commands@	| contains the commands that make up the bundle. @.rb@ files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast. |
-| @lib@			| contains Ruby code that is on the load path when executing commands within your bundle. Put code here you wish to invoke from within your commands, but which you do not want loaded at startup. |
+| @commands/@	| contains the commands that make up the bundle. @.rb@ files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast. |
+| @lib/@		| contains Ruby code that is on the load path when executing commands within your bundle. Put code here you wish to invoke from within your commands, but which you do not want loaded at startup. |
 
 By convention, there are several other files and directories found in most bundles:
 
@@ -52,14 +52,14 @@ h2. Commands
 
 Commands are the fundamental building blocks of Bundles. A command has the following properties:
 
-| Element		| Required?	| Description |
-| name		    | Yes			| A human-readable name for the command. Must be unique within the bundle. |
-| invoke	    | Yes			| The code to be executed. If specified as a string, it is executed as a shell script. If passed a block, it is invoked as a block when the command is executed. |
-| scope		    | 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes. |
-| input		    |				| The input to the command. See the _Input Definition_ section below. |
-| output	    | 	 			| The output of the command. See the _Output Definition_ section below. |
-| key_binding	| 	 			| The keyboard binding for the command. It is also possible to define platform-specific key bindings, as described in the _Key Bindings_ section below. |
-| trigger	    |				| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command. |
+| Element		| Required?		| Description |
+| @name@		| Yes			| A human-readable name for the command. Must be unique within the bundle. |
+| @invoke@	    | Yes			| The code to be executed. If specified as a string, it is executed as a shell script. If passed a block, it is invoked as a block when the command is executed. |
+| @scope@		| 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes. |
+| @input@		|				| The input to the command. See the _Input Definition_ section below. |
+| @output@	    | 	 			| The output of the command. See the _Output Definition_ section below. |
+| @key_binding@	| 	 			| The keyboard binding for the command. It is also possible to define platform-specific key bindings, as described in the _Key Bindings_ section below. |
+| @trigger@	    |				| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command. |
 
 Example command:
 
@@ -109,11 +109,11 @@ Snippets are a specialized form of commands, designed to make it easier to speci
 
 Here are the properties specific to snippets. Note that the @trigger@ is required, unlike the case for commands.
 
-| Element		| Required?	| Description |
-| name		    | Yes			| A human-readable name for the command. Must be unique within the bundle. |
-| scope		    | 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes. |
-| trigger	    | Yes			| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command. |
-| expansion	    | Yes			| The snippet text that will be substituted for the command trigger. |
+| Element		| Required?		| Description |
+| @name@		| Yes			| A human-readable name for the command. Must be unique within the bundle. |
+| @scope@		| 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes. |
+| @trigger@	    | Yes			| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command. |
+| @expansion@	| Yes			| The snippet text that will be substituted for the command trigger. |
 
 FORTHCOMING: the syntax for the expansion string (which roughly follows TextMate, but doesn't support nesting at present)
 
