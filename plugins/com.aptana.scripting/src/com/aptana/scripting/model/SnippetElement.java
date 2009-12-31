@@ -32,6 +32,14 @@ public class SnippetElement extends CommandElement
 	}
 
 	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "snippet";
+	}
+	
+	/**
 	 * getExpansion
 	 * 
 	 * @return

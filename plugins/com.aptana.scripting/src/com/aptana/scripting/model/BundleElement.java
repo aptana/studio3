@@ -229,6 +229,14 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "bundle";
+	}
+
+	/**
 	 * getGitRepo
 	 * 
 	 * @return
@@ -286,6 +294,16 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
+	 * hasMenus
+	 * 
+	 * @return
+	 */
+	public boolean hasMenus()
+	{
+		return this._menus != null && this._menus.size() > 0;
+	}
+	
+	/**
 	 * hasMetadata
 	 * 
 	 * @return
@@ -299,16 +317,6 @@ public class BundleElement extends AbstractElement
 			this._license != null ||
 			this._licenseUrl != null
 		);
-	}
-	
-	/**
-	 * hasMenus
-	 * 
-	 * @return
-	 */
-	public boolean hasMenus()
-	{
-		return this._menus != null && this._menus.size() > 0;
 	}
 	
 	/**
@@ -335,6 +343,39 @@ public class BundleElement extends AbstractElement
 		return displayName != null && displayName.length() > 0;
 	}
 
+	/**
+	 * printBody
+	 * 
+	 * @return
+	 */
+	public void printBody(SourcePrinter printer)
+	{
+		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
+		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
+		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
+		printer.printWithIndent("git: ").println(this._gitRepo); //$NON-NLS-1$
+		
+		// output commands
+		if (this._commands != null)
+		{
+			for (CommandElement command : this._commands)
+			{
+				command.toSource(printer);
+			}
+		}
+		
+		// output menus
+		if (this._menus != null)
+		{
+			for (MenuElement menu : this._menus)
+			{
+				menu.toSource(printer);
+			}
+		}
+	}
+	
 	/**
 	 * removeCommand
 	 * 
@@ -385,7 +426,7 @@ public class BundleElement extends AbstractElement
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
 	}
-	
+
 	/**
 	 * setAuthor
 	 * 
@@ -395,7 +436,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._author = author;
 	}
-
+	
 	/**
 	 * setCopyright
 	 * 
@@ -405,7 +446,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._copyright = copyright;
 	}
-	
+
 	/**
 	 * setDescription
 	 * 
@@ -435,7 +476,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._license = license;
 	}
-
+	
 	/**
 	 * setLicenseUrl
 	 * 
@@ -444,45 +485,5 @@ public class BundleElement extends AbstractElement
 	public void setLicenseUrl(String licenseUrl)
 	{
 		this._licenseUrl = licenseUrl;
-	}
-	
-	/**
-	 * toSource
-	 * 
-	 * @return
-	 */
-	public void toSource(SourcePrinter printer)
-	{
-		// open bundle
-		printer.printWithIndent("bundle \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// show body
-		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
-		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
-		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
-		printer.printWithIndent("git: ").println(this._gitRepo); //$NON-NLS-1$
-		
-		// output commands
-		if (this._commands != null)
-		{
-			for (CommandElement command : this._commands)
-			{
-				command.toSource(printer);
-			}
-		}
-		
-		// output menus
-		if (this._menus != null)
-		{
-			for (MenuElement menu : this._menus)
-			{
-				menu.toSource(printer);
-			}
-		}
-		
-		// close bundle
-		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }

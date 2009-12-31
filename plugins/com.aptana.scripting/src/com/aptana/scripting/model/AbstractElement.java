@@ -138,6 +138,13 @@ public abstract class AbstractElement
 	}
 
 	/**
+	 * getElementName
+	 * 
+	 * @return
+	 */
+	protected abstract String getElementName();
+	
+	/**
 	 * getPath
 	 * 
 	 * @return
@@ -212,5 +219,32 @@ public abstract class AbstractElement
 	 * 
 	 * @param printer
 	 */
-	abstract protected void toSource(SourcePrinter printer);
+	protected void toSource(SourcePrinter printer)
+	{
+		// open element
+		printer.printWithIndent(this.getElementName());
+		printer.print(" \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// emit body
+		this.printBody(printer);
+		
+		// emit custom properties
+		if (this._customProperties != null)
+		{
+			for (Map.Entry<String, Object> entry : this._customProperties.entrySet())
+			{
+				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString());
+			}
+		}
+
+		// close element
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+	}
+	
+	/**
+	 * printBody
+	 * 
+	 * @param printer
+	 */
+	abstract protected void printBody(SourcePrinter printer);
 }

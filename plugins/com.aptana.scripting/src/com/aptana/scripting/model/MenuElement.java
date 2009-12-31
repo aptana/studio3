@@ -119,6 +119,14 @@ public class MenuElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "menu";
+	}
+	
+	/**
 	 * getLeafMenus
 	 * 
 	 * @return
@@ -257,6 +265,24 @@ public class MenuElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * printBody
+	 */
+	protected void printBody(SourcePrinter printer)
+	{
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
+		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
+		
+		if (this.hasChildren())
+		{
+			for (MenuElement menu : this._children)
+			{
+				menu.toSource(printer);
+			}
+		}
+	}
+	
+	/**
 	 * removeChildren
 	 */
 	public void removeChildren()
@@ -290,27 +316,5 @@ public class MenuElement extends AbstractBundleElement
 	public void setCommandName(String name)
 	{
 		this._commandName = name;
-	}
-	
-	/**
-	 * toSource
-	 */
-	protected void toSource(SourcePrinter printer)
-	{
-		printer.printWithIndent("menu \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
-		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
-		
-		if (this.hasChildren())
-		{
-			for (MenuElement menu : this._children)
-			{
-				menu.toSource(printer);
-			}
-		}
-		
-		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }

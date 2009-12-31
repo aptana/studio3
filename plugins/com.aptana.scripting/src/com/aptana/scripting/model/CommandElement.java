@@ -97,6 +97,14 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "command";
+	}
+	
+	/**
 	 * getInput
 	 * 
 	 * @return
@@ -210,6 +218,32 @@ public class CommandElement extends AbstractBundleElement
 	}
 	
 	/**
+	 * getWorkingDirectory
+	 * 
+	 * @return
+	 */
+	public String getWorkingDirectory()
+	{
+		switch (this._workingDirectoryType)
+		{
+			case CURRENT_BUNDLE:
+				return new File(this.getPath()).getParentFile().toString();
+
+			case PATH:
+				return this._workingDirectoryPath;
+
+				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
+				// can't implement these yet because they require us to hook into higher level functionality in the
+				// editor.common and explorer plugins. AAAARGH.
+			case UNDEFINED:
+			case CURRENT_PROJECT:
+			case CURRENT_FILE:
+			default:
+				return new File(this.getPath()).getParentFile().toString();
+		}
+	}
+
+	/**
 	 * invokeBlockCommand
 	 * 
 	 * @param resultText
@@ -249,32 +283,6 @@ public class CommandElement extends AbstractBundleElement
 		}
 		
 		return resultText;
-	}
-
-	/**
-	 * getWorkingDirectory
-	 * 
-	 * @return
-	 */
-	public String getWorkingDirectory()
-	{
-		switch (this._workingDirectoryType)
-		{
-			case CURRENT_BUNDLE:
-				return new File(this.getPath()).getParentFile().toString();
-
-			case PATH:
-				return this._workingDirectoryPath;
-
-				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-				// can't implement these yet because they require us to hook into higher level functionality in the
-				// editor.common and explorer plugins. AAAARGH.
-			case UNDEFINED:
-			case CURRENT_PROJECT:
-			case CURRENT_FILE:
-			default:
-				return new File(this.getPath()).getParentFile().toString();
-		}
 	}
 
 	/**
@@ -411,182 +419,10 @@ public class CommandElement extends AbstractBundleElement
 	}
 	
 	/**
-	 * setInputType
-	 * 
-	 * @param type
+	 * printBody
 	 */
-	public void setInputType(InputType type)
+	protected void printBody(SourcePrinter printer)
 	{
-		this.setInputType(new InputType[] { type });
-	}
-	
-	/**
-	 * setInputType
-	 * 
-	 * @param input
-	 */
-	public void setInputType(String input)
-	{
-		this.setInputType(InputType.get(input));
-	}
-	
-	/**
-	 * setInputType
-	 * 
-	 * @param types
-	 */
-	public void setInputType(InputType[] types)
-	{
-		this._inputTypes = (types == null) ? NO_TYPES : types;
-	}
-	
-	/**
-	 * setInputType
-	 * 
-	 * @param types
-	 */
-	public void setInputType(String[] types)
-	{
-		InputType[] result = null;
-		
-		if (types != null)
-		{
-			result = new InputType[types.length];
-			
-			for (int i = 0; i < types.length; i++)
-			{
-				result[i] = InputType.get(types[i]);
-			}
-		}
-		
-		this.setInputType(result);
-	}
-	
-	/**
-	 * setInvoke
-	 * 
-	 * @param invoke
-	 */
-	public void setInvoke(String invoke)
-	{
-		this._invoke = invoke;
-	}
-	
-	/**
-	 * setInvokeBlock
-	 * 
-	 * @param block
-	 */
-	public void setInvokeBlock(RubyProc block)
-	{
-		this._invokeBlock = block;
-	}
-	
-	/**
-	 * setKeyBinding
-	 * 
-	 * @param keyBinding
-	 */
-	public void setKeyBinding(String keyBinding)
-	{
-		this._keyBinding = keyBinding;
-	}
-
-	/**
-	 * setOutputPath
-	 *
-	 * @param path
-	 */
-	public void setOutputPath(String path)
-	{
-		this._outputPath = path;
-	}
-
-	/**
-	 * setOutputType
-	 * 
-	 * @param type
-	 */
-	public void setOutputType(OutputType type)
-	{
-		this._outputType = type;
-	}
-	
-	/**
-	 * setOutput
-	 * 
-	 * @param output
-	 */
-	public void setOutputType(String output)
-	{
-		this._outputType = OutputType.get(output);
-	}
-	
-	/**
-	 * setTrigger
-	 * 
-	 * @param trigger
-	 */
-	public void setTrigger(String trigger)
-	{
-		this._triggers = new String[] { trigger };
-	}
-	
-	/**
-	 * setTrigger
-	 * 
-	 * @param triggers
-	 */
-	public void setTrigger(String[] triggers)
-	{
-		this._triggers = triggers;
-	}
-	
-	/**
-	 * setOutputPath
-	 *
-	 * @param path
-	 */
-	public void setWorkingDirectoryPath(String path)
-	{
-		this._workingDirectoryPath = path;
-	}
-
-	/**
-	 * setWorkingDirectoryType
-	 *
-	 * @param workingDirectory
-	 */
-	public void setWorkingDirectoryType(String workingDirectory)
-	{
-		this._workingDirectoryType = WorkingDirectoryType.get(workingDirectory);
-	}
-
-	/**
-	 * setWorkingDirectoryType
-	 *
-	 * @param type
-	 */
-	public void setWorkingDirectoryType(WorkingDirectoryType type)
-	{
-		this._workingDirectoryType = type;
-	}
-
-	/**
-	 * toSource
-	 */
-	protected void toSource(SourcePrinter printer)
-	{
-		// output command type
-		if (this instanceof CommandElement)
-		{
-			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		else
-		{
-			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
@@ -656,8 +492,167 @@ public class CommandElement extends AbstractBundleElement
 			
 			printer.println();
 		}
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param type
+	 */
+	public void setInputType(InputType type)
+	{
+		this.setInputType(new InputType[] { type });
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param types
+	 */
+	public void setInputType(InputType[] types)
+	{
+		this._inputTypes = (types == null) ? NO_TYPES : types;
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param input
+	 */
+	public void setInputType(String input)
+	{
+		this.setInputType(InputType.get(input));
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param types
+	 */
+	public void setInputType(String[] types)
+	{
+		InputType[] result = null;
 		
-		// close the element
-		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+		if (types != null)
+		{
+			result = new InputType[types.length];
+			
+			for (int i = 0; i < types.length; i++)
+			{
+				result[i] = InputType.get(types[i]);
+			}
+		}
+		
+		this.setInputType(result);
+	}
+	
+	/**
+	 * setInvoke
+	 * 
+	 * @param invoke
+	 */
+	public void setInvoke(String invoke)
+	{
+		this._invoke = invoke;
+	}
+	
+	/**
+	 * setInvokeBlock
+	 * 
+	 * @param block
+	 */
+	public void setInvokeBlock(RubyProc block)
+	{
+		this._invokeBlock = block;
+	}
+
+	/**
+	 * setKeyBinding
+	 * 
+	 * @param keyBinding
+	 */
+	public void setKeyBinding(String keyBinding)
+	{
+		this._keyBinding = keyBinding;
+	}
+
+	/**
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setOutputPath(String path)
+	{
+		this._outputPath = path;
+	}
+	
+	/**
+	 * setOutputType
+	 * 
+	 * @param type
+	 */
+	public void setOutputType(OutputType type)
+	{
+		this._outputType = type;
+	}
+	
+	/**
+	 * setOutput
+	 * 
+	 * @param output
+	 */
+	public void setOutputType(String output)
+	{
+		this._outputType = OutputType.get(output);
+	}
+	
+	/**
+	 * setTrigger
+	 * 
+	 * @param trigger
+	 */
+	public void setTrigger(String trigger)
+	{
+		this._triggers = new String[] { trigger };
+	}
+	
+	/**
+	 * setTrigger
+	 * 
+	 * @param triggers
+	 */
+	public void setTrigger(String[] triggers)
+	{
+		this._triggers = triggers;
+	}
+
+	/**
+	 * setOutputPath
+	 *
+	 * @param path
+	 */
+	public void setWorkingDirectoryPath(String path)
+	{
+		this._workingDirectoryPath = path;
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param workingDirectory
+	 */
+	public void setWorkingDirectoryType(String workingDirectory)
+	{
+		this._workingDirectoryType = WorkingDirectoryType.get(workingDirectory);
+	}
+
+	/**
+	 * setWorkingDirectoryType
+	 *
+	 * @param type
+	 */
+	public void setWorkingDirectoryType(WorkingDirectoryType type)
+	{
+		this._workingDirectoryType = type;
 	}
 }
