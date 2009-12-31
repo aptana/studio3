@@ -224,34 +224,42 @@ As discussed in the _Runtime Architecture_ section above, commands and snippets 
 
 h2. Key Bindings
 
-A command can optionally have a key binding associated with it. These key bindings are specified using an array of KEY_BINDING_VALUEs, like so:
+A command can optionally have one or more key bindings associated with it. These key bindings are specified using one of the following forms:
 
-bc. command.key_binding = [ KEY_BINDING_VALUE, KEY_BINDING_VALUE, etc. ]
+If there is only one key binding associated with the command:
 
-There should be *at least two* KEY_BINDING_VALUEs supplied, one of which is a CONTROL_KEY_SPECIFIER:
+bc. command.key_binding = KEY_SEQUENCE_STRING
 
-* :control
-* :option
-* :meta
-* :shift
-* :command, :windows_key - these are platform and/or hardware specific synonyms for :meta
+Examples:
 
-We strongly recommend against the use of :SHIFT without including another CONTROL_KEY_SPECIFIER, as the results can be unpredictable.
+bc. command.key_binding = "CONTROL+T" # Single key stroke key binding
 
-For other keys, the values can be specified using their Latin-1 character (e.g. "q" or "#") or using a numeric keycode. Keycodes are not recommended as they aren't portable, but they may not be avoidable in all cases. If a key is specified using an upper case character or a symbol that requires the SHIFT key to be held down, the :SHIFT modifier is implied. Different platforms may display such key bindings differently in menus: some might display a key binding specified as "[:control, "#"]" as "Control-Shift-3", while others would display "Control-#".
+bc. command.key_binding = "M1+M3+Q C" # Mutiple key stroke key binding
 
-It may be necessary for commands to define specific key bindings for specific platforms. To enable this, the @key_binding@ property supports hash-table style access for setting platform specific key bindings. Platform-specific bindings always take precedence over the generic binding. See the example below:
+If there are more than one key bindings associated with the command:
+
+bc. command.key_binding = [ KEY_SEQUENCE_STRING, KEY_SEQUENCE_STRING, etc. ]
+
+Example:
+
+bc. command.key_binding = [ "M1+W", "M1+F4" ] # Multiple keybindings for same command
+
+A KEY_SEQUENCE_STRING should consist of one or more key strokes. Key strokes are separated by spaces. A key stroke consists of one or more keys held down at the same time. This should be zero or more modifier keys, and one other key. The keys are separated by the + character. The recognized modifiers keys are ALT or OPTION, COMMAND, CTRL, and SHIFT. In addition M1, M2, M3, M4 modifier keys are also recognized. The "M" modifier keys are a platform-independent way of representing keys, and these are generally preferred. M1 is the COMMAND key on MacOS X, and the CTRL key on most other platforms. M2 is the SHIFT key. M3 is the Option key on MacOS X, and the ALT key on most other platforms. M4 is the CTRL key on MacOS X, and is undefined on other platforms. Since M2+M3+<Letter> (Alt+Shift+<Letter>) is reserved on MacOS X for writing special characters.
+
+The actual key is generally specified simply as the ASCII character, in uppercase. So, for example F or , are examples of such keys. However, there are some special keys; keys that have no printable ASCII representation. The following is a list of the current special keys: ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, BREAK, BS, CAPS_LOCK, CR, DEL, END, ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, FF, HOME, INSERT, LF, NUL, NUM_LOCK, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5, NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_DECIMAL, NUMPAD_DIVIDE, NUMPAD_ENTER, NUMPAD_EQUAL, NUMPAD_MULTIPLY, NUMPAD_SUBTRACT, PAGE_UP, PAGE_DOWN, PAUSE, PRINT_SCREEN, SCROLL_LOCK, SPACE, TAB and VT. Alternate names for some common special keys are also allowed. For example, ESC and ESCAPE, and CR, ENTER and RETURN are all the same. 
+
+We strongly recommend against the use of SHIFT or M2 without including another CONTROL_KEY_SPECIFIER, as the results can be unpredictable.
+
+It is possible for commands to define specific key bindings for specific platforms. To enable this, the @key_binding@ property supports hash-table style access for setting platform specific key bindings. Platform-specific bindings always take precedence over the generic binding. See the example below:
 
 <pre>
 <code programming-language="ruby">
-command.key_binding = [ :control, "v" ]
-command.key_binding[:mac] = [ :command, "v" ]
+command.key_binding = "CONTROL+V"
+command.key_binding[:mac] = "COMMAND+V" ]
 </code>
 </pre>
 
 Supported platform identifiers are @:mac@, @:windows@, @:linux@, and @:unix@. The @:unix@ identifier will match Linux, BSD, Solaris, and most other unix-like OSes (except the Mac).
-
-FORTHCOMING: special symbol definitions for other keys (arrows, function keys, return, enter, etc.)
 
 h2. Input Definition
 
