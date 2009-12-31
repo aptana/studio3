@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -38,8 +39,8 @@ public class ScriptingEngine
 	private static ScriptingEngine instance;
 
 	private ScriptingContainer _scriptingContainer;
-	private String[] _loadPaths;
-	private String[] _frameworkFiles;
+	private List<String> _loadPaths;
+	private List<String> _frameworkFiles;
 
 	/**
 	 * ScriptingEngine
@@ -68,7 +69,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public String[] getContributedLoadPaths()
+	public List<String> getContributedLoadPaths()
 	{
 		if (this._loadPaths == null)
 		{
@@ -105,7 +106,7 @@ public class ScriptingEngine
 				}
 			}
 
-			this._loadPaths = paths.toArray(new String[paths.size()]);
+			this._loadPaths = Collections.unmodifiableList(paths);
 		}
 
 		return this._loadPaths;
@@ -116,7 +117,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public String[] getFrameworkFiles()
+	public List<String> getFrameworkFiles()
 	{
 		if (this._frameworkFiles == null)
 		{
@@ -146,7 +147,7 @@ public class ScriptingEngine
 				}
 			}
 
-			this._frameworkFiles = names.toArray(new String[names.size()]);
+			this._frameworkFiles = Collections.unmodifiableList(names);
 		}
 		
 		return this._frameworkFiles;
