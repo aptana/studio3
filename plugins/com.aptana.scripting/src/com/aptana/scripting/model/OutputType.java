@@ -20,7 +20,8 @@ public enum OutputType
 	CREATE_NEW_DOCUMENT("create_new_document"), //$NON-NLS-1$
 	OUTPUT_TO_CONSOLE("output_to_console"), //$NON-NLS-1$
 	OUTPUT_TO_STREAM("output_to_stream"), //$NON-NLS-1$
-	OUTPUT_TO_FILE("output_to_file"); //$NON-NLS-1$
+	OUTPUT_TO_FILE("output_to_file"), //$NON-NLS-1$
+	COPY_TO_CLIPBOARD("copy_to_clipboard"); //$NON-NLS-1$
 
 	private static Map<String, OutputType> NAME_MAP;
 	private String _name;
