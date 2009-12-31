@@ -221,9 +221,6 @@ public class CommandElement extends AbstractBundleElement
 		ThreadContext threadContext = runtime.getCurrentContext();
 		String resultText = ""; //$NON-NLS-1$
 		
-		// grab map from context and make it unmodifiable
-		//Map<String,Object> map = Collections.unmodifiableMap(context.getMap());
-		
 		try
 		{
 			RubyModule radrails = runtime.getModule("RadRails");
@@ -233,7 +230,6 @@ public class CommandElement extends AbstractBundleElement
 			
 			IRubyObject result = this._invokeBlock.call(
 				threadContext,
-//				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, obj) }
 				new IRubyObject[] { rubyContext }
 			);
 			
@@ -310,11 +306,20 @@ public class CommandElement extends AbstractBundleElement
 			
 			List<String> commands = new ArrayList<String>();
 			ProcessBuilder builder = new ProcessBuilder();
-			Map<String,String> environment = builder.environment();
 			
-			for (Map.Entry<String, Object> entry : context.getMap().entrySet())
+			if (context != null)
 			{
-				environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
+				Map<String, Object> contextMap = context.getMap();
+				
+				if (contextMap != null)
+				{
+					Map<String, String> environment = builder.environment();
+					
+					for (Map.Entry<String, Object> entry : context.getMap().entrySet())
+					{
+						environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
+					}
+				}
 			}
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
