@@ -18,7 +18,7 @@ public class CommandTests extends BundleTestBase
 		assertNotNull(command);
 		
 		// run command and grab result
-		CommandResult result = command.execute(null);
+		CommandResult result = command.execute();
 		assertNotNull(result);
 		
 		// return string result
