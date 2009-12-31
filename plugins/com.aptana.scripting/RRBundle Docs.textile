@@ -232,8 +232,9 @@ bc. command.key_binding = KEY_SEQUENCE_STRING
 
 Examples:
 
-bc. command.key_binding = "CONTROL+T" // Single key stroke key binding
-bc. command.key_binding = "M1+M3+Q C" // Mutiple key stroke key binding
+bc. command.key_binding = "CONTROL+T" # Single key stroke key binding
+
+bc. command.key_binding = "M1+M3+Q C" # Mutiple key stroke key binding
 
 If there are more than one key bindings associated with the command:
 
@@ -241,7 +242,7 @@ bc. command.key_binding = [ KEY_SEQUENCE_STRING, KEY_SEQUENCE_STRING, etc. ]
 
 Example:
 
-bc. command.key_binding = [ "M1+W", "M1+F4" ] // Multiple keybindings for same command
+bc. command.key_binding = [ "M1+W", "M1+F4" ] # Multiple keybindings for same command
 
 A KEY_SEQUENCE_STRING should consist of one or more key strokes. Key strokes are separated by spaces. A key stroke consists of one or more keys held down at the same time. This should be zero or more modifier keys, and one other key. The keys are separated by the + character. The recognized modifiers keys are ALT or OPTION, COMMAND, CTRL, and SHIFT. In addition M1, M2, M3, M4 modifier keys are also recognized. The "M" modifier keys are a platform-independent way of representing keys, and these are generally preferred. M1 is the COMMAND key on MacOS X, and the CTRL key on most other platforms. M2 is the SHIFT key. M3 is the Option key on MacOS X, and the ALT key on most other platforms. M4 is the CTRL key on MacOS X, and is undefined on other platforms. Since M2+M3+<Letter> (Alt+Shift+<Letter>) is reserved on MacOS X for writing special characters.
 
