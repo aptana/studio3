@@ -52,3 +52,9 @@ module RadRails
   end
   
 end
+
+# define top-level convenience methods
+
+def snippet(name, &block)
+  RadRails::Snippet.define_snippet(name, &block)
+end

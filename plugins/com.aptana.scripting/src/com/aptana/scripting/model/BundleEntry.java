@@ -21,7 +21,7 @@ public class BundleEntry
 	{
 		if (name == null || name.length() == 0)
 		{
-			throw new IllegalArgumentException("name must be defined");
+			throw new IllegalArgumentException(Messages.BundleEntry_Name_Not_Defined);
 		}
 		
 		this._name = name;

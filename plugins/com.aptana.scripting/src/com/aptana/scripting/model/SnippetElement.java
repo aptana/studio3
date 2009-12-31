@@ -16,6 +16,22 @@ public class SnippetElement extends CommandElement
 	}
 
 	/**
+	 * execute
+	 */
+	public CommandResult execute()
+	{
+		return new CommandResult(this.getExpansion());
+	}
+
+	/**
+	 * execute
+	 */
+	public CommandResult execute(CommandContext context)
+	{
+		return new CommandResult(this.getExpansion());
+	}
+
+	/**
 	 * getExpansion
 	 * 
 	 * @return

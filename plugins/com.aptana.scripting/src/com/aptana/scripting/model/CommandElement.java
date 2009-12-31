@@ -7,11 +7,14 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
+import org.jruby.RubyClass;
+import org.jruby.RubyModule;
 import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
@@ -45,11 +48,31 @@ public class CommandElement extends AbstractBundleElement
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
 	}
-
+	
+	/**
+	 * createCommandContext
+	 * 
+	 * @return
+	 */
+	public CommandContext createCommandContext()
+	{
+		return new CommandContext(this);
+	}
+	
 	/**
 	 * execute
 	 * 
-	 * @param context
+	 * @return
+	 */
+	public CommandResult execute()
+	{
+		return this.execute(this.createCommandContext());
+	}
+	
+	/**
+	 * execute
+	 * 
+	 * @param map
 	 * @return
 	 */
 	public CommandResult execute(CommandContext context)
@@ -58,38 +81,13 @@ public class CommandElement extends AbstractBundleElement
 		
 		if (this.isExecutable())
 		{
-			if (this.isSnippet())
+			if (this.isShellCommand())
 			{
-				resultText = this._invoke;
-			}
-			else if (this.isShellCommand())
-			{
-				resultText = this.invokeStringCommand();
+				resultText = this.invokeStringCommand(context);
 			}
 			else if (this.isBlockCommand())
 			{
-				Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-				ThreadContext threadContext = runtime.getCurrentContext();
-				
-				try
-				{
-					IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
-					context.setRuntime(runtime); // so that we can return a RubyIO to ruby code by wrapping the input stream
-					IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] {obj});	
-					if (result != null)
-					{
-						resultText = result.asString().asJavaString();
-					}
-				}
-				catch (Exception e)
-				{
-					String message = MessageFormat.format(
-						Messages.CommandElement_Error_Processing_Command_Block,
-						new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-					);
-					
-					ScriptLogger.logError(message);
-				}
+				resultText = this.invokeBlockCommand(context);
 			}
 		}
 		
@@ -105,7 +103,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._inputType.getName();
 	}
-	
+
 	/**
 	 * getInvoke
 	 * 
@@ -135,7 +133,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._keyBinding;
 	}
-
+	
 	/**
 	 * getKeySequence
 	 * 
@@ -152,7 +150,7 @@ public class CommandElement extends AbstractBundleElement
 		catch (ParseException e)
 		{
 			String message = MessageFormat.format(
-				"Unable to convert {0} to an Eclipse key sequence in {0}: {1}",
+				Messages.CommandElement_Invalid_Key_Binding,
 				new Object[] { this.getDisplayName(), this.getPath() }
 			);
 			
@@ -161,7 +159,7 @@ public class CommandElement extends AbstractBundleElement
 		
 		return result;
 	}
-	
+
 	/**
 	 * getOutput
 	 * 
@@ -169,10 +167,12 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public String getOutput()
 	{
-		if (this._outputType == OutputType.OUTPUT_TO_FILE) {
+		if (this._outputType == OutputType.OUTPUT_TO_FILE)
+		{
 			return this._outputPath;
 		}
-		else {
+		else
+		{
 			return this._outputType.getName();
 		}
 	}
@@ -206,28 +206,76 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._triggers;
 	}
+	
+	/**
+	 * invokeBlockCommand
+	 * 
+	 * @param resultText
+	 * @return
+	 */
+	private String invokeBlockCommand(CommandContext context)
+	{
+		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+		ThreadContext threadContext = runtime.getCurrentContext();
+		String resultText = ""; //$NON-NLS-1$
+		
+		// grab map from context and make it unmodifiable
+		//Map<String,Object> map = Collections.unmodifiableMap(context.getMap());
+		
+		try
+		{
+			RubyModule radrails = runtime.getModule("RadRails");
+			RubyClass rclass = radrails.getClass("Context");
+			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
+			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
+			
+			IRubyObject result = this._invokeBlock.call(
+				threadContext,
+//				new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, obj) }
+				new IRubyObject[] { rubyContext }
+			);
+			
+			if (result != null)
+			{
+				resultText = result.asString().asJavaString();
+			}
+		}
+		catch (Exception e)
+		{
+			String message = MessageFormat.format(
+				Messages.CommandElement_Error_Processing_Command_Block,
+				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
+			);
+			
+			ScriptLogger.logError(message);
+		}
+		
+		return resultText;
+	}
 
 	/**
 	 * getWorkingDirectory
-	 *
+	 * 
 	 * @return
 	 */
 	public String getWorkingDirectory()
 	{
-		switch (this._workingDirectoryType) {
-		case CURRENT_BUNDLE:
-			return new File(this.getPath()).getParentFile().toString();
+		switch (this._workingDirectoryType)
+		{
+			case CURRENT_BUNDLE:
+				return new File(this.getPath()).getParentFile().toString();
 
-		case PATH:
-			return this._workingDirectoryPath;
+			case PATH:
+				return this._workingDirectoryPath;
 
-		// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-		// can't implement these yet because they require us to hook into higher level functionality in the editor.common and explorer plugins. AAAARGH.
-		case UNDEFINED:
-		case CURRENT_PROJECT:
-		case CURRENT_FILE:
-		default:
-			return new File(this.getPath()).getParentFile().toString();
+				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
+				// can't implement these yet because they require us to hook into higher level functionality in the
+				// editor.common and explorer plugins. AAAARGH.
+			case UNDEFINED:
+			case CURRENT_PROJECT:
+			case CURRENT_FILE:
+			default:
+				return new File(this.getPath()).getParentFile().toString();
 		}
 	}
 
@@ -236,7 +284,7 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	private String invokeStringCommand()
+	private String invokeStringCommand(CommandContext context)
 	{
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
@@ -260,6 +308,12 @@ public class CommandElement extends AbstractBundleElement
 			
 			List<String> commands = new ArrayList<String>();
 			ProcessBuilder builder = new ProcessBuilder();
+			Map<String,String> environment = builder.environment();
+			
+			for (Map.Entry<String, Object> entry : context.getMap().entrySet())
+			{
+				environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
+			}
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 			{
@@ -350,13 +404,13 @@ public class CommandElement extends AbstractBundleElement
 	}
 	
 	/**
-	 * isSnippet
+	 * setInputType
 	 * 
-	 * @return
+	 * @param type
 	 */
-	public boolean isSnippet()
+	public void setInputType(InputType type)
 	{
-		return (this._inputType == InputType.NONE && this._outputType == OutputType.INSERT_AS_SNIPPET);
+		this._inputType = type;
 	}
 	
 	/**
@@ -367,16 +421,6 @@ public class CommandElement extends AbstractBundleElement
 	public void setInputType(String input)
 	{
 		this._inputType = InputType.get(input);
-	}
-	
-	/**
-	 * setInputType
-	 * 
-	 * @param type
-	 */
-	public void setInputType(InputType type)
-	{
-		this._inputType = type;
 	}
 	
 	/**
@@ -422,21 +466,21 @@ public class CommandElement extends AbstractBundleElement
 	/**
 	 * setOutputType
 	 * 
-	 * @param output
-	 */
-	public void setOutputType(String output)
-	{
-		this._outputType = OutputType.get(output);
-	}
-	
-	/**
-	 * setOutputType
-	 * 
 	 * @param type
 	 */
 	public void setOutputType(OutputType type)
 	{
 		this._outputType = type;
+	}
+	
+	/**
+	 * setOutput
+	 * 
+	 * @param output
+	 */
+	public void setOutputType(String output)
+	{
+		this._outputType = OutputType.get(output);
 	}
 	
 	/**
@@ -495,13 +539,13 @@ public class CommandElement extends AbstractBundleElement
 	protected void toSource(SourcePrinter printer)
 	{
 		// output command type
-		if (this.isSnippet())
+		if (this instanceof CommandElement)
 		{
-			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else
 		{
-			printer.printWithIndent("command \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+			printer.printWithIndent("snippet \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		// output path and scope
@@ -538,7 +582,7 @@ public class CommandElement extends AbstractBundleElement
 			{
 				if (first == false)
 				{
-					printer.print(", ");
+					printer.print(", "); //$NON-NLS-1$
 				}
 				
 				printer.print(trigger);

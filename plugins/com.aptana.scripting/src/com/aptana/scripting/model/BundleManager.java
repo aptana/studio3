@@ -382,8 +382,9 @@ public class BundleManager
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
 		List<String> result = new ArrayList<String>();
+		List<String> paths = ScriptingEngine.getInstance().getContributedLoadPaths();
 		
-		result.add(ScriptingEngine.getBuiltinsLoadPath());
+		result.addAll(paths);
 		result.add(bundleDirectory.getAbsolutePath() + File.separator + LIB_DIRECTORY_NAME);
 		
 		return result;
