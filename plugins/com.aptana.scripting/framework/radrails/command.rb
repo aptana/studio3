@@ -1,23 +1,15 @@
 require "java"
+require "radrails/base_element"
 require "radrails/scope_selector"
 
 module RadRails
   
-  class Command
+  class Command < BaseElement
     def initialize(name)
-      @jobj = create_java_object
-      @jobj.display_name = name;
+      super(name)
       
       bundle = BundleManager.bundle_from_path(path)
       bundle.apply_defaults(self) unless bundle.nil?
-    end
-    
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
     end
     
     def input
@@ -68,10 +60,6 @@ module RadRails
     
     def owning_bundle
       @jobj.owning_bundle
-    end
-    
-    def path
-      @jobj.path
     end
     
     def scope

@@ -14,6 +14,7 @@ public abstract class AbstractElement
 	
 	private String _path;
 	private String _displayName;
+	private Map<String,Object> _customProperties;
 	
 	/**
 	 * static constructor
@@ -109,6 +110,24 @@ public abstract class AbstractElement
 	}
 	
 	/**
+	 * get
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public Object get(String property)
+	{
+		Object result = null;
+		
+		if (this._customProperties != null)
+		{
+			result = this._customProperties.get(property);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getDisplayName
 	 * 
 	 * @return
@@ -128,6 +147,25 @@ public abstract class AbstractElement
 		return this._path;
 	}
 
+	/**
+	 * put
+	 * 
+	 * @param property
+	 * @param value
+	 */
+	public void put(String property, Object value)
+	{
+		if (property != null && property.length() > 0)
+		{
+			if (this._customProperties == null)
+			{
+				this._customProperties = new HashMap<String, Object>();
+			}
+			
+			this._customProperties.put(property, value);
+		}
+	}
+	
 	/**
 	 * setDisplayName
 	 * 
