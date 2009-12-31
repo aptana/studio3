@@ -323,22 +323,13 @@ public class CommandExecutionUtils
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
 
-		if (command.isShellCommand())
+		Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
+		if (computedEnvironmentMap != null)
 		{
-			Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
-			if (computedEnvironmentMap != null)
+			// augment it
+			for (Map.Entry<String,String> entry : computedEnvironmentMap.entrySet())
 			{
-				Map<String, String> environmentMap = commandContext.getEnvironmentMap();
-				if (environmentMap == null)
-				{
-					// missing. re-add it
-					commandContext.put(CommandContext.ENV, computedEnvironmentMap);
-				}
-				else
-				{
-					// augment it
-					environmentMap.putAll(computedEnvironmentMap);
-				}
+				commandContext.put(entry.getKey(), entry.getValue());
 			}
 		}
 

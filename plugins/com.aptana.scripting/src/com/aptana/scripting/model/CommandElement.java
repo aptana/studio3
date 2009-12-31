@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -307,6 +308,12 @@ public class CommandElement extends AbstractBundleElement
 			
 			List<String> commands = new ArrayList<String>();
 			ProcessBuilder builder = new ProcessBuilder();
+			Map<String,String> environment = builder.environment();
+			
+			for (Map.Entry<String, Object> entry : context.getMap().entrySet())
+			{
+				environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
+			}
 			
 			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
 			{

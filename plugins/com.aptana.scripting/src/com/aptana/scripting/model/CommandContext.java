@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +21,10 @@ import com.aptana.scripting.ScriptingEngine;
 public class CommandContext
 {
 	// Key names for well known keys in the map
-	public static final String ENV = "ENV"; //$NON-NLS-1$
-	public static final String WORKING_DIRECTORY = "ACTIVE_PROJECT_FOLDER"; //$NON-NLS-1$
+	public static final String WORKING_DIRECTORY = "active_project_folder"; //$NON-NLS-1$
 
-	public static final String ACTIVE_PROJECT_NAME = "ACTIVE_PROJECT_NAME"; //$NON-NLS-1$
-	public static final String ACTIVE_PROJECT_FOLDER = "ACTIVE_PROJECT_FOLDER"; //$NON-NLS-1$
+	public static final String ACTIVE_PROJECT_NAME = "active_project_name"; //$NON-NLS-1$
+	public static final String ACTIVE_PROJECT_FOLDER = "active_project_folder"; //$NON-NLS-1$
 
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
@@ -99,17 +97,6 @@ public class CommandContext
 	CommandContext(CommandElement command)
 	{
 		this._map = new HashMap<String,Object>();
-		
-		if (command.isShellCommand())
-		{
-			Map<String, String> envMap = new LinkedHashMap<String, String>();
-			
-			// Inherit the environment from parent
-			envMap.putAll(new ProcessBuilder().environment());
-			
-			// Install default environment
-			this._map.put(ENV, envMap);
-		}
 
 		for (ContextContributor contributor : getContextContributors())
 		{
@@ -126,17 +113,6 @@ public class CommandContext
 	public Object get(String key)
 	{
 		return this._map.get(key);
-	}
-	
-	/**
-	 * Return ENV map.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public Map<String, String> getEnvironmentMap()
-	{
-		return (Map<String, String>) this._map.get(ENV);
 	}
 	
 	/**
@@ -184,31 +160,13 @@ public class CommandContext
 	}
 	
 	/**
-	 * Set the value of environment variable.
+	 * putAll
 	 * 
-	 * @param name
-	 *            Ignored if null.
-	 * @param value
-	 *            If not null set the value. If null, remove the environment variable.
+	 * @param entries
 	 */
-	public void putEnvironment(String name, String value)
+	public void putAll(Map<String,Object> entries)
 	{
-		if (name != null)
-		{
-			Map<String, String> map = this.getEnvironmentMap();
-	
-			if (map != null)
-			{
-				if (value == null)
-				{
-					map.remove(name);
-				}
-				else
-				{
-					map.put(name, value);
-				}
-			}
-		}
+		this._map.putAll(entries);
 	}
 
 	/**

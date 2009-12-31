@@ -30,16 +30,8 @@ public class ExplorerContextContributor implements
 			return;
 		}
 		
-		if (command.isShellCommand())
-		{
-			context.putEnvironment(CommandContext.ACTIVE_PROJECT_NAME, activeProjectName);
-			context.putEnvironment(CommandContext.ACTIVE_PROJECT_FOLDER, project.getLocation().toOSString());
-		}
-		else
-		{
-			context.put(CommandContext.ACTIVE_PROJECT_NAME.toLowerCase(), activeProjectName);
-			context.put(CommandContext.ACTIVE_PROJECT_FOLDER.toLowerCase(), project.getLocation().toOSString());
-		}
+		context.put(CommandContext.ACTIVE_PROJECT_NAME, activeProjectName);
+		context.put(CommandContext.ACTIVE_PROJECT_FOLDER, project.getLocation().toOSString());
 	}
 
 }
