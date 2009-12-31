@@ -28,8 +28,12 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -306,6 +310,9 @@ public class CommandExecutionUtils
 		case DOCUMENT:
 			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText());
 			break;
+		case CLIPBOARD:
+			filterInputProvider = new CommandExecutionUtils.StringInputProvider(getClipboardContents());
+			break;
 		case LINE:
 			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget.getLineAtOffset(textWidget.getCaretOffset())));
 			break;
@@ -377,113 +384,149 @@ public class CommandExecutionUtils
 				SnippetsCompletionProcessor.insertAsTemplate(textViewer, caretOffset, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
-				// TODO Refactor into a method
-				File tempHmtlFile = null;
-				try
-				{
-					tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
-				}
-				catch (IOException e)
-				{
-					CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
-				}
-				if (tempHmtlFile != null)
-				{
-					String output = commandResult.getOutputString();
-					tempHmtlFile.deleteOnExit();
-					PrintWriter pw = null;
-					try
-					{
-						pw = new PrintWriter(tempHmtlFile);
-					}
-					catch (FileNotFoundException fne)
-					{
-						CommonEditorPlugin.logError(fne);
-					}
-					if (pw != null)
-					{
-						pw.println(output);
-						pw.flush();
-						pw.close();
-						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-						try
-						{
-							URL url = tempHmtlFile.toURI().toURL();
-							if (support.isInternalWebBrowserAvailable())
-							{
-								support.createBrowser(
-										IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-												| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
-										"", //$NON-NLS-1$
-										"", //$NON-NLS-1$
-										command.getDisplayName()).openURL(url);
-							}
-							else
-							{
-								support.getExternalBrowser().openURL(url);
-							}
-						}
-						catch (PartInitException e)
-						{
-							CommonEditorPlugin.logError(e);
-						}
-						catch (MalformedURLException e)
-						{
-							CommonEditorPlugin.logError(e);
-						}
-					}
-				}
+				showAsHTML(command, commandResult);
 				break;
 			case SHOW_AS_TOOLTIP:
-				// TODO Refactor into a method
-				DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(), Messages.CommandExecutionUtils_TypeEscapeToDismiss,
-						null);
-				tooltip.setInformation(commandResult.getOutputString());
-				Point p = tooltip.computeSizeHint();
-				tooltip.setSize(p.x, p.y);
-
-				Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
-				locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
-						+ textWidget.getLineHeight(caretOffset) + 2);
-				tooltip.setLocation(locationAtOffset);
-				tooltip.setVisible(true);
-				tooltip.setFocus();
+				showAsTooltip(commandResult, textWidget, caretOffset);
 				break;
 			case CREATE_NEW_DOCUMENT:
-				// TODO Refactor into a method
-				File file = Utilities.getFile();
-				IEditorInput input = Utilities.createFileEditorInput(file, "Untitled.txt"); //$NON-NLS-1$
-				String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
+				createNewDocument(commandResult);
+				break;
+			case COPY_TO_CLIPBOARD:
+				copyToClipboard(commandResult);
+				break;
+		}
+	}
+
+	private static void copyToClipboard(CommandResult commandResult)
+	{
+		getClipboard().setContents(new Object[] { commandResult.getOutputString() }, new Transfer[] { TextTransfer.getInstance() });
+	}
+	
+	private static String getClipboardContents()
+	{
+		return (String) getClipboard().getContents(TextTransfer.getInstance());
+	}
+
+	protected static Clipboard getClipboard()
+	{
+		Display display = Display.getCurrent();
+		if (display == null)
+			display = Display.getDefault();
+		final Clipboard cb = new Clipboard(display);
+		return cb;
+	}
+
+	private static void createNewDocument(CommandResult commandResult)
+	{
+		File file = Utilities.getFile();
+		IEditorInput input = Utilities.createFileEditorInput(file, "Untitled.txt"); //$NON-NLS-1$
+		String editorId = "org.eclipse.ui.DefaultTextEditor"; //$NON-NLS-1$
+		try
+		{
+			IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+					input, editorId);
+			if (part instanceof ITextEditor)
+			{
+				ITextEditor openedTextEditor = (ITextEditor) part;
+				IDocumentProvider dp = openedTextEditor.getDocumentProvider();
+				IDocument doc = dp.getDocument(openedTextEditor.getEditorInput());
 				try
 				{
-					IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-							input, editorId);
-					if (part instanceof ITextEditor)
+					String fileContents = commandResult.getOutputString();
+					if (fileContents != null)
 					{
-						ITextEditor openedTextEditor = (ITextEditor) part;
-						IDocumentProvider dp = openedTextEditor.getDocumentProvider();
-						IDocument doc = dp.getDocument(openedTextEditor.getEditorInput());
-						try
-						{
-							String fileContents = commandResult.getOutputString();
-							if (fileContents != null)
-							{
-								doc.replace(0, 0, fileContents);
-							}
-						}
-						catch (BadLocationException e)
-						{
-							CommonEditorPlugin.logError(e);
-						}
+						doc.replace(0, 0, fileContents);
 					}
+				}
+				catch (BadLocationException e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
 
+		}
+		catch (PartInitException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	private static void showAsTooltip(CommandResult commandResult, StyledText textWidget, final int caretOffset)
+	{
+		DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell(), Messages.CommandExecutionUtils_TypeEscapeToDismiss,
+				null);
+		tooltip.setInformation(commandResult.getOutputString());
+		Point p = tooltip.computeSizeHint();
+		tooltip.setSize(p.x, p.y);
+
+		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
+		locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
+				+ textWidget.getLineHeight(caretOffset) + 2);
+		tooltip.setLocation(locationAtOffset);
+		tooltip.setVisible(true);
+		tooltip.setFocus();
+	}
+
+	private static void showAsHTML(CommandElement command, CommandResult commandResult)
+	{
+		String output = commandResult.getOutputString();
+		if (output == null || output.trim().length() == 0)
+			return; // Don't open a browser when there's no content
+		File tempHmtlFile = null;
+		try
+		{
+			tempHmtlFile = File.createTempFile(CommonEditorPlugin.PLUGIN_ID, ".html"); //$NON-NLS-1$
+		}
+		catch (IOException e)
+		{
+			CommonEditorPlugin.logError(Messages.CommandExecutionUtils_CouldNotCreateTemporaryFile, e);
+		}
+		if (tempHmtlFile != null)
+		{			
+			tempHmtlFile.deleteOnExit();
+			PrintWriter pw = null;
+			try
+			{
+				pw = new PrintWriter(tempHmtlFile);
+			}
+			catch (FileNotFoundException fne)
+			{
+				CommonEditorPlugin.logError(fne);
+			}
+			if (pw != null)
+			{
+				pw.println(output);
+				pw.flush();
+				pw.close();
+				IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+				try
+				{
+					URL url = tempHmtlFile.toURI().toURL();
+					if (support.isInternalWebBrowserAvailable())
+					{
+						support.createBrowser(
+								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
+								"", //$NON-NLS-1$
+								"", //$NON-NLS-1$
+								command.getDisplayName()).openURL(url);
+					}
+					else
+					{
+						support.getExternalBrowser().openURL(url);
+					}
 				}
 				catch (PartInitException e)
 				{
 					CommonEditorPlugin.logError(e);
 				}
-				break;
+				catch (MalformedURLException e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
 		}
 	}
 

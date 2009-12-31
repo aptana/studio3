@@ -35,6 +35,7 @@ public class FilterThroughCommandDialog extends Dialog {
 	private Button documentButton;
 	private Button lineButton;
 	private Button wordButton;
+	private Button clipboardButton;
 	private Button inputFromConsoleButton;
 	
 	private InputType inputType;
@@ -50,6 +51,7 @@ public class FilterThroughCommandDialog extends Dialog {
 	private Button insertAsSnippetButton;
 	private Button showAsHTMLButton;
 	private Button showAsToolTipButton;
+	private Button copyToClipboardButton;
 	private Button createNewDocumentButton;
 	
 	private Button outputToConsoleButton;
@@ -106,6 +108,8 @@ public class FilterThroughCommandDialog extends Dialog {
 		lineButton.setText(Messages.FilterThroughCommandDialog_LBL_Line);
 		wordButton = new Button(inputGroup, SWT.RADIO);
 		wordButton.setText(Messages.FilterThroughCommandDialog_LBL_Word);
+		clipboardButton = new Button(inputGroup, SWT.RADIO);
+		clipboardButton.setText(Messages.FilterThroughCommandDialog_LBL_Clipboard);
 		inputFromConsoleButton = new Button(inputGroup, SWT.RADIO);
 		inputFromConsoleButton.setText(Messages.FilterThroughCommandDialog_LBL_FromConsole);
 		
@@ -137,6 +141,8 @@ public class FilterThroughCommandDialog extends Dialog {
 		showAsHTMLButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowAsHTML);
 		showAsToolTipButton = new Button(outputGroup, SWT.RADIO);
 		showAsToolTipButton.setText(Messages.FilterThroughCommandDialog_LBL_ShowAsToolTip);
+		copyToClipboardButton = new Button(outputGroup, SWT.RADIO);
+		copyToClipboardButton.setText(Messages.FilterThroughCommandDialog_LBL_CopyToClipboard);
 		createNewDocumentButton = new Button(outputGroup, SWT.RADIO);
 		createNewDocumentButton.setText(Messages.FilterThroughCommandDialog_LBL_CreateNewDocument);
 		outputToConsoleButton = new Button(outputGroup, SWT.RADIO);
@@ -209,6 +215,8 @@ public class FilterThroughCommandDialog extends Dialog {
 			inputType = InputType.WORD;
 		} else if (inputFromConsoleButton.getSelection()) {
 			inputType = InputType.INPUT_FROM_CONSOLE;
+		} else if (clipboardButton.getSelection()) {
+			inputType = InputType.CLIPBOARD;
 		}
 		
 		if (discardButton.getSelection()) {
@@ -235,6 +243,8 @@ public class FilterThroughCommandDialog extends Dialog {
 			outputType = OutputType.CREATE_NEW_DOCUMENT;
 		} else if (outputToConsoleButton.getSelection()) {
 			outputType = OutputType.OUTPUT_TO_CONSOLE;
+		} else if (copyToClipboardButton.getSelection()) {
+			outputType = OutputType.COPY_TO_CLIPBOARD;
 		}
 		
 		saveState();
@@ -261,6 +271,9 @@ public class FilterThroughCommandDialog extends Dialog {
 			break;
 		case WORD:
 			wordButton.setSelection(true);
+			break;
+		case CLIPBOARD:
+			clipboardButton.setSelection(true);
 			break;
 		case INPUT_FROM_CONSOLE:
 			inputFromConsoleButton.setSelection(true);
@@ -294,6 +307,9 @@ public class FilterThroughCommandDialog extends Dialog {
 			break;
 		case SHOW_AS_TOOLTIP:
 			showAsToolTipButton.setSelection(true);
+			break;
+		case COPY_TO_CLIPBOARD:
+			copyToClipboardButton.setSelection(true);
 			break;
 		case OUTPUT_TO_CONSOLE:
 			outputToConsoleButton.setSelection(true);
