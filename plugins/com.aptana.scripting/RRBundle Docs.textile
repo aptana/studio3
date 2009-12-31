@@ -139,6 +139,7 @@ The possible input specifiers are:
 | @:word@				| word surrounding the current caret |
 | @:line@				| the line containing the caret |
 | @:document@			| the entire current document |
+| @:clipboard@			| the contents of the clipboard |
 | @:scope@				| (NOT YET IMPLEMENTED) As in TextMate: search backwards and forwards for the first character which is not matched by the scope selector of the command and use those as boundaries for the input. |
 | @:input_from_console@	| take input from a shell window? How do we specify which console? |
 | @:none@				| no input is needed by this command. When encountered in the *multiple symbol specifier* case, this symbol always terminates fallback evaluation |
@@ -152,6 +153,7 @@ The possible output specifiers are:
 | @:insert_as_snippet@	| as with @:insert_as_text@, but the output is interpreted as snippet expansion text |
 | @:replace_selection@	| replace the currently selected text with the output. If no text is selected, this is equivalent to the @:insert_as_text@ specifier |
 | @:replace_document@	| replace the entire document with the output |
+| @:copy_to_clipboard@	| replace the contents of the clipboard with the output |
 | @:show_as_html@	| open an html browser window and intepret the output as html |
 | @:show_as_tooltip@	| show a tooltip containing the output |
 | @:create_new_document@	| create a new editor document containing the output |
