@@ -34,6 +34,8 @@ public class Messages extends NLS {
 	public static String FilterThroughCommandDialog_LBL_ShowEnvironment;
 	public static String FilterThroughCommandDialog_LBL_ToConsole;
 	public static String FilterThroughCommandDialog_LBL_Word;
+	public static String FilterThroughCommandDialog_LBL_Clipboard;
+	public static String FilterThroughCommandDialog_LBL_CopyToClipboard;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
