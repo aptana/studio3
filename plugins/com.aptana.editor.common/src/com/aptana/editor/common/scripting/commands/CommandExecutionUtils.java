@@ -294,7 +294,8 @@ public class CommandExecutionUtils
 		
 		FilterInputProvider filterInputProvider = CommandExecutionUtils.EOF;
 
-		InputType inputType = InputType.get(command.getInputType());
+		InputType[] inputTypes = command.getInputTypes();
+		InputType inputType = (inputTypes == null || inputTypes.length == 0) ? InputType.UNDEFINED : inputTypes[0];
 		switch (inputType) {
 		case SELECTION:
 			filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());

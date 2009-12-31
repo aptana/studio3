@@ -25,7 +25,7 @@ module RadRails
     end
     
     def input=(input)
-      @jobj.input_type = input.to_s
+      @jobj.input_type = (input && input.kind_of?(Array)) ? input.to_java(:String) : input.to_s;
     end
     
     def invoke(&block)
@@ -64,6 +64,10 @@ module RadRails
         @jobj.output_type = "output_to_file"
         @jobj.output_path = output.to_s
       end
+    end
+    
+    def owning_bundle
+      @jobj.owning_bundle
     end
     
     def path
@@ -110,7 +114,7 @@ module RadRails
     end
     
     def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger;
+      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
     end
     
     class << self

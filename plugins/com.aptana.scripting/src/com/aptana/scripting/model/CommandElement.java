@@ -25,11 +25,13 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
+	private static final InputType[] NO_TYPES = new InputType[0];
+	
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
 	private String _keyBinding;
-	private InputType _inputType;
+	private InputType[] _inputTypes;
 	private OutputType _outputType;
 	private String _outputPath;
 	private String _workingDirectoryPath;
@@ -44,7 +46,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		super(path);
 		
-		this._inputType = InputType.UNDEFINED;
+		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
 	}
@@ -99,9 +101,9 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getInputType()
+	public InputType[] getInputTypes()
 	{
-		return this._inputType.getName();
+		return this._inputTypes;
 	}
 
 	/**
@@ -410,7 +412,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInputType(InputType type)
 	{
-		this._inputType = type;
+		this.setInputType(new InputType[] { type });
 	}
 	
 	/**
@@ -420,7 +422,39 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInputType(String input)
 	{
-		this._inputType = InputType.get(input);
+		this.setInputType(InputType.get(input));
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param types
+	 */
+	public void setInputType(InputType[] types)
+	{
+		this._inputTypes = (types == null) ? NO_TYPES : types;
+	}
+	
+	/**
+	 * setInputType
+	 * 
+	 * @param types
+	 */
+	public void setInputType(String[] types)
+	{
+		InputType[] result = null;
+		
+		if (types != null)
+		{
+			result = new InputType[types.length];
+			
+			for (int i = 0; i < types.length; i++)
+			{
+				result[i] = InputType.get(types[i]);
+			}
+		}
+		
+		this.setInputType(result);
 	}
 	
 	/**
@@ -566,7 +600,32 @@ public class CommandElement extends AbstractBundleElement
 		
 		// output key binding, intput, and output settings
 		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
-		printer.printWithIndent("input: ").println(this._inputType.getName()); //$NON-NLS-1$
+		
+		// output a comma-delimited list of input types, if they are defined
+		InputType[] types = this.getInputTypes();
+		
+		if (types != null && types.length > 0)
+		{
+			boolean first = true;
+			
+			printer.printWithIndent("input: "); //$NON-NLS-1$
+			
+			for (InputType type : types)
+			{
+				if (first == false)
+				{
+					printer.print(", "); //$NON-NLS-1$
+				}
+				
+				printer.print(type.getName());
+				
+				first = false;
+			}
+			
+			printer.println();
+		}
+		
+		// output output type
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
 		
 		// output a comma-delimited list of triggers, if any are defined
