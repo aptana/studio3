@@ -88,22 +88,22 @@ Snippets are a specialized form of commands, designed to make it easier to speci
 
 <pre>
 <code programming-language="ruby">
-	snippet "My Snippet" do |snip|
-	  snip.trigger = "foo"
-	  snip.expansion = "my_super_snippet"
-	end
+snippet "My Snippet" do |snip|
+  snip.trigger = "foo"
+  snip.expansion = "my_super_snippet"
+end
 
-	command "My Snippet" do |cmd|
-	  cmd.trigger = "foo"
-	  cmd.expansion = "my_super_snippet"
+command "My Snippet" do |cmd|
+  cmd.trigger = "foo"
+  cmd.expansion = "my_super_snippet"
 
-	  cmd.input = :none
-	  cmd.output = :insert_as_snippet
+  cmd.input = :none
+  cmd.output = :insert_as_snippet
 
-	  cmd.invoke do |context|
-	    context.output = cmd.expansion
-	  end
-	end
+  cmd.invoke do |context|
+    context.output = cmd.expansion
+  end
+end
 </code>
 </pre>
 
@@ -244,8 +244,8 @@ It may be necessary for commands to define specific key bindings for specific pl
 
 <pre>
 <code programming-language="ruby">
-	command.key_binding = [ :control, "v" ]
-	command.key_binding[:mac] = [ :command, "v" ]
+command.key_binding = [ :control, "v" ]
+command.key_binding[:mac] = [ :command, "v" ]
 </code>
 </pre>
 
