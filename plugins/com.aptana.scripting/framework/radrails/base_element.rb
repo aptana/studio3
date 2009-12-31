@@ -21,14 +21,11 @@ module RadRails
     end
     
     def method_missing(m, *args, &block)
-      puts "method missing: #{m}, #{args}"
       property_name = m.to_s
       
       if property_name.end_with?("=")
-        puts "calling put"
         @jobj.put(property_name.chop, args[0])
       else
-        puts "calling get"
         @jobj.get property_name
       end
     end
