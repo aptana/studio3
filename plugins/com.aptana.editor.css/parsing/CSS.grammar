@@ -1,0 +1,182 @@
+%package "com.aptana.editor.css.parsing";
+%class "CSSParser";
+
+%terminals AT_KEYWORD, CHARSET, IMPORT, MEDIA, PAGE, FUNCTION;
+%terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, FORWARD_SLASH;
+%terminals MINUS, PLUS, EQUAL, GREATER, STAR;
+%terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
+%terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
+
+Program
+	=	Statements
+	;
+
+Statements
+	=	Statements Statement
+	|	Statement
+	;
+
+Statement
+	=	AtRule
+	|	CharSet
+	|	Import
+	|	Media
+	|	Page
+	|	Rule
+	|	error
+	;
+
+AtRule
+	=	AT_KEYWORD STRING SEMICOLON
+	|	AT_KEYWORD STRING LCURLY RCURLY
+	;
+
+CharSet
+	=	CHARSET STRING SEMICOLON
+	;
+
+Import
+	=	IMPORT ImportWord SEMICOLON
+	|	IMPORT ImportWord List SEMICOLON
+	;
+
+Media
+	=	MEDIA IDENTIFIER LCURLY RCURLY
+	;
+	
+Page
+	=	PAGE LCURLY RCURLY
+	|	PAGE LCURLY Declarations RCURLY
+	|	PAGE COLON IDENTIFIER LCURLY RCURLY
+	;
+
+Rule
+	=	Selectors LCURLY RCURLY
+	|	Selectors LCURLY Declarations RCURLY
+	;
+
+ImportWord
+	=	STRING
+	|	URL
+	;
+	
+Function
+	=	FUNCTION Expression RPAREN
+	;
+	
+List
+	=	List COMMA IDENTIFIER
+	|	IDENTIFIER
+	;
+
+Declarations
+	=	Declarations SEMICOLON Declaration
+	|	Declarations SEMICOLON
+	|	Declaration
+	|	SEMICOLON
+	;
+
+Declaration
+	=	Identifier COLON Expression
+	|	Identifier COLON Expression IMPORTANT
+	;
+	
+Identifier
+	=	IDENTIFIER
+	|	PROPERTY
+	;
+
+Expression
+	=	Expression Separator Primitive
+	|	Expression Separator Function
+	|	Expression Primitive
+	|	Expression Function
+	|	Term
+	;
+
+Term
+	=	PlusMinus Primitive
+	|	Primitive
+	|	Function
+	;
+
+PlusMinus
+	=	MINUS
+	|	PLUS
+	;
+	
+Separator
+	=	FORWARD_SLASH
+	|	COMMA
+	|	PLUS
+	|	MINUS
+	;
+
+Selectors
+	=	Selectors COMMA Selector
+	|	Selector
+	;
+
+Selector
+	=	Selector SimpleSelector
+	|	Selector Combinator SimpleSelector
+	|	SimpleSelector
+	;
+
+SimpleSelector
+	=	TypeOrUniversalSelector
+	|	TypeOrUniversalSelector AttributeSelectors
+	|	AttributeSelectors
+	;
+	
+Combinator
+	=	PLUS
+	|	GREATER
+	;
+
+TypeOrUniversalSelector
+	=	IDENTIFIER
+	|	STAR
+	|	SELECTOR
+	;
+	
+AttributeSelectors
+	=	AttributeSelectors AttributeSelector
+	|	AttributeSelector
+	;
+	
+AttributeSelector
+	=	CLASS
+	|	COLON IDENTIFIER
+	|	COLON Function
+	|	COLOR
+	|	HASH
+	|	LBRACKET IDENTIFIER RBRACKET
+	|	LBRACKET IDENTIFIER AttributeValueOperator IdentiferOrString RBRACKET
+	;
+
+AttributeValueOperator
+	=	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
+	;
+
+IdentiferOrString
+	=	IDENTIFIER
+	|	STRING
+	;
+
+Primitive
+	=	NUMBER
+	|	PERCENTAGE
+	|	LENGTH
+	|	EMS
+	|	EXS
+	|	ANGLE
+	|	TIME
+	|	FREQUENCY
+	|	STRING
+	|	IDENTIFIER
+	|	URL
+	|	COLOR
+	;
