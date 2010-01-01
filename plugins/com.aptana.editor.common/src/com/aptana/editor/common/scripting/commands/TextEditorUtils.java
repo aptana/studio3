@@ -12,7 +12,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * 
  * @author schitale
  */
-abstract class TextEditorUtils
+public abstract class TextEditorUtils
 {
 
 	/**
@@ -24,7 +24,7 @@ abstract class TextEditorUtils
 	 * @param textEditor
 	 * @return
 	 */
-	static int getCaretOffset(ITextEditor textEditor)
+	public static int getCaretOffset(ITextEditor textEditor)
 	{
 		// Assume forward (LtoR) selection
 		boolean forwardSelection = true;

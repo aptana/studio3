@@ -98,7 +98,7 @@ public class BundleManager
 		{
 			INSTANCE.userBundlesPath = userBundlesPath;
 		}
-
+		
 		return INSTANCE;
 	}
 	
