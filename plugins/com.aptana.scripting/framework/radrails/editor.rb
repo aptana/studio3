@@ -15,7 +15,7 @@ module RadRails
         absolute_path = uri.path
         uri_string = uri.scheme ? uri.to_s : "file:#{absolute_path}"
         editor = nil
-        job = UIJob.new("Opening editor") do          
+        RadRails::UI.run("Opening editor") do          
           page = RadRails::UI.active_page
           return nil unless page
           ipath = org.eclipse.core.runtime.Path.new(absolute_path)
@@ -30,9 +30,35 @@ module RadRails
           end
           editor = RadRails::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), desc.getId, true))
         end
-        job.schedule
-        job.join
         return editor
+      end
+      
+      # Return the active editor
+      def active
+        editor = nil
+        RadRails::UI.run("Getting reference to active editor") do          
+          page = RadRails::UI.active_page
+          return nil unless page
+          editor = RadRails::Editor.new(page.active_editor)
+        end
+        return editor
+      end
+      
+      # Opens an editor to a specific file, line and column. If no file is specified, assume the active editor
+      # Line numbers begin at 1. If not specified, line will be 1.
+      # Columns begin at 1. If not specified, column will be 1.
+      def go_to(options = {})
+        default_line = options.has_key?(:file) ? 1 : ENV['TM_LINE_NUMBER']
+        options = {:file => ENV['TM_FILEPATH'], :line => default_line, :column => 1}.merge(options)
+        editor = nil
+        if options[:file]
+          editor = RadRails::Editor.open("file://#{options[:file]}")
+        else
+          editor = RadRails::Editor.active
+        end
+        return unless editor        
+        region = editor.document.getLineInformation(options[:line].to_i - 1)
+        editor.selection = [region.offset + options[:column].to_i - 1, 0]
       end
     end
     
@@ -49,11 +75,7 @@ module RadRails
     # Closes the editor. Pass in false to avoid saving before closing.
     def close(save = true)     
       closed = false 
-      job = UIJob.new("Close Editor") do |monitor|
-        closed = RadRails::UI.active_page.close_editor(editor_part, save)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Close Editor") { closed = RadRails::UI.active_page.close_editor(editor_part, save) }
       closed
     end
     
@@ -65,11 +87,7 @@ module RadRails
     # Saves the editor. Pass in false to avoid confirm dialog if editor is dirty.
     def save(confirm = true)
       saved = false
-      job = UIJob.new("Save Editor") do |monitor|
-        saved = RadRails::UI.active_page.save_editor(editor_part, confirm)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Save Editor") { saved = RadRails::UI.active_page.save_editor(editor_part, confirm) }
       saved
     end
     
@@ -85,20 +103,12 @@ module RadRails
     
     # FIXME This method only exists in Eclipse 3.5+
     def hide
-      job = UIJob.new("Hide Editor") do |monitor|
-        RadRails::UI.active_page.hide_editor(editor_reference)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Hide Editor") { RadRails::UI.active_page.hide_editor(editor_reference) }
     end
     
     # FIXME This method only exists in Eclipse 3.5+
     def show
-      job = UIJob.new("Show Editor") do |monitor|
-        RadRails::UI.active_page.show_editor(editor_reference)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Show Editor") { RadRails::UI.active_page.show_editor(editor_reference) }
     end
     
     def editor_reference
@@ -115,11 +125,7 @@ module RadRails
     end
     
     def document=(src)
-      job = UIJob.new("Change Editor Contents") do |monitor|
-        document.set(src)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Change Editor Contents") { document.set(src) }
     end
     
     # Is the editor editable?
@@ -130,11 +136,7 @@ module RadRails
     # Replace a portion of the editor's contents
     # Assumes that the args in the brackets are offset and length, and that the value is a string
     def []=(offset, length, src)    
-      job = UIJob.new("Replacing Editor Contents") do |monitor|
-        document.replace(offset, length, src)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
     end
     
     # TODO Just forward missing methods over to editor_part?
@@ -160,11 +162,7 @@ module RadRails
         offset = array_or_range.first
         length = array_or_range.last - offset
       end
-      job = UIJob.new("Changing Editor Selection") do |monitor|
-        editor_part.select_and_reveal(offset, length)
-      end
-      job.schedule
-      job.join
+      RadRails::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
     end    
   end
 end
