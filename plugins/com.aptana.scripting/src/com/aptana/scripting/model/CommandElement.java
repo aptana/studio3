@@ -468,7 +468,7 @@ public class CommandElement extends AbstractBundleElement
 			
 			for (Map.Entry<Platform, String[]> entry : this._keyBindings.entrySet())
 			{
-				printer.printWithIndent(entry.getKey().getName()).print(": ");
+				printer.printWithIndent(entry.getKey().getName()).print(": "); //$NON-NLS-1$
 				
 				boolean first = true;
 				
@@ -626,7 +626,7 @@ public class CommandElement extends AbstractBundleElement
 		else
 		{
 			String message = MessageFormat.format(
-				"Ignoring undefined key binding in {0}",
+				Messages.CommandElement_Undefined_Key_Binding,
 				new Object[] { this.getPath() }
 			);
 			
@@ -656,7 +656,7 @@ public class CommandElement extends AbstractBundleElement
 		else
 		{
 			String message = MessageFormat.format(
-				"Ignoring key binding for unrecognized OS in {0}: {1}",
+				Messages.CommandElement_Unrecognized_OS,
 				new Object[] { this.getPath(), OS }
 			);
 			
