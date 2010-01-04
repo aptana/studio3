@@ -36,7 +36,7 @@ public class SnippetElement extends CommandElement
 	 */
 	protected String getElementName()
 	{
-		return "snippet";
+		return "snippet"; //$NON-NLS-1$
 	}
 	
 	/**

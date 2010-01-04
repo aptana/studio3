@@ -233,7 +233,7 @@ public abstract class AbstractElement
 		{
 			for (Map.Entry<String, Object> entry : this._customProperties.entrySet())
 			{
-				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString());
+				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString()); //$NON-NLS-1$
 			}
 		}
 

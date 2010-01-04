@@ -13,6 +13,8 @@ public class Messages extends NLS
 
 	public static String BundleManager_Executed_Null_Script;
 
+	public static String BundleManager_No_Bundle_File;
+
 	public static String BundleManager_Reloaded_Null_Script;
 	public static String BundleManager_Unloaded_Null_Script;
 

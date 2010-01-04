@@ -101,7 +101,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	protected String getElementName()
 	{
-		return "command";
+		return "command"; //$NON-NLS-1$
 	}
 	
 	/**
@@ -257,8 +257,8 @@ public class CommandElement extends AbstractBundleElement
 		
 		try
 		{
-			RubyModule radrails = runtime.getModule("RadRails");
-			RubyClass rclass = radrails.getClass("Context");
+			RubyModule radrails = runtime.getModule("RadRails"); //$NON-NLS-1$
+			RubyClass rclass = radrails.getClass("Context"); //$NON-NLS-1$
 			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
 			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
 			
