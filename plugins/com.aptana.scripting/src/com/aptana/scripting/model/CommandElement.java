@@ -483,8 +483,10 @@ public class CommandElement extends AbstractBundleElement
 					
 					first = false;
 				}
+				
+				printer.println();
 			}
-			
+
 			printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 		}
 		
