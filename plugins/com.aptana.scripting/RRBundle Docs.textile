@@ -246,7 +246,7 @@ bc. command.key_binding = [ "M1+W", "M1+F4" ] # Multiple keybindings for same co
 
 The KEY_SEQUENCE syntax follows the Eclipse conventions, since those are more portable than the ones used in TextMate. A KEY_SEQUENCE should consist of one or more key strokes. Key strokes are separated by spaces. A key stroke consists of one or more keys held down at the same time. This should be zero or more modifier keys, and one other key. The keys are separated by the + character. The recognized modifiers keys are ALT or OPTION, COMMAND, CTRL, and SHIFT. In addition M1, M2, M3, M4 modifier keys are also recognized. The "M" modifier keys are a platform-independent way of representing keys, and these are generally preferred. M1 is the COMMAND key on MacOS X, and the CTRL key on most other platforms. M2 is the SHIFT key. M3 is the Option key on MacOS X, and the ALT key on most other platforms. M4 is the CTRL key on MacOS X, and is undefined on other platforms. Since M2+M3+<Letter> (Alt+Shift+<Letter>) is reserved on MacOS X for writing special characters.
 
-The actual key is generally specified simply as the ASCII character, in uppercase. So, for example F or , are examples of such keys. However, there are some special keys; keys that have no printable ASCII representation. The following is a list of the current special keys: 
+The actual key is generally specified simply as the ASCII character, in uppercase. So, for example F or X, are examples of such keys. However, there are some special keys; keys that have no printable ASCII representation. The following is a list of the current special keys: 
 
 | ARROW_DOWN	| F1	| NUMPAD_0	|
 | ARROW_LEFT	| F2	| NUMPAD_1	|
