@@ -252,11 +252,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 
 	public static void insertAsTemplate(ITextViewer textViewer, final int caretOffset, String templateText)
 	{
-		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
-		Template template = new SnippetTemplate("", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				SnippetsCompletionProcessor.processExpansion(templateText));
 		IRegion region = new IRegion()
 		{
 			public int getOffset()
@@ -269,11 +264,21 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				return 0;
 			}
 		};
+		insertAsTemplate(textViewer, region, templateText);
+	}
+	
+	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText)
+	{
+		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
+		Template template = new SnippetTemplate("", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				SnippetsCompletionProcessor.processExpansion(templateText));
 		TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
 		SnippetTemplateProposal completionProposal = (SnippetTemplateProposal) snippetsCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
-		completionProposal.apply(textViewer, '0', SWT.NONE, caretOffset);
+		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
 	}
 
 	private static class CustomStyler extends Styler
