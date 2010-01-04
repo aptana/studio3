@@ -19,14 +19,14 @@ public class ResourceUtils
 	}
 
 	/**
-	 * resourcePathToString
+	 * resourcePathToFile
 	 * 
 	 * @param url
 	 * @return
 	 */
-	static public String resourcePathToString(URL url)
+	static public File resourcePathToFile(URL url)
 	{
-		String result = null;
+		File result = null;
 
 		if (url != null)
 		{
@@ -34,9 +34,7 @@ public class ResourceUtils
 			{
 				URL fileURL = FileLocator.toFileURL(url);
 				URI fileURI = toURI(fileURL); // Use Eclipse to get around Java 1.5 bug on Windows
-				File file = new File(fileURI);
-
-				result = file.getAbsolutePath();
+				result = new File(fileURI);
 			}
 			catch (IOException e)
 			{
@@ -56,6 +54,25 @@ public class ResourceUtils
 				
 				UtilPlugin.logError(message, e);
 			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * resourcePathToString
+	 * 
+	 * @param url
+	 * @return
+	 */
+	static public String resourcePathToString(URL url)
+	{
+		String result = null;
+		
+		File file = resourcePathToFile(url);
+		if (file != null)
+		{
+			result = file.getAbsolutePath();
 		}
 
 		return result;
