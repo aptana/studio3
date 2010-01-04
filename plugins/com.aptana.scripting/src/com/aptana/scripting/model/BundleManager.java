@@ -722,7 +722,7 @@ public class BundleManager
 			{
 				if (bundleDirectory.canRead())
 				{
-					File bundleFile = new File(bundleDirectory.getAbsolutePath() + File.separator + BUNDLE_FILE);
+					File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
 					
 					// NOTE: We verify readability when we try to execute the scripts in the bundle
 					// so, there's no need to do that here.
