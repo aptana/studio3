@@ -190,11 +190,26 @@ module RadRails
         active_window.active_page if active_window
       end
       
+      # Executes a block inline if we're already in the UI thread or in a UIJob if we're not. if run in a job, we run synchronously by joining the thread.
+      def run(title, &blk)
+        if in_ui_thread?
+          blk.call(org.eclipse.core.runtime.NullProgressMonitor.new)
+        else
+          job = UIJob.new(title, &blk)
+          job.schedule
+          job.join
+        end
+      end
+      
       private
+      def in_ui_thread?
+        !display.nil?
+      end
+      
       def display
         org.eclipse.swt.widgets.Display.current || org.eclipse.swt.widgets.Display.default
       end
-      
+          
       def shell
         display.active_shell || org.eclipse.swt.widgets.Shell.new(display)
       end
