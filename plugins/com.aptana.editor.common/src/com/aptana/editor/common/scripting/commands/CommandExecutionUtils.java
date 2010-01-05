@@ -308,6 +308,7 @@ public class CommandExecutionUtils
 		StyledText textWidget = textViewer.getTextWidget();
 		FilterInputProvider filterInputProvider = null;
 
+		InputType selected = InputType.UNDEFINED;
 		InputType[] inputTypes = command.getInputTypes();
 		if (inputTypes == null || inputTypes.length == 0)
 		{
@@ -318,14 +319,14 @@ public class CommandExecutionUtils
 			filterInputProvider = getInputProvider(textWidget, inputType);
 			if (filterInputProvider != null)
 			{
-				command.setUsedInput(inputType);
+				selected = inputType;
 				break;
 			}
 		}
 		if (filterInputProvider == null)
 		{
 			filterInputProvider = CommandExecutionUtils.EOF;
-			command.setUsedInput(InputType.UNDEFINED);
+			selected = InputType.UNDEFINED;
 		}
 
 		// Create command context
@@ -333,6 +334,7 @@ public class CommandExecutionUtils
 
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
+		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
 
 		Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
 		if (computedEnvironmentMap != null)
@@ -378,11 +380,7 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget
 						.getLineAtOffset(textWidget.getCaretOffset())));
 			case WORD:
-				int caretOffset = textWidget.getCaretOffset();
-				int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-				String currentLine = textWidget.getLine(lineAtCaret);
-				int offsetInLine = caretOffset - textWidget.getOffsetAtLine(lineAtCaret);
-				String currentWord = findWord(currentLine, offsetInLine);
+				String currentWord = findWord(textWidget);
 				if (currentWord == null || currentWord.trim().length() == 0)
 					return null;
 				return new CommandExecutionUtils.StringInputProvider(currentWord);
@@ -443,22 +441,25 @@ public class CommandExecutionUtils
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
-				if (command.getUsedInputType() == InputType.SELECTION)
+				IRegion region = new Region(caretOffset, 0);
+				if (commandResult.getInputType() == InputType.SELECTION)
 				{
-					IRegion region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
+					region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
 							- selectionStartOffsetLineStartOffset);
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				}
-				else if (command.getUsedInputType() == InputType.DOCUMENT)
+				else if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
-					IRegion region = new Region(0, textWidget.getCharCount());
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+					region = new Region(0, textWidget.getCharCount());
 				}
-				else
+				else if (commandResult.getInputType() == InputType.LINE)
 				{
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, caretOffset, commandResult
-							.getOutputString());
+					region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
 				}
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					region = findWordRegion(textWidget);
+				}
+				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
 				showAsHTML(command, commandResult);
@@ -627,6 +628,7 @@ public class CommandExecutionUtils
 				environment
 						.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_FILENAME.name(), iFile.getLocation().toFile().getName());
 				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile()
 						.getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile()
@@ -659,9 +661,7 @@ public class CommandExecutionUtils
 						String currentLine = styledText.getLine(lineAtCaret);
 						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), currentLine);
 						environment.put(VARIABLES_NAMES.TM_CURRENT_LINE.name(), currentLine);
-						int offsetInLine = caretOffset - styledText.getOffsetAtLine(lineAtCaret);
-						String currentWord = findWord(currentLine, offsetInLine);
-						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), currentWord);
+						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), findWord(styledText));
 					}
 				}
 			}
@@ -669,16 +669,33 @@ public class CommandExecutionUtils
 		return environment;
 	}
 
+	private static String findWord(StyledText textWidget)
+	{
+		IRegion region = findWordRegion(textWidget);
+		return textWidget.getTextRange(region.getOffset(), region.getLength());
+	}
+
+	private static IRegion findWordRegion(StyledText textWidget)
+	{
+		int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		String currentLine = textWidget.getLine(lineAtCaret);
+		int lineOffset = textWidget.getOffsetAtLine(lineAtCaret);
+		int offsetInLine = caretOffset - lineOffset;
+		IRegion region = findWordRegion(currentLine, offsetInLine);
+		return new Region(region.getOffset() + lineOffset, region.getLength());
+	}
+
 	/**
 	 * Tries to find the word at the given offset.
 	 * 
-	 * @param document
-	 *            the document
+	 * @param line
+	 *            the line
 	 * @param offset
 	 *            the offset
 	 * @return the word or <code>null</code> if none
 	 */
-	protected static String findWord(String line, int offset)
+	protected static IRegion findWordRegion(String line, int offset)
 	{
 		BreakIterator breakIter = BreakIterator.getWordInstance();
 		breakIter.setText(line);
@@ -700,8 +717,8 @@ public class CommandExecutionUtils
 		}
 
 		if (end == start)
-			return null;
-		return line.substring(start, end);
+			return new Region(start, 0);
+		return new Region(start, end - start);
 	}
 
 	@SuppressWarnings("unused")

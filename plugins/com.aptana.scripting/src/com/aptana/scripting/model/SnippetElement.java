@@ -20,7 +20,7 @@ public class SnippetElement extends CommandElement
 	 */
 	public CommandResult execute()
 	{
-		return new CommandResult(this.getExpansion());
+		return execute(null);
 	}
 
 	/**
@@ -28,7 +28,7 @@ public class SnippetElement extends CommandElement
 	 */
 	public CommandResult execute(CommandContext context)
 	{
-		return new CommandResult(this.getExpansion());
+		return new CommandResult(this.getExpansion(), InputType.get((String) context.get(CommandContext.INPUT_TYPE)));
 	}
 
 	/**

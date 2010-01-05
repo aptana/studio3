@@ -65,8 +65,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 {
 	private static final int RULER_EDITOR_GAP = 5;
 
-	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'',
-			'"', '"' };
+	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
+			'\'', '\'', '"', '"' };
 
 	// Adapter factory to adapt to IFindBarDecorated
 	private static IAdapterFactory factory = new IAdapterFactory()
@@ -138,7 +138,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		super.createPartControl(findBarComposite);
 		getFindBarDecorator().createFindBar(getSourceViewer());
 		overrideThemeColors();
-		PeerCharacterCloser.install(getSourceViewer());
+		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 	}
 
 	private void overrideThemeColors()
@@ -197,9 +197,31 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		super.configureSourceViewerDecorationSupport(support);
 
-		support.setCharacterPairMatcher(new CharacterPairMatcher(PAIR_MATCHING_CHARS));
+		support.setCharacterPairMatcher(new CharacterPairMatcher(getPairMatchingCharacters()));
 		support.setMatchingCharacterPainterPreferenceKeys(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
 				IPreferenceConstants.CHARACTER_PAIR_COLOR);
+	}
+
+	/**
+	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
+	 * are the end.
+	 * 
+	 * @return
+	 */
+	protected char[] getPairMatchingCharacters()
+	{
+		return DEFAULT_PAIR_MATCHING_CHARS;
+	}
+
+	/**
+	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
+	 * the end. Defaults to using the same characters as the pair matching.
+	 * 
+	 * @return
+	 */
+	protected char[] getAutoClosePairCharacters()
+	{
+		return getPairMatchingCharacters();
 	}
 
 	/**

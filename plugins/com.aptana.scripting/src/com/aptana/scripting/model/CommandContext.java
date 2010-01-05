@@ -25,6 +25,7 @@ public class CommandContext
 
 	public static final String ACTIVE_PROJECT_NAME = "active_project_name"; //$NON-NLS-1$
 	public static final String ACTIVE_PROJECT_FOLDER = "active_project_folder"; //$NON-NLS-1$
+	public static final String INPUT_TYPE = "input_type"; //$NON-NLS-1$
 
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
 	private static final String TAG_CONTRIBUTOR = "contributor"; //$NON-NLS-1$
@@ -97,7 +98,6 @@ public class CommandContext
 	CommandContext(CommandElement command)
 	{
 		this._map = new HashMap<String,Object>();
-
 		for (ContextContributor contributor : getContextContributors())
 		{
 			contributor.modifyContext(command, this);

@@ -39,7 +39,6 @@ public class CommandElement extends AbstractBundleElement
 	private String _outputPath;
 	private String _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
-	private InputType _usedInputType;
 	
 	/**
 	 * Snippet
@@ -53,7 +52,6 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
-		this._usedInputType = InputType.UNDEFINED;
 	}
 	
 	/**
@@ -98,7 +96,7 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 		
-		return new CommandResult(resultText);
+		return new CommandResult(resultText, InputType.get((String) context.get(CommandContext.INPUT_TYPE)));
 	}
 
 	/**
@@ -792,15 +790,5 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
-	}
-
-	public void setUsedInput(InputType inputType)
-	{
-		this._usedInputType = inputType;		
-	}
-
-	public InputType getUsedInputType()
-	{
-		return this._usedInputType;
 	}
 }
