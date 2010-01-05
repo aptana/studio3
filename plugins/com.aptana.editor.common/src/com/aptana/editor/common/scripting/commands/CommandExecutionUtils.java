@@ -380,11 +380,7 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget
 						.getLineAtOffset(textWidget.getCaretOffset())));
 			case WORD:
-				int caretOffset = textWidget.getCaretOffset();
-				int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-				String currentLine = textWidget.getLine(lineAtCaret);
-				int offsetInLine = caretOffset - textWidget.getOffsetAtLine(lineAtCaret);
-				String currentWord = findWord(currentLine, offsetInLine);
+				String currentWord = findWord(textWidget);
 				if (currentWord == null || currentWord.trim().length() == 0)
 					return null;
 				return new CommandExecutionUtils.StringInputProvider(currentWord);
@@ -445,27 +441,25 @@ public class CommandExecutionUtils
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
+				IRegion region = new Region(caretOffset, 0);
 				if (commandResult.getInputType() == InputType.SELECTION)
 				{
-					IRegion region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
+					region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
 							- selectionStartOffsetLineStartOffset);
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				}
 				else if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
-					IRegion region = new Region(0, textWidget.getCharCount());
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+					region = new Region(0, textWidget.getCharCount());
 				}
 				else if (commandResult.getInputType() == InputType.LINE)
 				{
-					IRegion region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+					region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
 				}
-				else
+				else if (commandResult.getInputType() == InputType.WORD)
 				{
-					SnippetsCompletionProcessor.insertAsTemplate(textViewer, caretOffset, commandResult
-							.getOutputString());
+					region = findWordRegion(textWidget);
 				}
+				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
 				showAsHTML(command, commandResult);
@@ -666,9 +660,7 @@ public class CommandExecutionUtils
 						String currentLine = styledText.getLine(lineAtCaret);
 						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), currentLine);
 						environment.put(VARIABLES_NAMES.TM_CURRENT_LINE.name(), currentLine);
-						int offsetInLine = caretOffset - styledText.getOffsetAtLine(lineAtCaret);
-						String currentWord = findWord(currentLine, offsetInLine);
-						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), currentWord);
+						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), findWord(styledText));
 					}
 				}
 			}
@@ -676,16 +668,33 @@ public class CommandExecutionUtils
 		return environment;
 	}
 
+	private static String findWord(StyledText textWidget)
+	{
+		IRegion region = findWordRegion(textWidget);
+		return textWidget.getTextRange(region.getOffset(), region.getLength());
+	}
+
+	private static IRegion findWordRegion(StyledText textWidget)
+	{
+		int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		String currentLine = textWidget.getLine(lineAtCaret);
+		int lineOffset = textWidget.getOffsetAtLine(lineAtCaret);
+		int offsetInLine = caretOffset - lineOffset;
+		IRegion region = findWordRegion(currentLine, offsetInLine);
+		return new Region(region.getOffset() + lineOffset, region.getLength());
+	}
+
 	/**
 	 * Tries to find the word at the given offset.
 	 * 
-	 * @param document
-	 *            the document
+	 * @param line
+	 *            the line
 	 * @param offset
 	 *            the offset
 	 * @return the word or <code>null</code> if none
 	 */
-	protected static String findWord(String line, int offset)
+	protected static IRegion findWordRegion(String line, int offset)
 	{
 		BreakIterator breakIter = BreakIterator.getWordInstance();
 		breakIter.setText(line);
@@ -707,8 +716,8 @@ public class CommandExecutionUtils
 		}
 
 		if (end == start)
-			return null;
-		return line.substring(start, end);
+			return new Region(start, 0);
+		return new Region(start, end - start);
 	}
 
 	@SuppressWarnings("unused")
