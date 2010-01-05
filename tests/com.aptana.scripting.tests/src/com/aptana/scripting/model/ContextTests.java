@@ -89,6 +89,9 @@ public class ContextTests extends BundleTestBase
 	 */
 	public void testRubyToEnvironment()
 	{
+		String propertyName = "test_property";
+		String propertyValue = "test_property value";
+		
 		// get the command we're interested in
 		CommandElement command = this.getCommand();
 		
@@ -97,6 +100,10 @@ public class ContextTests extends BundleTestBase
 		Map<String, Object> contextMap = context.getMap();
 		assertNotNull(contextMap);
 		
+		Map<String, String> environment = new HashMap<String, String>();
+		command.populateEnvironment(contextMap, environment);
 		
+		assertTrue(environment.containsKey(propertyName));
+		assertEquals(propertyValue, environment.get(propertyName));
 	}
 }
