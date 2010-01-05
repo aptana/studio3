@@ -628,6 +628,7 @@ public class CommandExecutionUtils
 				environment
 						.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_FILENAME.name(), iFile.getLocation().toFile().getName());
 				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile()
 						.getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile()
