@@ -40,13 +40,77 @@ h3. Extending Bundles From Other Bundles
 
 It is possible for a bundle to override or extend another bundle's functionality. This is quite handy when you want to add a command or two to the menu of the existing bundle without having to maintain your own clone of a bundle repository.
 
-MORE DETAILS FORTHCOMING
+It is possible for a bundle to override or extend another bundle's functionality. This is quite handy when you want to add a command or two to the menu of the existing bundle without having to maintain your own clone of a bundle repository.
+
+Example
+
+<pre>
+	# $USER_DOCUMENT_DIRECTORY/RadRails Bundles//MyBundle/bundle.rb
+	bundle "MyBundle" do |b|
+		command "A" do |cmd|
+			...
+		end
+		
+		command "B" do |cmd|
+			...
+		end
+	end
+	
+	# $PROJECT_DIRECTORY/bundles/MyBundle/bundle.rb
+	bundle "MyBundle" do |b|
+		command "A" do |cmd|
+			...
+		end
+		
+		command "C" do |cmd|
+			...
+		end
+	end
+</pre>
+
+This example shows two separate bundle directories. The first bundle.rb file defines a bundle named "MyBundle" in the user's bundles directory. The second bundle.rb file defines a bundle of the same name, but within a project's bundles directory.
+
+Bundle names are globally unique. This means that both files are referencing the same bundle. Since the user bundle is loaded first, the "MyBundle" bundle will contain two commands: A and B. Next, the project bundle will be loaded. It also defines an "A" command, so its definition will replace the user bundle's definition. The "B" command will remain and the "C" command will be added. As a result, "MyBundle" will consist of three commands: A, B, and C where A is the instance defined in the project bundle.
 
 h2. Scopes
 
+A scope specifies a context within the IDE. For example, when editing a document, the current cursor position within that document has a context associated with it. These scopes are supplied by the IDE and may be queried using the Shift-Control-P key command.
+
 Our bundle runtime contains an implementation of scopes that is intended to be "compatible with TextMate's":http://manual.macromates.com/en/scope_selectors.
 
-MORE DETAILS FORTHCOMING
+h3. Scope Selectors
+
+A scope selector describes a pattern of scopes and is composed of dotted names, descendant operators, and grouping operators. In its simplest form, the scope selector consists of a single name.
+
+Example - Simple Name Pattern
+
+<pre>
+	text
+</pre>
+
+A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics". A prefix match must end at dot within the scope or at the end of the scope itself.
+
+Example - Descendant Pattern
+
+<pre>
+	text.html source.ruby
+</pre>
+
+A scope may be defined as a hierarchy of scopes. In this sense, scope selectors match against that hierarchy much like CSS matches against and HTML DOM. In the above example, the selector will match when the editor's cursor is within Ruby code which is within HTML. The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html" and likewise "source.ruby" is a prefix for "source.ruby.embedded.html".
+
+It is important to note that descendant matching progresses right-to-left. If, in our example, we had defined our selector as simply "source.ruby", then we would not only match the previous case where Ruby was embedded within HTML, but we would also match any cursor location that is within any Ruby source, regardless of nesting.
+
+Example - Group Pattern
+
+<pre>
+	text.html.ruby, text.html source.ruby
+</pre>
+
+In this example, our selector defines a list of selectors to be used for matching. The comma serves as an OR operator. Specifically, this selector is saying match "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply; however, if an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or if all alternations have been exhausted.
+
+h3. Menus Scope Selectors
+
+It is important to note that scope selectors work left-to-right when matching a menu scope. For example, if we have a menu scope of "text.html", this will match when the cursor is within HTML but also when the cursor is within Ruby which is within HTML.
 
 h2. Commands
 
