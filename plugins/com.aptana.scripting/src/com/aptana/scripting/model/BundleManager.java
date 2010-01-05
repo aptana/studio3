@@ -477,10 +477,8 @@ public class BundleManager
 
 		if (this.isValidBundleDirectory(bundleDirectory))
 		{
-			String bundlePath = bundleDirectory.getAbsolutePath();
-
 			// check for a top-level bundle.rb file
-			File bundleFile = new File(bundlePath + File.separator + BUNDLE_FILE);
+			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
 
 			if (bundleFile.exists())
 			{
@@ -488,12 +486,12 @@ public class BundleManager
 			}
 
 			// check for scripts inside "commands" directory
-			File commandsDirectory = new File(bundlePath + File.separator + COMMANDS_DIRECTORY_NAME);
+			File commandsDirectory = new File(bundleDirectory, COMMANDS_DIRECTORY_NAME);
 
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(commandsDirectory)));
 			
 			// check for scripts inside "snippets" directory
-			File snippetsDirectory = new File(bundlePath + File.separator + SNIPPETS_DIRECTORY_NAME);
+			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 			
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
 		}
