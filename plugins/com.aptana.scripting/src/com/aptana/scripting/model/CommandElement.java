@@ -332,24 +332,18 @@ public class CommandElement extends AbstractBundleElement
 			PrintWriter pw = new PrintWriter(tempFile);
 			pw.print(this._invoke);
 			pw.close();
-			
-			List<String> commands = new ArrayList<String>();
+
+			// create process builder
 			ProcessBuilder builder = new ProcessBuilder();
 			
+			// augment environment with the context map
 			if (context != null)
 			{
-				Map<String, Object> contextMap = context.getMap();
-				
-				if (contextMap != null)
-				{
-					Map<String, String> environment = builder.environment();
-					
-					for (Map.Entry<String, Object> entry : context.getMap().entrySet())
-					{
-						environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
-					}
-				}
+				this.populateEnvironment(context.getMap(), builder.environment());
 			}
+			
+			// create the command to execute
+			List<String> commands = new ArrayList<String>();
 			
 			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX) || OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
 			{
@@ -361,6 +355,7 @@ public class CommandElement extends AbstractBundleElement
 				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
 				commands.add("cmd"); //$NON-NLS-1$
 			}
+			
 			commands.add(tempFile.getAbsolutePath());
 			
 			// setup command-line
@@ -407,6 +402,52 @@ public class CommandElement extends AbstractBundleElement
 		}
 		
 		return result;
+	}
+
+	/**
+	 * populateEnvironment
+	 * 
+	 * @param contextMap
+	 * @param environment
+	 */
+	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
+	{
+		for (Map.Entry<String, Object> entry : contextMap.entrySet())
+		{
+			Object valueObject = entry.getValue();
+			String key = entry.getKey().toUpperCase();
+			
+			if (valueObject instanceof IRubyObject)
+			{
+				IRubyObject rubyObject = (IRubyObject) valueObject;
+				
+				if (rubyObject.respondsTo("to_env"))
+				{
+					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+					ThreadContext threadContext = runtime.getCurrentContext();
+					IRubyObject environmentHash = rubyObject.callMethod(threadContext, "to_env");
+					
+					if (environmentHash.getType().isKindOfModule(runtime.getModule("Hash")))
+					{
+						
+					}
+				}
+			}
+			else if (valueObject instanceof EnvironmentContributor)
+			{
+				EnvironmentContributor contributor = (EnvironmentContributor) valueObject;
+				Map<String,String> contributedEnvironment = contributor.toEnvironment();
+				
+				if (contributedEnvironment != null)
+				{
+					environment.putAll(contributedEnvironment);
+				}
+			}
+			else
+			{
+				environment.put(key, valueObject.toString());
+			}
+		}
 	}
 	
 	/**
