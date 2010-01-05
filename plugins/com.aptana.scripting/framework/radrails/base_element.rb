@@ -16,6 +16,10 @@ module RadRails
       @jobj.display_name = display_name
     end
     
+    def java_object
+      @jobj
+    end
+    
     def path
       @jobj.path
     end

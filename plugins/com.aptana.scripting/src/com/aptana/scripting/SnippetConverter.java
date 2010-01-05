@@ -57,7 +57,6 @@ public class SnippetConverter
 		List<String> snippets = new ArrayList<String>();
 		File[] plistFiles = snippetDirectory.listFiles(new FilenameFilter()
 		{
-			@SuppressWarnings("nls")
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith("plist") || name.endsWith("tmSnippet");

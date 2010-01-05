@@ -6,10 +6,10 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
@@ -30,7 +30,7 @@ public class CommandElement extends AbstractBundleElement
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
-	private String _keyBinding;
+	private Map<Platform, String[]> _keyBindings;
 	private InputType[] _inputTypes;
 	private OutputType _outputType;
 	private String _outputPath;
@@ -139,9 +139,22 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public String getKeyBinding()
+	public String[] getKeyBindings()
 	{
-		return this._keyBinding;
+		Platform platform = Platform.getPlatform();
+		String[] result = null;
+		
+		if (platform != Platform.UNDEFINED)
+		{
+			result = this._keyBindings.get(platform);
+		}
+		
+		if (result == null)
+		{
+			result = this._keyBindings.get(Platform.ALL);
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -149,25 +162,34 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public KeySequence getKeySequence()
+	public KeySequence[] getKeySequences()
 	{
-		KeySequence result = null;
-		
-		try
+		String[] bindings = this.getKeyBindings();
+		List<KeySequence> result = new ArrayList<KeySequence>();
+
+		if (bindings != null && bindings.length > 0)
 		{
-			result = KeySequence.getInstance(this._keyBinding);
-		}
-		catch (ParseException e)
-		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Invalid_Key_Binding,
-				new Object[] { this.getDisplayName(), this.getPath() }
-			);
-			
-			ScriptLogger.logError(message);
+			for (String binding : bindings)
+			{
+				try
+				{
+					KeySequence sequence = KeySequence.getInstance(binding);
+					
+					result.add(sequence);
+				}
+				catch (ParseException e)
+				{
+					String message = MessageFormat.format(
+						Messages.CommandElement_Invalid_Key_Binding,
+						new Object[] { this.getDisplayName(), this.getPath() }
+					);
+					
+					ScriptLogger.logError(message);
+				}
+			}
 		}
 		
-		return result;
+		return result.toArray(new KeySequence[result.size()]);
 	}
 
 	/**
@@ -292,7 +314,7 @@ public class CommandElement extends AbstractBundleElement
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
 		
-		String OS = Platform.getOS();
+		String OS = org.eclipse.core.runtime.Platform.getOS();
 		File tempFile = null;
 		String result = ""; //$NON-NLS-1$
 		
@@ -301,7 +323,7 @@ public class CommandElement extends AbstractBundleElement
 			// create temporary file for execution
 			tempFile = File.createTempFile(
 				"command_temp_", //$NON-NLS-1$
-				(OS.equals(Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
+				(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
 			);
 			
 			// dump "invoke" content into temp file
@@ -327,7 +349,7 @@ public class CommandElement extends AbstractBundleElement
 				}
 			}
 			
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX) || OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
 			{
 				// FIXME: should we be using the user's preferred shell instead of hardcoding?
 				commands.add("/bin/bash"); //$NON-NLS-1$
@@ -436,8 +458,34 @@ public class CommandElement extends AbstractBundleElement
 			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
 		}
 		
-		// output key binding, intput, and output settings
-		printer.printWithIndent("keys: ").println(this._keyBinding); //$NON-NLS-1$
+		// output key bindings, if it is defined
+		if (this._keyBindings != null && this._keyBindings.size() > 0)
+		{
+			printer.printlnWithIndent("keys {").increaseIndent(); //$NON-NLS-1$
+			
+			for (Map.Entry<Platform, String[]> entry : this._keyBindings.entrySet())
+			{
+				printer.printWithIndent(entry.getKey().getName()).print(": "); //$NON-NLS-1$
+				
+				boolean first = true;
+				
+				for (String binding : entry.getValue())
+				{
+					if (first == false)
+					{
+						printer.print(", "); //$NON-NLS-1$
+					}
+					
+					printer.print(binding);
+					
+					first = false;
+				}
+				
+				printer.println();
+			}
+
+			printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+		}
 		
 		// output a comma-delimited list of input types, if they are defined
 		InputType[] types = this.getInputTypes();
@@ -568,9 +616,51 @@ public class CommandElement extends AbstractBundleElement
 	 * 
 	 * @param keyBinding
 	 */
-	public void setKeyBinding(String keyBinding)
+	public void setKeyBinding(String OS, String keyBinding)
 	{
-		this._keyBinding = keyBinding;
+		if (keyBinding != null && keyBinding.length() > 0)
+		{
+			this.setKeyBindings(OS, new String[] { keyBinding } );
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				Messages.CommandElement_Undefined_Key_Binding,
+				new Object[] { this.getPath() }
+			);
+			
+			ScriptLogger.logWarning(message);
+		}
+	}
+	
+	/**
+	 * setKeyBindings
+	 * 
+	 * @param OS
+	 * @param keyBindings
+	 */
+	public void setKeyBindings(String OS, String[] keyBindings)
+	{
+		Platform bindingOS = Platform.get(OS);
+		
+		if (bindingOS != Platform.UNDEFINED)
+		{
+			if (this._keyBindings == null)
+			{
+				this._keyBindings = new HashMap<Platform, String[]>();
+			}
+			
+			this._keyBindings.put(bindingOS, keyBindings);
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				Messages.CommandElement_Unrecognized_OS,
+				new Object[] { this.getPath(), OS }
+			);
+			
+			ScriptLogger.logWarning(message);
+		}
 	}
 
 	/**

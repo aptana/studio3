@@ -27,6 +27,10 @@ public class Messages extends NLS
 	public static String CommandElement_Error_Processing_Command_Block;
 
 	public static String CommandElement_Invalid_Key_Binding;
+
+	public static String CommandElement_Undefined_Key_Binding;
+
+	public static String CommandElement_Unrecognized_OS;
 	
 	static
 	{

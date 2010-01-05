@@ -1,5 +1,6 @@
 require "java"
 require "radrails/base_element"
+require "radrails/key_binding"
 require "radrails/scope_selector"
 
 module RadRails
@@ -7,7 +8,8 @@ module RadRails
   class Command < BaseElement
     def initialize(name)
       super(name)
-      
+
+      @key_binding = KeyBinding.new(java_object)
       bundle = BundleManager.bundle_from_path(path)
       bundle.apply_defaults(self) unless bundle.nil?
     end
@@ -32,17 +34,12 @@ module RadRails
       @jobj.invoke = invoke
     end
     
-    def java_object
-      @jobj
-    end
-    
     def key_binding
-      @jobj.key_binding
+      @key_binding
     end
     
     def key_binding=(key_binding)
-      as_strings = key_binding.map {|x| x.to_s }
-      @jobj.key_binding = as_strings.join(" ")
+      @key_binding[:all] = key_binding
     end
     
     def output
