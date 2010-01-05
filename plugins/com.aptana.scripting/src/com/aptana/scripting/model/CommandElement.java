@@ -14,6 +14,7 @@ import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
+import org.jruby.RubyHash;
 import org.jruby.RubyModule;
 import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -25,6 +26,8 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
+	private static final String TO_ENV = "to_env";
+
 	private static final InputType[] NO_TYPES = new InputType[0];
 	
 	private String[] _triggers;
@@ -421,15 +424,20 @@ public class CommandElement extends AbstractBundleElement
 			{
 				IRubyObject rubyObject = (IRubyObject) valueObject;
 				
-				if (rubyObject.respondsTo("to_env"))
+				if (rubyObject.respondsTo(TO_ENV))
 				{
 					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
-					IRubyObject environmentHash = rubyObject.callMethod(threadContext, "to_env");
+					IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV);
 					
-					if (environmentHash.getType().isKindOfModule(runtime.getModule("Hash")))
+					if (methodResult instanceof RubyHash)
 					{
+						RubyHash environmentHash = (RubyHash) methodResult;
 						
+						for (Object hashKey : environmentHash.keySet())
+						{
+							environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
+						}
 					}
 				}
 			}
