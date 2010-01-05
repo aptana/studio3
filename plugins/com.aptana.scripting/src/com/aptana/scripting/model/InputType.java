@@ -43,6 +43,7 @@ public enum InputType
 	 */
 	public static final InputType get(String name)
 	{
+		name = name.toLowerCase();
 		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
 	}
 	

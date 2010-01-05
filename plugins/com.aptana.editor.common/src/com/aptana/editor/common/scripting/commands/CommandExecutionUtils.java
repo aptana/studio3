@@ -308,6 +308,7 @@ public class CommandExecutionUtils
 		StyledText textWidget = textViewer.getTextWidget();
 		FilterInputProvider filterInputProvider = null;
 
+		InputType selected = InputType.UNDEFINED;
 		InputType[] inputTypes = command.getInputTypes();
 		if (inputTypes == null || inputTypes.length == 0)
 		{
@@ -318,14 +319,14 @@ public class CommandExecutionUtils
 			filterInputProvider = getInputProvider(textWidget, inputType);
 			if (filterInputProvider != null)
 			{
-				command.setUsedInput(inputType);
+				selected = inputType;
 				break;
 			}
 		}
 		if (filterInputProvider == null)
 		{
 			filterInputProvider = CommandExecutionUtils.EOF;
-			command.setUsedInput(InputType.UNDEFINED);
+			selected = InputType.UNDEFINED;
 		}
 
 		// Create command context
@@ -333,6 +334,7 @@ public class CommandExecutionUtils
 
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
+		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
 
 		Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
 		if (computedEnvironmentMap != null)
@@ -443,15 +445,20 @@ public class CommandExecutionUtils
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
-				if (command.getUsedInputType() == InputType.SELECTION)
+				if (commandResult.getInputType() == InputType.SELECTION)
 				{
 					IRegion region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
 							- selectionStartOffsetLineStartOffset);
 					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				}
-				else if (command.getUsedInputType() == InputType.DOCUMENT)
+				else if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
 					IRegion region = new Region(0, textWidget.getCharCount());
+					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					IRegion region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
 					SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				}
 				else
