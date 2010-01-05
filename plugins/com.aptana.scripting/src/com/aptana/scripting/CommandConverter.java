@@ -8,6 +8,8 @@ import java.io.Writer;
 
 import org.xml.sax.InputSource;
 
+import com.aptana.scripting.model.OutputType;
+
 import plistreader.AbstractReader;
 import plistreader.PlistFactory;
 import plistreader.PlistProperties;
@@ -73,6 +75,7 @@ public class CommandConverter
 			buffer.append("  cmd.scope = '").append(sanitize(properties, "scope")).append("'\n");
 			String outputType = sanitize(properties, "output");
 			outputType = camelcaseToUnderscores(outputType);
+			outputType = convertOutputTypes(outputType);
 			buffer.append("  cmd.output = :").append(outputType).append("\n");
 			buffer.append("  cmd.input = :").append(sanitize(properties, "input"));
 			String fallbackInput = sanitize(properties, "fallbackInput");
@@ -108,6 +111,20 @@ public class CommandConverter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@SuppressWarnings("nls")
+	private static String convertOutputTypes(String outputType)
+	{
+		if (outputType.equals("replace_selected_text"))
+		{
+			return OutputType.REPLACE_SELECTION.getName().toLowerCase();
+		}
+		if (outputType.equals("after_selected_text"))
+		{
+			return OutputType.INSERT_AS_TEXT.getName().toLowerCase();
+		}
+		return outputType;
 	}
 
 	private static String camelcaseToUnderscores(String outputType)
