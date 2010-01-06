@@ -428,11 +428,16 @@ public class CommandElement extends AbstractBundleElement
 				executedSuccessfully = false;
 			}
 
+			exitValue = process.waitFor();
 			resultText = buffer.toString();
-			exitValue = process.exitValue();
 			executedSuccessfully = (exitValue == 0);
 		}
 		catch (IOException e)
+		{
+			ScriptLogger.logError(e.getMessage());
+			executedSuccessfully = false;
+		}
+		catch (InterruptedException e)
 		{
 			ScriptLogger.logError(e.getMessage());
 			executedSuccessfully = false;
