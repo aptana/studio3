@@ -142,4 +142,24 @@
          </fontOverride>
       </theme>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="com.aptana.editor.common.FindBarDecoratedAdapterFactory">
+         <adapter
+               type="com.aptana.editor.findbar.api.IFindBarDecorated">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="com.aptana.editor.common.CommandElementsProviderAdapterFactory">
+         <adapter
+               type="com.aptana.scripting.keybindings.ICommandElementsProvider">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

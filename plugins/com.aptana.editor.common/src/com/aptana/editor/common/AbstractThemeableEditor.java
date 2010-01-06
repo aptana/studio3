@@ -3,7 +3,6 @@ package com.aptana.editor.common;
 import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -52,11 +51,12 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
  * color prefs.
- * 
+ *
  * @author cwilliams
  * @author schitale
  */
@@ -68,31 +68,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private static final char[] DEFAULT_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
 			'\'', '\'', '"', '"' };
 
-	// Adapter factory to adapt to IFindBarDecorated
-	private static IAdapterFactory factory = new IAdapterFactory()
-	{
-		@SuppressWarnings("unchecked")
-		public Class[] getAdapterList()
-		{
-			return new Class[] { AbstractThemeableEditor.class, IFindBarDecorated.class };
-		}
-
-		@SuppressWarnings("unchecked")
-		public Object getAdapter(Object adaptableObject, Class adapterType)
-		{
-			if (adaptableObject instanceof AbstractThemeableEditor)
-			{
-				AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) adaptableObject;
-				return abstractThemeableEditor.getAdapter(IFindBarDecorated.class);
-			}
-			return null;
-		}
-	};
-
-	static
-	{
-		Platform.getAdapterManager().registerAdapters(factory, AbstractThemeableEditor.class);
-	}
 	private Image fCaretImage;
 	private RGB fCaretColor;
 
@@ -100,6 +75,12 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	private LineNumberRulerColumn fLineColumn;
 	private Composite parent;
+
+	// FindBar
+	private IFindBarDecorated findBarDecorated;
+	private IFindBarDecorator findBarDecorator;
+
+	private ICommandElementsProvider commandElementsProvider;
 
 	/**
 	 * This paints the entire line in the background color when there's only one bg color used on that line. To make
@@ -113,17 +94,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	public AbstractThemeableEditor()
 	{
 		super();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Object getAdapter(Class required)
-	{
-		if (IFindBarDecorated.class.equals(required))
-		{
-			return AbstractThemeableEditor.this.getFindBarDecorated();
-		}
-		return super.getAdapter(required);
 	}
 
 	/*
@@ -205,7 +175,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
 	 * are the end.
-	 * 
+	 *
 	 * @return
 	 */
 	protected char[] getPairMatchingCharacters()
@@ -216,7 +186,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
 	 * the end. Defaults to using the same characters as the pair matching.
-	 * 
+	 *
 	 * @return
 	 */
 	protected char[] getAutoClosePairCharacters()
@@ -228,7 +198,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
 	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
 	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
-	 * 
+	 *
 	 * @author cwilliams
 	 */
 	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
@@ -521,9 +491,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getFindBarDecorator().installActions();
 	}
 
-	private IFindBarDecorated findBarDecorated;
-
-	private IFindBarDecorated getFindBarDecorated()
+	IFindBarDecorated getFindBarDecorated()
 	{
 		if (findBarDecorated == null)
 		{
@@ -538,8 +506,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return findBarDecorated;
 	}
 
-	private IFindBarDecorator findBarDecorator;
-
 	private IFindBarDecorator getFindBarDecorator()
 	{
 		if (findBarDecorator == null)
@@ -549,9 +515,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return findBarDecorator;
 	}
 
+	ICommandElementsProvider getCommandElementsProvider() {
+		if (commandElementsProvider == null)
+		{
+			commandElementsProvider = new CommandElementsProvider(this, getSourceViewer());
+		}
+		return commandElementsProvider;
+	}
+
 	/**
 	 * Returns a description of the cursor position.
-	 * 
+	 *
 	 * @return a description of the cursor position
 	 */
 	protected String getCursorPosition()

@@ -9,8 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
@@ -29,7 +33,13 @@ public class CommandElement extends AbstractBundleElement
 	private static final String TO_ENV = "to_env";
 
 	private static final InputType[] NO_TYPES = new InputType[0];
-	
+	private static final String[] NO_KEY_BINDINGS = new String[0];
+
+	private static final Pattern CONTROL_PLUS = Pattern.compile("control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final String CTRL_PLUS = Matcher.quoteReplacement(IKeyLookup.CTRL_NAME + KeyStroke.KEY_DELIMITER);
+	private static final Pattern OPTION_PLUS = Pattern.compile("option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
+
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
@@ -39,51 +49,51 @@ public class CommandElement extends AbstractBundleElement
 	private String _outputPath;
 	private String _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
-	
+
 	/**
 	 * Snippet
-	 * 
+	 *
 	 * @param path
 	 */
 	public CommandElement(String path)
 	{
 		super(path);
-		
+
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
 	}
-	
+
 	/**
 	 * createCommandContext
-	 * 
+	 *
 	 * @return
 	 */
 	public CommandContext createCommandContext()
 	{
 		return new CommandContext(this);
 	}
-	
+
 	/**
 	 * execute
-	 * 
+	 *
 	 * @return
 	 */
 	public CommandResult execute()
 	{
 		return this.execute(this.createCommandContext());
 	}
-	
+
 	/**
 	 * execute
-	 * 
+	 *
 	 * @param map
 	 * @return
 	 */
 	public CommandResult execute(CommandContext context)
 	{
 		String resultText = ""; //$NON-NLS-1$
-		
+
 		if (this.isExecutable())
 		{
 			if (this.isShellCommand())
@@ -95,7 +105,7 @@ public class CommandElement extends AbstractBundleElement
 				resultText = this.invokeBlockCommand(context);
 			}
 		}
-		
+
 		return new CommandResult(resultText, InputType.get((String) context.get(CommandContext.INPUT_TYPE)));
 	}
 
@@ -106,10 +116,10 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return "command"; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * getInput
-	 * 
+	 *
 	 * @return
 	 */
 	public InputType[] getInputTypes()
@@ -119,50 +129,55 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getInvoke
-	 * 
+	 *
 	 * @return
 	 */
 	public String getInvoke()
 	{
 		return this._invoke;
 	}
-	
+
 	/**
 	 * getInvokeBlock
-	 * 
+	 *
 	 * @return
 	 */
 	public RubyProc getInvokeBlock()
 	{
 		return this._invokeBlock;
 	}
-	
+
 	/**
 	 * getKeyBinding
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getKeyBindings()
 	{
 		Platform platform = Platform.getPlatform();
 		String[] result = null;
+
+		if (this._keyBindings == null)
+		{
+			return NO_KEY_BINDINGS;
+		}
 		
 		if (platform != Platform.UNDEFINED)
 		{
 			result = this._keyBindings.get(platform);
 		}
-		
+
 		if (result == null)
 		{
 			result = this._keyBindings.get(Platform.ALL);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getKeySequence
-	 * 
+	 *
 	 * @return
 	 */
 	public KeySequence[] getKeySequences()
@@ -176,8 +191,10 @@ public class CommandElement extends AbstractBundleElement
 			{
 				try
 				{
-					KeySequence sequence = KeySequence.getInstance(binding);
-					
+					// Need to convert the format
+					String normalizedKeyBinding = this.normalizeKeyBinding(binding);
+					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
+
 					result.add(sequence);
 				}
 				catch (ParseException e)
@@ -186,18 +203,17 @@ public class CommandElement extends AbstractBundleElement
 						Messages.CommandElement_Invalid_Key_Binding,
 						new Object[] { this.getDisplayName(), this.getPath() }
 					);
-					
+
 					ScriptLogger.logError(message);
 				}
 			}
 		}
-		
 		return result.toArray(new KeySequence[result.size()]);
 	}
 
 	/**
 	 * getOutput
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOutput()
@@ -228,20 +244,20 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._outputType.getName();
 	}
-	
+
 	/**
 	 * getTrigger
-	 * 
+	 *
 	 * @return
 	 */
 	public String[] getTriggers()
 	{
 		return this._triggers;
 	}
-	
+
 	/**
 	 * getWorkingDirectory
-	 * 
+	 *
 	 * @return
 	 */
 	public String getWorkingDirectory()
@@ -267,7 +283,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * invokeBlockCommand
-	 * 
+	 *
 	 * @param resultText
 	 * @return
 	 */
@@ -276,19 +292,19 @@ public class CommandElement extends AbstractBundleElement
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
 		String resultText = ""; //$NON-NLS-1$
-		
+
 		try
 		{
 			RubyModule radrails = runtime.getModule("RadRails"); //$NON-NLS-1$
 			RubyClass rclass = radrails.getClass("Context"); //$NON-NLS-1$
 			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
 			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
-			
+
 			IRubyObject result = this._invokeBlock.call(
 				threadContext,
 				new IRubyObject[] { rubyContext }
 			);
-			
+
 			if (result != null)
 			{
 				resultText = result.asString().asJavaString();
@@ -300,27 +316,27 @@ public class CommandElement extends AbstractBundleElement
 				Messages.CommandElement_Error_Processing_Command_Block,
 				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
 			);
-			
+
 			ScriptLogger.logError(message);
 		}
-		
+
 		return resultText;
 	}
 
 	/**
 	 * invokeStringCommand
-	 * 
+	 *
 	 * @return
 	 */
 	private String invokeStringCommand(CommandContext context)
 	{
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
-		
+
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 		File tempFile = null;
 		String result = ""; //$NON-NLS-1$
-		
+
 		try
 		{
 			// create temporary file for execution
@@ -328,7 +344,7 @@ public class CommandElement extends AbstractBundleElement
 				"command_temp_", //$NON-NLS-1$
 				(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
 			);
-			
+
 			// dump "invoke" content into temp file
 			PrintWriter pw = new PrintWriter(tempFile);
 			pw.print(this._invoke);
@@ -358,25 +374,25 @@ public class CommandElement extends AbstractBundleElement
 			}
 			
 			commands.add(tempFile.getAbsolutePath());
-			
+
 			// setup command-line
 			builder.command(commands);
-			
+
 			// setup working directory
 			String path = this.getWorkingDirectory();
 			if (path != null && path.length() > 0)
 			{
 				builder.directory(new File(path));
 			}
-	
+
 			// run process and get output
 			StringBuffer buffer = new StringBuffer();
 			Process process = builder.start();
-			
+
 			InputStream is = process.getInputStream();
 			byte[] line = new byte[1024];
 			int count;
-			
+
 			try
 			{
 				while ((count = is.read(line)) != -1)
@@ -387,7 +403,7 @@ public class CommandElement extends AbstractBundleElement
 			catch (IOException e)
 			{
 			}
-			
+
 			result = buffer.toString();
 		}
 		catch (IOException e)
@@ -401,7 +417,7 @@ public class CommandElement extends AbstractBundleElement
 				tempFile.delete();
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -458,34 +474,34 @@ public class CommandElement extends AbstractBundleElement
 	
 	/**
 	 * isBlockCommand
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isBlockCommand()
 	{
 		return (this._invokeBlock != null);
 	}
-	
+
 	/**
 	 * isExecutable
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isExecutable()
 	{
 		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
 	}
-	
+
 	/**
 	 * isShellCommand
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isShellCommand()
 	{
 		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
 	}
-	
+
 	/**
 	 * printBody
 	 */
@@ -494,165 +510,165 @@ public class CommandElement extends AbstractBundleElement
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
-		
+
 		// output invoke/expansion, if it is defined
 		if (this._invoke != null)
 		{
 			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
 		}
-		
+
 		// output invoke block, if it is defined
 		if (this._invokeBlock != null)
 		{
 			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
 		}
-		
+
 		// output key bindings, if it is defined
 		if (this._keyBindings != null && this._keyBindings.size() > 0)
 		{
 			printer.printlnWithIndent("keys {").increaseIndent(); //$NON-NLS-1$
-			
+
 			for (Map.Entry<Platform, String[]> entry : this._keyBindings.entrySet())
 			{
 				printer.printWithIndent(entry.getKey().getName()).print(": "); //$NON-NLS-1$
-				
+
 				boolean first = true;
-				
+
 				for (String binding : entry.getValue())
 				{
 					if (first == false)
 					{
 						printer.print(", "); //$NON-NLS-1$
 					}
-					
+
 					printer.print(binding);
-					
+
 					first = false;
 				}
-				
+
 				printer.println();
 			}
 
 			printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 		}
-		
+
 		// output a comma-delimited list of input types, if they are defined
 		InputType[] types = this.getInputTypes();
-		
+
 		if (types != null && types.length > 0)
 		{
 			boolean first = true;
-			
+
 			printer.printWithIndent("input: "); //$NON-NLS-1$
-			
+
 			for (InputType type : types)
 			{
 				if (first == false)
 				{
 					printer.print(", "); //$NON-NLS-1$
 				}
-				
+
 				printer.print(type.getName());
-				
+
 				first = false;
 			}
-			
+
 			printer.println();
 		}
-		
+
 		// output output type
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
-		
+
 		// output a comma-delimited list of triggers, if any are defined
 		String[] triggers = this.getTriggers();
-		
+
 		if (triggers != null && triggers.length > 0)
 		{
 			boolean first = true;
-			
+
 			printer.printWithIndent("triggers: "); //$NON-NLS-1$
-			
+
 			for (String trigger : triggers)
 			{
 				if (first == false)
 				{
 					printer.print(", "); //$NON-NLS-1$
 				}
-				
+
 				printer.print(trigger);
-				
+
 				first = false;
 			}
-			
+
 			printer.println();
 		}
 	}
-	
+
 	/**
 	 * setInputType
-	 * 
+	 *
 	 * @param type
 	 */
 	public void setInputType(InputType type)
 	{
 		this.setInputType(new InputType[] { type });
 	}
-	
+
 	/**
 	 * setInputType
-	 * 
+	 *
 	 * @param types
 	 */
 	public void setInputType(InputType[] types)
 	{
 		this._inputTypes = (types == null) ? NO_TYPES : types;
 	}
-	
+
 	/**
 	 * setInputType
-	 * 
+	 *
 	 * @param input
 	 */
 	public void setInputType(String input)
 	{
 		this.setInputType(InputType.get(input));
 	}
-	
+
 	/**
 	 * setInputType
-	 * 
+	 *
 	 * @param types
 	 */
 	public void setInputType(String[] types)
 	{
 		InputType[] result = null;
-		
+
 		if (types != null)
 		{
 			result = new InputType[types.length];
-			
+
 			for (int i = 0; i < types.length; i++)
 			{
 				result[i] = InputType.get(types[i]);
 			}
 		}
-		
+
 		this.setInputType(result);
 	}
-	
+
 	/**
 	 * setInvoke
-	 * 
+	 *
 	 * @param invoke
 	 */
 	public void setInvoke(String invoke)
 	{
 		this._invoke = invoke;
 	}
-	
+
 	/**
 	 * setInvokeBlock
-	 * 
+	 *
 	 * @param block
 	 */
 	public void setInvokeBlock(RubyProc block)
@@ -662,7 +678,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setKeyBinding
-	 * 
+	 *
 	 * @param keyBinding
 	 */
 	public void setKeyBinding(String OS, String keyBinding)
@@ -677,28 +693,28 @@ public class CommandElement extends AbstractBundleElement
 				Messages.CommandElement_Undefined_Key_Binding,
 				new Object[] { this.getPath() }
 			);
-			
+
 			ScriptLogger.logWarning(message);
 		}
 	}
-	
+
 	/**
 	 * setKeyBindings
-	 * 
+	 *
 	 * @param OS
 	 * @param keyBindings
 	 */
 	public void setKeyBindings(String OS, String[] keyBindings)
 	{
 		Platform bindingOS = Platform.get(OS);
-		
+
 		if (bindingOS != Platform.UNDEFINED)
 		{
 			if (this._keyBindings == null)
 			{
 				this._keyBindings = new HashMap<Platform, String[]>();
 			}
-			
+
 			this._keyBindings.put(bindingOS, keyBindings);
 		}
 		else
@@ -707,7 +723,7 @@ public class CommandElement extends AbstractBundleElement
 				Messages.CommandElement_Unrecognized_OS,
 				new Object[] { this.getPath(), OS }
 			);
-			
+
 			ScriptLogger.logWarning(message);
 		}
 	}
@@ -721,40 +737,40 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this._outputPath = path;
 	}
-	
+
 	/**
 	 * setOutputType
-	 * 
+	 *
 	 * @param type
 	 */
 	public void setOutputType(OutputType type)
 	{
 		this._outputType = type;
 	}
-	
+
 	/**
 	 * setOutput
-	 * 
+	 *
 	 * @param output
 	 */
 	public void setOutputType(String output)
 	{
 		this._outputType = OutputType.get(output);
 	}
-	
+
 	/**
 	 * setTrigger
-	 * 
+	 *
 	 * @param trigger
 	 */
 	public void setTrigger(String trigger)
 	{
 		this._triggers = new String[] { trigger };
 	}
-	
+
 	/**
 	 * setTrigger
-	 * 
+	 *
 	 * @param triggers
 	 */
 	public void setTrigger(String[] triggers)
@@ -790,5 +806,25 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
+	}
+
+	/**
+	 * Normalize the keyBinding string.
+	 * <p>
+	 * Convert control+ to CTRL+
+	 * Convert option+ to ALT+
+	 *
+	 * @param keyBinding
+	 * @return
+	 */
+	static String normalizeKeyBinding(String keyBinding)
+	{
+		if (keyBinding == null)
+		{
+			return null;
+		}
+		keyBinding = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
+		keyBinding = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+		return keyBinding;
 	}
 }

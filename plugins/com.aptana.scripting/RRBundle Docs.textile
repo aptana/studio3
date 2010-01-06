@@ -45,27 +45,27 @@ It is possible for a bundle to override or extend another bundle's functionality
 Example
 
 <pre>
-	# $USER_DOCUMENT_DIRECTORY/RadRails Bundles//MyBundle/bundle.rb
-	bundle "MyBundle" do |b|
-		command "A" do |cmd|
-			...
-		end
-		
-		command "B" do |cmd|
-			...
-		end
-	end
-	
-	# $PROJECT_DIRECTORY/bundles/MyBundle/bundle.rb
-	bundle "MyBundle" do |b|
-		command "A" do |cmd|
-			...
-		end
-		
-		command "C" do |cmd|
-			...
-		end
-	end
+# $USER_DOCUMENT_DIRECTORY/RadRails Bundles//MyBundle/bundle.rb
+bundle "MyBundle" do |b|
+  command "A" do |cmd|
+    # ...
+  end
+
+  command "B" do |cmd|
+    # ...
+  end
+end
+
+# $PROJECT_DIRECTORY/bundles/MyBundle/bundle.rb
+bundle "MyBundle" do |b|
+  command "A" do |cmd|
+    # ...
+  end
+
+  command "C" do |cmd|
+    # ...
+  end
+end
 </pre>
 
 This example shows two separate bundle directories. The first bundle.rb file defines a bundle named "MyBundle" in the user's bundles directory. The second bundle.rb file defines a bundle of the same name, but within a project's bundles directory.
@@ -85,7 +85,7 @@ A scope selector describes a pattern of scopes and is composed of dotted names, 
 Example - Simple Name Pattern
 
 <pre>
-	text
+text
 </pre>
 
 A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics". A prefix match must end at dot within the scope or at the end of the scope itself.
@@ -93,7 +93,7 @@ A scope selector needs only to match the prefix of a name to be considered a mat
 Example - Descendant Pattern
 
 <pre>
-	text.html source.ruby
+text.html source.ruby
 </pre>
 
 A scope may be defined as a hierarchy of scopes. In this sense, scope selectors match against that hierarchy much like CSS matches against and HTML DOM. In the above example, the selector will match when the editor's cursor is within Ruby code which is within HTML. The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html" and likewise "source.ruby" is a prefix for "source.ruby.embedded.html".
@@ -103,7 +103,7 @@ It is important to note that descendant matching progresses right-to-left. If, i
 Example - Group Pattern
 
 <pre>
-	text.html.ruby, text.html source.ruby
+text.html.ruby, text.html source.ruby
 </pre>
 
 In this example, our selector defines a list of selectors to be used for matching. The comma serves as an OR operator. Specifically, this selector is saying match "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply; however, if an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or if all alternations have been exhausted.

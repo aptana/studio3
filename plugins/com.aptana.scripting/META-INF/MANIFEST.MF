@@ -8,6 +8,7 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.core.expressions,
  com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.util;bundle-version="1.0.0",
  plistreader;bundle-version="1.0.0"
@@ -17,5 +18,6 @@ Bundle-ClassPath: lib/jruby.jar,
  .
 Export-Package: com.aptana.scope,
  com.aptana.scripting,
+ com.aptana.scripting.keybindings,
  com.aptana.scripting.model
 Eclipse-BuddyPolicy: global
