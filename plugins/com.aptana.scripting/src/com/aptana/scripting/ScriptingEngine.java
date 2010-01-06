@@ -117,7 +117,7 @@ public class ScriptingEngine
 										new Object[] { url }
 									);
 									
-									Activator.logError(message);
+									Activator.logError(message, null);
 								}
 							}
 						}
