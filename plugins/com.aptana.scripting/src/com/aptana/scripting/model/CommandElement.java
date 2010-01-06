@@ -357,6 +357,7 @@ public class CommandElement extends AbstractBundleElement
 		File tempFile = null;
 		String resultText = ""; //$NON-NLS-1$
 		boolean executedSuccessfully = true;
+		int exitValue = 0;
 
 		try
 		{
@@ -428,6 +429,8 @@ public class CommandElement extends AbstractBundleElement
 			}
 
 			resultText = buffer.toString();
+			exitValue = process.exitValue();
+			executedSuccessfully = (exitValue == 0);
 		}
 		catch (IOException e)
 		{
@@ -443,6 +446,7 @@ public class CommandElement extends AbstractBundleElement
 		}
 
 		CommandResult result = new CommandResult(resultText);
+		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
 		
 		return result;
