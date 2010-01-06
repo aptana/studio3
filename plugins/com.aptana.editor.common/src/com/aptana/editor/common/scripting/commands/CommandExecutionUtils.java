@@ -427,9 +427,16 @@ public class CommandExecutionUtils
 			case DISCARD:
 				break;
 			case REPLACE_SELECTION:
-				int start = Math.min(selectionRange.x, selectionRange.y);
-				int end = Math.max(selectionRange.x, selectionRange.y);
-				textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+				if (commandResult.getInputType() == InputType.DOCUMENT)
+				{
+					textWidget.setText(commandResult.getOutputString());
+				}
+				else
+				{
+					int start = Math.min(selectionRange.x, selectionRange.y);
+					int end = Math.max(selectionRange.x, selectionRange.y);
+					textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+				}
 				break;
 			case REPLACE_SELECTED_LINES:
 				textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
