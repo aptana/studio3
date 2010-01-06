@@ -48,6 +48,7 @@ public class CommandElement extends AbstractBundleElement
 	private OutputType _outputType;
 	private String _outputPath;
 	private String _workingDirectoryPath;
+
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -192,7 +193,7 @@ public class CommandElement extends AbstractBundleElement
 				try
 				{
 					// Need to convert the format
-					String normalizedKeyBinding = this.normalizeKeyBinding(binding);
+					String normalizedKeyBinding = normalizeKeyBinding(binding);
 					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
 
 					result.add(sequence);
@@ -420,7 +421,58 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
+	
+	/**
+	 * isBlockCommand
+	 *
+	 * @return
+	 */
+	public boolean isBlockCommand()
+	{
+		return (this._invokeBlock != null);
+	}
 
+	/**
+	 * isExecutable
+	 *
+	 * @return
+	 */
+	public boolean isExecutable()
+	{
+		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
+	}
+
+	/**
+	 * isShellCommand
+	 *
+	 * @return
+	 */
+	public boolean isShellCommand()
+	{
+		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+	}
+
+	/**
+	 * Normalize the keyBinding string.
+	 * <p>
+	 * Convert control+ to CTRL+ Convert option+ to ALT+
+	 * 
+	 * @param keyBinding
+	 * @return
+	 */
+	static String normalizeKeyBinding(String keyBinding)
+	{
+		String result = null;
+
+		if (keyBinding != null)
+		{
+			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
+			result = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+		}
+
+		return result;
+	}
+	
 	/**
 	 * populateEnvironment
 	 * 
@@ -470,36 +522,6 @@ public class CommandElement extends AbstractBundleElement
 				environment.put(key, valueObject.toString());
 			}
 		}
-	}
-	
-	/**
-	 * isBlockCommand
-	 *
-	 * @return
-	 */
-	public boolean isBlockCommand()
-	{
-		return (this._invokeBlock != null);
-	}
-
-	/**
-	 * isExecutable
-	 *
-	 * @return
-	 */
-	public boolean isExecutable()
-	{
-		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
-	}
-
-	/**
-	 * isShellCommand
-	 *
-	 * @return
-	 */
-	public boolean isShellCommand()
-	{
-		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
 	}
 
 	/**
@@ -806,25 +828,5 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
-	}
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+
-	 * Convert option+ to ALT+
-	 *
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKeyBinding(String keyBinding)
-	{
-		if (keyBinding == null)
-		{
-			return null;
-		}
-		keyBinding = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-		keyBinding = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
-		return keyBinding;
 	}
 }
