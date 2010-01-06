@@ -3,11 +3,13 @@ package com.aptana.scripting;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
+import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 public class ScriptUtils
 {
+	public static final String RADRAILS_MODULE = "RadRails";
 	public static final IRubyObject[] NO_ARGS = new IRubyObject[0];
 	
 	/**
@@ -94,5 +96,18 @@ public class ScriptUtils
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * javaToRuby
+	 * 
+	 * @param javaObject
+	 * @return
+	 */
+	public static IRubyObject javaToRuby(Object javaObject)
+	{
+		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+		
+		return JavaEmbedUtils.javaToRuby(runtime, javaObject);
 	}
 }
