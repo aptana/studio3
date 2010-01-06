@@ -85,12 +85,12 @@ module RadRails
       @jobj.display_name = name
     end
     
-    def git_repo
-      @jobj.git_repo
+    def repository
+      @jobj.repository
     end
     
-    def git_repo=(git_repo)
-      @jobj.git_repo = git_repo
+    def repository=(repository)
+      @jobj.repository = repository
     end
     
     def license
