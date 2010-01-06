@@ -128,6 +128,17 @@ module RadRails
         end
       end
       
+      # request a single, simple string
+      def request_string(options = Hash.new,&block)
+        request_string_core('Enter string:', options, &block)
+      end
+      
+      # request a password or other text which should be obscured from view
+      def request_secure_string(options = Hash.new,&block)
+        request_string_core('Enter password:', options, &block)
+      end
+
+      
       # Show Tooltip using current cursor location. +content+ is shown as bold text at tp of tooltip.
       # Possible options:
       # :balloon => true - pop up a balloon style tooltip
@@ -202,6 +213,32 @@ module RadRails
       end
       
       private
+      
+      # common to request_string, request_secure_string
+      def request_string_core(default_prompt, options, &block)
+        params = default_buttons(options)
+        params["title"] = options[:title] || default_prompt
+        params["prompt"] = options[:prompt] || ""
+        params["string"] = options[:default] || ""
+        # FIXME Need to support button\d options and build buttons dynamically!
+        dialog = org.eclipse.jface.dialogs.InputDialog.new(shell, params["title"], params["prompt"], params["string"], nil)
+        return_value = nil
+        return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
+        
+        if return_value == nil then
+          block_given? ? raise(SystemExit) : nil
+        else
+          block_given? ? yield(return_value) : return_value
+        end
+      end
+      
+      def default_buttons(user_options = Hash.new)
+        options = Hash.new
+        options['button1'] = user_options[:button1] || "OK"
+        options['button2'] = user_options[:button2] || "Cancel"
+        options
+      end
+
       def in_ui_thread?
         !display.nil?
       end
