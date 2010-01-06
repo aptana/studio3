@@ -10,6 +10,10 @@ module RadRails
     def in
       @jobj.in
     end
+    
+    def [](arg)
+      @jobj.map[arg.to_s]
+    end
 
     def method_missing(m, *args, &block)
       @jobj.map[m.to_s]
