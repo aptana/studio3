@@ -71,7 +71,9 @@ public class CommandConverter
 			StringBuilder buffer = new StringBuilder();
 			buffer.append("require 'radrails'\n\n");
 			buffer.append("command '").append(sanitize(properties, "name")).append("' do |cmd|\n");
-			buffer.append("  cmd.key_binding = '").append(sanitize(properties, "keyEquivalent")).append("'\n");
+			String keyBinding = sanitize(properties, "keyEquivalent");
+			keyBinding = convertKeyBinding(keyBinding);
+			buffer.append("  cmd.key_binding = '").append(keyBinding).append("'\n");
 			buffer.append("  cmd.scope = '").append(sanitize(properties, "scope")).append("'\n");
 			String outputType = sanitize(properties, "output");
 			outputType = camelcaseToUnderscores(outputType);
@@ -111,6 +113,32 @@ public class CommandConverter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private static String convertKeyBinding(String keyBinding)
+	{
+		if (keyBinding == null)
+			return ""; //$NON-NLS-1$
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < keyBinding.length(); i++)
+		{
+			char c = keyBinding.charAt(i);
+			switch (c)
+			{
+				case '@':
+					builder.append("M1+M2+"); //$NON-NLS-1$
+					break;
+				case '^':
+					builder.append("CONTROL+M2+"); //$NON-NLS-1$
+					break;
+				default:
+					builder.append(c).append('+');
+					break;
+			}
+		}
+		if (keyBinding.length() > 0)
+			builder.deleteCharAt(builder.length() - 1);
+		return builder.toString();
 	}
 
 	@SuppressWarnings("nls")
