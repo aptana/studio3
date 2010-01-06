@@ -9,6 +9,7 @@ public class CommandResult
 	private String _errorString;
 	private OutputStream _errorStream;
 	private InputType _inputType;
+	private int _returnValue;
 	private boolean _executedSuccessfully;
 
 	/**
@@ -88,7 +89,7 @@ public class CommandResult
 	 */
 	public int getReturnValue()
 	{
-		return 0;
+		return this._returnValue;
 	}
 
 	/**
@@ -109,5 +110,15 @@ public class CommandResult
 	void setInputType(InputType inputType)
 	{
 		this._inputType = inputType;
+	}
+	
+	/**
+	 * setReturnValue
+	 * 
+	 * @param value
+	 */
+	void setReturnValue(int value)
+	{
+		this._returnValue = value;
 	}
 }
