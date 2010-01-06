@@ -158,10 +158,10 @@ module RadRails
 	  project = Project.current
 	  
 	  if project
-		{
-		  :TM_PROJECT_NAME => project.name,
-		  :TM_PROJECT_DIRECTORY => project.to_dir.path
-		}
+	    {
+	      :TM_PROJECT_NAME => project.name,
+	      :TM_PROJECT_DIRECTORY => project.to_dir.path
+	    }
 	  else
 	    nil
       end
