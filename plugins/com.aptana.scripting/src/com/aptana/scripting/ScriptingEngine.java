@@ -113,11 +113,11 @@ public class ScriptingEngine
 								else
 								{
 									String message = MessageFormat.format(
-										"Unable to convert resource URL to a string: {0}",
-										new Object[] { url }
+										Messages.ScriptingEngine_Unable_To_Convert_Load_Path,
+										new Object[] { declaringPluginID, url }
 									);
 									
-									Activator.logWarning(message);
+									Activator.logError(message, null);
 								}
 							}
 						}
