@@ -18,6 +18,7 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
+import org.jruby.RubyHash;
 import org.jruby.RubyModule;
 import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -29,6 +30,8 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
+	private static final String TO_ENV = "to_env";
+
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
 
@@ -45,6 +48,7 @@ public class CommandElement extends AbstractBundleElement
 	private OutputType _outputType;
 	private String _outputPath;
 	private String _workingDirectoryPath;
+
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -154,9 +158,11 @@ public class CommandElement extends AbstractBundleElement
 		Platform platform = Platform.getPlatform();
 		String[] result = null;
 
-		if (this._keyBindings == null) {
+		if (this._keyBindings == null)
+		{
 			return NO_KEY_BINDINGS;
 		}
+		
 		if (platform != Platform.UNDEFINED)
 		{
 			result = this._keyBindings.get(platform);
@@ -187,8 +193,8 @@ public class CommandElement extends AbstractBundleElement
 				try
 				{
 					// Need to convert the format
-					String normalizedKetBinding = normalizeKetBinding(binding);
-					KeySequence sequence = KeySequence.getInstance(normalizedKetBinding);
+					String normalizedKeyBinding = normalizeKeyBinding(binding);
+					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
 
 					result.add(sequence);
 				}
@@ -345,24 +351,18 @@ public class CommandElement extends AbstractBundleElement
 			pw.print(this._invoke);
 			pw.close();
 
-			List<String> commands = new ArrayList<String>();
+			// create process builder
 			ProcessBuilder builder = new ProcessBuilder();
-
+			
+			// augment environment with the context map
 			if (context != null)
 			{
-				Map<String, Object> contextMap = context.getMap();
-
-				if (contextMap != null)
-				{
-					Map<String, String> environment = builder.environment();
-
-					for (Map.Entry<String, Object> entry : context.getMap().entrySet())
-					{
-						environment.put(entry.getKey().toUpperCase(), entry.getValue().toString());
-					}
-				}
+				this.populateEnvironment(context.getMap(), builder.environment());
 			}
-
+			
+			// create the command to execute
+			List<String> commands = new ArrayList<String>();
+			
 			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX) || OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
 			{
 				// FIXME: should we be using the user's preferred shell instead of hardcoding?
@@ -373,6 +373,7 @@ public class CommandElement extends AbstractBundleElement
 				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
 				commands.add("cmd"); //$NON-NLS-1$
 			}
+			
 			commands.add(tempFile.getAbsolutePath());
 
 			// setup command-line
@@ -420,7 +421,7 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
-
+	
 	/**
 	 * isBlockCommand
 	 *
@@ -449,6 +450,78 @@ public class CommandElement extends AbstractBundleElement
 	public boolean isShellCommand()
 	{
 		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+	}
+
+	/**
+	 * Normalize the keyBinding string.
+	 * <p>
+	 * Convert control+ to CTRL+ Convert option+ to ALT+
+	 * 
+	 * @param keyBinding
+	 * @return
+	 */
+	static String normalizeKeyBinding(String keyBinding)
+	{
+		String result = null;
+
+		if (keyBinding != null)
+		{
+			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
+			result = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+		}
+
+		return result;
+	}
+	
+	/**
+	 * populateEnvironment
+	 * 
+	 * @param contextMap
+	 * @param environment
+	 */
+	void populateEnvironment(Map<String, Object> contextMap, Map<String, String> environment)
+	{
+		for (Map.Entry<String, Object> entry : contextMap.entrySet())
+		{
+			Object valueObject = entry.getValue();
+			String key = entry.getKey().toUpperCase();
+			
+			if (valueObject instanceof IRubyObject)
+			{
+				IRubyObject rubyObject = (IRubyObject) valueObject;
+				
+				if (rubyObject.respondsTo(TO_ENV))
+				{
+					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+					ThreadContext threadContext = runtime.getCurrentContext();
+					IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV);
+					
+					if (methodResult instanceof RubyHash)
+					{
+						RubyHash environmentHash = (RubyHash) methodResult;
+						
+						for (Object hashKey : environmentHash.keySet())
+						{
+							environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
+						}
+					}
+				}
+			}
+			else if (valueObject instanceof EnvironmentContributor)
+			{
+				EnvironmentContributor contributor = (EnvironmentContributor) valueObject;
+				Map<String,String> contributedEnvironment = contributor.toEnvironment();
+				
+				if (contributedEnvironment != null)
+				{
+					environment.putAll(contributedEnvironment);
+				}
+			}
+			else
+			{
+				environment.put(key, valueObject.toString());
+			}
+		}
 	}
 
 	/**
@@ -755,24 +828,5 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
-	}
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+
-	 * Convert option+ to ALT+
-	 *
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKetBinding(String keyBinding)
-	{
-		if (keyBinding == null) {
-			return null;
-		}
-		keyBinding = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-		keyBinding = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
-		return keyBinding;
 	}
 }
