@@ -152,6 +152,20 @@ module RadRails
     def rails?
       has_nature? org.radrails.rails.core.RailsProjectNature::ID
     end
+	
+	# convert to a list of environment variables
+	def to_env
+	  project = Project.current
+	  
+	  if project
+		{
+		  :TM_PROJECT_NAME => project.name,
+		  :TM_PROJECT_DIRECTORY => project.to_dir.path
+		}
+	  else
+	    nil
+      end
+	end
     
   end
 end
