@@ -104,8 +104,21 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
+								String urlAsPath = ResourceUtils.resourcePathToString(url);
 
-								paths.add(ResourceUtils.resourcePathToString(url));
+								if (urlAsPath != null && urlAsPath.length() > 0)
+								{
+									paths.add(urlAsPath);
+								}
+								else
+								{
+									String message = MessageFormat.format(
+										"Unable to convert resource URL to a string: {0}",
+										new Object[] { url }
+									);
+									
+									Activator.logWarning(message);
+								}
 							}
 						}
 					}
