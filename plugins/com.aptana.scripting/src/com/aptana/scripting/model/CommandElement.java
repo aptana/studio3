@@ -30,7 +30,7 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static final String TO_ENV = "to_env";
+	private static final String TO_ENV = "to_env"; //$NON-NLS-1$
 
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
