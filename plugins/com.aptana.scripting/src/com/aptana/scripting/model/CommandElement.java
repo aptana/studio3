@@ -93,21 +93,30 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public CommandResult execute(CommandContext context)
 	{
-		String resultText = ""; //$NON-NLS-1$
+		CommandResult result = null;
 
 		if (this.isExecutable())
 		{
 			if (this.isShellCommand())
 			{
-				resultText = this.invokeStringCommand(context);
+				result = this.invokeStringCommand(context);
 			}
 			else if (this.isBlockCommand())
 			{
-				resultText = this.invokeBlockCommand(context);
+				result = this.invokeBlockCommand(context);
 			}
 		}
 
-		return new CommandResult(resultText, InputType.get((String) context.get(CommandContext.INPUT_TYPE)));
+		if (result != null)
+		{
+			// grab input type so we can report back which input was used
+			String inputTypeString = (String) context.get(CommandContext.INPUT_TYPE);
+			InputType inputType = InputType.get(inputTypeString);
+			
+			result.setInputType(inputType);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -202,7 +211,12 @@ public class CommandElement extends AbstractBundleElement
 				{
 					String message = MessageFormat.format(
 						Messages.CommandElement_Invalid_Key_Binding,
-						new Object[] { this.getDisplayName(), this.getPath() }
+						new Object[] {
+							binding,
+							this.getDisplayName(),
+							this.getPath(),
+							e.getMessage()
+						}
 					);
 
 					ScriptLogger.logError(message);
@@ -288,11 +302,12 @@ public class CommandElement extends AbstractBundleElement
 	 * @param resultText
 	 * @return
 	 */
-	private String invokeBlockCommand(CommandContext context)
+	private CommandResult invokeBlockCommand(CommandContext context)
 	{
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
 		String resultText = ""; //$NON-NLS-1$
+		boolean executedSuccessfully = true;
 
 		try
 		{
@@ -319,9 +334,13 @@ public class CommandElement extends AbstractBundleElement
 			);
 
 			ScriptLogger.logError(message);
+			executedSuccessfully = false;
 		}
 
-		return resultText;
+		CommandResult result = new CommandResult(resultText);
+		result.setExecutedSuccessfully(executedSuccessfully);
+		
+		return result;
 	}
 
 	/**
@@ -329,14 +348,16 @@ public class CommandElement extends AbstractBundleElement
 	 *
 	 * @return
 	 */
-	private String invokeStringCommand(CommandContext context)
+	private CommandResult invokeStringCommand(CommandContext context)
 	{
 		// TODO: hardly a robust implementation, but enough to start testing
 		// functionality
 
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 		File tempFile = null;
-		String result = ""; //$NON-NLS-1$
+		String resultText = ""; //$NON-NLS-1$
+		boolean executedSuccessfully = true;
+		int exitValue = 0;
 
 		try
 		{
@@ -403,13 +424,18 @@ public class CommandElement extends AbstractBundleElement
 			}
 			catch (IOException e)
 			{
+				ScriptLogger.logError(e.getMessage());
+				executedSuccessfully = false;
 			}
 
-			result = buffer.toString();
+			resultText = buffer.toString();
+			exitValue = process.exitValue();
+			executedSuccessfully = (exitValue == 0);
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			ScriptLogger.logError(e.getMessage());
+			executedSuccessfully = false;
 		}
 		finally
 		{
@@ -419,6 +445,10 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 
+		CommandResult result = new CommandResult(resultText);
+		result.setReturnValue(exitValue);
+		result.setExecutedSuccessfully(executedSuccessfully);
+		
 		return result;
 	}
 	
@@ -467,7 +497,7 @@ public class CommandElement extends AbstractBundleElement
 		if (keyBinding != null)
 		{
 			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
 		}
 
 		return result;
