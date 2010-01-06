@@ -467,7 +467,7 @@ public class CommandElement extends AbstractBundleElement
 		if (keyBinding != null)
 		{
 			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(keyBinding).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
 		}
 
 		return result;
