@@ -130,12 +130,12 @@ module RadRails
       
       # request a single, simple string
       def request_string(options = Hash.new,&block)
-        request_string_core('Enter string:', options, &block)
+        request_string_core('Enter string:', false, options, &block)
       end
       
       # request a password or other text which should be obscured from view
       def request_secure_string(options = Hash.new,&block)
-        request_string_core('Enter password:', options, &block)
+        request_string_core('Enter password:', true, options, &block)
       end
 
       
@@ -213,15 +213,23 @@ module RadRails
       end
       
       private
+      # Used to request a secure string
+      class PasswordInputDialog < org.eclipse.jface.dialogs.InputDialog
+        def getInputTextStyle
+          org.eclipse.swt.SWT::SINGLE | org.eclipse.swt.SWT::BORDER | org.eclipse.swt.SWT::PASSWORD
+        end
+      end
       
       # common to request_string, request_secure_string
-      def request_string_core(default_prompt, options, &block)
+      def request_string_core(default_prompt, secure, options, &block)
         params = default_buttons(options)
         params["title"] = options[:title] || default_prompt
         params["prompt"] = options[:prompt] || ""
         params["string"] = options[:default] || ""
+
+        klass = secure ? PasswordInputDialog : org.eclipse.jface.dialogs.InputDialog
         # FIXME Need to support button\d options and build buttons dynamically!
-        dialog = org.eclipse.jface.dialogs.InputDialog.new(shell, params["title"], params["prompt"], params["string"], nil)
+        dialog = klass.new(shell, params["title"], params["prompt"], params["string"], nil)
         return_value = nil
         return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
         
