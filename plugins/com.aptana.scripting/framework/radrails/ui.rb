@@ -128,6 +128,31 @@ module RadRails
         end
       end
       
+      # Request an item from a list of items
+      def request_item(options = Hash.new,&block)
+        items = options[:items] || []
+        case items.size
+        when 0 then block_given? ? raise(SystemExit) : nil
+        when 1 then block_given? ? yield(items[0]) : items[0]
+        else
+          params = default_buttons(options)
+          params["title"] = options[:title] || "Select item:"
+          params["prompt"] = options[:prompt] || ""
+          params["string"] = options[:default] || ""
+          params["items"] = items
+
+          dialog = com.aptana.scripting.ListDialog.new(shell, java.util.HashMap.new(params))
+          return_value = nil
+          return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
+
+          if return_value == nil then
+            block_given? ? raise(SystemExit) : nil
+          else
+            block_given? ? yield(return_value) : return_value
+          end
+        end
+      end
+      
       # request a single, simple string
       def request_string(options = Hash.new,&block)
         request_string_core('Enter string:', false, options, &block)
@@ -137,7 +162,6 @@ module RadRails
       def request_secure_string(options = Hash.new,&block)
         request_string_core('Enter password:', true, options, &block)
       end
-
       
       # Show Tooltip using current cursor location. +content+ is shown as bold text at tp of tooltip.
       # Possible options:
