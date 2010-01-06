@@ -141,9 +141,16 @@ module RadRails
           params["string"] = options[:default] || ""
           params["items"] = items
 
-          dialog = com.aptana.scripting.ListDialog.new(shell, java.util.HashMap.new(params))
+          dialog = org.eclipse.ui.dialogs.ListDialog.new(shell)
+          dialog.content_provider = org.eclipse.jface.viewers.ArrayContentProvider.new
+          dialog.label_provider = org.eclipse.jface.viewers.LabelProvider.new
+          dialog.input = items
+          dialog.message = params["prompt"]
+          dialog.setInitialSelections([params["string"]].to_java(:object))
+          dialog.title = params["title"]
+          
           return_value = nil
-          return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
+          return_value = dialog.result[0].to_s if dialog.open == org.eclipse.jface.window.Window::OK
 
           if return_value == nil then
             block_given? ? raise(SystemExit) : nil
