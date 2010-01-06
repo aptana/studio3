@@ -61,7 +61,7 @@
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="Ruby Framework Files"
+            name="RadRails Framework Files"
             path="framework/">
       </loadPath>
    </extension>
