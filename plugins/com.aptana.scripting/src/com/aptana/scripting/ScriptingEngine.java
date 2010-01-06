@@ -104,8 +104,21 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
+								String urlAsPath = ResourceUtils.resourcePathToString(url);
 
-								paths.add(ResourceUtils.resourcePathToString(url));
+								if (urlAsPath != null && urlAsPath.length() > 0)
+								{
+									paths.add(urlAsPath);
+								}
+								else
+								{
+									String message = MessageFormat.format(
+										Messages.ScriptingEngine_Unable_To_Convert_Load_Path,
+										new Object[] { declaringPluginID, url }
+									);
+									
+									Activator.logError(message, null);
+								}
 							}
 						}
 					}

@@ -10,6 +10,7 @@ public class Messages extends NLS
 	public static String ScriptingEngine_Error_Setting_JRuby_Home;
 	public static String ScriptingEngine_Execution_Error;
 	public static String ScriptingEngine_Parse_Error;
+	public static String ScriptingEngine_Unable_To_Convert_Load_Path;
 	static
 	{
 		// initialize resource bundle
