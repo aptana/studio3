@@ -9,16 +9,26 @@ public class CommandResult
 	private String _errorString;
 	private OutputStream _errorStream;
 	private InputType _inputType;
-	
+	private boolean _executedSuccessfully;
+
 	/**
 	 * CommandResult
 	 * 
 	 * @param output
 	 */
-	public CommandResult(String output, InputType inputType)
+	public CommandResult(String output)
 	{
 		this._outputString = output;
-		this._inputType = inputType;
+	}
+
+	/**
+	 * executedSuccessfully
+	 * 
+	 * @return
+	 */
+	public boolean executedSuccessfully()
+	{
+		return this._executedSuccessfully;
 	}
 
 	/**
@@ -30,7 +40,7 @@ public class CommandResult
 	{
 		return this._errorStream;
 	}
-	
+
 	/**
 	 * getErrorString
 	 * 
@@ -40,17 +50,17 @@ public class CommandResult
 	{
 		return this._errorString;
 	}
-	
+
 	/**
-	 * getReturnValue
+	 * getInputType
 	 * 
 	 * @return
 	 */
-	public int getReturnValue()
+	public InputType getInputType()
 	{
-		return 0;
+		return this._inputType;
 	}
-	
+
 	/**
 	 * getOutputStream
 	 * 
@@ -71,8 +81,33 @@ public class CommandResult
 		return this._outputString;
 	}
 
-	public InputType getInputType()
+	/**
+	 * getReturnValue
+	 * 
+	 * @return
+	 */
+	public int getReturnValue()
 	{
-		return this._inputType;
+		return 0;
+	}
+
+	/**
+	 * setExecutedSuccessfully
+	 * 
+	 * @param value
+	 */
+	void setExecutedSuccessfully(boolean value)
+	{
+		this._executedSuccessfully = value;
+	}
+
+	/**
+	 * setInputType
+	 * 
+	 * @param inputType
+	 */
+	void setInputType(InputType inputType)
+	{
+		this._inputType = inputType;
 	}
 }

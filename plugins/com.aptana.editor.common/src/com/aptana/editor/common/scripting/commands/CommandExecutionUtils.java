@@ -401,6 +401,11 @@ public class CommandExecutionUtils
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer)
 	{
+		if (!commandResult.executedSuccessfully())
+		{
+			return;
+		}
+		
 		StyledText textWidget = textViewer.getTextWidget();
 
 		final int caretOffset = textWidget.getCaretOffset();
