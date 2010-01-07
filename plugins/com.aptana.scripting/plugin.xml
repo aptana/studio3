@@ -40,7 +40,7 @@
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
-            class="com.aptana.scripting.model.BundleSupportContextContributor"
+            class="com.aptana.scripting.BundleContextContributor"
             id="com.aptana.scripting.model.BundleSupportContextContributor"
             name="Bundle Support Context Contributor">
       </contributor>
