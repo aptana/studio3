@@ -35,9 +35,11 @@ public class CommandElement extends AbstractBundleElement
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
 
-	private static final Pattern CONTROL_PLUS = Pattern.compile("control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern CONTROL_PLUS = Pattern.compile(
+			"control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final String CTRL_PLUS = Matcher.quoteReplacement(IKeyLookup.CTRL_NAME + KeyStroke.KEY_DELIMITER);
-	private static final Pattern OPTION_PLUS = Pattern.compile("option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern OPTION_PLUS = Pattern.compile(
+			"option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
 
 	private String[] _triggers;
@@ -53,7 +55,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * Snippet
-	 *
+	 * 
 	 * @param path
 	 */
 	public CommandElement(String path)
@@ -67,7 +69,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * createCommandContext
-	 *
+	 * 
 	 * @return
 	 */
 	public CommandContext createCommandContext()
@@ -77,7 +79,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * execute
-	 *
+	 * 
 	 * @return
 	 */
 	public CommandResult execute()
@@ -87,7 +89,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * execute
-	 *
+	 * 
 	 * @param map
 	 * @return
 	 */
@@ -112,10 +114,10 @@ public class CommandElement extends AbstractBundleElement
 			// grab input type so we can report back which input was used
 			String inputTypeString = (String) context.get(CommandContext.INPUT_TYPE);
 			InputType inputType = InputType.get(inputTypeString);
-			
+
 			result.setInputType(inputType);
 		}
-		
+
 		return result;
 	}
 
@@ -129,7 +131,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getInput
-	 *
+	 * 
 	 * @return
 	 */
 	public InputType[] getInputTypes()
@@ -139,7 +141,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getInvoke
-	 *
+	 * 
 	 * @return
 	 */
 	public String getInvoke()
@@ -149,7 +151,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getInvokeBlock
-	 *
+	 * 
 	 * @return
 	 */
 	public RubyProc getInvokeBlock()
@@ -159,7 +161,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getKeyBinding
-	 *
+	 * 
 	 * @return
 	 */
 	public String[] getKeyBindings()
@@ -171,7 +173,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			return NO_KEY_BINDINGS;
 		}
-		
+
 		if (platform != Platform.UNDEFINED)
 		{
 			result = this._keyBindings.get(platform);
@@ -187,7 +189,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getKeySequence
-	 *
+	 * 
 	 * @return
 	 */
 	public KeySequence[] getKeySequences()
@@ -209,15 +211,8 @@ public class CommandElement extends AbstractBundleElement
 				}
 				catch (ParseException e)
 				{
-					String message = MessageFormat.format(
-						Messages.CommandElement_Invalid_Key_Binding,
-						new Object[] {
-							binding,
-							this.getDisplayName(),
-							this.getPath(),
-							e.getMessage()
-						}
-					);
+					String message = MessageFormat.format(Messages.CommandElement_Invalid_Key_Binding, new Object[] {
+							binding, this.getDisplayName(), this.getPath(), e.getMessage() });
 
 					ScriptLogger.logError(message);
 				}
@@ -228,7 +223,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getOutput
-	 *
+	 * 
 	 * @return
 	 */
 	public String getOutput()
@@ -242,7 +237,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getOutputPath
-	 *
+	 * 
 	 * @return
 	 */
 	public String getOutputPath()
@@ -252,7 +247,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getOutputType
-	 *
+	 * 
 	 * @return
 	 */
 	public String getOutputType()
@@ -262,7 +257,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getTrigger
-	 *
+	 * 
 	 * @return
 	 */
 	public String[] getTriggers()
@@ -272,7 +267,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * getWorkingDirectory
-	 *
+	 * 
 	 * @return
 	 */
 	public String getWorkingDirectory()
@@ -298,7 +293,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * invokeBlockCommand
-	 *
+	 * 
 	 * @param resultText
 	 * @return
 	 */
@@ -309,6 +304,7 @@ public class CommandElement extends AbstractBundleElement
 		String resultText = ""; //$NON-NLS-1$
 		boolean executedSuccessfully = true;
 
+		Map<String, String> environment = new HashMap<String, String>();
 		try
 		{
 			RubyModule radrails = runtime.getModule("RadRails"); //$NON-NLS-1$
@@ -316,10 +312,16 @@ public class CommandElement extends AbstractBundleElement
 			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
 			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
 
-			IRubyObject result = this._invokeBlock.call(
-				threadContext,
-				new IRubyObject[] { rubyContext }
-			);
+			// Populate ENV TODO Keep track of any env vars we may have clobbered here and restore back their original values!
+			IRubyObject env = runtime.getObject().getConstant("ENV"); //$NON-NLS-1$
+			if (env != null && env instanceof RubyHash)
+			{
+				RubyHash hash = (RubyHash) env;
+				populateEnvironment(context.getMap(), environment);
+				hash.putAll(environment);
+			}
+
+			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
 
 			if (result != null)
 			{
@@ -328,24 +330,32 @@ public class CommandElement extends AbstractBundleElement
 		}
 		catch (Exception e)
 		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Error_Processing_Command_Block,
-				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-			);
+			String message = MessageFormat.format(Messages.CommandElement_Error_Processing_Command_Block, new Object[] {
+					this.getDisplayName(), this.getPath(), e.getMessage() });
 
 			ScriptLogger.logError(message);
 			executedSuccessfully = false;
 		}
+		// Now clear the environment
+		IRubyObject env = runtime.getObject().getConstant("ENV"); //$NON-NLS-1$
+		if (env != null && env instanceof RubyHash)
+		{
+			RubyHash hash = (RubyHash) env;
+			for (String key : environment.keySet())
+			{
+				hash.remove(key);
+			}
+		}
 
 		CommandResult result = new CommandResult(resultText);
 		result.setExecutedSuccessfully(executedSuccessfully);
-		
+
 		return result;
 	}
 
 	/**
 	 * invokeStringCommand
-	 *
+	 * 
 	 * @return
 	 */
 	private CommandResult invokeStringCommand(CommandContext context)
@@ -362,10 +372,9 @@ public class CommandElement extends AbstractBundleElement
 		try
 		{
 			// create temporary file for execution
-			tempFile = File.createTempFile(
-				"command_temp_", //$NON-NLS-1$
-				(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
-			);
+			tempFile = File.createTempFile("command_temp_", //$NON-NLS-1$
+					(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
+					);
 
 			// dump "invoke" content into temp file
 			PrintWriter pw = new PrintWriter(tempFile);
@@ -374,17 +383,18 @@ public class CommandElement extends AbstractBundleElement
 
 			// create process builder
 			ProcessBuilder builder = new ProcessBuilder();
-			
+
 			// augment environment with the context map
 			if (context != null)
 			{
 				this.populateEnvironment(context.getMap(), builder.environment());
 			}
-			
+
 			// create the command to execute
 			List<String> commands = new ArrayList<String>();
-			
-			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX) || OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
+
+			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
+					|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
 			{
 				// FIXME: should we be using the user's preferred shell instead of hardcoding?
 				commands.add("/bin/bash"); //$NON-NLS-1$
@@ -394,7 +404,7 @@ public class CommandElement extends AbstractBundleElement
 				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
 				commands.add("cmd"); //$NON-NLS-1$
 			}
-			
+
 			commands.add(tempFile.getAbsolutePath());
 
 			// setup command-line
@@ -453,13 +463,13 @@ public class CommandElement extends AbstractBundleElement
 		CommandResult result = new CommandResult(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * isBlockCommand
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean isBlockCommand()
@@ -469,7 +479,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * isExecutable
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean isExecutable()
@@ -479,7 +489,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * isShellCommand
-	 *
+	 * 
 	 * @return
 	 */
 	public boolean isShellCommand()
@@ -507,7 +517,7 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
-	
+
 	/**
 	 * populateEnvironment
 	 * 
@@ -520,21 +530,21 @@ public class CommandElement extends AbstractBundleElement
 		{
 			Object valueObject = entry.getValue();
 			String key = entry.getKey().toUpperCase();
-			
+
 			if (valueObject instanceof IRubyObject)
 			{
 				IRubyObject rubyObject = (IRubyObject) valueObject;
-				
+
 				if (rubyObject.respondsTo(TO_ENV))
 				{
 					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
 					IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV);
-					
+
 					if (methodResult instanceof RubyHash)
 					{
 						RubyHash environmentHash = (RubyHash) methodResult;
-						
+
 						for (Object hashKey : environmentHash.keySet())
 						{
 							environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
@@ -545,8 +555,8 @@ public class CommandElement extends AbstractBundleElement
 			else if (valueObject instanceof EnvironmentContributor)
 			{
 				EnvironmentContributor contributor = (EnvironmentContributor) valueObject;
-				Map<String,String> contributedEnvironment = contributor.toEnvironment();
-				
+				Map<String, String> contributedEnvironment = contributor.toEnvironment();
+
 				if (contributedEnvironment != null)
 				{
 					environment.putAll(contributedEnvironment);
@@ -663,7 +673,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInputType
-	 *
+	 * 
 	 * @param type
 	 */
 	public void setInputType(InputType type)
@@ -673,7 +683,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInputType
-	 *
+	 * 
 	 * @param types
 	 */
 	public void setInputType(InputType[] types)
@@ -683,7 +693,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInputType
-	 *
+	 * 
 	 * @param input
 	 */
 	public void setInputType(String input)
@@ -693,7 +703,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInputType
-	 *
+	 * 
 	 * @param types
 	 */
 	public void setInputType(String[] types)
@@ -715,7 +725,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInvoke
-	 *
+	 * 
 	 * @param invoke
 	 */
 	public void setInvoke(String invoke)
@@ -725,7 +735,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setInvokeBlock
-	 *
+	 * 
 	 * @param block
 	 */
 	public void setInvokeBlock(RubyProc block)
@@ -735,21 +745,19 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setKeyBinding
-	 *
+	 * 
 	 * @param keyBinding
 	 */
 	public void setKeyBinding(String OS, String keyBinding)
 	{
 		if (keyBinding != null && keyBinding.length() > 0)
 		{
-			this.setKeyBindings(OS, new String[] { keyBinding } );
+			this.setKeyBindings(OS, new String[] { keyBinding });
 		}
 		else
 		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Undefined_Key_Binding,
-				new Object[] { this.getPath() }
-			);
+			String message = MessageFormat.format(Messages.CommandElement_Undefined_Key_Binding, new Object[] { this
+					.getPath() });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -757,7 +765,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setKeyBindings
-	 *
+	 * 
 	 * @param OS
 	 * @param keyBindings
 	 */
@@ -776,10 +784,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Unrecognized_OS,
-				new Object[] { this.getPath(), OS }
-			);
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
+					this.getPath(), OS });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -787,7 +793,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setOutputPath
-	 *
+	 * 
 	 * @param path
 	 */
 	public void setOutputPath(String path)
@@ -797,7 +803,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setOutputType
-	 *
+	 * 
 	 * @param type
 	 */
 	public void setOutputType(OutputType type)
@@ -807,7 +813,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setOutput
-	 *
+	 * 
 	 * @param output
 	 */
 	public void setOutputType(String output)
@@ -817,7 +823,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setTrigger
-	 *
+	 * 
 	 * @param trigger
 	 */
 	public void setTrigger(String trigger)
@@ -827,7 +833,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setTrigger
-	 *
+	 * 
 	 * @param triggers
 	 */
 	public void setTrigger(String[] triggers)
@@ -837,7 +843,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setOutputPath
-	 *
+	 * 
 	 * @param path
 	 */
 	public void setWorkingDirectoryPath(String path)
@@ -847,7 +853,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setWorkingDirectoryType
-	 *
+	 * 
 	 * @param workingDirectory
 	 */
 	public void setWorkingDirectoryType(String workingDirectory)
@@ -857,7 +863,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * setWorkingDirectoryType
-	 *
+	 * 
 	 * @param type
 	 */
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
