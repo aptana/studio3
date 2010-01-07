@@ -59,5 +59,9 @@ public class ExplorerContextContributor implements ContextContributor
 
 			context.put(PROJECT_PROPERTY_NAME, rubyInstance);
 		}
+		else
+		{
+			context.put(PROJECT_PROPERTY_NAME, null);
+		}
 	}
 }
