@@ -577,12 +577,9 @@ public class CommandElement extends AbstractBundleElement
 					environment.putAll(contributedEnvironment);
 				}
 			}
-			else
+			else if (valueObject != null)
 			{
-				if (valueObject != null)
-				{
-					environment.put(key, valueObject.toString());
-				}
+				environment.put(key, valueObject.toString());
 			}
 		}
 	}
