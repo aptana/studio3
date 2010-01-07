@@ -579,7 +579,10 @@ public class CommandElement extends AbstractBundleElement
 			}
 			else
 			{
-				environment.put(key, valueObject.toString());
+				if (valueObject != null)
+				{
+					environment.put(key, valueObject.toString());
+				}
 			}
 		}
 	}
