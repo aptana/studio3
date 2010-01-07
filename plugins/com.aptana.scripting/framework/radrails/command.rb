@@ -7,11 +7,16 @@ module RadRails
   
   class Command < BaseElement
     def initialize(name)
-      super(name)
-
-      @key_binding = KeyBinding.new(java_object)
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
+      if name.kind_of? String
+        super(name)
+        
+        @key_binding = KeyBinding.new(java_object)
+        bundle = BundleManager.bundle_from_path(path)
+        bundle.apply_defaults(self) unless bundle.nil?
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def input
