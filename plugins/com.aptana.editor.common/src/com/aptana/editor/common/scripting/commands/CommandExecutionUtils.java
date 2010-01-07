@@ -56,6 +56,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.OutputType;
+import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils
@@ -485,6 +486,21 @@ public class CommandExecutionUtils
 			case COPY_TO_CLIPBOARD:
 				copyToClipboard(commandResult);
 				break;
+			case OUTPUT_TO_CONSOLE:
+				outputToConsole(commandResult);
+				break;
+		}
+	}
+
+	private static void outputToConsole(CommandResult commandResult)
+	{
+		ScriptingConsole scriptingConsole = ScriptingConsole.getDefault();
+
+		scriptingConsole.print(commandResult.getOutputString());
+		if (!commandResult.executedSuccessfully())
+		{
+			// Dump the error output if any
+			scriptingConsole.printErr(commandResult.getErrorString());
 		}
 	}
 
