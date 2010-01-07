@@ -40,6 +40,7 @@ public class Messages extends NLS
 
 	public static String SingleProjectView_RefreshJob_title;
 
+	public static String SingleProjectView_Wildcard;
 	public static String SingleProjectView_RegularExpression;
 
 	public static String SingleProjectView_SwitchToApplication;

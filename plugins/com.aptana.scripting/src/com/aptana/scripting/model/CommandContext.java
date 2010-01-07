@@ -22,9 +22,6 @@ public class CommandContext
 {
 	// Key names for well known keys in the map
 	public static final String WORKING_DIRECTORY = "working_directory"; //$NON-NLS-1$
-
-	public static final String ACTIVE_PROJECT_NAME = "active_project_name"; //$NON-NLS-1$
-	public static final String ACTIVE_PROJECT_FOLDER = "active_project_folder"; //$NON-NLS-1$
 	public static final String INPUT_TYPE = "input_type"; //$NON-NLS-1$
 
 	private static final String CONTEXT_CONTRIBUTOR_ID = "contextContributors"; //$NON-NLS-1$
