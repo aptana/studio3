@@ -175,4 +175,10 @@
             name="radrails/editor.rb">
       </file>
    </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.editor.common.EditorContextContributor">
+      </contributor>
+   </extension>
 </plugin>
