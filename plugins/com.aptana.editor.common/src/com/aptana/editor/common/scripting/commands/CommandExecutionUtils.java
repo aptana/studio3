@@ -22,9 +22,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
@@ -304,44 +306,27 @@ public class CommandExecutionUtils
 	public static CommandResult executeCommand(CommandElement command, ITextViewer textViewer, ITextEditor textEditor)
 	{
 		StyledText textWidget = textViewer.getTextWidget();
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+		FilterInputProvider filterInputProvider = null;
 
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
-				+ textWidget.getLine(selectionEndOffsetLine).length();
-
-		FilterInputProvider filterInputProvider = CommandExecutionUtils.EOF;
-
+		InputType selected = InputType.UNDEFINED;
 		InputType[] inputTypes = command.getInputTypes();
-		InputType inputType = (inputTypes == null || inputTypes.length == 0) ? InputType.UNDEFINED : inputTypes[0];
-		switch (inputType)
+		if (inputTypes == null || inputTypes.length == 0)
 		{
-			case SELECTION:
-				filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
+			inputTypes = new InputType[] { InputType.UNDEFINED };
+		}
+		for (InputType inputType : inputTypes)
+		{
+			filterInputProvider = getInputProvider(textWidget, inputType);
+			if (filterInputProvider != null)
+			{
+				selected = inputType;
 				break;
-			case SELECTED_LINES:
-				filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText(
-						selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset));
-				break;
-			case DOCUMENT:
-				filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getText());
-				break;
-			case CLIPBOARD:
-				filterInputProvider = new CommandExecutionUtils.StringInputProvider(getClipboardContents());
-				break;
-			case LINE:
-				filterInputProvider = new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget
-						.getLineAtOffset(textWidget.getCaretOffset())));
-				break;
-			case WORD:
-				filterInputProvider = CommandExecutionUtils.EOF;
-				break;
-			case INPUT_FROM_CONSOLE:
-				filterInputProvider = new CommandExecutionUtils.EclipseConsoleInputProvider(
-						CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
-				break;
+			}
+		}
+		if (filterInputProvider == null)
+		{
+			filterInputProvider = CommandExecutionUtils.EOF;
+			selected = InputType.UNDEFINED;
 		}
 
 		// Create command context
@@ -349,6 +334,7 @@ public class CommandExecutionUtils
 
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
+		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
 
 		Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
 		if (computedEnvironmentMap != null)
@@ -363,6 +349,47 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, InputType inputType)
+	{
+		Point selectionRange = textWidget.getSelection();
+		switch (inputType)
+		{
+			case SELECTION:
+				if (selectionRange.x == selectionRange.y)
+					return null;
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getSelectionText());
+			case SELECTED_LINES:
+				if (selectionRange.x == selectionRange.y)
+					return null;
+
+				int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
+				int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+				int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
+				int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
+						+ textWidget.getLine(selectionEndOffsetLine).length();
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getText(
+						selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset));
+			case DOCUMENT:
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getText());
+			case CLIPBOARD:
+				String contents = getClipboardContents();
+				if (contents == null || contents.trim().length() == 0)
+					return null;
+				return new CommandExecutionUtils.StringInputProvider(contents);
+			case LINE:
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getLine(textWidget
+						.getLineAtOffset(textWidget.getCaretOffset())));
+			case WORD:
+				String currentWord = findWord(textWidget);
+				if (currentWord == null || currentWord.trim().length() == 0)
+					return null;
+				return new CommandExecutionUtils.StringInputProvider(currentWord);
+			case INPUT_FROM_CONSOLE:
+				return new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
+		}
+		return null;
+	}
+
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor)
 	{
 		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
@@ -374,6 +401,11 @@ public class CommandExecutionUtils
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer)
 	{
+		if (!commandResult.executedSuccessfully())
+		{
+			return;
+		}
+		
 		StyledText textWidget = textViewer.getTextWidget();
 
 		final int caretOffset = textWidget.getCaretOffset();
@@ -395,9 +427,16 @@ public class CommandExecutionUtils
 			case DISCARD:
 				break;
 			case REPLACE_SELECTION:
-				int start = Math.min(selectionRange.x, selectionRange.y);
-				int end = Math.max(selectionRange.x, selectionRange.y);
-				textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+				if (commandResult.getInputType() == InputType.DOCUMENT)
+				{
+					textWidget.setText(commandResult.getOutputString());
+				}
+				else
+				{
+					int start = Math.min(selectionRange.x, selectionRange.y);
+					int end = Math.max(selectionRange.x, selectionRange.y);
+					textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+				}
 				break;
 			case REPLACE_SELECTED_LINES:
 				textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
@@ -414,8 +453,25 @@ public class CommandExecutionUtils
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
-				// FIXME Should remove selection if that was the input
-				SnippetsCompletionProcessor.insertAsTemplate(textViewer, caretOffset, commandResult.getOutputString());
+				IRegion region = new Region(caretOffset, 0);
+				if (commandResult.getInputType() == InputType.SELECTION)
+				{
+					region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
+							- selectionStartOffsetLineStartOffset);
+				}
+				else if (commandResult.getInputType() == InputType.DOCUMENT)
+				{
+					region = new Region(0, textWidget.getCharCount());
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+				}
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					region = findWordRegion(textWidget);
+				}
+				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
 				showAsHTML(command, commandResult);
@@ -584,6 +640,7 @@ public class CommandExecutionUtils
 				environment
 						.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
+				environment.put(VARIABLES_NAMES.TM_FILENAME.name(), iFile.getLocation().toFile().getName());
 				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile()
 						.getAbsolutePath());
 				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile()
@@ -616,9 +673,7 @@ public class CommandExecutionUtils
 						String currentLine = styledText.getLine(lineAtCaret);
 						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), currentLine);
 						environment.put(VARIABLES_NAMES.TM_CURRENT_LINE.name(), currentLine);
-						int offsetInLine = caretOffset - styledText.getOffsetAtLine(lineAtCaret);
-						String currentWord = findWord(currentLine, offsetInLine);
-						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), currentWord);
+						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), findWord(styledText));
 					}
 				}
 			}
@@ -626,16 +681,33 @@ public class CommandExecutionUtils
 		return environment;
 	}
 
+	private static String findWord(StyledText textWidget)
+	{
+		IRegion region = findWordRegion(textWidget);
+		return textWidget.getTextRange(region.getOffset(), region.getLength());
+	}
+
+	private static IRegion findWordRegion(StyledText textWidget)
+	{
+		int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		String currentLine = textWidget.getLine(lineAtCaret);
+		int lineOffset = textWidget.getOffsetAtLine(lineAtCaret);
+		int offsetInLine = caretOffset - lineOffset;
+		IRegion region = findWordRegion(currentLine, offsetInLine);
+		return new Region(region.getOffset() + lineOffset, region.getLength());
+	}
+
 	/**
 	 * Tries to find the word at the given offset.
 	 * 
-	 * @param document
-	 *            the document
+	 * @param line
+	 *            the line
 	 * @param offset
 	 *            the offset
 	 * @return the word or <code>null</code> if none
 	 */
-	protected static String findWord(String line, int offset)
+	protected static IRegion findWordRegion(String line, int offset)
 	{
 		BreakIterator breakIter = BreakIterator.getWordInstance();
 		breakIter.setText(line);
@@ -657,8 +729,8 @@ public class CommandExecutionUtils
 		}
 
 		if (end == start)
-			return null;
-		return line.substring(start, end);
+			return new Region(start, 0);
+		return new Region(start, end - start);
 	}
 
 	@SuppressWarnings("unused")

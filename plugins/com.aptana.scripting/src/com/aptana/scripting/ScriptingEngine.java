@@ -13,13 +13,18 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyString;
 import org.jruby.embed.EmbedEvalUnit;
 import org.jruby.embed.EvalFailedException;
 import org.jruby.embed.LocalContextProvider;
 import org.jruby.embed.ParseFailedException;
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
+import org.jruby.runtime.builtin.IRubyObject;
 import org.osgi.framework.Bundle;
 
 import com.aptana.util.ResourceUtils;
@@ -30,7 +35,7 @@ public class ScriptingEngine
 	private static final String FRAMEWORK_FILE_ID = "frameworkFiles"; //$NON-NLS-1$
 	private static final String TAG_FILE = "file"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
-	
+
 	// loadpath extension point
 	private static final String LOADPATH_ID = "loadPaths"; //$NON-NLS-1$
 	private static final String TAG_LOADPATH = "loadPath"; //$NON-NLS-1$
@@ -41,6 +46,7 @@ public class ScriptingEngine
 	private ScriptingContainer _scriptingContainer;
 	private List<String> _loadPaths;
 	private List<String> _frameworkFiles;
+	private List<RubyString> fAdded = new ArrayList<RubyString>();
 
 	/**
 	 * ScriptingEngine
@@ -98,8 +104,21 @@ public class ScriptingEngine
 								String declaringPluginID = declaring.getNamespaceIdentifier();
 								Bundle bundle = Platform.getBundle(declaringPluginID);
 								URL url = bundle.getEntry(path);
+								String urlAsPath = ResourceUtils.resourcePathToString(url);
 
-								paths.add(ResourceUtils.resourcePathToString(url));
+								if (urlAsPath != null && urlAsPath.length() > 0)
+								{
+									paths.add(urlAsPath);
+								}
+								else
+								{
+									String message = MessageFormat.format(
+										Messages.ScriptingEngine_Unable_To_Convert_Load_Path,
+										new Object[] { declaringPluginID, url }
+									);
+									
+									Activator.logError(message, null);
+								}
 							}
 						}
 					}
@@ -149,10 +168,10 @@ public class ScriptingEngine
 
 			this._frameworkFiles = Collections.unmodifiableList(names);
 		}
-		
+
 		return this._frameworkFiles;
 	}
-	
+
 	/**
 	 * getScriptingContainer
 	 * 
@@ -166,16 +185,27 @@ public class ScriptingEngine
 
 			try
 			{
-				File pluginFile = FileLocator.getBundleFile(Activator.getDefault().getBundle());
-
-				this._scriptingContainer.getProvider().getRubyInstanceConfig().setJRubyHome(pluginFile.getAbsolutePath());
+				File jrubyHome = null;
+				// try just exploding the jruby lib dir
+				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("lib"), null); //$NON-NLS-1$
+				if (url != null)
+				{
+					File lib = ResourceUtils.resourcePathToFile(url);
+					// Ok, now use the parent of exploded lib dir as JRuby Home
+					jrubyHome = lib.getParentFile();
+				}
+				else
+				{
+					// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
+					jrubyHome = FileLocator.getBundleFile(Activator.getDefault().getBundle());
+				}
+				this._scriptingContainer.getProvider().getRubyInstanceConfig()
+						.setJRubyHome(jrubyHome.getAbsolutePath());
 			}
 			catch (IOException e)
 			{
-				String message = MessageFormat.format(
-					Messages.ScriptingEngine_Error_Setting_JRuby_Home,
-					new Object[] { e.getMessage() }
-				);
+				String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
+						new Object[] { e.getMessage() });
 
 				Activator.logError(message, e);
 				ScriptLogger.logError(message);
@@ -201,7 +231,22 @@ public class ScriptingEngine
 
 			if (provider != null)
 			{
-				provider.setLoadPaths(loadPaths);
+				Ruby runtime = provider.getRuntime();	    
+				IRubyObject object = runtime.getLoadService().getLoadPath();
+				RubyArray loadpathArray = (RubyArray) object;
+				// wipe whatever we added before
+				for (RubyString added : fAdded)
+				{
+					loadpathArray.remove(added);
+				}
+				fAdded.clear();
+				// Now add our custom loadpath for this execution
+				for (String loadPath : loadPaths)
+				{
+					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+					loadpathArray.append(toAdd);
+					fAdded.add(toAdd); 
+				}
 			}
 		}
 
@@ -219,19 +264,15 @@ public class ScriptingEngine
 		}
 		catch (ParseFailedException e)
 		{
-			String message = MessageFormat.format(
-				Messages.ScriptingEngine_Parse_Error,
-				new Object[] { fullPath, e.getMessage() }
-			);
+			String message = MessageFormat.format(Messages.ScriptingEngine_Parse_Error, new Object[] { fullPath,
+					e.getMessage() });
 
 			ScriptLogger.logError(message);
 		}
 		catch (EvalFailedException e)
 		{
-			String message = MessageFormat.format(
-				Messages.ScriptingEngine_Execution_Error,
-				new Object[] { fullPath, e.getMessage() }
-			);
+			String message = MessageFormat.format(Messages.ScriptingEngine_Execution_Error, new Object[] { fullPath,
+					e.getMessage() });
 
 			ScriptLogger.logError(message);
 		}

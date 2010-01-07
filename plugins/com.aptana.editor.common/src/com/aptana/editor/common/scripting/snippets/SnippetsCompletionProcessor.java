@@ -114,8 +114,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	static String processExpansion(String expansion)
 	{
 		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$		
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		// Turn \$ into $$
+		expansion = expansion.replaceAll(Pattern.quote("\\$"), Matcher.quoteReplacement("$$")); //$NON-NLS-1$  //$NON-NLS-2$
 		// turn empty tab stops into something eclipse can handle
 		expansion = expansion.replaceAll("\\$(\\d)", "\\${value$1:$1('')}"); //$NON-NLS-1$  //$NON-NLS-2$
 		// transform ${n:value1/value2/value3} to ${choices:n('value1',value2','value3)} where n is a digit
@@ -252,11 +254,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 
 	public static void insertAsTemplate(ITextViewer textViewer, final int caretOffset, String templateText)
 	{
-		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
-		Template template = new SnippetTemplate("", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				SnippetsCompletionProcessor.processExpansion(templateText));
 		IRegion region = new IRegion()
 		{
 			public int getOffset()
@@ -269,11 +266,21 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				return 0;
 			}
 		};
+		insertAsTemplate(textViewer, region, templateText);
+	}
+	
+	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText)
+	{
+		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
+		Template template = new SnippetTemplate("", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				SnippetsCompletionProcessor.processExpansion(templateText));
 		TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
 		SnippetTemplateProposal completionProposal = (SnippetTemplateProposal) snippetsCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
-		completionProposal.apply(textViewer, '0', SWT.NONE, caretOffset);
+		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
 	}
 
 	private static class CustomStyler extends Styler

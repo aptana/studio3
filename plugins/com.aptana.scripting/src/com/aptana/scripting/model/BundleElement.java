@@ -13,7 +13,7 @@ public class BundleElement extends AbstractElement
 	private String _description;
 	private String _license;
 	private String _licenseUrl;
-	private String _gitRepo;
+	private String _repository;
 	
 	private File _bundleDirectory;
 	private BundleScope _bundleScope;
@@ -233,7 +233,7 @@ public class BundleElement extends AbstractElement
 	 */
 	protected String getElementName()
 	{
-		return "bundle";
+		return "bundle"; //$NON-NLS-1$
 	}
 
 	/**
@@ -241,9 +241,9 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public String getGitRepo()
+	public String getRepository()
 	{
-		return this._gitRepo;
+		return this._repository;
 	}
 
 	/**
@@ -355,7 +355,7 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
 		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
 		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
-		printer.printWithIndent("git: ").println(this._gitRepo); //$NON-NLS-1$
+		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 		
 		// output commands
 		if (this._commands != null)
@@ -462,9 +462,9 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param gitRepo
 	 */
-	public void setGitRepo(String gitRepo)
+	public void setRepository(String gitRepo)
 	{
-		this._gitRepo = gitRepo;
+		this._repository = gitRepo;
 	}
 
 	/**

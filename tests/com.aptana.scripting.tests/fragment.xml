@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.scripting.model.TestContextContributor"
+            name="Context Contributor Test">
+      </contributor>
+   </extension>
+
+</fragment>

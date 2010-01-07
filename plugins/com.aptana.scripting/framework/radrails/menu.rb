@@ -33,28 +33,12 @@ module RadRails
       @jobj.command_name = command_name
     end
     
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
-    end
-    
-    def java_object
-      @jobj
-    end
-    
     def menu(name, &block)
       child_menu = Menu.new(name)
       
       block.call(child_menu) if block_given?
       
       add_menu(child_menu)
-    end
-    
-    def path
-      @jobj.path
     end
     
     def scope

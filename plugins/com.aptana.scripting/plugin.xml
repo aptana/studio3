@@ -37,5 +37,13 @@
             name="radrails/context.rb">
       </file>
    </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.scripting.model.BundleSupportContextContributor"
+            id="com.aptana.scripting.model.BundleSupportContextContributor"
+            name="Bundle Support Context Contributor">
+      </contributor>
+   </extension>
 
 </plugin>

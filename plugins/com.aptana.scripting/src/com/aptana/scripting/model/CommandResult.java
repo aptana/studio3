@@ -8,7 +8,10 @@ public class CommandResult
 	private OutputStream _outputStream;
 	private String _errorString;
 	private OutputStream _errorStream;
-	
+	private InputType _inputType;
+	private int _returnValue;
+	private boolean _executedSuccessfully;
+
 	/**
 	 * CommandResult
 	 * 
@@ -18,39 +21,15 @@ public class CommandResult
 	{
 		this._outputString = output;
 	}
-	
+
 	/**
-	 * CommandResult
+	 * executedSuccessfully
 	 * 
-	 * @param output
-	 * @param errors
+	 * @return
 	 */
-	public CommandResult(String output, String errors)
+	public boolean executedSuccessfully()
 	{
-		this._outputString = output;
-		this._errorString = errors;
-	}
-	
-	/**
-	 * CommandResult
-	 * 
-	 * @param stream
-	 */
-	public CommandResult(OutputStream stream)
-	{
-		this._outputStream = stream;
-	}
-	
-	/**
-	 * CommandResult
-	 * 
-	 * @param outputStream
-	 * @param errorStream
-	 */
-	public CommandResult(OutputStream outputStream, OutputStream errorStream)
-	{
-		this._outputStream = outputStream;
-		this._errorStream = errorStream;
+		return this._executedSuccessfully;
 	}
 
 	/**
@@ -62,7 +41,7 @@ public class CommandResult
 	{
 		return this._errorStream;
 	}
-	
+
 	/**
 	 * getErrorString
 	 * 
@@ -72,17 +51,17 @@ public class CommandResult
 	{
 		return this._errorString;
 	}
-	
+
 	/**
-	 * getReturnValue
+	 * getInputType
 	 * 
 	 * @return
 	 */
-	public int getReturnValue()
+	public InputType getInputType()
 	{
-		return 0;
+		return this._inputType;
 	}
-	
+
 	/**
 	 * getOutputStream
 	 * 
@@ -101,5 +80,45 @@ public class CommandResult
 	public String getOutputString()
 	{
 		return this._outputString;
+	}
+
+	/**
+	 * getReturnValue
+	 * 
+	 * @return
+	 */
+	public int getReturnValue()
+	{
+		return this._returnValue;
+	}
+
+	/**
+	 * setExecutedSuccessfully
+	 * 
+	 * @param value
+	 */
+	void setExecutedSuccessfully(boolean value)
+	{
+		this._executedSuccessfully = value;
+	}
+
+	/**
+	 * setInputType
+	 * 
+	 * @param inputType
+	 */
+	void setInputType(InputType inputType)
+	{
+		this._inputType = inputType;
+	}
+	
+	/**
+	 * setReturnValue
+	 * 
+	 * @param value
+	 */
+	void setReturnValue(int value)
+	{
+		this._returnValue = value;
 	}
 }
