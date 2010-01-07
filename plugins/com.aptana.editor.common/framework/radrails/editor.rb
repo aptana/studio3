@@ -179,19 +179,46 @@ module RadRails
         result["TM_DIRECTORY"] = file.parent_file.absolute_path
         result["TM_PROJECT_DIRECTORY"] = ifile.project.location.to_file.absolute_path # duplicate name in project.rb
         
-		result["TM_SELECTED_TEXT"] = selection.text
-		result["TM_LINE_NUMBER"] = selection.start_line + 1
-		result["TM_SELECTION_OFFSET"] = selection.offset
-		result["TM_SELECTION_LENGTH"] = selection.length
-		result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
-		result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
-		
-		# TODO
-		result["TM_LINE_INDEX"] = -1
-		result["TM_CARET_LINE_NUMBER"] = -1
-		result["TM_CARET_LINE_TEXT"] = ""
-		result["TM_CURRENT_LINE"] = ""
-		result["TM_CURRENT_WORD"] = ""
+        result["TM_SELECTED_TEXT"] = selection.text
+        result["TM_LINE_NUMBER"] = selection.start_line + 1
+        result["TM_SELECTION_OFFSET"] = selection.offset
+        result["TM_SELECTION_LENGTH"] = selection.length
+        result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
+        result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+        
+        styled_text = editor_part.get_adapter(org.eclipse.swt.widgets.Control.java_class)
+        caret_offset = styled_text.caret_offset
+        caret_line = styled_text.line_at_offset(caret_offset)
+        current_line = styled_text.line(caret_line)
+        caret_column = selection.offset - styled_text.offset_at_line(selection.start_line)
+        
+        result["TM_LINE_INDEX"] = caret_column
+        result["TM_CARET_LINE_NUMBER"] = caret_line + 1
+        result["TM_CARET_LINE_TEXT"] = current_line
+        result["TM_CURRENT_LINE"] = current_line
+        
+        # I'm sure there's a better way to extract the word at the current caret position
+        if current_line !~ /^\s*$/
+          starting_offset = caret_column
+          ending_offset = current_line.length
+          
+          (caret_column - 1).downto(0) do |n|
+            if current_line[n,1] =~ /\W/
+              starting_offset = n + 1
+              break
+            end
+          end
+          (caret_column...current_line.length).each do |n|
+            if current_line[n,1] =~ /\W/
+              ending_offset = n
+              break
+            end
+          end
+          
+          result["TM_CURRENT_WORD"] = current_line[starting_offset, ending_offset - starting_offset]
+        else
+          result["TM_CURRENT_WORD"] = ""
+        end
       end
       
       result
