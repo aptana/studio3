@@ -117,9 +117,18 @@ public abstract class SingleProjectView extends CommonNavigator
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
 
+	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
+	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
+		GridLayout gridLayout = (GridLayout)parent.getLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginTop = 0;
+		gridLayout.marginBottom = 0;
+		gridLayout.verticalSpacing = 1;
+
 		// Create toolbar
 		Composite toolbarComposite = new Composite(parent, SWT.NONE);
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -291,6 +300,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchText.setText(initialText);
+		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 		searchText.addFocusListener(new FocusListener()
 		{
@@ -349,14 +359,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		GridData toolbarGridData = new GridData(SWT.FILL, SWT.CENTER, false, false);
 		toolbar.setLayoutData(toolbarGridData);
 
-		final ToolItem menuButton = new ToolItem(toolbar, SWT.PUSH);
-		menuButton.setImage(ExplorerPlugin.getImage("icons/full/elcl16/down.png")); //$NON-NLS-1$
-
-		// Construct the menu to attach to the above button.
-		final Menu menu = new Menu(toolbar);
-
-		final MenuItem caseSensitiveMenuItem = new MenuItem(menu, SWT.CHECK);
-		caseSensitiveMenuItem.setText(Messages.SingleProjectView_CaseSensitive);
+		final ToolItem caseSensitiveMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		caseSensitiveMenuItem.setImage(ExplorerPlugin.getImage(CASE_SENSITIVE_ICON_PATH));
+		caseSensitiveMenuItem.setToolTipText(Messages.SingleProjectView_CaseSensitive);
 		caseSensitiveMenuItem.setSelection(caseSensitiveSearch);
 		caseSensitiveMenuItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -367,8 +372,9 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		final MenuItem regularExressionMenuItem = new MenuItem(menu, SWT.CHECK);
-		regularExressionMenuItem.setText(Messages.SingleProjectView_RegularExpression);
+		final ToolItem regularExressionMenuItem = new ToolItem(toolbar, SWT.CHECK);
+		regularExressionMenuItem.setImage(ExplorerPlugin.getImage(REGULAR_EXPRESSION_ICON_PATH));
+		regularExressionMenuItem.setToolTipText(Messages.SingleProjectView_RegularExpression);
 		regularExressionMenuItem.setSelection(regularExpressionSearch);
 		regularExressionMenuItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -376,19 +382,6 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				setRegularExpressionSearch(regularExressionMenuItem.getSelection());
 				searchText.setFocus();
-			}
-		});
-
-		menuButton.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent selectionEvent)
-			{
-				Point toolbarLocation = toolbar.getLocation();
-				toolbarLocation = toolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-				Point toolbarSize = toolbar.getSize();
-				menu.setLocation(toolbarLocation.x, toolbarLocation.y
-						+ toolbarSize.y);
-				menu.setVisible(true);
 			}
 		});
 
