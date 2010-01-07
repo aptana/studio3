@@ -312,6 +312,7 @@ public class CommandElement extends AbstractBundleElement
 			IRubyObject obj = JavaEmbedUtils.javaToRuby(runtime, context);
 			IRubyObject rubyContext = rclass.newInstance(threadContext, new IRubyObject[] { obj }, null);
 
+			// Populate ENV TODO Keep track of any env vars we may have clobbered here and restore back their original values!
 			IRubyObject env = runtime.getObject().getConstant("ENV"); //$NON-NLS-1$
 			if (env != null && env instanceof RubyHash)
 			{
