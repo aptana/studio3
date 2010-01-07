@@ -163,6 +163,12 @@ module RadRails
         length = array_or_range.last - offset
       end
       RadRails::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
-    end    
+    end
+    
+    def to_env
+      {
+      }
+    end
+    
   end
 end
