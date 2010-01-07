@@ -22,6 +22,13 @@ module RadRails
       @jobj.expansion = expansion
     end
     
+    def to_env
+      {
+        :TM_SNIPPET_NAME => display_name,
+        :TM_SNIPPET_PATH => path
+      }
+    end
+    
     def to_s
       <<-EOS
       snippet(

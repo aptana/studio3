@@ -85,6 +85,13 @@ module RadRails
       @jobj.working_directory
     end
 
+    def to_env
+      {
+        :TM_COMMAND_NAME => display_name,
+        :TM_COMMAND_PATH => path
+      }
+    end
+    
     def to_s
       <<-EOS
       command(
