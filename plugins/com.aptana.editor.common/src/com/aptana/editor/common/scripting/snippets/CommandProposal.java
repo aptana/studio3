@@ -8,6 +8,11 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.Activator;
@@ -65,7 +70,22 @@ public class CommandProposal extends SnippetTemplateProposal
 			{
 				Activator.logError(e.getMessage(), e);
 			}
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer, null);
+
+			ITextEditor textEditor = null;
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				IWorkbenchPage page = window.getActivePage();
+				if (page != null)
+				{
+					IEditorPart part = page.getActiveEditor();
+					if (part instanceof ITextEditor)
+					{
+						textEditor = (ITextEditor) part;
+					}
+				}
+			}
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer, textEditor);
 			CommandExecutionUtils.processCommandResult(command, commandResult, viewer);
 		}
 	}
