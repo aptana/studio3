@@ -205,18 +205,23 @@ public class TerminalBrowser
 					return;
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					Display.getCurrent().syncExec(new Runnable()
+					Display display = Display.getCurrent();
+					
+					if (display != null)
 					{
-
-						@Override
-						public void run()
+						display.syncExec(new Runnable()
 						{
-							final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
-									+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
-									+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
-							_browser.execute(reloadCSSScript);
-						}
-					});
+	
+							@Override
+							public void run()
+							{
+								final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
+										+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
+										+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
+								_browser.execute(reloadCSSScript);
+							}
+						});
+					}
 				}
 			}
 		};
