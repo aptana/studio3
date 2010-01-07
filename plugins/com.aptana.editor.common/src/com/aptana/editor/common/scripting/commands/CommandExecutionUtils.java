@@ -12,33 +12,26 @@ import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -336,16 +329,6 @@ public class CommandExecutionUtils
 		commandContext.setInputStream(filterInputProvider.getInputStream());
 		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
 
-		Map<String, String> computedEnvironmentMap = computeEnvironment(textEditor);
-		if (computedEnvironmentMap != null)
-		{
-			// augment it
-			for (Map.Entry<String, String> entry : computedEnvironmentMap.entrySet())
-			{
-				commandContext.put(entry.getKey(), entry.getValue());
-			}
-		}
-
 		return command.execute(commandContext);
 	}
 
@@ -623,62 +606,6 @@ public class CommandExecutionUtils
 				}
 			}
 		}
-	}
-
-	public static Map<String, String> computeEnvironment(ITextEditor textEditor)
-	{
-		Map<String, String> environment = new HashMap<String, String>();
-		if (textEditor == null)
-			return environment;
-		IEditorInput editorInput = textEditor.getEditorInput();
-		if (editorInput instanceof IFileEditorInput)
-		{
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile iFile = fileEditorInput.getFile();
-			if (iFile != null)
-			{
-				environment
-						.put(VARIABLES_NAMES.TM_SELECTED_FILE.name(), iFile.getLocation().toFile().getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_FILEPATH.name(), iFile.getLocation().toFile().getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_FILENAME.name(), iFile.getLocation().toFile().getName());
-				environment.put(VARIABLES_NAMES.TM_DIRECTORY.name(), iFile.getParent().getLocation().toFile()
-						.getAbsolutePath());
-				environment.put(VARIABLES_NAMES.TM_PROJECT_DIRECTORY.name(), iFile.getProject().getLocation().toFile()
-						.getAbsolutePath());
-				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
-				ISelection selection = selectionProvider.getSelection();
-				if (selection instanceof ITextSelection)
-				{
-					ITextSelection textSelection = (ITextSelection) selection;
-					environment.put(VARIABLES_NAMES.TM_SELECTED_TEXT.name(), textSelection.getText());
-					environment.put(VARIABLES_NAMES.TM_LINE_NUMBER.name(), String
-							.valueOf(textSelection.getStartLine() + 1));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_OFFSET.name(), String.valueOf(textSelection
-							.getOffset()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_LENGTH.name(), String.valueOf(textSelection
-							.getLength()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_START_LINE_NUMBER.name(), String.valueOf(textSelection
-							.getStartLine()));
-					environment.put(VARIABLES_NAMES.TM_SELECTION_END_LINE_NUMBER.name(), String.valueOf(textSelection
-							.getEndLine()));
-					Object adapter = textEditor.getAdapter(Control.class);
-					if (adapter instanceof StyledText)
-					{
-						StyledText styledText = (StyledText) adapter;
-						environment.put(VARIABLES_NAMES.TM_LINE_INDEX.name(), String.valueOf(textSelection.getOffset()
-								- styledText.getOffsetAtLine(textSelection.getStartLine())));
-						int caretOffset = styledText.getCaretOffset();
-						int lineAtCaret = styledText.getLineAtOffset(caretOffset);
-						environment.put(VARIABLES_NAMES.TM_CARET_LINE_NUMBER.name(), String.valueOf(lineAtCaret + 1));
-						String currentLine = styledText.getLine(lineAtCaret);
-						environment.put(VARIABLES_NAMES.TM_CARET_LINE_TEXT.name(), currentLine);
-						environment.put(VARIABLES_NAMES.TM_CURRENT_LINE.name(), currentLine);
-						environment.put(VARIABLES_NAMES.TM_CURRENT_WORD.name(), findWord(styledText));
-					}
-				}
-			}
-		}
-		return environment;
 	}
 
 	private static String findWord(StyledText textWidget)
