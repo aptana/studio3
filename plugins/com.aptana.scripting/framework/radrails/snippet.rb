@@ -6,7 +6,12 @@ module RadRails
   
   class Snippet < Command
     def initialize(name)
-      super(name)
+      if name.kind_of? String
+        super(name)
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def expansion
