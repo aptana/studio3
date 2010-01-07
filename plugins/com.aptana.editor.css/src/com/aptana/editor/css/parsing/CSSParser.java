@@ -1,6 +1,7 @@
 package com.aptana.editor.css.parsing;
 
 import beaver.*;
+import com.aptana.editor.css.parsing.ast.*;
 import java.util.ArrayList;
 
 /**
@@ -10,29 +11,30 @@ import java.util.ArrayList;
  */
 public class CSSParser extends Parser {
 
-    @SuppressWarnings("nls")
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9obLLTqLKKKtVVT6qqYY0WX3G532o6aaeQ80H8b6XKBH8sz8w96nSQFIt$uqxLSIpzrBN$" +
-		"i3Rj1HGKLKLImOSC2Y1KHiNFSS#RmSlDAG9otzioPEMNsd9dx3X1qe1dJK8ec3C8nE1x3CH" +
-		"8jE0opS1p6eXerg4KTwZ4L3MZ4iIZ7JCn6cNgDerSdMdLridaLOdwQLm#kLA$hS0PEHH46u" +
-		"sHwdOB3LNCKvgZcUfJWKbJWG2p23JW91MX7X1piX$sHYppaemq9tNS8ckGUifs0yJXOzpsQ" +
-		"REUbxJjKhJl8SWQEm4Iox3JhIen8iovM9XqYk0hdunnCnuKu6nTW57TgLwPNOp5E9zFHP38" +
-		"5LRes0Lt6$b0SW4Dm48OX9FjEZ4bXxwDUR55xS2REJKOzZH4km#MuWkmceHj7AlEvPDuNbS" +
-		"pbS$aC9wGnTxOdqlOiFQVRfSLsgKopzIpEC$r5M81Bi13NA0lLoPDU9qymdcjUvvhtlTPy#" +
-		"rhIDulEQM2QkEnExvexVL$hHi1xZlGNC9SpcRjyPc6Gvd48Sp6KjpwCBxN0Rh6OBwTGlHhf" +
-		"KygSkTLnIQ$6DAzoPjbvLUez5jEca5x5VF5EKy7Nx3K1VxNKHPgzNEQucRcTnbkQpjVhijs" +
-		"g##RHefsIOvWx0Dj8hKiukZqSorAphkEtaseTg5K9S#AyGZBnxycnQbAcW$crEAQ5PE9itP" +
-		"hRrxCVoPSpYgzrZB8lvNf$zZvgaKLrla6$gEFvkYUINSZNKw7M0PdtHSrNNSZTqvdxd9GhA" +
-		"xTBlkrIbz4sfDNkiytcrrN4Z3WM$HaMeLpOl4ubho$pUacsc6zc7JMKVDIupDEh3KyVywZd" +
-		"3IovqR$EPSHI9my4QxKcpxLn0T7bP0RTnQ7DraVRU7E6EBSGDn5tspma8fFdsNYhZIk9#Ow" +
-		"npLVlYUS0$1SH9NjXjp7B#ZfYVMo#XbX1RB3vMABRv3ly60ndjzFaCjDjfbmTYzEROQz$Y3" +
-		"jDRYUschoDs95k7pHaFqyGnUAE81PdizrRy3fMSMZPHzyjAMTjJ#4tn#IUVUK7zu#R8QyPx" +
-		"Exw7pdOdX8hZxZTv8KstaOiZzcipSAZDpxkWVEcxBgWm6oM#45soT$ob$mfVyZlyflirBLV" +
-		"YHqg$QBzTk9dOejibczbgtbkq$uduaVvMZRfx0lPoFvJ#KGUbsNoc3mgZyZ3yf0yA0$8$NA" +
-		"VtAjMtyZ7ia7MoRloZhmj7t7bG$b0tfVtPBtglv8lROyVjF#U#8vOAs#oNoEhvNLvILwa$8" +
-		"8yBykbLwsUq$vPxP#Hf#KfMI6loKfvHLwMLsMLl25lYVjgkhHgjV8$qDMngGEWcVyypOXOF" +
-		"q9M48U8TIHY9Ga9D#QmfeH4n8eTA2PpFaiHi0Q7XAlGWQAQyshQrb2kqIeR6XA6W3KjGGIA" +
-		"9aDT2Xheqy2nYhPLb5tDhbGaTAmtJ8bX4dM#rZaa3Bld8P73AXGaqMQe#8#OyI#Z$zet");
+		"U9obLbbqL4KGlM$c3J0I8a90C0iG4iA4C34J868oCIPZeg0eIjmLL5nG4LU4enyUZv$##kl" +
+		"XYtC45HKGGSGjAgWWxafSSL$01HKLjRnTtJEyYM#Ig9rpkwghg$fsLzUy3k0jnt4u7ZVWHX" +
+		"HXEIx223JX0Xo9Pip6KMX3FOv50r9en0pCn2minYKQSGKMuNASW1FHpeXQb6Z4c08Hns1qN" +
+		"aHQ6OzGnYHQSIkcOmMwvLDKOpnyn304Gp4CSLHg$3H4NFnKMPCNMvUB$GJLqXEC5S5D6bs6" +
+		"iIxwQDoCMvprMkxMMaUgTIagS0Q6Onn6eJZ0SJRE9yTeHD5DwyMOaxS$krOf9hYrBWqmbCk" +
+		"ppjgiraoEOIuPpiIfgC8KrEIiP#NndexvvErKteau2Gj2U3Cupp4iL8RBS39EuOf9TA2BUJ" +
+		"4tDGcJSmnDPBXIRog19V#uAUDzDHaNuXhvZ8nDyemyhTwcXNbtwinfz0NNxc9VoDlkrpIxt" +
+		"wv0dZ8vQqQjSAT0Jkl4F9xY7EKvbvev7tW#KpjNKPgi0HSoQy1rM8RhqGBRkbWxXsSzrb4D" +
+		"fZ9$jRJ7A9Eino9MVHjhVYGhVXHlkeILCPQr4c7kJOJD#GJUmYH6JARDH7W58eff3qPKAcD" +
+		"26UjqppOtvZRRD3TDpELiPjFN#5R#HcnybFae71lDYuNkDChOk8iUmJeQxgmU$wmrfjOuQs" +
+		"4yVvMb79S7ECpUauJXCDPy3hkMJo#xbXTWy0bhBL9h8iVWaI7665iBMMjn7g#lD#7bpkQ7y" +
+		"2PejGmrob3dLZHvgM1UZ5SpxptB42U3lQaqlpXzRyfuTx2luTV1rqeeun#zXItKszCP#hAF" +
+		"eu9zVzvHdR7xhGZaAP6p9eoL8ps5UjlpU7eAosCqdezQlPwpZ99PuvXPOr$5x#KKf4KRULe" +
+		"Fpx8YLjvXVmDxYAL6xmzSu115nCKi8Mvt#brELlQDOQicgeXxtVW#9#yXTZbzhfNUK7RjWT" +
+		"W5n3wpSpVl3xJ7$i3uKdRZ1kVBBoMmbbZanfk9TLoZt8stEzb3R7BwRYVlfDzyf$SwkOAsb" +
+		"DF74Ca0r#eG$eFqppZzDcA$qtya3eJupmivRpemNq8i7ipPis3QTn0x1$9Z6#Pazdoh0dCR" +
+		"#$ZU7HA$pUmlkCP$1S#SpERvVwmno1gnjP05SzLBMxCxnp9YQ#2CMyBNi7Qsde7vi3Ta3tF" +
+		"St4ehv2$vGmx9x$AR$2e7vHUr$QpzJyG1uWlvN9wNvvm$wqb#KErxuZlLFfAzAZ#GzzdtoZ" +
+		"lojcoLnsMBR9R7P9CyAXjbWwoNH#HXzVjIziXJygHiaoVaNNbFFdHhV#paVcAVQjyItwZsD" +
+		"V4LyPQy8Q$AQ$AAxEJePNb9NfGTwh5T#nUqVq3kbxMoItRBGx9E7fJNvKtvanFTV04zlcaH" +
+		"mhmEXJ6JtzPP2f$lXa6ChqUKy0cZ3#5R4YLylYXHVMthADiKvfjh457PGjb2sKZPI9cYJuh" +
+		"#AUffwcdQqzIdEpJGra2PfDsyOhMKjIezld0Hmhmp1X67x3XAnFWVYAUOuT3XqDe7zVyIqm" +
+		"9e3o3nDpHWtpu=");
 
 	static final Action RETURN3 = new Action() {
 		public Symbol reduce(Symbol[] _symbols, int offset) {
@@ -43,18 +45,6 @@ public class CSSParser extends Parser {
 	static final Action RETURN4 = new Action() {
 		public Symbol reduce(Symbol[] _symbols, int offset) {
 			return _symbols[offset + 4];
-		}
-	};
-
-	static final Action RETURN5 = new Action() {
-		public Symbol reduce(Symbol[] _symbols, int offset) {
-			return _symbols[offset + 5];
-		}
-	};
-
-	static final Action RETURN2 = new Action() {
-		public Symbol reduce(Symbol[] _symbols, int offset) {
-			return _symbols[offset + 2];
 		}
 	};
 
@@ -74,114 +64,335 @@ public class CSSParser extends Parser {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [3] Statement = AtRule
-			Action.RETURN,	// [4] Statement = CharSet
-			Action.RETURN,	// [5] Statement = Import
-			Action.RETURN,	// [6] Statement = Media
-			Action.RETURN,	// [7] Statement = Page
+			Action.RETURN,	// [3] Statement = CharSet
+			Action.RETURN,	// [4] Statement = Import
+			Action.RETURN,	// [5] Statement = Media
+			Action.RETURN,	// [6] Statement = Page
+			Action.RETURN,	// [7] Statement = AtRule
 			Action.RETURN,	// [8] Statement = Rule
 			Action.RETURN,	// [9] Statement = error
-			RETURN3,	// [10] AtRule = AT_KEYWORD STRING SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN4,	// [11] AtRule = AT_KEYWORD STRING LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN3,	// [12] CharSet = CHARSET STRING SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN3,	// [13] Import = IMPORT ImportWord SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN4,	// [14] Import = IMPORT ImportWord List SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN4,	// [15] Media = MEDIA IDENTIFIER LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN3,	// [16] Page = PAGE LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN4,	// [17] Page = PAGE LCURLY Declarations RCURLY; returns 'RCURLY' although none is marked
-			RETURN5,	// [18] Page = PAGE COLON IDENTIFIER LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN3,	// [19] Rule = Selectors LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN4,	// [20] Rule = Selectors LCURLY Declarations RCURLY; returns 'RCURLY' although none is marked
-			Action.RETURN,	// [21] ImportWord = STRING
-			Action.RETURN,	// [22] ImportWord = URL
-			RETURN3,	// [23] Function = FUNCTION Expression RPAREN; returns 'RPAREN' although none is marked
+			new Action() {	// [10] CharSet = CHARSET STRING.s SEMICOLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					return new CSSCharSetNode(s);
+				}
+			},
+			new Action() {	// [11] Import = IMPORT ImportWord.s SEMICOLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					return new CSSImportNode(s);
+				}
+			},
+			new Action() {	// [12] Import = IMPORT ImportWord.s List.m SEMICOLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					final Symbol _symbol_m = _symbols[offset + 3];
+					final ArrayList _list_m = (ArrayList) _symbol_m.value;
+					final String[] m = _list_m == null ? new String[0] : (String[]) _list_m.toArray(new String[_list_m.size()]);
+					return new CSSImportNode(s, m);
+				}
+			},
+			new Action() {	// [13] Media = MEDIA List.m LCURLY RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_m = _symbols[offset + 2];
+					final ArrayList _list_m = (ArrayList) _symbol_m.value;
+					final String[] m = _list_m == null ? new String[0] : (String[]) _list_m.toArray(new String[_list_m.size()]);
+					return new CSSMediaNode(m);
+				}
+			},
+			new Action() {	// [14] Media = MEDIA List.m LCURLY Statements RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_m = _symbols[offset + 2];
+					final ArrayList _list_m = (ArrayList) _symbol_m.value;
+					final String[] m = _list_m == null ? new String[0] : (String[]) _list_m.toArray(new String[_list_m.size()]);
+					return new CSSMediaNode(m);
+				}
+			},
+			new Action() {	// [15] Page = PAGE LCURLY RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					return new CSSPageNode();
+				}
+			},
+			new Action() {	// [16] Page = PAGE LCURLY Declarations.d RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol d = _symbols[offset + 3];
+					return new CSSPageNode(d.value);
+				}
+			},
+			new Action() {	// [17] Page = PAGE COLON IDENTIFIER.s LCURLY RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 3];
+					final String s = (String) _symbol_s.value;
+					return new CSSPageNode(s);
+				}
+			},
+			new Action() {	// [18] Page = PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 3];
+					final String s = (String) _symbol_s.value;
+					final Symbol d = _symbols[offset + 5];
+					return new CSSPageNode(s, d.value);
+				}
+			},
+			RETURN3,	// [19] AtRule = AT_KEYWORD STRING SEMICOLON; returns 'SEMICOLON' although none is marked
+			RETURN4,	// [20] AtRule = AT_KEYWORD STRING LCURLY RCURLY; returns 'RCURLY' although none is marked
+			new Action() {	// [21] Rule = Selectors.s LCURLY RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 1];
+					final ArrayList _list_s = (ArrayList) _symbol_s.value;
+					final beaver.Symbol[] s = _list_s == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_s.toArray(new beaver.Symbol[_list_s.size()]);
+					return new CSSRuleNode(s);
+				}
+			},
+			new Action() {	// [22] Rule = Selectors.s LCURLY Declarations.d RCURLY
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_s = _symbols[offset + 1];
+					final ArrayList _list_s = (ArrayList) _symbol_s.value;
+					final beaver.Symbol[] s = _list_s == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_s.toArray(new beaver.Symbol[_list_s.size()]);
+					final Symbol d = _symbols[offset + 3];
+					return new CSSRuleNode(s, d.value);
+				}
+			},
+			new Action() {	// [23] Function = FUNCTION Expression.e RPAREN
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
+					return new CSSFunctionNode(e);
+				}
+			},
 			new Action() {	// [24] List = List COMMA IDENTIFIER
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
 			new Action() {	// [25] List = IDENTIFIER
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			RETURN3,	// [26] Declarations = Declarations SEMICOLON Declaration; returns 'Declaration' although none is marked
-			RETURN2,	// [27] Declarations = Declarations SEMICOLON; returns 'SEMICOLON' although none is marked
-			Action.RETURN,	// [28] Declarations = Declaration
-			Action.RETURN,	// [29] Declarations = SEMICOLON
-			RETURN3,	// [30] Declaration = Identifier COLON Expression; returns 'Expression' although none is marked
-			RETURN4,	// [31] Declaration = Identifier COLON Expression IMPORTANT; returns 'IMPORTANT' although none is marked
-			Action.RETURN,	// [32] Identifier = IDENTIFIER
-			Action.RETURN,	// [33] Identifier = PROPERTY
-			RETURN3,	// [34] Expression = Expression Separator Primitive; returns 'Primitive' although none is marked
-			RETURN3,	// [35] Expression = Expression Separator Function; returns 'Function' although none is marked
-			RETURN2,	// [36] Expression = Expression Primitive; returns 'Primitive' although none is marked
-			RETURN2,	// [37] Expression = Expression Function; returns 'Function' although none is marked
+			Action.RETURN,	// [26] Declarations = Subdeclarations
+			new Action() {	// [27] Declarations = Subdeclarations.l Declaration2.d
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final ArrayList _list_l = (ArrayList) _symbol_l.value;
+					final CSSDeclarationNode[] l = _list_l == null ? new CSSDeclarationNode[0] : (CSSDeclarationNode[]) _list_l.toArray(new CSSDeclarationNode[_list_l.size()]);
+					final Symbol _symbol_d = _symbols[offset + 2];
+					final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
+					_list_l.add(d); return _symbol_l;
+				}
+			},
+			Action.RETURN,	// [28] Declarations = Declaration2
+			new Action() {	// [29] Subdeclarations = Subdeclarations Declaration
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
+				}
+			},
+			new Action() {	// [30] Subdeclarations = Declaration
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+				}
+			},
+			new Action() {	// [31] Declaration = Declaration2.d SEMICOLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_d = _symbols[offset + 1];
+					final CSSDeclarationNode d = (CSSDeclarationNode) _symbol_d.value;
+					((CSSDeclarationNode) d).setHasSemicolon(true); return d;
+				}
+			},
+			new Action() {	// [32] Declaration = SEMICOLON
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					return new CSSDeclarationNode(true);
+				}
+			},
+			new Action() {	// [33] Declaration2 = Identifier.i COLON Expression.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_e = _symbols[offset + 3];
+					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
+					return new CSSDeclarationNode(i, e);
+				}
+			},
+			new Action() {	// [34] Declaration2 = Identifier.i COLON Expression.e IMPORTANT.s
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_e = _symbols[offset + 3];
+					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
+					final Symbol _symbol_s = _symbols[offset + 4];
+					final String s = (String) _symbol_s.value;
+					return new CSSDeclarationNode(i, e, s);
+				}
+			},
+			Action.RETURN,	// [35] Declaration2 = error
+			new Action() {	// [36] Expression = Expression.e Separator.s Term.t
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final String s = (String) _symbol_s.value;
+					final Symbol _symbol_t = _symbols[offset + 3];
+					final CSSExpressionNode t = (CSSExpressionNode) _symbol_t.value;
+					return new CSSTermListNode(e, t, s);
+				}
+			},
+			new Action() {	// [37] Expression = Expression.e Term.t
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final CSSExpressionNode e = (CSSExpressionNode) _symbol_e.value;
+					final Symbol _symbol_t = _symbols[offset + 2];
+					final CSSExpressionNode t = (CSSExpressionNode) _symbol_t.value;
+					return new CSSTermListNode(e, t);
+				}
+			},
 			Action.RETURN,	// [38] Expression = Term
-			RETURN2,	// [39] Term = PlusMinus Primitive; returns 'Primitive' although none is marked
-			Action.RETURN,	// [40] Term = Primitive
-			Action.RETURN,	// [41] Term = Function
-			Action.RETURN,	// [42] PlusMinus = MINUS
-			Action.RETURN,	// [43] PlusMinus = PLUS
-			Action.RETURN,	// [44] Separator = FORWARD_SLASH
-			Action.RETURN,	// [45] Separator = COMMA
-			Action.RETURN,	// [46] Separator = PLUS
-			Action.RETURN,	// [47] Separator = MINUS
-			new Action() {	// [48] Selectors = Selectors COMMA Selector
+			new Action() {	// [39] Term = Primitive.p
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_p = _symbols[offset + 1];
+					final String p = (String) _symbol_p.value;
+					return new CSSTermNode(p);
+				}
+			},
+			Action.RETURN,	// [40] Term = Function
+			new Action() {	// [41] Selectors = Selectors COMMA Selector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3]); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [49] Selectors = Selector
+			new Action() {	// [42] Selectors = Selector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			RETURN2,	// [50] Selector = Selector SimpleSelector; returns 'SimpleSelector' although none is marked
-			RETURN3,	// [51] Selector = Selector Combinator SimpleSelector; returns 'SimpleSelector' although none is marked
-			Action.RETURN,	// [52] Selector = SimpleSelector
-			Action.RETURN,	// [53] SimpleSelector = TypeOrUniversalSelector
-			RETURN2,	// [54] SimpleSelector = TypeOrUniversalSelector AttributeSelectors; returns 'AttributeSelectors' although none is marked
-			Action.RETURN,	// [55] SimpleSelector = AttributeSelectors
-			Action.RETURN,	// [56] Combinator = PLUS
-			Action.RETURN,	// [57] Combinator = GREATER
-			Action.RETURN,	// [58] TypeOrUniversalSelector = IDENTIFIER
-			Action.RETURN,	// [59] TypeOrUniversalSelector = STAR
-			Action.RETURN,	// [60] TypeOrUniversalSelector = SELECTOR
-			new Action() {	// [61] AttributeSelectors = AttributeSelectors AttributeSelector
+			new Action() {	// [43] Selector = Selector SimpleSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [62] AttributeSelectors = AttributeSelector
+			new Action() {	// [44] Selector = SimpleSelector
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [63] AttributeSelector = CLASS
-			RETURN2,	// [64] AttributeSelector = COLON IDENTIFIER; returns 'IDENTIFIER' although none is marked
-			RETURN2,	// [65] AttributeSelector = COLON Function; returns 'Function' although none is marked
-			Action.RETURN,	// [66] AttributeSelector = COLOR
-			Action.RETURN,	// [67] AttributeSelector = HASH
-			RETURN3,	// [68] AttributeSelector = LBRACKET IDENTIFIER RBRACKET; returns 'RBRACKET' although none is marked
-			RETURN5,	// [69] AttributeSelector = LBRACKET IDENTIFIER AttributeValueOperator IdentiferOrString RBRACKET; returns 'RBRACKET' although none is marked
-			Action.RETURN,	// [70] AttributeValueOperator = EQUAL
-			Action.RETURN,	// [71] AttributeValueOperator = INCLUDES
-			Action.RETURN,	// [72] AttributeValueOperator = DASHMATCH
-			Action.RETURN,	// [73] IdentiferOrString = IDENTIFIER
-			Action.RETURN,	// [74] IdentiferOrString = STRING
-			Action.RETURN,	// [75] Primitive = NUMBER
-			Action.RETURN,	// [76] Primitive = PERCENTAGE
-			Action.RETURN,	// [77] Primitive = LENGTH
-			Action.RETURN,	// [78] Primitive = EMS
-			Action.RETURN,	// [79] Primitive = EXS
-			Action.RETURN,	// [80] Primitive = ANGLE
-			Action.RETURN,	// [81] Primitive = TIME
-			Action.RETURN,	// [82] Primitive = FREQUENCY
-			Action.RETURN,	// [83] Primitive = STRING
-			Action.RETURN,	// [84] Primitive = IDENTIFIER
-			Action.RETURN,	// [85] Primitive = URL
-			Action.RETURN	// [86] Primitive = COLOR
+			new Action() {	// [45] SimpleSelector = TypeOrUniversalSelector.t AttributeSelectors.a
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_t = _symbols[offset + 1];
+					final String t = (String) _symbol_t.value;
+					final Symbol _symbol_a = _symbols[offset + 2];
+					final ArrayList _list_a = (ArrayList) _symbol_a.value;
+					final CSSAttributeSelectorNode[] a = _list_a == null ? new CSSAttributeSelectorNode[0] : (CSSAttributeSelectorNode[]) _list_a.toArray(new CSSAttributeSelectorNode[_list_a.size()]);
+					return new CSSSimpleSelectorNode(t, a);
+				}
+			},
+			new Action() {	// [46] SimpleSelector = TypeOrUniversalSelector.t
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_t = _symbols[offset + 1];
+					final String t = (String) _symbol_t.value;
+					return new CSSSimpleSelectorNode(t);
+				}
+			},
+			new Action() {	// [47] SimpleSelector = AttributeSelectors.a
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_a = _symbols[offset + 1];
+					final ArrayList _list_a = (ArrayList) _symbol_a.value;
+					final CSSAttributeSelectorNode[] a = _list_a == null ? new CSSAttributeSelectorNode[0] : (CSSAttributeSelectorNode[]) _list_a.toArray(new CSSAttributeSelectorNode[_list_a.size()]);
+					return new CSSSimpleSelectorNode(a);
+				}
+			},
+			new Action() {	// [48] AttributeSelectors = AttributeSelectors AttributeSelector
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
+				}
+			},
+			new Action() {	// [49] AttributeSelectors = AttributeSelector
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+				}
+			},
+			new Action() {	// [50] AttributeSelector = CLASS.c
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_c = _symbols[offset + 1];
+					final String c = (String) _symbol_c.value;
+					return new CSSAttributeSelectorNode(c);
+				}
+			},
+			new Action() {	// [51] AttributeSelector = COLON IDENTIFIER.i
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 2];
+					final String i = (String) _symbol_i.value;
+					return new CSSAttributeSelectorNode(":" + i);
+				}
+			},
+			new Action() {	// [52] AttributeSelector = COLON Function.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_f = _symbols[offset + 2];
+					final CSSExpressionNode f = (CSSExpressionNode) _symbol_f.value;
+					return new CSSAttributeSelectorNode(f);
+				}
+			},
+			new Action() {	// [53] AttributeSelector = COLOR.c
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_c = _symbols[offset + 1];
+					final String c = (String) _symbol_c.value;
+					return new CSSAttributeSelectorNode(c);
+				}
+			},
+			new Action() {	// [54] AttributeSelector = HASH.h
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_h = _symbols[offset + 1];
+					final String h = (String) _symbol_h.value;
+					return new CSSAttributeSelectorNode(h);
+				}
+			},
+			new Action() {	// [55] AttributeSelector = LBRACKET IDENTIFIER.i RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 2];
+					final String i = (String) _symbol_i.value;
+					return new CSSAttributeSelectorNode("[" + i + "]");
+				}
+			},
+			new Action() {	// [56] AttributeSelector = LBRACKET IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 2];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_o = _symbols[offset + 3];
+					final String o = (String) _symbol_o.value;
+					final Symbol _symbol_s = _symbols[offset + 4];
+					final String s = (String) _symbol_s.value;
+					return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]");
+				}
+			},
+			Action.RETURN,	// [57] ImportWord = STRING
+			Action.RETURN,	// [58] ImportWord = URL
+			Action.RETURN,	// [59] Identifier = IDENTIFIER
+			Action.RETURN,	// [60] Identifier = PROPERTY
+			Action.RETURN,	// [61] IdentiferOrString = IDENTIFIER
+			Action.RETURN,	// [62] IdentiferOrString = STRING
+			Action.RETURN,	// [63] Separator = FORWARD_SLASH
+			Action.RETURN,	// [64] Separator = COMMA
+			Action.RETURN,	// [65] Separator = PLUS
+			Action.RETURN,	// [66] Separator = MINUS
+			Action.RETURN,	// [67] Primitive = NUMBER
+			Action.RETURN,	// [68] Primitive = PERCENTAGE
+			Action.RETURN,	// [69] Primitive = LENGTH
+			Action.RETURN,	// [70] Primitive = EMS
+			Action.RETURN,	// [71] Primitive = EXS
+			Action.RETURN,	// [72] Primitive = ANGLE
+			Action.RETURN,	// [73] Primitive = TIME
+			Action.RETURN,	// [74] Primitive = FREQUENCY
+			Action.RETURN,	// [75] Primitive = STRING
+			Action.RETURN,	// [76] Primitive = IDENTIFIER
+			Action.RETURN,	// [77] Primitive = URL
+			Action.RETURN,	// [78] Primitive = COLOR
+			Action.RETURN,	// [79] TypeOrUniversalSelector = IDENTIFIER
+			Action.RETURN,	// [80] TypeOrUniversalSelector = STAR
+			Action.RETURN,	// [81] TypeOrUniversalSelector = SELECTOR
+			Action.RETURN,	// [82] AttributeValueOperator = EQUAL
+			Action.RETURN,	// [83] AttributeValueOperator = INCLUDES
+			Action.RETURN	// [84] AttributeValueOperator = DASHMATCH
 		};
 	}
 

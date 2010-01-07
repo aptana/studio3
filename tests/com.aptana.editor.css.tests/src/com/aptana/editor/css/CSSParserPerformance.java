@@ -9,7 +9,7 @@ import com.aptana.editor.css.parsing.CSSScanner;
 public class CSSParserPerformance {
 
     public static void main(String[] args) throws Exception {
-        InputStream stream = CSSParserPerformance.class.getResourceAsStream("test.css");
+        InputStream stream = CSSParserPerformance.class.getResourceAsStream("yui.css");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int read = -1;
         while ((read = stream.read()) != -1) {
@@ -24,7 +24,10 @@ public class CSSParserPerformance {
         long start = System.currentTimeMillis();
         for (int i = 0; i < numRuns; i++) {
             scanner.setSource(src);
-            parser.parse(scanner);
+            try {
+                parser.parse(scanner);
+            } catch (Exception e) {
+            }
         }
         long diff = System.currentTimeMillis() - start;
         System.out.println("Total time: " + diff + "ms");

@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.css.CSSCodeScannerTest;
 import com.aptana.editor.css.CSSSourcePartitionScannerTest;
+import com.aptana.editor.css.CSSTokenScannerTest;
 
 public class AllTests
 {
@@ -15,6 +16,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
 		suite.addTestSuite(CSSCodeScannerTest.class);
+		suite.addTestSuite(CSSTokenScannerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

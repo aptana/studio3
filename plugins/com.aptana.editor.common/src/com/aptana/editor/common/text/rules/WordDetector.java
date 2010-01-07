@@ -53,7 +53,8 @@ public class WordDetector implements IWordDetector
 	 */
 	public boolean isWordPart(char c)
 	{
-		return Character.isJavaIdentifierPart(c);
+		boolean b = Character.isJavaIdentifierPart(c);
+		return b;
 	}
 
 	/*
@@ -62,7 +63,8 @@ public class WordDetector implements IWordDetector
 	 */
 	public boolean isWordStart(char c)
 	{
-		return Character.isJavaIdentifierStart(c);
+		boolean b = Character.isJavaIdentifierStart(c);
+		return b;
 	}
 
 }

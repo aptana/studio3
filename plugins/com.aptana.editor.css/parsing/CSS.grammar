@@ -1,11 +1,20 @@
 %package "com.aptana.editor.css.parsing";
 %class "CSSParser";
+%import "com.aptana.editor.css.parsing.ast.*";
 
 %terminals AT_KEYWORD, CHARSET, IMPORT, MEDIA, PAGE, FUNCTION;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, FORWARD_SLASH;
-%terminals MINUS, PLUS, EQUAL, GREATER, STAR;
+%terminals MINUS, PLUS, EQUAL, STAR;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
+
+%typeof IDENTIFIER, PROPERTY, STRING, URL, IMPORTANT, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, HASH, CLASS = "String";
+%typeof Declaration, Declaration2 = "CSSDeclarationNode";
+%typeof Expression, Function, Term = "CSSExpressionNode";
+%typeof ImportWord, Identifier, IdentiferOrString, Separator, Primitive, TypeOrUniversalSelector, AttributeValueOperator = "String";
+%typeof AttributeSelector = "CSSAttributeSelectorNode";
+
+%goal Program;
 
 Program
 	=	Statements
@@ -17,13 +26,34 @@ Statements
 	;
 
 Statement
-	=	AtRule
-	|	CharSet
+	=	CharSet
 	|	Import
 	|	Media
 	|	Page
+	|	AtRule
 	|	Rule
 	|	error
+	;
+
+CharSet
+	=	CHARSET STRING.s SEMICOLON {:return new CSSCharSetNode(s);:}
+	;
+
+Import
+	=	IMPORT ImportWord.s SEMICOLON {:return new CSSImportNode(s);:}
+	|	IMPORT ImportWord.s List.m SEMICOLON {:return new CSSImportNode(s, m);:}
+	;
+
+Media
+	=	MEDIA List.m LCURLY RCURLY {:return new CSSMediaNode(m);:}
+	|	MEDIA List.m LCURLY Statements RCURLY {:return new CSSMediaNode(m);:}
+	;
+	
+Page
+	=	PAGE LCURLY RCURLY {:return new CSSPageNode();:}
+	|	PAGE LCURLY Declarations.d RCURLY {:return new CSSPageNode(d.value);:}
+	|	PAGE COLON IDENTIFIER.s LCURLY RCURLY {:return new CSSPageNode(s);:}
+	|	PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY {:return new CSSPageNode(s, d.value);:}
 	;
 
 AtRule
@@ -31,37 +61,13 @@ AtRule
 	|	AT_KEYWORD STRING LCURLY RCURLY
 	;
 
-CharSet
-	=	CHARSET STRING SEMICOLON
-	;
-
-Import
-	=	IMPORT ImportWord SEMICOLON
-	|	IMPORT ImportWord List SEMICOLON
-	;
-
-Media
-	=	MEDIA IDENTIFIER LCURLY RCURLY
-	;
-	
-Page
-	=	PAGE LCURLY RCURLY
-	|	PAGE LCURLY Declarations RCURLY
-	|	PAGE COLON IDENTIFIER LCURLY RCURLY
-	;
-
 Rule
-	=	Selectors LCURLY RCURLY
-	|	Selectors LCURLY Declarations RCURLY
+	=	Selectors.s LCURLY RCURLY {:return new CSSRuleNode(s);:}
+	|	Selectors.s LCURLY Declarations.d RCURLY {:return new CSSRuleNode(s, d.value);:}
 	;
 
-ImportWord
-	=	STRING
-	|	URL
-	;
-	
 Function
-	=	FUNCTION Expression RPAREN
+	=	FUNCTION Expression.e RPAREN {:return new CSSFunctionNode(e);:}
 	;
 	
 List
@@ -70,46 +76,36 @@ List
 	;
 
 Declarations
-	=	Declarations SEMICOLON Declaration
-	|	Declarations SEMICOLON
+	=	Subdeclarations
+	|	Subdeclarations.l Declaration2.d {:_list_l.add(d); return _symbol_l;:}
+	|	Declaration2
+	;
+
+Subdeclarations
+	=	Subdeclarations Declaration
 	|	Declaration
-	|	SEMICOLON
 	;
 
 Declaration
-	=	Identifier COLON Expression
-	|	Identifier COLON Expression IMPORTANT
+	=	Declaration2.d SEMICOLON {:((CSSDeclarationNode) d).setHasSemicolon(true); return d;:}
+	|	SEMICOLON {:return new CSSDeclarationNode(true);:}
 	;
-	
-Identifier
-	=	IDENTIFIER
-	|	PROPERTY
+
+Declaration2
+	=	Identifier.i COLON Expression.e {:return new CSSDeclarationNode(i, e);:}
+	|	Identifier.i COLON Expression.e IMPORTANT.s {:return new CSSDeclarationNode(i, e, s);:}
+	|	error
 	;
 
 Expression
-	=	Expression Separator Primitive
-	|	Expression Separator Function
-	|	Expression Primitive
-	|	Expression Function
+	=	Expression.e Separator.s Term.t {:return new CSSTermListNode(e, t, s);:}
+	|	Expression.e Term.t {:return new CSSTermListNode(e, t);:}
 	|	Term
 	;
 
 Term
-	=	PlusMinus Primitive
-	|	Primitive
+	=	Primitive.p {:return new CSSTermNode(p);:}
 	|	Function
-	;
-
-PlusMinus
-	=	MINUS
-	|	PLUS
-	;
-	
-Separator
-	=	FORWARD_SLASH
-	|	COMMA
-	|	PLUS
-	|	MINUS
 	;
 
 Selectors
@@ -119,51 +115,50 @@ Selectors
 
 Selector
 	=	Selector SimpleSelector
-	|	Selector Combinator SimpleSelector
 	|	SimpleSelector
 	;
 
 SimpleSelector
-	=	TypeOrUniversalSelector
-	|	TypeOrUniversalSelector AttributeSelectors
-	|	AttributeSelectors
-	;
-	
-Combinator
-	=	PLUS
-	|	GREATER
+	=	TypeOrUniversalSelector.t AttributeSelectors.a {:return new CSSSimpleSelectorNode(t, a);:}
+	|	TypeOrUniversalSelector.t {:return new CSSSimpleSelectorNode(t);:}
+	|	AttributeSelectors.a {:return new CSSSimpleSelectorNode(a);:}
 	;
 
-TypeOrUniversalSelector
-	=	IDENTIFIER
-	|	STAR
-	|	SELECTOR
-	;
-	
 AttributeSelectors
 	=	AttributeSelectors AttributeSelector
 	|	AttributeSelector
 	;
 	
 AttributeSelector
-	=	CLASS
-	|	COLON IDENTIFIER
-	|	COLON Function
-	|	COLOR
-	|	HASH
-	|	LBRACKET IDENTIFIER RBRACKET
-	|	LBRACKET IDENTIFIER AttributeValueOperator IdentiferOrString RBRACKET
+	=	CLASS.c {:return new CSSAttributeSelectorNode(c);:}
+	|	COLON IDENTIFIER.i {:return new CSSAttributeSelectorNode(":" + i);:}
+	|	COLON Function.f {:return new CSSAttributeSelectorNode(f);:}
+	|	COLOR.c {:return new CSSAttributeSelectorNode(c);:}
+	|	HASH.h {:return new CSSAttributeSelectorNode(h);:}
+	|	LBRACKET IDENTIFIER.i RBRACKET {:return new CSSAttributeSelectorNode("[" + i + "]");:}
+	|	LBRACKET IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET {:return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]");:}
 	;
 
-AttributeValueOperator
-	=	EQUAL
-	|	INCLUDES
-	|	DASHMATCH
+ImportWord
+	=	STRING
+	|	URL
+	;
+	
+Identifier
+	=	IDENTIFIER
+	|	PROPERTY
 	;
 
 IdentiferOrString
 	=	IDENTIFIER
 	|	STRING
+	;
+	
+Separator
+	=	FORWARD_SLASH
+	|	COMMA
+	|	PLUS
+	|	MINUS
 	;
 
 Primitive
@@ -179,4 +174,16 @@ Primitive
 	|	IDENTIFIER
 	|	URL
 	|	COLOR
+	;
+
+TypeOrUniversalSelector
+	=	IDENTIFIER
+	|	STAR
+	|	SELECTOR
+	;
+	
+AttributeValueOperator
+	=	EQUAL
+	|	INCLUDES
+	|	DASHMATCH
 	;

@@ -2,6 +2,7 @@ package com.aptana.editor.css.parsing;
 
 import java.io.IOException;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
@@ -13,13 +14,15 @@ import beaver.Symbol;
 public class CSSScanner extends Scanner {
 
     private CSSTokenScanner fTokenScanner;
+    private Document fDocument;
 
     public CSSScanner() {
         fTokenScanner = new CSSTokenScanner();
     }
 
     public void setSource(String text) {
-        fTokenScanner.setRange(new Document(text), 0, text.length());
+        fDocument = new Document(text);
+        fTokenScanner.setRange(fDocument, 0, text.length());
     }
 
     @Override
@@ -40,6 +43,10 @@ public class CSSScanner extends Scanner {
         if (data != null) {
             type = CSSTokens.getToken(data.toString());
         }
-        return new Symbol(type, offset, offset + length - 1, data);
+        try {
+            return new Symbol(type, offset, offset + length - 1, fDocument.get(offset, length));
+        } catch (BadLocationException e) {
+            throw new Scanner.Exception(e.getLocalizedMessage());
+        }
     }
 }

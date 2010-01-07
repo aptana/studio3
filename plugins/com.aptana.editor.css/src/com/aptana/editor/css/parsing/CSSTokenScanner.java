@@ -66,7 +66,7 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
             "div", "dl", "dt", "em", "fieldset", "form", "frame", "frameset", "head", "hr", "html", "h1", "h2", "h3",
             "h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
             "meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
-            "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td",
+            "script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "tbody", "td",
             "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
 
     @SuppressWarnings("nls")
@@ -74,7 +74,7 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
             "print", "projection", "screen", "tty", "tv" };
 
     @SuppressWarnings("nls")
-    private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
+    private static final String[] FUNCTIONS = { "rgb", "attr", "counters", "counter" };
 
     @SuppressWarnings("nls")
     private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment",
@@ -132,32 +132,42 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
 
         // normal words
         WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
-        wordRule.addWord(KEYWORD_IMPORT, createToken(getTokenName(CSSTokens.IMPORT)));
-        wordRule.addWord(KEYWORD_PAGE, createToken(getTokenName(CSSTokens.PAGE)));
-        wordRule.addWord(KEYWORD_MEDIA, createToken(getTokenName(CSSTokens.MEDIA)));
-        wordRule.addWord(KEYWORD_CHARSET, createToken(getTokenName(CSSTokens.CHARSET)));
-        wordRule.addWord(WORD_INCLUDES, createToken(getTokenName(CSSTokens.INCLUDES)));
-        wordRule.addWord(WORD_DASHMATCH, createToken(getTokenName(CSSTokens.DASHMATCH)));
         String identifier = getTokenName(CSSTokens.IDENTIFIER);
         addWordsToRule(wordRule, HTML_TAGS, identifier);
         addWordsToRule(wordRule, MEDIAS, identifier);
         addWordsToRule(wordRule, FUNCTIONS, identifier);
+        rules.add(wordRule);
 
-        // properties
+        // keywords that start with @
+        wordRule = new WordRule(new AtWordDetector(), Token.UNDEFINED);
+        wordRule.addWord(KEYWORD_CHARSET, createToken(getTokenName(CSSTokens.CHARSET)));
+        wordRule.addWord(KEYWORD_IMPORT, createToken(getTokenName(CSSTokens.IMPORT)));
+        wordRule.addWord(KEYWORD_MEDIA, createToken(getTokenName(CSSTokens.MEDIA)));
+        wordRule.addWord(KEYWORD_PAGE, createToken(getTokenName(CSSTokens.PAGE)));
+        rules.add(wordRule);
+
+        // property words
         IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
-        WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
-        addWordsToRule(wordRule2, PROPERTY_NAMES, identifier);
-        rules.add(wordRule2);
+        wordRule = new WordRule(lettersAndHyphens, Token.UNDEFINED);
+        addWordsToRule(wordRule, PROPERTY_NAMES, identifier);
+        rules.add(wordRule);
+
+        // letters and hyphens, ignore case
+        wordRule = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
+        addWordsToRule(wordRule, FONT_NAMES, identifier);
+        rules.add(wordRule);
 
         // colors
+        wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
         addWordsToRule(wordRule, STANDARD_COLORS, getTokenName(CSSTokens.COLOR));
         addWordsToRule(wordRule, DEPRECATED_COLORS, getTokenName(CSSTokens.COLOR));
         rules.add(wordRule);
 
-        // letters and hyphens, ignore case
-        WordRule wordRule3 = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
-        addWordsToRule(wordRule3, FONT_NAMES, identifier);
-        rules.add(wordRule3);
+        // special character keywords
+        wordRule = new WordRule(new SpecialCharacterWordDetector(), Token.UNDEFINED);
+        wordRule.addWord(WORD_INCLUDES, createToken(getTokenName(CSSTokens.INCLUDES)));
+        wordRule.addWord(WORD_DASHMATCH, createToken(getTokenName(CSSTokens.DASHMATCH)));
+        rules.add(wordRule);
 
         // curly braces
         rules.add(new SingleCharacterRule('{', createToken(getTokenName(CSSTokens.LCURLY))));
@@ -179,7 +189,7 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
         // star
         rules.add(new SingleCharacterRule('*', createToken(getTokenName(CSSTokens.STAR))));
         // greater
-        rules.add(new SingleCharacterRule('>', createToken(getTokenName(CSSTokens.GREATER))));
+        // rules.add(new SingleCharacterRule('>', createToken(getTokenName(CSSTokens.GREATER))));
         // forward slash
         rules.add(new SingleCharacterRule('/', createToken(getTokenName(CSSTokens.FORWARD_SLASH))));
         // equal
@@ -195,26 +205,26 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
         rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(getTokenName(CSSTokens.CLASS)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
         // url
-        rules.add(new RegexpRule("url([^)]*)", createToken(getTokenName(CSSTokens.URL)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+        rules.add(new RegexpRule("url\\([^\\)]*\\)", createToken(getTokenName(CSSTokens.URL)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
         // minus
         rules.add(new RegexpRule("-(?=\\s*[0-9])", createToken(getTokenName(CSSTokens.MINUS)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
         // em
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?em", createToken(getTokenName(CSSTokens.EMS)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?em", createToken(getTokenName(CSSTokens.EMS)))); //$NON-NLS-1$
         // length
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?(px|cm|mm|in|pt|pc)", createToken(getTokenName(CSSTokens.LENGTH)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(px|cm|mm|in|pt|pc)", createToken(getTokenName(CSSTokens.LENGTH)))); //$NON-NLS-1$
         // percentage
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?%", createToken(getTokenName(CSSTokens.PERCENTAGE)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?%", createToken(getTokenName(CSSTokens.PERCENTAGE)))); //$NON-NLS-1$
         // angle
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?(deg|rad|grad)", createToken(getTokenName(CSSTokens.ANGLE)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(deg|rad|grad)", createToken(getTokenName(CSSTokens.ANGLE)))); //$NON-NLS-1$
         // ex
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?ex", createToken(getTokenName(CSSTokens.EXS)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?ex", createToken(getTokenName(CSSTokens.EXS)))); //$NON-NLS-1$
         // frequency
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?([Hh]z|k[Hh]z)", createToken(getTokenName(CSSTokens.FREQUENCY)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?([Hh]z|k[Hh]z)", createToken(getTokenName(CSSTokens.FREQUENCY)))); //$NON-NLS-1$
         // time
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?(ms|s)", createToken(getTokenName(CSSTokens.TIME)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(ms|s)", createToken(getTokenName(CSSTokens.TIME)))); //$NON-NLS-1$
         // numbers
-        rules.add(new RegexpRule("[0-9]+(\\.[0-9]+)?", createToken(getTokenName(CSSTokens.NUMBER)))); //$NON-NLS-1$
+        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?", createToken(getTokenName(CSSTokens.NUMBER)))); //$NON-NLS-1$
 
         // !important
         rules.add(new RegexpRule("!\\s*important", createToken(getTokenName(CSSTokens.IMPORTANT)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
@@ -256,6 +266,32 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
         @Override
         public boolean isWordStart(char c) {
             return Character.isLetter(c);
+        }
+    }
+
+    private static final class AtWordDetector implements IWordDetector {
+
+        @Override
+        public boolean isWordPart(char c) {
+            return Character.isLetter(c) || c == '@';
+        }
+
+        @Override
+        public boolean isWordStart(char c) {
+            return c == '@';
+        }
+    }
+
+    private static final class SpecialCharacterWordDetector implements IWordDetector {
+
+        @Override
+        public boolean isWordPart(char c) {
+            return !Character.isLetterOrDigit(c);
+        }
+
+        @Override
+        public boolean isWordStart(char c) {
+            return !Character.isLetterOrDigit(c);
         }
     }
 }
