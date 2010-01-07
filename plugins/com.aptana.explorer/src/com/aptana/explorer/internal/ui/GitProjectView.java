@@ -651,7 +651,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					rightLabelGridData.exclude = false;
 					rightLabel.setVisible(true);
 				}
-				branchesToolbar.getParent().layout();
+				branchesToolbar.getParent().getParent().layout(true, true);
 				return Status.OK_STATUS;
 			}
 		};
