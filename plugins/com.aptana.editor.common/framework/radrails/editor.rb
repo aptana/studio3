@@ -166,8 +166,35 @@ module RadRails
     end
     
     def to_env
-      {
-      }
+      input = editor_input
+      result = {}
+      
+      if input
+        ifile = input.file
+        file = ifile.location.to_file
+        
+        result["TM_SELECTED_FILE"] = file.absolute_path
+        result["TM_FILEPATH"] = file.absolute_path
+        result["TM_FILENAME"] = file.name
+        result["TM_DIRECTORY"] = file.parent_file.absolute_path
+        result["TM_PROJECT_DIRECTORY"] = ifile.project.location.to_file.absolute_path # duplicate name in project.rb
+        
+		result["TM_SELECTED_TEXT"] = selection.text
+		result["TM_LINE_NUMBER"] = selection.start_line + 1
+		result["TM_SELECTION_OFFSET"] = selection.offset
+		result["TM_SELECTION_LENGTH"] = selection.length
+		result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
+		result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+		
+		# TODO
+		result["TM_LINE_INDEX"] = -1
+		result["TM_CARET_LINE_NUMBER"] = -1
+		result["TM_CARET_LINE_TEXT"] = ""
+		result["TM_CURRENT_LINE"] = ""
+		result["TM_CURRENT_WORD"] = ""
+      end
+      
+      result
     end
     
   end
