@@ -2,6 +2,9 @@ package com.aptana.editor.common;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -18,14 +21,41 @@ public class EditorContextContributor implements ContextContributor
 {
 	private static final String EDITOR_PROPERTY_NAME = "editor";
 	private static final String EDITOR_RUBY_CLASS = "Editor";
-	
+
 	private IEditorPart _editor;
-	
+
 	/**
 	 * EditorContextContributor
 	 */
 	public EditorContextContributor()
 	{
+	}
+
+	/**
+	 * getDisplay
+	 * 
+	 * @return
+	 */
+	private Display getDisplay()
+	{
+		Display result = Display.getCurrent();
+
+		if (result == null)
+		{
+			result = Display.getDefault();
+		}
+
+		return result;
+	}
+
+	/**
+	 * onUIThread
+	 * 
+	 * @return
+	 */
+	private boolean onUIThread()
+	{
+		return (this.getDisplay() != null);
 	}
 
 	/**
@@ -40,39 +70,44 @@ public class EditorContextContributor implements ContextContributor
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-				
+
 				if (window != null)
 				{
 					IWorkbenchPage page = window.getActivePage();
-					
+
 					if (page != null)
 					{
 						_editor = page.getActiveEditor();
 					}
 				}
-				
-				return null;
+
+				return Status.OK_STATUS;
 			}
 		};
 		IEditorPart result = null;
-		
-		// run the job
-		try
+
+		if (this.onUIThread())
 		{
-			job.schedule();
-			job.join();
-			
-			// grab the result
-			result = this._editor;
-			
-			// lose the reference so we don't hang on to the editor
-			this._editor = null;
+			job.runInUIThread(new NullProgressMonitor());
 		}
-		catch (InterruptedException e)
+		else
 		{
-			// fail silently
+			// run the job
+			try
+			{
+				job.schedule();
+				job.join();
+			}
+			catch (InterruptedException e)
+			{
+				// fail silently
+			}
 		}
 		
+		// grab the result and lose the editor reference
+		result = this._editor;
+		this._editor = null;
+
 		return result;
 	}
 
@@ -84,11 +119,12 @@ public class EditorContextContributor implements ContextContributor
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		IEditorPart editor = this.getActiveEditor();
-		
+
 		if (editor != null)
 		{
 			IRubyObject[] args = new IRubyObject[] { ScriptUtils.javaToRuby(editor) };
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, EDITOR_RUBY_CLASS, args);
+			IRubyObject rubyInstance = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, EDITOR_RUBY_CLASS,
+					args);
 
 			context.put(EDITOR_PROPERTY_NAME, rubyInstance);
 		}
