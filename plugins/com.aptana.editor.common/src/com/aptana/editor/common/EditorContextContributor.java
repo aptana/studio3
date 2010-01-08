@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -69,23 +70,27 @@ public class EditorContextContributor implements ContextContributor
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-				if (window != null)
+				IWorkbench workbench = PlatformUI.getWorkbench();
+				
+				if (workbench != null)
 				{
-					IWorkbenchPage page = window.getActivePage();
-
-					if (page != null)
+					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+	
+					if (window != null)
 					{
-						_editor = page.getActiveEditor();
+						IWorkbenchPage page = window.getActivePage();
+	
+						if (page != null)
+						{
+							_editor = page.getActiveEditor();
+						}
 					}
 				}
 
 				return Status.OK_STATUS;
 			}
 		};
-		IEditorPart result = null;
-
+		
 		if (this.onUIThread())
 		{
 			job.runInUIThread(new NullProgressMonitor());
@@ -105,7 +110,7 @@ public class EditorContextContributor implements ContextContributor
 		}
 		
 		// grab the result and lose the editor reference
-		result = this._editor;
+		IEditorPart result = this._editor;
 		this._editor = null;
 
 		return result;
