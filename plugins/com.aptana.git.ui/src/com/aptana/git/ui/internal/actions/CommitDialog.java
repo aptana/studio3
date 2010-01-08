@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -80,6 +83,8 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 	private Image emptyFileImage;
 	private Browser diffArea;
 	private UIJob refreshTablesJob;
+	// FIXME This is a hack to get around getting called back twice whenever we stage/unstage files
+	private boolean fIgnoreFirstIndexChange;
 
 	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -210,6 +215,8 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 		packTable(table);
 
 		// Drag and Drop
+		// FIXME If user drags and drops while we're still crunching on last drag/drop then we end up hanging
+		// Seems to be related to manipulating the table here before we receive the index changed callback
 		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
 
 		// Drag Source
@@ -262,41 +269,40 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 
 			public void drop(DropTargetEvent event)
 			{
-				if (TextTransfer.getInstance().isSupportedType(event.currentDataType))
+				if (!TextTransfer.getInstance().isSupportedType(event.currentDataType))
+					return;
+				// Get the dropped data
+				DropTarget target = (DropTarget) event.widget;
+				Table table = (Table) target.getControl();
+				String data = (String) event.data;
+				// Translate the comma delimited paths back into the matching ChangedFile objects
+				Map<String, ChangedFile> draggedFiles = new HashMap<String, ChangedFile>();
+				StringTokenizer tokenizer = new StringTokenizer(data, ","); //$NON-NLS-1$
+				while (tokenizer.hasMoreTokens())
 				{
-					// Get the dropped data
-					DropTarget target = (DropTarget) event.widget;
-					Table table = (Table) target.getControl();
-					String data = (String) event.data;
-					// Translate the comma delimited paths back into the matching ChangedFile objects
-					Map<String, ChangedFile> draggedFiles = new HashMap<String, ChangedFile>();
-					StringTokenizer tokenizer = new StringTokenizer(data, ","); //$NON-NLS-1$
-					while (tokenizer.hasMoreTokens())
-					{
-						String path = tokenizer.nextToken();
-						ChangedFile changedFile = findChangedFile(path);
-						draggedFiles.put(path, changedFile);
-						createTableItem(table, changedFile); // add it to our new table
-					}
-					packTable(table);
-					table.redraw();
-
-					// Actually stage or unstage the files
-					Table sourceDragTable = null;
-					if (staged)
-					{
-						gitRepository.index().stageFiles(draggedFiles.values());
-						sourceDragTable = unstagedTable;
-					}
-					else
-					{
-						gitRepository.index().unstageFiles(draggedFiles.values());
-						sourceDragTable = stagedTable;
-					}
-					removeDraggedFilesFromSource(sourceDragTable, draggedFiles);
-					workaroundEmptyTableDropEffectBug(sourceDragTable);
-					validate();
+					String path = tokenizer.nextToken();
+					ChangedFile changedFile = findChangedFile(path);
+					draggedFiles.put(path, changedFile);
+					createTableItem(table, changedFile); // add it to our new table
 				}
+				packTable(table);
+				table.redraw();
+
+				// Actually stage or unstage the files
+				Table sourceDragTable = null;
+				if (staged)
+				{
+					stageFiles(draggedFiles.values());
+					sourceDragTable = unstagedTable;
+				}
+				else
+				{
+					unstageFiles(draggedFiles.values());
+					sourceDragTable = stagedTable;
+				}
+				removeDraggedFilesFromSource(sourceDragTable, draggedFiles);
+				workaroundEmptyTableDropEffectBug(sourceDragTable);
+				validate();
 			}
 		});
 
@@ -339,6 +345,47 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 				updateDiff(diff);
 			}
 		});
+		// Allow double-clicking to toggle staged/unstaged
+		table.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseDoubleClick(MouseEvent e)
+			{
+				if (e.getSource() == null)
+					return;
+				Table table = (Table) e.getSource();
+				TableItem[] selected = table.getSelection();
+				Map<String, ChangedFile> draggedFiles = new HashMap<String, ChangedFile>();
+				for (TableItem item : selected)
+				{
+					String path = item.getText(1);
+					ChangedFile file = findChangedFile(path);
+					if (file == null)
+						continue;
+					createTableItem(table, file); // add it to our new table
+				}
+				packTable(table);
+				table.redraw();
+				if (draggedFiles.isEmpty())
+					return;
+
+				// Actually stage or unstage the files
+				Table sourceDragTable = null;
+				if (!staged)
+				{
+					stageFiles(draggedFiles.values());
+					sourceDragTable = unstagedTable;
+				}
+				else
+				{
+					unstageFiles(draggedFiles.values());
+					sourceDragTable = stagedTable;
+				}
+				removeDraggedFilesFromSource(sourceDragTable, draggedFiles);
+				workaroundEmptyTableDropEffectBug(sourceDragTable);
+				validate();
+			}
+		});
 
 		if (!staged)
 		{
@@ -373,6 +420,18 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 		}
 
 		return table;
+	}
+
+	protected void unstageFiles(Collection<ChangedFile> values)
+	{
+		fIgnoreFirstIndexChange = true;
+		gitRepository.index().unstageFiles(values);
+	}
+
+	protected void stageFiles(Collection<ChangedFile> values)
+	{
+		fIgnoreFirstIndexChange = true;
+		gitRepository.index().stageFiles(values);
 	}
 
 	protected void updateDiff(String diff)
@@ -528,6 +587,11 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 
 	public void indexChanged(IndexChangedEvent e)
 	{
+		if (fIgnoreFirstIndexChange)
+		{
+			fIgnoreFirstIndexChange = false;
+			return;
+		}
 		refreshTables();
 	}
 
@@ -535,7 +599,7 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 	{
 		if (stagedTable == null || stagedTable.isDisposed() || unstagedTable == null || unstagedTable.isDisposed())
 			return;
-		
+
 		if (refreshTablesJob != null)
 			refreshTablesJob.cancel();
 
@@ -545,23 +609,33 @@ public class CommitDialog extends StatusDialog implements IGitRepositoryListener
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				if (stagedTable == null || stagedTable.isDisposed() || unstagedTable == null || unstagedTable.isDisposed())
+				if (stagedTable == null || stagedTable.isDisposed() || unstagedTable == null
+						|| unstagedTable.isDisposed())
 					return Status.OK_STATUS;
-				stagedTable.setRedraw(false);
-				unstagedTable.setRedraw(false);
-				stagedTable.removeAll();
-				unstagedTable.removeAll();
-				for (ChangedFile file : gitRepository.index().changedFiles())
+				try
 				{
-					if (monitor.isCanceled())
-						return Status.CANCEL_STATUS;
-					Table table = unstagedTable;
-					if (file.hasStagedChanges())
-						table = stagedTable;
-					createTableItem(table, file);
+					stagedTable.setRedraw(false);
+					unstagedTable.setRedraw(false);
+					stagedTable.removeAll();
+					unstagedTable.removeAll();
+					for (ChangedFile file : gitRepository.index().changedFiles())
+					{
+						if (monitor.isCanceled())
+							return Status.CANCEL_STATUS;
+						Table table = unstagedTable;
+						if (file.hasStagedChanges())
+							table = stagedTable;
+						createTableItem(table, file);
+					}
 				}
-				stagedTable.setRedraw(true);
-				unstagedTable.setRedraw(true);
+				finally
+				{
+					stagedTable.setRedraw(true);
+					unstagedTable.setRedraw(true);
+				}
+				packTable(stagedTable);
+				packTable(unstagedTable);
+				validate();
 				return Status.OK_STATUS;
 			}
 		};
