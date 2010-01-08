@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -70,11 +69,9 @@ public class EditorContextContributor implements ContextContributor
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				
-				if (workbench != null)
+				try
 				{
-					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	
 					if (window != null)
 					{
@@ -85,6 +82,9 @@ public class EditorContextContributor implements ContextContributor
 							_editor = page.getActiveEditor();
 						}
 					}
+				}
+				catch (IllegalStateException e)
+				{
 				}
 
 				return Status.OK_STATUS;
