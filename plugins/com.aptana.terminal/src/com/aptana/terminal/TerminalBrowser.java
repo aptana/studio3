@@ -18,7 +18,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
@@ -205,10 +207,12 @@ public class TerminalBrowser
 					return;
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					Display display = Display.getCurrent();
+					IWorkbench workbench = PlatformUI.getWorkbench();
 					
-					if (display != null)
+					if (workbench != null)
 					{
+						Display display = workbench.getDisplay();
+						
 						display.syncExec(new Runnable()
 						{
 	
