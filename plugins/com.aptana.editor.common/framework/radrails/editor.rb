@@ -165,6 +165,38 @@ module RadRails
       RadRails::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
     end
     
+    def styled_text
+      editor_part.get_adapter(org.eclipse.swt.widgets.Control.java_class)
+    end
+    
+    def current_scope
+      if content_type.nil?
+        document.content_type(caret_offset)
+      else
+        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(content_type).to_s
+      end
+    end
+    
+    def caret_column
+      selection.offset - styled_text.offset_at_line(selection.start_line)
+    end
+    
+    def caret_line
+      styled_text.line_at_offset(caret_offset)
+    end
+    
+    def caret_offset
+      styled_text.caret_offset
+    end
+    
+    def content_type
+      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, caret_offset)
+    end
+    
+    def current_line
+      styled_text.line(caret_line)
+    end
+    
     def to_env
       input = editor_input
       result = {}
@@ -185,12 +217,6 @@ module RadRails
         result["TM_SELECTION_LENGTH"] = selection.length
         result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
         result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
-        
-        styled_text = editor_part.get_adapter(org.eclipse.swt.widgets.Control.java_class)
-        caret_offset = styled_text.caret_offset
-        caret_line = styled_text.line_at_offset(caret_offset)
-        current_line = styled_text.line(caret_line)
-        caret_column = selection.offset - styled_text.offset_at_line(selection.start_line)
         
         result["TM_LINE_INDEX"] = caret_column
         result["TM_CARET_LINE_NUMBER"] = caret_line + 1
@@ -219,6 +245,8 @@ module RadRails
         else
           result["TM_CURRENT_WORD"] = ""
         end
+        
+        result["TM_CURRENT_SCOPE"] = current_scope
       end
       
       result
