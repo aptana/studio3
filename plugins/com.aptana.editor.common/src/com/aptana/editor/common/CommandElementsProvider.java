@@ -15,6 +15,7 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.SnippetElement;
 
 public class CommandElementsProvider implements ICommandElementsProvider
@@ -32,7 +33,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 	@Override
 	public void execute(CommandElement commandElement)
 	{
-		CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, textViewer, abstractThemeableEditor);
+		CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.KEY_BINDING, textViewer, abstractThemeableEditor);
 		CommandExecutionUtils.processCommandResult(commandElement, commandResult, abstractThemeableEditor);
 	}
 

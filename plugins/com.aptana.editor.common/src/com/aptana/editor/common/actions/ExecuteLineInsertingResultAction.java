@@ -13,6 +13,7 @@ import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.OutputType;
 
 public class ExecuteLineInsertingResultAction extends TextEditorAction {
@@ -49,7 +50,7 @@ public class ExecuteLineInsertingResultAction extends TextEditorAction {
 			int caretOffset = textWidget.getCaretOffset();
 			int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
 			command.setInvoke(textWidget.getLine(lineAtCaret));
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.UNKNOWN, textEditor);
 			CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 		}
 	}

@@ -48,6 +48,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.OutputType;
 import com.aptana.scripting.ui.ScriptingConsole;
 
@@ -286,7 +287,7 @@ public class CommandExecutionUtils
 
 	private static Map<String, IOConsole> nameToMessageConsole = new WeakHashMap<String, IOConsole>();
 
-	public static CommandResult executeCommand(CommandElement command, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextEditor textEditor)
 	{
 		ITextViewer textViewer = null;
 		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
@@ -294,10 +295,10 @@ public class CommandExecutionUtils
 		{
 			textViewer = (ITextViewer) adapter;
 		}
-		return executeCommand(command, textViewer, textEditor);
+		return executeCommand(command, invocationType, textViewer, textEditor);
 	}
 
-	public static CommandResult executeCommand(CommandElement command, ITextViewer textViewer, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextViewer textViewer, ITextEditor textEditor)
 	{
 		StyledText textWidget = textViewer.getTextWidget();
 		FilterInputProvider filterInputProvider = null;
@@ -329,6 +330,9 @@ public class CommandExecutionUtils
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
 		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
+		
+		// Set invocation type
+		commandContext.put(CommandContext.INVOKED_VIA, invocationType.getName());
 
 		return command.execute(commandContext);
 	}

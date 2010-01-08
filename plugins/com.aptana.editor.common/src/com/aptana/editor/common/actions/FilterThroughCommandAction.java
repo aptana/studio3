@@ -17,6 +17,7 @@ import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.FilterThroughCommandDialog;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	
@@ -57,7 +58,7 @@ public class FilterThroughCommandAction extends TextEditorAction {
 			command.setInputType(filterThroughCommandDialog.getInputType().getName());
 			command.setOutputType(filterThroughCommandDialog.getOuputType().getName());
 			command.setInvoke(filterThroughCommandDialog.getCommand());
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.UNKNOWN, textEditor);
 			CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 		}
 	}

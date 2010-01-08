@@ -32,6 +32,7 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.SnippetElement;
 
@@ -173,7 +174,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 									Messages.EditorCommandsMenuContributor_TITLE_CommandNotDefined,
 									Messages.bind(Messages.EditorCommandsMenuContributor_MSG_CommandNotDefined, menuItem.getText()));
 						} else {
-							CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
+							CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.MENU, textEditor);
 							CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 						}
 					}

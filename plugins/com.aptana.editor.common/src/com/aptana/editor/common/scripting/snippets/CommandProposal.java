@@ -18,6 +18,7 @@ import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
 
 public class CommandProposal extends SnippetTemplateProposal
 {
@@ -85,7 +86,7 @@ public class CommandProposal extends SnippetTemplateProposal
 					}
 				}
 			}
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, viewer, textEditor);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.TRIGGER, viewer, textEditor);
 			CommandExecutionUtils.processCommandResult(command, commandResult, viewer);
 		}
 	}
