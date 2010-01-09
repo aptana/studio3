@@ -29,7 +29,10 @@ public class SnippetElement extends CommandElement
 	public CommandResult execute(CommandContext context)
 	{
 		CommandResult result = new CommandResult(this.getExpansion());
-		
+
+		// indicate successful execution so that command result processing will work
+		result.setExecutedSuccessfully(true);
+
 		// grab input type so we can report back which input was used
 		String inputTypeString = (String) context.get(CommandContext.INPUT_TYPE);
 		InputType inputType = InputType.get(inputTypeString);

@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -43,6 +46,9 @@ import com.aptana.scripting.model.SnippetElement;
  *
  */
 public class EditorCommandsMenuContributor extends ContributionItem {
+
+	// FIXME Char for tab. Figure out how to use an image instead.
+	private static final String TAB = "\u21E5"; //$NON-NLS-1$
 
 	public EditorCommandsMenuContributor() {
 	}
@@ -145,13 +151,14 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 	 */
 	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String contentTypeAtOffset) {
 		for (MenuElement menuForScope : menusFromScope) {
+			String displayName = menuForScope.getDisplayName();
 			if (menuForScope.isHierarchicalMenu()) {
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
-				menuItemForMenuForScope.setText(menuForScope.getDisplayName());
-				
+				menuItemForMenuForScope.setText(displayName);
+
 				Menu menuForMenuForScope = new Menu(menu);
 				menuItemForMenuForScope.setMenu(menuForMenuForScope);
-				
+
 				// Recursive
 				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset);
 			} else if (menuForScope.isSeparator()) {
@@ -159,12 +166,29 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			} else {
 				final CommandElement command = menuForScope.getCommand();
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
-				menuItem.setText(menuForScope.getDisplayName());
 				if (command instanceof SnippetElement) {
 					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.SNIPPET));
+					String[] triggers = command.getTriggers();
+					if (triggers != null && triggers.length > 0) {
+						// Use first trigger
+					    displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				} else {
 					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.COMMAND));
+					if (command != null) {
+						KeySequence[] keySequences = command.getKeySequences();
+						if (keySequences != null && keySequences.length > 0) {
+							KeySequence keySequence = keySequences[0];
+							KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
+							// Eclipse can show only single key stroke key sequences
+							if (keyStrokes.length == 1) {
+								int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
+								menuItem.setAccelerator(accelerator);
+							}
+						}
+					}
 				}
+				menuItem.setText(displayName);
 				menuItem.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
