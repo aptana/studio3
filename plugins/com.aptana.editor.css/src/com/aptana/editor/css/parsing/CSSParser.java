@@ -15,27 +15,34 @@ import java.util.ArrayList;
 @SuppressWarnings("nls")
 public class CSSParser extends Parser implements IParser {
 
-    // suppress the error printouts
-    private static class CSSEvents extends Events {
+	// suppress the error printouts
+	private static class CSSEvents extends Events
+	{
 
-        public void scannerError(Scanner.Exception e) {
-        }
+		public void scannerError(Scanner.Exception e)
+		{
+		}
 
-        public void syntaxError(Symbol token) {
-        }
+		public void syntaxError(Symbol token)
+		{
+		}
 
-        public void unexpectedTokenRemoved(Symbol token) {
-        }
+		public void unexpectedTokenRemoved(Symbol token)
+		{
+		}
 
-        public void missingTokenInserted(Symbol token) {
-        }
+		public void missingTokenInserted(Symbol token)
+		{
+		}
 
-        public void misspelledTokenReplaced(Symbol token) {
-        }
+		public void misspelledTokenReplaced(Symbol token)
+		{
+		}
 
-        public void errorPhraseRemoved(Symbol error) {
-        }
-    }
+		public void errorPhraseRemoved(Symbol error)
+		{
+		}
+	}
 
     static final ParsingTables PARSING_TABLES = new ParsingTables(
 		"U9oTLbTqb4KK$lujw8eaOWGI2G6Zo6v8M598GB89f8e55Mo8W0KxbeXYvHmynrTVVF0Soml" +
@@ -79,7 +86,7 @@ public class CSSParser extends Parser implements IParser {
 
 	private CSSScanner fScanner;
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public CSSParser() {
 		super(PARSING_TABLES);
 		report = new CSSEvents();
@@ -436,8 +443,7 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol _symbol_s = _symbols[offset + 4];
 					final String s = (String) _symbol_s.value;
 					final Symbol r = _symbols[offset + 5];
-					
-			return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
+					return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
 				}
 			},
 			Action.RETURN,	// [58] ImportWord = STRING
@@ -478,9 +484,10 @@ public class CSSParser extends Parser implements IParser {
 		return actions[rule_num].reduce(_symbols, offset);
 	}
 
-    @Override
-    public IParseNode parse(String source) throws java.lang.Exception {
-        fScanner.setSource(source);
-        return (IParseNode) parse(fScanner);
-    }
+	@Override
+	public IParseNode parse(String source) throws java.lang.Exception
+	{
+		fScanner.setSource(source);
+		return (IParseNode) parse(fScanner);
+	}
 }

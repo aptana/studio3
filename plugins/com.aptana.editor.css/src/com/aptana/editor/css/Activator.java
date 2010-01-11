@@ -9,7 +9,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.css.parsing.CSSParser;
-import com.aptana.editor.css.parsing.CSSScanner;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -24,7 +23,6 @@ public class Activator extends AbstractUIPlugin {
 	
 	private CSSCodeScanner _codeScanner;
 	private CSSParser fParser;
-	private CSSScanner fScanner;
 
 	private static Map<String, Image> fImages = new HashMap<String, Image>();
 
@@ -78,41 +76,32 @@ public class Activator extends AbstractUIPlugin {
 
 	public CSSParser getParser()
 	{
-	    if (fParser == null)
-	    {
-	        fParser = new CSSParser();
-	    }
-	    return fParser;
+		if (fParser == null)
+		{
+			fParser = new CSSParser();
+		}
+		return fParser;
 	}
 
-    public CSSScanner getTokenScanner()
-    {
-        if (fScanner == null)
-        {
-            fScanner = new CSSScanner();
-        }
-        return fScanner;
-    }
+	public static Image getImage(String path)
+	{
+		Image image = fImages.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+			if (id == null)
+			{
+				return null;
+			}
 
-    public static Image getImage(String path)
-    {
-        Image image = fImages.get(path);
-        if (image == null)
-        {
-            ImageDescriptor id = getImageDescriptor(path);
-            if (id == null)
-            {
-                return null;
-            }
+			image = id.createImage();
+			fImages.put(path, image);
+		}
+		return image;
+	}
 
-            image = id.createImage();
-            fImages.put(path, image);
-        }
-        return image;
-    }
-
-    public static ImageDescriptor getImageDescriptor(String path)
-    {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 }

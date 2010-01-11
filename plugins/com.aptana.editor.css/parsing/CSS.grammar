@@ -70,7 +70,7 @@ Rule
 Function
 	=	FUNCTION.l Expression.e RPAREN.r {:return new CSSFunctionNode(e, l.getStart(), r.getEnd());:}
 	;
-	
+
 List
 	=	List COMMA IDENTIFIER
 	|	IDENTIFIER
@@ -130,7 +130,7 @@ AttributeSelectors
 	=	AttributeSelectors AttributeSelector
 	|	AttributeSelector
 	;
-	
+
 AttributeSelector
 	=	CLASS.c {:return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());:}
 	|	COLON.c IDENTIFIER.i {:return new CSSAttributeSelectorNode(":" + i, c.getStart(), _symbol_i.getEnd());:}
@@ -147,7 +147,7 @@ ImportWord
 	=	STRING
 	|	URL
 	;
-	
+
 Identifier
 	=	IDENTIFIER
 	|	PROPERTY
@@ -157,7 +157,7 @@ IdentiferOrString
 	=	IDENTIFIER
 	|	STRING
 	;
-	
+
 Separator
 	=	FORWARD_SLASH
 	|	COMMA
@@ -191,7 +191,7 @@ TypeOrUniversalSelector
 	|	STAR
 	|	SELECTOR
 	;
-	
+
 AttributeValueOperator
 	=	EQUAL
 	|	INCLUDES

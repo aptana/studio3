@@ -5,33 +5,42 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
 
-public class FileService {
+public class FileService
+{
 
-    private IDocument fDocument;
-    private IParser fParser;
-    private IParseNode fResult;
+	private IDocument fDocument;
+	private IParser fParser;
+	private IParseNode fResult;
 
-    public FileService() {
-    }
+	public FileService()
+	{
+	}
 
-    public void parse() {
-        String source = fDocument.get();
-        try {
-            fResult = fParser.parse(source);
-        } catch (Exception e) {
-            CommonEditorPlugin.logError(Messages.FileService_FailedToParse, e);
-        }
-    }
+	public void parse()
+	{
+		String source = fDocument.get();
+		try
+		{
+			fResult = fParser.parse(source);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(Messages.FileService_FailedToParse, e);
+		}
+	}
 
-    public IParseNode getParseResult() {
-        return fResult;
-    }
+	public IParseNode getParseResult()
+	{
+		return fResult;
+	}
 
-    public void setParser(IParser parser) {
-        fParser = parser;
-    }
+	public void setParser(IParser parser)
+	{
+		fParser = parser;
+	}
 
-    public void setDocument(IDocument document) {
-        fDocument = document;
-    }
+	public void setDocument(IDocument document)
+	{
+		fDocument = document;
+	}
 }

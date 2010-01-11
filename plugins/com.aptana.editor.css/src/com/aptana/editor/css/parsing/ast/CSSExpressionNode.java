@@ -1,5 +1,6 @@
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSExpressionNode extends CSSNode {
+public class CSSExpressionNode extends CSSNode
+{
 
 }

@@ -2,25 +2,30 @@ package com.aptana.editor.css.parsing;
 
 import com.aptana.parsing.IParser;
 
-public class CSSParserFactory {
+public class CSSParserFactory
+{
 
-    private static CSSParserFactory fInstance;
+	private static CSSParserFactory fInstance;
 
-    private IParser fParser;
+	private IParser fParser;
 
-    public static CSSParserFactory getInstance() {
-        if (fInstance == null) {
-            fInstance = new CSSParserFactory();
-        }
+	public static CSSParserFactory getInstance()
+	{
+		if (fInstance == null)
+		{
+			fInstance = new CSSParserFactory();
+		}
 
-        return fInstance;
-    }
+		return fInstance;
+	}
 
-    public IParser getParser() {
-        return fParser;
-    }
+	public IParser getParser()
+	{
+		return fParser;
+	}
 
-    private CSSParserFactory() {
-        fParser = new CSSParser();
-    }
+	private CSSParserFactory()
+	{
+		fParser = new CSSParser();
+	}
 }

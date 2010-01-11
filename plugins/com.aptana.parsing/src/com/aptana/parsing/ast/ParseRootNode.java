@@ -5,18 +5,22 @@ import java.util.List;
 
 import beaver.Symbol;
 
-public class ParseRootNode extends ParseBaseNode {
+public class ParseRootNode extends ParseBaseNode
+{
 
-    public ParseRootNode(Symbol[] children, int start, int end) {
-        this.start = start;
-        this.end = end;
+	public ParseRootNode(Symbol[] children, int start, int end)
+	{
+		this.start = start;
+		this.end = end;
 
-        List<IParseNode> nodes = new ArrayList<IParseNode>();
-        for (Symbol child : children) {
-            if (child instanceof IParseNode) {
-                nodes.add((IParseNode) child);
-            }
-        }
-        setChildren(nodes.toArray(new IParseNode[nodes.size()]));
-    }
+		List<IParseNode> nodes = new ArrayList<IParseNode>();
+		for (Symbol child : children)
+		{
+			if (child instanceof IParseNode)
+			{
+				nodes.add((IParseNode) child);
+			}
+		}
+		setChildren(nodes.toArray(new IParseNode[nodes.size()]));
+	}
 }

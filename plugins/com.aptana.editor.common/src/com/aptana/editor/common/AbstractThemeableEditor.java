@@ -121,16 +121,16 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("unchecked")
-    @Override
-    public Object getAdapter(Class adapter)
-    {
-        // returns our custom adapter for the content outline page
-        if (IContentOutlinePage.class.equals(adapter))
-        {
-            return getOutlinePage();
-        }
-        return super.getAdapter(adapter);
-    }
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		// returns our custom adapter for the content outline page
+		if (IContentOutlinePage.class.equals(adapter))
+		{
+			return getOutlinePage();
+		}
+		return super.getAdapter(adapter);
+	}
 
 	protected CommonOutlinePage getOutlinePage()
 	{
