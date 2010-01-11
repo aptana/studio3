@@ -9,7 +9,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.scripting.model");
 		// $JUnit-BEGIN$
-		suite.addTestSuite(BundleLoadingTests.class);
+		suite.addTestSuite(BundleTests.class);
 		suite.addTestSuite(CommandTests.class);
 		suite.addTestSuite(ContextTests.class);
 		// $JUnit-END$

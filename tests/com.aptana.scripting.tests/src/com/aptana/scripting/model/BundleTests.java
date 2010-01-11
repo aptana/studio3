@@ -1,7 +1,7 @@
 package com.aptana.scripting.model;
 
 
-public class BundleLoadingTests extends BundleTestBase
+public class BundleTests extends BundleTestBase
 {
 	/**
 	 * compareScopedBundles
@@ -314,5 +314,32 @@ public class BundleLoadingTests extends BundleTestBase
 			assertEquals("cd", command1.getInvoke());
 			assertEquals("cd ..", command2.getInvoke());
 		}
+	}
+	
+	/**
+	 * testNameFromBundleDirectory
+	 */
+	public void testNameFromBundleDirectory()
+	{
+		// load bundle
+		String bundleName = "bundleName";
+		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		
+		// get bundle entry
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		assertNotNull(entry);
+	}
+	
+	/**
+	 * testNameFromBundleDirectory2
+	 */
+	public void testNameFromBundleDirectory2()
+	{
+		// load bundle
+		this.loadBundleEntry("bundleNameWithExtension.rrbundle", BundleScope.PROJECT);
+		
+		// get bundle entry
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");
+		assertNotNull(entry);
 	}
 }
