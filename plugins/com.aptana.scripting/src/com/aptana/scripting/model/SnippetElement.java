@@ -16,6 +16,41 @@ public class SnippetElement extends CommandElement
 	}
 
 	/**
+	 * execute
+	 */
+	public CommandResult execute()
+	{
+		return execute(null);
+	}
+
+	/**
+	 * execute
+	 */
+	public CommandResult execute(CommandContext context)
+	{
+		CommandResult result = new CommandResult(this.getExpansion());
+
+		// indicate successful execution so that command result processing will work
+		result.setExecutedSuccessfully(true);
+
+		// grab input type so we can report back which input was used
+		String inputTypeString = (String) context.get(CommandContext.INPUT_TYPE);
+		InputType inputType = InputType.get(inputTypeString);
+		
+		result.setInputType(inputType);
+		
+		return result;
+	}
+
+	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "snippet"; //$NON-NLS-1$
+	}
+	
+	/**
 	 * getExpansion
 	 * 
 	 * @return

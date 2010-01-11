@@ -51,4 +51,24 @@
             label="%appExplorerFont.label">
       </fontDefinition>
    </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.explorer.ExplorerContextContributor"
+            name="Active Project Info Contributors">
+      </contributor>
+   </extension>
+   <extension
+         point="com.aptana.scripting.loadPaths">
+      <loadPath
+            name="RadRails Framework Files"
+            path="framework/">
+      </loadPath>
+   </extension>
+   <extension
+         point="com.aptana.scripting.frameworkFiles">
+      <file
+            name="radrails/project.rb">
+      </file>
+   </extension>
 </plugin>

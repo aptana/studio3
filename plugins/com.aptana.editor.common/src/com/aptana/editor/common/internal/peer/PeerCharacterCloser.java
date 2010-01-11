@@ -46,15 +46,17 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private final String CATEGORY = toString();
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
+	private char[] pairs;
 
-	PeerCharacterCloser(ITextViewer textViewer)
+	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
 	{
 		this.textViewer = textViewer;
+		this.pairs = pairs;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer)
+	public static PeerCharacterCloser install(ITextViewer textViewer, char[] pairs)
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
+		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer, pairs);
 		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
 		return pairMatcher;
 	}
@@ -252,19 +254,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	private char getPeerCharacter(char character)
 	{
-		switch (character)
+		for (int i = 0; i < pairs.length; i += 2)
 		{
-			case '[':
-				return ']';
-			case '(':
-				return ')';
-			case '{':
-				return '}';
-			case '<':
-				return '>';
-			default:
-				return character;
+			if (pairs[i] == character)
+			{
+				return pairs[i + 1];
+			}
 		}
+		return character;
 	}
 
 	/**
@@ -275,19 +272,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	private boolean isAutoInsertCharacter(char character)
 	{
-		switch (character)
+		for (int i = 0; i < pairs.length; i += 2)
 		{
-			case '[':
-			case '(':
-			case '{':
-			case '\'':
-			case '"':
-			case '<':
-			case '`':
+			if (pairs[i] == character)
+			{
 				return true;
-			default:
-				return false;
+			}
 		}
+		return false;
 	}
 
 	private boolean isAutoInsertEnabled()

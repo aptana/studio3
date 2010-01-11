@@ -1,23 +1,22 @@
 require "java"
+require "radrails/base_element"
+require "radrails/key_binding"
 require "radrails/scope_selector"
 
 module RadRails
   
-  class Command
+  class Command < BaseElement
     def initialize(name)
-      @jobj = create_java_object
-      @jobj.display_name = name;
-      
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
-    end
-    
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
+      if name.kind_of? String
+        super(name)
+        
+        @key_binding = KeyBinding.new(java_object)
+        bundle = BundleManager.bundle_from_path(path)
+        bundle.apply_defaults(self) unless bundle.nil?
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def input
@@ -25,7 +24,7 @@ module RadRails
     end
     
     def input=(input)
-      @jobj.input_type = input.to_s
+      @jobj.input_type = (input && input.kind_of?(Array)) ? input.to_java(:String) : input.to_s;
     end
     
     def invoke(&block)
@@ -40,17 +39,12 @@ module RadRails
       @jobj.invoke = invoke
     end
     
-    def java_object
-      @jobj
-    end
-    
     def key_binding
-      @jobj.key_binding
+      @key_binding
     end
     
     def key_binding=(key_binding)
-      as_strings = key_binding.map {|x| x.to_s }
-      @jobj.key_binding = as_strings.join(" ")
+      @key_binding[:all] = key_binding
     end
     
     def output
@@ -66,8 +60,8 @@ module RadRails
       end
     end
     
-    def path
-      @jobj.path
+    def owning_bundle
+      @jobj.owning_bundle
     end
     
     def scope
@@ -91,6 +85,13 @@ module RadRails
       @jobj.working_directory
     end
 
+    def to_env
+      {
+        :TM_COMMAND_NAME => display_name,
+        :TM_COMMAND_PATH => path
+      }
+    end
+    
     def to_s
       <<-EOS
       command(
@@ -110,7 +111,7 @@ module RadRails
     end
     
     def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger;
+      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
     end
     
     class << self
@@ -133,4 +134,10 @@ module RadRails
     end
   end
   
+end
+
+# define top-level convenience methods
+
+def command(name, &block)
+  RadRails::Command.define_command(name, &block)
 end

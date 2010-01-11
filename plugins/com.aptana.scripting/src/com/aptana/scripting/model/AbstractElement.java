@@ -14,6 +14,7 @@ public abstract class AbstractElement
 	
 	private String _path;
 	private String _displayName;
+	private Map<String,Object> _customProperties;
 	
 	/**
 	 * static constructor
@@ -109,6 +110,24 @@ public abstract class AbstractElement
 	}
 	
 	/**
+	 * get
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public Object get(String property)
+	{
+		Object result = null;
+		
+		if (this._customProperties != null)
+		{
+			result = this._customProperties.get(property);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getDisplayName
 	 * 
 	 * @return
@@ -119,6 +138,13 @@ public abstract class AbstractElement
 	}
 
 	/**
+	 * getElementName
+	 * 
+	 * @return
+	 */
+	protected abstract String getElementName();
+	
+	/**
 	 * getPath
 	 * 
 	 * @return
@@ -128,6 +154,25 @@ public abstract class AbstractElement
 		return this._path;
 	}
 
+	/**
+	 * put
+	 * 
+	 * @param property
+	 * @param value
+	 */
+	public void put(String property, Object value)
+	{
+		if (property != null && property.length() > 0)
+		{
+			if (this._customProperties == null)
+			{
+				this._customProperties = new HashMap<String, Object>();
+			}
+			
+			this._customProperties.put(property, value);
+		}
+	}
+	
 	/**
 	 * setDisplayName
 	 * 
@@ -174,5 +219,32 @@ public abstract class AbstractElement
 	 * 
 	 * @param printer
 	 */
-	abstract protected void toSource(SourcePrinter printer);
+	protected void toSource(SourcePrinter printer)
+	{
+		// open element
+		printer.printWithIndent(this.getElementName());
+		printer.print(" \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		// emit body
+		this.printBody(printer);
+		
+		// emit custom properties
+		if (this._customProperties != null)
+		{
+			for (Map.Entry<String, Object> entry : this._customProperties.entrySet())
+			{
+				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString()); //$NON-NLS-1$
+			}
+		}
+
+		// close element
+		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
+	}
+	
+	/**
+	 * printBody
+	 * 
+	 * @param printer
+	 */
+	abstract protected void printBody(SourcePrinter printer);
 }

@@ -1,16 +1,22 @@
 require "java"
+require "radrails/base_element"
 require "radrails/scope_selector"
 
 module RadRails
   
-  class Menu
+  class Menu < BaseElement
     def initialize(name)
-      @jobj = com.aptana.scripting.model.MenuElement.new($fullpath)
-      @jobj.command_name = name;
-      @jobj.display_name = name;
-      
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
+      if name.kind_of? String
+        super(name)
+        
+        @jobj.command_name = name;
+        
+        bundle = BundleManager.bundle_from_path(path)
+        bundle.apply_defaults(self) unless bundle.nil?
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def add_menu(menu)
@@ -32,28 +38,12 @@ module RadRails
       @jobj.command_name = command_name
     end
     
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
-    end
-    
-    def java_object
-      @jobj
-    end
-    
     def menu(name, &block)
       child_menu = Menu.new(name)
       
       block.call(child_menu) if block_given?
       
       add_menu(child_menu)
-    end
-    
-    def path
-      @jobj.path
     end
     
     def scope
@@ -80,6 +70,18 @@ module RadRails
         bundle.add_menu(new_menu) unless bundle.nil?
       end
     end
+    
+    private
+    
+    def create_java_object
+      com.aptana.scripting.model.MenuElement.new($fullpath)
+    end
   end
   
+end
+
+# define top-level convenience methods
+
+def menu(name, &block)
+  RadRails::Menu.define_menu(name, &block)
 end

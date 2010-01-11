@@ -32,3 +32,21 @@ module RadRails
   end
   
 end
+
+# define top-level convenience methods
+
+def log_error(error)
+  RadRails::Logger.log_error(error)
+end
+
+def log_info(info)
+  RadRails::Logger.log_info(info)
+end
+
+def log_warning(warning)
+  RadRails::Logger.log_warning(warning)
+end
+
+def trace(message)
+  RadRails::Logger.trace(message)
+end

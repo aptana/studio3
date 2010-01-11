@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests
-Bundle-SymbolicName: com.aptana.scripting.tests
+Bundle-SymbolicName: com.aptana.scripting.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Aptana
 Fragment-Host: com.aptana.scripting;bundle-version="1.0.0"

@@ -11,6 +11,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(BundleLoadingTests.class);
 		suite.addTestSuite(CommandTests.class);
+		suite.addTestSuite(ContextTests.class);
 		// $JUnit-END$
 		return suite;
 	}

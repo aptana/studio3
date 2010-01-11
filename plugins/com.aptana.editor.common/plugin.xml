@@ -142,4 +142,43 @@
          </fontOverride>
       </theme>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="com.aptana.editor.common.FindBarDecoratedAdapterFactory">
+         <adapter
+               type="com.aptana.editor.findbar.api.IFindBarDecorated">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.texteditor.ITextEditor"
+            class="com.aptana.editor.common.CommandElementsProviderAdapterFactory">
+         <adapter
+               type="com.aptana.scripting.keybindings.ICommandElementsProvider">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="com.aptana.scripting.loadPaths">
+      <loadPath
+            name="RadRails Framework Files"
+            path="framework/">
+      </loadPath>
+   </extension>
+   <extension
+         point="com.aptana.scripting.frameworkFiles">
+      <file
+            name="radrails/editor.rb">
+      </file>
+   </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.editor.common.EditorContextContributor">
+      </contributor>
+   </extension>
 </plugin>
