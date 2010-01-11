@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import com.aptana.editor.css.parsing.CSSParser;
-import com.aptana.editor.css.parsing.CSSScanner;
 
 public class CSSParserPerformance {
 
@@ -17,15 +16,13 @@ public class CSSParserPerformance {
         }
         stream.close();
         String src = new String(out.toByteArray());
-        CSSParser parser = new CSSParser();
-        CSSScanner scanner = new CSSScanner();
 
+        CSSParser parser = new CSSParser();
         int numRuns = 100;
         long start = System.currentTimeMillis();
         for (int i = 0; i < numRuns; i++) {
-            scanner.setSource(src);
             try {
-                parser.parse(scanner);
+                parser.parse(src);
             } catch (Exception e) {
             }
         }
