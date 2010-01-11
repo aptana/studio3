@@ -15,6 +15,28 @@ import java.util.ArrayList;
 @SuppressWarnings("nls")
 public class CSSParser extends Parser implements IParser {
 
+    // suppress the error printouts
+    private static class CSSEvents extends Events {
+
+        public void scannerError(Scanner.Exception e) {
+        }
+
+        public void syntaxError(Symbol token) {
+        }
+
+        public void unexpectedTokenRemoved(Symbol token) {
+        }
+
+        public void missingTokenInserted(Symbol token) {
+        }
+
+        public void misspelledTokenReplaced(Symbol token) {
+        }
+
+        public void errorPhraseRemoved(Symbol error) {
+        }
+    }
+
     static final ParsingTables PARSING_TABLES = new ParsingTables(
 		"U9oTLbTqb4KK$lujw8eaOWGI2G6Zo6v8M598GB89f8e55Mo8W0KxbeXYvHmynrTVVF0Soml" +
 		"dsCM2YbXYxmsne1BiMB2B1JlNR#xCRYR97xEwET$SEtVkdU$EdVbd0WIhq80PQCL8b61FLA" +
@@ -60,6 +82,7 @@ public class CSSParser extends Parser implements IParser {
     @SuppressWarnings("unchecked")
 	public CSSParser() {
 		super(PARSING_TABLES);
+		report = new CSSEvents();
 		fScanner = new CSSScanner();
 
 		actions = new Action[] {
