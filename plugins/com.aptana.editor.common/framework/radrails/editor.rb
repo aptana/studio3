@@ -163,6 +163,94 @@ module RadRails
         length = array_or_range.last - offset
       end
       RadRails::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
-    end    
+    end
+    
+    def styled_text
+      editor_part.get_adapter(org.eclipse.swt.widgets.Control.java_class)
+    end
+    
+    def current_scope
+      if content_type.nil?
+        document.content_type(caret_offset)
+      else
+        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(content_type).to_s
+      end
+    end
+    
+    def caret_column
+      selection.offset - styled_text.offset_at_line(selection.start_line)
+    end
+    
+    def caret_line
+      styled_text.line_at_offset(caret_offset)
+    end
+    
+    def caret_offset
+      styled_text.caret_offset
+    end
+    
+    def content_type
+      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, caret_offset)
+    end
+    
+    def current_line
+      styled_text.line(caret_line)
+    end
+    
+    def to_env
+      input = editor_input
+      result = {}
+      
+      if input
+        ifile = input.file
+        file = ifile.location.to_file
+        
+        result["TM_SELECTED_FILE"] = file.absolute_path
+        result["TM_FILEPATH"] = file.absolute_path
+        result["TM_FILENAME"] = file.name
+        result["TM_DIRECTORY"] = file.parent_file.absolute_path
+        result["TM_PROJECT_DIRECTORY"] = ifile.project.location.to_file.absolute_path # duplicate name in project.rb
+        
+        result["TM_SELECTED_TEXT"] = selection.text
+        result["TM_LINE_NUMBER"] = selection.start_line + 1
+        result["TM_SELECTION_OFFSET"] = selection.offset
+        result["TM_SELECTION_LENGTH"] = selection.length
+        result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
+        result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+        
+        result["TM_LINE_INDEX"] = caret_column
+        result["TM_CARET_LINE_NUMBER"] = caret_line + 1
+        result["TM_CARET_LINE_TEXT"] = current_line
+        result["TM_CURRENT_LINE"] = current_line
+        
+        # I'm sure there's a better way to extract the word at the current caret position
+        if current_line !~ /^\s*$/
+          starting_offset = caret_column
+          ending_offset = current_line.length
+          
+          (caret_column - 1).downto(0) do |n|
+            if current_line[n,1] =~ /\W/
+              starting_offset = n + 1
+              break
+            end
+          end
+          (caret_column...current_line.length).each do |n|
+            if current_line[n,1] =~ /\W/
+              ending_offset = n
+              break
+            end
+          end
+          
+          result["TM_CURRENT_WORD"] = current_line[starting_offset, ending_offset - starting_offset]
+        else
+          result["TM_CURRENT_WORD"] = ""
+        end
+        
+        result["TM_CURRENT_SCOPE"] = current_scope
+      end
+      
+      result
+    end
+    
   end
 end

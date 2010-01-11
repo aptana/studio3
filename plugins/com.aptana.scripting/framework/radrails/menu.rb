@@ -6,12 +6,17 @@ module RadRails
   
   class Menu < BaseElement
     def initialize(name)
-      super(name)
-      
-      @jobj.command_name = name;
-      
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
+      if name.kind_of? String
+        super(name)
+        
+        @jobj.command_name = name;
+        
+        bundle = BundleManager.bundle_from_path(path)
+        bundle.apply_defaults(self) unless bundle.nil?
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def add_menu(menu)

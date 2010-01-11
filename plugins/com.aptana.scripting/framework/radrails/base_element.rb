@@ -20,10 +20,6 @@ module RadRails
       @jobj
     end
     
-    def path
-      @jobj.path
-    end
-    
     def method_missing(m, *args, &block)
       property_name = m.to_s
       
@@ -32,6 +28,14 @@ module RadRails
       else
         @jobj.get property_name
       end
+    end
+    
+    def path
+      @jobj.path
+    end
+    
+    def to_env
+      {}
     end
     
     private

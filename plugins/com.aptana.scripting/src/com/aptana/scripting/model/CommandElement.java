@@ -21,6 +21,7 @@ import org.jruby.RubyClass;
 import org.jruby.RubyHash;
 import org.jruby.RubyModule;
 import org.jruby.RubyProc;
+import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
@@ -539,16 +540,30 @@ public class CommandElement extends AbstractBundleElement
 				{
 					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
-					IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV);
-
-					if (methodResult instanceof RubyHash)
+					
+					try
 					{
-						RubyHash environmentHash = (RubyHash) methodResult;
-
-						for (Object hashKey : environmentHash.keySet())
+						IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV);
+	
+						if (methodResult instanceof RubyHash)
 						{
-							environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
+							RubyHash environmentHash = (RubyHash) methodResult;
+	
+							for (Object hashKey : environmentHash.keySet())
+							{
+								environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
+							}
 						}
+					}
+					catch (RaiseException e)
+					{
+						String message = MessageFormat.format(
+							"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
+							new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() }
+						);
+						
+						ScriptLogger.logError(message);
+						e.printStackTrace();
 					}
 				}
 			}
@@ -562,7 +577,7 @@ public class CommandElement extends AbstractBundleElement
 					environment.putAll(contributedEnvironment);
 				}
 			}
-			else
+			else if (valueObject != null)
 			{
 				environment.put(key, valueObject.toString());
 			}

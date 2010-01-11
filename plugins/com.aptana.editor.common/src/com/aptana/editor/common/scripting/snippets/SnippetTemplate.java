@@ -33,4 +33,10 @@ public class SnippetTemplate extends Template {
 		}
 		return prefix != null && prefix.length() != 0 && getName() != null && getName().toLowerCase().startsWith(prefix.toLowerCase());
 	}
+	
+    @Override
+    public String toString()
+    {
+    	return getName() + " - " + getPattern(); //$NON-NLS-1$
+    }
 }

@@ -29,5 +29,11 @@ public class CommandTemplate extends Template {
         }
         return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
     }
+    
+    @Override
+    public String toString()
+    {
+    	return getName() + " - " + getPattern(); //$NON-NLS-1$
+    }
 
 }

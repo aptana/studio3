@@ -18,7 +18,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
@@ -205,18 +207,25 @@ public class TerminalBrowser
 					return;
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					Display.getCurrent().syncExec(new Runnable()
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					
+					if (workbench != null)
 					{
-
-						@Override
-						public void run()
+						Display display = workbench.getDisplay();
+						
+						display.syncExec(new Runnable()
 						{
-							final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
-									+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
-									+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
-							_browser.execute(reloadCSSScript);
-						}
-					});
+	
+							@Override
+							public void run()
+							{
+								final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
+										+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
+										+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
+								_browser.execute(reloadCSSScript);
+							}
+						});
+					}
 				}
 			}
 		};

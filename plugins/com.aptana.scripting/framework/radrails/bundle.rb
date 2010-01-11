@@ -109,6 +109,10 @@ module RadRails
       @jobj.license_url = license_url.join("\n")
     end
     
+    def to_env
+      { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib") }
+    end
+    
     def to_s
       <<-EOS
       bundle(

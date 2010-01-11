@@ -155,16 +155,10 @@ module RadRails
 	
 	# convert to a list of environment variables
 	def to_env
-	  project = Project.current
-	  
-	  if project
-	    {
-	      :TM_PROJECT_NAME => project.name,
-	      :TM_PROJECT_DIRECTORY => project.to_dir.path
-	    }
-	  else
-	    nil
-      end
+	  {
+	    :TM_PROJECT_NAME => name,
+	    :TM_PROJECT_DIRECTORY => to_dir.path
+	  }
 	end
     
   end

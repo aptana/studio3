@@ -111,6 +111,7 @@ class GitResourceListener implements IResourceChangeListener
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
+					// FIXME This seems to be getting triggered even when we're staging/unstaging files through the model
 					repo.index().refresh();
 					return Status.OK_STATUS;
 				}

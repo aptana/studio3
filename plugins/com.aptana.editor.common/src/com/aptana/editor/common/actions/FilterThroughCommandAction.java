@@ -1,5 +1,6 @@
 package com.aptana.editor.common.actions;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -16,6 +17,7 @@ import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.FilterThroughCommandDialog;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.InvocationType;
 
 public class FilterThroughCommandAction extends TextEditorAction {
 	
@@ -46,14 +48,17 @@ public class FilterThroughCommandAction extends TextEditorAction {
 		ITextEditor textEditor = getTextEditor();
 		
 		IWorkbenchWindow workbenchWindow = textEditor.getEditorSite().getWorkbenchWindow();
-		Map<String, String> environment = CommandExecutionUtils.computeEnvironment(textEditor);
+		// TODO: probably need to grab or generate a ENV map from a Command here
+		//Map<String, String> environment = CommandExecutionUtils.computeEnvironment(textEditor);
+		Map<String,String> environment = new HashMap<String,String>();
+		
 		FilterThroughCommandDialog filterThroughCommandDialog = new FilterThroughCommandDialog(workbenchWindow.getShell(), environment);
 		if (filterThroughCommandDialog.open() == Window.OK) {
 			CommandElement command = new CommandElement(null); // Use null value for path to create a one off command
 			command.setInputType(filterThroughCommandDialog.getInputType().getName());
 			command.setOutputType(filterThroughCommandDialog.getOuputType().getName());
 			command.setInvoke(filterThroughCommandDialog.getCommand());
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, textEditor);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.UNKNOWN, textEditor);
 			CommandExecutionUtils.processCommandResult(command, commandResult, textEditor);
 		}
 	}
