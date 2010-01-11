@@ -552,17 +552,6 @@ public class BundleManager
 	 * getCommandsFromScopes
 	 * 
 	 * @param scopes
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScopes(String[] scopes)
-	{
-		return this.getCommandsFromScopes(scopes, null);
-	}
-	
-	/**
-	 * getCommandsFromScopes
-	 * 
-	 * @param scopes
 	 * @param filter
 	 * @return
 	 */
