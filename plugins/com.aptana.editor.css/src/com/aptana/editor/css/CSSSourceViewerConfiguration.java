@@ -41,8 +41,8 @@ import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
@@ -53,7 +53,7 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 
     private ILanguageService fLanguageService;
 
-    public CSSSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+    public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
         super(preferences, editor);
     }
 

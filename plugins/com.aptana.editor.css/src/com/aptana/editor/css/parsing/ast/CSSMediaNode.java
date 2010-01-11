@@ -4,8 +4,10 @@ public class CSSMediaNode extends CSSNode {
 
     private String[] fMedias;
 
-    public CSSMediaNode(String[] medias) {
+    public CSSMediaNode(String[] medias, int start, int end) {
         fMedias = medias;
+        this.start = start;
+        this.end = end;
     }
 
     @Override

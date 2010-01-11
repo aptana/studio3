@@ -189,7 +189,7 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
         // star
         rules.add(new SingleCharacterRule('*', createToken(getTokenName(CSSTokens.STAR))));
         // greater
-        // rules.add(new SingleCharacterRule('>', createToken(getTokenName(CSSTokens.GREATER))));
+        rules.add(new SingleCharacterRule('>', createToken(getTokenName(CSSTokens.GREATER))));
         // forward slash
         rules.add(new SingleCharacterRule('/', createToken(getTokenName(CSSTokens.FORWARD_SLASH))));
         // equal
@@ -199,33 +199,34 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner {
         // rgb values
         rules.add(new RegexpRule("#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\\b", createToken(getTokenName(CSSTokens.COLOR)), //$NON-NLS-1$
                 OPTIMIZE_REGEXP_RULES));
+
+        // url
+        rules.add(new RegexpRule("url\\([^\\)]*\\)", createToken(getTokenName(CSSTokens.URL)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+        // em
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)em", createToken(getTokenName(CSSTokens.EMS)))); //$NON-NLS-1$
+        // length
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(px|cm|mm|in|pt|pc)", createToken(getTokenName(CSSTokens.LENGTH)))); //$NON-NLS-1$
+        // percentage
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)%", createToken(getTokenName(CSSTokens.PERCENTAGE)))); //$NON-NLS-1$
+        // angle
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(deg|rad|grad)", createToken(getTokenName(CSSTokens.ANGLE)))); //$NON-NLS-1$
+        // ex
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)ex", createToken(getTokenName(CSSTokens.EXS)))); //$NON-NLS-1$
+        // frequency
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)([Hh]z|k[Hh]z)", createToken(getTokenName(CSSTokens.FREQUENCY)))); //$NON-NLS-1$
+        // time
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(ms|s)", createToken(getTokenName(CSSTokens.TIME)))); //$NON-NLS-1$
+        // numbers
+        rules.add(new RegexpRule("(\\-|\\+)?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)", createToken(getTokenName(CSSTokens.NUMBER)))); //$NON-NLS-1$
+
         // ids
         rules.add(new RegexpRule("#[_a-zA-Z0-9-]+", createToken(getTokenName(CSSTokens.HASH)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
         // classes
         rules.add(new RegexpRule("\\.[_a-zA-Z0-9-]+", createToken(getTokenName(CSSTokens.CLASS)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
-        // url
-        rules.add(new RegexpRule("url\\([^\\)]*\\)", createToken(getTokenName(CSSTokens.URL)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-
         // minus
-        rules.add(new RegexpRule("-(?=\\s*[0-9])", createToken(getTokenName(CSSTokens.MINUS)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-        // em
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?em", createToken(getTokenName(CSSTokens.EMS)))); //$NON-NLS-1$
-        // length
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(px|cm|mm|in|pt|pc)", createToken(getTokenName(CSSTokens.LENGTH)))); //$NON-NLS-1$
-        // percentage
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?%", createToken(getTokenName(CSSTokens.PERCENTAGE)))); //$NON-NLS-1$
-        // angle
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(deg|rad|grad)", createToken(getTokenName(CSSTokens.ANGLE)))); //$NON-NLS-1$
-        // ex
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?ex", createToken(getTokenName(CSSTokens.EXS)))); //$NON-NLS-1$
-        // frequency
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?([Hh]z|k[Hh]z)", createToken(getTokenName(CSSTokens.FREQUENCY)))); //$NON-NLS-1$
-        // time
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?(ms|s)", createToken(getTokenName(CSSTokens.TIME)))); //$NON-NLS-1$
-        // numbers
-        rules.add(new RegexpRule("(\\-|\\+)?[0-9]+(\\.[0-9]+)?", createToken(getTokenName(CSSTokens.NUMBER)))); //$NON-NLS-1$
-
+        rules.add(new RegexpRule("-(?=\\s*[0-9\\.])", createToken(getTokenName(CSSTokens.MINUS)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
+        
         // !important
         rules.add(new RegexpRule("!\\s*important", createToken(getTokenName(CSSTokens.IMPORTANT)), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
         // @ rules

@@ -6,56 +6,57 @@ import java.util.Map;
 public class CSSTokens {
 
     public static final short UNKNOWN = -1;
-    static public final short EOF = 0;
-    static public final short IDENTIFIER = 1;
-    static public final short COLOR = 2;
-    static public final short COLON = 3;
-    static public final short RCURLY = 4;
-    static public final short SEMICOLON = 5;
-    static public final short LBRACKET = 6;
-    static public final short CLASS = 7;
-    static public final short HASH = 8;
-    static public final short STRING = 9;
-    static public final short STAR = 10;
-    static public final short SELECTOR = 11;
-    static public final short FUNCTION = 12;
-    static public final short URL = 13;
-    static public final short LCURLY = 14;
-    static public final short COMMA = 15;
-    static public final short NUMBER = 16;
-    static public final short PERCENTAGE = 17;
-    static public final short LENGTH = 18;
-    static public final short EMS = 19;
-    static public final short EXS = 20;
-    static public final short ANGLE = 21;
-    static public final short TIME = 22;
-    static public final short FREQUENCY = 23;
-    static public final short PAGE = 24;
-    static public final short AT_KEYWORD = 25;
-    static public final short CHARSET = 26;
-    static public final short MEDIA = 27;
-    static public final short RBRACKET = 28;
-    static public final short IMPORT = 29;
-    static public final short PROPERTY = 30;
-    static public final short FORWARD_SLASH = 31;
-    static public final short PLUS = 32;
-    static public final short MINUS = 33;
-    static public final short RPAREN = 34;
-    static public final short IMPORTANT = 35;
-    static public final short EQUAL = 36;
-    static public final short INCLUDES = 37;
-    static public final short DASHMATCH = 38;
-    public static final short COMMENT = 39;
+    public static final short EOF = 0;
+    public static final short IDENTIFIER = 1;
+    public static final short COLOR = 2;
+    public static final short COLON = 3;
+    public static final short RCURLY = 4;
+    public static final short SEMICOLON = 5;
+    public static final short LBRACKET = 6;
+    public static final short CLASS = 7;
+    public static final short HASH = 8;
+    public static final short STRING = 9;
+    public static final short STAR = 10;
+    public static final short SELECTOR = 11;
+    public static final short FUNCTION = 12;
+    public static final short URL = 13;
+    public static final short LCURLY = 14;
+    public static final short COMMA = 15;
+    public static final short NUMBER = 16;
+    public static final short PERCENTAGE = 17;
+    public static final short LENGTH = 18;
+    public static final short EMS = 19;
+    public static final short EXS = 20;
+    public static final short ANGLE = 21;
+    public static final short TIME = 22;
+    public static final short FREQUENCY = 23;
+    public static final short PAGE = 24;
+    public static final short AT_KEYWORD = 25;
+    public static final short CHARSET = 26;
+    public static final short MEDIA = 27;
+    public static final short RBRACKET = 28;
+    public static final short IMPORT = 29;
+    public static final short PROPERTY = 30;
+    public static final short PLUS = 31;
+    public static final short FORWARD_SLASH = 32;
+    public static final short MINUS = 33;
+    public static final short RPAREN = 34;
+    public static final short IMPORTANT = 35;
+    public static final short GREATER = 36;
+    public static final short EQUAL = 37;
+    public static final short INCLUDES = 38;
+    public static final short DASHMATCH = 39;
+    public static final short COMMENT = 40;
 
-    private static final short MAXIMUM = 39;
+    private static final short MAXIMUM = 40;
 
     @SuppressWarnings("nls")
     private static final String[] NAMES = { "EOF", "IDENTIFIER", "COLOR", "COLON", "RCURLY",
             "SEMICOLON", "LBRACKET", "CLASS", "HASH", "STRING", "STAR", "SELECTOR", "FUNCTION",
             "URL", "LCURLY", "COMMA", "NUMBER", "PERCENTAGE", "LENGTH", "EMS", "EXS", "ANGLE",
             "TIME", "FREQUENCY", "PAGE", "AT_KEYWORD", "CHARSET", "MEDIA", "RBRACKET", "IMPORT",
-            "PROPERTY", "FORWARD_SLASH", "PLUS", "MINUS", "RPAREN", "IMPORTANT", "EQUAL",
-            "INCLUDES", "DASHMATCH", "COMMENT" };
+            "PROPERTY", "PLUS", "FORWARD_SLASH", "MINUS", "RPAREN", "IMPORTANT", "GREATER",
+            "EQUAL", "INCLUDES", "DASHMATCH", "COMMENT" };
     private static final String NAME_UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
     private static Map<String, Short> nameIndexMap;

@@ -16,6 +16,8 @@ Export-Package: beaver,
  beaver.spec,
  beaver.spec.ast,
  beaver.spec.parser,
+ com.aptana.parsing,
+ com.aptana.parsing.ast,
  com.aptana.parsing.lexer
 Bundle-ClassPath: libs/beaver.jar,
  .

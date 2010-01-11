@@ -4,8 +4,10 @@ public class CSSFunctionNode extends CSSExpressionNode {
 
     private CSSExpressionNode fExpression;
 
-    public CSSFunctionNode(CSSExpressionNode expression) {
+    public CSSFunctionNode(CSSExpressionNode expression, int start, int end) {
         fExpression = expression;
+        this.start = start;
+        this.end = end;
     }
 
     @Override

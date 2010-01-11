@@ -14,6 +14,8 @@ public class CSSTermListNode extends CSSExpressionNode {
         fLeftExpr = left;
         fRightExpr = right;
         fSeparator = separator;
+        this.start = left.getStart();
+        this.end = right.getEnd();
     }
 
     @Override

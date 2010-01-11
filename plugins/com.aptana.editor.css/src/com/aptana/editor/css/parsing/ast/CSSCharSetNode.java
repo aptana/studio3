@@ -4,8 +4,10 @@ public class CSSCharSetNode extends CSSNode {
 
     private String fEncoding;
 
-    public CSSCharSetNode(String encoding) {
+    public CSSCharSetNode(String encoding, int start, int end) {
         fEncoding = encoding;
+        this.start = start;
+        this.end = end;
     }
 
     @Override

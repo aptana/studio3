@@ -1,10 +1,11 @@
 %package "com.aptana.editor.css.parsing";
 %class "CSSParser";
 %import "com.aptana.editor.css.parsing.ast.*";
+%import "com.aptana.parsing.ast.*";
 
 %terminals AT_KEYWORD, CHARSET, IMPORT, MEDIA, PAGE, FUNCTION;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, FORWARD_SLASH;
-%terminals MINUS, PLUS, EQUAL, STAR;
+%terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
 
@@ -17,7 +18,7 @@
 %goal Program;
 
 Program
-	=	Statements
+	=	Statements.p {:return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());:}
 	;
 
 Statements
@@ -32,28 +33,27 @@ Statement
 	|	Page
 	|	AtRule
 	|	Rule
-	|	error
 	;
 
 CharSet
-	=	CHARSET STRING.s SEMICOLON {:return new CSSCharSetNode(s);:}
+	=	CHARSET.c STRING.s SEMICOLON.e {:return new CSSCharSetNode(s, c.getStart(), e.getEnd());:}
 	;
 
 Import
-	=	IMPORT ImportWord.s SEMICOLON {:return new CSSImportNode(s);:}
-	|	IMPORT ImportWord.s List.m SEMICOLON {:return new CSSImportNode(s, m);:}
+	=	IMPORT.i ImportWord.s SEMICOLON.e {:return new CSSImportNode(s, i.getStart(), e.getEnd());:}
+	|	IMPORT.i ImportWord.s List.m SEMICOLON.e {:return new CSSImportNode(s, m, i.getStart(), e.getEnd());:}
 	;
 
 Media
-	=	MEDIA List.m LCURLY RCURLY {:return new CSSMediaNode(m);:}
-	|	MEDIA List.m LCURLY Statements RCURLY {:return new CSSMediaNode(m);:}
+	=	MEDIA.m List.l LCURLY RCURLY.r {:return new CSSMediaNode(l, m.getStart(), r.getEnd());:}
+	|	MEDIA.m List.l LCURLY Statements RCURLY.r {:return new CSSMediaNode(l, m.getStart(), r.getEnd());:}
 	;
-	
+
 Page
-	=	PAGE LCURLY RCURLY {:return new CSSPageNode();:}
-	|	PAGE LCURLY Declarations.d RCURLY {:return new CSSPageNode(d.value);:}
-	|	PAGE COLON IDENTIFIER.s LCURLY RCURLY {:return new CSSPageNode(s);:}
-	|	PAGE COLON IDENTIFIER.s LCURLY Declarations.d RCURLY {:return new CSSPageNode(s, d.value);:}
+	=	PAGE.p LCURLY RCURLY.r {:return new CSSPageNode(p.getStart(), r.getEnd());:}
+	|	PAGE.p LCURLY Declarations.d RCURLY.r {:return new CSSPageNode(d.value, p.getStart(), r.getEnd());:}
+	|	PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r {:return new CSSPageNode(s, p.getStart(), r.getEnd());:}
+	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r {:return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());:}
 	;
 
 AtRule
@@ -62,12 +62,13 @@ AtRule
 	;
 
 Rule
-	=	Selectors.s LCURLY RCURLY {:return new CSSRuleNode(s);:}
-	|	Selectors.s LCURLY Declarations.d RCURLY {:return new CSSRuleNode(s, d.value);:}
+	=	Selectors.s LCURLY RCURLY.r {:return new CSSRuleNode(s, r.getEnd());:}
+	|	Selectors.s LCURLY Declarations.d RCURLY.r {:return new CSSRuleNode(s, d.value, r.getEnd());:}
+	|	error
 	;
 
 Function
-	=	FUNCTION Expression.e RPAREN {:return new CSSFunctionNode(e);:}
+	=	FUNCTION.l Expression.e RPAREN.r {:return new CSSFunctionNode(e, l.getStart(), r.getEnd());:}
 	;
 	
 List
@@ -87,29 +88,30 @@ Subdeclarations
 	;
 
 Declaration
-	=	Declaration2.d SEMICOLON {:((CSSDeclarationNode) d).setHasSemicolon(true); return d;:}
-	|	SEMICOLON {:return new CSSDeclarationNode(true);:}
+	=	Declaration2.d SEMICOLON.s {:((CSSDeclarationNode) d).setHasSemicolon(s); return d;:}
+	|	SEMICOLON.s {:return new CSSDeclarationNode(s);:}
 	;
 
 Declaration2
-	=	Identifier.i COLON Expression.e {:return new CSSDeclarationNode(i, e);:}
-	|	Identifier.i COLON Expression.e IMPORTANT.s {:return new CSSDeclarationNode(i, e, s);:}
-	|	error
+	=	Identifier.i COLON Expression.e {:return new CSSDeclarationNode(_symbol_i, e);:}
+	|	Identifier.i COLON Expression.e IMPORTANT.s {:return new CSSDeclarationNode(_symbol_i, e, _symbol_s);:}
+	|	error.e {:return new CSSErrorDeclarationNode(e.getStart(), e.getEnd());:}
 	;
 
 Expression
 	=	Expression.e Separator.s Term.t {:return new CSSTermListNode(e, t, s);:}
 	|	Expression.e Term.t {:return new CSSTermListNode(e, t);:}
 	|	Term
+	|	error.e {:return new CSSErrorExpressionNode(e.getStart(), e.getEnd());:}
 	;
 
 Term
-	=	Primitive.p {:return new CSSTermNode(p);:}
+	=	Primitive.p {:return new CSSTermNode(_symbol_p);:}
 	|	Function
 	;
 
 Selectors
-	=	Selectors COMMA Selector
+	=	Selectors Combinator Selector
 	|	Selector
 	;
 
@@ -119,8 +121,8 @@ Selector
 	;
 
 SimpleSelector
-	=	TypeOrUniversalSelector.t AttributeSelectors.a {:return new CSSSimpleSelectorNode(t, a);:}
-	|	TypeOrUniversalSelector.t {:return new CSSSimpleSelectorNode(t);:}
+	=	TypeOrUniversalSelector.t AttributeSelectors.a {:return new CSSSimpleSelectorNode(_symbol_t, a);:}
+	|	TypeOrUniversalSelector.t {:return new CSSSimpleSelectorNode(_symbol_t);:}
 	|	AttributeSelectors.a {:return new CSSSimpleSelectorNode(a);:}
 	;
 
@@ -130,13 +132,15 @@ AttributeSelectors
 	;
 	
 AttributeSelector
-	=	CLASS.c {:return new CSSAttributeSelectorNode(c);:}
-	|	COLON IDENTIFIER.i {:return new CSSAttributeSelectorNode(":" + i);:}
-	|	COLON Function.f {:return new CSSAttributeSelectorNode(f);:}
-	|	COLOR.c {:return new CSSAttributeSelectorNode(c);:}
-	|	HASH.h {:return new CSSAttributeSelectorNode(h);:}
-	|	LBRACKET IDENTIFIER.i RBRACKET {:return new CSSAttributeSelectorNode("[" + i + "]");:}
-	|	LBRACKET IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET {:return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]");:}
+	=	CLASS.c {:return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());:}
+	|	COLON.c IDENTIFIER.i {:return new CSSAttributeSelectorNode(":" + i, c.getStart(), _symbol_i.getEnd());:}
+	|	COLON.c Function.f {:return new CSSAttributeSelectorNode(f, c.getStart());:}
+	|	COLOR.c {:return new CSSAttributeSelectorNode(c, _symbol_c.getStart(), _symbol_c.getEnd());:}
+	|	HASH.h {:return new CSSAttributeSelectorNode(h, _symbol_h.getStart(), _symbol_h.getEnd());:}
+	|	LBRACKET.l IDENTIFIER.i RBRACKET.r {:return new CSSAttributeSelectorNode("[" + i + "]", l.getStart(), r.getEnd());:}
+	|	LBRACKET.l IDENTIFIER.i AttributeValueOperator.o IdentiferOrString.s RBRACKET.r {:
+			return new CSSAttributeSelectorNode("[" + i + " " + o + " " + s + "]", l.getStart(), r.getEnd());
+		:}
 	;
 
 ImportWord
@@ -159,6 +163,12 @@ Separator
 	|	COMMA
 	|	PLUS
 	|	MINUS
+	;
+
+Combinator
+	=	COMMA
+	|	PLUS
+	|	GREATER
 	;
 
 Primitive

@@ -7,20 +7,20 @@ public class CSSPageNode extends CSSNode {
     private String fPageSelector;
     private CSSDeclarationNode[] fDeclarations;
 
-    public CSSPageNode() {
-        this(null, null);
+    public CSSPageNode(int start, int end) {
+        this(null, null, start, end);
     }
 
-    public CSSPageNode(String pageSelector) {
-        this(pageSelector, null);
+    public CSSPageNode(String pageSelector, int start, int end) {
+        this(pageSelector, null, start, end);
     }
 
-    public CSSPageNode(Object declarations) {
-        this(null, declarations);
+    public CSSPageNode(Object declarations, int start, int end) {
+        this(null, declarations, start, end);
     }
 
     @SuppressWarnings("unchecked")
-    public CSSPageNode(String pageSelector, Object declarations) {
+    public CSSPageNode(String pageSelector, Object declarations, int start, int end) {
         fPageSelector = pageSelector;
         if (declarations instanceof CSSDeclarationNode) {
             fDeclarations = new CSSDeclarationNode[1];
@@ -35,6 +35,8 @@ public class CSSPageNode extends CSSNode {
         } else {
             fDeclarations = new CSSDeclarationNode[0];
         }
+        this.start = start;
+        this.end = end;
     }
 
     @Override

@@ -38,6 +38,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
@@ -45,6 +46,7 @@ import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.ShowScopesAction;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -88,6 +90,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 */
 	private LineBackgroundPainter fFullLineBackgroundPainter;
 
+	private CommonOutlinePage fOutlinePage;
+	private FileService fFileService;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -109,6 +114,31 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getFindBarDecorator().createFindBar(getSourceViewer());
 		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+    @Override
+    public Object getAdapter(Class adapter)
+    {
+        // returns our custom adapter for the content outline page
+        if (IContentOutlinePage.class.equals(adapter))
+        {
+            return getOutlinePage();
+        }
+        return super.getAdapter(adapter);
+    }
+
+	protected CommonOutlinePage getOutlinePage()
+	{
+	    if (fOutlinePage == null)
+        {
+            fOutlinePage = new CommonOutlinePage(this);
+        }
+        return fOutlinePage;
 	}
 
 	private void overrideThemeColors()
@@ -442,6 +472,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
+		fFileService = new FileService();
 	}
 
 	@Override
@@ -474,6 +505,16 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal()
 	{
 		return getSourceViewerConfiguration();
+	}
+
+	public ISourceViewer getViewer()
+	{
+	    return getSourceViewer();
+	}
+
+	public FileService getFileService()
+	{
+	    return fFileService;
 	}
 
 	@Override

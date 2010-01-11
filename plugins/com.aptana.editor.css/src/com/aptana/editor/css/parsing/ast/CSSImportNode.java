@@ -5,13 +5,15 @@ public class CSSImportNode extends CSSNode {
     private String fUriStr;
     private String[] fMediaList;
 
-    public CSSImportNode(String uri) {
-        this(uri, new String[0]);
+    public CSSImportNode(String uri, int start, int end) {
+        this(uri, new String[0], start, end);
     }
 
-    public CSSImportNode(String uri, String[] mediaList) {
+    public CSSImportNode(String uri, String[] mediaList, int start, int end) {
         fUriStr = uri;
         fMediaList = mediaList;
+        this.start = start;
+        this.end = end;
     }
 
     @Override

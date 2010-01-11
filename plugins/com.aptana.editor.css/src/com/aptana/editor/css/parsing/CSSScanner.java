@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 
 import com.aptana.editor.css.parsing.lexer.CSSTokens;
@@ -14,15 +15,19 @@ import beaver.Symbol;
 public class CSSScanner extends Scanner {
 
     private CSSTokenScanner fTokenScanner;
-    private Document fDocument;
+    private IDocument fDocument;
 
     public CSSScanner() {
         fTokenScanner = new CSSTokenScanner();
     }
 
     public void setSource(String text) {
-        fDocument = new Document(text);
-        fTokenScanner.setRange(fDocument, 0, text.length());
+        setSource(new Document(text));
+    }
+
+    public void setSource(IDocument document) {
+        fDocument = document;
+        fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
     }
 
     @Override

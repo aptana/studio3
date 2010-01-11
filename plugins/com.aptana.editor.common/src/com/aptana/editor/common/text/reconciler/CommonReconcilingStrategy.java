@@ -35,19 +35,29 @@
 package com.aptana.editor.common.text.reconciler;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
-import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
 
-	public CommonReconcilingStrategy(ITextEditor editor)
+    private AbstractThemeableEditor fEditor;
+
+	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
+	    fEditor = editor;
 	}
+
+    public AbstractThemeableEditor getEditor()
+    {
+        return fEditor;
+    }
 
 	@Override
 	public void reconcile(IRegion partition)
@@ -64,6 +74,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void setDocument(IDocument document)
 	{
+	    fEditor.getFileService().setDocument(document);
 	}
 
 	@Override
@@ -89,7 +100,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 	}
 
+	protected void calculatePositions(IProgressMonitor monitor)
+	{
+	    // doing a full parse at the moment
+	    fEditor.getFileService().parse();
+	}
+
 	private void reconcile(boolean initialReconcile)
 	{
+	    calculatePositions(new NullProgressMonitor());
 	}
 }

@@ -59,7 +59,7 @@ public class CSSTokenScannerTest extends TestCase {
      * Tests YUI library.
      */
     public void testYUI() {
-        InputStream stream = getClass().getResourceAsStream("test.css");
+        InputStream stream = getClass().getResourceAsStream("yui.css");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int read = -1;
         try {

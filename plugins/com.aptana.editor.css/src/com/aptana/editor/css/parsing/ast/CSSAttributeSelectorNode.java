@@ -5,12 +5,22 @@ public class CSSAttributeSelectorNode extends CSSNode {
     private String fAttributeText;
     private CSSExpressionNode fFuncExpr;
 
-    public CSSAttributeSelectorNode(String text) {
+    public CSSAttributeSelectorNode(String text, int start, int end) {
         fAttributeText = text;
+        this.start = start;
+        this.end = end;
     }
 
-    public CSSAttributeSelectorNode(CSSExpressionNode function) {
+    /**
+     * ":" + function expression
+     * 
+     * @param function
+     *            the function expression
+     */
+    public CSSAttributeSelectorNode(CSSExpressionNode function, int start) {
         fFuncExpr = function;
+        this.start = start;
+        this.end = function.getEnd();
     }
 
     @Override

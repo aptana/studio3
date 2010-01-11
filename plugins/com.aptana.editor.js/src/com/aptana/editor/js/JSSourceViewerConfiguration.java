@@ -41,8 +41,8 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
@@ -54,7 +54,7 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 
     private CommonDoubleClickStrategy doubleClickStrategy;
 
-    public JSSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+    public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
         super(preferences, editor);
     }
 
