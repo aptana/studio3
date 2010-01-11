@@ -1,16 +1,22 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.text.MessageFormat;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.actions.MenuAction;
@@ -18,6 +24,8 @@ import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
 public class SwitchBranchAction extends MenuAction
 {
+
+	private static final int TOOLTIP_LIFETIME = 3000;
 
 	/**
 	 * Fills the fly-out menu
@@ -44,7 +52,7 @@ public class SwitchBranchAction extends MenuAction
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					repo.switchBranch(branchName);
+					switchBranch(repo, branchName);
 				}
 			});
 		}
@@ -63,8 +71,30 @@ public class SwitchBranchAction extends MenuAction
 
 		BranchDialog dialog = new BranchDialog(Display.getDefault().getActiveShell(), repo, true, false);
 		if (dialog.open() == Window.OK)
-			repo.switchBranch(dialog.getBranch());
-		// FIXME Doesn't seem to update the labels (at least not quickly)
+			switchBranch(repo, dialog.getBranch());
+	}
+
+	protected void switchBranch(final GitRepository repo, final String branchName)
+	{
+		if (!repo.switchBranch(branchName))
+			return;
+		// Now show a tooltip "toast" for 3 seconds to announce success
+		final Shell shell = Display.getDefault().getActiveShell();
+		String text = MessageFormat.format(Messages.SwitchBranchAction_BranchSwitch_Msg, branchName);
+		DefaultToolTip toolTip = new DefaultToolTip(shell)
+		{
+			@Override
+			public Point getLocation(Point size, Event event)
+			{
+				final Rectangle workbenchWindowBounds = shell.getBounds();
+				int xCoord = workbenchWindowBounds.x + workbenchWindowBounds.width - size.x - 10;
+				int yCoord = workbenchWindowBounds.y + workbenchWindowBounds.height - size.y - 10;
+				return new Point(xCoord, yCoord);
+			}
+		};
+		toolTip.setHideDelay(TOOLTIP_LIFETIME);
+		toolTip.setText(text);
+		toolTip.show(new Point(0, 0));
 	}
 
 }
