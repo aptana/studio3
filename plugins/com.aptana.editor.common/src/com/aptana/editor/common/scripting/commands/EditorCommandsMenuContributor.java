@@ -37,6 +37,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
 
 /**
@@ -85,7 +86,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 				// Split scope into successively outer scope
 				splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
 				for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
-					menusFromScope = BundleManager.getInstance().getMenusFromScope(splitContentTypesAtOffset[i]);
+					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
+					menusFromScope = BundleManager.getInstance().getMenus(filter);
 					if (menusFromScope.length > 0) {
 						// Build the menu
 						buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
@@ -104,7 +106,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
 					String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
 					// Get menus
-					menusFromScope = BundleManager.getInstance().getMenusFromScope(contentType);
+					ScopeFilter filter = new ScopeFilter(contentType);
+					menusFromScope = BundleManager.getInstance().getMenus(filter);
 					if (menusFromScope.length > 0) {
 						// Collect
 						menusFromScopeList.addAll(Arrays.asList(menusFromScope));

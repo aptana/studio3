@@ -1,6 +1,6 @@
 package com.aptana.scripting.model;
 
-public class TriggerOnlyFilter implements IModelFilter
+public class HasTriggerFilter implements IModelFilter
 {
 	/*
 	 * (non-Javadoc)
