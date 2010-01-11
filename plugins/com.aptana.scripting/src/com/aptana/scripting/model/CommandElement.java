@@ -167,7 +167,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public String[] getKeyBindings()
 	{
-		Platform platform = Platform.getPlatform();
+		Platform[] platforms = Platform.getCurrentPlatforms();
 		String[] result = null;
 
 		if (this._keyBindings == null)
@@ -175,9 +175,17 @@ public class CommandElement extends AbstractBundleElement
 			return NO_KEY_BINDINGS;
 		}
 
-		if (platform != Platform.UNDEFINED)
+		for (Platform platform : platforms)
 		{
-			result = this._keyBindings.get(platform);
+			if (platform != Platform.UNDEFINED)
+			{
+				result = this._keyBindings.get(platform);
+				
+				if (result != null && result.length > 0)
+				{
+					break;
+				}
+			}
 		}
 
 		if (result == null)

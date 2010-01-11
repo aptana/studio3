@@ -1,7 +1,9 @@
 package com.aptana.scripting.model;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum Platform
@@ -11,14 +13,15 @@ public enum Platform
 
 	UNDEFINED("undefined"), //$NON-NLS-1$
 	ALL("all"), //$NON-NLS-1$
+	LINUX("linux", org.eclipse.core.runtime.Platform.OS_LINUX), //$NON-NLS-1$
 	MAC("mac", org.eclipse.core.runtime.Platform.OS_MACOSX), //$NON-NLS-1$
 	WIN("windows", org.eclipse.core.runtime.Platform.OS_WIN32), //$NON-NLS-1$
 	UNIX("unix", org.eclipse.core.runtime.Platform.OS_AIX, org.eclipse.core.runtime.Platform.OS_HPUX, //$NON-NLS-1$
-			org.eclipse.core.runtime.Platform.OS_LINUX, org.eclipse.core.runtime.Platform.OS_SOLARIS),
-	LINUX("linux", org.eclipse.core.runtime.Platform.OS_LINUX); //$NON-NLS-1$
+			org.eclipse.core.runtime.Platform.OS_LINUX, org.eclipse.core.runtime.Platform.OS_SOLARIS);
 
+	private static Platform[] NO_PLATFORMS = new Platform[0];
 	private static Map<String, Platform> NAME_MAP;
-	private static Map<String, Platform> PLATFORM_MAP;
+	private static Map<String, List<Platform>> PLATFORM_MAP;
 	private String _name;
 	private String[] _platforms;
 
@@ -28,7 +31,7 @@ public enum Platform
 	static
 	{
 		NAME_MAP = new HashMap<String, Platform>();
-		PLATFORM_MAP = new HashMap<String, Platform>();
+		PLATFORM_MAP = new HashMap<String, List<Platform>>();
 
 		for (Platform type : EnumSet.allOf(Platform.class))
 		{
@@ -42,25 +45,44 @@ public enum Platform
 			{
 				for (String os : oses)
 				{
-					PLATFORM_MAP.put(os, type);
+					if (PLATFORM_MAP.containsKey(os) == false)
+					{
+						PLATFORM_MAP.put(os, new ArrayList<Platform>());
+					}
+					
+					List<Platform> types = PLATFORM_MAP.get(os);
+					
+					types.add(type);
 				}
 			}
 		}
 	}
 
 	/**
-	 * getPlatform
+	 * getCurrentPlatforms
 	 * 
 	 * @return
 	 */
-	static Platform getPlatform()
+	static Platform[] getCurrentPlatforms()
 	{
-		String os = org.eclipse.core.runtime.Platform.getOS();
-		Platform result = UNDEFINED;
+		return getPlatformsForEclipsePlatform(org.eclipse.core.runtime.Platform.getOS());
+	}
+	
+	/**
+	 * getPlatformsForEclipsePlatform
+	 * 
+	 * @param eclipsePlatform
+	 * @return
+	 */
+	static Platform[] getPlatformsForEclipsePlatform(String eclipsePlatform)
+	{
+		Platform[] result = NO_PLATFORMS;
 
-		if (PLATFORM_MAP.containsKey(os))
+		if (PLATFORM_MAP.containsKey(eclipsePlatform))
 		{
-			result = PLATFORM_MAP.get(os);
+			List<Platform> platforms = PLATFORM_MAP.get(eclipsePlatform);
+			
+			result = platforms.toArray(new Platform[platforms.size()]);
 		}
 
 		return result;
