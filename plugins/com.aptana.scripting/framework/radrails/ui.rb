@@ -264,7 +264,7 @@ module RadRails
         return_value = nil
         return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
         
-        if return_value == nil then
+        if return_value == nil
           block_given? ? raise(SystemExit) : nil
         else
           block_given? ? yield(return_value) : return_value
