@@ -59,7 +59,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
 import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
@@ -73,9 +72,9 @@ import com.aptana.editor.common.text.reconciler.CommonReconciler;
 
 public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider {
 
-    private ITextEditor fTextEditor;
+    private AbstractThemeableEditor fTextEditor;
 
-    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, ITextEditor editor) {
+    public CommonSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor) {
         super(preferenceStore);
         fTextEditor = editor;
     }

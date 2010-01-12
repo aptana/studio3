@@ -6,6 +6,7 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.messages"; //$NON-NLS-1$
 	public static String AbstractThemeableEditor_CursorPositionLabel;
+	public static String FileService_FailedToParse;
 	static
 	{
 		// initialize resource bundle

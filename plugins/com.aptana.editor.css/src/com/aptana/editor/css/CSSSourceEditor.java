@@ -35,8 +35,21 @@
 package com.aptana.editor.css;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.css.outline.CSSOutlineContentProvider;
+import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
+import com.aptana.editor.css.parsing.CSSParserFactory;
 
 public class CSSSourceEditor extends AbstractThemeableEditor {
+
+    @Override
+	protected CommonOutlinePage getOutlinePage() {
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new CSSOutlineContentProvider());
+		outline.setLabelProvider(new CSSOutlineLabelProvider());
+
+		return outline;
+	}
 
     @Override
     protected void initializeEditor() {
@@ -44,5 +57,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor {
 
         setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new CSSDocumentProvider());
+
+        getFileService().setParser(CSSParserFactory.getInstance().getParser());
     }
 }

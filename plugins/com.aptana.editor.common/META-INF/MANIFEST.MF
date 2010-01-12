@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
+ org.eclipse.ui.views,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  com.aptana.scripting,
  com.aptana.scripting.ui;bundle-version="1.0.0",
@@ -24,6 +25,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
+ com.aptana.editor.common.outline,
  com.aptana.editor.common.text,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.theme,

@@ -8,4 +8,16 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.parsing.lexer
+Export-Package: beaver,
+ beaver.comp,
+ beaver.comp.io,
+ beaver.comp.run,
+ beaver.comp.util,
+ beaver.spec,
+ beaver.spec.ast,
+ beaver.spec.parser,
+ com.aptana.parsing,
+ com.aptana.parsing.ast,
+ com.aptana.parsing.lexer
+Bundle-ClassPath: libs/beaver.jar,
+ .
