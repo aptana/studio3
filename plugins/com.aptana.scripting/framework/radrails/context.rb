@@ -16,7 +16,11 @@ module RadRails
     end
 
     def method_missing(m, *args, &block)
-      @jobj.map[m.to_s]
+      if @jobj
+        @jobj.map[m.to_s]
+      else
+        super
+      end
     end
   end
 	
