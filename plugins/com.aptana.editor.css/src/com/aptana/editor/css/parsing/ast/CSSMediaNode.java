@@ -4,6 +4,7 @@ public class CSSMediaNode extends CSSNode
 {
 
 	private String[] fMedias;
+	private String fText;
 
 	public CSSMediaNode(String[] medias, int start, int end)
 	{
@@ -15,13 +16,17 @@ public class CSSMediaNode extends CSSNode
 	@Override
 	public String toString()
 	{
-		StringBuilder text = new StringBuilder();
-		text.append("@media"); //$NON-NLS-1$
-		for (String media : fMedias)
+		if (fText == null)
 		{
-			text.append(" ").append(media); //$NON-NLS-1$
+			StringBuilder text = new StringBuilder();
+			text.append("@media"); //$NON-NLS-1$
+			for (String media : fMedias)
+			{
+				text.append(" ").append(media); //$NON-NLS-1$
+			}
+			text.append("{").append("}"); //$NON-NLS-1$ //$NON-NLS-2$
+			fText = text.toString();
 		}
-		text.append("{").append("}"); //$NON-NLS-1$ //$NON-NLS-2$
-		return text.toString();
+		return fText;
 	}
 }

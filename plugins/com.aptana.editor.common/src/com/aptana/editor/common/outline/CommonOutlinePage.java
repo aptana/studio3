@@ -29,7 +29,7 @@ public class CommonOutlinePage extends ContentOutlinePage
 		fLabelProvider = new LabelProvider();
 
 		// TODO: needs to be improved
-		editor.getViewer().getTextWidget().addFocusListener(new FocusAdapter()
+		editor.getSourceViewerNonFinal().getTextWidget().addFocusListener(new FocusAdapter()
 		{
 			public void focusGained(FocusEvent e)
 			{

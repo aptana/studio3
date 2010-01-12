@@ -507,7 +507,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return getSourceViewerConfiguration();
 	}
 
-	public ISourceViewer getViewer()
+	public ISourceViewer getSourceViewerNonFinal()
 	{
 	    return getSourceViewer();
 	}

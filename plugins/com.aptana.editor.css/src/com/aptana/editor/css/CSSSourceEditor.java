@@ -34,8 +34,6 @@
  */
 package com.aptana.editor.css;
 
-import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
-
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
@@ -44,16 +42,14 @@ import com.aptana.editor.css.parsing.CSSParserFactory;
 
 public class CSSSourceEditor extends AbstractThemeableEditor {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Object getAdapter(Class adapter) {
-        if (IContentOutlinePage.class.equals(adapter)) {
-            CommonOutlinePage outline = getOutlinePage();
-            outline.setContentProvider(new CSSOutlineContentProvider());
-            outline.setLabelProvider(new CSSOutlineLabelProvider());
-        }
-        return super.getAdapter(adapter);
-    }
+	protected CommonOutlinePage getOutlinePage() {
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new CSSOutlineContentProvider());
+		outline.setLabelProvider(new CSSOutlineLabelProvider());
+
+		return outline;
+	}
 
     @Override
     protected void initializeEditor() {

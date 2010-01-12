@@ -1,14 +1,10 @@
 package com.aptana.editor.css;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import com.aptana.editor.css.parsing.CSSParser;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -22,9 +18,8 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	
 	private CSSCodeScanner _codeScanner;
-	private CSSParser fParser;
 
-	private static Map<String, Image> fImages = new HashMap<String, Image>();
+	private static ImageRegistry fImages = new ImageRegistry();
 
 	/**
 	 * The constructor
@@ -72,15 +67,6 @@ public class Activator extends AbstractUIPlugin {
 		}
 
 		return this._codeScanner;
-	}
-
-	public CSSParser getParser()
-	{
-		if (fParser == null)
-		{
-			fParser = new CSSParser();
-		}
-		return fParser;
 	}
 
 	public static Image getImage(String path)
