@@ -1,16 +1,7 @@
 package com.aptana.scripting.model;
 
-public class TriggerOnlyFilter implements IModelFilter
+public class HasTriggerFilter implements IModelFilter
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IModelFilter#exclude(com.aptana.scripting.model.AbstractNode)
-	 */
-	public boolean exclude(AbstractElement element)
-	{
-		return (this.include(element) == false);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.IModelFilter#include(com.aptana.scripting.model.AbstractModel)

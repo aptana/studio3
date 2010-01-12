@@ -12,6 +12,7 @@ public class AllTests
 		suite.addTestSuite(BundleTests.class);
 		suite.addTestSuite(CommandTests.class);
 		suite.addTestSuite(ContextTests.class);
+		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
 		// $JUnit-END$
 		return suite;

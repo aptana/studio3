@@ -506,77 +506,33 @@ public class BundleManager
 	 */
 	public CommandElement[] getCommands()
 	{
-		CommandElement[] result = NO_COMMANDS;
+		List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		String[] bundleNames = this.getBundleNames();
-		
-		if (bundleNames != null && bundleNames.length > 0)
+		for (String name : this.getBundleNames())
 		{
-			List<CommandElement> commands = new ArrayList<CommandElement>();
-			
-			for (String name : bundleNames)
-			{
-				commands.addAll(Arrays.asList(this.getBundleCommands(name)));
-			}
-			
-			result = commands.toArray(new CommandElement[commands.size()]);
+			result.addAll(Arrays.asList(this.getBundleCommands(name)));
 		}
 		
-		return result;
+		return result.toArray(new CommandElement[result.size()]);
 	}
 	
 	/**
-	 * getCommandsFromScope
+	 * getCommands
 	 * 
-	 * @param scope
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScope(String scope)
-	{
-		return this.getCommandsFromScopes(new String[] { scope }, null);
-	}
-	
-	/**
-	 * getCommandsFromScope
-	 * 
-	 * @param scope
 	 * @param filter
 	 * @return
 	 */
-	public CommandElement[] getCommandsFromScope(String scope, IModelFilter filter)
-	{
-		return this.getCommandsFromScopes(new String[] { scope }, filter);
-	}
-	
-	/**
-	 * getCommandsFromScopes
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScopes(String[] scopes)
-	{
-		return this.getCommandsFromScopes(scopes, null);
-	}
-	
-	/**
-	 * getCommandsFromScopes
-	 * 
-	 * @param scopes
-	 * @param filter
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	public CommandElement[] getCommands(IModelFilter filter)
 	{
 		List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		if (scopes != null && scopes.length > 0)
+		if (filter != null)
 		{
 			for (String name : this.getBundleNames())
 			{
 				for (CommandElement command : this.getBundleCommands(name))
 				{
-					if (command.matches(scopes) && ((filter != null) ? filter.include(command) : true))
+					if (filter.include(command))
 					{
 						result.add(command);
 					}
@@ -588,57 +544,22 @@ public class BundleManager
 	}
 	
 	/**
-	 * getMenusFromScope
+	 * getMenus
 	 * 
-	 * @param scope
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScope(String scope)
-	{
-		return this.getMenusFromScopes(new String[] { scope }, null);
-	}
-	
-	/**
-	 * getMenusFromScope
-	 * 
-	 * @param scope
 	 * @param filter
 	 * @return
 	 */
-	public MenuElement[] getMenusFromScope(String scope, IModelFilter filter)
-	{
-		return this.getMenusFromScopes(new String[] { scope }, filter);
-	}
-	
-	/**
-	 * getMenusFromScope
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScope(String[] scopes)
-	{
-		return this.getMenusFromScopes(scopes, null);
-	}
-
-	/**
-	 * getMenusFromScopes
-	 * 
-	 * @param scopes
-	 * @param filter
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScopes(String[] scopes, IModelFilter filter)
+	public MenuElement[] getMenus(IModelFilter filter)
 	{
 		List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		if (scopes != null && scopes.length > 0)
+		if (filter != null)
 		{
 			for (String name : this.getBundleNames())
 			{
 				for (MenuElement menu : this.getBundleMenus(name))
 				{
-					if (menu.matches(scopes) && ((filter != null) ? filter.include(menu) : true))
+					if (filter.include(menu))
 					{
 						result.add(menu);
 					}

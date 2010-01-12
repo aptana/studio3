@@ -336,6 +336,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		parserSupport.initTopLocalVariables();
 		fQueue.clear();
 		inSingleQuote = false;
+		fContentType = RubySourceConfiguration.DEFAULT;
 	}
 
 	private void adjustOffset(String opening)

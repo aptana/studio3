@@ -31,10 +31,12 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.scripting.model.TriggerOnlyFilter;
+import com.aptana.scripting.model.HasTriggerFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
@@ -83,8 +85,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	protected Template[] getTemplates(String contextTypeId)
 	{
 		List<Template> templatesList = new LinkedList<Template>();
-		CommandElement[] commandsFromScope =
-			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+		AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
+		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 		for (CommandElement commandElement : commandsFromScope) {
 			String[] triggers = commandElement.getTriggers();
 			if (triggers != null) {
