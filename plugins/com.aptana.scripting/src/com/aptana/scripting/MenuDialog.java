@@ -163,6 +163,7 @@ public class MenuDialog extends PopupDialog
 		{
 			tableColumn.pack();
 		}
+		// FIXME Need to limit vertical size of list! If we have 100 items we shouldn't let this dialog grow to take up entire vertical space of screen/IDE!
 
 		/*
 		 * If you double-click on the table, it should execute the selected command.
