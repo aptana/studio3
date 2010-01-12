@@ -16,6 +16,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
@@ -48,6 +50,8 @@ import com.aptana.scripting.model.SnippetElement;
  */
 public class EditorCommandsMenuContributor extends ContributionItem {
 
+	private static final String DISPOSE_ON_HIDE = "DOH"; //$NON-NLS-1$
+
 	// FIXME Char for tab. Figure out how to use an image instead.
 	private static final String TAB = "\u21E5"; //$NON-NLS-1$
 
@@ -71,7 +75,41 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 		}
 	}
 	
-	public static void fill(Menu menu, ITextEditor textEditor) {
+	public static void fill(final Menu menu, ITextEditor textEditor) {
+		// Add the listener to clean up the menu on hide
+		// so that the accelerators do not interfere with
+		// key binding
+		menu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuShown(MenuEvent e) {
+			}
+
+			@Override
+			public void menuHidden(MenuEvent e) {
+				menu.removeMenuListener(this);
+				// Have to use the delay to allow the dispatching
+				// of any menu item selection events 
+				menu.getDisplay().timerExec(200, new Runnable() {
+					@Override
+					public void run() {
+						if (menu.isDisposed()) {
+							return;
+						}
+						MenuItem[] menuItems = menu.getItems();
+						for (MenuItem menuItem : menuItems) {
+							if (!menuItem.isDisposed()) {
+								// Is this a menu item that we had added
+								Object data = menuItem.getData(DISPOSE_ON_HIDE);
+								if (data != null) {
+									menuItem.dispose();
+								}
+							}
+						}
+					}
+				});
+			}
+		});
+
 		// Is this an Aptana Editor
 		if (textEditor instanceof AbstractThemeableEditor) {
 			AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) textEditor;
@@ -125,9 +163,10 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 					});
 					menusFromScope = new MenuElement[menusFromScopeList.size()];
 					menusFromScopeList.toArray(menusFromScope);
+
 					// Add separator
 					new MenuItem(menu, SWT.SEPARATOR);
-					
+
 					// Now build the menu
 					buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
 				}
@@ -158,6 +197,10 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			if (menuForScope.isHierarchicalMenu()) {
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
 				menuItemForMenuForScope.setText(displayName);
+				// We mark the cascade menu items for disposal when the menu is hidden
+				// so that accelerators on descendant menu items do not hinder the handling of
+				// key bindings
+				menuItemForMenuForScope.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
 
 				Menu menuForMenuForScope = new Menu(menu);
 				menuItemForMenuForScope.setMenu(menuForMenuForScope);
@@ -187,6 +230,13 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 							if (keyStrokes.length == 1) {
 								int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
 								menuItem.setAccelerator(accelerator);
+								// We mark the first level menu item with accelerators
+								// for disposal when the menu is hidden so that it does
+								// the accelerator does not interfere with the handling
+								// of key bindings
+								if (menu.getParentMenu() == null) {
+									menuItem.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
+								}
 							}
 						}
 					}
