@@ -18,6 +18,11 @@ public class FileService
 
 	public void parse()
 	{
+		if (fParser == null || fDocument == null)
+		{
+			return;
+		}
+
 		String source = fDocument.get();
 		try
 		{
