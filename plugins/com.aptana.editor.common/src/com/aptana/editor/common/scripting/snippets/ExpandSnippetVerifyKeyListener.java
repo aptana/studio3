@@ -15,9 +15,11 @@ import org.eclipse.ui.texteditor.ITextEditorExtension2;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.TriggerOnlyFilter;
+import com.aptana.scripting.model.ScopeFilter;
+import com.aptana.scripting.model.HasTriggerFilter;
 
 public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 
@@ -63,8 +65,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 								int caretOffset = textViewer.getTextWidget().getCaretOffset();
 								String contextTypeId = getContextType(document, caretOffset);
 								boolean found = false;
-								CommandElement[] commandsFromScope =
-									BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+								AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
+								CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 								if (commandsFromScope.length > 0) {
 									String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
 									LOOP: for (CommandElement commandElement : commandsFromScope) {

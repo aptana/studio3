@@ -122,4 +122,15 @@ public abstract class BundleTestBase extends TestCase
 		// load bundle
 		manager.loadBundle(bundleFile);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	protected void tearDown() throws Exception
+	{
+		BundleManager.getInstance().reset();
+		
+		super.tearDown();
+	}
 }
