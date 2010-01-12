@@ -51,6 +51,8 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	@Override
 	protected void initializeEditor()
 	{
+		super.initializeEditor();
+
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
 				EditorsPlugin.getDefault().getPreferenceStore() }));
