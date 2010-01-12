@@ -498,7 +498,36 @@ public class GitIndex
 			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
 			return;
 		}
+		// FIXME For merges we need to do equivalent of:
+		/*
+		 * pptr = &commit_list_insert(lookup_commit(head_sha1), pptr)->next;
+		fp = fopen(git_path("MERGE_HEAD"), "r");
+		if (fp == NULL)
+			die_errno("could not open '%s' for reading",
+				  git_path("MERGE_HEAD"));
+		while (strbuf_getline(&m, fp, '\n') != EOF) {
+			unsigned char sha1[20];
+			if (get_sha1_hex(m.buf, sha1) < 0)
+				die("Corrupt MERGE_HEAD file (%s)", m.buf);
+			pptr = &commit_list_insert(lookup_commit(sha1), pptr)->next;
+		}
+		fclose(fp);
+		strbuf_release(&m);
+		if (!stat(git_path("MERGE_MODE"), &statbuf)) {
+			if (strbuf_read_file(&sb, git_path("MERGE_MODE"), 0) < 0)
+				die_errno("could not read MERGE_MODE");
+			if (!strcmp(sb.buf, "no-ff"))
+				allow_fast_forward = 0;
+		}
+		if (allow_fast_forward)
+			parents = reduce_heads(parents);
 
+
+		 I sent a message to GitX author asking why he wrapped commit-tree vs commit. 
+		 He said that he used commit-tree because it's API and is supposed to be stable, while commit API may change since it's UI, plus
+		 you can get better feedback about what part of process failed. I should continue dialog with him to see how we can both implement
+		 merge commits properly with commit-tree then.
+		 */
 		List<String> arguments = new ArrayList<String>();
 		arguments.add("commit-tree"); //$NON-NLS-1$
 		arguments.add(tree);
