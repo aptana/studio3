@@ -79,8 +79,7 @@ public class PeerCharacterCloserTest extends TestCase
 		VerifyEvent event = new VerifyEvent(e);
 		closer.verifyKey(event);
 
-		assertFalse(event.doit);
-		assertEquals("( ) ", document.get());
+		assertTrue(event.doit); // don't interfere
 	}
 	
 	public void testDontCloseWhenUnOpenedPairFollows()
@@ -100,7 +99,7 @@ public class PeerCharacterCloserTest extends TestCase
 		VerifyEvent event = new VerifyEvent(e);
 		closer.verifyKey(event);
 
-		assertEquals("( ()) ", document.get());
+		assertTrue(event.doit); // don't interfere
 	}
 
 	public void testWrapSelected()
