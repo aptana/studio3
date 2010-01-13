@@ -36,6 +36,11 @@ public class FileService
 
 	public IParseNode getParseResult()
 	{
+		if (fResult == null)
+		{
+			// performs an initial parse
+			parse();
+		}
 		return fResult;
 	}
 

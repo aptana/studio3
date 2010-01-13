@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension2;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -32,12 +33,15 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -53,6 +57,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.parsing.lexer.ILexeme;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
 /**
@@ -93,6 +98,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	private CommonOutlinePage fOutlinePage;
 	private FileService fFileService;
 
+	private boolean fCursorChangeListened;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -114,6 +121,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getFindBarDecorator().createFindBar(getSourceViewer());
 		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
+		fCursorChangeListened = true;
 	}
 
 	/*
@@ -517,6 +525,62 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	    return fFileService;
 	}
 
+	public Object computeHighlightedOutlineNode()
+	{
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer == null)
+		{
+			return null;
+		}
+		StyledText styledText = sourceViewer.getTextWidget();
+		if (styledText == null)
+		{
+			return null;
+		}
+
+		int caret = 0;
+		if (sourceViewer instanceof ITextViewerExtension5)
+		{
+			ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
+			caret = extension.widgetOffset2ModelOffset(styledText.getCaretOffset());
+		}
+		else
+		{
+			int offset = sourceViewer.getVisibleRegion().getOffset();
+			caret = offset + styledText.getCaretOffset();
+		}
+
+		return getOutlineElementAt(caret);
+	}
+
+	public void select(ILexeme element, boolean checkIfOutlineActive)
+	{
+		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+		{
+			// disables listening to cursor change so we don't get into the loop of setting selections between editor
+			// and outline
+			fCursorChangeListened = false;
+			selectAndReveal(element.getStartingOffset(), element.getLength());
+		}
+	}
+
+	protected void handleCursorPositionChanged()
+	{
+		super.handleCursorPositionChanged();
+		if (fCursorChangeListened)
+		{
+			if (isLinkedWithEditor())
+			{
+				getOutlinePage().select(computeHighlightedOutlineNode());
+			}
+		}
+		else
+		{
+			// re-enables listening to cursor change
+			fCursorChangeListened = true;
+		}
+	}
+
 	@Override
 	protected void createActions()
 	{
@@ -578,4 +642,33 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
 	}
 
+	/**
+	 * Retrieves the logical parse element closest to the caret position for the outline. Subclass should override.
+	 * 
+	 * @param caret
+	 *            the caret position
+	 * @return the closest logical parse element
+	 */
+	protected Object getOutlineElementAt(int caret)
+	{
+		return null;
+	}
+
+	private static boolean isLinkedWithEditor()
+	{
+		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+				IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true, null);
+	}
+
+	private boolean isOutlinePageActive()
+	{
+		IWorkbenchPart part = getActivePart();
+		return part instanceof ContentOutline && ((ContentOutline) part).getCurrentPage() == fOutlinePage;
+	}
+
+	private IWorkbenchPart getActivePart()
+	{
+		IWorkbenchWindow window = getSite().getWorkbenchWindow();
+		return window.getPartService().getActivePart();
+	}
 }

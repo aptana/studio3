@@ -7,6 +7,7 @@ public class ParseBaseNode extends Node implements IParseNode
 {
 
 	private IParseNode[] fChildren;
+	private IParseNode fParent;
 
 	public ParseBaseNode()
 	{
@@ -37,6 +38,12 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	@Override
+	public IParseNode getParent()
+	{
+		return fParent;
+	}
+
+	@Override
 	public int getStartingOffset()
 	{
 		return getStart();
@@ -59,8 +66,17 @@ public class ParseBaseNode extends Node implements IParseNode
 		return text.toString();
 	}
 
+	public void setParent(IParseNode parent)
+	{
+		fParent = parent;
+	}
+
 	protected void setChildren(IParseNode[] children)
 	{
 		fChildren = children;
+		for (IParseNode child : children)
+		{
+			((ParseBaseNode) child).setParent(this);
+		}
 	}
 }
