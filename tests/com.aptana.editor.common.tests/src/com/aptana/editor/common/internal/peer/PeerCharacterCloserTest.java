@@ -123,4 +123,24 @@ public class PeerCharacterCloserTest extends TestCase
 		assertFalse(event.doit);
 		assertEquals("\"selected\" ", document.get());
 	}
+	
+	public void testUnpairedClose() throws Exception
+	{
+		char[] pairs = new char[] { '(', ')', '"', '"' };
+		PeerCharacterCloser closer = new PeerCharacterCloser(null, pairs);
+		StringBuilder builder = new StringBuilder();
+		int times = 5000;
+		for (int i = 0; i < times; i++)
+		{
+			builder.append("(");
+		}
+		for (int i = 0; i < times; i++)
+		{
+			builder.append(")");
+		}
+		assertFalse(closer.unpairedClose('(', ')', new Document(builder.toString()), times));
+		builder.append(")");
+		assertTrue(closer.unpairedClose('(', ')', new Document(builder.toString()), times));
+
+	}
 }

@@ -173,39 +173,29 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 	}
 
-	private boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
+	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
 	{
 		try
 		{
-			// TODO Cheaper to use an int
 			// TODO See if we can increase performance by using indexOf rather than iterate over each character
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
 			String before = document.get(0, offset).trim();
-			Stack<Character> stack = new Stack<Character>();
+			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
 				char c = before.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					if (stack.isEmpty())
-					{
-						stack.push(c);
-					}
-					else
-					{
-						stack.pop();
-					}
+					stackLevel++;
+					stackLevel = stackLevel % 2;
 				}
 				else if (c == openingChar)
 				{
-					stack.push(c);
+					stackLevel++;
 				}
 				else if (c == closingCharacter)
 				{
-					if (!stack.isEmpty())
-					{
-						stack.pop();
-					}
+					stackLevel--;
 				}
 			}
 
@@ -215,33 +205,21 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				char c = after.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					if (stack.isEmpty())
-					{
-						stack.push(c);
-					}
-					else
-					{
-						stack.pop();
-					}
+					stackLevel++;
+					stackLevel = stackLevel % 2;
 				}
 				else if (c == openingChar)
 				{
-					stack.push(c);
+					stackLevel++;
 				}
 				else if (c == closingCharacter)
 				{
-					if (stack.isEmpty())
-					{
+					stackLevel--;
+					if (stackLevel < 0)
 						return true;
-					}
-					stack.pop();
 				}
 			}
-			if (openingChar == closingCharacter)
-			{
-				return !stack.isEmpty();
-			}
-
+			return stackLevel != 0;
 		}
 		catch (BadLocationException e)
 		{
