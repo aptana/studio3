@@ -93,14 +93,15 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 
 			final char closingCharacter = getPeerCharacter(event.character);
+			// If this is the start char and there's no unmatched close char, insert the close char
+			if (unpairedClose(event.character, closingCharacter, document, offset))
+			{
+				return;
+			}
 			
 			final StringBuffer buffer = new StringBuffer();
 			buffer.append(event.character);
-			// If this is the start char and there's no unmatched close char, insert the close char
-			if (!unpairedClose(event.character, closingCharacter, document, offset))
-			{
-				buffer.append(closingCharacter);
-			}
+			buffer.append(closingCharacter);
 			if (offset == document.getLength())
 			{
 				String delim = null;
@@ -173,7 +174,18 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			for (int i = 0; i < before.length(); i++)
 			{
 				char c = before.charAt(i);
-				if (c == openingChar)
+				if (c == openingChar && openingChar == closingCharacter)
+				{
+					if (stack.isEmpty())
+					{
+						stack.push(c);
+					}
+					else
+					{
+						stack.pop();
+					}
+				}
+				else if (c == openingChar)
 				{
 					stack.push(c);
 				}
@@ -182,15 +194,26 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 					if (!stack.isEmpty())
 					{
 						stack.pop();
-					}					
+					}
 				}
-			}			
-			
+			}
+
 			String after = document.get(offset, document.getLength() - offset).trim();
 			for (int i = 0; i < after.length(); i++)
 			{
 				char c = after.charAt(i);
-				if (c == openingChar)
+				if (c == openingChar && openingChar == closingCharacter)
+				{
+					if (stack.isEmpty())
+					{
+						stack.push(c);
+					}
+					else
+					{
+						stack.pop();
+					}
+				}
+				else if (c == openingChar)
 				{
 					stack.push(c);
 				}
@@ -203,7 +226,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 					stack.pop();
 				}
 			}
-			
+			if (openingChar == closingCharacter)
+			{
+				return !stack.isEmpty();
+			}
+
 		}
 		catch (BadLocationException e)
 		{
