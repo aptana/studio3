@@ -93,17 +93,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 
 			final char closingCharacter = getPeerCharacter(event.character);
-			// Check if the next character in source is the closing character (and don't close if it is)!
-			if (offset < document.getLength())
-			{
-				if (document.getChar(offset) == closingCharacter)
-				{
-					return;
-				}
-			}
+			
 			final StringBuffer buffer = new StringBuffer();
 			buffer.append(event.character);
-			buffer.append(closingCharacter);
+			// If this is the start char and there's no unmatched close char, insert the close char
+			if (!unpairedClose(event.character, closingCharacter, document, offset))
+			{
+				buffer.append(closingCharacter);
+			}
 			if (offset == document.getLength())
 			{
 				String delim = null;
@@ -163,6 +160,57 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	private boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
+	{
+		try
+		{
+			// FIXME I don't think this handles when both start and end chars are the same!
+			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
+			String before = document.get(0, offset).trim();
+			Stack<Character> stack = new Stack<Character>();
+			for (int i = 0; i < before.length(); i++)
+			{
+				char c = before.charAt(i);
+				if (c == openingChar)
+				{
+					stack.push(c);
+				}
+				else if (c == closingCharacter)
+				{
+					if (!stack.isEmpty())
+					{
+						stack.pop();
+					}					
+				}
+			}			
+			
+			String after = document.get(offset, document.getLength() - offset).trim();
+			for (int i = 0; i < after.length(); i++)
+			{
+				char c = after.charAt(i);
+				if (c == openingChar)
+				{
+					stack.push(c);
+				}
+				else if (c == closingCharacter)
+				{
+					if (stack.isEmpty())
+					{
+						return true;
+					}
+					stack.pop();
+				}
+			}
+			
+		}
+		catch (BadLocationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
