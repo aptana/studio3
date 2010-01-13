@@ -177,7 +177,6 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	{
 		try
 		{
-			// TODO See if we can increase performance by using indexOf rather than iterate over each character
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
 			String before = document.get(0, offset).trim();
 			int stackLevel = 0;
