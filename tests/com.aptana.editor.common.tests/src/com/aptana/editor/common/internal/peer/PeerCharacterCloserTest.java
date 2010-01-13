@@ -61,6 +61,47 @@ public class PeerCharacterCloserTest extends TestCase
 		assertFalse(event.doit);
 		assertEquals("\"\" ", document.get());
 	}
+	
+	public void testDontCloseWhenSimpleUnopenedPairCloseCharFollows()
+	{
+		ITextViewer viewer = new TextViewer(Display.getDefault().getActiveShell(), SWT.NONE);
+		IDocument document = new Document(" ) ");
+		viewer.setDocument(document);
+		PeerCharacterCloser closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS);
+		Event e = new Event();
+		e.character = '(';
+		e.start = 0;
+		e.end = 0;
+		e.keyCode = 39;
+		e.doit = true;
+		e.stateMask = 131072;
+		e.widget = viewer.getTextWidget();
+		VerifyEvent event = new VerifyEvent(e);
+		closer.verifyKey(event);
+
+		assertFalse(event.doit);
+		assertEquals("( ) ", document.get());
+	}
+	
+	public void testDontCloseWhenUnOpenedPairFollows()
+	{
+		ITextViewer viewer = new TextViewer(Display.getDefault().getActiveShell(), SWT.NONE);
+		IDocument document = new Document(" ()) ");
+		viewer.setDocument(document);
+		PeerCharacterCloser closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS);
+		Event e = new Event();
+		e.character = '(';
+		e.start = 0;
+		e.end = 0;
+		e.keyCode = 39;
+		e.doit = true;
+		e.stateMask = 131072;
+		e.widget = viewer.getTextWidget();
+		VerifyEvent event = new VerifyEvent(e);
+		closer.verifyKey(event);
+
+		assertEquals("( ()) ", document.get());
+	}
 
 	public void testWrapSelected()
 	{
