@@ -30,3 +30,4 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.theme,
  com.aptana.editor.common.tmp
+Import-Package: com.aptana.util
