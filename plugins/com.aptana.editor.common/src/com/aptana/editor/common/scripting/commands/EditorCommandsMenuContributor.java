@@ -41,6 +41,7 @@ import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.util.CollectionsUtil;
 
 /**
  * This contributes the menus for editor scope to the Commands menu.
@@ -113,31 +114,33 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 		// Is this an Aptana Editor
 		if (textEditor instanceof AbstractThemeableEditor) {
 			AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) textEditor;
-			String[] splitContentTypesAtOffset = null;
 			String contentTypeAtOffset = null;
+			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
 			MenuElement[] menusFromScope;
 			try {
 				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
 				// Get the scope at caret offset
 				contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
-				// Split scope into successively outer scope
-				splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-				for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
-					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
-					if (menusFromScope.length > 0) {
-						// Build the menu
-						buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
-						break;
-					}
-				}
 			} catch (BadLocationException e) {
 				CommonEditorPlugin.logError(e);
 			}
 			
+			// First pull all possible menus from the current caret position's scopes
+			if (contentTypeAtOffset != null) {
+				String[] splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
+				for (int i = 0; i < splitContentTypesAtOffset.length; i++) {
+					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
+					menusFromScope = BundleManager.getInstance().getMenus(filter);
+					if (menusFromScope.length > 0) {
+						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+						break;
+					}
+				}
+			}
+
+			// Next we get all possible scopes from the top level content type provider
 			SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor.getSourceViewerConfigurationNonFinal();
-			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
 			if (sourceViewerConfiguration instanceof ITopContentTypesProvider) {
 				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
 				for (String[] topContentType : topContentTypes) {
@@ -151,25 +154,23 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 					}
 				}
-				
-				// Do we have some menus?
-				if (menusFromScopeList.size() > 0) {
-					// Sort them
-					Collections.sort(menusFromScopeList, new Comparator<MenuElement>() {
-						@Override
-						public int compare(MenuElement menuElement1, MenuElement menuElement2) {
-							return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
-						}
-					});
-					menusFromScope = new MenuElement[menusFromScopeList.size()];
-					menusFromScopeList.toArray(menusFromScope);
+			}
 
-					// Add separator
-					new MenuItem(menu, SWT.SEPARATOR);
+			// Do we have some menus?
+			if (menusFromScopeList.size() > 0) {
+				// Remove duplicates and sort
+				CollectionsUtil.removeDuplicates(menusFromScopeList);
+				Collections.sort(menusFromScopeList, new Comparator<MenuElement>() {
+					@Override
+					public int compare(MenuElement menuElement1, MenuElement menuElement2) {
+						return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
+					}
+				});
+				menusFromScope = new MenuElement[menusFromScopeList.size()];
+				menusFromScopeList.toArray(menusFromScope);
 
-					// Now build the menu
-					buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
-				}
+				// Now build the menu
+				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
 			}
 
 			new MenuItem(menu, SWT.SEPARATOR);
@@ -182,6 +183,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			// TODO Need API in Bundle Manager to implement this.
 		}
 	}
+
+	
 	
 	/**
 	 * This recursively builds the menu contribution.
