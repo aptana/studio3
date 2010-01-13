@@ -85,6 +85,16 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				return;
 			}
 
+			// Don't auto-close if next char is a letter or digit
+			if (document.getLength() > offset)
+			{
+				char nextChar = document.getChar(offset);
+				if (Character.isJavaIdentifierPart(nextChar))
+				{
+					return;
+				}
+			}
+
 			// Don't auto-close if we have an open pair!
 			if (isUnclosedPair(event, document, offset)) // We have an open string or pair, just insert the single
 															// character, don't do anything special
@@ -98,7 +108,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			{
 				return;
 			}
-			
+
 			final StringBuffer buffer = new StringBuffer();
 			buffer.append(event.character);
 			buffer.append(closingCharacter);
@@ -167,7 +177,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	{
 		try
 		{
-			// FIXME I don't think this handles when both start and end chars are the same!
+			// TODO Cheaper to use an int
+			// TODO See if we can increase performance by using indexOf rather than iterate over each character
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
 			String before = document.get(0, offset).trim();
 			Stack<Character> stack = new Stack<Character>();
