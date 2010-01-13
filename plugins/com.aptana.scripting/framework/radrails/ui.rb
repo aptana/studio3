@@ -84,7 +84,8 @@ module RadRails
         end
         dialog.text = options[:title] || "Select File"
         dialog.filter_path = options[:directory] if options[:directory]
-        dialog.open        
+        dialog.open
+        # FIXME Handle when block is given
       end
       
       # show a standard open file dialog, allowing multiple selections
@@ -105,6 +106,7 @@ module RadRails
         dialog.text = options[:title] || "Select File(s)"
         dialog.filter_path = options[:directory] if options[:directory]
         dialog.open
+        # FIXME Handle when block is given
       end
       
       # Post a confirmation alert

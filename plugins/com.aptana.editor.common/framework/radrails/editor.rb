@@ -221,6 +221,7 @@ module RadRails
         result["TM_LINE_INDEX"] = caret_column
         result["TM_CARET_LINE_NUMBER"] = caret_line + 1
         result["TM_CARET_LINE_TEXT"] = current_line
+        result["TM_CARET_OFFSET"] = caret_offset
         result["TM_CURRENT_LINE"] = current_line
         
         # I'm sure there's a better way to extract the word at the current caret position
