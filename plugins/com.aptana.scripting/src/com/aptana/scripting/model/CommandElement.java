@@ -21,6 +21,7 @@ import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyProc;
+import org.jruby.RubySystemExit;
 import org.jruby.embed.ScriptingContainer;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
@@ -47,6 +48,26 @@ public class CommandElement extends AbstractBundleElement
 	private static final Pattern OPTION_PLUS = Pattern.compile("option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
 
+	/**
+	 * Normalize the keyBinding string.
+	 * <p>
+	 * Convert control+ to CTRL+ Convert option+ to ALT+
+	 * 
+	 * @param keyBinding
+	 * @return
+	 */
+	static String normalizeKeyBinding(String keyBinding)
+	{
+		String result = null;
+
+		if (keyBinding != null)
+		{
+			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
+			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
+		}
+
+		return result;
+	}
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
@@ -54,6 +75,7 @@ public class CommandElement extends AbstractBundleElement
 	private InputType[] _inputTypes;
 	private OutputType _outputType;
 	private String _outputPath;
+
 	private String _workingDirectoryPath;
 
 	private WorkingDirectoryType _workingDirectoryType;
@@ -125,7 +147,7 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
-
+	
 	/**
 	 * getElementName
 	 */
@@ -346,6 +368,9 @@ public class CommandElement extends AbstractBundleElement
 			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
 			context.put(INPUT_PROPERTY, container.getIn());
 			
+			// set default output type, this may be changed by context.exit_with_message
+			context.setOutputType(this._outputType);
+			
 			// invoke the block
 			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
 			String output = writer.toString();
@@ -358,6 +383,20 @@ public class CommandElement extends AbstractBundleElement
 			else if (output != null && output.length() > 0)
 			{
 				resultText = output;
+			}
+		}
+		catch (RaiseException e)
+		{
+			// prevent printing an error message to stdout when using exit_with_message
+			if ((e.getException() instanceof RubySystemExit) == false)
+			{
+				String message = MessageFormat.format(
+					Messages.CommandElement_Error_Processing_Command_Block,
+					new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
+				);
+
+				ScriptLogger.logError(message);
+				executedSuccessfully = false;
 			}
 		}
 		catch (Exception e)
@@ -532,27 +571,6 @@ public class CommandElement extends AbstractBundleElement
 	public boolean isShellCommand()
 	{
 		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
-	}
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+ Convert option+ to ALT+
-	 * 
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKeyBinding(String keyBinding)
-	{
-		String result = null;
-
-		if (keyBinding != null)
-		{
-			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
-		}
-
-		return result;
 	}
 
 	/**
