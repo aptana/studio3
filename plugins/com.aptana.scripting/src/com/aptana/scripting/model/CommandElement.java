@@ -387,8 +387,12 @@ public class CommandElement extends AbstractBundleElement
 		}
 		catch (RaiseException e)
 		{
-			// prevent printing an error message to stdout when using exit_with_message
-			if ((e.getException() instanceof RubySystemExit) == false)
+			if ((e.getException() instanceof RubySystemExit) && context.isForcedExit())
+			{
+				// should be from the exit call in exit_with_message
+				resultText = context.get(OUTPUT_PROPERTY).toString();
+			}
+			else
 			{
 				String message = MessageFormat.format(
 					Messages.CommandElement_Error_Processing_Command_Block,
@@ -425,6 +429,8 @@ public class CommandElement extends AbstractBundleElement
 
 		CommandResult result = new CommandResult(resultText);
 		result.setExecutedSuccessfully(executedSuccessfully);
+		result.setCommand(this);
+		result.setContext(context);
 
 		return result;
 	}

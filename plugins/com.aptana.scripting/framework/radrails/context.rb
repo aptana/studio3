@@ -8,8 +8,9 @@ module RadRails
     end
     
     def exit_with_message(message, output_type)
-      STDERR.puts message
-      @jobj.output_type = output_type
+      @jobj.forced_exit = true
+      @jobj.map['output'] = message.to_s
+      @jobj.output_type = output_type.to_s
       exit
     end
     	

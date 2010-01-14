@@ -398,7 +398,7 @@ public class CommandExecutionUtils
 
 		StyledText textWidget = textViewer.getTextWidget();
 		final int caretOffset = textWidget.getCaretOffset();
-		OutputType ouputType = OutputType.get(command.getOutputType());
+		OutputType ouputType = commandResult.getOutputType(); //OutputType.get(command.getOutputType());
 		switch (ouputType)
 		{
 			case DISCARD:
