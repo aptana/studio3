@@ -48,9 +48,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 		public SortingAction()
 		{
-			setText(Messages.CommonOutlinePage_LBL);
-			setToolTipText(Messages.CommonOutlinePage_TTP);
-			setDescription(Messages.CommonOutlinePage_Description);
+			setText(Messages.CommonOutlinePage_Sorting_LBL);
+			setToolTipText(Messages.CommonOutlinePage_Sorting_TTP);
+			setDescription(Messages.CommonOutlinePage_Sorting_Description);
 			setImageDescriptor(CommonEditorPlugin.getImageDescriptor(ICON_PATH));
 
 			setChecked(isSortingEnabled());
