@@ -60,6 +60,7 @@ public class EarlyStartup implements IStartup
 		// create CONSOLE and $console streams
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		RubyIO rubyStream = new RubyIO(runtime, console.getOutputConsoleStream());
+		rubyStream.sync_set(runtime.getTrue());	// force immediate output
 		
 		// store as a global and a constant
 		runtime.getGlobalVariables().set(CONSOLE_VARIABLE, rubyStream);
