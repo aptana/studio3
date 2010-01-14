@@ -1,6 +1,8 @@
 package com.aptana.editor.common.outline;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -11,6 +13,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -18,6 +21,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.lexer.ILexeme;
@@ -35,6 +39,26 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		public void run()
 		{
 			fPrefs.setValue(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, isChecked());
+		}
+	}
+
+	private class SortingAction extends Action
+	{
+		private static final String ICON_PATH = "icons/sort_alphab.gif"; //$NON-NLS-1$
+
+		public SortingAction()
+		{
+			setText(Messages.CommonOutlinePage_LBL);
+			setToolTipText(Messages.CommonOutlinePage_TTP);
+			setDescription(Messages.CommonOutlinePage_Description);
+			setImageDescriptor(CommonEditorPlugin.getImageDescriptor(ICON_PATH));
+
+			setChecked(isSortingEnabled());
+		}
+
+		public void run()
+		{
+			fPrefs.setValue(IPreferenceConstants.SORT_OUTLINE_ALPHABETIC, isChecked());
 		}
 	}
 
@@ -73,6 +97,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
+		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
 
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
@@ -100,7 +125,9 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
-		if (event.getProperty().equals(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR))
+		String property = event.getProperty();
+
+		if (property.equals(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR))
 		{
 			boolean isLinked = ((Boolean) event.getNewValue()).booleanValue();
 
@@ -110,6 +137,11 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			{
 				setEditorSelection((IStructuredSelection) viewer.getSelection(), false);
 			}
+		}
+		else if (property.equals(IPreferenceConstants.SORT_OUTLINE_ALPHABETIC))
+		{
+			boolean sort = ((Boolean) event.getNewValue()).booleanValue();
+			getTreeViewer().setComparator(sort ? new ViewerComparator() : null);
 		}
 	}
 
@@ -155,6 +187,12 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private void registerActions(IActionBars actionBars)
 	{
+		IToolBarManager toolBarManager = actionBars.getToolBarManager();
+		if (toolBarManager != null)
+		{
+			toolBarManager.add(new SortingAction());
+		}
+
 		IMenuManager menu = actionBars.getMenuManager();
 
 		fToggleLinkingAction = new ToggleLinkingAction();
@@ -177,5 +215,10 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	private boolean isLinkedWithEditor()
 	{
 		return fPrefs.getBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR);
+	}
+
+	private boolean isSortingEnabled()
+	{
+		return fPrefs.getBoolean(IPreferenceConstants.SORT_OUTLINE_ALPHABETIC);
 	}
 }
