@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -339,8 +340,12 @@ public class CommandElement extends AbstractBundleElement
 		}
 		catch (Exception e)
 		{
+			StringWriter stringWriter = new StringWriter();
+			PrintWriter writer = new PrintWriter(stringWriter);
+			e.printStackTrace(writer);
 			String message = MessageFormat.format(Messages.CommandElement_Error_Processing_Command_Block, new Object[] {
 					this.getDisplayName(), this.getPath(), e.getMessage() });
+			message += "\n" + stringWriter.toString(); //$NON-NLS-1$
 
 			ScriptLogger.logError(message);
 			executedSuccessfully = false;
