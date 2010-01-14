@@ -394,8 +394,8 @@ public class CommandElement extends AbstractBundleElement
 					Messages.CommandElement_Error_Processing_Command_Block,
 					new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
 				);
-
-				ScriptLogger.logError(message);
+				
+				ScriptUtils.logErrorWithStackTrace(message, e);
 				executedSuccessfully = false;
 			}
 		}
@@ -405,8 +405,8 @@ public class CommandElement extends AbstractBundleElement
 				Messages.CommandElement_Error_Processing_Command_Block,
 				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
 			);
-
-			ScriptLogger.logError(message);
+			
+			ScriptUtils.logErrorWithStackTrace(message, e);
 			executedSuccessfully = false;
 		}
 		

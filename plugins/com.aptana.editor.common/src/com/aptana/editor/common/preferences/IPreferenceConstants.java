@@ -62,5 +62,10 @@ public interface IPreferenceConstants
 	/**
 	 * Pref key for linking the outline view with the active editor
 	 */
-	public String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$
+	public static final String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for sorting the outline view alphabetically
+	 */
+	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
 }
