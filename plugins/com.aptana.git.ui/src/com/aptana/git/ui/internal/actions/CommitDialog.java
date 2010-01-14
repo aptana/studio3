@@ -590,4 +590,10 @@ public class CommitDialog extends StatusDialog
 			dtarget.setDropTargetEffect(new TableDropTargetEffect(sourceDragTable));
 		}
 	}
+	
+	@Override
+	protected boolean isResizable()
+	{
+		return true;
+	}
 }
