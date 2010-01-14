@@ -33,7 +33,8 @@ public class CommandContext
 	
 	private Map<String,Object> _map;
 	private InputStream _inputStream;
-	//private Ruby _runtime;
+	private OutputType _outputType;
+	private boolean _forcedExit;
 
 	/**
 	 * getContextContributors
@@ -96,6 +97,7 @@ public class CommandContext
 	CommandContext(CommandElement command)
 	{
 		this._map = new HashMap<String,Object>();
+		
 		for (ContextContributor contributor : getContextContributors())
 		{
 			contributor.modifyContext(command, this);
@@ -134,6 +136,16 @@ public class CommandContext
 	}
 
 	/**
+	 * getOutputType
+	 * 
+	 * @return
+	 */
+	public OutputType getOutputType()
+	{
+		return this._outputType;
+	}
+	
+	/**
 	 * in
 	 * 
 	 * @return
@@ -144,6 +156,16 @@ public class CommandContext
 			ScriptingEngine.getInstance().getScriptingContainer().getRuntime(),
 			this.getInputStream()
 		);
+	}
+	
+	/**
+	 * isForcedExit
+	 * 
+	 * @return
+	 */
+	public boolean isForcedExit()
+	{
+		return this._forcedExit;
 	}
 	
 	/**
@@ -168,10 +190,40 @@ public class CommandContext
 	}
 
 	/**
+	 * setForceExit
+	 * 
+	 * @param value
+	 */
+	public void setForcedExit(boolean value)
+	{
+		this._forcedExit = value;
+	}
+	
+	/**
 	 * @param inputStream
 	 */
 	public void setInputStream(InputStream inputStream)
 	{
 		this._inputStream = inputStream;
+	}
+	
+	/**
+	 * setOutputType
+	 * 
+	 * @param type
+	 */
+	public void setOutputType(OutputType type)
+	{
+		this._outputType = type;
+	}
+
+	/**
+	 * setOutput
+	 * 
+	 * @param output
+	 */
+	public void setOutputType(String output)
+	{
+		this._outputType = OutputType.get(output);
 	}
 }

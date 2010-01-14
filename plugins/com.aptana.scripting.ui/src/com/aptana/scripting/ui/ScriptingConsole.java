@@ -19,88 +19,36 @@ public class ScriptingConsole
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
 
 	private static ScriptingConsole INSTANCE;
-
-	private static MessageConsole _console;
-	private static MessageConsoleStream _outputConsoleStream;
-	private static MessageConsoleStream _errorConsoleStream;
-	private static MessageConsoleStream _infoConsoleStream;
-	private static MessageConsoleStream _warningConsoleStream;
-	private static MessageConsoleStream _traceConsoleStream;
+	private static MessageConsole console;
+	private static MessageConsoleStream outputConsoleStream;
+	private static MessageConsoleStream errorConsoleStream;
+	private static MessageConsoleStream infoConsoleStream;
+	private static MessageConsoleStream warningConsoleStream;
+	private static MessageConsoleStream traceConsoleStream;
 
 	/**
-	 * Return the singleton instance of ScriptConsole. Should be called
-	 * on UI thread.
+	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
 	 * <p>
-	 * Throws IllegalStateException if unable to get the Display
-	 * which most likely happens when called on non-UI thread.
-	 *
+	 * Throws IllegalStateException if unable to get the Display which most likely happens when called on non-UI thread.
+	 * 
 	 * @return
 	 */
 	public static ScriptingConsole getDefault()
 	{
-		if (INSTANCE == null) {
+		if (INSTANCE == null)
+		{
 			INSTANCE = new ScriptingConsole();
 		}
+		
 		return INSTANCE;
 	}
 
-	private ScriptingConsole() {
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		final Display display = workbench.getDisplay();
-		if (display == null)
-		{
-			throw new IllegalStateException(new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS));
-		}
-		display.syncExec(new Runnable()
-		{
-			public void run()
-			{
-				// create console
-				_console = new MessageConsole(
-					Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
-					ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH)
-				);
-
-				// register our console with Eclipse
-				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { _console });
-
-				// create message streams
-				_outputConsoleStream = _console.newMessageStream();
-				_errorConsoleStream = _console.newMessageStream();
-				_infoConsoleStream = _console.newMessageStream();
-				_warningConsoleStream = _console.newMessageStream();
-				_traceConsoleStream = _console.newMessageStream();
-
-				// set stream colors
-				_outputConsoleStream.setColor(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				_errorConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_RED));
-				_infoConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				_warningConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				_traceConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_GREEN));
-			}
-		});
-	}
-
-	public void print(String output)
-	{
-		print(getOutputConsoleStream(), output);
-		showConsole();
-	}
-
-	public void printErr(String output)
-	{
-		print(getErrorConsoleStream(), output);
-		showConsole();
-	}
-
-	private void showConsole()
-	{
-		if (_console != null)
-		{
-			_console.activate();
-		}
-	}
-
+	/**
+	 * print
+	 * 
+	 * @param stream
+	 * @param output
+	 */
 	private static void print(final MessageConsoleStream stream, final String output)
 	{
 		Job job = new Job("Writing to console") //$NON-NLS-1$
@@ -117,29 +65,127 @@ public class ScriptingConsole
 		job.schedule();
 	}
 
-	MessageConsoleStream getOutputConsoleStream()
+	/**
+	 * ScriptingConsole
+	 */
+	private ScriptingConsole()
 	{
-		return _outputConsoleStream;
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		final Display display = workbench.getDisplay();
+		
+		if (display == null)
+		{
+			throw new IllegalStateException(new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS));
+		}
+		
+		display.syncExec(new Runnable()
+		{
+			public void run()
+			{
+				// create console
+				console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+
+				// register our console with Eclipse
+				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+
+				// create message streams
+				outputConsoleStream = console.newMessageStream();
+				errorConsoleStream = console.newMessageStream();
+				infoConsoleStream = console.newMessageStream();
+				warningConsoleStream = console.newMessageStream();
+				traceConsoleStream = console.newMessageStream();
+
+				// set stream colors
+				outputConsoleStream.setColor(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				errorConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_RED));
+				infoConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_BLUE));
+				warningConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+				traceConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_GREEN));
+			}
+		});
 	}
 
+	/**
+	 * getErrorConsoleStream
+	 * 
+	 * @return
+	 */
 	MessageConsoleStream getErrorConsoleStream()
 	{
-		return _errorConsoleStream;
+		return errorConsoleStream;
 	}
 
+	/**
+	 * getInfoConsoleStream
+	 * 
+	 * @return
+	 */
 	MessageConsoleStream getInfoConsoleStream()
 	{
-		return _infoConsoleStream;
+		return infoConsoleStream;
 	}
 
-	MessageConsoleStream getWarningConsoleStream()
+	/**
+	 * getOutputConsoleStream
+	 * 
+	 * @return
+	 */
+	MessageConsoleStream getOutputConsoleStream()
 	{
-		return _warningConsoleStream;
+		return outputConsoleStream;
 	}
 
+	/**
+	 * getTraceConsoleStream
+	 * 
+	 * @return
+	 */
 	MessageConsoleStream getTraceConsoleStream()
 	{
-		return _traceConsoleStream;
+		return traceConsoleStream;
+	}
+
+	/**
+	 * getWarningConsoleStream
+	 * 
+	 * @return
+	 */
+	MessageConsoleStream getWarningConsoleStream()
+	{
+		return warningConsoleStream;
+	}
+
+	/**
+	 * print
+	 * 
+	 * @param output
+	 */
+	public void print(String output)
+	{
+		print(getOutputConsoleStream(), output);
+		showConsole();
+	}
+
+	/**
+	 * printErr
+	 * 
+	 * @param output
+	 */
+	public void printErr(String output)
+	{
+		print(getErrorConsoleStream(), output);
+		showConsole();
+	}
+
+	/**
+	 * showConsole
+	 */
+	private void showConsole()
+	{
+		if (console != null)
+		{
+			console.activate();
+		}
 	}
 
 }

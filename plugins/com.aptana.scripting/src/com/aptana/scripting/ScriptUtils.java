@@ -1,5 +1,8 @@
 package com.aptana.scripting;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
@@ -109,5 +112,21 @@ public class ScriptUtils
 		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		
 		return JavaEmbedUtils.javaToRuby(runtime, javaObject);
+	}
+	
+	/**
+	 * logErroWithStackTrace
+	 * 
+	 * @param message
+	 * @param e
+	 */
+	public static void logErrorWithStackTrace(String message, Exception e)
+	{
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(stringWriter);
+		
+		e.printStackTrace(writer);
+		
+		ScriptLogger.logError(message + "\n" + stringWriter.toString()); //$NON-NLS-1$
 	}
 }
