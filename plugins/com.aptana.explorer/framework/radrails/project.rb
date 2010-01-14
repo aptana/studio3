@@ -1,20 +1,7 @@
 require "java"
+require 'radrails/progress'
 
-# FIXME For some reason when the file is executed the second time (after a save) it hangs on the first job execution!
 module RadRails
-  # Wraps an Eclipse Job and allows us to use a block to implement the one abstract method we need
-  class Job < org.eclipse.core.runtime.jobs.Job
-    def initialize(name, &blk)
-      super(name)
-      @block = blk
-    end
-    
-    def run(monitor)
-      @block.call(monitor)
-      return org.eclipse.core.runtime.Status::OK_STATUS
-    end
-  end
-
   # Wraps the eclipse IProject
   class Project
   
@@ -39,7 +26,7 @@ module RadRails
         return_proj = find(name)
         return return_proj if return_proj.exists?
         # FIXME Allow setting a non-standard location or default set of nature Ids using the options hash!
-        job = Job.new("Create project") {|monitor| find(name).project.create(monitor) }
+        job = RadRails::Job.new("Create project") {|monitor| find(name).project.create(monitor) }
         job.schedule
         job.join
         return_proj
@@ -79,7 +66,7 @@ module RadRails
     # Add a new nature to the project. +nature_id+ is a String 
     def add_nature(nature_id)
       return unless project.exists?
-      job = Job.new("Add Nature to project") do |monitor| 
+      job = RadRails::Job.new("Add Nature to project") do |monitor| 
         description = project.description
         new_natures = natures + [nature_id]
         description.nature_ids = new_natures.to_java(:string)
@@ -110,7 +97,7 @@ module RadRails
     
     def open
       return if is_open?
-      job = Job.new("Open project") {|monitor| project.open(monitor) }
+      job = RadRails::Job.new("Open project") {|monitor| project.open(monitor) }
       job.schedule
       job.join
     end
@@ -122,7 +109,7 @@ module RadRails
     # Close the project
     def close
       return if is_closed?
-      job = Job.new("Close project") {|monitor| project.close(monitor) }
+      job = RadRails::Job.new("Close project") {|monitor| project.close(monitor) }
       job.schedule
       job.join
     end
@@ -130,7 +117,7 @@ module RadRails
     # Delete the project
     def delete
       return if !exists?
-      job = Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
+      job = RadRails::Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
       job.schedule
       job.join
     end
