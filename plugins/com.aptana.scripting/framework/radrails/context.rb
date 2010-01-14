@@ -6,7 +6,13 @@ module RadRails
     def initialize(jobj=nil)
       @jobj = jobj if jobj
     end
-
+    
+    def exit_with_message(message, output_type)
+      STDERR.puts message
+      @jobj.output_type = output_type
+      exit
+    end
+    	
     def in
       @jobj.in
     end
