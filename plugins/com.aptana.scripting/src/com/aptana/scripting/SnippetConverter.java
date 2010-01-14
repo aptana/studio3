@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.Writer;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class SnippetConverter
 		if (args == null || args.length == 0)
 		{
 			String userHome = System.getProperty("user.home");
-			args = new String[] { userHome + "/Documents/RadRails Bundles/ruby/Snippets" };
+			args = new String[] { userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets" };
 		}
 		for (String path : args)
 		{
@@ -73,24 +72,32 @@ public class SnippetConverter
 				Process p = builder.start();
 				int exitCode = p.waitFor();
 				if (exitCode != 0)
-					System.err.println("Bad exit code for conversion: " + exitCode);
+				{
+					System.err.println("Bad exit code for conversion: " + exitCode + ", for file: " + plistFile.getAbsolutePath());
+					continue;
+				}
 				AbstractReader reader = PlistFactory.createReader();
 				reader.setSource(new InputSource(new FileInputStream(plistFile)));
 				PlistProperties properties = reader.parse();
 
+				String name = sanitize(properties, "name");
+				StringBuilder buffer = new StringBuilder();
+				buffer.append("snippet '").append(name).append("' do |s|\n");				
 				String trigger = sanitize(properties, "tabTrigger");
-				String content = sanitize(properties, "content");
-				// TODO Do more fiddling with the content?
 				if (trigger != null)
 				{
-					String template = "snippet ''{0}'' do |s|\n  s.trigger = ''{1}''\n  s.expansion = ''{2}''\nend\n";
-					snippets.add(MessageFormat.format(template, sanitize(properties, "name"), trigger, content));
+				buffer.append("  s.trigger = '").append(trigger).append("'\n");
 				}
 				else
 				{
-					String template = "# FIXME No tab trigger, probably needs to become command\nsnippet ''{0}'' do |s|\n  s.expansion = ''{1}''\nend\n";
-					snippets.add(MessageFormat.format(template, sanitize(properties, "name"), content));
+					buffer.append("  # FIXME No tab trigger, probably needs to become command\n");
 				}
+				String scope = sanitize(properties, "scope");
+				buffer.append("  s.scope = '").append(scope).append("'\n");
+				String content = sanitize(properties, "content");
+				buffer.append("  s.expansion = '").append(content).append("'\n");
+				buffer.append("end\n\n");
+				snippets.add(buffer.toString());
 			}
 			catch (Exception e)
 			{
