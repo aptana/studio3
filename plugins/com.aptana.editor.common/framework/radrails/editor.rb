@@ -174,10 +174,16 @@ module RadRails
     end
     
     def current_scope
-      if content_type.nil?
-        document.content_type(caret_offset)
+      scope_at_offset caret_offset
+    end
+    
+    def scope_at_offset(offset)
+      ctype = content_type(offset)
+      
+      if ctype.nil?
+        document.content_type(offset)
       else
-        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(content_type).to_s
+        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(ctype).to_s
       end
     end
     
@@ -193,8 +199,8 @@ module RadRails
       styled_text.caret_offset
     end
     
-    def content_type
-      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, caret_offset)
+    def content_type(offset)
+      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, offset)
     end
     
     def current_line

@@ -6,7 +6,14 @@ module RadRails
     def initialize(jobj=nil)
       @jobj = jobj if jobj
     end
-
+    
+    def exit_with_message(message, output_type)
+      @jobj.forced_exit = true
+      @jobj.map['output'] = message.to_s
+      @jobj.output_type = output_type.to_s
+      exit
+    end
+    	
     def in
       @jobj.in
     end
@@ -16,7 +23,11 @@ module RadRails
     end
 
     def method_missing(m, *args, &block)
-      @jobj.map[m.to_s]
+      if @jobj
+        @jobj.map[m.to_s]
+      else
+        super
+      end
     end
   end
 	
