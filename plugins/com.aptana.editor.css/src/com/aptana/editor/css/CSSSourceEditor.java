@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.css;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
@@ -68,5 +70,11 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	protected Object getOutlineElementAt(int caret)
 	{
 		return CSSOutlineContentProvider.getElementAt(getFileService().getParseResult(), caret);
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return Activator.getDefault().getPreferenceStore();
 	}
 }

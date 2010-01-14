@@ -1,9 +1,9 @@
 package com.aptana.editor.common.outline;
 
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -18,12 +18,11 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.parsing.lexer.ILexeme;
 
-public class CommonOutlinePage extends ContentOutlinePage
+public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
 	public class ToggleLinkingAction extends BaseToggleLinkingAction
 	{
@@ -35,22 +34,7 @@ public class CommonOutlinePage extends ContentOutlinePage
 		@Override
 		public void run()
 		{
-			boolean isLinked = isChecked();
-			IEclipsePreferences prefs = (new InstanceScope()).getNode(CommonEditorPlugin.PLUGIN_ID);
-			prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, isLinked);
-
-			TreeViewer viewer = getTreeViewer();
-			if (isLinked)
-			{
-				// connects outline selection with editor selection
-				viewer.addSelectionChangedListener(CommonOutlinePage.this);
-				setEditorSelection((IStructuredSelection) viewer.getSelection(), false);
-			}
-			else
-			{
-				// disconnects outline selection from editor selection
-				viewer.removeSelectionChangedListener(CommonOutlinePage.this);
-			}
+			fPrefs.setValue(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, isChecked());
 		}
 	}
 
@@ -61,9 +45,12 @@ public class CommonOutlinePage extends ContentOutlinePage
 
 	private ToggleLinkingAction fToggleLinkingAction;
 
-	public CommonOutlinePage(AbstractThemeableEditor editor)
+	private IPreferenceStore fPrefs;
+
+	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
 		fEditor = editor;
+		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
 		fLabelProvider = new LabelProvider();
 
@@ -85,21 +72,45 @@ public class CommonOutlinePage extends ContentOutlinePage
 		TreeViewer viewer = getTreeViewer();
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
-		if (isLinkedWithEditor())
-		{
-			viewer.addSelectionChangedListener(this);
-		}
 		viewer.setInput(fEditor);
 
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
 		actionBars.updateActionBars();
+
+		fPrefs.addPropertyChangeListener(this);
+	}
+
+	@Override
+	public void dispose()
+	{
+		fPrefs.removePropertyChangeListener(this);
+		super.dispose();
 	}
 
 	@Override
 	public void selectionChanged(SelectionChangedEvent event)
 	{
-		setEditorSelection((IStructuredSelection) event.getSelection(), true);
+		if (isLinkedWithEditor())
+		{
+			setEditorSelection((IStructuredSelection) event.getSelection(), true);
+		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
+	{
+		if (event.getProperty().equals(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR))
+		{
+			boolean isLinked = ((Boolean) event.getNewValue()).booleanValue();
+
+			fToggleLinkingAction.setChecked(isLinked);
+			TreeViewer viewer = getTreeViewer();
+			if (isLinked)
+			{
+				setEditorSelection((IStructuredSelection) viewer.getSelection(), false);
+			}
+		}
 	}
 
 	public void refresh()
@@ -163,9 +174,8 @@ public class CommonOutlinePage extends ContentOutlinePage
 		}
 	}
 
-	private static boolean isLinkedWithEditor()
+	private boolean isLinkedWithEditor()
 	{
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true, null);
+		return fPrefs.getBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR);
 	}
 }

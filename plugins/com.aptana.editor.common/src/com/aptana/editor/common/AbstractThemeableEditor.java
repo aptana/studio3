@@ -144,7 +144,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 	    if (fOutlinePage == null)
         {
-            fOutlinePage = new CommonOutlinePage(this);
+            fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
         }
         return fOutlinePage;
 	}
@@ -654,10 +654,17 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return null;
 	}
 
-	private static boolean isLinkedWithEditor()
+	/**
+	 * @return the preference store for outline page
+	 */
+	protected IPreferenceStore getOutlinePreferenceStore()
 	{
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
-				IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true, null);
+		return CommonEditorPlugin.getDefault().getPreferenceStore();
+	}
+
+	private boolean isLinkedWithEditor()
+	{
+		return getOutlinePreferenceStore().getBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR);
 	}
 
 	private boolean isOutlinePageActive()
