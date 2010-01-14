@@ -170,7 +170,7 @@ class Dir
   # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
   def refresh(shallow = false)
     depth = shallow ? org.eclipse.core.resources.IResource::DEPTH_ONE : org.eclipse.core.resources.IResource::DEPTH_INFINITE
-    job = Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
+    job = RadRails::Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end
@@ -193,7 +193,7 @@ class File
   def refresh
     return if resource.nil?
     depth = org.eclipse.core.resources.IResource::DEPTH_ZERO
-    job = Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
+    job = RadRails::Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end
