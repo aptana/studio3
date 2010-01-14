@@ -34,6 +34,7 @@ public class CommandContext
 	private Map<String,Object> _map;
 	private InputStream _inputStream;
 	private OutputType _outputType;
+	private boolean _forcedExit;
 
 	/**
 	 * getContextContributors
@@ -158,6 +159,16 @@ public class CommandContext
 	}
 	
 	/**
+	 * isForcedExit
+	 * 
+	 * @return
+	 */
+	public boolean isForcedExit()
+	{
+		return this._forcedExit;
+	}
+	
+	/**
 	 * put
 	 * 
 	 * @param key
@@ -178,6 +189,16 @@ public class CommandContext
 		this._map.putAll(entries);
 	}
 
+	/**
+	 * setForceExit
+	 * 
+	 * @param value
+	 */
+	public void setForcedExit(boolean value)
+	{
+		this._forcedExit = value;
+	}
+	
 	/**
 	 * @param inputStream
 	 */
