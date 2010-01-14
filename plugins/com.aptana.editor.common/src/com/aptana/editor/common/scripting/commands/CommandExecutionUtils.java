@@ -287,7 +287,8 @@ public class CommandExecutionUtils
 
 	private static Map<String, IOConsole> nameToMessageConsole = new WeakHashMap<String, IOConsole>();
 
-	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType,
+			ITextEditor textEditor)
 	{
 		ITextViewer textViewer = null;
 		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
@@ -298,7 +299,8 @@ public class CommandExecutionUtils
 		return executeCommand(command, invocationType, textViewer, textEditor);
 	}
 
-	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextViewer textViewer, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType,
+			ITextViewer textViewer, ITextEditor textEditor)
 	{
 		StyledText textWidget = textViewer.getTextWidget();
 		FilterInputProvider filterInputProvider = null;
@@ -330,7 +332,7 @@ public class CommandExecutionUtils
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
 		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
-		
+
 		// Set invocation type
 		commandContext.put(CommandContext.INVOKED_VIA, invocationType.getName());
 
@@ -393,22 +395,9 @@ public class CommandExecutionUtils
 		{
 			return;
 		}
-		
+
 		StyledText textWidget = textViewer.getTextWidget();
-
 		final int caretOffset = textWidget.getCaretOffset();
-		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-		String lineText = textWidget.getLine(lineAtCaret);
-		int lineLength = lineText.length();
-
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
-
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
-				+ textWidget.getLine(selectionEndOffsetLine).length();
-
 		OutputType ouputType = OutputType.get(command.getOutputType());
 		switch (ouputType)
 		{
@@ -417,25 +406,29 @@ public class CommandExecutionUtils
 			case REPLACE_SELECTION:
 				if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
-					textWidget.setText(commandResult.getOutputString());
+					replaceDocument(textWidget, commandResult);
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					replaceLine(textWidget, commandResult);
 				}
 				else
 				{
-					int start = Math.min(selectionRange.x, selectionRange.y);
-					int end = Math.max(selectionRange.x, selectionRange.y);
-					textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+					IRegion region = getSelectedRegion(textWidget);
+					textWidget
+							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 				}
 				break;
 			case REPLACE_SELECTED_LINES:
-				textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
-						- selectionStartOffsetLineStartOffset, commandResult.getOutputString());
+				IRegion selectedLines = getSelectedLinesRegion(textWidget);
+				textWidget.replaceTextRange(selectedLines.getOffset(), selectedLines.getLength(), commandResult
+						.getOutputString());
 				break;
 			case REPLACE_LINE:
-				int startOffsetOfLineAtCaret = textWidget.getOffsetAtLine(lineAtCaret);
-				textWidget.replaceTextRange(startOffsetOfLineAtCaret, lineLength, commandResult.getOutputString());
+				replaceLine(textWidget, commandResult);
 				break;
 			case REPLACE_DOCUMENT:
-				textWidget.setText(commandResult.getOutputString());
+				replaceDocument(textWidget, commandResult);
 				break;
 			case INSERT_AS_TEXT:
 				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
@@ -444,8 +437,11 @@ public class CommandExecutionUtils
 				IRegion region = new Region(caretOffset, 0);
 				if (commandResult.getInputType() == InputType.SELECTION)
 				{
-					region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
-							- selectionStartOffsetLineStartOffset);
+					region = getSelectedRegion(textWidget);
+				}
+				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+				{
+					region = getSelectedLinesRegion(textWidget);
 				}
 				else if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
@@ -453,7 +449,7 @@ public class CommandExecutionUtils
 				}
 				else if (commandResult.getInputType() == InputType.LINE)
 				{
-					region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+					region = getCurrentLineRegion(textWidget);
 				}
 				else if (commandResult.getInputType() == InputType.WORD)
 				{
@@ -477,6 +473,46 @@ public class CommandExecutionUtils
 				outputToConsole(commandResult);
 				break;
 		}
+	}
+
+	private static IRegion getSelectedLinesRegion(StyledText textWidget)
+	{
+		Point selectionRange = textWidget.getSelection();
+		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
+		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+
+		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
+		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
+				+ textWidget.getLine(selectionEndOffsetLine).length();
+		return new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
+				- selectionStartOffsetLineStartOffset);
+	}
+
+	private static IRegion getSelectedRegion(StyledText textWidget)
+	{
+		Point selectionRange = textWidget.getSelection();
+		int start = Math.min(selectionRange.x, selectionRange.y);
+		int end = Math.max(selectionRange.x, selectionRange.y);
+		return new Region(start, end - start);
+	}
+
+	protected static IRegion getCurrentLineRegion(StyledText textWidget)
+	{
+		final int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		int lineLength = textWidget.getLine(lineAtCaret).length();
+		return new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+	}
+
+	protected static void replaceDocument(StyledText textWidget, CommandResult commandResult)
+	{
+		textWidget.setText(commandResult.getOutputString());
+	}
+
+	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
+	{
+		IRegion region = getCurrentLineRegion(textWidget);
+		textWidget.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)

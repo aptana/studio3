@@ -39,14 +39,14 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
 
-    public RubySourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
+    public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
         super(preferences, editor);
     }
 

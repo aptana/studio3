@@ -58,4 +58,9 @@ public interface IPreferenceConstants
 	 * Pref key for the color of the pair matching box.
 	 */
 	public String CHARACTER_PAIR_COLOR = CommonEditorPlugin.PLUGIN_ID + ".characterPairColor"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for linking the outline view with the active editor
+	 */
+	public String LINK_OUTLINE_WITH_EDITOR = CommonEditorPlugin.PLUGIN_ID + ".linkOutlineWithEditor"; //$NON-NLS-1$
 }
