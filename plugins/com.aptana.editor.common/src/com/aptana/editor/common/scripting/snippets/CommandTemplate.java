@@ -5,6 +5,7 @@ import org.eclipse.jface.text.templates.Template;
 import com.aptana.scripting.model.CommandElement;
 
 public class CommandTemplate extends Template {
+	// TODO: We need to figure out a way to have a common base class for this and SnippetTemplate
 
     private final CommandElement command;
 
@@ -29,7 +30,12 @@ public class CommandTemplate extends Template {
         }
         return prefix != null && prefix.length() != 0 && getName().toLowerCase().startsWith(prefix.toLowerCase());
     }
-    
+
+    boolean exactMatches(String prefix)
+    {
+        return prefix != null && prefix.length() != 0 && getName().equalsIgnoreCase(prefix);
+    }
+
     @Override
     public String toString()
     {
