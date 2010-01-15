@@ -4,8 +4,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -14,8 +18,23 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ColorManager;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
+
 public class ScriptingConsole
 {
+	private static final String CONSOLE_TRACE = "console.trace";
+
+	private static final String CONSOLE_WARNING = "console.warning";
+
+	private static final String CONSOLE_INFO = "console.info";
+
+	private static final String CONSOLE_ERROR = "console.error";
+
+	private static final String CONSOLE_OUTPUT = "console.output";
+
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
 
 	private static ScriptingConsole INSTANCE;
@@ -25,6 +44,8 @@ public class ScriptingConsole
 	private static MessageConsoleStream infoConsoleStream;
 	private static MessageConsoleStream warningConsoleStream;
 	private static MessageConsoleStream traceConsoleStream;
+	
+	private IPreferenceChangeListener _themeChangeListener;
 
 	/**
 	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
@@ -70,6 +91,24 @@ public class ScriptingConsole
 	 */
 	private ScriptingConsole()
 	{
+		// create console
+		console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+
+		// register our console with Eclipse
+		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+		
+		// setup theme listener
+		this.listenForThemeChanges();
+		
+		// and apply colors
+		this.applyTheme();
+	}
+
+	/**
+	 * applyTheme
+	 */
+	private void applyTheme()
+	{
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		final Display display = workbench.getDisplay();
 		
@@ -82,11 +121,19 @@ public class ScriptingConsole
 		{
 			public void run()
 			{
-				// create console
-				console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
-
-				// register our console with Eclipse
-				ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+				// set colors
+				CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+				ColorManager colorManager = plugin.getColorManager();
+				Theme theme = plugin.getThemeManager().getCurrentTheme();
+				
+				// set background color
+				console.setBackground(colorManager.getColor(theme.getBackground()));
+				
+				Color outputColor = getColor(CONSOLE_OUTPUT, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				Color errorColor = getColor(CONSOLE_ERROR, display.getSystemColor(SWT.COLOR_DARK_RED));
+				Color infoColor = getColor(CONSOLE_INFO, display.getSystemColor(SWT.COLOR_DARK_BLUE));
+				Color warningColor = getColor(CONSOLE_WARNING, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+				Color traceColor = getColor(CONSOLE_TRACE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
 
 				// create message streams
 				outputConsoleStream = console.newMessageStream();
@@ -96,15 +143,31 @@ public class ScriptingConsole
 				traceConsoleStream = console.newMessageStream();
 
 				// set stream colors
-				outputConsoleStream.setColor(display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				errorConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_RED));
-				infoConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				warningConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				traceConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_GREEN));
+				outputConsoleStream.setColor(outputColor);
+				errorConsoleStream.setColor(errorColor);
+				infoConsoleStream.setColor(infoColor);
+				warningConsoleStream.setColor(warningColor);
+				traceConsoleStream.setColor(traceColor);
 			}
 		});
+		
 	}
-
+	
+	/**
+	 * getColor
+	 * 
+	 * @param name
+	 * @param defaultColor
+	 * @return
+	 */
+	private Color getColor(String name, Color defaultColor)
+	{
+		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		Theme theme = plugin.getThemeManager().getCurrentTheme();
+		
+		return (theme.hasEntry(name)) ? theme.getForeground(name) : defaultColor;
+	}
+	
 	/**
 	 * getErrorConsoleStream
 	 * 
@@ -155,6 +218,26 @@ public class ScriptingConsole
 		return warningConsoleStream;
 	}
 
+	/**
+	 * listenForThemeChanges
+	 */
+	private void listenForThemeChanges()
+	{
+		this._themeChangeListener = new IPreferenceChangeListener()
+		{
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					applyTheme();
+				}
+			}
+		};
+		
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this._themeChangeListener);
+	}
+	
 	/**
 	 * print
 	 * 
