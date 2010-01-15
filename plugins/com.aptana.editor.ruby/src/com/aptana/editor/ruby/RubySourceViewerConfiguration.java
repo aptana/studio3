@@ -35,6 +35,7 @@
 package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -44,37 +45,53 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 
-public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration {
+public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
+{
 
-    public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-        super(preferences, editor);
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				RubySourceConfiguration.CONTENT_TYPES
-			});
+	public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	{
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				RubySourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return RubySourceConfiguration.getDefault().getTopContentTypes();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
+	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new RubyAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 }

@@ -253,49 +253,36 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			{
 				final CommandElement command = menuForScope.getCommand();
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
-				if (command instanceof SnippetElement)
+
+				if (command != null)
 				{
-					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.SNIPPET));
-					String[] triggers = command.getTriggers();
-					if (triggers != null && triggers.length > 0)
+					KeySequence[] keySequences = command.getKeySequences();
+					if (keySequences != null && keySequences.length > 0)
 					{
-						// Use first trigger
-						displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-					}
-				}
-				else
-				{
-					menuItem.setImage(CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.COMMAND));
-					if (command != null)
-					{
-						KeySequence[] keySequences = command.getKeySequences();
-						if (keySequences != null && keySequences.length > 0)
+						KeySequence keySequence = keySequences[0];
+						KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
+						// Eclipse can show only single key stroke key sequences
+						if (keyStrokes.length == 1)
 						{
-							KeySequence keySequence = keySequences[0];
-							KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
-							// Eclipse can show only single key stroke key sequences
-							if (keyStrokes.length == 1)
+							int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
+							menuItem.setAccelerator(accelerator);
+							// We mark the first level menu item with accelerators
+							// for disposal when the menu is hidden so that it does
+							// the accelerator does not interfere with the handling
+							// of key bindings
+							if (menu.getParentMenu() == null)
 							{
-								int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
-								menuItem.setAccelerator(accelerator);
-								// We mark the first level menu item with accelerators
-								// for disposal when the menu is hidden so that it does
-								// the accelerator does not interfere with the handling
-								// of key bindings
-								if (menu.getParentMenu() == null)
-								{
-									menuItem.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
-								}
+								menuItem.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
 							}
 						}
-						else
+					}
+					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0)
+					{
+						String[] triggers = command.getTriggers();
+						if (triggers != null && triggers.length > 0)
 						{
-							String[] triggers = command.getTriggers();
-							if (triggers != null && triggers.length > 0)
-							{
-								// Use first trigger
-								displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-							}
+							// Use first trigger
+							displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					}
 				}
