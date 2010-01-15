@@ -20,10 +20,10 @@ import org.jruby.RubyArray;
 import org.jruby.RubyString;
 import org.jruby.embed.EmbedEvalUnit;
 import org.jruby.embed.EvalFailedException;
-import org.jruby.embed.LocalContextProvider;
 import org.jruby.embed.ParseFailedException;
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
+import org.jruby.embed.internal.LocalContextProvider;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.osgi.framework.Bundle;
 
