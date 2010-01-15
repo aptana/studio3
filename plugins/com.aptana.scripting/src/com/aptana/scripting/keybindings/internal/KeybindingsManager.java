@@ -1,5 +1,6 @@
 package com.aptana.scripting.keybindings.internal;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -12,59 +13,68 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
-import org.eclipse.jface.bindings.BindingManagerEvent;
-import org.eclipse.jface.bindings.IBindingManagerListener;
-import org.eclipse.jface.bindings.Scheme;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 
-import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.ElementChangeListener;
+import com.aptana.scripting.model.LoadCycleListener;
 import com.aptana.scripting.model.SnippetElement;
 
-public class KeybindingsManager implements IBindingManagerListener, ElementChangeListener
+@SuppressWarnings("restriction")
+public class KeybindingsManager implements LoadCycleListener, IPropertyChangeListener
 {
+	private static final String SCRIPTING_COMMAND_ID_PREFIX = "com.aptana.scripting.keybindings."; //$NON-NLS-1$
+
 	private static final AtomicBoolean installed = new AtomicBoolean(false);
 	private BundleManager bundleManager;
 	private IBindingService bindingService;
 	private ICommandService commandService;
 	private final IHandlerService handlerService;
 
+	private static class MutexRule implements ISchedulingRule {
+		public boolean isConflicting(ISchedulingRule rule) {
+			return rule == this;
+		}
+		public boolean contains(ISchedulingRule rule) {
+			return rule == this;
+		}
+	};
+
+	private static final MutexRule MUTEX_RULE = new MutexRule();
+
+	private static List<CommandElementListHandler> commandElementListHandlers = new LinkedList<CommandElementListHandler>();
+
 	public static final void install()
 	{
 		if (installed.compareAndSet(false, true))
 		{
-			WorkbenchJob workbenchJob = new WorkbenchJob("Installing KeybindingsManager") //$NON-NLS-1$
-			{
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor)
-				{
-					IWorkbench workbench = PlatformUI.getWorkbench();
-					IBindingService bindingService = (IBindingService) workbench.getService(IBindingService.class);
-					ICommandService commandService = (ICommandService) workbench.getService(ICommandService.class);
-					IHandlerService handlerService = (IHandlerService) workbench.getService(IHandlerService.class);
-					KeybindingsManager keybindingsManager = new KeybindingsManager(bindingService, commandService,
-							handlerService);
-					// Load initial bindings
-					keybindingsManager.loadbindings();
-					return Status.OK_STATUS;
-				}
-			};
-			workbenchJob.setSystem(true);
-			workbenchJob.setPriority(Job.LONG);
-			workbenchJob.schedule();
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			IBindingService bindingService = (IBindingService) workbench.getService(IBindingService.class);
+			ICommandService commandService = (ICommandService) workbench.getService(ICommandService.class);
+			IHandlerService handlerService = (IHandlerService) workbench.getService(IHandlerService.class);
+			KeybindingsManager keybindingsManager = new KeybindingsManager(bindingService, commandService,
+					handlerService);
+
+			// Load initial bindings
+			keybindingsManager.initBindings();
 		}
 	}
 
@@ -75,16 +85,96 @@ public class KeybindingsManager implements IBindingManagerListener, ElementChang
 		this.commandService = commandService;
 		this.handlerService = handlerService;
 
-		// Listen to the changes to bindings
-		bindingService.addBindingManagerListener(this);
-
 		bundleManager = BundleManager.getInstance();
-		bundleManager.addElementChangeListener(this);
+		bundleManager.addLoadCycleListener(this);
+
+		WorkbenchPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
-	@SuppressWarnings("restriction")
+	private void initBindings() {
+		WorkbenchJob workbenchJob = new WorkbenchJob("Installing KeybindingsManager") //$NON-NLS-1$
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				try {
+					loadbindings();
+				} finally {
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		workbenchJob.setRule(MUTEX_RULE);
+		workbenchJob.setSystem(true);
+		workbenchJob.setPriority(Job.LONG);
+		workbenchJob.schedule();
+	}
+
+	private void reloadbindings() {
+		WorkbenchJob workbenchJob = new WorkbenchJob("Reloading KeybindingsManager") //$NON-NLS-1$
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				try {
+					Binding[] bindings = bindingService.getBindings();
+
+					List<Binding> bindingsList = new LinkedList<Binding>(Arrays.asList(bindings));
+
+					// Remove any bindings we added
+					for (Binding binding : bindings)
+					{
+						ParameterizedCommand parameterizedCommand = binding.getParameterizedCommand();
+						if (parameterizedCommand != null)
+						{
+							Command command = parameterizedCommand.getCommand();
+							if (command.isDefined())
+							{
+								String id = command.getId();
+								if (id.startsWith(SCRIPTING_COMMAND_ID_PREFIX))
+								{
+									bindingsList.remove(binding);
+								}
+							}
+						}
+					}
+
+					for (CommandElementListHandler commandElementListHandler : commandElementListHandlers)
+					{
+						// Deactivate the handler
+						handlerService.deactivateHandler(commandElementListHandler.getActivateHandler());
+
+						// Add back the original bindings that we were wrapping
+						Binding originalBinding = commandElementListHandler.getOriginalBinding();
+						if (originalBinding != null)
+						{
+							bindingsList.add(originalBinding);
+						}
+					}
+
+					// Set the new bindings
+					BindingManager bindingManager = ((org.eclipse.ui.internal.keys.BindingService) bindingService)
+					.getBindingManager();
+
+					bindingManager.setBindings(bindingsList.toArray(new Binding[0]));
+
+					loadbindings();
+				} finally {
+				}
+				return Status.OK_STATUS;
+			}
+
+		};
+		workbenchJob.setRule(MUTEX_RULE);
+		workbenchJob.setSystem(true);
+		workbenchJob.setPriority(Job.LONG);
+		workbenchJob.schedule();
+	}
+
 	private void loadbindings()
 	{
+		commandElementListHandlers.clear();
+
 		// Collect unique key sequences
 		Set<KeySequence> uniqueKeySequences = new LinkedHashSet<KeySequence>();
 
@@ -112,10 +202,15 @@ public class KeybindingsManager implements IBindingManagerListener, ElementChang
 
 		List<Binding> commandElementBindings = new LinkedList<Binding>();
 		List<Binding> bindingsToRemove = new LinkedList<Binding>();
-		Scheme activeScheme = bindingService.getActiveScheme();
+
+		String schemeId = PlatformUI.getPreferenceStore().getString(IWorkbenchPreferenceConstants.KEY_CONFIGURATION_ID);
 		for (KeySequence keySequence : uniqueKeySequences)
 		{
 			ParameterizedCommand originalParameterizedCommand = null;
+			Binding originalBinding = null;
+
+			// id is a combination of the constant string and the string form of key sequence
+
 			// Is there a command that already has the same key sequence bounding ?
 			Binding perfectMatch = bindingService.getPerfectMatch(keySequence);
 			if (perfectMatch != null)
@@ -124,42 +219,42 @@ public class KeybindingsManager implements IBindingManagerListener, ElementChang
 				// type (USER vs. SYSTEM). For now we check for SYSTEM bindings in the current scheme that are defined
 				// for base editor context.
 				if (perfectMatch.getType() == Binding.SYSTEM &&
-						activeScheme.getId().equals(perfectMatch.getSchemeId()) &&
+						schemeId.equals(perfectMatch.getSchemeId()) &&
 						"org.eclipse.ui.textEditorScope".equals(perfectMatch.getContextId())) //$NON-NLS-1$
 				{
 					// Remove the bindings
 					bindingsToRemove.add(perfectMatch);
 					//
 					originalParameterizedCommand = perfectMatch.getParameterizedCommand();
+					originalBinding = perfectMatch;
 				}
 			}
 
+			String commandId = SCRIPTING_COMMAND_ID_PREFIX + keySequence;
 			CommandElementListHandler commandElementListHandler = new CommandElementListHandler(keySequence,
-					originalParameterizedCommand);
+					originalParameterizedCommand, originalBinding);
 
-			// id is a combination of the constant string and the string form of key sequence
-			Command commandElementListCommand = commandService.getCommand("com.aptana.scripting.keybindings." //$NON-NLS-1$
-					+ keySequence);
+			commandElementListHandlers.add(commandElementListHandler);
+
+			Command commandElementListCommand = commandService.getCommand(commandId);
 			String nameAndDescription = NLS.bind(Messages.KeybindingsManager_AptanaProxyCommand, new Object[] { keySequence });
 			commandElementListCommand
 					.define(nameAndDescription,
 							nameAndDescription, commandService.getCategory("org.eclipse.ui.category.edit")); //$NON-NLS-1$
 
-			handlerService.activateHandler(commandElementListCommand.getId(), commandElementListHandler);
+			IHandlerActivation activateHandler = handlerService.activateHandler(commandElementListCommand.getId(), commandElementListHandler);
+			commandElementListHandler.setActivationHandler(activateHandler);
 			ParameterizedCommand parameterizedCommand = new ParameterizedCommand(commandElementListCommand, null);
-			Binding commandElementBinding = new KeyBinding(keySequence, parameterizedCommand, activeScheme.getId(),
+			Binding commandElementBinding = new KeyBinding(keySequence, parameterizedCommand, schemeId,
 					"org.eclipse.ui.textEditorScope", // TODO Handle other scopes //$NON-NLS-1$
 					null, null, null, Binding.SYSTEM);
 			commandElementBindings.add(commandElementBinding);
 		}
 
-		List<Binding> bindingsList = new LinkedList<Binding>();
-
 		// Original key bindings
-		Binding[] bindings = bindingService.getBindings();
-		bindingsList.addAll(Arrays.asList(bindings));
+		List<Binding> bindingsList = new LinkedList<Binding>(Arrays.asList(bindingService.getBindings()));
 
-		// Remove proxied key bindings
+		// Remove the original key bindings that we are wrapping
 		bindingsList.removeAll(bindingsToRemove);
 
 		// Add key bindings defined in bundles
@@ -172,18 +267,43 @@ public class KeybindingsManager implements IBindingManagerListener, ElementChang
 		bindingManager.setBindings(bindingsList.toArray(new Binding[0]));
 	}
 
-	public void bindingManagerChanged(BindingManagerEvent event)
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
 	{
-		// TODO Deal with changes to binding
+		// Apparently this preference property name is fired when the user makes changes to
+		// the General > Keys preferences page
+		if (IWorkbenchRegistryConstants.EXTENSION_COMMANDS.equals(event.getProperty()))
+		{
+			// Not working yet
+			// reloadbindings();
+		}
 	}
 
-	public void elementAdded(AbstractElement element)
+	/* (non-Javadoc)
+	 * @see com.aptana.scripting.model.LoadCycleListener#scriptLoaded(java.io.File)
+	 */
+	@Override
+	public void scriptLoaded(File script)
 	{
-		// TODO Deal with changes to key bindings if the element was CommandElement
+		reloadbindings();
 	}
 
-	public void elementDeleted(AbstractElement element)
+	/* (non-Javadoc)
+	 * @see com.aptana.scripting.model.LoadCycleListener#scriptReloaded(java.io.File)
+	 */
+	@Override
+	public void scriptReloaded(File script)
 	{
-		// TODO Deal with changes to key bindings if the element was CommandElement
+		reloadbindings();
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.scripting.model.LoadCycleListener#scriptUnloaded(java.io.File)
+	 */
+	@Override
+	public void scriptUnloaded(File script)
+	{
+		reloadbindings();
+	}
+
 }

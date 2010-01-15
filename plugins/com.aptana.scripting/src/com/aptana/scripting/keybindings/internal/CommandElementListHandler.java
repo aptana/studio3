@@ -10,6 +10,7 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
@@ -22,6 +23,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -30,7 +32,9 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import com.aptana.scripting.Activator;
@@ -44,16 +48,18 @@ import com.aptana.scripting.model.CommandElement;
  */
 class CommandElementListHandler extends AbstractHandler
 {
+	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
 
 	private final KeySequence keySequence;
 	private final ParameterizedCommand originalParameterizedCommand;
+	private final Binding originalBinding;
+	private IHandlerActivation activateHandler;
 
-	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
-
-	CommandElementListHandler(KeySequence keySequence, ParameterizedCommand originalParameterizedCommand)
+	CommandElementListHandler(KeySequence keySequence, ParameterizedCommand originalParameterizedCommand, Binding originalBinding)
 	{
 		this.keySequence = keySequence;
 		this.originalParameterizedCommand = originalParameterizedCommand;
+		this.originalBinding = originalBinding;
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
@@ -90,7 +96,7 @@ class CommandElementListHandler extends AbstractHandler
 					IContextService contextService = (IContextService) workbenchPart.getSite().getService(
 							IContextService.class);
 					Shell shell = workbenchPart.getSite().getShell();
-					popup(shell, contextService, handlerService, commandElementsProvider, commandElements);
+					popup(shell, contextService, handlerService, commandElementsProvider, commandElements, getInitialLocation(commandElementsProvider));
 				}
 			}
 			else
@@ -138,8 +144,24 @@ class CommandElementListHandler extends AbstractHandler
 		return keySequence;
 	}
 
-	private void popup(Shell shell, final IContextService contextService, final IHandlerService handlerService,
-			final ICommandElementsProvider commandElementsProvider, final List<CommandElement> commandElements)
+	Binding getOriginalBinding()
+	{
+		return originalBinding;
+	}
+
+	IHandlerActivation getActivateHandler()
+	{
+		return activateHandler;
+	}
+
+	void setActivationHandler(IHandlerActivation activateHandler)
+	{
+		this.activateHandler = activateHandler;
+	}
+
+	private void popup(final Shell shell, final IContextService contextService, final IHandlerService handlerService,
+			final ICommandElementsProvider commandElementsProvider, final List<CommandElement> commandElements,
+			final Point initialLocation)
 	{
 		PopupDialog popupDialog = new PopupDialog(shell, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false,
 				false, null, null)
@@ -148,7 +170,10 @@ class CommandElementListHandler extends AbstractHandler
 			@Override
 			protected Point getInitialLocation(Point initialSize)
 			{
-				return getShell().getDisplay().getCursorLocation();
+				if (initialLocation != null) {
+					return initialLocation;
+				}
+				return shell.getDisplay().getCursorLocation();
 			}
 
 			protected Control createDialogArea(Composite parent)
@@ -295,5 +320,17 @@ class CommandElementListHandler extends AbstractHandler
 			}
 		};
 		popupDialog.open();
+	}
+
+	private Point getInitialLocation(ICommandElementsProvider commandElementsProvider)
+	{
+		// TODO Ask the commandElementsProvider to provide the location
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		if (display != null)
+		{
+			return display.getCursorLocation();
+		}
+
+		return null;
 	}
 }
