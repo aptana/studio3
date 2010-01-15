@@ -7,6 +7,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Color;
@@ -15,6 +19,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
@@ -25,19 +30,17 @@ import com.aptana.editor.common.theme.Theme;
 
 public class ScriptingConsole
 {
+	private static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont";
 	private static final String CONSOLE_TRACE = "console.trace";
-
 	private static final String CONSOLE_WARNING = "console.warning";
-
 	private static final String CONSOLE_INFO = "console.info";
-
 	private static final String CONSOLE_ERROR = "console.error";
-
 	private static final String CONSOLE_OUTPUT = "console.output";
-
+	
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
 
 	private static ScriptingConsole INSTANCE;
+	
 	private static MessageConsole console;
 	private static MessageConsoleStream outputConsoleStream;
 	private static MessageConsoleStream errorConsoleStream;
@@ -45,47 +48,19 @@ public class ScriptingConsole
 	private static MessageConsoleStream warningConsoleStream;
 	private static MessageConsoleStream traceConsoleStream;
 	
+	private IPropertyChangeListener _fontChangeListener;
 	private IPreferenceChangeListener _themeChangeListener;
 
-	/**
-	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
-	 * <p>
-	 * Throws IllegalStateException if unable to get the Display which most likely happens when called on non-UI thread.
-	 * 
-	 * @return
-	 */
-	public static ScriptingConsole getDefault()
+	static
 	{
-		if (INSTANCE == null)
-		{
-			INSTANCE = new ScriptingConsole();
-		}
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		final Display display = workbench.getDisplay();
 		
-		return INSTANCE;
-	}
-
-	/**
-	 * print
-	 * 
-	 * @param stream
-	 * @param output
-	 */
-	private static void print(final MessageConsoleStream stream, final String output)
-	{
-		Job job = new Job("Writing to console") //$NON-NLS-1$
+		if (display != null)
 		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				stream.print(output);
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.setPriority(Job.SHORT);
-		job.schedule();
+		}
 	}
-
+	
 	/**
 	 * ScriptingConsole
 	 */
@@ -97,13 +72,29 @@ public class ScriptingConsole
 		// register our console with Eclipse
 		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
 		
+		// create message streams
+		outputConsoleStream = console.newMessageStream();
+		errorConsoleStream = console.newMessageStream();
+		infoConsoleStream = console.newMessageStream();
+		warningConsoleStream = console.newMessageStream();
+		traceConsoleStream = console.newMessageStream();
+		
 		// setup theme listener
-		this.listenForThemeChanges();
+		this.addListeners();
 		
 		// and apply colors
 		this.applyTheme();
 	}
 
+	/**
+	 * addListeners
+	 */
+	private void addListeners()
+	{
+		this.listenForFontChanges();
+		this.listenForThemeChanges();
+	}
+	
 	/**
 	 * applyTheme
 	 */
@@ -128,44 +119,66 @@ public class ScriptingConsole
 				
 				// set background color
 				console.setBackground(colorManager.getColor(theme.getBackground()));
+				console.setFont(JFaceResources.getTextFont());
 				
-				Color outputColor = getColor(CONSOLE_OUTPUT, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				Color errorColor = getColor(CONSOLE_ERROR, display.getSystemColor(SWT.COLOR_DARK_RED));
-				Color infoColor = getColor(CONSOLE_INFO, display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				Color warningColor = getColor(CONSOLE_WARNING, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				Color traceColor = getColor(CONSOLE_TRACE, display.getSystemColor(SWT.COLOR_DARK_GREEN));
-
-				// create message streams
-				outputConsoleStream = console.newMessageStream();
-				errorConsoleStream = console.newMessageStream();
-				infoConsoleStream = console.newMessageStream();
-				warningConsoleStream = console.newMessageStream();
-				traceConsoleStream = console.newMessageStream();
-
 				// set stream colors
-				outputConsoleStream.setColor(outputColor);
-				errorConsoleStream.setColor(errorColor);
-				infoConsoleStream.setColor(infoColor);
-				warningConsoleStream.setColor(warningColor);
-				traceConsoleStream.setColor(traceColor);
+				applyTheme(CONSOLE_OUTPUT, outputConsoleStream, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+				applyTheme(CONSOLE_ERROR, errorConsoleStream, display.getSystemColor(SWT.COLOR_DARK_RED));
+				applyTheme(CONSOLE_INFO, infoConsoleStream, display.getSystemColor(SWT.COLOR_DARK_BLUE));
+				applyTheme(CONSOLE_WARNING, warningConsoleStream, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+				applyTheme(CONSOLE_TRACE, traceConsoleStream, display.getSystemColor(SWT.COLOR_DARK_GREEN));
 			}
 		});
-		
 	}
 	
 	/**
-	 * getColor
+	 * applyTheme
 	 * 
 	 * @param name
+	 * @param stream
 	 * @param defaultColor
+	 * 
 	 * @return
 	 */
-	private Color getColor(String name, Color defaultColor)
+	private void applyTheme(String name, MessageConsoleStream stream, Color defaultColor)
 	{
-		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
-		Theme theme = plugin.getThemeManager().getCurrentTheme();
+		IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
+		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		Color color = defaultColor;
+		int style = SWT.NONE;
 		
-		return (theme.hasEntry(name)) ? theme.getForeground(name) : defaultColor;
+		// grab theme values, if they exist
+		if (theme.hasEntry(name))
+		{
+			TextAttribute attr = theme.getTextAttribute(name);
+			
+			color = theme.getForeground(name);
+			style = attr.getStyle();
+		}
+		
+		// apply new values
+		stream.setColor(color);
+		stream.setFontStyle(style);
+		
+		// refresh the display
+		consoleManager.refresh(stream.getConsole());
+	}
+	
+	/**
+	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
+	 * <p>
+	 * Throws IllegalStateException if unable to get the Display which most likely happens when called on non-UI thread.
+	 * 
+	 * @return
+	 */
+	public static ScriptingConsole getDefault()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new ScriptingConsole();
+		}
+		
+		return INSTANCE;
 	}
 	
 	/**
@@ -219,6 +232,25 @@ public class ScriptingConsole
 	}
 
 	/**
+	 * listenForFontChanges
+	 */
+	private void listenForFontChanges()
+	{
+		this._fontChangeListener = new IPropertyChangeListener()
+		{
+			@Override
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (event.getProperty().equals(TEXTFONT_PROPERTY))
+				{
+					applyTheme();
+				}
+			}
+		};
+		JFaceResources.getFontRegistry().addListener(this._fontChangeListener);
+	}
+	
+	/**
 	 * listenForThemeChanges
 	 */
 	private void listenForThemeChanges()
@@ -236,6 +268,29 @@ public class ScriptingConsole
 		};
 		
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this._themeChangeListener);
+	}
+	
+	/**
+	 * print
+	 * 
+	 * @param stream
+	 * @param output
+	 */
+	private static void print(final MessageConsoleStream stream, final String output)
+	{
+		Job job = new Job("Writing to console") //$NON-NLS-1$
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				stream.print(output);
+				return Status.OK_STATUS;
+			}
+		};
+		
+		job.setSystem(true);
+		job.setPriority(Job.SHORT);
+		job.schedule();
 	}
 	
 	/**
