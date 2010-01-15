@@ -156,6 +156,7 @@ def with_defaults(values, &block)
   else
     bundle.defaults = values
     block.call(bundle) if block_given?
+    bundle.defaults = {}
   end
 end
 
