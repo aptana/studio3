@@ -379,6 +379,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		 */
 		public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
 		{
+			if (event.character == 10 || event.character == 13) // \n // \r
+			{
+				return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
+			}
+
 			if (event.character != fExitCharacter)
 				return null;
 
