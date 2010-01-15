@@ -44,13 +44,14 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
+import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.OutputType;
-import com.aptana.scripting.ui.ScriptingConsole;
+//import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils
@@ -517,13 +518,11 @@ public class CommandExecutionUtils
 
 	private static void outputToConsole(CommandResult commandResult)
 	{
-		ScriptingConsole scriptingConsole = ScriptingConsole.getDefault();
-
-		scriptingConsole.print(commandResult.getOutputString());
+		ScriptLogger.print(commandResult.getOutputString());
 		if (!commandResult.executedSuccessfully())
 		{
 			// Dump the error output if any
-			scriptingConsole.printErr(commandResult.getErrorString());
+			ScriptLogger.printError(commandResult.getErrorString());
 		}
 	}
 
