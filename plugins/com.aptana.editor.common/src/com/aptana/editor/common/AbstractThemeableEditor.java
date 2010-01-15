@@ -63,7 +63,7 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
  * color prefs.
- *
+ * 
  * @author cwilliams
  * @author schitale
  */
@@ -142,11 +142,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	protected CommonOutlinePage getOutlinePage()
 	{
-	    if (fOutlinePage == null)
-        {
-            fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
-        }
-        return fOutlinePage;
+		if (fOutlinePage == null)
+		{
+			fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
+		}
+		return fOutlinePage;
 	}
 
 	private void overrideThemeColors()
@@ -213,7 +213,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
 	 * are the end.
-	 *
+	 * 
 	 * @return
 	 */
 	protected char[] getPairMatchingCharacters()
@@ -224,7 +224,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
 	 * the end. Defaults to using the same characters as the pair matching.
-	 *
+	 * 
 	 * @return
 	 */
 	protected char[] getAutoClosePairCharacters()
@@ -236,7 +236,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
 	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
 	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
-	 *
+	 * 
 	 * @author cwilliams
 	 */
 	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
@@ -517,12 +517,12 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	public ISourceViewer getSourceViewerNonFinal()
 	{
-	    return getSourceViewer();
+		return getSourceViewer();
 	}
 
 	public FileService getFileService()
 	{
-	    return fFileService;
+		return fFileService;
 	}
 
 	public Object computeHighlightedOutlineNode()
@@ -620,7 +620,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return findBarDecorator;
 	}
 
-	ICommandElementsProvider getCommandElementsProvider() {
+	ICommandElementsProvider getCommandElementsProvider()
+	{
 		if (commandElementsProvider == null)
 		{
 			commandElementsProvider = new CommandElementsProvider(this, getSourceViewer());
@@ -630,7 +631,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	/**
 	 * Returns a description of the cursor position.
-	 *
+	 * 
 	 * @return a description of the cursor position
 	 */
 	protected String getCursorPosition()
@@ -677,5 +678,30 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		IWorkbenchWindow window = getSite().getWorkbenchWindow();
 		return window.getPartService().getActivePart();
+	}
+
+	/**
+	 * Made public so we can set TM_SOFT_TABS for scripting
+	 */
+	@Override
+	public boolean isTabsToSpacesConversionEnabled()
+	{
+		// Make public so we can grab the value
+		return super.isTabsToSpacesConversionEnabled();
+	}
+
+	/**
+	 * Added so we can set TM_TAB_SIZE for scripting.
+	 * 
+	 * @return
+	 */
+	public int getTabSize()
+	{
+		SourceViewerConfiguration config = getSourceViewerConfiguration();
+		if (config != null)
+		{
+			return config.getTabWidth(getSourceViewer());
+		}
+		return 4;
 	}
 }
