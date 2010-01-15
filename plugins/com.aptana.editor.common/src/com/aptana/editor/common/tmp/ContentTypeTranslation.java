@@ -80,7 +80,7 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.ruby.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+				new QualifiedContentType("text.html.ruby", "source.ruby.rails.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		addTranslation(new QualifiedContentType("__html_comment"), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("__html_tag"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
