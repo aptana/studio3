@@ -55,6 +55,16 @@ public class EarlyStartup implements IStartup
 			{
 				console.getTraceConsoleStream().println(this.formatMessage(message));
 			}
+
+			public void print(String message)
+			{
+				console.getOutputConsoleStream().println(message);
+			}
+
+			public void printError(String message)
+			{
+				console.getErrorConsoleStream().println(message);
+			}
 		});
 
 		// create CONSOLE and $console streams

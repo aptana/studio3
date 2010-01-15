@@ -211,6 +211,14 @@ module RadRails
       input = editor_input
       result = {}
       
+      if editor_part.kind_of?(com.aptana.editor.common.AbstractThemeableEditor)
+        result['TM_SOFT_TABS'] = editor_part.isTabsToSpacesConversionEnabled() ? "YES" : "NO"
+        result['TM_TAB_SIZE'] = editor_part.getTabSize()
+      else
+        result['TM_SOFT_TABS'] = "NO"
+        result['TM_TAB_SIZE'] = 4
+      end
+      
       if input
         ifile = input.file
         file = ifile.location.to_file
