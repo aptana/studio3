@@ -902,7 +902,18 @@ public abstract class SingleProjectView extends CommonNavigator
 									public void run()
 									{
 										// Construct the menu item to for this project
-										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
+										// Insert in alphabetical order
+										int index = projectsMenu.getItemCount();
+										MenuItem[] items = projectsMenu.getItems();
+										for(int i = 0; i < items.length; i++)
+										{
+											if (items[i].getText().compareTo(projectName) > 0)
+											{
+												index = i;
+												break;
+											}
+										}
+										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO, index);
 										projectNameMenuItem.setText(projectName);
 										projectNameMenuItem.setSelection(true);
 										projectNameMenuItem.addSelectionListener(new SelectionAdapter()
