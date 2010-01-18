@@ -64,6 +64,10 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -74,6 +78,8 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.terminal.TerminalBrowser;
+import com.aptana.terminal.views.TerminalView;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -210,6 +216,35 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void fill(Menu menu, int index)
 			{
+				new MenuItem(menu, SWT.SEPARATOR);
+				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH)
+				{
+					public boolean isEnabled() {
+						return super.isEnabled() && selectedProject != null;
+						
+					};
+				};
+				terminalMenuItem.setText("Open Terminal");
+				terminalMenuItem.addSelectionListener(new SelectionAdapter()
+				{
+					public void widgetSelected(SelectionEvent e)
+					{
+						// Open a terminal on active project!
+						try
+						{
+							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+							TerminalBrowser.setStartingDirectory(selectedProject.getLocation().toOSString());
+							String projectName = selectedProject.getName();
+							TerminalView term = (TerminalView) page.showView(TerminalView.ID, projectName, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
+							term.setPartName(projectName);
+						}
+						catch (PartInitException e1)
+						{
+							ExplorerPlugin.logError(e1);
+						}
+					}
+				});
+				
 				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 				if (projects.length > 0)
 				{
