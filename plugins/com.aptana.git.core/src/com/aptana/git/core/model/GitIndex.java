@@ -482,115 +482,10 @@ public class GitIndex
 
 	public void commit(String commitMessage)
 	{
-		String commitSubject = "commit: "; //$NON-NLS-1$
-		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
-		if (newLine == -1)
-			commitSubject += commitMessage;
-		else
-			commitSubject += commitMessage.substring(0, newLine);
-
-		repository.writetoCommitFile(commitMessage);
-
-		postCommitUpdate("Creating tree"); //$NON-NLS-1$
-		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree"); //$NON-NLS-1$
-		if (tree.length() != 40)
-		{
-			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
-			return;
-		}
-		// FIXME For merges we need to do equivalent of:
-		/*
-		 * pptr = &commit_list_insert(lookup_commit(head_sha1), pptr)->next;
-		fp = fopen(git_path("MERGE_HEAD"), "r");
-		if (fp == NULL)
-			die_errno("could not open '%s' for reading",
-				  git_path("MERGE_HEAD"));
-		while (strbuf_getline(&m, fp, '\n') != EOF) {
-			unsigned char sha1[20];
-			if (get_sha1_hex(m.buf, sha1) < 0)
-				die("Corrupt MERGE_HEAD file (%s)", m.buf);
-			pptr = &commit_list_insert(lookup_commit(sha1), pptr)->next;
-		}
-		fclose(fp);
-		strbuf_release(&m);
-		if (!stat(git_path("MERGE_MODE"), &statbuf)) {
-			if (strbuf_read_file(&sb, git_path("MERGE_MODE"), 0) < 0)
-				die_errno("could not read MERGE_MODE");
-			if (!strcmp(sb.buf, "no-ff"))
-				allow_fast_forward = 0;
-		}
-		if (allow_fast_forward)
-			parents = reduce_heads(parents);
-
-
-		 I sent a message to GitX author asking why he wrapped commit-tree vs commit. 
-		 He said that he used commit-tree because it's API and is supposed to be stable, while commit API may change since it's UI, plus
-		 you can get better feedback about what part of process failed. I should continue dialog with him to see how we can both implement
-		 merge commits properly with commit-tree then.
-		 */
-		List<String> arguments = new ArrayList<String>();
-		arguments.add("commit-tree"); //$NON-NLS-1$
-		arguments.add(tree);
-		String parent = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
-		if (repository.parseReference(parent) != null)
-		{
-			arguments.add("-p"); //$NON-NLS-1$
-			arguments.add(parent);
-		}
-
-		postCommitUpdate("Creating commit"); //$NON-NLS-1$
-		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
-				amendEnvironment, arguments.toArray(new String[arguments.size()]));
-		String commit = result.values().iterator().next();
-		ret = result.keySet().iterator().next();
-
-		if (ret != 0 || commit.length() != 40)
-		{
-			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
-			return;
-		}
-
-		postCommitUpdate("Running hooks"); //$NON-NLS-1$
-		if (!repository.executeHook("pre-commit")) //$NON-NLS-1$
-		{
-			postCommitFailure("Pre-commit hook failed"); //$NON-NLS-1$
-			return;
-		}
-
-		if (!repository.executeHook("commit-msg", repository.commitMessageFile())) //$NON-NLS-1$
-		{
-			postCommitFailure("Commit-msg hook failed"); //$NON-NLS-1$
-			return;
-		}
-
-		postCommitUpdate("Updating HEAD"); //$NON-NLS-1$
-		result = GitExecutable.instance().runInBackground(workingDirectory, "update-ref", "-m", commitSubject, "HEAD", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				commit);
-		ret = result.keySet().iterator().next();
-
-		if (ret != 0)
-		{
-			postCommitFailure("Could not update HEAD"); //$NON-NLS-1$
-			return;
-		}
-
-		postCommitUpdate("Running post-commit hook"); //$NON-NLS-1$
-
-		boolean success = repository.executeHook("post-commit"); //$NON-NLS-1$
-		Map<String, Object> userInfo = new HashMap<String, Object>();
-		userInfo.put("success", success); //$NON-NLS-1$
-		String description;
-		if (success)
-			description = "Successfully created commit " + commit; //$NON-NLS-1$
-		else
-			description = "Post-commit hook failed, but successfully created commit " + commit; //$NON-NLS-1$
-
-		userInfo.put("description", description); //$NON-NLS-1$
-		userInfo.put("sha", commit); //$NON-NLS-1$
-
+		boolean success = doCommit(commitMessage);
 		if (!success)
 			return;
+
 		// Need to explicitly fire off changes for the files that were staged and got committed
 		postIndexChange(getStagedFiles());
 		repository.hasChanged();
@@ -602,11 +497,155 @@ public class GitIndex
 			refresh();
 	}
 
+	private boolean doCommit(String commitMessage)
+	{
+		// prepare to commit
+		prepareToCommit(commitMessage);
+
+		// build up list of parents
+		List<String> parents = new ArrayList<String>();
+		String head = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
+		parents.add(head);
+		parents.addAll(repository.getMergeSHAs());
+
+		// TODO get commit message from file since it could have been changed?
+
+		// commit tree
+		String commit = commitTree(parents, commitMessage);
+		if (commit == null)
+			return false;
+
+		// update HEAD ref
+		if (!updateHeadRef(commit, commitMessage))
+			return false;
+
+		// TODO Extract these files as constants
+		unlink(repository.gitFile(GitRepository.MERGE_HEAD_FILENAME));
+		unlink(repository.gitFile("MERGE_MSG")); //$NON-NLS-1$
+		unlink(repository.gitFile("MERGE_MODE")); //$NON-NLS-1$
+		unlink(repository.gitFile("SQUASH_MSG")); //$NON-NLS-1$
+
+		// Run post-commit hook
+		postCommitUpdate("Running post-commit hook"); //$NON-NLS-1$
+		return repository.executeHook("post-commit"); //$NON-NLS-1$
+	}
+
+	private boolean prepareToCommit(String commitMessage)
+	{
+		// Run pre-commit hook
+		postCommitUpdate("Running pre-commit hook"); //$NON-NLS-1$
+		if (!repository.executeHook("pre-commit")) //$NON-NLS-1$
+		{
+			postCommitFailure("Pre-commit hook failed"); //$NON-NLS-1$
+			return false;
+		}
+		// Write commit message to file
+		String commitSubject = "commit: "; //$NON-NLS-1$
+		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
+		if (newLine == -1)
+			commitSubject += commitMessage;
+		else
+			commitSubject += commitMessage.substring(0, newLine);
+
+		repository.writetoCommitFile(commitMessage);
+		// Re-read index (?)
+
+		// Run prepare-commit-msg hook
+		postCommitUpdate("Running prepare-commit hook"); //$NON-NLS-1$
+		if (!repository.executeHook("prepare-commit-msg", "message")) //$NON-NLS-1$ //$NON-NLS-2$
+		{
+			postCommitFailure("prepare-commit-msg hook failed"); //$NON-NLS-1$
+			return false;
+		}
+		// Run commit-msg hook
+		postCommitUpdate("Running commit-msg hook"); //$NON-NLS-1$
+		if (!repository.executeHook("commit-msg", repository.commitMessageFile())) //$NON-NLS-1$
+		{
+			postCommitFailure("Commit-msg hook failed"); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	protected String commitTree(List<String> parents, String commitMessage)
+	{
+		postCommitUpdate("Creating tree"); //$NON-NLS-1$
+		String tree = GitExecutable.instance().outputForCommand(workingDirectory, "write-tree"); //$NON-NLS-1$
+		if (tree.length() != 40)
+		{
+			postCommitFailure("Creating tree failed"); //$NON-NLS-1$
+			return null;
+		}
+
+		List<String> arguments = new ArrayList<String>();
+		arguments.add("commit-tree"); //$NON-NLS-1$
+		arguments.add(tree);
+		for (String parent : parents)
+		{
+			if (repository.parseReference(parent) != null)
+			{
+				arguments.add("-p"); //$NON-NLS-1$
+				arguments.add(parent);
+			}
+		}
+		postCommitUpdate("Creating commit"); //$NON-NLS-1$
+		int ret = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
+				amendEnvironment, arguments.toArray(new String[arguments.size()]));
+		String commit = result.values().iterator().next();
+		ret = result.keySet().iterator().next();
+		if (ret != 0 || commit.length() != 40)
+		{
+			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
+			return null;
+		}
+		return commit;
+	}
+
+	/**
+	 * One of the steps during commit.
+	 * 
+	 * @param commit
+	 * @param commitMessage
+	 * @return
+	 */
+	protected boolean updateHeadRef(String commit, String commitMessage)
+	{
+		postCommitUpdate("Updating HEAD"); //$NON-NLS-1$
+		String commitSubject = "commit: "; //$NON-NLS-1$
+		int newLine = commitMessage.indexOf("\n"); //$NON-NLS-1$
+		if (newLine == -1)
+			commitSubject += commitMessage;
+		else
+			commitSubject += commitMessage.substring(0, newLine);
+
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+				"update-ref", "-m", commitSubject, "HEAD", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				commit);
+		int ret = result.keySet().iterator().next();
+		if (ret != 0)
+		{
+			postCommitFailure("Could not update HEAD"); //$NON-NLS-1$
+			return false;
+		}
+		return true;
+	}
+
+	private boolean unlink(File gitFile)
+	{
+		if (gitFile == null)
+			return false;
+		if (!gitFile.exists())
+			return false;
+
+		return gitFile.delete();
+	}
+
 	private Collection<ChangedFile> getStagedFiles()
 	{
 		Collection<ChangedFile> staged = new ArrayList<ChangedFile>();
 		synchronized (this.files)
-		{			
+		{
 			for (ChangedFile file : this.files)
 			{
 				if (file.hasStagedChanges())
