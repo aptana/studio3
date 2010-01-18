@@ -40,7 +40,6 @@ public class CommandElement extends AbstractBundleElement
 	
 	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
 	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	private static final String INPUT_PROPERTY = "input"; //$NON-NLS-1$
 	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
