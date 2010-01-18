@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -181,5 +182,37 @@ public class TerminalView extends ViewPart
 	public String getId()
 	{
 		return browser.getId();
+	}
+
+	/**
+	 * @param id
+	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
+	 * @param title
+	 *            the title used in the UI tab for the instance of the view.
+	 * @param workingDirectory
+	 *            The directory in which to set the view initially.
+	 * @return
+	 */
+	public static TerminalView open(String id, String title, String workingDirectory)
+	{
+		try
+		{
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			if (workingDirectory != null)
+			{
+				TerminalBrowser.setStartingDirectory(workingDirectory);
+			}
+			TerminalView term = (TerminalView) page.showView(TerminalView.ID, id,
+					org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
+			if (term == null)
+				return null;
+			term.setPartName(title);
+			return term;
+		}
+		catch (PartInitException e1)
+		{
+			Activator.logError(e1.getMessage(), e1);
+		}
+		return null;
 	}
 }

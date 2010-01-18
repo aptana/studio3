@@ -64,10 +64,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -78,12 +74,11 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.views.TerminalView;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
- *
+ * 
  * @author cwilliams
  */
 public abstract class SingleProjectView extends CommonNavigator
@@ -129,7 +124,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		GridLayout gridLayout = (GridLayout)parent.getLayout();
+		GridLayout gridLayout = (GridLayout) parent.getLayout();
 		gridLayout.marginHeight = 0;
 		gridLayout.marginTop = 0;
 		gridLayout.marginBottom = 0;
@@ -168,21 +163,18 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y
-						+ toolbarSize.y + 2);
+				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
 			}
 		});
 
-		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(),
-				"RunLast", //$NON-NLS-1$
+		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
 				SWT.PUSH);
 		runLastCCI = new CommandContributionItem(runLastCCIP);
 		commandsMenuManager.add(runLastCCI);
 
-		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(),
-				"DebugLast", //$NON-NLS-1$
+		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
 				SWT.PUSH);
 		debugLastCCI = new CommandContributionItem(debugLastCCIP);
@@ -217,34 +209,18 @@ public abstract class SingleProjectView extends CommonNavigator
 			public void fill(Menu menu, int index)
 			{
 				new MenuItem(menu, SWT.SEPARATOR);
-				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH)
-				{
-					public boolean isEnabled() {
-						return super.isEnabled() && selectedProject != null;
-						
-					};
-				};
+				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
 				terminalMenuItem.setText("Open Terminal");
 				terminalMenuItem.addSelectionListener(new SelectionAdapter()
 				{
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						try
-						{
-							IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-							TerminalBrowser.setStartingDirectory(selectedProject.getLocation().toOSString());
-							String projectName = selectedProject.getName();
-							TerminalView term = (TerminalView) page.showView(TerminalView.ID, projectName, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
-							term.setPartName(projectName);
-						}
-						catch (PartInitException e1)
-						{
-							ExplorerPlugin.logError(e1);
-						}
+						TerminalView.open(selectedProject.getName(), selectedProject.getName(), selectedProject
+								.getLocation().toOSString());
 					}
 				});
-				
+
 				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 				if (projects.length > 0)
 				{
@@ -259,7 +235,8 @@ public abstract class SingleProjectView extends CommonNavigator
 						// Construct the menu to attach to the above button.
 						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 						projectNameMenuItem.setText(iProject.getName());
-						projectNameMenuItem.setSelection(selectedProject != null && iProject.getName().equals(selectedProject.getName()));
+						projectNameMenuItem.setSelection(selectedProject != null
+								&& iProject.getName().equals(selectedProject.getName()));
 						projectNameMenuItem.addSelectionListener(new SelectionAdapter()
 						{
 							public void widgetSelected(SelectionEvent e)
@@ -314,8 +291,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = projectsToolbar.getLocation();
 				toolbarLocation = projectsToolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = projectsToolbar.getSize();
-				projectsMenu.setLocation(toolbarLocation.x, toolbarLocation.y
-						+ toolbarSize.y + 2);
+				projectsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				projectsMenu.setVisible(true);
 			}
 		});
@@ -363,7 +339,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		searchText.addKeyListener(new KeyListener()
 		{
 			@Override
-			public void keyReleased(KeyEvent e) {}
+			public void keyReleased(KeyEvent e)
+			{
+			}
 
 			@Override
 			public void keyPressed(KeyEvent e)
@@ -382,12 +360,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		});
 
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-//		// if the text widget supported cancel then it will have it's own
-//		// integrated button. We can take all of the space.
-//		if ((searchText.getStyle() & SWT.ICON_CANCEL) != 0)
-//			gridData.horizontalSpan = 2;
+		// // if the text widget supported cancel then it will have it's own
+		// // integrated button. We can take all of the space.
+		// if ((searchText.getStyle() & SWT.ICON_CANCEL) != 0)
+		// gridData.horizontalSpan = 2;
 		searchText.setLayoutData(gridData);
-
 
 		// Button for search options
 		final ToolBar toolbar = new ToolBar(search, SWT.NONE);
@@ -427,8 +404,10 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		Composite viewer = new Composite(myComposite, SWT.BORDER);
 		FillLayout fillLayout = new FillLayout();
-		fillLayout.marginWidth = 0;;
-		fillLayout.marginHeight = 0;;
+		fillLayout.marginWidth = 0;
+		;
+		fillLayout.marginHeight = 0;
+		;
 		viewer.setLayout(fillLayout);
 
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -470,7 +449,9 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+			}
 		});
 
 		return filter;
@@ -888,7 +869,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	/**
 	 * Listens for Project addition/removal to change the active project to new project added, or off the deleted
 	 * project if it was active.
-	 *
+	 * 
 	 * @author cwilliams
 	 */
 	private class ResourceListener implements IResourceChangeListener
@@ -1014,71 +995,71 @@ public abstract class SingleProjectView extends CommonNavigator
 		this.regularExpressionSearch = regularExpressionSearch;
 	}
 
-    /**
-     * Search the text in project.
-     */
-    protected void searchText()
-    {
-    	if (selectedProject == null)
-    	{
-    		return;
-    	}
-        String textToSearch = searchText.getText();
-        if (textToSearch.length() == 0)
-        {
-            return;
-        }
+	/**
+	 * Search the text in project.
+	 */
+	protected void searchText()
+	{
+		if (selectedProject == null)
+		{
+			return;
+		}
+		String textToSearch = searchText.getText();
+		if (textToSearch.length() == 0)
+		{
+			return;
+		}
 
-        IResource searchResource = selectedProject;
-        TextSearchPageInput input= new TextSearchPageInput(textToSearch,
-        		isCaseSensitiveSearch(),
-        		isRegularExpressionSearch(),
-        		FileTextSearchScope.newSearchScope(new IResource[] {searchResource}, new String[] {"*"}, false)); //$NON-NLS-1$
-        try
-        {
-            NewSearchUI.runQueryInBackground(TextSearchQueryProvider.getPreferred().createQuery(input));
-        }
-        catch (CoreException e)
-        {
-            ExplorerPlugin.logError(e);
-        }
-    }
+		IResource searchResource = selectedProject;
+		TextSearchPageInput input = new TextSearchPageInput(textToSearch, isCaseSensitiveSearch(),
+				isRegularExpressionSearch(), FileTextSearchScope.newSearchScope(new IResource[] { searchResource },
+						new String[] { "*" }, false)); //$NON-NLS-1$
+		try
+		{
+			NewSearchUI.runQueryInBackground(TextSearchQueryProvider.getPreferred().createQuery(input));
+		}
+		catch (CoreException e)
+		{
+			ExplorerPlugin.logError(e);
+		}
+	}
 
-    private static class TextSearchPageInput extends TextSearchInput
-    {
+	private static class TextSearchPageInput extends TextSearchInput
+	{
 
-        private final String fSearchText;
-        private final boolean fIsCaseSensitive;
-        private final boolean fIsRegEx;
-        private final FileTextSearchScope fScope;
+		private final String fSearchText;
+		private final boolean fIsCaseSensitive;
+		private final boolean fIsRegEx;
+		private final FileTextSearchScope fScope;
 
-        public TextSearchPageInput(String searchText, boolean isCaseSensitive, boolean isRegEx, FileTextSearchScope scope)
-        {
-        	fSearchText= searchText;
-            fIsCaseSensitive= isCaseSensitive;
-            fIsRegEx= isRegEx;
-            fScope= scope;
-        }
+		public TextSearchPageInput(String searchText, boolean isCaseSensitive, boolean isRegEx,
+				FileTextSearchScope scope)
+		{
+			fSearchText = searchText;
+			fIsCaseSensitive = isCaseSensitive;
+			fIsRegEx = isRegEx;
+			fScope = scope;
+		}
 
-        public String getSearchText()
-        {
-            return fSearchText;
-        }
+		public String getSearchText()
+		{
+			return fSearchText;
+		}
 
-        public boolean isCaseSensitiveSearch()
-        {
-            return fIsCaseSensitive;
-        }
+		public boolean isCaseSensitiveSearch()
+		{
+			return fIsCaseSensitive;
+		}
 
-        public boolean isRegExSearch()
-        {
-            return fIsRegEx;
-        }
+		public boolean isRegExSearch()
+		{
+			return fIsRegEx;
+		}
 
-        public FileTextSearchScope getScope()
-        {
-            return fScope;
-        }
-    }
+		public FileTextSearchScope getScope()
+		{
+			return fScope;
+		}
+	}
 
 }
