@@ -1,5 +1,6 @@
 package com.aptana.scripting.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +40,6 @@ public class CommandElement extends AbstractBundleElement
 	
 	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
 	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	private static final String INPUT_PROPERTY = "input"; //$NON-NLS-1$
 	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
@@ -364,9 +364,8 @@ public class CommandElement extends AbstractBundleElement
 			// do "turn off warnings" hack and set STDIN
 			boolean isVerbose = runtime.isVerbose();
 			runtime.setVerbose(runtime.getNil());
-			container.setReader(new InputStreamReader(context.getInputStream()));
+			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
 			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-			context.put(INPUT_PROPERTY, container.getIn());
 			
 			// set default output type, this may be changed by context.exit_with_message
 			context.setOutputType(this._outputType);

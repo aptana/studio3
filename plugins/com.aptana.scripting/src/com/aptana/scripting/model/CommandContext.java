@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.jruby.RubyIO;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptingEngine;
@@ -150,12 +150,9 @@ public class CommandContext
 	 * 
 	 * @return
 	 */
-	public RubyIO in()
+	public IRubyObject in()
 	{
-		return new RubyIO(
-			ScriptingEngine.getInstance().getScriptingContainer().getRuntime(),
-			this.getInputStream()
-		);
+		return ScriptingEngine.getInstance().getScriptingContainer().getRuntime().getObject().getConstant("STDIN"); //$NON-NLS-1$
 	}
 	
 	/**

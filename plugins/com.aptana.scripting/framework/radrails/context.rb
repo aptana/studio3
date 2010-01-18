@@ -18,6 +18,10 @@ module RadRails
       @jobj.in
     end
     
+    def input
+      self.in
+    end
+    
     def [](arg)
       @jobj.map[arg.to_s]
     end
