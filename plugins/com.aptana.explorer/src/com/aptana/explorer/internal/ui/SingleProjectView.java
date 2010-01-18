@@ -405,9 +405,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		Composite viewer = new Composite(myComposite, SWT.BORDER);
 		FillLayout fillLayout = new FillLayout();
 		fillLayout.marginWidth = 0;
-		;
 		fillLayout.marginHeight = 0;
-		;
 		viewer.setLayout(fillLayout);
 
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
