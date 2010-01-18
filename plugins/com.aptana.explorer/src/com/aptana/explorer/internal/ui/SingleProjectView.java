@@ -210,7 +210,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				new MenuItem(menu, SWT.SEPARATOR);
 				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
-				terminalMenuItem.setText("Open Terminal");
+				terminalMenuItem.setText(Messages.SingleProjectView_OpenTerminalMenuItem_LBL);
 				terminalMenuItem.addSelectionListener(new SelectionAdapter()
 				{
 					public void widgetSelected(SelectionEvent e)
