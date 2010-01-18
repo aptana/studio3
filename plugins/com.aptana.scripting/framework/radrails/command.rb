@@ -24,7 +24,7 @@ module RadRails
     end
     
     def input=(input)
-      @jobj.input_type = (input && input.kind_of?(Array)) ? input.to_java(:String) : input.to_s;
+      @jobj.input_type = (input && input.kind_of?(Array)) ? input.map {|element| element.to_s}.to_java(:String) : input.to_s;
     end
     
     def invoke(&block)
