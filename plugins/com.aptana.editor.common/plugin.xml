@@ -129,6 +129,12 @@
    </extension>
    <extension
          point="org.eclipse.ui.themes">
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            colorFactory="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
+            id="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
+            label="FontLoader">
+      </colorDefinition>
       <theme
             id="com.aptana.editor.common.theme"
             name="%customThemeName">
