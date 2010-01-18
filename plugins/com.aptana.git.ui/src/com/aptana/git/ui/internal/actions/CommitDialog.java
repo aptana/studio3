@@ -75,6 +75,7 @@ public class CommitDialog extends StatusDialog
 	private Image deletedFileImage;
 	private Image emptyFileImage;
 	private Browser diffArea;
+	private ChangedFile fLastDiffFile;
 
 	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -307,7 +308,7 @@ public class CommitDialog extends StatusDialog
 						if (file.getPath().endsWith(extension))
 						{
 							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
-							updateDiff("<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+							updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
 							return;
 						}
 					}
@@ -321,7 +322,7 @@ public class CommitDialog extends StatusDialog
 				{
 					GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
 				}
-				updateDiff(diff);
+				updateDiff(file, diff);
 			}
 		});
 		// Allow double-clicking to toggle staged/unstaged
@@ -389,7 +390,7 @@ public class CommitDialog extends StatusDialog
 					{
 						// need to remove the file(s) from staged table once action runs
 						@Override
-						protected void doOperation(GitRepository repo, List<ChangedFile> changedFiles)
+						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
 						{
 							super.doOperation(repo, changedFiles);
 							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
@@ -398,6 +399,17 @@ public class CommitDialog extends StatusDialog
 								@Override
 								public void run()
 								{
+									// If this file was shown in diff area, we need to blank the diff area!
+									if (fLastDiffFile != null)
+									{
+										for (ChangedFile file : changedFiles)
+										{
+											if (file != null && file.equals(fLastDiffFile))
+											{
+												updateDiff(null, Messages.CommitDialog_4);
+											}
+										}
+									}
 									removeDraggedFilesFromSource(unstagedTable, filePaths);
 								}
 							});
@@ -450,10 +462,13 @@ public class CommitDialog extends StatusDialog
 		validate();
 	}
 
-	protected void updateDiff(String diff)
+	protected void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
+		{
 			diffArea.setText(diff);
+			fLastDiffFile = file;
+		}
 	}
 
 	protected ChangedFile findChangedFile(String path)
@@ -590,7 +605,7 @@ public class CommitDialog extends StatusDialog
 			dtarget.setDropTargetEffect(new TableDropTargetEffect(sourceDragTable));
 		}
 	}
-	
+
 	@Override
 	protected boolean isResizable()
 	{
