@@ -127,6 +127,9 @@ public class CommandElement extends AbstractBundleElement
 
 		if (this.isExecutable())
 		{
+			// set default output type, this may be changed by context.exit_with_message
+			context.setOutputType(this._outputType);
+
 			if (this.isShellCommand())
 			{
 				result = this.invokeStringCommand(context);
@@ -363,10 +366,7 @@ public class CommandElement extends AbstractBundleElement
 			runtime.setVerbose(runtime.getNil());
 			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
 			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-			
-			// set default output type, this may be changed by context.exit_with_message
-			context.setOutputType(this._outputType);
-			
+
 			// invoke the block
 			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
 			String output = writer.toString();
@@ -541,6 +541,8 @@ public class CommandElement extends AbstractBundleElement
 		CommandResult result = new CommandResult(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
+		result.setCommand(this);
+		result.setContext(context);
 
 		return result;
 	}
