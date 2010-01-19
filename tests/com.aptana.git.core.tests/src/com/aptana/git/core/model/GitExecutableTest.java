@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 
+@SuppressWarnings("nls")
 public class GitExecutableTest extends TestCase
 {
 	// FIXME This certainly won't work on Windows!

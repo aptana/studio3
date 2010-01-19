@@ -135,12 +135,16 @@ public class GitRepository
 			return null;
 
 		String repositoryPath = repositoryURL.getPath();
-
+		if (!new File(repositoryPath).exists())
+			return null;
+		
 		if (isBareRepository(repositoryPath))
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
 		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (newPath == null)
+			return null;
 		if (newPath.equals(GIT_DIR))
 			return new File(repositoryPath, GIT_DIR).toURI();
 		if (newPath.length() > 0)
@@ -550,10 +554,15 @@ public class GitRepository
 			path = path.substring(0, path.length() - GIT_DIR.length());
 		}
 
-		URI existing = gitDirForURL(new File(path).toURI());
+		File file = new File(path);
+		URI existing = gitDirForURL(file.toURI());
 		if (existing != null)
 			return;
 
+		if (!file.exists())
+		{
+			file.mkdirs();
+		}
 		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
 	}
 
@@ -660,7 +669,11 @@ public class GitRepository
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
-		return result.keySet().iterator().next() == 0;
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		// Add branch to list in model!
+		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		return true;
 	}
 
 	public boolean validBranchName(String branchName)
@@ -769,6 +782,8 @@ public class GitRepository
 	public List<String> getMergeSHAs()
 	{
 		List<String> shas = new ArrayList<String>();
+		if (!mergeHeadFile().exists())
+			return shas;
 		BufferedReader reader = null;
 		try
 		{

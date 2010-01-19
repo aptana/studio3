@@ -52,7 +52,7 @@ public class DeleteBranchAction extends MenuAction
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					repo.switchBranch(branchName);
+					deleteBranch(repo, branchName);
 				}
 			});
 		}
