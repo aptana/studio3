@@ -195,7 +195,7 @@ public class Diff
 	 * @param gitCommit
 	 * @return
 	 */
-	public static List<Diff> create(GitCommit gitCommit)
+	static List<Diff> create(GitCommit gitCommit)
 	{
 		try
 		{

@@ -2,6 +2,8 @@ package com.aptana.git.core.model;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -195,7 +197,58 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(index.changedFiles().isEmpty());
 	}
 
-	// TODO Test adding/removing listeners and receiving events!
+	public void testAddRemoveListeners() throws Throwable
+	{
+		final List<RepositoryEvent> eventsReceived = new ArrayList<RepositoryEvent>();
+		IGitRepositoryListener listener = new IGitRepositoryListener()
+		{
+			@Override
+			public void repositoryRemoved(RepositoryRemovedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void repositoryAdded(RepositoryAddedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void indexChanged(IndexChangedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void branchChanged(BranchChangedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+		};
+		GitRepository.addListener(listener);
+		// TODO Attach and unattach repo with the RepositoryProvider and check those events
+
+		testSwitchBranch();
+
+		// 6 index changes, 2 branch changes
+		assertEquals(8, eventsReceived.size());
+		assertBranchChangedEvent(eventsReceived.get(6), "master", "my_new_branch");
+		assertBranchChangedEvent(eventsReceived.get(7), "my_new_branch", "master");
+
+		GitRepository.removeListener(listener);
+		// Do some things that should send events and make sure we don't get any more.
+		assertSwitchBranch("my_new_branch");
+		assertEquals(8, eventsReceived.size());
+	}
+
+	protected void assertBranchChangedEvent(final RepositoryEvent event, String oldName, String newName)
+	{
+		BranchChangedEvent branchChangeEvent = (BranchChangedEvent) event;
+		assertEquals(oldName, branchChangeEvent.getOldBranchName());
+		assertEquals(newName, branchChangeEvent.getNewBranchName());
+	}
+
 	// TODO Test deleting folder
 
 	public void testAddBranch() throws Throwable
@@ -234,7 +287,7 @@ public class GitRepositoryTest extends TestCase
 		assertFalse(branches.contains("my_new_branch"));
 	}
 
-	public void testChangeBranch() throws Throwable
+	public void testSwitchBranch() throws Throwable
 	{
 		testAddBranch();
 
