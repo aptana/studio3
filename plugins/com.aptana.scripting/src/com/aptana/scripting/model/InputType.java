@@ -22,7 +22,7 @@ public enum InputType
 
 	private static final Map<String, InputType> NAME_MAP;
 	private String _name;
-	
+
 	/**
 	 * static
 	 */

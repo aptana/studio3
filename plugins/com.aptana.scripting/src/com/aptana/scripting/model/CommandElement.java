@@ -156,7 +156,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return "command"; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * getInputPath
 	 * 
@@ -166,7 +166,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._inputPath;
 	}
-	
+
 	/**
 	 * getInput
 	 * 
@@ -751,7 +751,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this._inputPath = path;
 	}
-	
+
 	/**
 	 * setInputType
 	 * 

@@ -21,7 +21,7 @@ module RadRails
     end
     
     def input
-     @jobj.input 
+     @jobj.input
     end
     
     def input=(input)
