@@ -40,7 +40,10 @@ public abstract class IOUtil
 			while ((line = reader.readLine()) != null)
 			{
 				template.append(line);
+				template.append("\n"); //$NON-NLS-1$
 			}
+			if (template.length() > 0)
+				template.deleteCharAt(template.length() - 1); // delete last extraneous newline
 			return template.toString();
 		}
 		catch (IOException e)

@@ -85,6 +85,7 @@ public class CommitDialog extends StatusDialog
 		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
 		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
 		emptyFileImage = GitUIPlugin.getImage("icons/obj16/empty_file.png"); //$NON-NLS-1$
+		fLastDiffFile = null;
 	}
 
 	@Override
@@ -313,6 +314,10 @@ public class CommitDialog extends StatusDialog
 						}
 					}
 				}
+				// Don't recalc if it's the same file as we are already showing
+				if (fLastDiffFile != null && file.equals(fLastDiffFile))
+					return;
+
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
 				try
 				{
