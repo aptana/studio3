@@ -125,10 +125,76 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(fRepo.deleteFile(addedFile));
 		// make sure its deleted from filesystem
 		assertFalse(new File(addedFile).exists());
-		// TODO Verify that we sent correct args to git executable!
+
+		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
+		GitIndex index = fRepo.index();
+
+		// Now there should be a single file that's been changed!
+		assertFalse(index.changedFiles().isEmpty());
+		assertEquals(1, index.changedFiles().size());
+
+		// Make sure it's shown as having unstaged changes only and is MODIFIED
+		assertStaged(index.changedFiles().get(0));
+		assertStatus(Status.DELETED, index.changedFiles().get(0));
+
+		// Unstage the file
+		assertTrue(index.unstageFiles(index.changedFiles()));
+		assertUnstaged(index.changedFiles().get(0));
+		assertStatus(Status.DELETED, index.changedFiles().get(0));
+
+		// stage again so we can commit...
+		assertTrue(index.stageFiles(index.changedFiles()));
+		assertStaged(index.changedFiles().get(0));
+		assertStatus(Status.DELETED, index.changedFiles().get(0));
+
+		index.commit("Delete files");
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
 	}
 
-	// TODO Test modifying file that isn't new (already checked in)
+	// Test modifying file that isn't new (already checked in)
+	public void testModifyCheckedInFile() throws Throwable
+	{
+		testAddFileStageUnstageAndCommit();
+
+		GitIndex index = fRepo.index();
+
+		// Actually add a file to the location
+		String txtFile = fileToAdd();
+		FileWriter writer = new FileWriter(txtFile, true);
+		writer.write("\nHello second line!");
+		writer.close();
+		// refresh the index
+		index.refresh();
+
+		// Now there should be a single file that's been changed!
+		assertFalse(index.changedFiles().isEmpty());
+		assertEquals(1, index.changedFiles().size());
+
+		// Make sure it's shown as having unstaged changes only and is MODIFIED
+		assertUnstaged(index.changedFiles().get(0));
+		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+
+		// Stage the new file
+		assertTrue(index.stageFiles(index.changedFiles()));
+		assertStaged(index.changedFiles().get(0));
+		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+
+		// Unstage the file
+		assertTrue(index.unstageFiles(index.changedFiles()));
+		assertUnstaged(index.changedFiles().get(0));
+		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+
+		// stage again so we can commit...
+		assertTrue(index.stageFiles(index.changedFiles()));
+		assertStaged(index.changedFiles().get(0));
+		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+
+		index.commit("Add second line");
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
+	}
+
 	// TODO Test adding/removing listeners and receiving events!
 	// TODO Test deleting folder
 
