@@ -78,6 +78,7 @@ public class DeleteBranchAction extends MenuAction
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				// TODO Handle failure in a different way than whatever the job does?
+				// TODO If code == 1 and the error says run with -D, then pop up a scary dialog asking user if they really want to force it and if so then run with -D
 				return repo.deleteBranch(branchName);
 			}
 		};

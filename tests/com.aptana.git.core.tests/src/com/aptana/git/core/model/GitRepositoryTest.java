@@ -7,6 +7,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.git.core.GitPlugin;
@@ -130,7 +131,6 @@ public class GitRepositoryTest extends TestCase
 	// TODO Test modifying file that isn't new (already checked in)
 	// TODO Test adding/removing listeners and receiving events!
 	// TODO Test deleting folder
-	// TODO Test changing branches and checking currentBranch
 
 	public void testAddBranch() throws Throwable
 	{
@@ -158,7 +158,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddBranch();
 
-		// Create a new branch off master
+		// Delete the new branch
 		assertTrue(fRepo.deleteBranch("my_new_branch").isOK());
 
 		// make sure the branch is no longer listed in model
@@ -166,7 +166,6 @@ public class GitRepositoryTest extends TestCase
 		assertEquals(1, branches.size());
 		assertTrue(branches.contains("master"));
 		assertFalse(branches.contains("my_new_branch"));
-		// TODO Try to delete a branch that won't work and needs to be run with -D!
 	}
 
 	public void testChangeBranch() throws Throwable
@@ -174,11 +173,54 @@ public class GitRepositoryTest extends TestCase
 		testAddBranch();
 
 		assertEquals("master", fRepo.currentBranch());
-		fRepo.switchBranch("my_new_branch");
-		assertEquals("my_new_branch", fRepo.currentBranch());
+		assertSwitchBranch("my_new_branch");
+		assertSwitchBranch("master");
+	}
 
-		fRepo.switchBranch("master");
-		assertEquals("master", fRepo.currentBranch());
+	public void testDeleteUnMergedBranch() throws Throwable
+	{
+		testAddBranch();
+
+		assertSwitchBranch("my_new_branch");
+
+		// Now we need to make changes, commit and then switch back to master
+		GitIndex index = fRepo.index();
+
+		// TODO Refactor out common code with testAddFileStageUnstageCommit
+		// Actually add a file to the location
+		String txtFile = fRepo.workingDirectory() + File.separator + "file_on_branch.txt";
+		FileWriter writer = new FileWriter(txtFile);
+		writer.write("Hello Branched World!");
+		writer.close();
+		// refresh the index
+		index.refresh();
+
+		// Now there should be a single file that's been changed!
+		assertFalse(index.changedFiles().isEmpty());
+		assertEquals(1, index.changedFiles().size());
+
+		// Make sure it's shown as having unstaged changes only and is NEW
+		assertUnstaged(index.changedFiles().get(0));
+		assertStatus(Status.NEW, index.changedFiles().get(0));
+
+		// Stage the new file
+		assertTrue(index.stageFiles(index.changedFiles()));
+		assertStaged(index.changedFiles().get(0));
+		assertStatus(Status.NEW, index.changedFiles().get(0));
+
+		index.commit("Initial commit");
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
+
+		// Now switch to master
+		assertSwitchBranch("master");
+
+		IStatus status = fRepo.deleteBranch("my_new_branch");
+		assertFalse(status.isOK());
+		assertEquals(1, status.getCode());
+		assertEquals(
+				"error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
+				status.getMessage());
 	}
 
 	protected IPath repoToGenerate()
@@ -198,6 +240,12 @@ public class GitRepositoryTest extends TestCase
 		return createRepo(repoToGenerate());
 	}
 
+	/**
+	 * Create a git repo and make sure it actually generate a model object and not null
+	 * 
+	 * @param path
+	 * @return
+	 */
 	protected GitRepository createRepo(IPath path)
 	{
 		GitRepository.create(path.toOSString());
@@ -212,15 +260,36 @@ public class GitRepositoryTest extends TestCase
 		assertEquals(status, file.getStatus());
 	}
 
+	/**
+	 * Assert a changed file has staged changes and no unstaged changes.
+	 * 
+	 * @param file
+	 */
 	protected void assertStaged(ChangedFile file)
 	{
 		assertTrue(file.hasStagedChanges());
 		assertFalse(file.hasUnstagedChanges());
 	}
 
+	/**
+	 * Assert a changed file has unstaged changes and no staged changes.
+	 * 
+	 * @param file
+	 */
 	protected void assertUnstaged(ChangedFile file)
 	{
 		assertFalse(file.hasStagedChanges());
 		assertTrue(file.hasUnstagedChanges());
+	}
+
+	/**
+	 * Switch branch and make sure that it performed properly and update current branch in model.
+	 * 
+	 * @param branchName
+	 */
+	protected void assertSwitchBranch(String branchName)
+	{
+		assertTrue(fRepo.switchBranch(branchName));
+		assertEquals(branchName, fRepo.currentBranch());
 	}
 }
