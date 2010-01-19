@@ -2,7 +2,9 @@ package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -86,6 +88,32 @@ public class CommandExecutionUtils
 		public void consume(InputStream input);
 	}
 
+	public static class FileInputProvider implements FilterInputProvider
+	{
+		private final String path;
+		
+		public FileInputProvider(String path)
+		{
+			this.path = path;
+		}
+		
+		public InputStream getInputStream()
+		{
+			InputStream result = null;
+			
+			try
+			{
+				result = new FileInputStream(this.path);
+			}
+			catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			
+			return result;
+		}
+	}
+	
 	public static class StringInputProvider implements FilterInputProvider
 	{
 		private final String string;
@@ -314,7 +342,7 @@ public class CommandExecutionUtils
 		}
 		for (InputType inputType : inputTypes)
 		{
-			filterInputProvider = getInputProvider(textWidget, inputType);
+			filterInputProvider = getInputProvider(textWidget, command, inputType);
 			if (filterInputProvider != null)
 			{
 				selected = inputType;
@@ -340,7 +368,7 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, InputType inputType)
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command, InputType inputType)
 	{
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
@@ -377,6 +405,8 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.StringInputProvider(currentWord);
 			case INPUT_FROM_CONSOLE:
 				return new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
+			case INPUT_FROM_FILE:
+				return new CommandExecutionUtils.FileInputProvider(command.getInputPath());
 		}
 		return null;
 	}
@@ -473,6 +503,9 @@ public class CommandExecutionUtils
 			case OUTPUT_TO_CONSOLE:
 				outputToConsole(commandResult);
 				break;
+			case OUTPUT_TO_FILE:
+				outputToFile(commandResult);
+				break;
 		}
 	}
 
@@ -526,6 +559,33 @@ public class CommandExecutionUtils
 		}
 	}
 
+	private static void outputToFile(CommandResult commandResult)
+	{
+		FileWriter writer = null;
+		try
+		{
+			writer = new FileWriter(commandResult.getCommand().getOutputPath());
+			writer.write(commandResult.getOutputString());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (writer != null)
+			{
+				try
+				{
+					writer.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
+		}
+	}
+	
 	private static void copyToClipboard(CommandResult commandResult)
 	{
 		getClipboard().setContents(new Object[] { commandResult.getOutputString() },
