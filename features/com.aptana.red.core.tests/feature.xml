@@ -101,7 +101,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.git.ui.tests"
+         id="com.aptana.git.ui.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
