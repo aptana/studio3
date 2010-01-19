@@ -1,0 +1,643 @@
+%package "com.aptana.editor.js.parsing";
+%class "JSParser";
+%import "com.aptana.editor.js.parsing.ast.*";
+%import "com.aptana.editor.js.parsing.lexer.JSTokens";
+
+%terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX;
+%terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
+%terminals IF, ELSE, DO, WHILE, FOR, IN, CONTINUE, BREAK, RETURN, WITH, SWITCH, CASE, DEFAULT, THROW, TRY, CATCH, FINALLY;
+%terminals VAR, THIS, NEW, DELETE, PLUS_PLUS, MINUS_MINUS, PLUS, MINUS, EXCLAMATION, TILDE, TYPEOF, VOID, AMPERSAND, CARET, PIPE, AMPERSAND_AMPERSAND, PIPE_PIPE;
+%terminals STAR, FORWARD_SLASH, PERCENT, LESS_LESS, GREATER_GREATER, GREATER_GREATER_GREATER;
+%terminals LESS, GREATER, LESS_EQUAL, GREATER_EQUAL, INSTANCEOF, IN, EQUAL_EQUAL, EXCLAMATION_EQUAL, EQUAL_EQUAL_EQUAL, EXCLAMATION_EQUAL_EQUAL;
+%terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
+
+%typeof NUMBER, STRING, REGEX, IDENTIFIER = "String";
+
+%goal Program;
+
+Program
+	=	SourceElements
+	;
+
+SourceElements
+	=	SourceElements SourceElement
+	|	SourceElement
+	;
+
+SourceElement
+	=	FunctionDeclaration
+	|	Statement
+	;
+
+FunctionDeclaration
+	=	FUNCTION IDENTIFIER FunctionParameters FunctionBody
+	;
+
+FunctionExpression
+	=	FUNCTION FunctionParameters FunctionBody
+	|	FunctionDeclaration
+	;
+
+FunctionParameters
+	=	LPAREN RPAREN
+	|	LPAREN FormalParameterList RPAREN
+	;
+
+FormalParameterList
+	=	FormalParameterList COMMA IDENTIFIER
+	|	IDENTIFIER
+	;
+
+FunctionBody
+	=	LCURLY RCURLY
+	|	LCURLY SourceElements RCURLY
+	;
+
+Statement
+	=	Block
+	|	VAR VariableDeclarationList SEMICOLON
+	|	Expression_NoLBF SEMICOLON
+	|	IfStatement
+	|	IterationStatement
+	|	ContinueStatement
+	|	BreakStatement
+	|	ReturnStatement
+	|	WithStatement
+	|	LabelledStatement
+	|	SwitchStatement
+	|	ThrowStatement
+	|	TryStatement
+	|	SEMICOLON
+	|	error {:return new JSErrorStatementNode();:}
+	;
+
+Statement_NoIf
+	=	Block
+	|	VAR VariableDeclarationList SEMICOLON
+	|	Expression_NoLBF SEMICOLON
+	|	IfStatement_NoIf
+	|	IterationStatement_NoIf
+	|	ContinueStatement
+	|	BreakStatement
+	|	ReturnStatement
+	|	WithStatement_NoIf
+	|	LabelledStatement_NoIf
+	|	SwitchStatement
+	|	ThrowStatement
+	|	TryStatement
+	|	SEMICOLON
+	|	error {:return new JSErrorStatementNode();:}
+	;
+
+Block
+	=	LCURLY RCURLY
+	|	LCURLY StatementList RCURLY
+	;
+
+StatementList
+	=	StatementList Statement
+	|	Statement
+	;
+
+VariableDeclarationList
+	=	VariableDeclarationList COMMA VariableDeclaration
+	|	VariableDeclaration
+	;
+
+VariableDeclarationList_NoIn
+	=	VariableDeclarationList_NoIn COMMA VariableDeclaration_NoIn
+	|	VariableDeclaration_NoIn
+	;
+
+VariableDeclaration
+	=	IDENTIFIER
+	|	IDENTIFIER EQUAL AssignmentExpression
+	;
+
+VariableDeclaration_NoIn
+	=	IDENTIFIER
+	|	IDENTIFIER EQUAL AssignmentExpression_NoIn
+	;
+
+IfStatement
+	=	IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement
+	|	IF LPAREN Expression RPAREN Statement
+	;
+
+IfStatement_NoIf
+	=	IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement_NoIf
+	;
+
+IterationStatement
+	=	DO Statement WHILE LPAREN Expression RPAREN SEMICOLON
+	|	WHILE LPAREN Expression RPAREN Statement
+	|	FOR LPAREN SEMICOLON SEMICOLON RPAREN Statement
+	|	FOR LPAREN SEMICOLON SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement
+	|	FOR LPAREN SEMICOLON Expression SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON RPAREN Statement
+	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement
+	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON RPAREN Statement
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement
+	|	FOR LPAREN LeftHandSideExpression IN Expression RPAREN Statement
+	|	FOR LPAREN VAR VariableDeclaration_NoIn IN Expression RPAREN Statement
+	;
+
+IterationStatement_NoIf
+	=	DO Statement WHILE LPAREN Expression RPAREN SEMICOLON
+	|	WHILE LPAREN Expression RPAREN Statement_NoIf
+	|	FOR LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
+	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
+	|	FOR LPAREN LeftHandSideExpression IN Expression RPAREN Statement_NoIf
+	|	FOR LPAREN VAR VariableDeclaration_NoIn IN Expression RPAREN Statement_NoIf
+	;
+
+ContinueStatement
+	=	CONTINUE.c SEMICOLON.s {:
+			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.CONTINUE, c.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	|	CONTINUE.c IDENTIFIER.i SEMICOLON.s {:
+			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.CONTINUE, i, c.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+
+BreakStatement
+	=	BREAK.b SEMICOLON.s {:
+			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.BREAK, b.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	|	BREAK.b IDENTIFIER.i SEMICOLON.s {:
+			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.BREAK, i, b.getStart(), s.getEnd());
+			node.setSemicolonIncluded(true);
+			return node;
+		:}
+	;
+
+ReturnStatement
+	=	RETURN SEMICOLON
+	|	RETURN Expression SEMICOLON
+	;
+
+WithStatement
+	=	WITH LPAREN Expression RPAREN Statement
+	;
+
+WithStatement_NoIf
+	=	WITH LPAREN Expression RPAREN Statement_NoIf
+	;
+
+SwitchStatement
+	=	SWITCH LPAREN Expression RPAREN CaseBlock
+	;
+
+CaseBlock
+	=	LCURLY RCURLY
+	|	LCURLY CaseClauses RCURLY
+	|	LCURLY DefaultClause RCURLY
+	|	LCURLY DefaultClause CaseClauses RCURLY
+	|	LCURLY CaseClauses DefaultClause RCURLY
+	|	LCURLY CaseClauses DefaultClause CaseClauses RCURLY
+	;
+
+CaseClauses
+	=	CaseClauses CaseClause
+	|	CaseClause
+	;
+
+CaseClause
+	=	CASE Expression COLON
+	|	CASE Expression COLON StatementList
+	;
+
+DefaultClause
+	=	DEFAULT COLON
+	|	DEFAULT COLON StatementList
+	;
+
+LabelledStatement
+	=	IDENTIFIER COLON Statement
+	;
+
+LabelledStatement_NoIf
+	=	IDENTIFIER COLON Statement_NoIf
+	;
+
+ThrowStatement
+	=	THROW Expression SEMICOLON
+	;
+
+TryStatement
+	=	TRY Block Catch
+	|	TRY Block Finally
+	|	TRY Block Catch Finally
+	;
+
+Catch
+	=	CATCH LPAREN IDENTIFIER RPAREN Block
+	;
+
+Finally
+	=	FINALLY Block
+	;
+
+PrimaryExpression
+	=	PrimaryExpression_NoLBF
+	|	ObjectLiteral
+	;
+
+PrimaryExpression_NoLBF
+	=	THIS.t {:return new JSPrimitiveNode(JSTokens.THIS, t.getStart(), t.getEnd());:}
+	|	IDENTIFIER.t {:return new JSPrimitiveNode(t, _symbol_t.getStart(), _symbol_t.getEnd());:}
+	|	Literal
+	|	ArrayLiteral
+	|	LPAREN Expression RPAREN
+	;
+
+ArrayLiteral
+	=	LBRACKET RBRACKET
+	|	LBRACKET Elision RBRACKET
+	|	LBRACKET ElementList RBRACKET
+	|	LBRACKET ElementList COMMA RBRACKET
+	|	LBRACKET ElementList COMMA Elision RBRACKET
+	;
+
+ElementList
+	=	AssignmentExpression
+	|	Elision AssignmentExpression
+	|	ElementList COMMA AssignmentExpression
+	|	ElementList COMMA Elision AssignmentExpression
+	;
+
+Elision
+	=	Elision COMMA
+	|	COMMA
+	;
+
+ObjectLiteral
+	=	LCURLY RCURLY
+	|	LCURLY PropertyNameAndValueList RCURLY
+	;
+
+PropertyNameAndValueList
+	=	PropertyName COLON AssignmentExpression
+	|	PropertyNameAndValueList COMMA PropertyName COLON AssignmentExpression
+	;
+
+PropertyName
+	=	IDENTIFIER
+	|	STRING
+	|	NUMBER
+	;
+
+MemberExpression
+	=	PrimaryExpression
+	|	FunctionExpression
+	|	MemberExpression LBRACKET Expression RBRACKET
+	|	MemberExpression DOT IDENTIFIER
+	|	NEW MemberExpression Arguments
+	;
+
+MemberExpression_NoLBF
+	=	PrimaryExpression_NoLBF
+	|	MemberExpression_NoLBF LBRACKET Expression RBRACKET
+	|	MemberExpression_NoLBF DOT IDENTIFIER
+	|	NEW MemberExpression Arguments
+	;
+
+NewExpression
+	=	MemberExpression
+	|	NEW NewExpression
+	;
+
+NewExpression_NoLBF
+	=	MemberExpression_NoLBF
+	|	NEW NewExpression
+	;
+
+CallExpression
+	=	MemberExpression Arguments
+	|	CallExpression Arguments
+	|	CallExpression LBRACKET Expression RBRACKET
+	|	CallExpression DOT IDENTIFIER
+	;
+
+CallExpression_NoLBF
+	=	MemberExpression_NoLBF Arguments
+	|	CallExpression_NoLBF Arguments
+	|	CallExpression_NoLBF LBRACKET Expression RBRACKET
+	|	CallExpression_NoLBF DOT IDENTIFIER
+	;
+
+Arguments
+	=	LPAREN RPAREN
+	|	LPAREN ArgumentList RPAREN
+	;
+
+ArgumentList
+	=	ArgumentList COMMA AssignmentExpression
+	|	AssignmentExpression
+	;
+
+LeftHandSideExpression
+	=	NewExpression
+	|	CallExpression
+	;
+
+LeftHandSideExpression_NoLBF
+	=	NewExpression_NoLBF
+	|	CallExpression_NoLBF
+	;
+
+PostfixExpression
+	=	LeftHandSideExpression
+	|	LeftHandSideExpression PLUS_PLUS
+	|	LeftHandSideExpression MINUS_MINUS
+	;
+
+PostfixExpression_NoLBF
+	=	LeftHandSideExpression_NoLBF
+	|	LeftHandSideExpression_NoLBF PLUS_PLUS
+	|	LeftHandSideExpression_NoLBF MINUS_MINUS
+	;
+
+UnaryExpression
+	=	PostfixExpression
+	|	DELETE UnaryExpression
+	|	EXCLAMATION UnaryExpression
+	|	MINUS UnaryExpression
+	|	MINUS_MINUS UnaryExpression
+	|	PLUS UnaryExpression
+	|	PLUS_PLUS UnaryExpression
+	|	TILDE UnaryExpression
+	|	TYPEOF UnaryExpression
+	|	VOID UnaryExpression
+	;
+
+UnaryExpression_NoLBF
+	=	PostfixExpression_NoLBF
+	|	DELETE UnaryExpression
+	|	EXCLAMATION UnaryExpression
+	|	MINUS UnaryExpression
+	|	MINUS_MINUS UnaryExpression
+	|	PLUS UnaryExpression
+	|	PLUS_PLUS UnaryExpression
+	|	TILDE UnaryExpression
+	|	TYPEOF UnaryExpression
+	|	VOID UnaryExpression
+	;
+
+MultiplicativeExpression
+	=	UnaryExpression
+	|	MultiplicativeExpression STAR UnaryExpression
+	|	MultiplicativeExpression FORWARD_SLASH UnaryExpression
+	|	MultiplicativeExpression PERCENT UnaryExpression
+	;
+
+MultiplicativeExpression_NoLBF
+	=	UnaryExpression_NoLBF
+	|	MultiplicativeExpression_NoLBF STAR UnaryExpression
+	|	MultiplicativeExpression_NoLBF FORWARD_SLASH UnaryExpression
+	|	MultiplicativeExpression_NoLBF PERCENT UnaryExpression
+	;
+
+AdditiveExpression
+	=	MultiplicativeExpression
+	|	AdditiveExpression PLUS MultiplicativeExpression
+	|	AdditiveExpression MINUS MultiplicativeExpression
+	;
+
+AdditiveExpression_NoLBF
+	=	MultiplicativeExpression_NoLBF
+	|	AdditiveExpression_NoLBF PLUS MultiplicativeExpression
+	|	AdditiveExpression_NoLBF MINUS MultiplicativeExpression
+	;
+
+ShiftExpression
+	=	AdditiveExpression
+	|	ShiftExpression LESS_LESS AdditiveExpression
+	|	ShiftExpression GREATER_GREATER AdditiveExpression
+	|	ShiftExpression GREATER_GREATER_GREATER AdditiveExpression
+	;
+
+ShiftExpression_NoLBF
+	=	AdditiveExpression_NoLBF
+	|	ShiftExpression_NoLBF LESS_LESS AdditiveExpression
+	|	ShiftExpression_NoLBF GREATER_GREATER AdditiveExpression
+	|	ShiftExpression_NoLBF GREATER_GREATER_GREATER AdditiveExpression
+	;
+
+RelationalExpression
+	=	ShiftExpression
+	|	RelationalExpression LESS ShiftExpression
+	|	RelationalExpression GREATER ShiftExpression
+	|	RelationalExpression LESS_EQUAL ShiftExpression
+	|	RelationalExpression GREATER_EQUAL ShiftExpression
+	|	RelationalExpression INSTANCEOF ShiftExpression
+	|	RelationalExpression IN ShiftExpression
+	;
+
+RelationalExpression_NoLBF
+	=	ShiftExpression_NoLBF
+	|	RelationalExpression_NoLBF LESS ShiftExpression
+	|	RelationalExpression_NoLBF GREATER ShiftExpression
+	|	RelationalExpression_NoLBF LESS_EQUAL ShiftExpression
+	|	RelationalExpression_NoLBF GREATER_EQUAL ShiftExpression
+	|	RelationalExpression_NoLBF INSTANCEOF ShiftExpression
+	|	RelationalExpression_NoLBF IN ShiftExpression
+	;
+
+RelationalExpression_NoIn
+	=	ShiftExpression
+	|	RelationalExpression_NoIn LESS ShiftExpression
+	|	RelationalExpression_NoIn GREATER ShiftExpression
+	|	RelationalExpression_NoIn LESS_EQUAL ShiftExpression
+	|	RelationalExpression_NoIn GREATER_EQUAL ShiftExpression
+	|	RelationalExpression_NoIn INSTANCEOF ShiftExpression
+	;
+
+EqualityExpression
+	=	RelationalExpression
+	|	EqualityExpression EQUAL_EQUAL RelationalExpression
+	|	EqualityExpression EXCLAMATION_EQUAL RelationalExpression
+	|	EqualityExpression EQUAL_EQUAL_EQUAL RelationalExpression
+	|	EqualityExpression EXCLAMATION_EQUAL_EQUAL RelationalExpression
+	;
+
+EqualityExpression_NoLBF
+	=	RelationalExpression_NoLBF
+	|	EqualityExpression_NoLBF EQUAL_EQUAL RelationalExpression
+	|	EqualityExpression_NoLBF EXCLAMATION_EQUAL RelationalExpression
+	|	EqualityExpression_NoLBF EQUAL_EQUAL_EQUAL RelationalExpression
+	|	EqualityExpression_NoLBF EXCLAMATION_EQUAL_EQUAL RelationalExpression
+	;
+
+EqualityExpression_NoIn
+	=	RelationalExpression_NoIn
+	|	EqualityExpression_NoIn EQUAL_EQUAL RelationalExpression_NoIn
+	|	EqualityExpression_NoIn EXCLAMATION_EQUAL RelationalExpression_NoIn
+	|	EqualityExpression_NoIn EQUAL_EQUAL_EQUAL RelationalExpression_NoIn
+	|	EqualityExpression_NoIn EXCLAMATION_EQUAL_EQUAL RelationalExpression_NoIn
+	;
+
+BitwiseAndExpression
+	=	BitwiseAndExpression AMPERSAND EqualityExpression
+	|	EqualityExpression
+	;
+
+BitwiseAndExpression_NoLBF
+	=	BitwiseAndExpression_NoLBF AMPERSAND EqualityExpression
+	|	EqualityExpression_NoLBF
+	;
+
+BitwiseAndExpression_NoIn
+	=	BitwiseAndExpression_NoIn AMPERSAND EqualityExpression_NoIn
+	|	EqualityExpression_NoIn
+	;
+
+BitwiseXorExpression
+	=	BitwiseXorExpression CARET BitwiseAndExpression
+	|	BitwiseAndExpression
+	;
+
+BitwiseXorExpression_NoLBF
+	=	BitwiseXorExpression_NoLBF CARET BitwiseAndExpression
+	|	BitwiseAndExpression_NoLBF
+	;
+
+BitwiseXorExpression_NoIn
+	=	BitwiseXorExpression_NoIn CARET BitwiseAndExpression_NoIn
+	|	BitwiseAndExpression_NoIn
+	;
+
+BitwiseOrExpression
+	=	BitwiseOrExpression PIPE BitwiseXorExpression
+	|	BitwiseXorExpression
+	;
+
+BitwiseOrExpression_NoLBF
+	=	BitwiseOrExpression_NoLBF PIPE BitwiseXorExpression
+	|	BitwiseXorExpression_NoLBF
+	;
+
+BitwiseOrExpression_NoIn
+	=	BitwiseOrExpression_NoIn PIPE BitwiseXorExpression_NoIn
+	|	BitwiseXorExpression_NoIn
+	;
+
+LogicalAndExpression
+	=	LogicalAndExpression AMPERSAND_AMPERSAND BitwiseOrExpression
+	|	BitwiseOrExpression
+	;
+
+LogicalAndExpression_NoLBF
+	=	LogicalAndExpression_NoLBF AMPERSAND_AMPERSAND BitwiseOrExpression
+	|	BitwiseOrExpression_NoLBF
+	;
+
+LogicalAndExpression_NoIn
+	=	LogicalAndExpression_NoIn AMPERSAND_AMPERSAND BitwiseOrExpression_NoIn
+	|	BitwiseOrExpression_NoIn
+	;
+
+LogicalOrExpression
+	=	LogicalOrExpression PIPE_PIPE LogicalAndExpression
+	|	LogicalAndExpression
+	;
+
+LogicalOrExpression_NoLBF
+	=	LogicalOrExpression_NoLBF PIPE_PIPE LogicalAndExpression
+	|	LogicalAndExpression_NoLBF
+	;
+
+LogicalOrExpression_NoIn
+	=	LogicalOrExpression_NoIn PIPE_PIPE LogicalAndExpression_NoIn
+	|	LogicalAndExpression_NoIn
+	;
+
+ConditionalExpression
+	=	LogicalOrExpression
+	|	LogicalOrExpression QUESTION AssignmentExpression COLON AssignmentExpression
+	;
+
+ConditionalExpression_NoLBF
+	=	LogicalOrExpression_NoLBF
+	|	LogicalOrExpression_NoLBF QUESTION AssignmentExpression COLON AssignmentExpression
+	;
+
+ConditionalExpression_NoIn
+	=	LogicalOrExpression_NoIn
+	|	LogicalOrExpression_NoIn QUESTION AssignmentExpression_NoIn COLON AssignmentExpression_NoIn
+	;
+
+AssignmentExpression
+	=	ConditionalExpression
+	|	LeftHandSideExpression AssignmentOperator AssignmentExpression
+	;
+
+AssignmentExpression_NoLBF
+	=	ConditionalExpression_NoLBF
+	|	LeftHandSideExpression_NoLBF AssignmentOperator AssignmentExpression
+	;
+
+AssignmentExpression_NoIn
+	=	ConditionalExpression_NoIn
+	|	LeftHandSideExpression AssignmentOperator AssignmentExpression_NoIn
+	;
+
+AssignmentOperator
+	=	EQUAL
+	|	STAR_EQUAL
+	|	FORWARD_SLASH_EQUAL
+	|	PERCENT_EQUAL
+	|	PLUS_EQUAL
+	|	MINUS_EQUAL
+	|	LESS_LESS_EQUAL
+	|	GREATER_GREATER_EQUAL
+	|	GREATER_GREATER_GREATER_EQUAL
+	|	AMPERSAND_EQUAL
+	|	CARET_EQUAL
+	|	PIPE_EQUAL
+	;
+
+Expression
+	=	Expression COMMA AssignmentExpression
+	|	AssignmentExpression
+	;
+
+Expression_NoLBF
+	=	Expression_NoLBF COMMA AssignmentExpression
+	|	AssignmentExpression_NoLBF
+	;
+
+Expression_NoIn
+	=	Expression_NoIn COMMA AssignmentExpression_NoIn
+	|	AssignmentExpression_NoIn
+	;
+
+Literal
+	=	NULL.n {:return new JSPrimitiveNode(JSTokens.NULL, n.getStart(), n.getEnd());:}
+	|	TRUE.t {:return new JSPrimitiveNode(JSTokens.TRUE, t.getStart(), t.getEnd());:}
+	|	FALSE.f {:return new JSPrimitiveNode(JSTokens.FALSE, f.getStart(), f.getEnd());:}
+	|	NUMBER.n {:return new JSPrimitiveNode(n, _symbol_n.getStart(), _symbol_n.getEnd());:}
+	|	STRING.s {:return new JSPrimitiveNode(s, _symbol_s.getStart(), _symbol_s.getEnd());:}
+	|	REGEX.r {:return new JSPrimitiveNode(r, _symbol_r.getStart(), _symbol_r.getEnd());:}
+	;

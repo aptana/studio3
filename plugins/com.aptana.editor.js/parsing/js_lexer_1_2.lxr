@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lexer
+	xmlns="http://www.aptana.com/2007/lexer/1.2"
+	language="text/javascript"
+	category-enumeration="com.aptana.ide.lexer.TokenCategories"
+	type-enumeration="com.aptana.ide.editor.js.lexing.JSTokenTypes">
+	
+	<bundle>com.aptana.ide.editor.js</bundle>
+	<package>com.aptana.ide.editor.js.lexing</package>
+	
+    <token-group group="default">
+		<category-group category="WHITESPACE">
+			<one-or-more type="WHITESPACE">
+				<character-class> \t\v\f</character-class>
+			</one-or-more>
+			<line-terminator type="LINE_TERMINATOR"/>
+			<comment type="COMMENT"/>
+			
+			<string type="CDO">&lt;!--</string>
+			<string type="CDC">--></string>
+			
+			<string type="PI_CLOSE">?&gt;</string>
+			<string type="PI_OPEN">&lt;?</string>
+			
+			<string type="START_DOCUMENTATION">/**</string>
+			<string type="START_MULTILINE_COMMENT">/*</string>
+		</category-group>
+		
+		<category-group category="KEYWORD">
+			<and>
+	    		<or>
+	    			<string type="BREAK">break</string>
+	    			<string type="CASE">case</string>
+	    			<string type="CATCH">catch</string>
+	    			<string type="CONTINUE">continue</string>
+	    			<string type="DEFAULT">default</string>
+	    			<string type="DELETE">delete</string>
+	    			<string type="DO">do</string>
+	    			<string type="ELSE">else</string>
+	    			<string type="IF">if</string>
+	    			<string type="INSTANCEOF">instanceof</string>
+	    			<string type="IN">in</string>
+	    			<string type="FINALLY">finally</string>
+	    			<string type="FOR">for</string>
+	    			<string type="FUNCTION">function</string>
+	    			<string type="NEW">new</string>
+	    			<string type="RETURN">return</string>
+	    			<string type="SWITCH">switch</string>
+	    			<string type="THIS">this</string>
+	    			<string type="THROW">throw</string>
+	    			<string type="TRY">try</string>
+	    			<string type="TYPEOF">typeof</string>
+	    			<string type="VAR">var</string>
+	    			<string type="VAR">const</string>
+	    			<string type="VOID">void</string>
+	    			<string type="WHILE">while</string>
+	    			<string type="WITH">with</string>
+	    		</or>
+				<lookahead negate="true">
+					<or>
+						<letter/>
+						<character-class>$_</character-class>
+						<digit/>
+					</or>
+				</lookahead>
+			</and>
+    	</category-group>
+		
+		<!-- Future Reserved Words -->
+		<!--
+		<multi-token category="FUTURE">
+			<and>
+	    		<or>
+					<string type="ABSTRACT">abstract</string>
+					<string type="BOOLEAN">boolean</string>
+					<string type="BYTE">byte</string>
+					<string type="CHAR">char</string>
+					<string type="CLASS">class</string>
+					<string type="CONST">const</string>
+					<string type="DEBUGGER">debugger</string>
+					<string type="DOUBLE">double</string>
+					<string type="ENUM">enum</string>
+					<string type="EXPORT">export</string>
+					<string type="EXTENDS">extends</string>
+					<string type="FINAL">final</string>
+					<string type="FLOAT">float</string>
+					<string type="GOTO">goto</string>
+					<string type="IMPLEMENTS">implements</string>
+					<string type="IMPORT">import</string>
+					<string type="INT">int</string>
+					<string type="INTERFACE">interface</string>
+					<string type="LONG">long</string>
+					<string type="NATIVE">native</string>
+					<string type="PACKAGE">package</string>
+					<string type="PRIVATE">private</string>
+					<string type="PROTECTED">protected</string>
+					<string type="PUBLIC">public</string>
+					<string type="SHORT">short</string>
+					<string type="STATIC">static</string>
+					<string type="SUPER">super</string>
+					<string type="SYNCHRONIZED">synchronized</string>
+					<string type="THROWS">throws</string>
+					<string type="TRANSIENT">transient</string>
+					<string type="VOLATILE">volatile</string>
+				</or>
+				<lookahead negate="true">
+					<or>
+						<letter/>
+						<character-class>$_</character-class>
+						<digit/>
+					</or>
+				</lookahead>
+			</and>
+		</multi-token>
+		-->
+		
+    	<category-group category="LITERAL">
+			<and>
+	    		<or>
+	    			<string type="NULL">null</string>
+	    			<string type="TRUE">true</string>
+	    			<string type="FALSE">false</string>
+	    		</or>
+				<lookahead negate="true">
+					<or>
+						<letter/>
+						<character-class>$_</character-class>
+						<digit/>
+					</or>
+				</lookahead>
+			</and>
+			<and>
+				<string case-insensitive="true" category="ERROR" type="NUMBER">0x</string>
+				<optional>
+					<one-or-more category="LITERAL" type="NUMBER">
+						<hex/>
+					</one-or-more>
+				</optional>
+			</and>
+			<number match-sci-notation="true" type="NUMBER"/>
+			<quoted-string type="STRING">'"</quoted-string>
+    	</category-group>
+		
+		<identifier category="IDENTIFIER" type="IDENTIFIER" start-characters="$_" part-characters="$_"/>
+		
+    	<category-group category="PUNCTUATOR">
+    		<character type="LCURLY">{</character>
+    		<character type="RCURLY">}</character>
+    		<character type="LBRACKET">[</character>
+    		<character type="RBRACKET">]</character>
+    		<character type="LPAREN">(</character>
+    		<character type="RPAREN">)</character>
+    		<character type="TILDE">~</character>
+    		<character type="DOT">.</character>
+    		<character type="SEMICOLON">;</character>
+    		<character type="COMMA">,</character>
+    		<character type="QUESTION">?</character>
+    		<character type="COLON">:</character>
+			
+    		<string type="PLUS_PLUS">++</string>
+    		<string type="PLUS_EQUAL">+=</string>
+    		<character type="PLUS">+</character>
+			
+    		<string type="MINUS_MINUS">--</string>
+    		<string type="MINUS_EQUAL">-=</string>
+    		<character type="MINUS">-</character>
+			
+    		<string type="STAR_EQUAL">*=</string>
+    		<character type="STAR">*</character>
+			
+    		<string type="FORWARD_SLASH_EQUAL">/=</string>
+    		<character type="FORWARD_SLASH">/</character>
+			
+    		<string type="CARET_EQUAL">^=</string>
+    		<character type="CARET">^</character>
+			
+    		<string type="EXCLAMATION_EQUAL_EQUAL">!==</string>
+    		<string type="EXCLAMATION_EQUAL">!=</string>
+    		<character type="EXCLAMATION">!</character>
+			
+    		<string type="PERCENT_EQUAL">%=</string>
+    		<character type="PERCENT">%</character>
+			
+    		<string type="AMPERSAND_AMPERSAND">&amp;&amp;</string>
+    		<string type="AMPERSAND_EQUAL">&amp;=</string>
+    		<character type="AMPERSAND">&amp;</character>
+			
+			
+    		<string type="PIPE_PIPE">||</string>
+    		<string type="PIPE_EQUAL">|=</string>
+    		<character type="PIPE">|</character>
+			
+    		<string type="GREATER_GREATER_GREATER_EQUAL">>>>=</string>
+    		<string type="GREATER_GREATER_GREATER">>>></string>
+    		<string type="GREATER_GREATER_EQUAL">>>=</string>
+    		<string type="GREATER_GREATER">>></string>
+    		<string type="GREATER_EQUAL">>=</string>
+    		<character type="GREATER">></character>
+			
+    		<string type="LESS_LESS_EQUAL">&lt;&lt;=</string>
+    		<string type="LESS_LESS">&lt;&lt;</string>
+    		<string type="LESS_EQUAL">&lt;=</string>
+    		<character type="LESS">&lt;</character>
+			
+    		<string type="EQUAL_EQUAL_EQUAL">===</string>
+    		<string type="EQUAL_EQUAL">==</string>
+    		<character type="EQUAL">=</character>
+	    </category-group>
+		
+	</token-group>
+	
+	<token-group group="error">
+		<category-group category="ERROR">
+			<one-or-more type="ERROR" switch-to="default">
+				<or>
+					<character-class negate="true"> \t\r\n\f\v/"'</character-class>
+					<string>\/</string>
+				</or>
+			</one-or-more>
+			<and type="REGEX" switch-to="default">
+				<character>/</character>
+				<one-or-more>
+					<character-class negate="true">\r\n</character-class>
+				</one-or-more>
+			</and>
+		</category-group>
+	</token-group>
+	
+	<token-group group="regex">
+		<category-group category="LITERAL">
+			<reg-exp type="REGEX" switch-to="default"/>
+		</category-group>
+	</token-group>
+	
+	<token-group group="addition">
+		<category-group category="PUNCTUATOR">
+			<character type="PLUS" switchTo="default">+</character>
+			<character type="MINUS" switchTo="default">-</character>
+		</category-group>
+	</token-group>
+	
+	<token-group group="documentation-delimiter">
+		<string category="WHITESPACE" type="WHITESPACE">*/</string>
+	</token-group>
+	
+	<token-group group="line-delimiter">
+		<line-terminator category="WHITESPACE" type="WHITESPACE"/>
+	</token-group>
+	
+</lexer>

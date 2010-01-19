@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.js.JSCodeScannerTest;
+import com.aptana.editor.js.JSParserTest;
 import com.aptana.editor.js.JSSourcePartitionScannerTest;
 
 public class AllTests
@@ -15,6 +16,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(JSSourcePartitionScannerTest.class);
 		suite.addTestSuite(JSCodeScannerTest.class);
+		suite.addTestSuite(JSParserTest.class);
 		// $JUnit-END$
 		return suite;
 	}
