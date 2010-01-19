@@ -67,7 +67,7 @@ public class GitRepositoryTest extends TestCase
 		// Doesn't yet exist
 		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
 		assertNull(repo);
-
+		// Create it now and assert that it was created
 		createRepo(path);
 	}
 
@@ -151,9 +151,34 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
 
-		// TODO Add ability to delete a branch through the model and then test that too!
-
 		// TODO Add tests for creating tracking branches!
+	}
+
+	public void testDeleteBranch() throws Throwable
+	{
+		testAddBranch();
+
+		// Create a new branch off master
+		assertTrue(fRepo.deleteBranch("my_new_branch").isOK());
+
+		// make sure the branch is no longer listed in model
+		Set<String> branches = fRepo.allBranches();
+		assertEquals(1, branches.size());
+		assertTrue(branches.contains("master"));
+		assertFalse(branches.contains("my_new_branch"));
+		// TODO Try to delete a branch that won't work and needs to be run with -D!
+	}
+
+	public void testChangeBranch() throws Throwable
+	{
+		testAddBranch();
+
+		assertEquals("master", fRepo.currentBranch());
+		fRepo.switchBranch("my_new_branch");
+		assertEquals("my_new_branch", fRepo.currentBranch());
+
+		fRepo.switchBranch("master");
+		assertEquals("master", fRepo.currentBranch());
 	}
 
 	protected IPath repoToGenerate()

@@ -137,7 +137,7 @@ public class GitRepository
 		String repositoryPath = repositoryURL.getPath();
 		if (!new File(repositoryPath).exists())
 			return null;
-		
+
 		if (isBareRepository(repositoryPath))
 			return repositoryURL;
 
@@ -674,6 +674,23 @@ public class GitRepository
 		// Add branch to list in model!
 		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
 		return true;
+	}
+
+	public IStatus deleteBranch(String branchName)
+	{
+		List<String> args = new ArrayList<String>();
+		args.add("branch"); //$NON-NLS-1$
+		args.add("-d"); //$NON-NLS-1$
+		args.add(branchName);
+
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				args.toArray(new String[args.size()]));
+		int exitCode = result.keySet().iterator().next();
+		if (exitCode != 0)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
+		// Remove branch in model!
+		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		return Status.OK_STATUS;
 	}
 
 	public boolean validBranchName(String branchName)
