@@ -102,13 +102,16 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Activating shell scheme");
-
 					try
 					{
 						BindingService bindingService = (BindingService) _serviceLocator
 								.getService(IBindingService.class);
 						Scheme currentScheme = bindingService.getActiveScheme();
+						if (currentScheme.getId().equals(SHELL_KEY_BINDING_SCHEME))
+							return;
+
+						Activator.trace("Activating shell scheme"); //$NON-NLS-1$
+
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
 
 						// NOTE: During debugging I saw two activation events in a row with no
@@ -119,7 +122,7 @@ public class TerminalBrowser
 						{
 							oldScheme = currentScheme;
 						}
-						// FIXME This getBidningManager method doesn't exist in 3.4!
+						// FIXME This getBindingManager method doesn't exist in 3.4!
 						bindingService.getBindingManager().setActiveScheme(scheme);
 					}
 					catch (NotDefinedException e)
@@ -141,7 +144,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Shell brought to top");
+					Activator.trace("Shell brought to top"); //$NON-NLS-1$
 				}
 			}
 
@@ -161,7 +164,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Deactivating shell scheme");
+					Activator.trace("Deactivating shell scheme"); //$NON-NLS-1$
 
 					try
 					{
@@ -192,7 +195,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Shell opened");
+					Activator.trace("Shell opened"); //$NON-NLS-1$
 				}
 			}
 		});
@@ -208,14 +211,14 @@ public class TerminalBrowser
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
 					IWorkbench workbench = PlatformUI.getWorkbench();
-					
+
 					if (workbench != null)
 					{
 						Display display = workbench.getDisplay();
-						
+
 						display.syncExec(new Runnable()
 						{
-	
+
 							@Override
 							public void run()
 							{
