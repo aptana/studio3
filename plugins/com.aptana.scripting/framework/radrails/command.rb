@@ -2,6 +2,7 @@ require "java"
 require "radrails/base_element"
 require "radrails/key_binding"
 require "radrails/scope_selector"
+require "pathname"
 
 module RadRails
   
@@ -24,7 +25,19 @@ module RadRails
     end
     
     def input=(input)
-      @jobj.input_type = (input && input.kind_of?(Array)) ? input.map {|element| element.to_s}.to_java(:String) : input.to_s;
+      return if input.nil?
+      
+      case input
+      when Array
+        @jobj.input_type = input.map { |element| element.to_s }.to_java(:String)
+      when Symbol
+        @jobj.input_type = input.to_s
+      else
+        bundle = BundleManager.bundle_from_path(path)
+        base_path = Pathname.new(File.dirname(bundle.path))
+        @jobj.input_type = "input_from_file"
+        @jobj.input_path = (base_path + Pathname.new(input.to_s)).to_s
+      end
     end
     
     def invoke(&block)
@@ -52,11 +65,15 @@ module RadRails
     end
     
     def output=(output)
+      return if output.nil?
+      
       if output.kind_of? Symbol
         @jobj.output_type = output.to_s
       else
+        bundle = BundleManager.bundle_from_path(path)
+        base_path = Pathname.new(File.dirname(bundle.path))
         @jobj.output_type = "output_to_file"
-        @jobj.output_path = output.to_s
+        @jobj.output_path = (base_path + Pathname.new(output.to_s)).to_s
       end
     end
     

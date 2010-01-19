@@ -73,6 +73,7 @@ public class CommandElement extends AbstractBundleElement
 	private RubyProc _invokeBlock;
 	private Map<Platform, String[]> _keyBindings;
 	private InputType[] _inputTypes;
+	private String _inputPath;
 	private OutputType _outputType;
 	private String _outputPath;
 
@@ -155,7 +156,17 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return "command"; //$NON-NLS-1$
 	}
-
+	
+	/**
+	 * getInputPath
+	 * 
+	 * @return
+	 */
+	public String getInputPath()
+	{
+		return this._inputPath;
+	}
+	
 	/**
 	 * getInput
 	 * 
@@ -254,20 +265,6 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 		return result.toArray(new KeySequence[result.size()]);
-	}
-
-	/**
-	 * getOutput
-	 * 
-	 * @return
-	 */
-	public String getOutput()
-	{
-		if (this._outputType == OutputType.OUTPUT_TO_FILE)
-		{
-			return this._outputPath;
-		}
-		return this._outputType.getName();
 	}
 
 	/**
@@ -745,6 +742,16 @@ public class CommandElement extends AbstractBundleElement
 		}
 	}
 
+	/**
+	 * setInputPath
+	 * 
+	 * @param path
+	 */
+	public void setInputPath(String path)
+	{
+		this._inputPath = path;
+	}
+	
 	/**
 	 * setInputType
 	 * 

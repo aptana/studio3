@@ -17,6 +17,7 @@ public enum InputType
 	DOCUMENT("document"), //$NON-NLS-1$
 	CLIPBOARD("clipboard"),  //$NON-NLS-1$
 	INPUT_FROM_CONSOLE("input_from_console"), //$NON-NLS-1$
+	INPUT_FROM_FILE("input_from_file"), //$NON-NLS-1$
 	INPUT_FROM_STREAM("input_from_stream"); //$NON-NLS-1$
 
 	private static final Map<String, InputType> NAME_MAP;
