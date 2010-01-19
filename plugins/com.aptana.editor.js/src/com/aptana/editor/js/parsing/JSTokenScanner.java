@@ -145,7 +145,7 @@ public class JSTokenScanner extends JSCodeScanner
 				createToken(getTokenName(JSTokens.NUMBER))));
 
 		// identifiers
-		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken(identifier), true)); //$NON-NLS-1$
+		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(identifier), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
