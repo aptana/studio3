@@ -97,7 +97,24 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 44);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 45);
 	}
-		
+
+	public void testComplexRegexp2()
+	{
+
+		String source =
+//			             1          2           3
+//			 01234 5678 90 123456789012 3 456789012345678
+			"/^[^{\\[]*\\/\\*/.test();/\\\\/g// comment";
+
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 0);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 13);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 14);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 21);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 22);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 26);
+		assertContentType(JSSourceConfiguration.JS_SINGLELINE_COMMENT, source, 27);
+	}
+
 	public void testPartitioningOfCommentSpanningMultipleLines()
 	{
 		String source = 

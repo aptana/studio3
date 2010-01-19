@@ -2,7 +2,9 @@ package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +14,7 @@ import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -45,6 +48,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
@@ -86,6 +90,37 @@ public class CommandExecutionUtils
 		public void consume(InputStream input);
 	}
 
+	public static class FileInputProvider implements FilterInputProvider
+	{
+		private final String path;
+
+		public FileInputProvider(String path)
+		{
+			this.path = path;
+		}
+
+		public InputStream getInputStream()
+		{
+			InputStream result = null;
+
+			try
+			{
+				result = new FileInputStream(this.path);
+			}
+			catch (FileNotFoundException e)
+			{
+				String message = MessageFormat.format(
+					Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
+					new Object[] { path }
+				);
+				
+				ScriptUtils.logErrorWithStackTrace(message, e);
+			}
+
+			return result;
+		}
+	}
+	
 	public static class StringInputProvider implements FilterInputProvider
 	{
 		private final String string;
@@ -314,7 +349,7 @@ public class CommandExecutionUtils
 		}
 		for (InputType inputType : inputTypes)
 		{
-			filterInputProvider = getInputProvider(textWidget, inputType);
+			filterInputProvider = getInputProvider(textWidget, command, inputType);
 			if (filterInputProvider != null)
 			{
 				selected = inputType;
@@ -340,7 +375,7 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, InputType inputType)
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command, InputType inputType)
 	{
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
@@ -377,6 +412,8 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.StringInputProvider(currentWord);
 			case INPUT_FROM_CONSOLE:
 				return new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
+			case INPUT_FROM_FILE:
+				return new CommandExecutionUtils.FileInputProvider(command.getInputPath());
 		}
 		return null;
 	}
@@ -473,6 +510,9 @@ public class CommandExecutionUtils
 			case OUTPUT_TO_CONSOLE:
 				outputToConsole(commandResult);
 				break;
+			case OUTPUT_TO_FILE:
+				outputToFile(commandResult);
+				break;
 		}
 	}
 
@@ -523,6 +563,40 @@ public class CommandExecutionUtils
 		{
 			// Dump the error output if any
 			ScriptLogger.printError(commandResult.getErrorString());
+		}
+	}
+
+	private static void outputToFile(CommandResult commandResult)
+	{
+		FileWriter writer = null;
+		String path = commandResult.getCommand().getOutputPath();
+		
+		try
+		{
+			writer = new FileWriter(path);
+			writer.write(commandResult.getOutputString());
+		}
+		catch (IOException e)
+		{
+			String message = MessageFormat.format(
+				Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
+				new Object[] { path }
+			);
+			
+			ScriptUtils.logErrorWithStackTrace(message, e);
+		}
+		finally
+		{
+			if (writer != null)
+			{
+				try
+				{
+					writer.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
 		}
 	}
 
