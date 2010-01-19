@@ -12,12 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
@@ -43,31 +39,6 @@ public class CommandElement extends AbstractBundleElement
 	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
-	private static final Pattern CONTROL_PLUS = Pattern.compile("control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String CTRL_PLUS = Matcher.quoteReplacement(IKeyLookup.CTRL_NAME + KeyStroke.KEY_DELIMITER);
-	private static final Pattern OPTION_PLUS = Pattern.compile("option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+ Convert option+ to ALT+
-	 * 
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKeyBinding(String keyBinding)
-	{
-		String result = null;
-
-		if (keyBinding != null)
-		{
-			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
-		}
-
-		return result;
-	}
 	private String[] _triggers;
 	private String _invoke;
 	private RubyProc _invokeBlock;
@@ -76,9 +47,9 @@ public class CommandElement extends AbstractBundleElement
 	private String _inputPath;
 	private OutputType _outputType;
 	private String _outputPath;
-
+	private boolean _async;
+	
 	private String _workingDirectoryPath;
-
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -250,7 +221,7 @@ public class CommandElement extends AbstractBundleElement
 				try
 				{
 					// Need to convert the format
-					String normalizedKeyBinding = normalizeKeyBinding(binding);
+					String normalizedKeyBinding = ScriptUtils.normalizeKeyBinding(binding);
 					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
 
 					result.add(sequence);
@@ -423,7 +394,8 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 
-		CommandResult result = new CommandResult(resultText);
+		CommandResult result = new CommandResult();
+		result.setOutputString(resultText);
 		result.setExecutedSuccessfully(executedSuccessfully);
 		result.setCommand(this);
 		result.setContext(context);
@@ -538,13 +510,24 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 
-		CommandResult result = new CommandResult(resultText);
+		CommandResult result = new CommandResult();
+		result.setOutputString(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
 
 		return result;
 	}
 
+	/**
+	 * isAsync
+	 * 
+	 * @return
+	 */
+	public boolean isAsync()
+	{
+		return this._async;
+	}
+	
 	/**
 	 * isBlockCommand
 	 * 
@@ -742,6 +725,16 @@ public class CommandElement extends AbstractBundleElement
 		}
 	}
 
+	/**
+	 * setAsync
+	 * 
+	 * @param value
+	 */
+	public void setAsync(boolean value)
+	{
+		this._async = value;
+	}
+	
 	/**
 	 * setInputPath
 	 * 

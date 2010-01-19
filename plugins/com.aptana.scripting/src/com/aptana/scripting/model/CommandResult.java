@@ -17,12 +17,9 @@ public class CommandResult
 
 	/**
 	 * CommandResult
-	 * 
-	 * @param output
 	 */
-	public CommandResult(String output)
+	public CommandResult()
 	{
-		this._outputString = output;
 	}
 
 	/**
@@ -166,6 +163,26 @@ public class CommandResult
 		this._inputType = inputType;
 	}
 
+	/**
+	 * setOutputStream
+	 * 
+	 * @param output
+	 */
+	void setOutputStream(OutputStream output)
+	{
+		this._outputStream = output;
+	}
+	
+	/**
+	 * setOutputString
+	 * 
+	 * @param output
+	 */
+	void setOutputString(String output)
+	{
+		this._outputString = output;
+	}
+	
 	/**
 	 * setReturnValue
 	 * 
