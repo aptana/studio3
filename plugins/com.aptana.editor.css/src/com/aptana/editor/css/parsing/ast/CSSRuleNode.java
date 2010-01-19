@@ -50,6 +50,13 @@ public class CSSRuleNode extends CSSNode
 		{
 			fDeclarations = new CSSDeclarationNode[0];
 		}
+		if (fSelectors.length > 0)
+		{
+			for (CSSDeclarationNode declaration : fDeclarations)
+			{
+				declaration.setParent(fSelectors[0]);
+			}
+		}
 		this.end = end;
 	}
 

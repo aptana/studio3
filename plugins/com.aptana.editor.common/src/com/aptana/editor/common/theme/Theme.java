@@ -79,10 +79,10 @@ public class Theme
 			throw new IllegalStateException("Invalid theme properties!"); //$NON-NLS-1$
 		// The general editor colors
 		defaultFG = parseHexRGB((String) props.remove(FOREGROUND_PROP_KEY));
-		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY));
 		defaultBG = parseHexRGB((String) props.remove(BACKGROUND_PROP_KEY));
-		selection = parseHexRGB((String) props.remove(SELECTION_PROP_KEY));
-		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY));
+		lineHighlight = parseHexRGB((String) props.remove(LINE_HIGHLIGHT_PROP_KEY), true);
+		selection = parseHexRGB((String) props.remove(SELECTION_PROP_KEY), true);
+		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
 		for (Entry<Object, Object> entry : props.entrySet())
 		{
@@ -96,11 +96,10 @@ public class Theme
 				if (token.startsWith("#")) //$NON-NLS-1$
 				{
 					// it's a color!
-					RGB rgb = parseHexRGB(token);
 					if (foreground == null)
-						foreground = colorManager.getColor(rgb);
+						foreground = colorManager.getColor(parseHexRGB(token));
 					else
-						background = colorManager.getColor(rgb);
+						background = colorManager.getColor(parseHexRGB(token, true));
 				}
 				else
 				{
@@ -137,11 +136,15 @@ public class Theme
 
 	private RGB parseHexRGB(String token)
 	{
+		return parseHexRGB(token, false);
+	}
+
+	private RGB parseHexRGB(String token, boolean alphaMergeWithBG)
+	{
 		if (token == null)
 			return new RGB(0, 0, 0);
 		if (token.length() != 7 && token.length() != 9)
 		{
-			// TODO Handle RGBa values by mixing against BG, etc?
 			CommonEditorPlugin.logError(
 					MessageFormat.format("Received RGB Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
 			if (defaultFG != null)
@@ -154,7 +157,28 @@ public class Theme
 		int g = Integer.parseInt(s, 16);
 		s = token.substring(5, 7);
 		int b = Integer.parseInt(s, 16);
+		if (token.length() == 9 && alphaMergeWithBG)
+		{
+			// TODO Handle RGBa values by mixing against BG, etc?
+			s = token.substring(7, 9);
+			int a = Integer.parseInt(s, 16);
+			return alphaBlend(defaultBG, new RGB(r, g, b), a);
+		}
 		return new RGB(r, g, b);
+	}
+
+	public static RGB alphaBlend(RGB baseToBlendWith, RGB colorOnTop, int alpha)
+	{
+		int destRed = baseToBlendWith.red;
+		int destGreen = baseToBlendWith.green;
+		int destBlue = baseToBlendWith.blue;
+
+		// Alpha blending math
+		destRed += (colorOnTop.red - destRed) * alpha / 0xFF;
+		destGreen += (colorOnTop.green - destGreen) * alpha / 0xFF;
+		destBlue += (colorOnTop.blue - destBlue) * alpha / 0xFF;
+
+		return new RGB(destRed, destGreen, destBlue);
 	}
 
 	public TextAttribute getTextAttribute(String tokenType)

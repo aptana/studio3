@@ -30,4 +30,20 @@ public interface ScriptLogListener
 	 * @param message
 	 */
 	void trace(String message);
+	
+	/**
+	 * Remove this once either CommandExecutionUtils or Theming has been pulled out of editor.common
+	 * 
+	 * @deprecated
+	 * @param message
+	 */
+	void print(String message);
+	
+	/**
+	 * Remove this once either CommandExecutionUtils or Theming has been pulled out of editor.common
+	 * 
+	 * @deprecated
+	 * @param message
+	 */
+	void printError(String message);
 }

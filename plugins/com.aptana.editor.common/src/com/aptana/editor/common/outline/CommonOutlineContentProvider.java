@@ -28,6 +28,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	@Override
 	public Object getParent(Object element)
 	{
+		if (element instanceof IParseNode)
+		{
+			return ((IParseNode) element).getParent();
+		}
 		return null;
 	}
 

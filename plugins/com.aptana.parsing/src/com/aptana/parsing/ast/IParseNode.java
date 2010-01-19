@@ -6,4 +6,6 @@ public interface IParseNode extends ILexeme
 {
 
 	public IParseNode[] getChildren();
+
+	public IParseNode getParent();
 }

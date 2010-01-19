@@ -228,6 +228,10 @@
 			<param name="test.plugin" value="com.aptana.editor.xml.tests" />
 			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
 		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.git.ui.tests" />
+			<param name="test.classname" value="com.aptana.git.ui.AllTests" />
+		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->
 		<ant target="collect" antfile="${library-file}" dir="${baseLocation}">

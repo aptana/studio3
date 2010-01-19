@@ -21,6 +21,8 @@ import org.jruby.RubyString;
 import org.jruby.embed.EmbedEvalUnit;
 import org.jruby.embed.EvalFailedException;
 import org.jruby.embed.LocalContextProvider;
+import org.jruby.embed.LocalContextScope;
+import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ParseFailedException;
 import org.jruby.embed.PathType;
 import org.jruby.embed.ScriptingContainer;
@@ -181,7 +183,7 @@ public class ScriptingEngine
 	{
 		if (this._scriptingContainer == null)
 		{
-			this._scriptingContainer = new ScriptingContainer();
+			this._scriptingContainer = new ScriptingContainer(LocalContextScope.SINGLETON, LocalVariableBehavior.PERSISTENT);
 
 			try
 			{

@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal.actions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
@@ -73,6 +75,7 @@ public class CommitDialog extends StatusDialog
 	private Image deletedFileImage;
 	private Image emptyFileImage;
 	private Browser diffArea;
+	private ChangedFile fLastDiffFile;
 
 	public CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
@@ -82,6 +85,7 @@ public class CommitDialog extends StatusDialog
 		newFileImage = GitUIPlugin.getImage("icons/obj16/new_file.png"); //$NON-NLS-1$
 		deletedFileImage = GitUIPlugin.getImage("icons/obj16/deleted_file.png"); //$NON-NLS-1$
 		emptyFileImage = GitUIPlugin.getImage("icons/obj16/empty_file.png"); //$NON-NLS-1$
+		fLastDiffFile = null;
 	}
 
 	@Override
@@ -305,11 +309,15 @@ public class CommitDialog extends StatusDialog
 						if (file.getPath().endsWith(extension))
 						{
 							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
-							updateDiff("<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+							updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
 							return;
 						}
 					}
 				}
+				// Don't recalc if it's the same file as we are already showing
+				if (fLastDiffFile != null && file.equals(fLastDiffFile))
+					return;
+
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
 				try
 				{
@@ -319,7 +327,7 @@ public class CommitDialog extends StatusDialog
 				{
 					GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
 				}
-				updateDiff(diff);
+				updateDiff(file, diff);
 			}
 		});
 		// Allow double-clicking to toggle staged/unstaged
@@ -365,19 +373,53 @@ public class CommitDialog extends StatusDialog
 			{
 				public void menuAboutToShow(IMenuManager manager)
 				{
-					RevertAction revertAction = new RevertAction();
+
 					TableItem[] selected = myTable.getSelection();
 					List<IResource> files = new ArrayList<IResource>();
+					final List<String> filePaths = new ArrayList<String>();
 					for (TableItem item : selected)
 					{
 						String filePath = item.getText(1);
+
 						String workingDirectory = gitRepository.workingDirectory();
 
 						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
 								new Path(workingDirectory).append(filePath));
 						if (file != null)
+						{
 							files.add(file);
+							filePaths.add(filePath);
+						}
 					}
+					RevertAction revertAction = new RevertAction()
+					{
+						// need to remove the file(s) from staged table once action runs
+						@Override
+						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
+						{
+							super.doOperation(repo, changedFiles);
+							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+							{
+
+								@Override
+								public void run()
+								{
+									// If this file was shown in diff area, we need to blank the diff area!
+									if (fLastDiffFile != null)
+									{
+										for (ChangedFile file : changedFiles)
+										{
+											if (file != null && file.equals(fLastDiffFile))
+											{
+												updateDiff(null, Messages.CommitDialog_4);
+											}
+										}
+									}
+									removeDraggedFilesFromSource(unstagedTable, filePaths);
+								}
+							});
+						}
+					};
 					revertAction.selectionChanged(null, new StructuredSelection(files));
 					manager.add(revertAction);
 					// Other plug-ins can contribute there actions here
@@ -420,15 +462,18 @@ public class CommitDialog extends StatusDialog
 		packTable(to);
 		to.setRedraw(true);
 		to.redraw();
-		removeDraggedFilesFromSource(from, files);
+		removeDraggedFilesFromSource(from, files.keySet());
 		workaroundEmptyTableDropEffectBug(from);
 		validate();
 	}
 
-	protected void updateDiff(String diff)
+	protected void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
+		{
 			diffArea.setText(diff);
+			fLastDiffFile = file;
+		}
 	}
 
 	protected ChangedFile findChangedFile(String path)
@@ -521,14 +566,14 @@ public class CommitDialog extends StatusDialog
 	 * @param sourceTable
 	 * @param draggedFiles
 	 */
-	protected void removeDraggedFilesFromSource(Table sourceTable, Map<String, ChangedFile> draggedFiles)
+	protected void removeDraggedFilesFromSource(Table sourceTable, Collection<String> draggedFiles)
 	{
 		List<Integer> toRemove = new ArrayList<Integer>();
 		TableItem[] items = sourceTable.getItems();
 		for (int i = 0; i < items.length; i++)
 		{
 			TableItem item = items[i];
-			if (draggedFiles.keySet().contains(item.getText(1)))
+			if (draggedFiles.contains(item.getText(1)))
 			{
 				toRemove.add(i);
 			}
@@ -564,5 +609,11 @@ public class CommitDialog extends StatusDialog
 		{
 			dtarget.setDropTargetEffect(new TableDropTargetEffect(sourceDragTable));
 		}
+	}
+
+	@Override
+	protected boolean isResizable()
+	{
+		return true;
 	}
 }

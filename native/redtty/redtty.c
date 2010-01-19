@@ -21,7 +21,6 @@ main (void)
 {
 	/* Read char */
 	char buffer[1024+1];
-	char old_char;
 	int read_count;
 		
 	/* Descriptor set for select */

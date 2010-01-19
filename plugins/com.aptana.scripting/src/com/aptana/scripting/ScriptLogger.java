@@ -41,6 +41,28 @@ public class ScriptLogger
 	}
 
 	/**
+	 * Remove this once either CommandExecutionUtils or Theming has been pulled out of editor.common
+	 * 
+	 * @deprecated
+	 * @param message
+	 */
+	public static void print(String message)
+	{
+		getInstance().firePrintEvent(message);
+	}
+	
+	/**
+	 * Remove this once either CommandExecutionUtils or Theming has been pulled out of editor.common
+	 * 
+	 * @deprecated
+	 * @param message
+	 */
+	public static void printError(String message)
+	{
+		getInstance().firePrintErrorEvent(message);
+	}
+	
+	/**
 	 * trace
 	 * 
 	 * @param message
@@ -135,6 +157,40 @@ public class ScriptLogger
 			for (ScriptLogListener listener : this._logListeners)
 			{
 				listener.logWarning(warning);
+			}
+		}
+	}
+	
+	/**
+	 * firePrintEvent
+	 * 
+	 * @param message
+	 */
+	@SuppressWarnings("deprecation")
+	public void firePrintEvent(String message)
+	{
+		if (this._logListeners != null)
+		{
+			for (ScriptLogListener listener : this._logListeners)
+			{
+				listener.print(message);
+			}
+		}
+	}
+	
+	/**
+	 * firePrintErrorEvent
+	 * 
+	 * @param message
+	 */
+	@SuppressWarnings("deprecation")
+	public void firePrintErrorEvent(String message)
+	{
+		if (this._logListeners != null)
+		{
+			for (ScriptLogListener listener : this._logListeners)
+			{
+				listener.printError(message);
 			}
 		}
 	}

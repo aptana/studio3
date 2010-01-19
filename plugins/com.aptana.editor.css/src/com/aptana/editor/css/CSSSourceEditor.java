@@ -34,16 +34,20 @@
  */
 package com.aptana.editor.css;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.CSSParserFactory;
 
-public class CSSSourceEditor extends AbstractThemeableEditor {
+public class CSSSourceEditor extends AbstractThemeableEditor
+{
 
-    @Override
-	protected CommonOutlinePage getOutlinePage() {
+	@Override
+	protected CommonOutlinePage getOutlinePage()
+	{
 		CommonOutlinePage outline = super.getOutlinePage();
 		outline.setContentProvider(new CSSOutlineContentProvider());
 		outline.setLabelProvider(new CSSOutlineLabelProvider());
@@ -51,13 +55,26 @@ public class CSSSourceEditor extends AbstractThemeableEditor {
 		return outline;
 	}
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new CSSDocumentProvider());
+		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new CSSDocumentProvider());
 
-        getFileService().setParser(CSSParserFactory.getInstance().getParser());
-    }
+		getFileService().setParser(CSSParserFactory.getInstance().getParser());
+	}
+
+	@Override
+	protected Object getOutlineElementAt(int caret)
+	{
+		return CSSOutlineContentProvider.getElementAt(getFileService().getParseResult(), caret);
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return Activator.getDefault().getPreferenceStore();
+	}
 }

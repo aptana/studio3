@@ -50,6 +50,7 @@ public class BundleManager
 	private Map<String, BundleEntry> _entriesByName;
 	
 	private List<ElementChangeListener> _elementListeners;
+	private List<LoadCycleListener> _loadCycleListeners;
 	
 	/**
 	 * getInstance - used for unit testing
@@ -195,6 +196,24 @@ public class BundleManager
 	}
 	
 	/**
+	 * addLoadCycleListener
+	 * 
+	 * @param listener
+	 */
+	public void addLoadCycleListener(LoadCycleListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._loadCycleListeners == null)
+			{
+				this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+			}
+			
+			this._loadCycleListeners.add(listener);
+		}
+	}
+	
+	/**
 	 * fireElementAddedEvent
 	 * 
 	 * @param element
@@ -250,6 +269,54 @@ public class BundleManager
 					listener.elementAdded(element);
 //					listener.elementModified(element);
 				}
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptLoadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptLoadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptLoaded(script);
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptReloadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptReloadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptReloaded(script);
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptUnloadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptUnloadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptReloaded(script);
 			}
 		}
 	}
@@ -722,7 +789,7 @@ public class BundleManager
 			
 			for (File script : bundleScripts)
 			{
-				this.loadScript(script, bundleLoadPaths);
+				this.loadScript(script, true, bundleLoadPaths);
 			}
 		}
 	}
@@ -764,6 +831,17 @@ public class BundleManager
 	 */
 	public void loadScript(File script)
 	{
+		this.loadScript(script, true);
+	}
+	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 * @param fireEvent
+	 */
+	public void loadScript(File script, boolean fireEvent)
+	{
 		if (script != null)
 		{
 			// determine bundle root directory
@@ -783,7 +861,7 @@ public class BundleManager
 			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
 			
 			// execute script
-			this.loadScript(script, bundleLoadPaths);
+			this.loadScript(script, fireEvent, bundleLoadPaths);
 		}
 	}
 	
@@ -791,8 +869,10 @@ public class BundleManager
 	 * loadScript
 	 * 
 	 * @param script
+	 * @param fireEvent
+	 * @param loadPaths
 	 */
-	public void loadScript(File script, List<String> loadPaths)
+	public void loadScript(File script, boolean fireEvent, List<String> loadPaths)
 	{
 		boolean execute = true;
 		
@@ -821,6 +901,11 @@ public class BundleManager
 		if (execute)
 		{
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+			
+			if (fireEvent)
+			{
+				this.fireScriptLoadedEvent(script);
+			}
 		}
 	}
 
@@ -851,8 +936,10 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			this.unloadScript(script);
-			this.loadScript(script);
+			this.unloadScript(script, false);
+			this.loadScript(script, false);
+			
+			this.fireScriptReloadedEvent(script);
 		}
 		else
 		{
@@ -875,6 +962,19 @@ public class BundleManager
 		if (this._elementListeners != null)
 		{
 			this._elementListeners.remove(listener);
+		}
+	}
+	
+	/**
+	 * removeLoadCycleListener
+	 * 
+	 * @param listener
+	 */
+	public void removeLoadCycleListener(LoadCycleListener listener)
+	{
+		if (this._loadCycleListeners != null)
+		{
+			this._loadCycleListeners.remove(listener);
 		}
 	}
 	
@@ -902,6 +1002,17 @@ public class BundleManager
 	 * @param script
 	 */
 	public void unloadScript(File script)
+	{
+		this.unloadScript(script, true);
+	}
+	
+	/**
+	 * unloadScript
+	 * 
+	 * @param script
+	 * @param fireEvent
+	 */
+	public void unloadScript(File script, boolean fireEvent)
 	{
 		if (script != null)
 		{
@@ -941,6 +1052,11 @@ public class BundleManager
 						AbstractElement.unregisterElement(bundle);
 					}
 				}
+			}
+			
+			if (fireEvent)
+			{
+				this.fireScriptUnloadedEvent(script);
 			}
 		}
 		else

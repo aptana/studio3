@@ -36,13 +36,29 @@ package com.aptana.editor.html;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class HTMLEditor extends AbstractThemeableEditor {
+public class HTMLEditor extends AbstractThemeableEditor
+{
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
+			'\'', '\'', '"', '"', '<', '>', 'Ò', 'Ó' };
 
-        setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new HTMLDocumentProvider());
-    }
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
+
+		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new HTMLDocumentProvider());
+	}
+
+	/**
+	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
+	 * are the end.
+	 * 
+	 * @return
+	 */
+	protected char[] getPairMatchingCharacters()
+	{
+		return HTML_PAIR_MATCHING_CHARS;
+	}
 }

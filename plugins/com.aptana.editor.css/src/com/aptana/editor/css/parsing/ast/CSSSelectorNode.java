@@ -3,20 +3,19 @@ package com.aptana.editor.css.parsing.ast;
 public class CSSSelectorNode extends CSSNode
 {
 
-	private CSSRuleNode fParent;
 	private CSSSimpleSelectorNode[] fSimpleSelectors;
 
 	public CSSSelectorNode(CSSRuleNode parent, CSSSimpleSelectorNode[] simpleSelectors, int start, int end)
 	{
-		fParent = parent;
+		setParent(parent);
 		fSimpleSelectors = simpleSelectors;
 		this.start = start;
 		this.end = end;
 	}
 
-	public CSSRuleNode getParent()
+	public CSSRuleNode getRule()
 	{
-		return fParent;
+		return (CSSRuleNode) getParent();
 	}
 
 	public CSSSimpleSelectorNode[] getSimpleSelectors()

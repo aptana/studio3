@@ -1,6 +1,5 @@
 package com.aptana.util;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,38 +28,7 @@ public abstract class ProcessUtil
 
 	public static String read(InputStream stream)
 	{
-		// TODO Use IOUtil.read!
-		StringBuilder builder = new StringBuilder();
-		try
-		{
-			if (!(stream instanceof BufferedInputStream))
-			{
-				stream = new BufferedInputStream(stream);
-			}
-			int read;
-			while ((read = stream.read()) != -1)
-			{
-				builder.append((char) read);
-			}
-			return builder.toString();
-		}
-		catch (IOException e)
-		{
-			UtilPlugin.logError(e.getMessage(), e);
-		}
-		finally
-		{
-			try
-			{
-				stream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
-
-		return null;
+		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
 	}
 
 	public static Map<Integer, String> runInBackground(String command, String workingDir, String[] args)
