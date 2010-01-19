@@ -20,17 +20,30 @@ public abstract class IOUtil
 	 */
 	public static String read(InputStream stream)
 	{
+		return read(stream, null);
+	}
+
+	public static String read(InputStream stream, String charset)
+	{
 		if (stream == null)
 			return null;
 		try
 		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			InputStreamReader inReader;
+			if (charset != null)
+				inReader = new InputStreamReader(stream, charset);
+			else
+				inReader = new InputStreamReader(stream);
+			BufferedReader reader = new BufferedReader(inReader);
 			StringBuilder template = new StringBuilder();
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{
 				template.append(line);
+				template.append("\n"); //$NON-NLS-1$
 			}
+			if (template.length() > 0)
+				template.deleteCharAt(template.length() - 1); // delete last extraneous newline
 			return template.toString();
 		}
 		catch (IOException e)

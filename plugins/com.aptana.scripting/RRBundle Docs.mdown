@@ -387,12 +387,9 @@ Property      | Description
 <code>file</code>		| The File currently being edited, or nil
 <code>project</code>		| The Project that owns the file currently being edited, or nil. See _Project API_ for more information.
 <code>explorer</code>	| The app explorer. See _Project API_ for more information.
+<code>editor</code>		| The currently active Aptana file editor. See _Editor API_ for more information.
 <code>stdout</code>		| Stream useful for writing output to stdout. See the _Output During Command Invocation_ section below.
 <code>stderr</code>		| Stream useful for writing error output. See the _Output During Command Invocation_ section below.
-<code>line_number</code>	| The starting line number of <code>input</code>, numbered starting with 1.
-<code>line_index</code>	| The starting position on the line of <code>input</code>, numbered from 0.
-<code>soft_tabs</code>	| Boolean indicating whether or not soft tabs are being used for the current file.
-<code>tab_size</code>	| Tab width for the current file.
 
 In addition, the context has a few handy-dandy functions for use by commands, as described below:
 
@@ -463,6 +460,44 @@ Method      | Description
 
 
 ## PROJECT_OPTIONS
+
+# Editor API
+
+Editor objects have the following properties and methods.
+
+Property      | Description
+------------- | -------------
+<code>close(save = true)</code>	| Close the editor. Save or not based on the <code>save</code> argument
+<code>close!</code>			| Close without saving
+<code>save</code>			| Save the editor. Confirm or not based on the <code>confirm</code> argument
+<code>save!</code>			| Save the editor without confirming
+<code>dirty?</code>			| Return true if the editor dirty (has unsaved contents) else false.
+<code>hide</code>			| Hide the editor
+<code>show</code>			| Show the editor
+<code>document=(src)</code>				| Set the contents of the editor's document to <code>src</code>
+<code>document</code>		| Returns editor's document
+<code>editbale?</code>				| Returns true if the editor is editable otherwise false
+<code>[]=(offset, length, src)</code>			| Replace a portion of the editor's contents
+<code>selection</code>		| Return the current selection. It has properties length, offset, text, start_line, end_line
+<code>selection=(array_or_range)</code>			| Argument is a 2 integer array with first being offset, second being length; or a Range object with the range of offsets - first and last
+<code>current_scope</code>				| Returns current scope
+<code>scope_at_offset(offset)</code>	| Return scope at given <code>offset</code>
+<code>caret_column</code>	| The caret column
+<code>caret_line</code>	| The line containing caret
+<code>caret_offset</code>	| The caret offset
+<code>current_line</code>	| The current line
+<code>line_number</code>	| The starting line number of <code>input</code>, numbered starting with 1.
+<code>line_index</code>	| The starting position on the line of <code>input</code>, numbered from 0.
+<code>soft_tabs</code>	| Boolean indicating whether or not soft tabs are being used for the current file.
+<code>tab_size</code>	| Tab width for the current file.
+
+There are also a number of useful static methods defined on the RadRails::Editor class that can be useful in ruby code outside of a command:
+
+Method      | Description
+------------- | -------------
+<code>open(absolute_path)</code>	| Open a file specified by the absolute path.
+<code>active</code>					| Returns the "active" editor.
+<code>go_to(options)</code>			| Where the options is a hash that can contains keys :file (active editor if not specified), :line (default to 1) or :column (defaults to 1)
 
 FORTHCOMING
 

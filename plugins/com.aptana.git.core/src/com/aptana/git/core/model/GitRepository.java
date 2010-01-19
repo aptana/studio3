@@ -1,7 +1,9 @@
 package com.aptana.git.core.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.SoftReference;
@@ -35,7 +37,7 @@ import com.aptana.util.StringUtil;
 public class GitRepository
 {
 
-	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
 	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
@@ -385,7 +387,7 @@ public class GitRepository
 
 	public boolean hasMerges()
 	{
-		return new File(fileURL.getPath(), MERGE_HEAD_FILENAME).exists();
+		return mergeHeadFile().exists();
 	}
 
 	boolean executeHook(String name)
@@ -420,7 +422,7 @@ public class GitRepository
 
 		Map<String, String> env = new HashMap<String, String>();
 		env.put(GitEnv.GIT_DIR, fileURL.getPath());
-		env.put(GitEnv.GIT_INDEX_FILE, fileURL.getPath() + File.separator + "index"); //$NON-NLS-1$
+		env.put(GitEnv.GIT_INDEX_FILE, gitFile("index").getAbsolutePath()); //$NON-NLS-1$
 
 		int ret = 1;
 		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);
@@ -430,7 +432,7 @@ public class GitRepository
 
 	String commitMessageFile()
 	{
-		return new File(fileURL.getPath(), COMMIT_MSG_FILENAME).getAbsolutePath();
+		return gitFile(COMMIT_MSG_FILENAME).getAbsolutePath();
 	}
 
 	void writetoCommitFile(String commitMessage)
@@ -445,7 +447,7 @@ public class GitRepository
 		}
 		catch (IOException ioe)
 		{
-			ioe.printStackTrace();
+			GitPlugin.logError(ioe.getMessage(), ioe);
 		}
 		finally
 		{
@@ -763,4 +765,45 @@ public class GitRepository
 		}
 		return false;
 	}
+
+	public List<String> getMergeSHAs()
+	{
+		List<String> shas = new ArrayList<String>();
+		BufferedReader reader = null;
+		try
+		{
+			reader = new BufferedReader(new FileReader(mergeHeadFile()));
+			String sha = null;
+			while ((sha = reader.readLine()) != null)
+				shas.add(sha);
+		}
+		catch (Exception e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			if (reader != null)
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+		}
+		return shas;
+	}
+
+	File mergeHeadFile()
+	{
+		return gitFile(MERGE_HEAD_FILENAME);
+	}
+
+	File gitFile(String string)
+	{
+		return new File(fileURL.getPath(), string);
+	}
+
 }

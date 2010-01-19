@@ -723,15 +723,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 		if (project != null)
 		{
-			projectToolItem.setText(project.getName());
-			MenuItem[] menuItems = projectsMenu.getItems();
-			for (MenuItem menuItem : menuItems)
-			{
-				menuItem.setSelection(menuItem.getText().equals(project.getName()));
-			}
-			projectToolItem.getParent().pack(true);
 			setActiveProject(project.getName());
-			return;
 		}
 	}
 
@@ -803,6 +795,13 @@ public abstract class SingleProjectView extends CommonNavigator
 		catch (JNotifyException e)
 		{
 			ExplorerPlugin.logError(e.getMessage(), e);
+		}
+
+		projectToolItem.setText(newProject.getName());
+		MenuItem[] menuItems = projectsMenu.getItems();
+		for (MenuItem menuItem : menuItems)
+		{
+			menuItem.setSelection(menuItem.getText().equals(newProject.getName()));
 		}
 	}
 
@@ -902,9 +901,19 @@ public abstract class SingleProjectView extends CommonNavigator
 
 									public void run()
 									{
-										projectToolItem.setText(projectName);
 										// Construct the menu item to for this project
-										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
+										// Insert in alphabetical order
+										int index = projectsMenu.getItemCount();
+										MenuItem[] items = projectsMenu.getItems();
+										for(int i = 0; i < items.length; i++)
+										{
+											if (items[i].getText().compareTo(projectName) > 0)
+											{
+												index = i;
+												break;
+											}
+										}
+										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO, index);
 										projectNameMenuItem.setText(projectName);
 										projectNameMenuItem.setSelection(true);
 										projectNameMenuItem.addSelectionListener(new SelectionAdapter()
@@ -916,8 +925,8 @@ public abstract class SingleProjectView extends CommonNavigator
 												setActiveProject(projectName);
 											}
 										});
-										projectToolItem.getParent().pack(true);
 										setActiveProject(projectName);
+										projectToolItem.getParent().pack(true);
 									}
 								});
 							}
@@ -948,12 +957,6 @@ public abstract class SingleProjectView extends CommonNavigator
 											if (projects.length > 0)
 											{
 												newActiveProject = projects[0].getName();
-											}
-											projectToolItem.setText(newActiveProject);
-											menuItems = projectsMenu.getItems();
-											for (MenuItem menuItem : menuItems)
-											{
-												menuItem.setSelection(menuItem.getText().equals(newActiveProject));
 											}
 											setActiveProject(newActiveProject);
 										}
