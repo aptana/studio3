@@ -50,9 +50,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * @author Max Stepanov
@@ -85,6 +87,8 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (instance == null)
 		{
 			instance = new SassSourceConfiguration();
+			// TODO Probably need to do some other massaging!
+			ContentTypeTranslation.getDefault().addTranslation(new QualifiedContentType("com.aptana.contenttype.sass"), new QualifiedContentType("source.sass")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return instance;
 	}
