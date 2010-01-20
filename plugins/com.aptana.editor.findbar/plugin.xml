@@ -23,6 +23,26 @@
             id="org.eclipse.ui.edit.findbar.findPrevious"
             name="%FindPrevious.command.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.cut"
+            name="%Cut.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.copy"
+            name="%Copy.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.paste"
+            name="%Paste.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.selectall"
+            name="%SelectAll.command.name">
+      </command>
    </extension>
    
    <extension
@@ -64,6 +84,30 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.cut"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+X">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.copy"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+C">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.paste"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+V">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.selectall"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+A">
       </key>
    </extension>
    
