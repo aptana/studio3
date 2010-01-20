@@ -27,7 +27,7 @@ public class CommandConverter
 		if (args == null || args.length == 0)
 		{
 			String userHome = System.getProperty("user.home");
-			args = new String[] { userHome + "/Documents/RadRails Bundles/ruby/commands" };
+			args = new String[] { userHome + "/Documents/RadRails Bundles/sass/commands" };
 		}
 		for (String commandDir : args)
 		{
@@ -130,6 +130,17 @@ public class CommandConverter
 					break;
 				case '^':
 					builder.append("CONTROL+M2+"); //$NON-NLS-1$
+					break;
+				case '~':
+					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
+					{
+						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
+						i++;
+					}
+					else
+					{
+						builder.append(c).append('+');
+					}
 					break;
 				default:
 					builder.append(c).append('+');
