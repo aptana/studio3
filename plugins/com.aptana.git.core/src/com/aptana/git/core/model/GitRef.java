@@ -13,7 +13,7 @@ public class GitRef
 	 */
 	static final String REFS = "refs/"; //$NON-NLS-1$
 	static final String REFS_REMOTES = REFS + "remotes/"; //$NON-NLS-1$
-	private static final String REFS_TAGS = REFS + "tags/"; //$NON-NLS-1$
+	static final String REFS_TAGS = REFS + "tags/"; //$NON-NLS-1$
 	static final String REFS_HEADS = REFS + "heads/"; //$NON-NLS-1$
 
 	/**

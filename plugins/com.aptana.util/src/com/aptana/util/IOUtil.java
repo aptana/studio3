@@ -23,6 +23,12 @@ public abstract class IOUtil
 		return read(stream, null);
 	}
 
+	/**
+	 * Newlines will get converted into \n.
+	 * @param stream
+	 * @param charset
+	 * @return
+	 */
 	public static String read(InputStream stream, String charset)
 	{
 		if (stream == null)
@@ -48,7 +54,7 @@ public abstract class IOUtil
 		}
 		catch (IOException e)
 		{
-			UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
+			log(e);
 		}
 		finally
 		{
@@ -62,6 +68,13 @@ public abstract class IOUtil
 			}
 		}
 		return null;
+	}
+
+	private static void log(Exception e)
+	{
+		if (UtilPlugin.getDefault() == null)
+			return;
+		UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
 	}
 
 }
