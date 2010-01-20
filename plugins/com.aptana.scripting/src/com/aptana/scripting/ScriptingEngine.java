@@ -175,6 +175,50 @@ public class ScriptingEngine
 	}
 
 	/**
+	 * createScriptingContainer
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public ScriptingContainer createScriptingContainer(LocalContextScope scope)
+	{
+		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
+
+		try
+		{
+			File jrubyHome = null;
+			
+			// try just exploding the jruby lib dir
+			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("lib"), null); //$NON-NLS-1$
+			
+			if (url != null)
+			{
+				File lib = ResourceUtils.resourcePathToFile(url);
+				
+				// Ok, now use the parent of exploded lib dir as JRuby Home
+				jrubyHome = lib.getParentFile();
+			}
+			else
+			{
+				// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
+				jrubyHome = FileLocator.getBundleFile(Activator.getDefault().getBundle());
+			}
+			
+			result.getProvider().getRubyInstanceConfig().setJRubyHome(jrubyHome.getAbsolutePath());
+		}
+		catch (IOException e)
+		{
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
+					new Object[] { e.getMessage() });
+
+			Activator.logError(message, e);
+			ScriptLogger.logError(message);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getScriptingContainer
 	 * 
 	 * @return
@@ -183,35 +227,7 @@ public class ScriptingEngine
 	{
 		if (this._scriptingContainer == null)
 		{
-			this._scriptingContainer = new ScriptingContainer(LocalContextScope.SINGLETON, LocalVariableBehavior.PERSISTENT);
-
-			try
-			{
-				File jrubyHome = null;
-				// try just exploding the jruby lib dir
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("lib"), null); //$NON-NLS-1$
-				if (url != null)
-				{
-					File lib = ResourceUtils.resourcePathToFile(url);
-					// Ok, now use the parent of exploded lib dir as JRuby Home
-					jrubyHome = lib.getParentFile();
-				}
-				else
-				{
-					// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
-					jrubyHome = FileLocator.getBundleFile(Activator.getDefault().getBundle());
-				}
-				this._scriptingContainer.getProvider().getRubyInstanceConfig()
-						.setJRubyHome(jrubyHome.getAbsolutePath());
-			}
-			catch (IOException e)
-			{
-				String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
-						new Object[] { e.getMessage() });
-
-				Activator.logError(message, e);
-				ScriptLogger.logError(message);
-			}
+			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.SINGLETON);
 		}
 
 		return this._scriptingContainer;
@@ -253,7 +269,7 @@ public class ScriptingEngine
 		}
 
 		// TODO: $0 should work, but until then, we'll use this hack so scripts
-		// can get its full path
+		// can get their full path
 		container.put("$fullpath", fullPath); //$NON-NLS-1$
 
 		// compile
