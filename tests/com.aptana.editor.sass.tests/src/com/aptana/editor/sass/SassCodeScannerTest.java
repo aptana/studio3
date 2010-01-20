@@ -67,6 +67,61 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 25, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
 	}
+	
+	public void testVariableDefinition()
+	{
+		String src = "!blue = #3bbfce";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("variable.other.sass"), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("punctuation.definition.entity.sass"), 6, 1);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("constant.other.color.rgb-value.css"), 8, 7);
+	}
+	
+	public void testVariableUsage()
+	{
+		String src = ".content_navigation\n  border-color = !blue";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("entity.other.attribute-name.class.css"), 0, 19);
+		assertToken(Token.WHITESPACE, 19, 3);
+		assertToken(getToken("support.type.property-name.css"), 22, 12);
+		assertToken(Token.WHITESPACE, 34, 1);
+		assertToken(getToken("punctuation.definition.entity.sass"), 35, 1);
+		assertToken(Token.WHITESPACE, 36, 1);
+		assertToken(getToken("variable.other.sass"), 37, 5);
+	}
+	
+	public void testMixinDefinition()
+	{
+		String src = "=table-scaffolding\n  th\n    text-align: center";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("variable.other.sass"), 0, 18);
+		assertToken(Token.WHITESPACE, 18, 3);
+		assertToken(getToken("entity.name.tag.css"), 21, 2);
+		assertToken(Token.WHITESPACE, 23, 5);
+		assertToken(getToken("support.type.property-name.css"), 28, 10);
+		assertToken(getToken("punctuation.separator.key-value.css"), 38, 1);
+		assertToken(Token.WHITESPACE, 39, 1);
+		assertToken(getToken("support.constant.property-value.css"), 40, 6);
+	}
+	
+	public void testMixinUsage()
+	{
+		String src = "#data\n  +table-scaffolding";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("entity.other.attribute-name.id.css"), 0, 5);
+		assertToken(Token.WHITESPACE, 5, 3);
+		assertToken(getToken("variable.other.sass"), 8, 18);
+	}	
 
 	public void testBasicTokenizing()
 	{

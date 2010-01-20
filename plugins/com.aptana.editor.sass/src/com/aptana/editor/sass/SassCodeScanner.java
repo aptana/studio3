@@ -11,6 +11,7 @@ import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IWordDetector;
 
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.css.CSSCodeScanner;
 
 /**
@@ -46,7 +47,8 @@ public class SassCodeScanner extends CSSCodeScanner
 			}
 		};
 		rules.add(1, variableRule);
-
+		rules.add(new SingleCharacterRule('=', createToken("punctuation.definition.entity.sass"))); //$NON-NLS-1$
+		
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
