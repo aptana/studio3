@@ -129,7 +129,7 @@ public class GitExecutable
 			return null;
 
 		String version = ProcessUtil.outputForCommand(path, null, "--version"); //$NON-NLS-1$
-		if (version.startsWith("git version ")) //$NON-NLS-1$
+		if (version != null && version.startsWith("git version ")) //$NON-NLS-1$
 			return version.substring(12);
 
 		return null;
