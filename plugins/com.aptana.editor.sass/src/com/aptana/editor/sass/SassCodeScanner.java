@@ -65,6 +65,7 @@ public class SassCodeScanner extends CSSCodeScanner
 			StringTokenizer tokenizer = new StringTokenizer(name, "-"); //$NON-NLS-1$
 			while (tokenizer.hasMoreTokens())
 				namespaced.add(tokenizer.nextToken());
+			namespaced.add(name);
 		}
 		return namespaced.toArray(new String[namespaced.size()]);
 	}
