@@ -23,7 +23,7 @@ public class GitRef
 	{
 		TAG, HEAD, REMOTE
 	}
-	
+
 	private String ref;
 
 	private GitRef(String string)
@@ -38,6 +38,7 @@ public class GitRef
 
 	/**
 	 * The full name of the ref. i.e. "refs/heads/master" or "refs/tags/v0.7"
+	 * 
 	 * @return
 	 */
 	public String ref()
@@ -47,6 +48,7 @@ public class GitRef
 
 	/**
 	 * Short name for the ref. i.e. "master" or "v0.7"
+	 * 
 	 * @return
 	 */
 	public String shortName()
@@ -69,6 +71,7 @@ public class GitRef
 
 	/**
 	 * Type of reference. head (local branch), remote (remote branch) or tag.
+	 * 
 	 * @return
 	 */
 	public TYPE type()
@@ -86,5 +89,20 @@ public class GitRef
 	public String toString()
 	{
 		return ref;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof GitRef))
+			return false;
+		GitRef other = (GitRef) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
 	}
 }
