@@ -294,4 +294,12 @@ module RadRails
     end
   end
 end
-  
+
+# Add exit_show_tool_tip to context
+module RadRails
+  class Context
+    def exit_show_tool_tip(message)
+      exit_with_message(message, :show_as_tooltip)
+    end
+  end
+end
