@@ -12,6 +12,7 @@ import java.util.Map;
 
 import plistreader.PlistProperties;
 
+@SuppressWarnings("nls")
 public class SnippetConverter
 {
 
@@ -19,7 +20,6 @@ public class SnippetConverter
 	 * @param args
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception
 	{
 		String userHome = System.getProperty("user.home");
@@ -39,7 +39,6 @@ public class SnippetConverter
 		convert(new File(args[0]), outputFilePath);
 	}
 
-	@SuppressWarnings("nls")
 	private static List<String> convert(File snippetDirectory)
 	{
 		List<String> snippets = new ArrayList<String>();
@@ -51,7 +50,8 @@ public class SnippetConverter
 			try
 			{
 				PlistProperties properties = BundleConverter.parse(plistFile);
-
+				if (properties == null)
+					continue;
 				String name = BundleConverter.sanitize(properties, "name");
 				StringBuilder buffer = new StringBuilder();
 				buffer.append("snippet '").append(name).append("' do |s|\n");
@@ -64,8 +64,17 @@ public class SnippetConverter
 				{
 					buffer.append("  # FIXME No tab trigger, probably needs to become command\n");
 				}
+				String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
+				if (keyBinding != null)
+				{
+					keyBinding = BundleConverter.convertKeyBinding(keyBinding);
+					buffer.append("  s.key_binding = '").append(keyBinding).append("'\n");
+				}
 				String scope = BundleConverter.sanitize(properties, "scope");
-				buffer.append("  s.scope = '").append(scope).append("'\n");
+				if (scope != null)
+				{
+					buffer.append("  s.scope = '").append(scope).append("'\n");
+				}
 				String content = BundleConverter.sanitize(properties, "content");
 				buffer.append("  s.expansion = '").append(content).append("'\n");
 				buffer.append("end\n\n");
@@ -95,6 +104,8 @@ public class SnippetConverter
 	public static void convert(File snippetsDir, String outputFilePath) throws IOException
 	{
 		List<String> snippets = convert(snippetsDir);
+		if (snippets == null || snippets.isEmpty())
+			return;
 		Writer writer = null;
 		try
 		{
@@ -104,7 +115,6 @@ public class SnippetConverter
 			for (String snippet : snippets)
 			{
 				writer.write(snippet);
-				writer.write("\n"); //$NON-NLS-1$
 			}
 		}
 		finally
@@ -124,7 +134,8 @@ public class SnippetConverter
 			try
 			{
 				PlistProperties properties = BundleConverter.parse(plistFile);
-
+				if (properties == null)
+					continue;
 				String name = BundleConverter.sanitize(properties, "name");
 				String uuid = (String) properties.getProperty("uuid");
 				snippets.put(uuid, name);
