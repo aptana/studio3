@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.Status;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
-import org.jruby.RubyModule;
 import org.jruby.RubyProc;
 import org.jruby.RubySystemExit;
 import org.jruby.embed.ScriptingContainer;
