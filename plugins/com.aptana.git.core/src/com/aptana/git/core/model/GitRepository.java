@@ -1,7 +1,9 @@
 package com.aptana.git.core.model;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.SoftReference;
@@ -35,7 +37,7 @@ import com.aptana.util.StringUtil;
 public class GitRepository
 {
 
-	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
 	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
@@ -133,12 +135,16 @@ public class GitRepository
 			return null;
 
 		String repositoryPath = repositoryURL.getPath();
+		if (!new File(repositoryPath).exists())
+			return null;
 
 		if (isBareRepository(repositoryPath))
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
 		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (newPath == null)
+			return null;
 		if (newPath.equals(GIT_DIR))
 			return new File(repositoryPath, GIT_DIR).toURI();
 		if (newPath.length() > 0)
@@ -385,7 +391,7 @@ public class GitRepository
 
 	public boolean hasMerges()
 	{
-		return new File(fileURL.getPath(), MERGE_HEAD_FILENAME).exists();
+		return mergeHeadFile().exists();
 	}
 
 	boolean executeHook(String name)
@@ -420,7 +426,7 @@ public class GitRepository
 
 		Map<String, String> env = new HashMap<String, String>();
 		env.put(GitEnv.GIT_DIR, fileURL.getPath());
-		env.put(GitEnv.GIT_INDEX_FILE, fileURL.getPath() + File.separator + "index"); //$NON-NLS-1$
+		env.put(GitEnv.GIT_INDEX_FILE, gitFile("index").getAbsolutePath()); //$NON-NLS-1$
 
 		int ret = 1;
 		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);
@@ -430,7 +436,7 @@ public class GitRepository
 
 	String commitMessageFile()
 	{
-		return new File(fileURL.getPath(), COMMIT_MSG_FILENAME).getAbsolutePath();
+		return gitFile(COMMIT_MSG_FILENAME).getAbsolutePath();
 	}
 
 	void writetoCommitFile(String commitMessage)
@@ -445,7 +451,7 @@ public class GitRepository
 		}
 		catch (IOException ioe)
 		{
-			ioe.printStackTrace();
+			GitPlugin.logError(ioe.getMessage(), ioe);
 		}
 		finally
 		{
@@ -548,10 +554,15 @@ public class GitRepository
 			path = path.substring(0, path.length() - GIT_DIR.length());
 		}
 
-		URI existing = gitDirForURL(new File(path).toURI());
+		File file = new File(path);
+		URI existing = gitDirForURL(file.toURI());
 		if (existing != null)
 			return;
 
+		if (!file.exists())
+		{
+			file.mkdirs();
+		}
 		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
 	}
 
@@ -658,7 +669,28 @@ public class GitRepository
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
-		return result.keySet().iterator().next() == 0;
+		if (result.keySet().iterator().next() != 0)
+			return false;
+		// Add branch to list in model!
+		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		return true;
+	}
+
+	public IStatus deleteBranch(String branchName)
+	{
+		List<String> args = new ArrayList<String>();
+		args.add("branch"); //$NON-NLS-1$
+		args.add("-d"); //$NON-NLS-1$
+		args.add(branchName);
+
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				args.toArray(new String[args.size()]));
+		int exitCode = result.keySet().iterator().next();
+		if (exitCode != 0)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
+		// Remove branch in model!
+		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		return Status.OK_STATUS;
 	}
 
 	public boolean validBranchName(String branchName)
@@ -763,4 +795,47 @@ public class GitRepository
 		}
 		return false;
 	}
+
+	public List<String> getMergeSHAs()
+	{
+		List<String> shas = new ArrayList<String>();
+		if (!mergeHeadFile().exists())
+			return shas;
+		BufferedReader reader = null;
+		try
+		{
+			reader = new BufferedReader(new FileReader(mergeHeadFile()));
+			String sha = null;
+			while ((sha = reader.readLine()) != null)
+				shas.add(sha);
+		}
+		catch (Exception e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			if (reader != null)
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+		}
+		return shas;
+	}
+
+	File mergeHeadFile()
+	{
+		return gitFile(MERGE_HEAD_FILENAME);
+	}
+
+	File gitFile(String string)
+	{
+		return new File(fileURL.getPath(), string);
+	}
+
 }

@@ -2,7 +2,9 @@ package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,6 +14,7 @@ import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -44,13 +47,15 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
+import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.OutputType;
-import com.aptana.scripting.ui.ScriptingConsole;
+//import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils
@@ -85,6 +90,37 @@ public class CommandExecutionUtils
 		public void consume(InputStream input);
 	}
 
+	public static class FileInputProvider implements FilterInputProvider
+	{
+		private final String path;
+
+		public FileInputProvider(String path)
+		{
+			this.path = path;
+		}
+
+		public InputStream getInputStream()
+		{
+			InputStream result = null;
+
+			try
+			{
+				result = new FileInputStream(this.path);
+			}
+			catch (FileNotFoundException e)
+			{
+				String message = MessageFormat.format(
+					Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
+					new Object[] { path }
+				);
+				
+				ScriptUtils.logErrorWithStackTrace(message, e);
+			}
+
+			return result;
+		}
+	}
+	
 	public static class StringInputProvider implements FilterInputProvider
 	{
 		private final String string;
@@ -287,7 +323,8 @@ public class CommandExecutionUtils
 
 	private static Map<String, IOConsole> nameToMessageConsole = new WeakHashMap<String, IOConsole>();
 
-	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType,
+			ITextEditor textEditor)
 	{
 		ITextViewer textViewer = null;
 		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
@@ -298,7 +335,8 @@ public class CommandExecutionUtils
 		return executeCommand(command, invocationType, textViewer, textEditor);
 	}
 
-	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType, ITextViewer textViewer, ITextEditor textEditor)
+	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType,
+			ITextViewer textViewer, ITextEditor textEditor)
 	{
 		StyledText textWidget = textViewer.getTextWidget();
 		FilterInputProvider filterInputProvider = null;
@@ -311,7 +349,7 @@ public class CommandExecutionUtils
 		}
 		for (InputType inputType : inputTypes)
 		{
-			filterInputProvider = getInputProvider(textWidget, inputType);
+			filterInputProvider = getInputProvider(textWidget, command, inputType);
 			if (filterInputProvider != null)
 			{
 				selected = inputType;
@@ -330,14 +368,14 @@ public class CommandExecutionUtils
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
 		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
-		
+
 		// Set invocation type
 		commandContext.put(CommandContext.INVOKED_VIA, invocationType.getName());
 
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, InputType inputType)
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command, InputType inputType)
 	{
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
@@ -374,6 +412,8 @@ public class CommandExecutionUtils
 				return new CommandExecutionUtils.StringInputProvider(currentWord);
 			case INPUT_FROM_CONSOLE:
 				return new CommandExecutionUtils.EclipseConsoleInputProvider(CommandExecutionUtils.DEFAULT_CONSOLE_NAME);
+			case INPUT_FROM_FILE:
+				return new CommandExecutionUtils.FileInputProvider(command.getInputPath());
 		}
 		return null;
 	}
@@ -393,23 +433,10 @@ public class CommandExecutionUtils
 		{
 			return;
 		}
-		
+
 		StyledText textWidget = textViewer.getTextWidget();
-
 		final int caretOffset = textWidget.getCaretOffset();
-		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
-		String lineText = textWidget.getLine(lineAtCaret);
-		int lineLength = lineText.length();
-
-		Point selectionRange = textWidget.getSelection();
-		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
-		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
-
-		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
-		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
-				+ textWidget.getLine(selectionEndOffsetLine).length();
-
-		OutputType ouputType = OutputType.get(command.getOutputType());
+		OutputType ouputType = commandResult.getOutputType(); //OutputType.get(command.getOutputType());
 		switch (ouputType)
 		{
 			case DISCARD:
@@ -417,35 +444,53 @@ public class CommandExecutionUtils
 			case REPLACE_SELECTION:
 				if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
-					textWidget.setText(commandResult.getOutputString());
+					replaceDocument(textWidget, commandResult);
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					replaceLine(textWidget, commandResult);
 				}
 				else
 				{
-					int start = Math.min(selectionRange.x, selectionRange.y);
-					int end = Math.max(selectionRange.x, selectionRange.y);
-					textWidget.replaceTextRange(start, end - start, commandResult.getOutputString());
+					IRegion region = getSelectedRegion(textWidget);
+					textWidget
+							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 				}
 				break;
 			case REPLACE_SELECTED_LINES:
-				textWidget.replaceTextRange(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
-						- selectionStartOffsetLineStartOffset, commandResult.getOutputString());
+				IRegion selectedLines = getSelectedLinesRegion(textWidget);
+				textWidget.replaceTextRange(selectedLines.getOffset(), selectedLines.getLength(), commandResult
+						.getOutputString());
 				break;
 			case REPLACE_LINE:
-				int startOffsetOfLineAtCaret = textWidget.getOffsetAtLine(lineAtCaret);
-				textWidget.replaceTextRange(startOffsetOfLineAtCaret, lineLength, commandResult.getOutputString());
+				replaceLine(textWidget, commandResult);
 				break;
 			case REPLACE_DOCUMENT:
-				textWidget.setText(commandResult.getOutputString());
+				replaceDocument(textWidget, commandResult);
 				break;
 			case INSERT_AS_TEXT:
-				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
+				int offsetToInsert = caretOffset;
+				if (commandResult.getInputType() == InputType.SELECTION)
+				{
+					IRegion region = getSelectedRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					IRegion region = getCurrentLineRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				textWidget.replaceTextRange(offsetToInsert, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
 				IRegion region = new Region(caretOffset, 0);
 				if (commandResult.getInputType() == InputType.SELECTION)
 				{
-					region = new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
-							- selectionStartOffsetLineStartOffset);
+					region = getSelectedRegion(textWidget);
+				}
+				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+				{
+					region = getSelectedLinesRegion(textWidget);
 				}
 				else if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
@@ -453,7 +498,7 @@ public class CommandExecutionUtils
 				}
 				else if (commandResult.getInputType() == InputType.LINE)
 				{
-					region = new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+					region = getCurrentLineRegion(textWidget);
 				}
 				else if (commandResult.getInputType() == InputType.WORD)
 				{
@@ -476,18 +521,93 @@ public class CommandExecutionUtils
 			case OUTPUT_TO_CONSOLE:
 				outputToConsole(commandResult);
 				break;
+			case OUTPUT_TO_FILE:
+				outputToFile(commandResult);
+				break;
 		}
+	}
+
+	private static IRegion getSelectedLinesRegion(StyledText textWidget)
+	{
+		Point selectionRange = textWidget.getSelection();
+		int selectionStartOffsetLine = textWidget.getLineAtOffset(selectionRange.x);
+		int selectionEndOffsetLine = textWidget.getLineAtOffset(selectionRange.y);
+
+		int selectionStartOffsetLineStartOffset = textWidget.getOffsetAtLine(selectionStartOffsetLine);
+		int selectionEndOffsetLineEndOffset = textWidget.getOffsetAtLine(selectionEndOffsetLine)
+				+ textWidget.getLine(selectionEndOffsetLine).length();
+		return new Region(selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset
+				- selectionStartOffsetLineStartOffset);
+	}
+
+	private static IRegion getSelectedRegion(StyledText textWidget)
+	{
+		Point selectionRange = textWidget.getSelection();
+		int start = Math.min(selectionRange.x, selectionRange.y);
+		int end = Math.max(selectionRange.x, selectionRange.y);
+		return new Region(start, end - start);
+	}
+
+	protected static IRegion getCurrentLineRegion(StyledText textWidget)
+	{
+		final int caretOffset = textWidget.getCaretOffset();
+		int lineAtCaret = textWidget.getLineAtOffset(caretOffset);
+		int lineLength = textWidget.getLine(lineAtCaret).length();
+		return new Region(textWidget.getOffsetAtLine(lineAtCaret), lineLength);
+	}
+
+	protected static void replaceDocument(StyledText textWidget, CommandResult commandResult)
+	{
+		textWidget.setText(commandResult.getOutputString());
+	}
+
+	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
+	{
+		IRegion region = getCurrentLineRegion(textWidget);
+		textWidget.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)
 	{
-		ScriptingConsole scriptingConsole = ScriptingConsole.getDefault();
-
-		scriptingConsole.print(commandResult.getOutputString());
+		ScriptLogger.print(commandResult.getOutputString());
 		if (!commandResult.executedSuccessfully())
 		{
 			// Dump the error output if any
-			scriptingConsole.printErr(commandResult.getErrorString());
+			ScriptLogger.printError(commandResult.getErrorString());
+		}
+	}
+
+	private static void outputToFile(CommandResult commandResult)
+	{
+		FileWriter writer = null;
+		String path = commandResult.getCommand().getOutputPath();
+		
+		try
+		{
+			writer = new FileWriter(path);
+			writer.write(commandResult.getOutputString());
+		}
+		catch (IOException e)
+		{
+			String message = MessageFormat.format(
+				Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
+				new Object[] { path }
+			);
+			
+			ScriptUtils.logErrorWithStackTrace(message, e);
+		}
+		finally
+		{
+			if (writer != null)
+			{
+				try
+				{
+					writer.close();
+				}
+				catch (IOException e)
+				{
+				}
+			}
 		}
 	}
 

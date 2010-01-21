@@ -6,7 +6,7 @@ import java.util.List;
 
 public class BundleElement extends AbstractElement
 {
-	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rr-bundle"; //$NON-NLS-1$
+	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rrbundle"; //$NON-NLS-1$
 	
 	private String _author;
 	private String _copyright;
@@ -214,7 +214,7 @@ public class BundleElement extends AbstractElement
 			
 			if (path != null && path.length() > 0)
 			{
-				File file = new File(path);
+				File file = new File(path).getParentFile();
 				
 				result = file.getName();
 				

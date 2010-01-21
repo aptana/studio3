@@ -71,7 +71,8 @@ package com.aptana.editor.common.text.reconciler;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
-import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class CommonCompositeReconcilingStrategy extends CompositeReconcilingStrategy
 {
@@ -86,7 +87,7 @@ public class CommonCompositeReconcilingStrategy extends CompositeReconcilingStra
 	 * @param documentPartitioning
 	 *            the document partitioning this strategy uses for configuration
 	 */
-	public CommonCompositeReconcilingStrategy(ITextEditor editor, String documentPartitioning)
+	public CommonCompositeReconcilingStrategy(AbstractThemeableEditor editor, String documentPartitioning)
 	{
 		fStrategy = new CommonReconcilingStrategy(editor);
 		// TODO: adds spell-checking reconciling strategy

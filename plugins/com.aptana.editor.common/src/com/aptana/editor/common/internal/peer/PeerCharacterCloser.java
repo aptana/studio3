@@ -85,6 +85,16 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				return;
 			}
 
+			// Don't auto-close if next char is a letter or digit
+			if (document.getLength() > offset)
+			{
+				char nextChar = document.getChar(offset);
+				if (Character.isJavaIdentifierPart(nextChar))
+				{
+					return;
+				}
+			}
+
 			// Don't auto-close if we have an open pair!
 			if (isUnclosedPair(event, document, offset)) // We have an open string or pair, just insert the single
 															// character, don't do anything special
@@ -93,14 +103,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 
 			final char closingCharacter = getPeerCharacter(event.character);
-			// Check if the next character in source is the closing character (and don't close if it is)!
-			if (offset < document.getLength())
+			// If this is the start char and there's no unmatched close char, insert the close char
+			if (unpairedClose(event.character, closingCharacter, document, offset))
 			{
-				if (document.getChar(offset) == closingCharacter)
-				{
-					return;
-				}
+				return;
 			}
+
 			final StringBuffer buffer = new StringBuffer();
 			buffer.append(event.character);
 			buffer.append(closingCharacter);
@@ -163,6 +171,61 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
+	{
+		try
+		{
+			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
+			String before = document.get(0, offset).trim();
+			int stackLevel = 0;
+			for (int i = 0; i < before.length(); i++)
+			{
+				char c = before.charAt(i);
+				if (c == openingChar && openingChar == closingCharacter)
+				{
+					stackLevel++;
+					stackLevel = stackLevel % 2;
+				}
+				else if (c == openingChar)
+				{
+					stackLevel++;
+				}
+				else if (c == closingCharacter)
+				{
+					stackLevel--;
+				}
+			}
+
+			String after = document.get(offset, document.getLength() - offset).trim();
+			for (int i = 0; i < after.length(); i++)
+			{
+				char c = after.charAt(i);
+				if (c == openingChar && openingChar == closingCharacter)
+				{
+					stackLevel++;
+					stackLevel = stackLevel % 2;
+				}
+				else if (c == openingChar)
+				{
+					stackLevel++;
+				}
+				else if (c == closingCharacter)
+				{
+					stackLevel--;
+					if (stackLevel < 0)
+						return true;
+				}
+			}
+			return stackLevel != 0;
+		}
+		catch (BadLocationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
@@ -316,6 +379,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		 */
 		public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
 		{
+			if (event.character == 10 || event.character == 13) // \n // \r
+			{
+				return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
+			}
+
 			if (event.character != fExitCharacter)
 				return null;
 

@@ -17,12 +17,6 @@
             id="com.aptana.editor.common.showscopes"
             name="%command.scope.name">
       </command>
-      <command
-       		categoryId="org.eclipse.ui.category.edit"
-            description="%command.execute.description"
-            id="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
-            name="%command.execute.name">
-      </command>
        <command
        		categoryId="org.eclipse.ui.category.edit"
             description="%command.filter.description"
@@ -37,12 +31,6 @@
             contextId="org.eclipse.ui.textEditorScope"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+P">
-      </key>
-      <key
-            commandId="com.aptana.editor.common.scripting.commands.ExecuteLineInsertingResult"
-            contextId="org.eclipse.ui.textEditorScope"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="Ctrl+R">
       </key>
       <key
             commandId="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
@@ -129,6 +117,12 @@
    </extension>
    <extension
          point="org.eclipse.ui.themes">
+      <colorDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            colorFactory="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
+            id="com.aptana.editor.common.internal.theme.fontloader.FontLoader"
+            label="FontLoader">
+      </colorDefinition>
       <theme
             id="com.aptana.editor.common.theme"
             name="%customThemeName">
@@ -173,6 +167,9 @@
          point="com.aptana.scripting.frameworkFiles">
       <file
             name="radrails/editor.rb">
+      </file>
+      <file
+            name="radrails/theme.rb">
       </file>
    </extension>
    <extension

@@ -1,20 +1,18 @@
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Writer;
-import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.xml.sax.InputSource;
-
-import plistreader.AbstractReader;
-import plistreader.PlistFactory;
 import plistreader.PlistProperties;
 
+@SuppressWarnings("nls")
 public class SnippetConverter
 {
 
@@ -22,75 +20,65 @@ public class SnippetConverter
 	 * @param args
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception
 	{
+		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			String userHome = System.getProperty("user.home");
-			args = new String[] { userHome + "/Documents/RadRails Bundles/ruby/Snippets" };
+			args = new String[] { userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets" };
 		}
-		for (String path : args)
+		String outputFilePath;
+		if (args.length < 2)
 		{
-			List<String> snippets = convert(new File(path));
-			Writer writer = null;
-			try
-			{
-				File outFile = new File(path, "snippets.rb");
-				writer = new FileWriter(outFile);
-				for (String snippet : snippets)
-				{
-					writer.write(snippet);
-					writer.write("\n");
-				}
-			}
-			finally
-			{
-				writer.close();
-			}
+			outputFilePath = userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets/snippets.rb";
 		}
+		else
+		{
+			outputFilePath = args[1];
+		}
+		convert(new File(args[0]), outputFilePath);
 	}
 
-	@SuppressWarnings("nls")
 	private static List<String> convert(File snippetDirectory)
 	{
 		List<String> snippets = new ArrayList<String>();
-		File[] plistFiles = snippetDirectory.listFiles(new FilenameFilter()
-		{
-			public boolean accept(File dir, String name)
-			{
-				return name.endsWith("plist") || name.endsWith("tmSnippet");
-			}
-		});
+		File[] plistFiles = findSnippetFiles(snippetDirectory);
 		if (plistFiles == null)
 			return snippets;
 		for (File plistFile : plistFiles)
 		{
 			try
 			{
-				ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile
-						.getAbsolutePath());
-				Process p = builder.start();
-				int exitCode = p.waitFor();
-				if (exitCode != 0)
-					System.err.println("Bad exit code for conversion: " + exitCode);
-				AbstractReader reader = PlistFactory.createReader();
-				reader.setSource(new InputSource(new FileInputStream(plistFile)));
-				PlistProperties properties = reader.parse();
-
-				String trigger = sanitize(properties, "tabTrigger");
-				String content = sanitize(properties, "content");
-				// TODO Do more fiddling with the content?
+				PlistProperties properties = BundleConverter.parse(plistFile);
+				if (properties == null)
+					continue;
+				String name = BundleConverter.sanitize(properties, "name");
+				StringBuilder buffer = new StringBuilder();
+				buffer.append("snippet '").append(name).append("' do |s|\n");
+				String trigger = BundleConverter.sanitize(properties, "tabTrigger");
 				if (trigger != null)
 				{
-					String template = "snippet ''{0}'' do |s|\n  s.trigger = ''{1}''\n  s.expansion = ''{2}''\nend\n";
-					snippets.add(MessageFormat.format(template, sanitize(properties, "name"), trigger, content));
+					buffer.append("  s.trigger = '").append(trigger).append("'\n");
 				}
 				else
 				{
-					String template = "# FIXME No tab trigger, probably needs to become command\nsnippet ''{0}'' do |s|\n  s.expansion = ''{1}''\nend\n";
-					snippets.add(MessageFormat.format(template, sanitize(properties, "name"), content));
+					buffer.append("  # FIXME No tab trigger, probably needs to become command\n");
 				}
+				String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
+				if (keyBinding != null)
+				{
+					keyBinding = BundleConverter.convertKeyBinding(keyBinding);
+					buffer.append("  s.key_binding = '").append(keyBinding).append("'\n");
+				}
+				String scope = BundleConverter.sanitize(properties, "scope");
+				if (scope != null)
+				{
+					buffer.append("  s.scope = '").append(scope).append("'\n");
+				}
+				String content = BundleConverter.sanitize(properties, "content");
+				buffer.append("  s.expansion = '").append(content).append("'\n");
+				buffer.append("end\n\n");
+				snippets.add(buffer.toString());
 			}
 			catch (Exception e)
 			{
@@ -101,12 +89,64 @@ public class SnippetConverter
 		return snippets;
 	}
 
-	protected static String sanitize(PlistProperties properties, String key)
+	protected static File[] findSnippetFiles(File snippetDirectory)
 	{
-		String content = (String) properties.getProperty(key);
-		if (content == null)
-			return null;
-		return content.replace("'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+		File[] plistFiles = snippetDirectory.listFiles(new FilenameFilter()
+		{
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith("plist") || name.endsWith("tmSnippet");
+			}
+		});
+		return plistFiles;
+	}
+
+	public static void convert(File snippetsDir, String outputFilePath) throws IOException
+	{
+		List<String> snippets = convert(snippetsDir);
+		if (snippets == null || snippets.isEmpty())
+			return;
+		Writer writer = null;
+		try
+		{
+			File outFile = new File(outputFilePath);
+			outFile.getParentFile().mkdirs();
+			writer = new FileWriter(outFile);
+			for (String snippet : snippets)
+			{
+				writer.write(snippet);
+			}
+		}
+		finally
+		{
+			writer.close();
+		}
+	}
+
+	static Map<String, String> uuidNameMap(File snippetDirectory)
+	{
+		Map<String, String> snippets = new HashMap<String, String>();
+		File[] plistFiles = findSnippetFiles(snippetDirectory);
+		if (plistFiles == null)
+			return snippets;
+		for (File plistFile : plistFiles)
+		{
+			try
+			{
+				PlistProperties properties = BundleConverter.parse(plistFile);
+				if (properties == null)
+					continue;
+				String name = BundleConverter.sanitize(properties, "name");
+				String uuid = (String) properties.getProperty("uuid");
+				snippets.put(uuid, name);
+			}
+			catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return snippets;
 	}
 
 }

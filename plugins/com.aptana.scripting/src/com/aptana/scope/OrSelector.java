@@ -49,13 +49,13 @@ public class OrSelector implements ISelectorNode
 		{
 			context.pushCurrentStep();
 			
-			if (this._right != null)
+			if (this._left != null)
 			{
-				result = this._right.matches(context);
+				result = this._left.matches(context);
 				
-				if (result == false && this._left != null)
+				if (result == false && this._right != null)
 				{
-					result = this._left.matches(context);
+					result = this._right.matches(context);
 				}
 			}
 			

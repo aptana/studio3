@@ -16,6 +16,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
+import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
 
 public class CommandElementsProvider implements ICommandElementsProvider
@@ -47,7 +48,8 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		try
 		{
 			String contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
-			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommandsFromScope(contentTypeAtOffset);
+			ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 			for (CommandElement commandElement : commandsFromScope)
 			{
 				if (commandElement instanceof SnippetElement)

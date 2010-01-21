@@ -12,6 +12,7 @@ import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension2;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -32,31 +33,36 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.views.contentoutline.ContentOutline;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.editor.common.actions.ExecuteLineInsertingResultAction;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.ShowScopesAction;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.parsing.lexer.ILexeme;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
  * color prefs.
- *
+ * 
  * @author cwilliams
  * @author schitale
  */
@@ -88,6 +94,11 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 */
 	private LineBackgroundPainter fFullLineBackgroundPainter;
 
+	private CommonOutlinePage fOutlinePage;
+	private FileService fFileService;
+
+	private boolean fCursorChangeListened;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -109,6 +120,32 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getFindBarDecorator().createFindBar(getSourceViewer());
 		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
+		fCursorChangeListened = true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractDecoratedTextEditor#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		// returns our custom adapter for the content outline page
+		if (IContentOutlinePage.class.equals(adapter))
+		{
+			return getOutlinePage();
+		}
+		return super.getAdapter(adapter);
+	}
+
+	protected CommonOutlinePage getOutlinePage()
+	{
+		if (fOutlinePage == null)
+		{
+			fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
+		}
+		return fOutlinePage;
 	}
 
 	private void overrideThemeColors()
@@ -175,7 +212,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
 	 * are the end.
-	 *
+	 * 
 	 * @return
 	 */
 	protected char[] getPairMatchingCharacters()
@@ -186,7 +223,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	/**
 	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
 	 * the end. Defaults to using the same characters as the pair matching.
-	 *
+	 * 
 	 * @return
 	 */
 	protected char[] getAutoClosePairCharacters()
@@ -198,7 +235,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	 * A class that colors the entire line in token bg if there's only one background color specified in styling. This
 	 * extends block comment bg colors to entire line in the most common use case, rather than having the bg color
 	 * revert to the editor bg on the preceding spaces and trailing newline and empty space.
-	 *
+	 * 
 	 * @author cwilliams
 	 */
 	private static class LineBackgroundPainter implements IPainter, LineBackgroundListener
@@ -442,6 +479,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
+		fFileService = new FileService();
 	}
 
 	@Override
@@ -476,12 +514,77 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return getSourceViewerConfiguration();
 	}
 
+	public ISourceViewer getSourceViewerNonFinal()
+	{
+		return getSourceViewer();
+	}
+
+	public FileService getFileService()
+	{
+		return fFileService;
+	}
+
+	public Object computeHighlightedOutlineNode()
+	{
+		ISourceViewer sourceViewer = getSourceViewer();
+		if (sourceViewer == null)
+		{
+			return null;
+		}
+		StyledText styledText = sourceViewer.getTextWidget();
+		if (styledText == null)
+		{
+			return null;
+		}
+
+		int caret = 0;
+		if (sourceViewer instanceof ITextViewerExtension5)
+		{
+			ITextViewerExtension5 extension = (ITextViewerExtension5) sourceViewer;
+			caret = extension.widgetOffset2ModelOffset(styledText.getCaretOffset());
+		}
+		else
+		{
+			int offset = sourceViewer.getVisibleRegion().getOffset();
+			caret = offset + styledText.getCaretOffset();
+		}
+
+		return getOutlineElementAt(caret);
+	}
+
+	public void select(ILexeme element, boolean checkIfOutlineActive)
+	{
+		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+		{
+			// disables listening to cursor change so we don't get into the loop of setting selections between editor
+			// and outline
+			fCursorChangeListened = false;
+			selectAndReveal(element.getStartingOffset(), element.getLength());
+		}
+	}
+
+	protected void handleCursorPositionChanged()
+	{
+		super.handleCursorPositionChanged();
+		if (fCursorChangeListened)
+		{
+			if (isLinkedWithEditor())
+			{
+				getOutlinePage().select(computeHighlightedOutlineNode());
+			}
+		}
+		else
+		{
+			// re-enables listening to cursor change
+			fCursorChangeListened = true;
+		}
+	}
+
 	@Override
 	protected void createActions()
 	{
 		super.createActions();
 		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
-		setAction(ExecuteLineInsertingResultAction.COMMAND_ID, ExecuteLineInsertingResultAction.create(this));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
 		ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer instanceof ITextViewerExtension)
@@ -515,7 +618,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return findBarDecorator;
 	}
 
-	ICommandElementsProvider getCommandElementsProvider() {
+	ICommandElementsProvider getCommandElementsProvider()
+	{
 		if (commandElementsProvider == null)
 		{
 			commandElementsProvider = new CommandElementsProvider(this, getSourceViewer());
@@ -525,7 +629,7 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 
 	/**
 	 * Returns a description of the cursor position.
-	 *
+	 * 
 	 * @return a description of the cursor position
 	 */
 	protected String getCursorPosition()
@@ -537,4 +641,65 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
 	}
 
+	/**
+	 * Retrieves the logical parse element closest to the caret position for the outline. Subclass should override.
+	 * 
+	 * @param caret
+	 *            the caret position
+	 * @return the closest logical parse element
+	 */
+	protected Object getOutlineElementAt(int caret)
+	{
+		return null;
+	}
+
+	/**
+	 * @return the preference store for outline page
+	 */
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return CommonEditorPlugin.getDefault().getPreferenceStore();
+	}
+
+	private boolean isLinkedWithEditor()
+	{
+		return getOutlinePreferenceStore().getBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR);
+	}
+
+	private boolean isOutlinePageActive()
+	{
+		IWorkbenchPart part = getActivePart();
+		return part instanceof ContentOutline && ((ContentOutline) part).getCurrentPage() == fOutlinePage;
+	}
+
+	private IWorkbenchPart getActivePart()
+	{
+		IWorkbenchWindow window = getSite().getWorkbenchWindow();
+		return window.getPartService().getActivePart();
+	}
+
+	/**
+	 * Made public so we can set TM_SOFT_TABS for scripting
+	 */
+	@Override
+	public boolean isTabsToSpacesConversionEnabled()
+	{
+		// Make public so we can grab the value
+		return super.isTabsToSpacesConversionEnabled();
+	}
+
+	/**
+	 * Added so we can set TM_TAB_SIZE for scripting.
+	 * 
+	 * @return
+	 */
+	public int getTabSize()
+	{
+		SourceViewerConfiguration config = getSourceViewerConfiguration();
+		if (config != null)
+		{
+			return config.getTabWidth(getSourceViewer());
+		}
+		return 4;
+	}
 }

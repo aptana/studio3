@@ -68,11 +68,16 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		if (command.length == 0 && command.text != null && isLineDelimiter(document, command.text))
 		{
-			if (!indentAfterOpenBrace(document, command))
+			if (!autoIndent(document, command))
 			{
 				autoIndentAfterNewLine(document, command);
 			}
 		}
+	}
+
+	protected SourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return fViewerConfiguration;
 	}
 
 	/**
@@ -123,7 +128,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 	 *            the command to deal with
 	 * @return true if the indentation occurred, false otherwise
 	 */
-	protected boolean indentAfterOpenBrace(IDocument d, DocumentCommand c)
+	protected boolean autoIndent(IDocument d, DocumentCommand c)
 	{
 		int offset = c.offset;
 

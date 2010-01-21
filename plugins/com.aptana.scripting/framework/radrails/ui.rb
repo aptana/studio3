@@ -84,7 +84,8 @@ module RadRails
         end
         dialog.text = options[:title] || "Select File"
         dialog.filter_path = options[:directory] if options[:directory]
-        dialog.open        
+        dialog.open
+        # FIXME Handle when block is given
       end
       
       # show a standard open file dialog, allowing multiple selections
@@ -105,6 +106,7 @@ module RadRails
         dialog.text = options[:title] || "Select File(s)"
         dialog.filter_path = options[:directory] if options[:directory]
         dialog.open
+        # FIXME Handle when block is given
       end
       
       # Post a confirmation alert
@@ -264,7 +266,7 @@ module RadRails
         return_value = nil
         return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
         
-        if return_value == nil then
+        if return_value == nil
           block_given? ? raise(SystemExit) : nil
         else
           block_given? ? yield(return_value) : return_value
@@ -292,4 +294,3 @@ module RadRails
     end
   end
 end
-  

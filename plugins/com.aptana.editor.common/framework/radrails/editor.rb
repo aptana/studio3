@@ -28,7 +28,9 @@ module RadRails
           else
             desc = org.eclipse.ui.ide.IDE.getDefaultEditor(ifile)
           end
-          editor = RadRails::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), desc.getId, true))
+          editor_id = "org.eclipse.ui.DefaultTextEditor" # FIXME Set to out own text editor if/when we have one!
+          editor_id = desc.getId unless desc.nil?
+          editor = RadRails::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), editor_id, true))
         end
         return editor
       end
@@ -47,6 +49,7 @@ module RadRails
       # Opens an editor to a specific file, line and column. If no file is specified, assume the active editor
       # Line numbers begin at 1. If not specified, line will be 1.
       # Columns begin at 1. If not specified, column will be 1.
+      # Returns reference to opened RadRails::Editor
       def go_to(options = {})
         default_line = options.has_key?(:file) ? 1 : ENV['TM_LINE_NUMBER']
         options = {:file => ENV['TM_FILEPATH'], :line => default_line, :column => 1}.merge(options)
@@ -56,9 +59,10 @@ module RadRails
         else
           editor = RadRails::Editor.active
         end
-        return unless editor        
+        return nil unless editor        
         region = editor.document.getLineInformation(options[:line].to_i - 1)
         editor.selection = [region.offset + options[:column].to_i - 1, 0]
+        editor
       end
     end
     
@@ -170,10 +174,16 @@ module RadRails
     end
     
     def current_scope
-      if content_type.nil?
-        document.content_type(caret_offset)
+      scope_at_offset caret_offset
+    end
+    
+    def scope_at_offset(offset)
+      ctype = content_type(offset)
+      
+      if ctype.nil?
+        document.content_type(offset)
       else
-        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(content_type).to_s
+        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(ctype).to_s
       end
     end
     
@@ -189,8 +199,8 @@ module RadRails
       styled_text.caret_offset
     end
     
-    def content_type
-      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, caret_offset)
+    def content_type(offset)
+      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, offset)
     end
     
     def current_line
@@ -200,6 +210,14 @@ module RadRails
     def to_env
       input = editor_input
       result = {}
+      
+      if editor_part.kind_of?(com.aptana.editor.common.AbstractThemeableEditor)
+        result['TM_SOFT_TABS'] = editor_part.isTabsToSpacesConversionEnabled() ? "YES" : "NO"
+        result['TM_TAB_SIZE'] = editor_part.getTabSize()
+      else
+        result['TM_SOFT_TABS'] = "NO"
+        result['TM_TAB_SIZE'] = 4
+      end
       
       if input
         ifile = input.file
@@ -221,6 +239,7 @@ module RadRails
         result["TM_LINE_INDEX"] = caret_column
         result["TM_CARET_LINE_NUMBER"] = caret_line + 1
         result["TM_CARET_LINE_TEXT"] = current_line
+        result["TM_CARET_OFFSET"] = caret_offset
         result["TM_CURRENT_LINE"] = current_line
         
         # I'm sure there's a better way to extract the word at the current caret position

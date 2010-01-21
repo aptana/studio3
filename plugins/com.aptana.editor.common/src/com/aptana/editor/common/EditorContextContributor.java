@@ -6,7 +6,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -70,34 +69,28 @@ public class EditorContextContributor implements ContextContributor
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				IWorkbench workbench = null;
 				try
 				{
-					workbench = PlatformUI.getWorkbench();
-				}
-				catch (IllegalStateException ise)
-				{
-					workbench = null;
-				}
-				if (workbench != null)
-				{
-					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-
+					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+	
 					if (window != null)
 					{
 						IWorkbenchPage page = window.getActivePage();
-
+	
 						if (page != null)
 						{
 							_editor = page.getActiveEditor();
 						}
 					}
 				}
+				catch (IllegalStateException e)
+				{
+				}
 
 				return Status.OK_STATUS;
 			}
 		};
-
+		
 		if (this.onUIThread())
 		{
 			job.runInUIThread(new NullProgressMonitor());
@@ -115,7 +108,7 @@ public class EditorContextContributor implements ContextContributor
 				// fail silently
 			}
 		}
-
+		
 		// grab the result and lose the editor reference
 		IEditorPart result = this._editor;
 		this._editor = null;
@@ -135,8 +128,7 @@ public class EditorContextContributor implements ContextContributor
 		if (editor != null)
 		{
 			IRubyObject[] args = new IRubyObject[] { ScriptUtils.javaToRuby(editor) };
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, EDITOR_RUBY_CLASS,
-					args);
+			IRubyObject rubyInstance = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, EDITOR_RUBY_CLASS, args);
 
 			context.put(EDITOR_PROPERTY_NAME, rubyInstance);
 		}

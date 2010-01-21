@@ -115,7 +115,8 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	@Override
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(new Path(rootPath));
+		String pathString = rootPath + (name.length() > 0 ?  Path.SEPARATOR + name : ""); //$NON-NLS-1$
+		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(new Path(pathString).removeLastSegments(1));
 		addToRefreshList(resource, IResource.DEPTH_ONE);
 	}
 

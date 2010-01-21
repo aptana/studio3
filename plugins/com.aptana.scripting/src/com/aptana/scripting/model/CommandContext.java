@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.jruby.RubyIO;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptingEngine;
@@ -33,7 +33,8 @@ public class CommandContext
 	
 	private Map<String,Object> _map;
 	private InputStream _inputStream;
-	//private Ruby _runtime;
+	private OutputType _outputType;
+	private boolean _forcedExit;
 
 	/**
 	 * getContextContributors
@@ -96,6 +97,7 @@ public class CommandContext
 	CommandContext(CommandElement command)
 	{
 		this._map = new HashMap<String,Object>();
+		
 		for (ContextContributor contributor : getContextContributors())
 		{
 			contributor.modifyContext(command, this);
@@ -134,16 +136,33 @@ public class CommandContext
 	}
 
 	/**
+	 * getOutputType
+	 * 
+	 * @return
+	 */
+	public OutputType getOutputType()
+	{
+		return this._outputType;
+	}
+	
+	/**
 	 * in
 	 * 
 	 * @return
 	 */
-	public RubyIO in()
+	public IRubyObject in()
 	{
-		return new RubyIO(
-			ScriptingEngine.getInstance().getScriptingContainer().getRuntime(),
-			this.getInputStream()
-		);
+		return ScriptingEngine.getInstance().getScriptingContainer().getRuntime().getObject().getConstant("STDIN"); //$NON-NLS-1$
+	}
+	
+	/**
+	 * isForcedExit
+	 * 
+	 * @return
+	 */
+	public boolean isForcedExit()
+	{
+		return this._forcedExit;
 	}
 	
 	/**
@@ -168,10 +187,40 @@ public class CommandContext
 	}
 
 	/**
+	 * setForceExit
+	 * 
+	 * @param value
+	 */
+	public void setForcedExit(boolean value)
+	{
+		this._forcedExit = value;
+	}
+	
+	/**
 	 * @param inputStream
 	 */
 	public void setInputStream(InputStream inputStream)
 	{
 		this._inputStream = inputStream;
+	}
+	
+	/**
+	 * setOutputType
+	 * 
+	 * @param type
+	 */
+	public void setOutputType(OutputType type)
+	{
+		this._outputType = type;
+	}
+
+	/**
+	 * setOutput
+	 * 
+	 * @param output
+	 */
+	public void setOutputType(String output)
+	{
+		this._outputType = OutputType.get(output);
 	}
 }

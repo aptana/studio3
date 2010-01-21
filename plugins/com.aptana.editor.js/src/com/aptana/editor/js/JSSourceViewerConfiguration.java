@@ -37,81 +37,79 @@ package com.aptana.editor.js;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.js.internal.JSAutoIndentStrategy;
 import com.aptana.editor.js.internal.JSCommentIndentStrategy;
 import com.aptana.editor.js.internal.JSDocIndentStrategy;
 
-public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
+{
 
-    private CommonDoubleClickStrategy doubleClickStrategy;
-
-    public JSSourceViewerConfiguration(IPreferenceStore preferences, ITextEditor editor) {
-        super(preferences, editor);
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				JSSourceConfiguration.CONTENT_TYPES
-			});
+	public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	{
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				JSSourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return JSSourceConfiguration.getDefault().getTopContentTypes();
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
-     */
-    @Override
-    public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType) {
-        if (doubleClickStrategy == null) {
-            doubleClickStrategy = new CommonDoubleClickStrategy();
-        }
-        return doubleClickStrategy;
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
-     */
-    @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
-        String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-        if (contentType.equals(JSSourceConfiguration.JS_SINGLELINE_COMMENT)
-                || contentType.equals(JSSourceConfiguration.JS_MULTILINE_COMMENT)) {
-            return new IAutoEditStrategy[] { new JSCommentIndentStrategy(partitioning, contentType,
-                    this, sourceViewer) };
-        }
-        if (contentType.equals(JSSourceConfiguration.JS_DOC)) {
-            return new IAutoEditStrategy[] { new JSDocIndentStrategy(partitioning, contentType,
-                    this, sourceViewer) };
-        }
-        return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer) };
-    }
+	/*
+	 * (non-Javadoc)
+	 * @seeorg.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.
+	 * ISourceViewer, java.lang.String)
+	 */
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
+		if (contentType.equals(JSSourceConfiguration.JS_SINGLELINE_COMMENT)
+				|| contentType.equals(JSSourceConfiguration.JS_MULTILINE_COMMENT))
+		{
+			return new IAutoEditStrategy[] { new JSCommentIndentStrategy(partitioning, contentType, this, sourceViewer) };
+		}
+		if (contentType.equals(JSSourceConfiguration.JS_DOC))
+		{
+			return new IAutoEditStrategy[] { new JSDocIndentStrategy(partitioning, contentType, this, sourceViewer) };
+		}
+		return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
 }
