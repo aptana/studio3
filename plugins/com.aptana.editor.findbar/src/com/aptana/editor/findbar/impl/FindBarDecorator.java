@@ -279,6 +279,10 @@ public class FindBarDecorator implements IFindBarDecorator {
 		handlerService.activateHandler("org.eclipse.ui.edit.findbar.hide", new HideFindBarHandler()); //$NON-NLS-1$
 		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
 		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.cut", new CutFromFindBarHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.copy", new CopyFromFindBarHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.paste", new PasteInFindBarHandler()); //$NON-NLS-1$
+		handlerService.activateHandler("org.eclipse.ui.edit.findbar.selectall", new SelectAllFindBarHandler()); //$NON-NLS-1$
 	}
 	
 	boolean isActive() {
@@ -349,6 +353,34 @@ public class FindBarDecorator implements IFindBarDecorator {
 	private class FindNextHandler extends AbstractHandler {
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			findNext();
+			return null;
+		}
+	}
+
+	private class CutFromFindBarHandler extends AbstractHandler {
+		public Object execute(ExecutionEvent event) throws ExecutionException {
+			combo.cut();
+			return null;
+		}
+	}
+
+	private class CopyFromFindBarHandler extends AbstractHandler {
+		public Object execute(ExecutionEvent event) throws ExecutionException {
+			combo.copy();
+			return null;
+		}
+	}
+
+	private class PasteInFindBarHandler extends AbstractHandler {
+		public Object execute(ExecutionEvent event) throws ExecutionException {
+			combo.paste();
+			return null;
+		}
+	}
+
+	private class SelectAllFindBarHandler extends AbstractHandler {
+		public Object execute(ExecutionEvent event) throws ExecutionException {
+			combo.setSelection(new Point(0, combo.getText().length()));
 			return null;
 		}
 	}

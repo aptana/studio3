@@ -1,18 +1,14 @@
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
-import java.io.Writer;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.xml.sax.InputSource;
+import plistreader.PlistProperties;
 
 import com.aptana.scripting.model.OutputType;
-
-import plistreader.AbstractReader;
-import plistreader.PlistFactory;
-import plistreader.PlistProperties;
 
 public class CommandConverter
 {
@@ -24,21 +20,22 @@ public class CommandConverter
 	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception
 	{
+		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			String userHome = System.getProperty("user.home");
-			args = new String[] { userHome + "/Documents/RadRails Bundles/ruby/commands" };
+			args = new String[] { userHome + "/Documents/RadRails Bundles/sass/commands" };
 		}
-		for (String commandDir : args)
+
+		String outputFilePath;
+		if (args.length < 2)
 		{
-			File[] commandFiles = gatherCommands(new File(commandDir));
-			if (commandFiles == null)
-				continue;
-			for (File commandFile : commandFiles)
-			{
-				convert(commandFile);
-			}
+			outputFilePath = userHome + "/Documents/RadRails Bundles/sass/commands";
 		}
+		else
+		{
+			outputFilePath = args[1];
+		}
+		convert(new File(args[0]), outputFilePath);
 	}
 
 	private static File[] gatherCommands(File commandDirectory)
@@ -54,65 +51,43 @@ public class CommandConverter
 	}
 
 	@SuppressWarnings("nls")
-	private static void convert(File commandFile)
+	private static String convert(File commandFile)
 	{
-		try
-		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", commandFile
-					.getAbsolutePath());
-			Process p = builder.start();
-			int exitCode = p.waitFor();
-			if (exitCode != 0)
-				System.err.println("Bad exit code for conversion: " + exitCode);
-			AbstractReader reader = PlistFactory.createReader();
-			reader.setSource(new InputSource(new FileInputStream(commandFile)));
-			PlistProperties properties = reader.parse();
+		PlistProperties properties = BundleConverter.parse(commandFile);
 
-			StringBuilder buffer = new StringBuilder();
-			buffer.append("require 'radrails'\n\n");
-			buffer.append("command '").append(sanitize(properties, "name")).append("' do |cmd|\n");
-			String keyBinding = sanitize(properties, "keyEquivalent");
-			keyBinding = convertKeyBinding(keyBinding);
-			buffer.append("  cmd.key_binding = '").append(keyBinding).append("'\n");
-			buffer.append("  cmd.scope = '").append(sanitize(properties, "scope")).append("'\n");
-			String outputType = sanitize(properties, "output");
-			outputType = camelcaseToUnderscores(outputType);
-			outputType = convertOutputTypes(outputType);
-			buffer.append("  cmd.output = :").append(outputType).append("\n");
-			buffer.append("  cmd.input = :").append(sanitize(properties, "input"));
-			String fallbackInput = sanitize(properties, "fallbackInput");
-			if (fallbackInput != null)
-				buffer.append(", :").append(fallbackInput);
-			buffer.append("\n");
-			buffer.append("  cmd.invoke =<<-EOF\n").append(properties.getProperty("command")).append("\nEOF\n");
-			buffer.append("end\n");
+		StringBuilder buffer = new StringBuilder();
+		buffer.append("require 'radrails'\n\n");
+		buffer.append("command '").append(BundleConverter.sanitize(properties, "name")).append("' do |cmd|\n");
+		String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
+		keyBinding = convertKeyBinding(keyBinding);
+		buffer.append("  cmd.key_binding = '").append(keyBinding).append("'\n");
+		buffer.append("  cmd.scope = '").append(BundleConverter.sanitize(properties, "scope")).append("'\n");
+		String outputType = BundleConverter.sanitize(properties, "output");
+		outputType = camelcaseToUnderscores(outputType);
+		outputType = convertOutputTypes(outputType);
+		buffer.append("  cmd.output = :").append(outputType).append("\n");
+		buffer.append("  cmd.input = :").append(BundleConverter.sanitize(properties, "input"));
+		String fallbackInput = BundleConverter.sanitize(properties, "fallbackInput");
+		if (fallbackInput != null)
+			buffer.append(", :").append(fallbackInput);
+		buffer.append("\n");
+		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.getProperty("command")).append("\nEOF\n");
+		buffer.append("end\n");
 
-			Writer writer = null;
-			try
-			{
-				// convert spaces to underscores, remove file extension
-				String name = commandFile.getName().toLowerCase();
-				name = name.replace(' ', '_');
-				int lastDot = name.lastIndexOf('.');
-				if (lastDot != -1)
-				{
-					name = name.substring(0, lastDot);
-				}
-				File outFile = new File(commandFile.getParentFile(), name + ".rb");
-				writer = new FileWriter(outFile);
-				writer.write(buffer.toString());
-			}
-			finally
-			{
-				writer.close();
-			}
-		}
-		catch (Exception e)
+		return buffer.toString();
+	}
+
+	protected static String convertFilename(File commandFile)
+	{
+		// convert spaces to underscores, remove file extension
+		String name = commandFile.getName().toLowerCase();
+		name = name.replace(' ', '_');
+		int lastDot = name.lastIndexOf('.');
+		if (lastDot != -1)
 		{
-			System.err.println("An error occurred processing: " + commandFile.getAbsolutePath());
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			name = name.substring(0, lastDot);
 		}
+		return name + ".rb"; //$NON-NLS-1$
 	}
 
 	private static String convertKeyBinding(String keyBinding)
@@ -130,6 +105,17 @@ public class CommandConverter
 					break;
 				case '^':
 					builder.append("CONTROL+M2+"); //$NON-NLS-1$
+					break;
+				case '~':
+					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
+					{
+						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
+						i++;
+					}
+					else
+					{
+						builder.append(c).append('+');
+					}
 					break;
 				default:
 					builder.append(c).append('+');
@@ -180,12 +166,52 @@ public class CommandConverter
 		return builder.toString();
 	}
 
-	protected static String sanitize(PlistProperties properties, String key)
+	public static void convert(File textmateCommandsDir, String outputCommandsDir)
 	{
-		String content = (String) properties.getProperty(key);
-		if (content == null)
-			return null;
-		return content.replace("'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		File[] commandFiles = gatherCommands(textmateCommandsDir);
+		if (commandFiles == null)
+			return;
+		for (File commandFile : commandFiles)
+		{
+			convertSingleFile(commandFile, outputCommandsDir + File.separator + convertFilename(commandFile));
+		}
+	}
+
+	private static void convertSingleFile(File commandFile, String outFilePath)
+	{
+		String output = convert(commandFile);
+		if (output == null)
+		{
+			// TODO Spit out an error!
+			return;
+		}
+		try
+		{
+			BundleConverter.writeToFile(output, outFilePath);
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static Map<String, String> uuidNameMap(File commandsDir)
+	{
+		Map<String, String> uuidNameMap = new HashMap<String, String>();
+		File[] commandFiles = gatherCommands(commandsDir);
+		if (commandFiles == null)
+			return uuidNameMap;
+		for (File commandFile : commandFiles)
+		{
+			PlistProperties properties = BundleConverter.parse(commandFile);
+
+			String name = BundleConverter.sanitize(properties, "name");
+			String uuid = (String) properties.getProperty("uuid");
+			uuidNameMap.put(uuid, name);
+		}
+		return uuidNameMap;
 	}
 
 }

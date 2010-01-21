@@ -23,7 +23,7 @@ public class GitExecutable
 	private static ArrayList<String> fgLocations;
 	private String gitPath;
 
-	private static GitExecutable fgExecutable;
+	static GitExecutable fgExecutable;
 	private static boolean fgAddedPrefListener;
 
 	private GitExecutable(String gitPath)
@@ -57,7 +57,7 @@ public class GitExecutable
 
 	private static GitExecutable find()
 	{
-		String prefPath = Platform.getPreferencesService().get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
+		String prefPath = Platform.getPreferencesService().getString(GitPlugin.getPluginId(), IPreferenceConstants.GIT_EXECUTABLE_PATH, null, null);
 		if (prefPath != null && prefPath.length() > 0)
 		{
 			if (acceptBinary(prefPath))
@@ -129,7 +129,7 @@ public class GitExecutable
 			return null;
 
 		String version = ProcessUtil.outputForCommand(path, null, "--version"); //$NON-NLS-1$
-		if (version.startsWith("git version ")) //$NON-NLS-1$
+		if (version != null && version.startsWith("git version ")) //$NON-NLS-1$
 			return version.substring(12);
 
 		return null;

@@ -134,7 +134,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 
 		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
 		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
-		addWordsToRule(wordRule2, PROPERTY_NAMES, "support.type.property-name.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule2, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
 		rules.add(wordRule2);
 		
@@ -194,6 +194,11 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
+	protected String[] getPropertyNames()
+	{
+		return PROPERTY_NAMES;
+	}
+
 	private void addWordsToRule(WordRule wordRule, String[] words, String tokenType)
 	{
 		IToken token = createToken(tokenType);
@@ -218,7 +223,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class LettersAndHyphensWordDetector implements IWordDetector
+	protected static class LettersAndHyphensWordDetector implements IWordDetector
 	{
 		@Override
 		public boolean isWordPart(char c)
