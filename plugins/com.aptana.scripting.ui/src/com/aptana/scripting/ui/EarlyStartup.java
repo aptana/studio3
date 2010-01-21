@@ -1,97 +1,92 @@
 package com.aptana.scripting.ui;
 
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.MessageConsole;
-import org.eclipse.ui.console.MessageConsoleStream;
+import org.jruby.Ruby;
+import org.jruby.RubyIO;
 
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptingEngine;
 
 public class EarlyStartup implements IStartup
 {
-	private MessageConsole _console;
-	private MessageConsoleStream _errorConsoleStream;
-	private MessageConsoleStream _infoConsoleStream;
-	private MessageConsoleStream _warningConsoleStream;
-	private MessageConsoleStream _traceConsoleStream;
-	private ScriptLogListener _logListener;
-	
+	private static final String CONSOLE_CONSTANT = "CONSOLE";
+	private static final String CONSOLE_VARIABLE = "$console";
+
 	public void earlyStartup()
 	{
-		// create console
-		this._console = new MessageConsole(
-			Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME,
-			ScriptingUIPlugin.getImageDescriptor("icons/console.png") //$NON-NLS-1$
-		);
+		final ScriptingConsole console = ScriptingConsole.getDefault();
 		
-		// create message streams
-		this._errorConsoleStream = this._console.newMessageStream();
-		this._infoConsoleStream = this._console.newMessageStream();
-		this._warningConsoleStream = this._console.newMessageStream();
-		this._traceConsoleStream = this._console.newMessageStream();
-		
-		// set stream colors
-		final Display display = PlatformUI.getWorkbench().getDisplay();
-		
-		display.syncExec(new Runnable()
+		// create our scripting log listener and register it
+		ScriptLogger.getInstance().addLogListener(new ScriptLogListener()
 		{
-			public void run()
-			{
-				_errorConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_RED));
-				_infoConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				_warningConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				_traceConsoleStream.setColor(display.getSystemColor(SWT.COLOR_DARK_GREEN));
-			}
-		});
-		
-		// register our console with Eclipse
-		ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this._console });
-		
-		// create our scripting log listener
-		this._logListener = new ScriptLogListener()
-		{
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+
 			private String getDateTimeStamp()
 			{
 				return format.format(new Date());
 			}
-			
+
 			private String formatMessage(String message)
 			{
-				return "[" + this.getDateTimeStamp() + "] " + message;
+				return "[" + this.getDateTimeStamp() + "] " + message; //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			public void logError(String error)
 			{
-				_errorConsoleStream.println(this.formatMessage(error));
+				console.getErrorConsoleStream().println(this.formatMessage(error));
 			}
 
 			public void logInfo(String info)
 			{
-				_infoConsoleStream.println(this.formatMessage(info));
+				console.getInfoConsoleStream().println(this.formatMessage(info));
 			}
 
 			public void logWarning(String warning)
 			{
-				_warningConsoleStream.println(this.formatMessage(warning));
+				console.getWarningConsoleStream().println(this.formatMessage(warning));
 			}
 
 			public void trace(String message)
 			{
-				_traceConsoleStream.println(this.formatMessage(message));
+				console.getTraceConsoleStream().println(this.formatMessage(message));
 			}
-		};
+
+			public void print(String message)
+			{
+				console.getOutputConsoleStream().println(message);
+			}
+
+			public void printError(String message)
+			{
+				console.getErrorConsoleStream().println(message);
+			}
+		});
+
+		// create CONSOLE and $console streams
+		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+		RubyIO rubyStream = new RubyIO(runtime, console.getOutputConsoleStream());
+		rubyStream.sync_set(runtime.getTrue());	// force immediate output
 		
-		// and register it
-		ScriptLogger.getInstance().addLogListener(this._logListener);
+		// store as a global and a constant
+		runtime.getGlobalVariables().set(CONSOLE_VARIABLE, rubyStream);
+		runtime.getObject().setConstant(CONSOLE_CONSTANT, rubyStream);
+
+		// use console for STDERR
+		// NOTE: The whole isVerbose thing is a bit hacky. As a side-effect, if the verbose
+		// setting is nil, then warnings are turned off. We turn them off so we don't get the
+		// warning about redefining the STDERR constant. I would expect setErrorWriter to
+		// prevent that, but it doesn't. Obviously, this workaround is probably not future-
+		// proof and there may be a correct way of redefining STDERR which doesn't throw this
+		// warning
+		OutputStreamWriter writer = new OutputStreamWriter(console.getErrorConsoleStream());
+		boolean isVerbose = runtime.isVerbose();
+		runtime.setVerbose(runtime.getNil());
+		ScriptingEngine.getInstance().getScriptingContainer().setErrorWriter(writer);
+		runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
 	}
 }

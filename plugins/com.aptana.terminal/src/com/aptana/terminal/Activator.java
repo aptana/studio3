@@ -103,6 +103,8 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public static void trace(String string)
 	{
+		if (getDefault() == null || !getDefault().isDebugging())
+			return;
 		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 

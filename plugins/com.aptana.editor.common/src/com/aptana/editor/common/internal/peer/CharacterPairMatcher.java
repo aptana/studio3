@@ -16,7 +16,7 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 /**
  * This is a modified version of DefaultCharacterPairMatcher from Eclipse. This version adds some heuristics to try and
- * properly handle character pairs wher eteh start and end chars are the same (like '', "", ``) by looking at the
+ * properly handle character pairs where the start and end chars are the same (like '', "", ``) by looking at the
  * partition transitions on the character. If the partition is the same on the character and before it, we assume that
  * this is the end of the pair. This works so long as the same character pairs do mark partition transitions (like
  * strings).

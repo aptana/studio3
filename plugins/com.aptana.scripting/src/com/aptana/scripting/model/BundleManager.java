@@ -50,6 +50,7 @@ public class BundleManager
 	private Map<String, BundleEntry> _entriesByName;
 	
 	private List<ElementChangeListener> _elementListeners;
+	private List<LoadCycleListener> _loadCycleListeners;
 	
 	/**
 	 * getInstance - used for unit testing
@@ -98,7 +99,7 @@ public class BundleManager
 		{
 			INSTANCE.userBundlesPath = userBundlesPath;
 		}
-
+		
 		return INSTANCE;
 	}
 	
@@ -195,6 +196,24 @@ public class BundleManager
 	}
 	
 	/**
+	 * addLoadCycleListener
+	 * 
+	 * @param listener
+	 */
+	public void addLoadCycleListener(LoadCycleListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._loadCycleListeners == null)
+			{
+				this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+			}
+			
+			this._loadCycleListeners.add(listener);
+		}
+	}
+	
+	/**
 	 * fireElementAddedEvent
 	 * 
 	 * @param element
@@ -250,6 +269,54 @@ public class BundleManager
 					listener.elementAdded(element);
 //					listener.elementModified(element);
 				}
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptLoadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptLoadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptLoaded(script);
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptReloadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptReloadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptReloaded(script);
+			}
+		}
+	}
+	
+	/**
+	 * fireScriptUnloadedEvent
+	 * 
+	 * @param path
+	 */
+	void fireScriptUnloadedEvent(File script)
+	{
+		if (this._loadCycleListeners != null && script != null)
+		{
+			for (LoadCycleListener listener : this._loadCycleListeners)
+			{
+				listener.scriptReloaded(script);
 			}
 		}
 	}
@@ -382,8 +449,9 @@ public class BundleManager
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
 		List<String> result = new ArrayList<String>();
+		List<String> paths = ScriptingEngine.getInstance().getContributedLoadPaths();
 		
-		result.add(ScriptingEngine.getBuiltinsLoadPath());
+		result.addAll(paths);
 		result.add(bundleDirectory.getAbsolutePath() + File.separator + LIB_DIRECTORY_NAME);
 		
 		return result;
@@ -476,10 +544,8 @@ public class BundleManager
 
 		if (this.isValidBundleDirectory(bundleDirectory))
 		{
-			String bundlePath = bundleDirectory.getAbsolutePath();
-
 			// check for a top-level bundle.rb file
-			File bundleFile = new File(bundlePath + File.separator + BUNDLE_FILE);
+			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
 
 			if (bundleFile.exists())
 			{
@@ -487,12 +553,12 @@ public class BundleManager
 			}
 
 			// check for scripts inside "commands" directory
-			File commandsDirectory = new File(bundlePath + File.separator + COMMANDS_DIRECTORY_NAME);
+			File commandsDirectory = new File(bundleDirectory, COMMANDS_DIRECTORY_NAME);
 
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(commandsDirectory)));
 			
 			// check for scripts inside "snippets" directory
-			File snippetsDirectory = new File(bundlePath + File.separator + SNIPPETS_DIRECTORY_NAME);
+			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 			
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
 		}
@@ -507,77 +573,33 @@ public class BundleManager
 	 */
 	public CommandElement[] getCommands()
 	{
-		CommandElement[] result = NO_COMMANDS;
+		List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		String[] bundleNames = this.getBundleNames();
-		
-		if (bundleNames != null && bundleNames.length > 0)
+		for (String name : this.getBundleNames())
 		{
-			List<CommandElement> commands = new ArrayList<CommandElement>();
-			
-			for (String name : bundleNames)
-			{
-				commands.addAll(Arrays.asList(this.getBundleCommands(name)));
-			}
-			
-			result = commands.toArray(new CommandElement[commands.size()]);
+			result.addAll(Arrays.asList(this.getBundleCommands(name)));
 		}
 		
-		return result;
+		return result.toArray(new CommandElement[result.size()]);
 	}
 	
 	/**
-	 * getCommandsFromScope
+	 * getCommands
 	 * 
-	 * @param scope
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScope(String scope)
-	{
-		return this.getCommandsFromScopes(new String[] { scope }, null);
-	}
-	
-	/**
-	 * getCommandsFromScope
-	 * 
-	 * @param scope
 	 * @param filter
 	 * @return
 	 */
-	public CommandElement[] getCommandsFromScope(String scope, IModelFilter filter)
-	{
-		return this.getCommandsFromScopes(new String[] { scope }, filter);
-	}
-	
-	/**
-	 * getCommandsFromScopes
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScopes(String[] scopes)
-	{
-		return this.getCommandsFromScopes(scopes, null);
-	}
-	
-	/**
-	 * getCommandsFromScopes
-	 * 
-	 * @param scopes
-	 * @param filter
-	 * @return
-	 */
-	public CommandElement[] getCommandsFromScopes(String[] scopes, IModelFilter filter)
+	public CommandElement[] getCommands(IModelFilter filter)
 	{
 		List<CommandElement> result = new ArrayList<CommandElement>();
 		
-		if (scopes != null && scopes.length > 0)
+		if (filter != null)
 		{
 			for (String name : this.getBundleNames())
 			{
 				for (CommandElement command : this.getBundleCommands(name))
 				{
-					if (command.matches(scopes) && ((filter != null) ? filter.include(command) : true))
+					if (filter.include(command))
 					{
 						result.add(command);
 					}
@@ -589,57 +611,22 @@ public class BundleManager
 	}
 	
 	/**
-	 * getMenusFromScope
+	 * getMenus
 	 * 
-	 * @param scope
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScope(String scope)
-	{
-		return this.getMenusFromScopes(new String[] { scope }, null);
-	}
-	
-	/**
-	 * getMenusFromScope
-	 * 
-	 * @param scope
 	 * @param filter
 	 * @return
 	 */
-	public MenuElement[] getMenusFromScope(String scope, IModelFilter filter)
-	{
-		return this.getMenusFromScopes(new String[] { scope }, filter);
-	}
-	
-	/**
-	 * getMenusFromScope
-	 * 
-	 * @param scopes
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScope(String[] scopes)
-	{
-		return this.getMenusFromScopes(scopes, null);
-	}
-
-	/**
-	 * getMenusFromScopes
-	 * 
-	 * @param scopes
-	 * @param filter
-	 * @return
-	 */
-	public MenuElement[] getMenusFromScopes(String[] scopes, IModelFilter filter)
+	public MenuElement[] getMenus(IModelFilter filter)
 	{
 		List<MenuElement> result = new ArrayList<MenuElement>();
 		
-		if (scopes != null && scopes.length > 0)
+		if (filter != null)
 		{
 			for (String name : this.getBundleNames())
 			{
 				for (MenuElement menu : this.getBundleMenus(name))
 				{
-					if (menu.matches(scopes) && ((filter != null) ? filter.include(menu) : true))
+					if (filter.include(menu))
 					{
 						result.add(menu);
 					}
@@ -721,7 +708,21 @@ public class BundleManager
 			{
 				if (bundleDirectory.canRead())
 				{
-					result = true;
+					File bundleFile = new File(bundleDirectory.getAbsolutePath(), BUNDLE_FILE);
+					
+					// NOTE: We verify readability when we try to execute the scripts in the bundle
+					// so, there's no need to do that here.
+					if (bundleFile.exists() && bundleFile.isFile())
+					{
+						result = true;
+					}
+					else
+					{
+						message = MessageFormat.format(
+							Messages.BundleManager_No_Bundle_File,
+							new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE }
+						);
+					}
 				}
 				else
 				{
@@ -788,7 +789,7 @@ public class BundleManager
 			
 			for (File script : bundleScripts)
 			{
-				this.loadScript(script, bundleLoadPaths);
+				this.loadScript(script, true, bundleLoadPaths);
 			}
 		}
 	}
@@ -830,6 +831,17 @@ public class BundleManager
 	 */
 	public void loadScript(File script)
 	{
+		this.loadScript(script, true);
+	}
+	
+	/**
+	 * loadScript
+	 * 
+	 * @param script
+	 * @param fireEvent
+	 */
+	public void loadScript(File script, boolean fireEvent)
+	{
 		if (script != null)
 		{
 			// determine bundle root directory
@@ -849,7 +861,7 @@ public class BundleManager
 			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
 			
 			// execute script
-			this.loadScript(script, bundleLoadPaths);
+			this.loadScript(script, fireEvent, bundleLoadPaths);
 		}
 	}
 	
@@ -857,8 +869,10 @@ public class BundleManager
 	 * loadScript
 	 * 
 	 * @param script
+	 * @param fireEvent
+	 * @param loadPaths
 	 */
-	public void loadScript(File script, List<String> loadPaths)
+	public void loadScript(File script, boolean fireEvent, List<String> loadPaths)
 	{
 		boolean execute = true;
 		
@@ -887,6 +901,11 @@ public class BundleManager
 		if (execute)
 		{
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths);
+			
+			if (fireEvent)
+			{
+				this.fireScriptLoadedEvent(script);
+			}
 		}
 	}
 
@@ -917,8 +936,10 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			this.unloadScript(script);
-			this.loadScript(script);
+			this.unloadScript(script, false);
+			this.loadScript(script, false);
+			
+			this.fireScriptReloadedEvent(script);
 		}
 		else
 		{
@@ -941,6 +962,19 @@ public class BundleManager
 		if (this._elementListeners != null)
 		{
 			this._elementListeners.remove(listener);
+		}
+	}
+	
+	/**
+	 * removeLoadCycleListener
+	 * 
+	 * @param listener
+	 */
+	public void removeLoadCycleListener(LoadCycleListener listener)
+	{
+		if (this._loadCycleListeners != null)
+		{
+			this._loadCycleListeners.remove(listener);
 		}
 	}
 	
@@ -968,6 +1002,17 @@ public class BundleManager
 	 * @param script
 	 */
 	public void unloadScript(File script)
+	{
+		this.unloadScript(script, true);
+	}
+	
+	/**
+	 * unloadScript
+	 * 
+	 * @param script
+	 * @param fireEvent
+	 */
+	public void unloadScript(File script, boolean fireEvent)
 	{
 		if (script != null)
 		{
@@ -1007,6 +1052,11 @@ public class BundleManager
 						AbstractElement.unregisterElement(bundle);
 					}
 				}
+			}
+			
+			if (fireEvent)
+			{
+				this.fireScriptUnloadedEvent(script);
 			}
 		}
 		else

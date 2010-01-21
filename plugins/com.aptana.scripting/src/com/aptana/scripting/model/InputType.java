@@ -15,12 +15,14 @@ public enum InputType
 	LEFT_CHAR("left_character"), //$NON-NLS-1$
 	RIGHT_CHAR("right_character"), //$NON-NLS-1$
 	DOCUMENT("document"), //$NON-NLS-1$
+	CLIPBOARD("clipboard"),  //$NON-NLS-1$
 	INPUT_FROM_CONSOLE("input_from_console"), //$NON-NLS-1$
+	INPUT_FROM_FILE("input_from_file"), //$NON-NLS-1$
 	INPUT_FROM_STREAM("input_from_stream"); //$NON-NLS-1$
 
 	private static final Map<String, InputType> NAME_MAP;
 	private String _name;
-	
+
 	/**
 	 * static
 	 */
@@ -42,6 +44,9 @@ public enum InputType
 	 */
 	public static final InputType get(String name)
 	{
+		if (name == null)
+			return UNDEFINED;
+		name = name.toLowerCase();
 		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
 	}
 	

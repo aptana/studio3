@@ -20,22 +20,41 @@ public abstract class IOUtil
 	 */
 	public static String read(InputStream stream)
 	{
+		return read(stream, null);
+	}
+
+	/**
+	 * Newlines will get converted into \n.
+	 * @param stream
+	 * @param charset
+	 * @return
+	 */
+	public static String read(InputStream stream, String charset)
+	{
 		if (stream == null)
 			return null;
 		try
 		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			InputStreamReader inReader;
+			if (charset != null)
+				inReader = new InputStreamReader(stream, charset);
+			else
+				inReader = new InputStreamReader(stream);
+			BufferedReader reader = new BufferedReader(inReader);
 			StringBuilder template = new StringBuilder();
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{
 				template.append(line);
+				template.append("\n"); //$NON-NLS-1$
 			}
+			if (template.length() > 0)
+				template.deleteCharAt(template.length() - 1); // delete last extraneous newline
 			return template.toString();
 		}
 		catch (IOException e)
 		{
-			UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
+			log(e);
 		}
 		finally
 		{
@@ -49,6 +68,13 @@ public abstract class IOUtil
 			}
 		}
 		return null;
+	}
+
+	private static void log(Exception e)
+	{
+		if (UtilPlugin.getDefault() == null)
+			return;
+		UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
 	}
 
 }

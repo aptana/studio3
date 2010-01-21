@@ -197,6 +197,6 @@ public class ScopeSelector
 	@Override
 	public String toString()
 	{
-		return (this._root == null) ? "null" : this._root.toString();
+		return (this._root == null) ? "null" : this._root.toString(); //$NON-NLS-1$
 	}
 }

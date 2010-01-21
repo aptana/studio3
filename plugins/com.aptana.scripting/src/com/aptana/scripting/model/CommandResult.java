@@ -8,7 +8,13 @@ public class CommandResult
 	private OutputStream _outputStream;
 	private String _errorString;
 	private OutputStream _errorStream;
-	
+	private InputType _inputType;
+	private OutputType _outputType;
+	private int _returnValue;
+	private boolean _executedSuccessfully;
+	private CommandContext _context;
+	private CommandElement _command;
+
 	/**
 	 * CommandResult
 	 * 
@@ -18,39 +24,35 @@ public class CommandResult
 	{
 		this._outputString = output;
 	}
-	
+
 	/**
-	 * CommandResult
+	 * executedSuccessfully
 	 * 
-	 * @param output
-	 * @param errors
+	 * @return
 	 */
-	public CommandResult(String output, String errors)
+	public boolean executedSuccessfully()
 	{
-		this._outputString = output;
-		this._errorString = errors;
+		return this._executedSuccessfully;
 	}
-	
+
 	/**
-	 * CommandResult
+	 * getCommand
 	 * 
-	 * @param stream
+	 * @return
 	 */
-	public CommandResult(OutputStream stream)
+	public CommandElement getCommand()
 	{
-		this._outputStream = stream;
+		return this._command;
 	}
-	
+
 	/**
-	 * CommandResult
+	 * getContext
 	 * 
-	 * @param outputStream
-	 * @param errorStream
+	 * @return
 	 */
-	public CommandResult(OutputStream outputStream, OutputStream errorStream)
+	public CommandContext getContext()
 	{
-		this._outputStream = outputStream;
-		this._errorStream = errorStream;
+		return this._context;
 	}
 
 	/**
@@ -62,7 +64,7 @@ public class CommandResult
 	{
 		return this._errorStream;
 	}
-	
+
 	/**
 	 * getErrorString
 	 * 
@@ -72,17 +74,17 @@ public class CommandResult
 	{
 		return this._errorString;
 	}
-	
+
 	/**
-	 * getReturnValue
+	 * getInputType
 	 * 
 	 * @return
 	 */
-	public int getReturnValue()
+	public InputType getInputType()
 	{
-		return 0;
+		return this._inputType;
 	}
-	
+
 	/**
 	 * getOutputStream
 	 * 
@@ -101,5 +103,76 @@ public class CommandResult
 	public String getOutputString()
 	{
 		return this._outputString;
+	}
+
+	/**
+	 * getOutputType
+	 * 
+	 * @return
+	 */
+	public OutputType getOutputType()
+	{
+		return (this._outputType != null) ? this._outputType : OutputType.UNDEFINED;
+	}
+	
+	/**
+	 * getReturnValue
+	 * 
+	 * @return
+	 */
+	public int getReturnValue()
+	{
+		return this._returnValue;
+	}
+	
+	/**
+	 * setCommand
+	 * 
+	 * @param command
+	 */
+	void setCommand(CommandElement command)
+	{
+		this._command = command;
+	}
+
+	/**
+	 * setContext
+	 * 
+	 * @param context
+	 */
+	void setContext(CommandContext context)
+	{
+		this._context = context;
+		this._outputType = (context != null) ? context.getOutputType() : OutputType.UNDEFINED;
+	}
+
+	/**
+	 * setExecutedSuccessfully
+	 * 
+	 * @param value
+	 */
+	void setExecutedSuccessfully(boolean value)
+	{
+		this._executedSuccessfully = value;
+	}
+
+	/**
+	 * setInputType
+	 * 
+	 * @param inputType
+	 */
+	void setInputType(InputType inputType)
+	{
+		this._inputType = inputType;
+	}
+
+	/**
+	 * setReturnValue
+	 * 
+	 * @param value
+	 */
+	void setReturnValue(int value)
+	{
+		this._returnValue = value;
 	}
 }

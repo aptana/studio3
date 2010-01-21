@@ -8,7 +8,6 @@ public class GitRevSpecifier
 {
 
 	private List<String> parameters;
-	private String workingDirectory;
 
 	public GitRevSpecifier(String... parameters)
 	{
@@ -24,11 +23,6 @@ public class GitRevSpecifier
 	List<String> parameters()
 	{
 		return parameters;
-	}
-
-	String getWorkingDirectory()
-	{
-		return workingDirectory;
 	}
 
 	static GitRevSpecifier allBranchesRevSpec()
@@ -73,13 +67,13 @@ public class GitRevSpecifier
 			builder.deleteCharAt(builder.length() - 1);
 		return builder.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof GitRevSpecifier))
 			return false;
-		
+
 		GitRevSpecifier other = (GitRevSpecifier) obj;
 		if (other.parameters.size() != parameters.size())
 			return false;
@@ -91,7 +85,7 @@ public class GitRevSpecifier
 		}
 		return true;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

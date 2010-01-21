@@ -27,6 +27,7 @@ public class Messages extends NLS
 	public static String PullAction_RefreshJob_Title;
 	public static String RevertAction_Label;
 	public static String RevertAction_RefreshJob_Title;
+	public static String SwitchBranchAction_BranchSwitch_Msg;
 	static
 	{
 		// initialize resource bundle

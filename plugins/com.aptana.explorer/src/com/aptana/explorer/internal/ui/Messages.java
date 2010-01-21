@@ -30,18 +30,16 @@ public class Messages extends NLS
 	public static String GitProjectView_ShowGitHubNetworkJobTitle;
 	public static String GitProjectView_StashJobTitle;
 	public static String GitProjectView_StashTooltip;
-
 	public static String GitProjectView_SwitchToBranch;
 	public static String GitProjectView_UnresolvedMerges_msg;
 	public static String GitProjectView_UnstashJobTitle;
 	public static String GitProjectView_UnstashTooltip;
 
 	public static String SingleProjectView_CaseSensitive;
-
+	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
-
+	public static String SingleProjectView_Wildcard;
 	public static String SingleProjectView_RegularExpression;
-
 	public static String SingleProjectView_SwitchToApplication;
 	static
 	{

@@ -1,31 +1,43 @@
 require "java"
+require "radrails/base_element"
+require "radrails/key_binding"
 require "radrails/scope_selector"
+require "pathname"
 
 module RadRails
   
-  class Command
+  class Command < BaseElement
     def initialize(name)
-      @jobj = create_java_object
-      @jobj.display_name = name;
-      
-      bundle = BundleManager.bundle_from_path(path)
-      bundle.apply_defaults(self) unless bundle.nil?
-    end
-    
-    def display_name
-      @jobj.display_name
-    end
-    
-    def display_name=(display_name)
-      @jobj.display_name = display_name
+      if name.kind_of? String
+        super(name)
+        
+        @key_binding = KeyBinding.new(java_object)
+        bundle = BundleManager.bundle_from_path(path)
+        bundle.apply_defaults(self) unless bundle.nil?
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def input
-     @jobj.input 
+     @jobj.input
     end
     
     def input=(input)
-      @jobj.input_type = input.to_s
+      return if input.nil?
+      
+      case input
+      when Array
+        @jobj.input_type = input.map { |element| element.to_s }.to_java(:String)
+      when Symbol
+        @jobj.input_type = input.to_s
+      else
+        bundle = BundleManager.bundle_from_path(path)
+        base_path = Pathname.new(File.dirname(bundle.path))
+        @jobj.input_type = "input_from_file"
+        @jobj.input_path = (base_path + Pathname.new(input.to_s)).to_s
+      end
     end
     
     def invoke(&block)
@@ -40,17 +52,12 @@ module RadRails
       @jobj.invoke = invoke
     end
     
-    def java_object
-      @jobj
-    end
-    
     def key_binding
-      @jobj.key_binding
+      @key_binding
     end
     
     def key_binding=(key_binding)
-      as_strings = key_binding.map {|x| x.to_s }
-      @jobj.key_binding = as_strings.join(" ")
+      @key_binding[:all] = key_binding
     end
     
     def output
@@ -58,16 +65,20 @@ module RadRails
     end
     
     def output=(output)
+      return if output.nil?
+      
       if output.kind_of? Symbol
         @jobj.output_type = output.to_s
       else
+        bundle = BundleManager.bundle_from_path(path)
+        base_path = Pathname.new(File.dirname(bundle.path))
         @jobj.output_type = "output_to_file"
-        @jobj.output_path = output.to_s
+        @jobj.output_path = (base_path + Pathname.new(output.to_s)).to_s
       end
     end
     
-    def path
-      @jobj.path
+    def owning_bundle
+      @jobj.owning_bundle
     end
     
     def scope
@@ -91,6 +102,13 @@ module RadRails
       @jobj.working_directory
     end
 
+    def to_env
+      {
+        :TM_COMMAND_NAME => display_name,
+        :TM_COMMAND_PATH => path
+      }
+    end
+    
     def to_s
       <<-EOS
       command(
@@ -110,7 +128,7 @@ module RadRails
     end
     
     def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger;
+      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
     end
     
     class << self
@@ -133,4 +151,10 @@ module RadRails
     end
   end
   
+end
+
+# define top-level convenience methods
+
+def command(name, &block)
+  RadRails::Command.define_command(name, &block)
 end

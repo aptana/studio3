@@ -57,6 +57,6 @@ public class CommonHoverRegion implements IRegion {
 
     @Override
     public int getOffset() {
-        return fLexeme == null ? 0 : fLexeme.getOffset();
+        return fLexeme == null ? 0 : fLexeme.getStartingOffset();
     }
 }

@@ -5,9 +5,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
@@ -18,10 +16,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.actions.MenuAction;
-import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
 public class DeleteBranchAction extends MenuAction
@@ -52,7 +48,7 @@ public class DeleteBranchAction extends MenuAction
 				public void widgetSelected(SelectionEvent e)
 				{
 					// what to do when menu is subsequently selected.
-					repo.switchBranch(branchName);
+					deleteBranch(repo, branchName);
 				}
 			});
 		}
@@ -81,17 +77,9 @@ public class DeleteBranchAction extends MenuAction
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "branch", //$NON-NLS-1$
-						"-d", branchName); //$NON-NLS-1$
-				while (!launch.isTerminated())
-				{
-					Thread.yield();
-				}
-				// FIXME Need to somehow trigger an event so app explorer rebuilds branch list. We really should be
-				// deleting branch through model, but we want the launch to go to the console because it may report
-				// failure.
-				repo.index().refresh();
-				return Status.OK_STATUS;
+				// TODO Handle failure in a different way than whatever the job does?
+				// TODO If code == 1 and the error says run with -D, then pop up a scary dialog asking user if they really want to force it and if so then run with -D
+				return repo.deleteBranch(branchName);
 			}
 		};
 		job.setUser(true);

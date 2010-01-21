@@ -6,7 +6,12 @@ module RadRails
   
   class Snippet < Command
     def initialize(name)
-      super(name)
+      if name.kind_of? String
+        super(name)
+      else
+        # hack to pass in java object...should test type
+        @jobj = name
+      end
     end
     
     def expansion
@@ -15,6 +20,13 @@ module RadRails
     
     def expansion=(expansion)
       @jobj.expansion = expansion
+    end
+    
+    def to_env
+      {
+        :TM_SNIPPET_NAME => display_name,
+        :TM_SNIPPET_PATH => path
+      }
     end
     
     def to_s
@@ -51,4 +63,10 @@ module RadRails
     
   end
   
+end
+
+# define top-level convenience methods
+
+def snippet(name, &block)
+  RadRails::Snippet.define_snippet(name, &block)
 end

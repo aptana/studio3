@@ -18,7 +18,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
@@ -100,13 +102,16 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Activating shell scheme");
-
 					try
 					{
 						BindingService bindingService = (BindingService) _serviceLocator
 								.getService(IBindingService.class);
 						Scheme currentScheme = bindingService.getActiveScheme();
+						if (currentScheme.getId().equals(SHELL_KEY_BINDING_SCHEME))
+							return;
+
+						Activator.trace("Activating shell scheme"); //$NON-NLS-1$
+
 						Scheme scheme = bindingService.getScheme(SHELL_KEY_BINDING_SCHEME);
 
 						// NOTE: During debugging I saw two activation events in a row with no
@@ -117,7 +122,7 @@ public class TerminalBrowser
 						{
 							oldScheme = currentScheme;
 						}
-						// FIXME This getBidningManager method doesn't exist in 3.4!
+						// FIXME This getBindingManager method doesn't exist in 3.4!
 						bindingService.getBindingManager().setActiveScheme(scheme);
 					}
 					catch (NotDefinedException e)
@@ -139,7 +144,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Shell brought to top");
+					Activator.trace("Shell brought to top"); //$NON-NLS-1$
 				}
 			}
 
@@ -159,7 +164,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Deactivating shell scheme");
+					Activator.trace("Deactivating shell scheme"); //$NON-NLS-1$
 
 					try
 					{
@@ -190,7 +195,7 @@ public class TerminalBrowser
 			{
 				if (part == TerminalBrowser.this._owningPart)
 				{
-					// System.out.println("Shell opened");
+					Activator.trace("Shell opened"); //$NON-NLS-1$
 				}
 			}
 		});
@@ -205,18 +210,25 @@ public class TerminalBrowser
 					return;
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					Display.getCurrent().syncExec(new Runnable()
-					{
+					IWorkbench workbench = PlatformUI.getWorkbench();
 
-						@Override
-						public void run()
+					if (workbench != null)
+					{
+						Display display = workbench.getDisplay();
+
+						display.syncExec(new Runnable()
 						{
-							final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
-									+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
-									+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
-							_browser.execute(reloadCSSScript);
-						}
-					});
+
+							@Override
+							public void run()
+							{
+								final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
+										+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
+										+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
+								_browser.execute(reloadCSSScript);
+							}
+						});
+					}
 				}
 			}
 		};

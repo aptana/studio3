@@ -84,7 +84,8 @@ module RadRails
         end
         dialog.text = options[:title] || "Select File"
         dialog.filter_path = options[:directory] if options[:directory]
-        dialog.open        
+        dialog.open
+        # FIXME Handle when block is given
       end
       
       # show a standard open file dialog, allowing multiple selections
@@ -105,6 +106,7 @@ module RadRails
         dialog.text = options[:title] || "Select File(s)"
         dialog.filter_path = options[:directory] if options[:directory]
         dialog.open
+        # FIXME Handle when block is given
       end
       
       # Post a confirmation alert
@@ -126,6 +128,48 @@ module RadRails
         else
           block_given? ? raise(SystemExit) : false
         end
+      end
+      
+      # Request an item from a list of items
+      def request_item(options = Hash.new,&block)
+        items = options[:items] || []
+        case items.size
+        when 0 then block_given? ? raise(SystemExit) : nil
+        when 1 then block_given? ? yield(items[0]) : items[0]
+        else
+          params = default_buttons(options)
+          params["title"] = options[:title] || "Select item:"
+          params["prompt"] = options[:prompt] || ""
+          params["string"] = options[:default] || ""
+          params["items"] = items
+
+          dialog = org.eclipse.ui.dialogs.ListDialog.new(shell)
+          dialog.content_provider = org.eclipse.jface.viewers.ArrayContentProvider.new
+          dialog.label_provider = org.eclipse.jface.viewers.LabelProvider.new
+          dialog.input = items
+          dialog.message = params["prompt"]
+          dialog.setInitialSelections([params["string"]].to_java(:object))
+          dialog.title = params["title"]
+          
+          return_value = nil
+          return_value = dialog.result[0].to_s if dialog.open == org.eclipse.jface.window.Window::OK
+
+          if return_value == nil then
+            block_given? ? raise(SystemExit) : nil
+          else
+            block_given? ? yield(return_value) : return_value
+          end
+        end
+      end
+      
+      # request a single, simple string
+      def request_string(options = Hash.new,&block)
+        request_string_core('Enter string:', false, options, &block)
+      end
+      
+      # request a password or other text which should be obscured from view
+      def request_secure_string(options = Hash.new,&block)
+        request_string_core('Enter password:', true, options, &block)
       end
       
       # Show Tooltip using current cursor location. +content+ is shown as bold text at tp of tooltip.
@@ -190,15 +234,63 @@ module RadRails
         active_window.active_page if active_window
       end
       
+      # Executes a block inline if we're already in the UI thread or in a UIJob if we're not. if run in a job, we run synchronously by joining the thread.
+      def run(title, &blk)
+        if in_ui_thread?
+          blk.call(org.eclipse.core.runtime.NullProgressMonitor.new)
+        else
+          job = UIJob.new(title, &blk)
+          job.schedule
+          job.join
+        end
+      end
+      
       private
+      # Used to request a secure string
+      class PasswordInputDialog < org.eclipse.jface.dialogs.InputDialog
+        def getInputTextStyle
+          org.eclipse.swt.SWT::SINGLE | org.eclipse.swt.SWT::BORDER | org.eclipse.swt.SWT::PASSWORD
+        end
+      end
+      
+      # common to request_string, request_secure_string
+      def request_string_core(default_prompt, secure, options, &block)
+        params = default_buttons(options)
+        params["title"] = options[:title] || default_prompt
+        params["prompt"] = options[:prompt] || ""
+        params["string"] = options[:default] || ""
+
+        klass = secure ? PasswordInputDialog : org.eclipse.jface.dialogs.InputDialog
+        # FIXME Need to support button\d options and build buttons dynamically!
+        dialog = klass.new(shell, params["title"], params["prompt"], params["string"], nil)
+        return_value = nil
+        return_value = dialog.value if dialog.open == org.eclipse.jface.window.Window::OK
+        
+        if return_value == nil
+          block_given? ? raise(SystemExit) : nil
+        else
+          block_given? ? yield(return_value) : return_value
+        end
+      end
+      
+      def default_buttons(user_options = Hash.new)
+        options = Hash.new
+        options['button1'] = user_options[:button1] || "OK"
+        options['button2'] = user_options[:button2] || "Cancel"
+        options
+      end
+
+      def in_ui_thread?
+        !display.nil?
+      end
+      
       def display
         org.eclipse.swt.widgets.Display.current || org.eclipse.swt.widgets.Display.default
       end
-      
+          
       def shell
         display.active_shell || org.eclipse.swt.widgets.Shell.new(display)
       end
     end
   end
 end
-  

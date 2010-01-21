@@ -1,21 +1,20 @@
 require "java"
+require "radrails/base_element"
 require "radrails/bundle_manager"
 
 module RadRails
   
-  class Bundle
+  class Bundle < BaseElement
     @@defaults = {}
     
     def initialize(name, default_values={})
       if name.kind_of? String
-        @jobj = com.aptana.scripting.model.BundleElement.new($fullpath)
-        @jobj.display_name = name
+        super(name)
         @@defaults[path.to_sym] = default_values
       else
         # hack to pass in java object...should test type
         @jobj = name
       end
-      
     end
     
     def add_command(command)
@@ -86,16 +85,12 @@ module RadRails
       @jobj.display_name = name
     end
     
-    def git_repo
-      @jobj.git_repo
+    def repository
+      @jobj.repository
     end
     
-    def git_repo=(git_repo)
-      @jobj.git_repo = git_repo
-    end
-    
-    def java_object
-      @jobj
+    def repository=(repository)
+      @jobj.repository = repository
     end
     
     def license
@@ -114,8 +109,8 @@ module RadRails
       @jobj.license_url = license_url.join("\n")
     end
     
-    def path
-      @jobj.path
+    def to_env
+      { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib") }
     end
     
     def to_s
@@ -137,6 +132,38 @@ module RadRails
         block.call(bundle) if block_given?
       end
     end
+  
+  private
+    
+    def create_java_object
+      com.aptana.scripting.model.BundleElement.new($fullpath)
+    end
   end
   
+end
+
+# define top-level convenience methods
+
+def bundle(name, &block)
+  RadRails::Bundle.define_bundle(name, {}, &block)
+end
+
+def with_defaults(values, &block)
+  bundle = RadRails::BundleManager.bundle_from_path(File.dirname($fullpath))
+  
+  if bundle.nil?
+    bundle = RadRails::Bundle.define_bundle("", values, &block)
+  else
+    bundle.defaults = values
+    block.call(bundle) if block_given?
+    bundle.defaults = {}
+  end
+end
+
+module RadRails
+  class << self
+    def current_bundle(&block)
+      with_defaults({}, &block)
+    end
+  end
 end

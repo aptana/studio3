@@ -50,5 +50,10 @@ public interface ILexeme {
     /**
      * @return the starting offset of this lexeme
      */
-    public int getOffset();
+    public int getStartingOffset();
+
+    /**
+     * @return the ending offset of this lexeme
+     */
+    public int getEndingOffset();
 }

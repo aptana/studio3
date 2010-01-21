@@ -6,14 +6,14 @@ import java.util.List;
 
 public class BundleElement extends AbstractElement
 {
-	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rr-bundle"; //$NON-NLS-1$
+	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rrbundle"; //$NON-NLS-1$
 	
 	private String _author;
 	private String _copyright;
 	private String _description;
 	private String _license;
 	private String _licenseUrl;
-	private String _gitRepo;
+	private String _repository;
 	
 	private File _bundleDirectory;
 	private BundleScope _bundleScope;
@@ -214,7 +214,7 @@ public class BundleElement extends AbstractElement
 			
 			if (path != null && path.length() > 0)
 			{
-				File file = new File(path);
+				File file = new File(path).getParentFile();
 				
 				result = file.getName();
 				
@@ -229,13 +229,21 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
+	 * getElementName
+	 */
+	protected String getElementName()
+	{
+		return "bundle"; //$NON-NLS-1$
+	}
+
+	/**
 	 * getGitRepo
 	 * 
 	 * @return
 	 */
-	public String getGitRepo()
+	public String getRepository()
 	{
-		return this._gitRepo;
+		return this._repository;
 	}
 
 	/**
@@ -286,6 +294,16 @@ public class BundleElement extends AbstractElement
 	}
 	
 	/**
+	 * hasMenus
+	 * 
+	 * @return
+	 */
+	public boolean hasMenus()
+	{
+		return this._menus != null && this._menus.size() > 0;
+	}
+	
+	/**
 	 * hasMetadata
 	 * 
 	 * @return
@@ -299,16 +317,6 @@ public class BundleElement extends AbstractElement
 			this._license != null ||
 			this._licenseUrl != null
 		);
-	}
-	
-	/**
-	 * hasMenus
-	 * 
-	 * @return
-	 */
-	public boolean hasMenus()
-	{
-		return this._menus != null && this._menus.size() > 0;
 	}
 	
 	/**
@@ -335,6 +343,39 @@ public class BundleElement extends AbstractElement
 		return displayName != null && displayName.length() > 0;
 	}
 
+	/**
+	 * printBody
+	 * 
+	 * @return
+	 */
+	public void printBody(SourcePrinter printer)
+	{
+		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
+		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
+		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
+		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
+		
+		// output commands
+		if (this._commands != null)
+		{
+			for (CommandElement command : this._commands)
+			{
+				command.toSource(printer);
+			}
+		}
+		
+		// output menus
+		if (this._menus != null)
+		{
+			for (MenuElement menu : this._menus)
+			{
+				menu.toSource(printer);
+			}
+		}
+	}
+	
 	/**
 	 * removeCommand
 	 * 
@@ -385,7 +426,7 @@ public class BundleElement extends AbstractElement
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
 	}
-	
+
 	/**
 	 * setAuthor
 	 * 
@@ -395,7 +436,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._author = author;
 	}
-
+	
 	/**
 	 * setCopyright
 	 * 
@@ -405,7 +446,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._copyright = copyright;
 	}
-	
+
 	/**
 	 * setDescription
 	 * 
@@ -421,9 +462,9 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param gitRepo
 	 */
-	public void setGitRepo(String gitRepo)
+	public void setRepository(String gitRepo)
 	{
-		this._gitRepo = gitRepo;
+		this._repository = gitRepo;
 	}
 
 	/**
@@ -435,7 +476,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._license = license;
 	}
-
+	
 	/**
 	 * setLicenseUrl
 	 * 
@@ -444,45 +485,5 @@ public class BundleElement extends AbstractElement
 	public void setLicenseUrl(String licenseUrl)
 	{
 		this._licenseUrl = licenseUrl;
-	}
-	
-	/**
-	 * toSource
-	 * 
-	 * @return
-	 */
-	public void toSource(SourcePrinter printer)
-	{
-		// open bundle
-		printer.printWithIndent("bundle \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		// show body
-		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
-		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
-		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
-		printer.printWithIndent("git: ").println(this._gitRepo); //$NON-NLS-1$
-		
-		// output commands
-		if (this._commands != null)
-		{
-			for (CommandElement command : this._commands)
-			{
-				command.toSource(printer);
-			}
-		}
-		
-		// output menus
-		if (this._menus != null)
-		{
-			for (MenuElement menu : this._menus)
-			{
-				menu.toSource(printer);
-			}
-		}
-		
-		// close bundle
-		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
 }

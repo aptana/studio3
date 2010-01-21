@@ -61,5 +61,13 @@
          </view>
       </perspectiveExtension>
    </extension>
+   <extension
+         point="com.aptana.scripting.loadPaths">
+      <loadPath
+            id="terminal"
+            name="terminal"
+            path="scripting">
+      </loadPath>
+   </extension>
 
 </plugin>

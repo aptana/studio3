@@ -31,10 +31,12 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.scripting.model.TriggerOnlyFilter;
+import com.aptana.scripting.model.HasTriggerFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
@@ -83,8 +85,8 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	protected Template[] getTemplates(String contextTypeId)
 	{
 		List<Template> templatesList = new LinkedList<Template>();
-		CommandElement[] commandsFromScope =
-			BundleManager.getInstance().getCommandsFromScope(contextTypeId, new TriggerOnlyFilter());
+		AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
+		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 		for (CommandElement commandElement : commandsFromScope) {
 			String[] triggers = commandElement.getTriggers();
 			if (triggers != null) {
@@ -114,8 +116,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	static String processExpansion(String expansion)
 	{
 		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$		
+		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
 		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
+		// Turn \$ into $$
+		expansion = expansion.replaceAll(Pattern.quote("\\$"), Matcher.quoteReplacement("$$")); //$NON-NLS-1$  //$NON-NLS-2$
 		// turn empty tab stops into something eclipse can handle
 		expansion = expansion.replaceAll("\\$(\\d)", "\\${value$1:$1('')}"); //$NON-NLS-1$  //$NON-NLS-2$
 		// transform ${n:value1/value2/value3} to ${choices:n('value1',value2','value3)} where n is a digit
@@ -174,6 +178,43 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, offset);
+
+		// We now check if there is only one proposal that
+		// matches exactly with the prefix the user has typed
+		String extractPrefix = extractPrefix(viewer, offset);
+		int exactPrefixMatches = 0;
+		int exactPrefixMatchIndex = -1;
+		for (int i = 0; i < completionProposals.length; i++)
+		{
+			SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
+			Template template = snippetTemplateProposal.getTemplateSuper();
+			if (template instanceof SnippetTemplate)
+			{
+				SnippetTemplate snippetTemplate = (SnippetTemplate) template;
+				if (snippetTemplate.exactMatches(extractPrefix))
+				{
+					exactPrefixMatches++;
+					exactPrefixMatchIndex = i;
+				}
+			}
+			else if (template instanceof CommandTemplate)
+			{
+				CommandTemplate commandTemplate = (CommandTemplate) template;
+				if (commandTemplate.exactMatches(extractPrefix))
+				{
+					exactPrefixMatches++;
+					exactPrefixMatchIndex = i;
+				}
+			}
+		}
+
+		// There is only one proposal that matches the prefix exactly
+		// So we just return it
+		if (exactPrefixMatches == 1)
+		{
+			return new ICompletionProposal[] {completionProposals[exactPrefixMatchIndex]};
+		}
+
 		for (int i = 0; i < completionProposals.length; i++)
 		{
 			if (completionProposals[i] instanceof SnippetTemplateProposal)
@@ -252,11 +293,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 
 	public static void insertAsTemplate(ITextViewer textViewer, final int caretOffset, String templateText)
 	{
-		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
-		Template template = new SnippetTemplate("", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				SnippetsCompletionProcessor.processExpansion(templateText));
 		IRegion region = new IRegion()
 		{
 			public int getOffset()
@@ -269,11 +305,21 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				return 0;
 			}
 		};
+		insertAsTemplate(textViewer, region, templateText);
+	}
+	
+	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText)
+	{
+		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
+		Template template = new SnippetTemplate("", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				"", //$NON-NLS-1$
+				SnippetsCompletionProcessor.processExpansion(templateText));
 		TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
 		SnippetTemplateProposal completionProposal = (SnippetTemplateProposal) snippetsCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
-		completionProposal.apply(textViewer, '0', SWT.NONE, caretOffset);
+		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
 	}
 
 	private static class CustomStyler extends Styler
