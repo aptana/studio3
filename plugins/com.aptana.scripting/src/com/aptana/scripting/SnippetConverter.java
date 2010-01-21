@@ -1,17 +1,15 @@
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.xml.sax.InputSource;
-
-import plistreader.AbstractReader;
-import plistreader.PlistFactory;
 import plistreader.PlistProperties;
 
 public class SnippetConverter
@@ -24,77 +22,51 @@ public class SnippetConverter
 	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception
 	{
+		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			String userHome = System.getProperty("user.home");
 			args = new String[] { userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets" };
 		}
-		for (String path : args)
+		String outputFilePath;
+		if (args.length < 2)
 		{
-			List<String> snippets = convert(new File(path));
-			Writer writer = null;
-			try
-			{
-				File outFile = new File(path, "snippets.rb");
-				writer = new FileWriter(outFile);
-				for (String snippet : snippets)
-				{
-					writer.write(snippet);
-					writer.write("\n");
-				}
-			}
-			finally
-			{
-				writer.close();
-			}
+			outputFilePath = userHome + "/Documents/RadRails Bundles/rails-rrbundle/Snippets/snippets.rb";
 		}
+		else
+		{
+			outputFilePath = args[1];
+		}
+		convert(new File(args[0]), outputFilePath);
 	}
 
 	@SuppressWarnings("nls")
 	private static List<String> convert(File snippetDirectory)
 	{
 		List<String> snippets = new ArrayList<String>();
-		File[] plistFiles = snippetDirectory.listFiles(new FilenameFilter()
-		{
-			public boolean accept(File dir, String name)
-			{
-				return name.endsWith("plist") || name.endsWith("tmSnippet");
-			}
-		});
+		File[] plistFiles = findSnippetFiles(snippetDirectory);
 		if (plistFiles == null)
 			return snippets;
 		for (File plistFile : plistFiles)
 		{
 			try
 			{
-				ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile
-						.getAbsolutePath());
-				Process p = builder.start();
-				int exitCode = p.waitFor();
-				if (exitCode != 0)
-				{
-					System.err.println("Bad exit code for conversion: " + exitCode + ", for file: " + plistFile.getAbsolutePath());
-					continue;
-				}
-				AbstractReader reader = PlistFactory.createReader();
-				reader.setSource(new InputSource(new FileInputStream(plistFile)));
-				PlistProperties properties = reader.parse();
+				PlistProperties properties = BundleConverter.parse(plistFile);
 
-				String name = sanitize(properties, "name");
+				String name = BundleConverter.sanitize(properties, "name");
 				StringBuilder buffer = new StringBuilder();
-				buffer.append("snippet '").append(name).append("' do |s|\n");				
-				String trigger = sanitize(properties, "tabTrigger");
+				buffer.append("snippet '").append(name).append("' do |s|\n");
+				String trigger = BundleConverter.sanitize(properties, "tabTrigger");
 				if (trigger != null)
 				{
-				buffer.append("  s.trigger = '").append(trigger).append("'\n");
+					buffer.append("  s.trigger = '").append(trigger).append("'\n");
 				}
 				else
 				{
 					buffer.append("  # FIXME No tab trigger, probably needs to become command\n");
 				}
-				String scope = sanitize(properties, "scope");
+				String scope = BundleConverter.sanitize(properties, "scope");
 				buffer.append("  s.scope = '").append(scope).append("'\n");
-				String content = sanitize(properties, "content");
+				String content = BundleConverter.sanitize(properties, "content");
 				buffer.append("  s.expansion = '").append(content).append("'\n");
 				buffer.append("end\n\n");
 				snippets.add(buffer.toString());
@@ -108,12 +80,62 @@ public class SnippetConverter
 		return snippets;
 	}
 
-	protected static String sanitize(PlistProperties properties, String key)
+	protected static File[] findSnippetFiles(File snippetDirectory)
 	{
-		String content = (String) properties.getProperty(key);
-		if (content == null)
-			return null;
-		return content.replace("'", "\\'"); //$NON-NLS-1$ //$NON-NLS-2$
+		File[] plistFiles = snippetDirectory.listFiles(new FilenameFilter()
+		{
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith("plist") || name.endsWith("tmSnippet");
+			}
+		});
+		return plistFiles;
+	}
+
+	public static void convert(File snippetsDir, String outputFilePath) throws IOException
+	{
+		List<String> snippets = convert(snippetsDir);
+		Writer writer = null;
+		try
+		{
+			File outFile = new File(outputFilePath);
+			outFile.getParentFile().mkdirs();
+			writer = new FileWriter(outFile);
+			for (String snippet : snippets)
+			{
+				writer.write(snippet);
+				writer.write("\n"); //$NON-NLS-1$
+			}
+		}
+		finally
+		{
+			writer.close();
+		}
+	}
+
+	static Map<String, String> uuidNameMap(File snippetDirectory)
+	{
+		Map<String, String> snippets = new HashMap<String, String>();
+		File[] plistFiles = findSnippetFiles(snippetDirectory);
+		if (plistFiles == null)
+			return snippets;
+		for (File plistFile : plistFiles)
+		{
+			try
+			{
+				PlistProperties properties = BundleConverter.parse(plistFile);
+
+				String name = BundleConverter.sanitize(properties, "name");
+				String uuid = (String) properties.getProperty("uuid");
+				snippets.put(uuid, name);
+			}
+			catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return snippets;
 	}
 
 }

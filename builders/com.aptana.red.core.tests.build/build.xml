@@ -233,6 +233,10 @@
 			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
 		</antcall>
 		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.sass.tests" />
+			<param name="test.classname" value="com.aptana.editor.sass.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.git.ui.tests" />
 			<param name="test.classname" value="com.aptana.git.ui.AllTests" />
 		</antcall>
