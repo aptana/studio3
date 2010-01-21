@@ -20,7 +20,7 @@ module RadRails
       theme_manager = plugin.getThemeManager
       # TODO Merge the hash with default values for fg, bg, selection, etc.
       props = java.util.Properties.new
-      hash.each {|key, value| props.setProperty(key.to_s, value.to_s) }
+      hash.each {|key, value| props.setProperty(key.to_s.tr("_", "."), value.to_s) }
       theme = com.aptana.editor.common.theme.Theme.new(color_manager, props)
       theme_manager.addTheme(theme)
       return theme
