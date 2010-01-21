@@ -30,9 +30,6 @@ public class CommandElement extends AbstractBundleElement
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
 	
-	//private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
-	//private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	//private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private String[] _triggers;
@@ -44,6 +41,7 @@ public class CommandElement extends AbstractBundleElement
 	private OutputType _outputType;
 	private String _outputPath;
 	private boolean _async;
+	private RunType _runType;
 	
 	private String _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
@@ -255,6 +253,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getRunType
+	 * 
+	 * @return
+	 */
+	public String getRunType()
+	{
+		return this._runType.getName();
+	}
+	
+	/**
 	 * getTrigger
 	 * 
 	 * @return
@@ -298,21 +306,34 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeBlockCommand(CommandContext context)
 	{
+		// create output stream and attach to context
 		context.setOutputStream(new ByteArrayOutputStream());
 		
 		// TODO: need to include proper load path
 		ExecuteBlockJob job = new ExecuteBlockJob(this, context);
 		
-//		job.setPriority(Job.SHORT);
-//		job.schedule();
-		
-		Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
-		thread.start();
-		
 		try
 		{
-//			job.join();
-			thread.join();
+			if (this._runType == RunType.JOB)
+			{
+				job.setPriority(Job.SHORT);
+				job.schedule();
+				
+				if (this._async == false)
+				{
+					job.join();
+				}
+			}
+			else
+			{
+				Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
+				thread.start();
+				
+				if (this._async == false)
+				{
+					thread.join();
+				}
+			}
 		}
 		catch (InterruptedException e)
 		{
@@ -324,111 +345,7 @@ public class CommandElement extends AbstractBundleElement
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return job.getCommandResult();
-		
-		/*
-		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer(); 
-		Ruby runtime = container.getRuntime();
-		//Map<String, String> environment = new HashMap<String, String>();
-		boolean executedSuccessfully = true;
-		String resultText = ""; //$NON-NLS-1$
-
-		try
-		{
-			ThreadContext threadContext = runtime.getCurrentContext();
-			IRubyObject[] args = new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, context) };
-			IRubyObject rubyContext = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, CONTEXT_RUBY_CLASS, args);
-
-			// TODO: Keep track of any env vars we may have clobbered here and restore back their original values!
-			IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-			
-			if (env != null && env instanceof RubyHash)
-			{
-				Map<String, String> environment = new HashMap<String, String>();
-				RubyHash hash = (RubyHash) env;
-				populateEnvironment(context.getMap(), environment);
-				hash.putAll(environment);
-			}
-
-			// set STDOUT
-			StringWriter writer = new StringWriter();
-			container.setWriter(writer);
-			context.put(OUTPUT_PROPERTY, container.getOut());
-			
-			// do "turn off warnings" hack and set STDIN
-			boolean isVerbose = runtime.isVerbose();
-			runtime.setVerbose(runtime.getNil());
-//			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
-			container.setReader(new InputStreamReader(context.getInputStream()));
-			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-			
-			// set default output type, this may be changed by context.exit_with_message
-			context.setOutputType(this._outputType);
-			
-			// invoke the block
-			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
-			String output = writer.toString();
-
-			// process return result, if any
-			if (result != null && result.isNil() == false)
-			{
-				resultText = result.asString().asJavaString();
-			}
-			else if (output != null && output.length() > 0)
-			{
-				resultText = output;
-			}
-		}
-		catch (RaiseException e)
-		{
-			if ((e.getException() instanceof RubySystemExit) && context.isForcedExit())
-			{
-				// should be from the exit call in exit_with_message
-				resultText = context.get(OUTPUT_PROPERTY).toString();
-			}
-			else
-			{
-				String message = MessageFormat.format(
-					Messages.CommandElement_Error_Processing_Command_Block,
-					new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-				);
-				
-				ScriptUtils.logErrorWithStackTrace(message, e);
-				executedSuccessfully = false;
-			}
-		}
-		catch (Exception e)
-		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Error_Processing_Command_Block,
-				new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() }
-			);
-			
-			ScriptUtils.logErrorWithStackTrace(message, e);
-			executedSuccessfully = false;
-		}
-		
-		// Now clear the environment
-		IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-		
-		if (env != null && env instanceof RubyHash)
-		{
-			RubyHash hash = (RubyHash) env;
-			
-			for (String key : environment.keySet())
-			{
-				hash.remove(key);
-			}
-		}
-
-		CommandResult result = new CommandResult();
-		result.setOutputString(resultText);
-		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
-
-		return result;
-		*/
+		return (this._async) ? null : job.getCommandResult();
 	}
 
 	/**
@@ -923,6 +840,26 @@ public class CommandElement extends AbstractBundleElement
 		this._outputType = OutputType.get(output);
 	}
 
+	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(String type)
+	{
+		this._runType = RunType.get(type);
+	}
+	
+	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(RunType type)
+	{
+		this._runType = type;
+	}
+	
 	/**
 	 * setTrigger
 	 * 
