@@ -469,7 +469,18 @@ public class CommandExecutionUtils
 				replaceDocument(textWidget, commandResult);
 				break;
 			case INSERT_AS_TEXT:
-				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
+				int offsetToInsert = caretOffset;
+				if (commandResult.getInputType() == InputType.SELECTION)
+				{
+					IRegion region = getSelectedRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					IRegion region = getCurrentLineRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				textWidget.replaceTextRange(offsetToInsert, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
 				IRegion region = new Region(caretOffset, 0);
