@@ -54,4 +54,11 @@
             class="com.aptana.scripting.ui.EarlyStartup">
       </startup>
    </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.scripting.ui.StreamContextContributor"
+            name="RadRails Stream Contributor">
+      </contributor>
+   </extension>
 </plugin>
