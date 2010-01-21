@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -320,6 +321,12 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
 		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
+		
+		Point selection= completionProposal.getSelection(textViewer.getDocument());
+		if (selection != null) {
+			textViewer.setSelectedRange(selection.x, selection.y);
+			textViewer.revealRange(selection.x, selection.y);
+		}
 	}
 
 	private static class CustomStyler extends Styler
