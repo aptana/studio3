@@ -99,7 +99,14 @@ public class CommandResult
 	 */
 	public String getOutputString()
 	{
-		return this._outputString;
+		String result = this._outputString;
+		
+		if (result == null && this._outputStream != null)
+		{
+			result = this._outputStream.toString();
+		}
+		
+		return result;
 	}
 
 	/**
