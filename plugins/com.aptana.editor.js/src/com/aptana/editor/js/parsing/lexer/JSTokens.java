@@ -11,12 +11,12 @@ public class JSTokens
 	static public final short IDENTIFIER = 2;
 	static public final short LCURLY = 3;
 	static public final short LBRACKET = 4;
-	static public final short MINUS = 5;
-	static public final short PLUS = 6;
-	static public final short PLUS_PLUS = 7;
-	static public final short MINUS_MINUS = 8;
-	static public final short STRING = 9;
-	static public final short NUMBER = 10;
+	static public final short PLUS_PLUS = 5;
+	static public final short MINUS_MINUS = 6;
+	static public final short STRING = 7;
+	static public final short NUMBER = 8;
+	static public final short MINUS = 9;
+	static public final short PLUS = 10;
 	static public final short THIS = 11;
 	static public final short NEW = 12;
 	static public final short NULL = 13;
@@ -45,43 +45,43 @@ public class JSTokens
 	static public final short TRY = 36;
 	static public final short RPAREN = 37;
 	static public final short ELSE = 38;
-	static public final short LESS_LESS = 39;
-	static public final short GREATER_GREATER = 40;
-	static public final short GREATER_GREATER_GREATER = 41;
-	static public final short LESS = 42;
-	static public final short GREATER = 43;
-	static public final short LESS_EQUAL = 44;
-	static public final short GREATER_EQUAL = 45;
-	static public final short INSTANCEOF = 46;
-	static public final short IN = 47;
-	static public final short RCURLY = 48;
-	static public final short COLON = 49;
-	static public final short RBRACKET = 50;
-	static public final short EQUAL = 51;
-	static public final short CASE = 52;
-	static public final short DOT = 53;
-	static public final short STAR = 54;
-	static public final short FORWARD_SLASH = 55;
-	static public final short PERCENT = 56;
-	static public final short EQUAL_EQUAL = 57;
-	static public final short EXCLAMATION_EQUAL = 58;
-	static public final short EQUAL_EQUAL_EQUAL = 59;
-	static public final short EXCLAMATION_EQUAL_EQUAL = 60;
-	static public final short AMPERSAND = 61;
-	static public final short CARET = 62;
-	static public final short PIPE = 63;
-	static public final short AMPERSAND_AMPERSAND = 64;
-	static public final short STAR_EQUAL = 65;
-	static public final short FORWARD_SLASH_EQUAL = 66;
-	static public final short PERCENT_EQUAL = 67;
-	static public final short PLUS_EQUAL = 68;
-	static public final short MINUS_EQUAL = 69;
-	static public final short LESS_LESS_EQUAL = 70;
-	static public final short GREATER_GREATER_EQUAL = 71;
-	static public final short GREATER_GREATER_GREATER_EQUAL = 72;
-	static public final short AMPERSAND_EQUAL = 73;
-	static public final short CARET_EQUAL = 74;
-	static public final short PIPE_EQUAL = 75;
+	static public final short RCURLY = 39;
+	static public final short COLON = 40;
+	static public final short RBRACKET = 41;
+	static public final short IN = 42;
+	static public final short EQUAL = 43;
+	static public final short CASE = 44;
+	static public final short DOT = 45;
+	static public final short LESS_LESS = 46;
+	static public final short GREATER_GREATER = 47;
+	static public final short GREATER_GREATER_GREATER = 48;
+	static public final short LESS = 49;
+	static public final short GREATER = 50;
+	static public final short LESS_EQUAL = 51;
+	static public final short GREATER_EQUAL = 52;
+	static public final short INSTANCEOF = 53;
+	static public final short EQUAL_EQUAL = 54;
+	static public final short EXCLAMATION_EQUAL = 55;
+	static public final short EQUAL_EQUAL_EQUAL = 56;
+	static public final short EXCLAMATION_EQUAL_EQUAL = 57;
+	static public final short AMPERSAND = 58;
+	static public final short CARET = 59;
+	static public final short PIPE = 60;
+	static public final short AMPERSAND_AMPERSAND = 61;
+	static public final short STAR_EQUAL = 62;
+	static public final short FORWARD_SLASH_EQUAL = 63;
+	static public final short PERCENT_EQUAL = 64;
+	static public final short PLUS_EQUAL = 65;
+	static public final short MINUS_EQUAL = 66;
+	static public final short LESS_LESS_EQUAL = 67;
+	static public final short GREATER_GREATER_EQUAL = 68;
+	static public final short GREATER_GREATER_GREATER_EQUAL = 69;
+	static public final short AMPERSAND_EQUAL = 70;
+	static public final short CARET_EQUAL = 71;
+	static public final short PIPE_EQUAL = 72;
+	static public final short STAR = 73;
+	static public final short FORWARD_SLASH = 74;
+	static public final short PERCENT = 75;
 	static public final short QUESTION = 76;
 	static public final short PIPE_PIPE = 77;
 	static public final short DEFAULT = 78;
@@ -91,16 +91,16 @@ public class JSTokens
 	public static final short MULTILINE_COMMENT = 82;
 	public static final short DOC = 83;
 
-	private static final short MAXIMUM = 83;
+	private static final short MAXIMUM = 84;
 
 	@SuppressWarnings("nls")
-	private static final String[] NAMES = { "EOF", "(", "IDENTIFIER", "{", "[", "-", "+", "++", "--", "STRING",
-			"NUMBER", "this", "new", "null", "true", "false", "REGEX", "delete", "!", "~", "typeof", "void",
-			"function", ";", ",", "var", "while", "for", "do", "if", "continue", "break", "with", "switch", "return",
-			"throw", "try", ")", "else", "<<", ">>", ">>>", "<", ">", "<=", ">=", "instanceof", "in", "}", ":", "]",
-			"=", "case", ".", "*", "/", "%", "==", "!=", "===", "!==", "&", "^", "|", "&&", "*=", "/=", "%=", "+=",
-			"-=", "<<=", ">>=", ">>>=", "&=", "^=", "|=", "?", "||", "default", "finally", "catch",
-			"SINGLELINE_COMMENT", "MULTILINE_COMMENT", "DOC" };
+	private static final String[] NAMES = { "EOF", "(", "IDENTIFIER", "{", "[", "++", "--", "STRING", "NUMBER", "-",
+			"+", "this", "new", "null", "true", "false", "REGEX", "delete", "!", "~", "typeof", "void", "function",
+			";", ",", "var", "while", "for", "do", "if", "continue", "break", "with", "switch", "return", "throw",
+			"try", ")", "else", "}", ":", "]", "in", "=", "case", ".", "<<", ">>", ">>>", "<", ">", "<=", ">=",
+			"instanceof", "==", "!=", "===", "!==", "&", "^", "|", "&&", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=",
+			">>>=", "&=", "^=", "|=", "*", "/", "%", "?", "||", "default", "finally", "catch", "SINGLELINE_COMMENT",
+			"MULTILINE_COMMENT", "DOC", };
 	private static final String NAME_UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
 	private static Map<String, Short> nameIndexMap;

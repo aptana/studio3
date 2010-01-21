@@ -1,7 +1,7 @@
 %package "com.aptana.editor.js.parsing";
 %class "JSParser";
 %import "com.aptana.editor.js.parsing.ast.*";
-%import "com.aptana.editor.js.parsing.lexer.JSTokens";
+%import "com.aptana.parsing.ast.ParseRootNode";
 
 %terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX;
 %terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
@@ -12,11 +12,15 @@
 %terminals EQUAL, STAR_EQUAL, FORWARD_SLASH_EQUAL, PERCENT_EQUAL, PLUS_EQUAL, MINUS_EQUAL, LESS_LESS_EQUAL, GREATER_GREATER_EQUAL, GREATER_GREATER_GREATER_EQUAL, AMPERSAND_EQUAL, CARET_EQUAL, PIPE_EQUAL;
 
 %typeof NUMBER, STRING, REGEX, IDENTIFIER = "String";
+%typeof AssignmentOperator, AdditiveOperator, MultiplicativeOperator, UnaryOperator, RelationalOperator, RelationalOperator_NoIn, ShiftOperator, EqualityOperator = "String";
+%typeof AssignmentExpression, AssignmentExpression_NoIn, LeftHandSideExpression, LeftHandSideExpression_NoLBF = "JSNode";
+%typeof AdditiveExpression, AdditiveExpression_NoLBF, MultiplicativeExpression, RelationalExpression, RelationalExpression_NoIn, RelationalExpression_NoLBF = "JSNode";
+%typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
 
 %goal Program;
 
 Program
-	=	SourceElements
+	=	SourceElements.p {:return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());:}
 	;
 
 SourceElements
@@ -56,7 +60,7 @@ FunctionBody
 Statement
 	=	Block
 	|	VAR VariableDeclarationList SEMICOLON
-	|	Expression_NoLBF SEMICOLON
+	|	Expression_NoLBF.e SEMICOLON {:((JSNode) e).setSemicolonIncluded(true); return e;:}
 	|	IfStatement
 	|	IterationStatement
 	|	ContinueStatement
@@ -67,14 +71,14 @@ Statement
 	|	SwitchStatement
 	|	ThrowStatement
 	|	TryStatement
-	|	SEMICOLON
-	|	error {:return new JSErrorStatementNode();:}
+	|	SEMICOLON.s {:return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd(), true);:}
+	|	error.e {:return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());:}
 	;
 
 Statement_NoIf
 	=	Block
 	|	VAR VariableDeclarationList SEMICOLON
-	|	Expression_NoLBF SEMICOLON
+	|	Expression_NoLBF.e SEMICOLON {:((JSNode) e).setSemicolonIncluded(true); return e;:}
 	|	IfStatement_NoIf
 	|	IterationStatement_NoIf
 	|	ContinueStatement
@@ -85,12 +89,12 @@ Statement_NoIf
 	|	SwitchStatement
 	|	ThrowStatement
 	|	TryStatement
-	|	SEMICOLON
-	|	error {:return new JSErrorStatementNode();:}
+	|	SEMICOLON.s {:return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd());:}
+	|	error.e {:return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());:}
 	;
 
 Block
-	=	LCURLY RCURLY
+	=	LCURLY.l RCURLY.r {:return new JSNaryNode(JSNodeTypes.STATEMENT, l.getStart(), r.getEnd());:}
 	|	LCURLY StatementList RCURLY
 	;
 
@@ -168,12 +172,12 @@ IterationStatement_NoIf
 
 ContinueStatement
 	=	CONTINUE.c SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.CONTINUE, c.getStart(), s.getEnd());
+			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	CONTINUE.c IDENTIFIER.i SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.CONTINUE, i, c.getStart(), s.getEnd());
+			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -181,12 +185,12 @@ ContinueStatement
 
 BreakStatement
 	=	BREAK.b SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.BREAK, b.getStart(), s.getEnd());
+			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
 	|	BREAK.b IDENTIFIER.i SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSTokens.BREAK, i, b.getStart(), s.getEnd());
+			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());
 			node.setSemicolonIncluded(true);
 			return node;
 		:}
@@ -265,8 +269,8 @@ PrimaryExpression
 	;
 
 PrimaryExpression_NoLBF
-	=	THIS.t {:return new JSPrimitiveNode(JSTokens.THIS, t.getStart(), t.getEnd());:}
-	|	IDENTIFIER.t {:return new JSPrimitiveNode(t, _symbol_t.getStart(), _symbol_t.getEnd());:}
+	=	THIS.t {:return new JSPrimitiveNode(JSNodeTypes.THIS, t.value.toString(), t.getStart(), t.getEnd());:}
+	|	IDENTIFIER.t {:return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());:}
 	|	Literal
 	|	ArrayLiteral
 	|	LPAREN Expression RPAREN
@@ -369,138 +373,141 @@ LeftHandSideExpression_NoLBF
 
 PostfixExpression
 	=	LeftHandSideExpression
-	|	LeftHandSideExpression PLUS_PLUS
-	|	LeftHandSideExpression MINUS_MINUS
+	|	LeftHandSideExpression PostfixOperator
 	;
 
 PostfixExpression_NoLBF
 	=	LeftHandSideExpression_NoLBF
-	|	LeftHandSideExpression_NoLBF PLUS_PLUS
-	|	LeftHandSideExpression_NoLBF MINUS_MINUS
+	|	LeftHandSideExpression_NoLBF PostfixOperator
+	;
+
+PostfixOperator
+	=	PLUS_PLUS
+	|	MINUS_MINUS
 	;
 
 UnaryExpression
 	=	PostfixExpression
-	|	DELETE UnaryExpression
-	|	EXCLAMATION UnaryExpression
-	|	MINUS UnaryExpression
-	|	MINUS_MINUS UnaryExpression
-	|	PLUS UnaryExpression
-	|	PLUS_PLUS UnaryExpression
-	|	TILDE UnaryExpression
-	|	TYPEOF UnaryExpression
-	|	VOID UnaryExpression
+	|	UnaryOperator UnaryExpression
 	;
 
 UnaryExpression_NoLBF
 	=	PostfixExpression_NoLBF
-	|	DELETE UnaryExpression
-	|	EXCLAMATION UnaryExpression
-	|	MINUS UnaryExpression
-	|	MINUS_MINUS UnaryExpression
-	|	PLUS UnaryExpression
-	|	PLUS_PLUS UnaryExpression
-	|	TILDE UnaryExpression
-	|	TYPEOF UnaryExpression
-	|	VOID UnaryExpression
+	|	UnaryOperator UnaryExpression
+	;
+
+UnaryOperator
+	=	DELETE
+	|	EXCLAMATION
+	|	MINUS
+	|	MINUS_MINUS
+	|	PLUS
+	|	PLUS_PLUS
+	|	TILDE
+	|	TYPEOF
+	|	VOID
 	;
 
 MultiplicativeExpression
-	=	UnaryExpression
-	|	MultiplicativeExpression STAR UnaryExpression
-	|	MultiplicativeExpression FORWARD_SLASH UnaryExpression
-	|	MultiplicativeExpression PERCENT UnaryExpression
+	=	UnaryExpression.e {:return e;:}
+	|	MultiplicativeExpression MultiplicativeOperator UnaryExpression
 	;
 
 MultiplicativeExpression_NoLBF
 	=	UnaryExpression_NoLBF
-	|	MultiplicativeExpression_NoLBF STAR UnaryExpression
-	|	MultiplicativeExpression_NoLBF FORWARD_SLASH UnaryExpression
-	|	MultiplicativeExpression_NoLBF PERCENT UnaryExpression
+	|	MultiplicativeExpression_NoLBF MultiplicativeOperator UnaryExpression
+	;
+
+MultiplicativeOperator
+	=	STAR
+	|	FORWARD_SLASH
+	|	PERCENT
 	;
 
 AdditiveExpression
-	=	MultiplicativeExpression
-	|	AdditiveExpression PLUS MultiplicativeExpression
-	|	AdditiveExpression MINUS MultiplicativeExpression
+	=	MultiplicativeExpression.e {:return e;:}
+	|	AdditiveExpression.l AdditiveOperator.o MultiplicativeExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 AdditiveExpression_NoLBF
 	=	MultiplicativeExpression_NoLBF
-	|	AdditiveExpression_NoLBF PLUS MultiplicativeExpression
-	|	AdditiveExpression_NoLBF MINUS MultiplicativeExpression
+	|	AdditiveExpression_NoLBF.l AdditiveOperator.o MultiplicativeExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
+	;
+
+AdditiveOperator
+	=	PLUS
+	|	MINUS
 	;
 
 ShiftExpression
-	=	AdditiveExpression
-	|	ShiftExpression LESS_LESS AdditiveExpression
-	|	ShiftExpression GREATER_GREATER AdditiveExpression
-	|	ShiftExpression GREATER_GREATER_GREATER AdditiveExpression
+	=	AdditiveExpression.e {:return e;:}
+	|	ShiftExpression.l ShiftOperator.o AdditiveExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 ShiftExpression_NoLBF
 	=	AdditiveExpression_NoLBF
-	|	ShiftExpression_NoLBF LESS_LESS AdditiveExpression
-	|	ShiftExpression_NoLBF GREATER_GREATER AdditiveExpression
-	|	ShiftExpression_NoLBF GREATER_GREATER_GREATER AdditiveExpression
+	|	ShiftExpression_NoLBF.l ShiftOperator.o AdditiveExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
+	;
+
+ShiftOperator
+	=	LESS_LESS
+	|	GREATER_GREATER
+	|	GREATER_GREATER_GREATER
 	;
 
 RelationalExpression
-	=	ShiftExpression
-	|	RelationalExpression LESS ShiftExpression
-	|	RelationalExpression GREATER ShiftExpression
-	|	RelationalExpression LESS_EQUAL ShiftExpression
-	|	RelationalExpression GREATER_EQUAL ShiftExpression
-	|	RelationalExpression INSTANCEOF ShiftExpression
-	|	RelationalExpression IN ShiftExpression
+	=	ShiftExpression.e {:return e;:}
+	|	RelationalExpression.l RelationalOperator.o ShiftExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 RelationalExpression_NoLBF
 	=	ShiftExpression_NoLBF
-	|	RelationalExpression_NoLBF LESS ShiftExpression
-	|	RelationalExpression_NoLBF GREATER ShiftExpression
-	|	RelationalExpression_NoLBF LESS_EQUAL ShiftExpression
-	|	RelationalExpression_NoLBF GREATER_EQUAL ShiftExpression
-	|	RelationalExpression_NoLBF INSTANCEOF ShiftExpression
-	|	RelationalExpression_NoLBF IN ShiftExpression
+	|	RelationalExpression_NoLBF.l RelationalOperator.o ShiftExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 RelationalExpression_NoIn
 	=	ShiftExpression
-	|	RelationalExpression_NoIn LESS ShiftExpression
-	|	RelationalExpression_NoIn GREATER ShiftExpression
-	|	RelationalExpression_NoIn LESS_EQUAL ShiftExpression
-	|	RelationalExpression_NoIn GREATER_EQUAL ShiftExpression
-	|	RelationalExpression_NoIn INSTANCEOF ShiftExpression
+	|	RelationalExpression_NoIn.l RelationalOperator_NoIn.o ShiftExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
+	;
+
+RelationalOperator_NoIn
+	=	LESS
+	|	GREATER
+	|	LESS_EQUAL
+	|	GREATER_EQUAL
+	|	INSTANCEOF
+	;
+
+RelationalOperator
+	=	RelationalOperator_NoIn
+	|	IN
 	;
 
 EqualityExpression
-	=	RelationalExpression
-	|	EqualityExpression EQUAL_EQUAL RelationalExpression
-	|	EqualityExpression EXCLAMATION_EQUAL RelationalExpression
-	|	EqualityExpression EQUAL_EQUAL_EQUAL RelationalExpression
-	|	EqualityExpression EXCLAMATION_EQUAL_EQUAL RelationalExpression
+	=	RelationalExpression.e {:return e;:}
+	|	EqualityExpression.l EqualityOperator.o RelationalExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 EqualityExpression_NoLBF
 	=	RelationalExpression_NoLBF
-	|	EqualityExpression_NoLBF EQUAL_EQUAL RelationalExpression
-	|	EqualityExpression_NoLBF EXCLAMATION_EQUAL RelationalExpression
-	|	EqualityExpression_NoLBF EQUAL_EQUAL_EQUAL RelationalExpression
-	|	EqualityExpression_NoLBF EXCLAMATION_EQUAL_EQUAL RelationalExpression
+	|	EqualityExpression_NoLBF.l EqualityOperator.o RelationalExpression.r {:return new JSBinaryOperatorNode(l, o, r);:}
 	;
 
 EqualityExpression_NoIn
 	=	RelationalExpression_NoIn
-	|	EqualityExpression_NoIn EQUAL_EQUAL RelationalExpression_NoIn
-	|	EqualityExpression_NoIn EXCLAMATION_EQUAL RelationalExpression_NoIn
-	|	EqualityExpression_NoIn EQUAL_EQUAL_EQUAL RelationalExpression_NoIn
-	|	EqualityExpression_NoIn EXCLAMATION_EQUAL_EQUAL RelationalExpression_NoIn
+	|	EqualityExpression_NoIn.l EqualityOperator.o RelationalExpression_NoIn.r {:return new JSBinaryOperatorNode(l, o, r);:}
+	;
+
+EqualityOperator
+	=	EQUAL_EQUAL
+	|	EXCLAMATION_EQUAL
+	|	EQUAL_EQUAL_EQUAL
+	|	EXCLAMATION_EQUAL_EQUAL
 	;
 
 BitwiseAndExpression
 	=	BitwiseAndExpression AMPERSAND EqualityExpression
-	|	EqualityExpression
+	|	EqualityExpression.e {:return e;:}
 	;
 
 BitwiseAndExpression_NoLBF
@@ -515,7 +522,7 @@ BitwiseAndExpression_NoIn
 
 BitwiseXorExpression
 	=	BitwiseXorExpression CARET BitwiseAndExpression
-	|	BitwiseAndExpression
+	|	BitwiseAndExpression.e {:return e;:}
 	;
 
 BitwiseXorExpression_NoLBF
@@ -530,7 +537,7 @@ BitwiseXorExpression_NoIn
 
 BitwiseOrExpression
 	=	BitwiseOrExpression PIPE BitwiseXorExpression
-	|	BitwiseXorExpression
+	|	BitwiseXorExpression.e {:return e;:}
 	;
 
 BitwiseOrExpression_NoLBF
@@ -545,7 +552,7 @@ BitwiseOrExpression_NoIn
 
 LogicalAndExpression
 	=	LogicalAndExpression AMPERSAND_AMPERSAND BitwiseOrExpression
-	|	BitwiseOrExpression
+	|	BitwiseOrExpression.e {:return e;:}
 	;
 
 LogicalAndExpression_NoLBF
@@ -560,7 +567,7 @@ LogicalAndExpression_NoIn
 
 LogicalOrExpression
 	=	LogicalOrExpression PIPE_PIPE LogicalAndExpression
-	|	LogicalAndExpression
+	|	LogicalAndExpression.e {:return e;:}
 	;
 
 LogicalOrExpression_NoLBF
@@ -590,17 +597,17 @@ ConditionalExpression_NoIn
 
 AssignmentExpression
 	=	ConditionalExpression
-	|	LeftHandSideExpression AssignmentOperator AssignmentExpression
+	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r {:return new JSAssignmentNode(l, o, r);:}
 	;
 
 AssignmentExpression_NoLBF
 	=	ConditionalExpression_NoLBF
-	|	LeftHandSideExpression_NoLBF AssignmentOperator AssignmentExpression
+	|	LeftHandSideExpression_NoLBF.l AssignmentOperator.o AssignmentExpression.r {:return new JSAssignmentNode(l, o, r);:}
 	;
 
 AssignmentExpression_NoIn
 	=	ConditionalExpression_NoIn
-	|	LeftHandSideExpression AssignmentOperator AssignmentExpression_NoIn
+	|	LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression_NoIn.r {:return new JSAssignmentNode(l, o, r);:}
 	;
 
 AssignmentOperator
@@ -634,10 +641,10 @@ Expression_NoIn
 	;
 
 Literal
-	=	NULL.n {:return new JSPrimitiveNode(JSTokens.NULL, n.getStart(), n.getEnd());:}
-	|	TRUE.t {:return new JSPrimitiveNode(JSTokens.TRUE, t.getStart(), t.getEnd());:}
-	|	FALSE.f {:return new JSPrimitiveNode(JSTokens.FALSE, f.getStart(), f.getEnd());:}
-	|	NUMBER.n {:return new JSPrimitiveNode(n, _symbol_n.getStart(), _symbol_n.getEnd());:}
-	|	STRING.s {:return new JSPrimitiveNode(s, _symbol_s.getStart(), _symbol_s.getEnd());:}
-	|	REGEX.r {:return new JSPrimitiveNode(r, _symbol_r.getStart(), _symbol_r.getEnd());:}
+	=	NULL.n {:return new JSPrimitiveNode(JSNodeTypes.NULL, n.value.toString(), n.getStart(), n.getEnd());:}
+	|	TRUE.t {:return new JSPrimitiveNode(JSNodeTypes.TRUE, t.value.toString(), t.getStart(), t.getEnd());:}
+	|	FALSE.f {:return new JSPrimitiveNode(JSNodeTypes.FALSE, f.value.toString(), f.getStart(), f.getEnd());:}
+	|	NUMBER.n {:return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());:}
+	|	STRING.s {:return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());:}
+	|	REGEX.r {:return new JSPrimitiveNode(JSNodeTypes.REGEX, r, _symbol_r.getStart(), _symbol_r.getEnd());:}
 	;

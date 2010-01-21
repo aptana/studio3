@@ -34,18 +34,16 @@
  */
 package com.aptana.editor.js;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import junit.framework.TestCase;
-import beaver.Parser.Exception;
 
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.JSScanner;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSParserTest extends TestCase
 {
+
+	private static final String EOL = "\n";
 
 	private JSParser fParser;
 	private JSScanner fScanner;
@@ -57,50 +55,207 @@ public class JSParserTest extends TestCase
 		fScanner = new JSScanner();
 	}
 
-	/**
-	 * Tests the parser.
-	 */
-	public void testParser()
+	public void testEmptyStatement() throws Exception
 	{
-		InputStream stream = getClass().getResourceAsStream("dojo.js.uncompressed.js");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		int read = -1;
-		try
-		{
-			while ((read = stream.read()) != -1)
-			{
-				out.write(read);
-			}
-		}
-		catch (IOException e)
-		{
-		}
-		finally
-		{
-			try
-			{
-				stream.close();
-			}
-			catch (IOException e)
-			{
-			}
-		}
+		parseTest(";" + EOL);
+	}
 
-		String source = new String(out.toByteArray());
+	public void testEmptyBlock() throws Exception
+	{
+		parseTest("{}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testAssign() throws Exception
+	{
+		parseTest("a = 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testAddAndAssign() throws Exception
+	{
+		parseTest("a += 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArithmeticShiftRightAndAssign() throws Exception
+	{
+		parseTest("a >>>= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseAndAndAssign() throws Exception
+	{
+		parseTest("a &= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseOrAndAssign() throws Exception
+	{
+		parseTest("a |= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseXorAndAssign() throws Exception
+	{
+		parseTest("a ^= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testDivideAndAssign() throws Exception
+	{
+		parseTest("a /= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testModAndAssign() throws Exception
+	{
+		parseTest("a %= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testMultiplyAndAssign() throws Exception
+	{
+		parseTest("a *= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testShiftLeftAndAssign() throws Exception
+	{
+		parseTest("a <<= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testShiftRightAndAssign() throws Exception
+	{
+		parseTest("a >>= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testSubtractAndAssign() throws Exception
+	{
+		parseTest("a -= 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testAdd() throws Exception
+	{
+		parseTest("5 + 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testEqual() throws Exception
+	{
+		parseTest("abc = def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testGreaterThan() throws Exception
+	{
+		parseTest("abc > def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testGreaterThanOrEqual() throws Exception
+	{
+		parseTest("abc >= def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testIdentity() throws Exception
+	{
+		parseTest("abc === def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testIn() throws Exception
+	{
+		parseTest("\"abc\" in def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testInstanceOf() throws Exception
+	{
+		parseTest("abc instanceof def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLessThan() throws Exception
+	{
+		parseTest("abc < def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLessThanOrEqual() throws Exception
+	{
+		parseTest("abc <= def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLogicalAnd() throws Exception
+	{
+		parseTest("abc && def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLogicalOr() throws Exception
+	{
+		parseTest("abc || def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testNotEqual() throws Exception
+	{
+		parseTest("abc != def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testNotIdentity() throws Exception
+	{
+		parseTest("abc !== def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArithmeticShiftRight() throws Exception
+	{
+		parseTest("abc >>> 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseAnd() throws Exception
+	{
+		parseTest("abc & 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseOr() throws Exception
+	{
+		parseTest("abc | 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseXor() throws Exception
+	{
+		parseTest("abc ^ 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testDivide() throws Exception
+	{
+		parseTest("abc / 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testMod() throws Exception
+	{
+		parseTest("abc % 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testMultiply() throws Exception
+	{
+		parseTest("abc * 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testShiftLeft() throws Exception
+	{
+		parseTest("abc << 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testShiftRight() throws Exception
+	{
+		parseTest("abc >> 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testSubtract() throws Exception
+	{
+		parseTest("abc - 5;" + EOL); //$NON-NLS-1$
+	}
+
+	protected void parseTest(String source) throws Exception
+	{
+		parseTest(source, source);
+	}
+
+	protected void parseTest(String source, String expected) throws Exception
+	{
 		fScanner.setSource(source);
 
-		try
+		IParseNode result = (IParseNode) fParser.parse(fScanner);
+		StringBuilder text = new StringBuilder();
+		IParseNode[] children = result.getChildren();
+		for (IParseNode child : children)
 		{
-			Object value = fParser.parse(fScanner);
-			System.out.println(value);
+			text.append(child).append(EOL);
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace(System.out);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.out);
-		}
+		assertEquals(expected, text.toString());
 	}
 }

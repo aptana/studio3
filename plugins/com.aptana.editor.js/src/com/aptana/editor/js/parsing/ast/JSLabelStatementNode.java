@@ -1,6 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-import com.aptana.editor.js.parsing.lexer.JSTokens;
 
 /**
  * Represents continue and break statements.
@@ -8,9 +7,7 @@ import com.aptana.editor.js.parsing.lexer.JSTokens;
 public class JSLabelStatementNode extends JSNode
 {
 
-	private short fType;
 	private String fIdentifier;
-
 	private String fText;
 
 	public JSLabelStatementNode(short type, int start, int end)
@@ -20,10 +17,8 @@ public class JSLabelStatementNode extends JSNode
 
 	public JSLabelStatementNode(short type, String identifier, int start, int end)
 	{
-		fType = type;
+		super(type, start, end);
 		fIdentifier = identifier;
-		this.start = start;
-		this.end = end;
 	}
 
 	@Override
@@ -32,7 +27,15 @@ public class JSLabelStatementNode extends JSNode
 		if (fText == null)
 		{
 			StringBuilder text = new StringBuilder();
-			text.append(JSTokens.getTokenName(fType));
+			switch (getType())
+			{
+				case JSNodeTypes.CONTINUE:
+					text.append("continue"); //$NON-NLS-1$
+					break;
+				case JSNodeTypes.BREAK:
+					text.append("break"); //$NON-NLS-1$
+					break;
+			}
 			if (fIdentifier != null)
 			{
 				text.append(" ").append(fIdentifier); //$NON-NLS-1$
