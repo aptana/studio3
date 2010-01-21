@@ -39,7 +39,7 @@ public class GitRevSpecifierTest extends TestCase
 
 	public void testLocalBranchesSpec() throws Exception
 	{
-		assertEquals("--local", GitRevSpecifier.localBranchesRevSpec().toString());
+		assertEquals("--branches", GitRevSpecifier.localBranchesRevSpec().toString());
 		assertFalse(GitRevSpecifier.localBranchesRevSpec().isSimpleRef());
 	}
 }
