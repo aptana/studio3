@@ -121,35 +121,27 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		OutputStream console = this._context.getConsoleStream();
 		
 		Ruby runtime = container.getRuntime();
-		RubyProc proc = this._command.getInvokeBlock();
-		RubyModule module = proc.getBlock().getBinding().getKlass();
-		Ruby moduleRuntime = module.getRuntime();
 		
 		// turn off verbose mode (and warnings)
 		boolean isVerbose = runtime.isVerbose();
 		runtime.setVerbose(runtime.getNil());
-		boolean moduleIsVerbose = moduleRuntime.isVerbose();
-		moduleRuntime.setVerbose(moduleRuntime.getNil());
 
 		// set stdin
 		if (stdin != null)
 		{
 			container.setReader(new InputStreamReader(stdin));
-        	module.setConstant("STDIN", runtime.getObject().getConstant("STDIN"));
 		}
 
 		// set stdout
 		if (stdout != null)
 		{
 			container.setWriter(new OutputStreamWriter(stdout));
-			module.setConstant("STDOUT", runtime.getObject().getConstant("STDOUT"));
 		}
 
 		// set stderr
 		if (stderr != null)
 		{
 			container.setErrorWriter(new OutputStreamWriter(stderr));
-			module.setConstant("STDERR", runtime.getObject().getConstant("STDERR"));
 		}
 		
 		// set console
@@ -161,15 +153,10 @@ public class ExecuteBlockJob extends AbstractScriptJob
 			// store as a global and a constant
 			runtime.getGlobalVariables().set(CONSOLE_VARIABLE, rubyStream);
 			runtime.getObject().setConstant(CONSOLE_CONSTANT, rubyStream);
-			module.setConstant(CONSOLE_CONSTANT, runtime.getObject().getConstant(CONSOLE_CONSTANT));
 		}
 
-		// advance constant generation to invalidate any constants that were previously cached
-		runtime.incrementConstantGeneration();
-		
 		// restore verbose mode
 		runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-		moduleRuntime.setVerbose((moduleIsVerbose) ? moduleRuntime.getTrue() : moduleRuntime.getFalse());
 	}
 
 	/**
