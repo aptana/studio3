@@ -1,27 +1,23 @@
 package com.aptana.scripting.model;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyProc;
-import org.jruby.RubySystemExit;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.exceptions.RaiseException;
-import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -34,9 +30,9 @@ public class CommandElement extends AbstractBundleElement
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
 	
-	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
-	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
+	//private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
+	//private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
+	//private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private String[] _triggers;
@@ -302,9 +298,38 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeBlockCommand(CommandContext context)
 	{
+		context.setOutputStream(new ByteArrayOutputStream());
+		
+		// TODO: need to include proper load path
+		ExecuteBlockJob job = new ExecuteBlockJob(this, context);
+		
+//		job.setPriority(Job.SHORT);
+//		job.schedule();
+		
+		Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
+		thread.start();
+		
+		try
+		{
+//			job.join();
+			thread.join();
+		}
+		catch (InterruptedException e)
+		{
+			String message = MessageFormat.format(
+				"An error occurred while executing command {0}: {1}",
+				new Object[] { this.getDisplayName(), this.getPath() }
+			);
+			
+			ScriptUtils.logErrorWithStackTrace(message, e);
+		}
+
+		return job.getCommandResult();
+		
+		/*
 		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer(); 
 		Ruby runtime = container.getRuntime();
-		Map<String, String> environment = new HashMap<String, String>();
+		//Map<String, String> environment = new HashMap<String, String>();
 		boolean executedSuccessfully = true;
 		String resultText = ""; //$NON-NLS-1$
 
@@ -319,6 +344,7 @@ public class CommandElement extends AbstractBundleElement
 			
 			if (env != null && env instanceof RubyHash)
 			{
+				Map<String, String> environment = new HashMap<String, String>();
 				RubyHash hash = (RubyHash) env;
 				populateEnvironment(context.getMap(), environment);
 				hash.putAll(environment);
@@ -332,7 +358,8 @@ public class CommandElement extends AbstractBundleElement
 			// do "turn off warnings" hack and set STDIN
 			boolean isVerbose = runtime.isVerbose();
 			runtime.setVerbose(runtime.getNil());
-			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
+//			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
+			container.setReader(new InputStreamReader(context.getInputStream()));
 			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
 			
 			// set default output type, this may be changed by context.exit_with_message
@@ -401,6 +428,7 @@ public class CommandElement extends AbstractBundleElement
 		result.setContext(context);
 
 		return result;
+		*/
 	}
 
 	/**
