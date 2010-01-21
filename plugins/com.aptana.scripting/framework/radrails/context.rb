@@ -17,6 +17,10 @@ module RadRails
     def exit_show_tool_tip(message)
       exit_with_message(message, :show_as_tooltip)
     end
+    
+    def exit_discard
+      exit_with_message('', :discard)
+    end
     	
     def in
       @jobj.in
