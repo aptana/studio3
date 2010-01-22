@@ -32,7 +32,7 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public static RunType getDefaultRunType()
 	{
-		return RunType.THREAD;
+		return RunType.JOB;
 	}
 	
 	/**
