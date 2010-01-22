@@ -233,7 +233,7 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths)
 	{
-		return this.runScript(fullPath, loadPaths, false);
+		return this.runScript(fullPath, loadPaths, true);
 	}
 	
 	/**
@@ -248,18 +248,18 @@ public class ScriptingEngine
 	{
 		ExecuteScriptJob job = new ExecuteScriptJob(fullPath, loadPaths);
 		
-//		job.setPriority(Job.SHORT);
-//		job.schedule();
+		job.setPriority(Job.SHORT);
+		job.schedule();
 		
-		Thread thread = new Thread(job, "Load '" + fullPath + "'");
-		thread.start();
+//		Thread thread = new Thread(job, "Load '" + fullPath + "'");
+//		thread.start();
 		
 		try
 		{
 			if (async == false)
 			{
-//				job.join();
-				thread.join();
+				job.join();
+//				thread.join();
 			}
 		}
 		catch (InterruptedException e)
