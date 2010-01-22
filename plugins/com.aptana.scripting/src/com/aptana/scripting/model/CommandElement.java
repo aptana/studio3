@@ -339,7 +339,7 @@ public class CommandElement extends AbstractBundleElement
 			switch (this._runType)
 			{
 				case JOB:
-					job.setPriority(Job.SHORT);
+					job.setPriority((this._async) ? Job.SHORT : Job.INTERACTIVE);
 					job.schedule();
 					
 					if (this._async == false)
