@@ -174,9 +174,6 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 */
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		Thread t = Thread.currentThread();
-		System.out.println("+" + t + ": " + t.getId());
-		
 		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
 
 		// apply load paths
@@ -217,7 +214,6 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		// save result
 		this.setCommandResult(result);
 
-		System.out.println("-" + t + ": " + t.getId());
 		return Status.OK_STATUS;
 	}
 

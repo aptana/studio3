@@ -83,9 +83,6 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	 */
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		Thread t = Thread.currentThread();
-		System.out.println("+" + t + ": " + t.getId());
-		
 		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
 		Object result = null;
 		
@@ -127,7 +124,6 @@ public class ExecuteScriptJob extends AbstractScriptJob
 		this.setReturnValue(result);
 		
 		// return status
-		System.out.println("-" + t + ": " + t.getId());
 		return Status.OK_STATUS;
 	}
 	
