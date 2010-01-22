@@ -571,7 +571,9 @@ public class CommandExecutionUtils
 	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
 	{
 		IRegion region = getCurrentLineRegion(textWidget);
-		textWidget.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
+		String output = commandResult.getOutputString();
+		textWidget.replaceTextRange(region.getOffset(), region.getLength(), output);
+		textWidget.setCaretOffset(region.getOffset() + output.length());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)
