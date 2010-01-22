@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.jruby.Ruby;
 import org.jruby.embed.EmbedEvalUnit;
 import org.jruby.embed.EvalFailedException;
 import org.jruby.embed.ParseFailedException;
@@ -84,10 +85,11 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	protected IStatus run(IProgressMonitor monitor)
 	{
 		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
+		Ruby runtime = container.getProvider().getRuntime(); 
 		Object result = null;
 		
 		// apply load paths
-		this.applyLoadPaths(container);
+		this.applyLoadPaths(runtime);
 		
 		// TODO: $0 should work, but until then, we'll use this hack so scripts
 		// can get their full path
@@ -119,6 +121,9 @@ public class ExecuteScriptJob extends AbstractScriptJob
 
 			ScriptLogger.logError(message);
 		}
+		
+		// unapply load paths
+		this.unapplyLoadPaths(runtime);
 		
 		// save result
 		this.setReturnValue(result);

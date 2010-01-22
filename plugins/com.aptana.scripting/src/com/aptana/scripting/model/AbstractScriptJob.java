@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.jruby.embed.ScriptingContainer;
+import org.jruby.Ruby;
+import org.jruby.RubyArray;
+import org.jruby.RubyString;
+import org.jruby.runtime.builtin.IRubyObject;
 
 public abstract class AbstractScriptJob extends Job implements Runnable
 {
@@ -38,40 +41,24 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	 * 
 	 * @param container
 	 */
-	protected void applyLoadPaths(ScriptingContainer container)
+	protected void applyLoadPaths(Ruby runtime)
 	{
 		if (this._loadPaths != null && this._loadPaths.size() > 0)
 		{
 			// NOTE: the following works only when using THREADSAFE containers
-			container.getProvider().setLoadPaths(this._loadPaths);
-		}
-		
-		/*
-		if (loadPaths != null && loadPaths.size() > 0)
-		{
-			LocalContextProvider provider = container.getProvider();
-	
-			if (provider != null)
+			// container.getProvider().setLoadPaths(this._loadPaths);
+
+			IRubyObject object = runtime.getLoadService().getLoadPath();
+			RubyArray loadpathArray = (RubyArray) object;
+			
+			// Add our custom loadpaths for this execution
+			for (String loadPath : this._loadPaths)
 			{
-				Ruby runtime = provider.getRuntime();	    
-				IRubyObject object = runtime.getLoadService().getLoadPath();
-				RubyArray loadpathArray = (RubyArray) object;
-				// wipe whatever we added before
-				for (RubyString added : _addedLoadPaths)
-				{
-					loadpathArray.remove(added);
-				}
-				_addedLoadPaths.clear();
-				// Now add our custom loadpath for this execution
-				for (String loadPath : loadPaths)
-				{
-					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
-					loadpathArray.append(toAdd);
-					_addedLoadPaths.add(toAdd); 
-				}
+				RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+				
+				loadpathArray.append(toAdd);
 			}
 		}
-		*/
 	}
 
 	/**
@@ -80,5 +67,27 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	public void run()
 	{
 		this.run(new NullProgressMonitor());
+	}
+	
+	/**
+	 * unapplyLoadPaths
+	 * 
+	 * @param runtime
+	 */
+	protected void unapplyLoadPaths(Ruby runtime)
+	{
+		if (this._loadPaths != null && this._loadPaths.size() > 0)
+		{
+			IRubyObject object = runtime.getLoadService().getLoadPath();
+			RubyArray loadpathArray = (RubyArray) object;
+			
+			// Remove our custom loadpaths from this execution
+			for (String loadPath : this._loadPaths)
+			{
+				RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+				
+				loadpathArray.remove(toAdd);
+			}
+		}
 	}
 }

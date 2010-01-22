@@ -19,14 +19,12 @@ import org.jruby.RubyProc;
 import org.jruby.RubySystemExit;
 import org.jruby.RubyGlobal.InputGlobalVariable;
 import org.jruby.RubyGlobal.OutputGlobalVariable;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
-import com.aptana.scripting.ScriptingEngine;
 
 public class ExecuteBlockJob extends AbstractScriptJob
 {
@@ -94,7 +92,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * 
 	 * @param container
 	 */
-	protected void applyEnvironment(ScriptingContainer container)
+	protected void applyEnvironment()
 	{
 		Ruby runtime = this.getRuntime();
 		IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
@@ -114,7 +112,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * 
 	 * @param container
 	 */
-	protected void applyStreams(ScriptingContainer container)
+	protected void applyStreams()
 	{
 		Ruby runtime = this.getRuntime();
 
@@ -171,7 +169,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * @param rubyContext
 	 * @return
 	 */
-	protected String executeBlock(ScriptingContainer container)
+	protected String executeBlock()
 	{
 		// create context
 		Ruby runtime = this.getRuntime();
@@ -268,22 +266,25 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 */
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
+		Ruby runtime = this.getRuntime();
 
 		// apply load paths
-		// this.applyLoadPaths(container);
+		this.applyLoadPaths(runtime);
 
 		// apply streams
-		this.applyStreams(container);
+		this.applyStreams();
 
 		// setup ENV
-		this.applyEnvironment(container);
+		this.applyEnvironment();
 
 		// set default output type, this may be changed by context.exit_with_message
 		this._context.setOutputType(this._command.getOutputType());
 
 		// execute block
-		String resultText = this.executeBlock(container);
+		String resultText = this.executeBlock();
+		
+		// unapply load paths
+		this.unapplyLoadPaths(runtime);
 
 		// process result
 		CommandResult result = new CommandResult();
