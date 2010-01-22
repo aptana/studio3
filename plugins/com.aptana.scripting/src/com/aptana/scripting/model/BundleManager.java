@@ -49,6 +49,9 @@ public class BundleManager
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
 	
+	private Object bundlePathsLock = new Object();
+	private Object entryNamesLock = new Object();
+	
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
 	
@@ -131,48 +134,54 @@ public class BundleManager
 		{
 			File bundleFile = bundle.getBundleDirectory();
 			
-			// store bundle by path
-			if (this._bundlesByPath == null)
+			synchronized (bundlePathsLock)
 			{
-				this._bundlesByPath = new HashMap<File, List<BundleElement>>();
-			}
-			
-			if (this._bundlesByPath.containsKey(bundleFile) == false)
-			{
-				List<BundleElement> bundles = new ArrayList<BundleElement>();
+				// store bundle by path
+				if (this._bundlesByPath == null)
+				{
+					this._bundlesByPath = new HashMap<File, List<BundleElement>>();
+				}
 				
-				bundles.add(bundle);
-				
-				this._bundlesByPath.put(bundleFile, bundles);
-			}
-			else
-			{
-				List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
-				
-				bundles.add(bundle);
+				if (this._bundlesByPath.containsKey(bundleFile) == false)
+				{
+					List<BundleElement> bundles = new ArrayList<BundleElement>();
+					
+					bundles.add(bundle);
+					
+					this._bundlesByPath.put(bundleFile, bundles);
+				}
+				else
+				{
+					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
+					
+					bundles.add(bundle);
+				}
 			}
 			
 			// store bundle by name
 			String name = bundle.getDisplayName();
 			
-			if (this._entriesByName == null)
+			synchronized (entryNamesLock)
 			{
-				this._entriesByName = new HashMap<String, BundleEntry>();
-			}
-			
-			if (this._entriesByName.containsKey(name) == false)
-			{
-				BundleEntry entry = new BundleEntry(name);
+				if (this._entriesByName == null)
+				{
+					this._entriesByName = new HashMap<String, BundleEntry>();
+				}
 				
-				entry.addBundle(bundle);
-				
-				this._entriesByName.put(name, entry);
-			}
-			else
-			{
-				BundleEntry entry = this._entriesByName.get(name);
-				
-				entry.addBundle(bundle);
+				if (this._entriesByName.containsKey(name) == false)
+				{
+					BundleEntry entry = new BundleEntry(name);
+					
+					entry.addBundle(bundle);
+					
+					this._entriesByName.put(name, entry);
+				}
+				else
+				{
+					BundleEntry entry = this._entriesByName.get(name);
+					
+					entry.addBundle(bundle);
+				}
 			}
 		}
 	}
@@ -341,12 +350,18 @@ public class BundleManager
 	{
 		CommandElement[] result = NO_COMMANDS;
 		
-		if (this._entriesByName != null && this._entriesByName.containsKey(name))
+		if (this._entriesByName != null)
 		{
-			// grab all bundles of the given name
-			BundleEntry entry = this._entriesByName.get(name);
-			
-			result = entry.getCommands();
+			synchronized (entryNamesLock)
+			{
+				if (this._entriesByName.containsKey(name))
+				{
+					// grab all bundles of the given name
+					BundleEntry entry = this._entriesByName.get(name);
+					
+					result = entry.getCommands();
+				}
+			}
 		}
 		
 		return result;
@@ -388,7 +403,10 @@ public class BundleManager
 		
 		if (this._entriesByName != null)
 		{
-			result = this._entriesByName.get(name);
+			synchronized (entryNamesLock)
+			{
+				result = this._entriesByName.get(name);
+			}
 		}
 		
 		return result;
@@ -467,12 +485,18 @@ public class BundleManager
 	{
 		MenuElement[] result = NO_MENUS;
 		
-		if (this._entriesByName != null && this._entriesByName.containsKey(name))
+		if (this._entriesByName != null)
 		{
-			// grab all bundles of the given name
-			BundleEntry entry = this._entriesByName.get(name);
-			
-			result = entry.getMenus();
+			synchronized (entryNamesLock)
+			{
+				if (this._entriesByName.containsKey(name))
+				{					
+					// grab all bundles of the given name
+					BundleEntry entry = this._entriesByName.get(name);
+					
+					result = entry.getMenus();
+				}
+			}
 		}
 		
 		return result;
@@ -487,9 +511,15 @@ public class BundleManager
 	{
 		String[] result = NO_STRINGS;
 		
-		if (this._entriesByName != null && this._entriesByName.size() > 0)
+		if (this._entriesByName != null)
 		{
-			result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
+			synchronized (entryNamesLock)
+			{
+				if (this._entriesByName.size() > 0)
+				{
+					result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
+				}
+			}
 			
 			Arrays.sort(result);
 		}
@@ -987,12 +1017,18 @@ public class BundleManager
 		// this is used for test only right now.
 		if (this._bundlesByPath != null)
 		{
-			this._bundlesByPath.clear();
+			synchronized (bundlePathsLock)
+			{
+				this._bundlesByPath.clear();
+			}
 		}
 		
 		if (this._entriesByName != null)
 		{
-			this._entriesByName.clear();
+			synchronized (entryNamesLock)
+			{
+				this._entriesByName.clear();
+			}
 		}
 	}
 	

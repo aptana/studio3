@@ -13,6 +13,8 @@ public class MenuElement extends AbstractBundleElement
 	private MenuElement _parent;
 	private List<MenuElement> _children;
 	private String _commandName;
+	
+	private Object childrenLock = new Object();
 
 	/**
 	 * Snippet
@@ -33,16 +35,19 @@ public class MenuElement extends AbstractBundleElement
 	{
 		if (menu != null)
 		{
-			if (this._children == null)
+			synchronized (childrenLock)
 			{
-				this._children = new ArrayList<MenuElement>();
+				if (this._children == null)
+				{
+					this._children = new ArrayList<MenuElement>();
+				}
+				
+				// set parent
+				menu._parent = this;
+				
+				// add to our list
+				this._children.add(menu);
 			}
-			
-			// set parent
-			menu._parent = this;
-			
-			// add to our list
-			this._children.add(menu);
 		}
 	}
 
@@ -78,13 +83,19 @@ public class MenuElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public MenuElement[] getChildren()
+	public synchronized MenuElement[] getChildren()
 	{
 		MenuElement[] result = BundleManager.NO_MENUS;
 		
-		if (this._children != null && this._children.size() > 0)
+		if (this._children != null)
 		{
-			result = this._children.toArray(new MenuElement[this._children.size()]);
+			synchronized (childrenLock)
+			{
+				if (this._children.size() > 0)
+				{
+					result = this._children.toArray(new MenuElement[this._children.size()]);
+				}
+			}
 		}
 		
 		return result;
@@ -145,7 +156,10 @@ public class MenuElement extends AbstractBundleElement
 			
 			if (menu.isHierarchicalMenu())
 			{
-				stack.addAll(menu._children);
+				synchronized (childrenLock)
+				{
+					stack.addAll(menu._children);
+				}
 			}
 			else if (menu.isLeafMenu())
 			{
@@ -229,7 +243,17 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public boolean hasChildren()
 	{
-		return this._children != null && this._children.size() > 0;
+		boolean result = false;
+		
+		if (this._children != null)
+		{
+			synchronized (childrenLock)
+			{
+				result = this._children.size() > 0;
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -287,9 +311,12 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public void removeChildren()
 	{
-		for (MenuElement child : this.getChildren())
+		synchronized (childrenLock)
 		{
-			this.removeMenu(child);
+			for (MenuElement child : this.getChildren())
+			{
+				this.removeMenu(child);
+			}
 		}
 	}
 	
@@ -300,11 +327,17 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public void removeMenu(MenuElement menu)
 	{
-		if (this._children != null && this._children.remove(menu))
+		if (this._children != null)
 		{
-			AbstractElement.unregisterElement(menu);
-			
-			menu.removeChildren();
+			synchronized (childrenLock)
+			{
+				if (this._children.remove(menu))
+				{
+					AbstractElement.unregisterElement(menu);
+					
+					menu.removeChildren();
+				}
+			}
 		}
 	}
 	

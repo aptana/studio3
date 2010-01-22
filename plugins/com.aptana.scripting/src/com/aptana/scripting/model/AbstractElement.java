@@ -37,15 +37,18 @@ public abstract class AbstractElement
 			
 			if (path != null && path.length() > 0)
 			{
-				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-				
-				if (elements != null)
+				synchronized (ELEMENTS_BY_PATH)
 				{
-					elements.remove(element);
+					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 					
-					if (elements.size() == 0)
+					if (elements != null)
 					{
-						ELEMENTS_BY_PATH.remove(path);
+						elements.remove(element);
+						
+						if (elements.size() == 0)
+						{
+							ELEMENTS_BY_PATH.remove(path);
+						}
 					}
 				}
 			}
@@ -61,11 +64,15 @@ public abstract class AbstractElement
 	public static AbstractElement[] getRegisteredElements(String path)
 	{
 		AbstractElement[] result = NO_ELEMENTS;
-		List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
 		
-		if (elements != null)
+		synchronized (ELEMENTS_BY_PATH)
 		{
-			result = elements.toArray(new AbstractElement[elements.size()]);
+			List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
+			
+			if (elements != null)
+			{
+				result = elements.toArray(new AbstractElement[elements.size()]);
+			}
 		}
 		
 		return result;
@@ -84,15 +91,18 @@ public abstract class AbstractElement
 			
 			if (path != null && path.length() > 0)
 			{
-				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-				
-				if (elements == null)
+				synchronized (ELEMENTS_BY_PATH)
 				{
-					elements = new ArrayList<AbstractElement>();
-					ELEMENTS_BY_PATH.put(path, elements);
+					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
+					
+					if (elements == null)
+					{
+						elements = new ArrayList<AbstractElement>();
+						ELEMENTS_BY_PATH.put(path, elements);
+					}
+					
+					elements.add(element);
 				}
-				
-				elements.add(element);
 			}
 		}
 	}
@@ -115,7 +125,7 @@ public abstract class AbstractElement
 	 * @param property
 	 * @return
 	 */
-	public Object get(String property)
+	public synchronized Object get(String property)
 	{
 		Object result = null;
 		
@@ -160,7 +170,7 @@ public abstract class AbstractElement
 	 * @param property
 	 * @param value
 	 */
-	public void put(String property, Object value)
+	public synchronized void put(String property, Object value)
 	{
 		if (property != null && property.length() > 0)
 		{
