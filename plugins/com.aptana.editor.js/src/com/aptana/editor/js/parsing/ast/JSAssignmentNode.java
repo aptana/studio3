@@ -107,10 +107,6 @@ public class JSAssignmentNode extends JSNode
 		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(children[1]);
 
-		if (getSemicolonIncluded())
-		{
-			text.append(";"); //$NON-NLS-1$
-		}
-		return text.toString();
+		return appendSemicolon(text.toString());
 	}
 }

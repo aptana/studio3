@@ -1,6 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-
 /**
  * Represents continue and break statements.
  */
@@ -40,11 +39,7 @@ public class JSLabelStatementNode extends JSNode
 			{
 				text.append(" ").append(fIdentifier); //$NON-NLS-1$
 			}
-			if (getSemicolonIncluded())
-			{
-				text.append(";"); //$NON-NLS-1$
-			}
-			fText = text.toString();
+			fText = appendSemicolon(text.toString());
 		}
 		return fText;
 	}

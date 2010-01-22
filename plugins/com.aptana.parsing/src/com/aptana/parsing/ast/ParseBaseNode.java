@@ -14,6 +14,16 @@ public class ParseBaseNode extends Node implements IParseNode
 		fChildren = new IParseNode[0];
 	}
 
+	public void addChild(IParseNode child)
+	{
+		// could use a more efficient way (e.g. doubling the array size when needed each time), but addChild() is not
+		// called often while setChildren() is the more preferred method
+		IParseNode[] newList = new IParseNode[fChildren.length + 1];
+		System.arraycopy(fChildren, 0, newList, 0, fChildren.length);
+		fChildren = newList;
+		fChildren[fChildren.length - 1] = child;
+	}
+
 	@Override
 	public void accept(TreeWalker walker)
 	{
@@ -59,9 +69,14 @@ public class ParseBaseNode extends Node implements IParseNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		for (IParseNode node : fChildren)
+		int count = fChildren.length;
+		for (int i = 0; i < count; ++i)
 		{
-			text.append(node);
+			text.append(fChildren[i]);
+			if (i < count - 1)
+			{
+				text.append(" "); //$NON-NLS-1$
+			}
 		}
 		return text.toString();
 	}

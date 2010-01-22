@@ -240,6 +240,176 @@ public class JSParserTest extends TestCase
 		parseTest("abc - 5;" + EOL); //$NON-NLS-1$
 	}
 
+	public void testGetElement() throws Exception
+	{
+		parseTest("abc[10];" + EOL); //$NON-NLS-1$
+	}
+
+	public void testGetProperty() throws Exception
+	{
+		parseTest("abc.def;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLogicalNot() throws Exception
+	{
+		parseTest("a = !false;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBitwiseNot() throws Exception
+	{
+		parseTest("a = ~10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testNegate() throws Exception
+	{
+		parseTest("a = -10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testPositive() throws Exception
+	{
+		parseTest("a = +10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testPreDecrement() throws Exception
+	{
+		parseTest("--a;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testPreIncrement() throws Exception
+	{
+		parseTest("++a;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testPostDecrement() throws Exception
+	{
+		parseTest("a--;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testPostIncrement() throws Exception
+	{
+		parseTest("a++;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testDelete() throws Exception
+	{
+		parseTest("delete obj.prop;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTypeof1() throws Exception
+	{
+		parseTest("a = typeof(object);" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTypeof2() throws Exception
+	{
+		parseTest("a = typeof object;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testVoid() throws Exception
+	{
+		parseTest("void (abc());" + EOL); //$NON-NLS-1$
+	}
+
+	public void testNull() throws Exception
+	{
+		parseTest("null;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTrue() throws Exception
+	{
+		parseTest("true;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testFalse() throws Exception
+	{
+		parseTest("false;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testNumber() throws Exception
+	{
+		parseTest("10.3;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testString() throws Exception
+	{
+		parseTest("\"this is a string\";" + EOL); //$NON-NLS-1$
+	}
+
+	public void testRegex() throws Exception
+	{
+		parseTest("/abc/;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testThis() throws Exception
+	{
+		parseTest("this;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testIdentifier() throws Exception
+	{
+		parseTest("abc;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testInvoke() throws Exception
+	{
+		parseTest("abc();" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArguments() throws Exception
+	{
+		parseTest("abc(a, b, c);" + EOL); //$NON-NLS-1$
+	}
+
+	public void testVar() throws Exception
+	{
+		parseTest("var abc = 10;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTryCatch() throws Exception
+	{
+		parseTest("try {} catch (e) {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTryFinally() throws Exception
+	{
+		parseTest("try {} finally {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testTryCatchFinally() throws Exception
+	{
+		parseTest("try {} catch (e) {} finally {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testConditional() throws Exception
+	{
+		parseTest("(abc) ? true : false;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testEmptyFunction() throws Exception
+	{
+		parseTest("function abc () {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testEmptyFunctionWithOneParameter() throws Exception
+	{
+		parseTest("function abc (a) {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testEmptyFunctionWithParameters() throws Exception
+	{
+		parseTest("function abc (a, b, c) {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testComma() throws Exception
+	{
+		parseTest("abc = 10, def = 20;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testGroup() throws Exception
+	{
+		parseTest("a = (3 + 4) * 5;" + EOL); //$NON-NLS-1$
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);

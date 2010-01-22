@@ -210,24 +210,6 @@ public class JSParser extends Parser {
 		"u8F01y0VYVudU2pm6U13zJ8IHF19uBF0Py3tX#yF#getmYZVllgRF3Pu8l1pT3Zq54$MpiM" +
 		"V2pu6l0ruEsBeKV#3zI3kaa=");
 
-	static final Action RETURN4 = new Action() {
-		public Symbol reduce(Symbol[] _symbols, int offset) {
-			return _symbols[offset + 4];
-		}
-	};
-
-	static final Action RETURN3 = new Action() {
-		public Symbol reduce(Symbol[] _symbols, int offset) {
-			return _symbols[offset + 3];
-		}
-	};
-
-	static final Action RETURN2 = new Action() {
-		public Symbol reduce(Symbol[] _symbols, int offset) {
-			return _symbols[offset + 2];
-		}
-	};
-
 	static final Action RETURN7 = new Action() {
 		public Symbol reduce(Symbol[] _symbols, int offset) {
 			return _symbols[offset + 7];
@@ -264,6 +246,24 @@ public class JSParser extends Parser {
 		}
 	};
 
+	static final Action RETURN2 = new Action() {
+		public Symbol reduce(Symbol[] _symbols, int offset) {
+			return _symbols[offset + 2];
+		}
+	};
+
+	static final Action RETURN3 = new Action() {
+		public Symbol reduce(Symbol[] _symbols, int offset) {
+			return _symbols[offset + 3];
+		}
+	};
+
+	static final Action RETURN4 = new Action() {
+		public Symbol reduce(Symbol[] _symbols, int offset) {
+			return _symbols[offset + 4];
+		}
+	};
+
 	private final Action[] actions;
 
 	public JSParser() {
@@ -273,45 +273,110 @@ public class JSParser extends Parser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
-					final beaver.Symbol[] p = _list_p == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_p.toArray(new beaver.Symbol[_list_p.size()]);
+					final JSNode[] p = _list_p == null ? new JSNode[0] : (JSNode[]) _list_p.toArray(new JSNode[_list_p.size()]);
 					return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] SourceElements = SourceElements SourceElement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
 			new Action() {	// [2] SourceElements = SourceElement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
 			Action.RETURN,	// [3] SourceElement = FunctionDeclaration
 			Action.RETURN,	// [4] SourceElement = Statement
-			RETURN4,	// [5] FunctionDeclaration = FUNCTION IDENTIFIER FunctionParameters FunctionBody; returns 'FunctionBody' although none is marked
-			RETURN3,	// [6] FunctionExpression = FUNCTION FunctionParameters FunctionBody; returns 'FunctionBody' although none is marked
+			new Action() {	// [5] FunctionDeclaration = FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol f = _symbols[offset + 1];
+					final Symbol _symbol_i = _symbols[offset + 2];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_p = _symbols[offset + 3];
+					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol _symbol_b = _symbols[offset + 4];
+					final JSNode b = (JSNode) _symbol_b.value;
+					return new JSFunctionNode(i, new JSNode[] { p, b }, f.getStart(), b.getEnd());
+				}
+			},
+			new Action() {	// [6] FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol f = _symbols[offset + 1];
+					final Symbol _symbol_p = _symbols[offset + 2];
+					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol _symbol_b = _symbols[offset + 3];
+					final JSNode b = (JSNode) _symbol_b.value;
+					return new JSFunctionNode(new JSNode[] { p, b }, f.getStart(), b.getEnd());
+				}
+			},
 			Action.RETURN,	// [7] FunctionExpression = FunctionDeclaration
-			RETURN2,	// [8] FunctionParameters = LPAREN RPAREN; returns 'RPAREN' although none is marked
-			RETURN3,	// [9] FunctionParameters = LPAREN FormalParameterList RPAREN; returns 'RPAREN' although none is marked
-			new Action() {	// [10] FormalParameterList = FormalParameterList COMMA IDENTIFIER
+			new Action() {	// [8] FunctionParameters = LPAREN.l RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol l = _symbols[offset + 1];
+					final Symbol r = _symbols[offset + 2];
+					return new JSNaryNode(JSNodeTypes.PARAMETERS, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [11] FormalParameterList = IDENTIFIER
+			new Action() {	// [9] FunctionParameters = LPAREN.l FormalParameterList.p RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol l = _symbols[offset + 1];
+					final Symbol _symbol_p = _symbols[offset + 2];
+					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol r = _symbols[offset + 3];
+					p.setLocation(l.getStart(), r.getEnd());return p;
 				}
 			},
-			RETURN2,	// [12] FunctionBody = LCURLY RCURLY; returns 'RCURLY' although none is marked
-			RETURN3,	// [13] FunctionBody = LCURLY SourceElements RCURLY; returns 'RCURLY' although none is marked
+			new Action() {	// [10] FormalParameterList = FormalParameterList.p COMMA IDENTIFIER.i
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_p = _symbols[offset + 1];
+					final JSNode p = (JSNode) _symbol_p.value;
+					final Symbol _symbol_i = _symbols[offset + 3];
+					final String i = (String) _symbol_i.value;
+					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());p.addChild(node);p.setLocation(p.getStart(), node.getEnd());return p;
+				}
+			},
+			new Action() {	// [11] FormalParameterList = IDENTIFIER.i
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNaryNode(JSNodeTypes.PARAMETERS, new JSNode[] { node }, node.getStart(), node.getEnd());
+				}
+			},
+			new Action() {	// [12] FunctionBody = LCURLY.l RCURLY.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol r = _symbols[offset + 2];
+					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [13] FunctionBody = LCURLY.l SourceElements.s RCURLY.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol _symbol_s = _symbols[offset + 2];
+					final ArrayList _list_s = (ArrayList) _symbol_s.value;
+					final JSNode[] s = _list_s == null ? new JSNode[0] : (JSNode[]) _list_s.toArray(new JSNode[_list_s.size()]);
+					final Symbol r = _symbols[offset + 3];
+					return new JSNaryNode(JSNodeTypes.STATEMENTS, s, l.getStart(), r.getEnd());
+				}
+			},
 			Action.RETURN,	// [14] Statement = Block
-			RETURN3,	// [15] Statement = VAR VariableDeclarationList SEMICOLON; returns 'SEMICOLON' although none is marked
+			new Action() {	// [15] Statement = VAR.s VariableDeclarationList.l SEMICOLON.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol s = _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 2];
+					final ArrayList _list_l = (ArrayList) _symbol_l.value;
+					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
+					final Symbol e = _symbols[offset + 3];
+					JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;
+				}
+			},
 			new Action() {	// [16] Statement = Expression_NoLBF.e SEMICOLON
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					((JSNode) e).setSemicolonIncluded(true); return e;
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					e.setSemicolonIncluded(true); return e;
 				}
 			},
 			Action.RETURN,	// [17] Statement = IfStatement
@@ -337,11 +402,21 @@ public class JSParser extends Parser {
 				}
 			},
 			Action.RETURN,	// [29] Statement_NoIf = Block
-			RETURN3,	// [30] Statement_NoIf = VAR VariableDeclarationList SEMICOLON; returns 'SEMICOLON' although none is marked
+			new Action() {	// [30] Statement_NoIf = VAR.s VariableDeclarationList.l SEMICOLON.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol s = _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 2];
+					final ArrayList _list_l = (ArrayList) _symbol_l.value;
+					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
+					final Symbol e = _symbols[offset + 3];
+					JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;
+				}
+			},
 			new Action() {	// [31] Statement_NoIf = Expression_NoLBF.e SEMICOLON
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					((JSNode) e).setSemicolonIncluded(true); return e;
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					e.setSemicolonIncluded(true); return e;
 				}
 			},
 			Action.RETURN,	// [32] Statement_NoIf = IfStatement_NoIf
@@ -370,44 +445,81 @@ public class JSParser extends Parser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
-					return new JSNaryNode(JSNodeTypes.STATEMENT, l.getStart(), r.getEnd());
+					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
 				}
 			},
-			RETURN3,	// [45] Block = LCURLY StatementList RCURLY; returns 'RCURLY' although none is marked
+			new Action() {	// [45] Block = LCURLY.l StatementList.a RCURLY.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol _symbol_a = _symbols[offset + 2];
+					final ArrayList _list_a = (ArrayList) _symbol_a.value;
+					final JSNode[] a = _list_a == null ? new JSNode[0] : (JSNode[]) _list_a.toArray(new JSNode[_list_a.size()]);
+					final Symbol r = _symbols[offset + 3];
+					return new JSNaryNode(JSNodeTypes.STATEMENTS, a, l.getStart(), r.getEnd());
+				}
+			},
 			new Action() {	// [46] StatementList = StatementList Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
 			new Action() {	// [47] StatementList = Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
 			new Action() {	// [48] VariableDeclarationList = VariableDeclarationList COMMA VariableDeclaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
 			new Action() {	// [49] VariableDeclarationList = VariableDeclaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
 			new Action() {	// [50] VariableDeclarationList_NoIn = VariableDeclarationList_NoIn COMMA VariableDeclaration_NoIn
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
 			new Action() {	// [51] VariableDeclarationList_NoIn = VariableDeclaration_NoIn
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [52] VariableDeclaration = IDENTIFIER
-			RETURN3,	// [53] VariableDeclaration = IDENTIFIER EQUAL AssignmentExpression; returns 'AssignmentExpression' although none is marked
-			Action.RETURN,	// [54] VariableDeclaration_NoIn = IDENTIFIER
-			RETURN3,	// [55] VariableDeclaration_NoIn = IDENTIFIER EQUAL AssignmentExpression_NoIn; returns 'AssignmentExpression_NoIn' although none is marked
+			new Action() {	// [52] VariableDeclaration = IDENTIFIER.i
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id }, _symbol_i.getStart(), _symbol_i.getEnd());
+				}
+			},
+			new Action() {	// [53] VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_e = _symbols[offset + 3];
+					final JSNode e = (JSNode) _symbol_e.value;
+					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+				}
+			},
+			new Action() {	// [54] VariableDeclaration_NoIn = IDENTIFIER.i
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id }, _symbol_i.getStart(), _symbol_i.getEnd());
+				}
+			},
+			new Action() {	// [55] VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_e = _symbols[offset + 3];
+					final JSNode e = (JSNode) _symbol_e.value;
+					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
+				}
+			},
 			RETURN7,	// [56] IfStatement = IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement; returns 'Statement' although none is marked
 			RETURN5,	// [57] IfStatement = IF LPAREN Expression RPAREN Statement; returns 'Statement' although none is marked
 			RETURN7,	// [58] IfStatement_NoIf = IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement_NoIf; returns 'Statement_NoIf' although none is marked
@@ -515,11 +627,56 @@ public class JSParser extends Parser {
 			RETURN3,	// [112] LabelledStatement = IDENTIFIER COLON Statement; returns 'Statement' although none is marked
 			RETURN3,	// [113] LabelledStatement_NoIf = IDENTIFIER COLON Statement_NoIf; returns 'Statement_NoIf' although none is marked
 			RETURN3,	// [114] ThrowStatement = THROW Expression SEMICOLON; returns 'SEMICOLON' although none is marked
-			RETURN3,	// [115] TryStatement = TRY Block Catch; returns 'Catch' although none is marked
-			RETURN3,	// [116] TryStatement = TRY Block Finally; returns 'Finally' although none is marked
-			RETURN4,	// [117] TryStatement = TRY Block Catch Finally; returns 'Finally' although none is marked
-			RETURN5,	// [118] Catch = CATCH LPAREN IDENTIFIER RPAREN Block; returns 'Block' although none is marked
-			RETURN2,	// [119] Finally = FINALLY Block; returns 'Block' although none is marked
+			new Action() {	// [115] TryStatement = TRY.t Block.b Catch.c
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol t = _symbols[offset + 1];
+					final Symbol _symbol_b = _symbols[offset + 2];
+					final JSNode b = (JSNode) _symbol_b.value;
+					final Symbol _symbol_c = _symbols[offset + 3];
+					final JSNode c = (JSNode) _symbol_c.value;
+					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, new JSNode() }, t.getStart(), c.getEnd());
+				}
+			},
+			new Action() {	// [116] TryStatement = TRY.t Block.b Finally.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol t = _symbols[offset + 1];
+					final Symbol _symbol_b = _symbols[offset + 2];
+					final JSNode b = (JSNode) _symbol_b.value;
+					final Symbol _symbol_f = _symbols[offset + 3];
+					final JSNode f = (JSNode) _symbol_f.value;
+					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, new JSNode(), f }, t.getStart(), f.getEnd());
+				}
+			},
+			new Action() {	// [117] TryStatement = TRY.t Block.b Catch.c Finally.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol t = _symbols[offset + 1];
+					final Symbol _symbol_b = _symbols[offset + 2];
+					final JSNode b = (JSNode) _symbol_b.value;
+					final Symbol _symbol_c = _symbols[offset + 3];
+					final JSNode c = (JSNode) _symbol_c.value;
+					final Symbol _symbol_f = _symbols[offset + 4];
+					final JSNode f = (JSNode) _symbol_f.value;
+					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, f }, t.getStart(), f.getEnd());
+				}
+			},
+			new Action() {	// [118] Catch = CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol c = _symbols[offset + 1];
+					final Symbol _symbol_i = _symbols[offset + 3];
+					final String i = (String) _symbol_i.value;
+					final Symbol _symbol_b = _symbols[offset + 5];
+					final JSNode b = (JSNode) _symbol_b.value;
+					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.CATCH, new JSNode[] { id, b }, c.getStart(), b.getEnd());
+				}
+			},
+			new Action() {	// [119] Finally = FINALLY.f Block.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol f = _symbols[offset + 1];
+					final Symbol _symbol_b = _symbols[offset + 2];
+					final JSNode b = (JSNode) _symbol_b.value;
+					return new JSNode(JSNodeTypes.FINALLY, new JSNode[] { b }, f.getStart(), b.getEnd());
+				}
+			},
 			Action.RETURN,	// [120] PrimaryExpression = PrimaryExpression_NoLBF
 			Action.RETURN,	// [121] PrimaryExpression = ObjectLiteral
 			new Action() {	// [122] PrimaryExpression_NoLBF = THIS.t
@@ -537,7 +694,15 @@ public class JSParser extends Parser {
 			},
 			Action.RETURN,	// [124] PrimaryExpression_NoLBF = Literal
 			Action.RETURN,	// [125] PrimaryExpression_NoLBF = ArrayLiteral
-			RETURN3,	// [126] PrimaryExpression_NoLBF = LPAREN Expression RPAREN; returns 'RPAREN' although none is marked
+			new Action() {	// [126] PrimaryExpression_NoLBF = LPAREN.l Expression.e RPAREN.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol r = _symbols[offset + 3];
+					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.GROUP, e);node.setLocation(l.getStart(), r.getEnd());return node;
+				}
+			},
 			RETURN2,	// [127] ArrayLiteral = LBRACKET RBRACKET; returns 'RBRACKET' although none is marked
 			RETURN3,	// [128] ArrayLiteral = LBRACKET Elision RBRACKET; returns 'RBRACKET' although none is marked
 			RETURN3,	// [129] ArrayLiteral = LBRACKET ElementList RBRACKET; returns 'RBRACKET' although none is marked
@@ -566,27 +731,138 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [144] PropertyName = NUMBER
 			Action.RETURN,	// [145] MemberExpression = PrimaryExpression
 			Action.RETURN,	// [146] MemberExpression = FunctionExpression
-			RETURN4,	// [147] MemberExpression = MemberExpression LBRACKET Expression RBRACKET; returns 'RBRACKET' although none is marked
-			RETURN3,	// [148] MemberExpression = MemberExpression DOT IDENTIFIER; returns 'IDENTIFIER' although none is marked
+			new Action() {	// [147] MemberExpression = MemberExpression.l LBRACKET Expression.r RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSGetElementOperatorNode(l, r);
+				}
+			},
+			new Action() {	// [148] MemberExpression = MemberExpression.l DOT IDENTIFIER.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final String r = (String) _symbol_r.value;
+					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+				}
+			},
 			RETURN3,	// [149] MemberExpression = NEW MemberExpression Arguments; returns 'Arguments' although none is marked
 			Action.RETURN,	// [150] MemberExpression_NoLBF = PrimaryExpression_NoLBF
-			RETURN4,	// [151] MemberExpression_NoLBF = MemberExpression_NoLBF LBRACKET Expression RBRACKET; returns 'RBRACKET' although none is marked
-			RETURN3,	// [152] MemberExpression_NoLBF = MemberExpression_NoLBF DOT IDENTIFIER; returns 'IDENTIFIER' although none is marked
+			new Action() {	// [151] MemberExpression_NoLBF = MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSGetElementOperatorNode(l, r);
+				}
+			},
+			new Action() {	// [152] MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT IDENTIFIER.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final String r = (String) _symbol_r.value;
+					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+				}
+			},
 			RETURN3,	// [153] MemberExpression_NoLBF = NEW MemberExpression Arguments; returns 'Arguments' although none is marked
 			Action.RETURN,	// [154] NewExpression = MemberExpression
 			RETURN2,	// [155] NewExpression = NEW NewExpression; returns 'NewExpression' although none is marked
 			Action.RETURN,	// [156] NewExpression_NoLBF = MemberExpression_NoLBF
 			RETURN2,	// [157] NewExpression_NoLBF = NEW NewExpression; returns 'NewExpression' although none is marked
-			RETURN2,	// [158] CallExpression = MemberExpression Arguments; returns 'Arguments' although none is marked
-			RETURN2,	// [159] CallExpression = CallExpression Arguments; returns 'Arguments' although none is marked
-			RETURN4,	// [160] CallExpression = CallExpression LBRACKET Expression RBRACKET; returns 'RBRACKET' although none is marked
-			RETURN3,	// [161] CallExpression = CallExpression DOT IDENTIFIER; returns 'IDENTIFIER' although none is marked
-			RETURN2,	// [162] CallExpression_NoLBF = MemberExpression_NoLBF Arguments; returns 'Arguments' although none is marked
-			RETURN2,	// [163] CallExpression_NoLBF = CallExpression_NoLBF Arguments; returns 'Arguments' although none is marked
-			RETURN4,	// [164] CallExpression_NoLBF = CallExpression_NoLBF LBRACKET Expression RBRACKET; returns 'RBRACKET' although none is marked
-			RETURN3,	// [165] CallExpression_NoLBF = CallExpression_NoLBF DOT IDENTIFIER; returns 'IDENTIFIER' although none is marked
-			RETURN2,	// [166] Arguments = LPAREN RPAREN; returns 'RPAREN' although none is marked
-			RETURN3,	// [167] Arguments = LPAREN ArgumentList RPAREN; returns 'RPAREN' although none is marked
+			new Action() {	// [158] CallExpression = MemberExpression.l Arguments.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 2];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [159] CallExpression = CallExpression.l Arguments.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 2];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [160] CallExpression = CallExpression.l LBRACKET Expression.r RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSGetElementOperatorNode(l, r);
+				}
+			},
+			new Action() {	// [161] CallExpression = CallExpression.l DOT IDENTIFIER.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final String r = (String) _symbol_r.value;
+					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+				}
+			},
+			new Action() {	// [162] CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 2];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [163] CallExpression_NoLBF = CallExpression_NoLBF.l Arguments.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 2];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [164] CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSGetElementOperatorNode(l, r);
+				}
+			},
+			new Action() {	// [165] CallExpression_NoLBF = CallExpression_NoLBF.l DOT IDENTIFIER.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final String r = (String) _symbol_r.value;
+					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
+				}
+			},
+			new Action() {	// [166] Arguments = LPAREN.l RPAREN.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol r = _symbols[offset + 2];
+					return new JSNaryNode(JSNodeTypes.ARGUMENTS, l.getStart(), r.getEnd());
+				}
+			},
+			new Action() {	// [167] Arguments = LPAREN.l ArgumentList.a RPAREN.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol l = _symbols[offset + 1];
+					final Symbol _symbol_a = _symbols[offset + 2];
+					final ArrayList _list_a = (ArrayList) _symbol_a.value;
+					final JSNode[] a = _list_a == null ? new JSNode[0] : (JSNode[]) _list_a.toArray(new JSNode[_list_a.size()]);
+					final Symbol r = _symbols[offset + 3];
+					return new JSNaryNode(JSNodeTypes.ARGUMENTS, a, l.getStart(), r.getEnd());
+				}
+			},
 			new Action() {	// [168] ArgumentList = ArgumentList COMMA AssignmentExpression
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
@@ -602,15 +878,47 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [172] LeftHandSideExpression_NoLBF = NewExpression_NoLBF
 			Action.RETURN,	// [173] LeftHandSideExpression_NoLBF = CallExpression_NoLBF
 			Action.RETURN,	// [174] PostfixExpression = LeftHandSideExpression
-			RETURN2,	// [175] PostfixExpression = LeftHandSideExpression PostfixOperator; returns 'PostfixOperator' although none is marked
+			new Action() {	// [175] PostfixExpression = LeftHandSideExpression.e PostfixOperator.o
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol _symbol_o = _symbols[offset + 2];
+					final String o = (String) _symbol_o.value;
+					JSNode node = new JSPostUnaryOperatorNode(e, o);node.setLocation(e.getStart(), _symbol_o.getEnd());return node;
+				}
+			},
 			Action.RETURN,	// [176] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF
-			RETURN2,	// [177] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF PostfixOperator; returns 'PostfixOperator' although none is marked
+			new Action() {	// [177] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF.e PostfixOperator.o
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					final Symbol _symbol_o = _symbols[offset + 2];
+					final String o = (String) _symbol_o.value;
+					JSNode node = new JSPostUnaryOperatorNode(e, o);node.setLocation(e.getStart(), _symbol_o.getEnd());return node;
+				}
+			},
 			Action.RETURN,	// [178] PostfixOperator = PLUS_PLUS
 			Action.RETURN,	// [179] PostfixOperator = MINUS_MINUS
 			Action.RETURN,	// [180] UnaryExpression = PostfixExpression
-			RETURN2,	// [181] UnaryExpression = UnaryOperator UnaryExpression; returns 'UnaryExpression' although none is marked
+			new Action() {	// [181] UnaryExpression = UnaryOperator.o UnaryExpression.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_o = _symbols[offset + 1];
+					final String o = (String) _symbol_o.value;
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSNode e = (JSNode) _symbol_e.value;
+					JSNode node = new JSUnaryOperatorNode(o, e);node.setLocation(_symbol_o.getStart(), e.getEnd());return node;
+				}
+			},
 			Action.RETURN,	// [182] UnaryExpression_NoLBF = PostfixExpression_NoLBF
-			RETURN2,	// [183] UnaryExpression_NoLBF = UnaryOperator UnaryExpression; returns 'UnaryExpression' although none is marked
+			new Action() {	// [183] UnaryExpression_NoLBF = UnaryOperator.o UnaryExpression.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_o = _symbols[offset + 1];
+					final String o = (String) _symbol_o.value;
+					final Symbol _symbol_e = _symbols[offset + 2];
+					final JSNode e = (JSNode) _symbol_e.value;
+					JSNode node = new JSUnaryOperatorNode(o, e);node.setLocation(_symbol_o.getStart(), e.getEnd());return node;
+				}
+			},
 			Action.RETURN,	// [184] UnaryOperator = DELETE
 			Action.RETURN,	// [185] UnaryOperator = EXCLAMATION
 			Action.RETURN,	// [186] UnaryOperator = MINUS
@@ -620,25 +928,34 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [190] UnaryOperator = TILDE
 			Action.RETURN,	// [191] UnaryOperator = TYPEOF
 			Action.RETURN,	// [192] UnaryOperator = VOID
-			new Action() {	// [193] MultiplicativeExpression = UnaryExpression.e
+			Action.RETURN,	// [193] MultiplicativeExpression = UnaryExpression
+			new Action() {	// [194] MultiplicativeExpression = MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_o = _symbols[offset + 2];
+					final String o = (String) _symbol_o.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			RETURN3,	// [194] MultiplicativeExpression = MultiplicativeExpression MultiplicativeOperator UnaryExpression; returns 'UnaryExpression' although none is marked
 			Action.RETURN,	// [195] MultiplicativeExpression_NoLBF = UnaryExpression_NoLBF
-			RETURN3,	// [196] MultiplicativeExpression_NoLBF = MultiplicativeExpression_NoLBF MultiplicativeOperator UnaryExpression; returns 'UnaryExpression' although none is marked
+			new Action() {	// [196] MultiplicativeExpression_NoLBF = MultiplicativeExpression_NoLBF.l MultiplicativeOperator.o UnaryExpression.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_o = _symbols[offset + 2];
+					final String o = (String) _symbol_o.value;
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o, r);
+				}
+			},
 			Action.RETURN,	// [197] MultiplicativeOperator = STAR
 			Action.RETURN,	// [198] MultiplicativeOperator = FORWARD_SLASH
 			Action.RETURN,	// [199] MultiplicativeOperator = PERCENT
-			new Action() {	// [200] AdditiveExpression = MultiplicativeExpression.e
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_e = _symbols[offset + 1];
-					final JSNode e = (JSNode) _symbol_e.value;
-					return e;
-				}
-			},
+			Action.RETURN,	// [200] AdditiveExpression = MultiplicativeExpression
 			new Action() {	// [201] AdditiveExpression = AdditiveExpression.l AdditiveOperator.o MultiplicativeExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
@@ -664,13 +981,7 @@ public class JSParser extends Parser {
 			},
 			Action.RETURN,	// [204] AdditiveOperator = PLUS
 			Action.RETURN,	// [205] AdditiveOperator = MINUS
-			new Action() {	// [206] ShiftExpression = AdditiveExpression.e
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_e = _symbols[offset + 1];
-					final JSNode e = (JSNode) _symbol_e.value;
-					return e;
-				}
-			},
+			Action.RETURN,	// [206] ShiftExpression = AdditiveExpression
 			new Action() {	// [207] ShiftExpression = ShiftExpression.l ShiftOperator.o AdditiveExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
@@ -697,13 +1008,7 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [210] ShiftOperator = LESS_LESS
 			Action.RETURN,	// [211] ShiftOperator = GREATER_GREATER
 			Action.RETURN,	// [212] ShiftOperator = GREATER_GREATER_GREATER
-			new Action() {	// [213] RelationalExpression = ShiftExpression.e
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_e = _symbols[offset + 1];
-					final JSNode e = (JSNode) _symbol_e.value;
-					return e;
-				}
-			},
+			Action.RETURN,	// [213] RelationalExpression = ShiftExpression
 			new Action() {	// [214] RelationalExpression = RelationalExpression.l RelationalOperator.o ShiftExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
@@ -746,13 +1051,7 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [223] RelationalOperator_NoIn = INSTANCEOF
 			Action.RETURN,	// [224] RelationalOperator = RelationalOperator_NoIn
 			Action.RETURN,	// [225] RelationalOperator = IN
-			new Action() {	// [226] EqualityExpression = RelationalExpression.e
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_e = _symbols[offset + 1];
-					final JSNode e = (JSNode) _symbol_e.value;
-					return e;
-				}
-			},
+			Action.RETURN,	// [226] EqualityExpression = RelationalExpression
 			new Action() {	// [227] EqualityExpression = EqualityExpression.l EqualityOperator.o RelationalExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
@@ -792,108 +1091,207 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [233] EqualityOperator = EXCLAMATION_EQUAL
 			Action.RETURN,	// [234] EqualityOperator = EQUAL_EQUAL_EQUAL
 			Action.RETURN,	// [235] EqualityOperator = EXCLAMATION_EQUAL_EQUAL
-			RETURN3,	// [236] BitwiseAndExpression = BitwiseAndExpression AMPERSAND EqualityExpression; returns 'EqualityExpression' although none is marked
-			new Action() {	// [237] BitwiseAndExpression = EqualityExpression.e
+			new Action() {	// [236] BitwiseAndExpression = BitwiseAndExpression.l AMPERSAND.o EqualityExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol _symbol_e = _symbols[offset + 1];
-					final JSNode e = (JSNode) _symbol_e.value;
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [238] BitwiseAndExpression_NoLBF = BitwiseAndExpression_NoLBF AMPERSAND EqualityExpression; returns 'EqualityExpression' although none is marked
+			Action.RETURN,	// [237] BitwiseAndExpression = EqualityExpression
+			new Action() {	// [238] BitwiseAndExpression_NoLBF = BitwiseAndExpression_NoLBF.l AMPERSAND.o EqualityExpression.r
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
+				}
+			},
 			Action.RETURN,	// [239] BitwiseAndExpression_NoLBF = EqualityExpression_NoLBF
-			new Action() {	// [240] BitwiseAndExpression_NoIn = BitwiseAndExpression_NoIn AMPERSAND EqualityExpression_NoIn
+			new Action() {	// [240] BitwiseAndExpression_NoIn = BitwiseAndExpression_NoIn.l AMPERSAND.o EqualityExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			new Action() {	// [241] BitwiseAndExpression_NoIn = EqualityExpression_NoIn
+			Action.RETURN,	// [241] BitwiseAndExpression_NoIn = EqualityExpression_NoIn
+			new Action() {	// [242] BitwiseXorExpression = BitwiseXorExpression.l CARET.o BitwiseAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [242] BitwiseXorExpression = BitwiseXorExpression CARET BitwiseAndExpression; returns 'BitwiseAndExpression' although none is marked
-			new Action() {	// [243] BitwiseXorExpression = BitwiseAndExpression.e
+			Action.RETURN,	// [243] BitwiseXorExpression = BitwiseAndExpression
+			new Action() {	// [244] BitwiseXorExpression_NoLBF = BitwiseXorExpression_NoLBF.l CARET.o BitwiseAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [244] BitwiseXorExpression_NoLBF = BitwiseXorExpression_NoLBF CARET BitwiseAndExpression; returns 'BitwiseAndExpression' although none is marked
 			Action.RETURN,	// [245] BitwiseXorExpression_NoLBF = BitwiseAndExpression_NoLBF
-			new Action() {	// [246] BitwiseXorExpression_NoIn = BitwiseXorExpression_NoIn CARET BitwiseAndExpression_NoIn
+			new Action() {	// [246] BitwiseXorExpression_NoIn = BitwiseXorExpression_NoIn.l CARET.o BitwiseAndExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			new Action() {	// [247] BitwiseXorExpression_NoIn = BitwiseAndExpression_NoIn
+			Action.RETURN,	// [247] BitwiseXorExpression_NoIn = BitwiseAndExpression_NoIn
+			new Action() {	// [248] BitwiseOrExpression = BitwiseOrExpression.l PIPE.o BitwiseXorExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [248] BitwiseOrExpression = BitwiseOrExpression PIPE BitwiseXorExpression; returns 'BitwiseXorExpression' although none is marked
-			new Action() {	// [249] BitwiseOrExpression = BitwiseXorExpression.e
+			Action.RETURN,	// [249] BitwiseOrExpression = BitwiseXorExpression
+			new Action() {	// [250] BitwiseOrExpression_NoLBF = BitwiseOrExpression_NoLBF.l PIPE.o BitwiseXorExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [250] BitwiseOrExpression_NoLBF = BitwiseOrExpression_NoLBF PIPE BitwiseXorExpression; returns 'BitwiseXorExpression' although none is marked
 			Action.RETURN,	// [251] BitwiseOrExpression_NoLBF = BitwiseXorExpression_NoLBF
-			new Action() {	// [252] BitwiseOrExpression_NoIn = BitwiseOrExpression_NoIn PIPE BitwiseXorExpression_NoIn
+			new Action() {	// [252] BitwiseOrExpression_NoIn = BitwiseOrExpression_NoIn.l PIPE.o BitwiseXorExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			new Action() {	// [253] BitwiseOrExpression_NoIn = BitwiseXorExpression_NoIn
+			Action.RETURN,	// [253] BitwiseOrExpression_NoIn = BitwiseXorExpression_NoIn
+			new Action() {	// [254] LogicalAndExpression = LogicalAndExpression.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [254] LogicalAndExpression = LogicalAndExpression AMPERSAND_AMPERSAND BitwiseOrExpression; returns 'BitwiseOrExpression' although none is marked
-			new Action() {	// [255] LogicalAndExpression = BitwiseOrExpression.e
+			Action.RETURN,	// [255] LogicalAndExpression = BitwiseOrExpression
+			new Action() {	// [256] LogicalAndExpression_NoLBF = LogicalAndExpression_NoLBF.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [256] LogicalAndExpression_NoLBF = LogicalAndExpression_NoLBF AMPERSAND_AMPERSAND BitwiseOrExpression; returns 'BitwiseOrExpression' although none is marked
 			Action.RETURN,	// [257] LogicalAndExpression_NoLBF = BitwiseOrExpression_NoLBF
-			new Action() {	// [258] LogicalAndExpression_NoIn = LogicalAndExpression_NoIn AMPERSAND_AMPERSAND BitwiseOrExpression_NoIn
+			new Action() {	// [258] LogicalAndExpression_NoIn = LogicalAndExpression_NoIn.l AMPERSAND_AMPERSAND.o BitwiseOrExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			new Action() {	// [259] LogicalAndExpression_NoIn = BitwiseOrExpression_NoIn
+			Action.RETURN,	// [259] LogicalAndExpression_NoIn = BitwiseOrExpression_NoIn
+			new Action() {	// [260] LogicalOrExpression = LogicalOrExpression.l PIPE_PIPE.o LogicalAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [260] LogicalOrExpression = LogicalOrExpression PIPE_PIPE LogicalAndExpression; returns 'LogicalAndExpression' although none is marked
-			new Action() {	// [261] LogicalOrExpression = LogicalAndExpression.e
+			Action.RETURN,	// [261] LogicalOrExpression = LogicalAndExpression
+			new Action() {	// [262] LogicalOrExpression_NoLBF = LogicalOrExpression_NoLBF.l PIPE_PIPE.o LogicalAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					final Symbol e = _symbols[offset + 1];
-					return e;
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			RETURN3,	// [262] LogicalOrExpression_NoLBF = LogicalOrExpression_NoLBF PIPE_PIPE LogicalAndExpression; returns 'LogicalAndExpression' although none is marked
 			Action.RETURN,	// [263] LogicalOrExpression_NoLBF = LogicalAndExpression_NoLBF
-			new Action() {	// [264] LogicalOrExpression_NoIn = LogicalOrExpression_NoIn PIPE_PIPE LogicalAndExpression_NoIn
+			new Action() {	// [264] LogicalOrExpression_NoIn = LogicalOrExpression_NoIn.l PIPE_PIPE.o LogicalAndExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol o = _symbols[offset + 2];
+					final Symbol _symbol_r = _symbols[offset + 3];
+					final JSNode r = (JSNode) _symbol_r.value;
+					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			new Action() {	// [265] LogicalOrExpression_NoIn = LogicalAndExpression_NoIn
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
-				}
-			},
+			Action.RETURN,	// [265] LogicalOrExpression_NoIn = LogicalAndExpression_NoIn
 			Action.RETURN,	// [266] ConditionalExpression = LogicalOrExpression
-			RETURN5,	// [267] ConditionalExpression = LogicalOrExpression QUESTION AssignmentExpression COLON AssignmentExpression; returns 'AssignmentExpression' although none is marked
+			new Action() {	// [267] ConditionalExpression = LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_t = _symbols[offset + 3];
+					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol _symbol_f = _symbols[offset + 5];
+					final JSNode f = (JSNode) _symbol_f.value;
+					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+				}
+			},
 			Action.RETURN,	// [268] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF
-			RETURN5,	// [269] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF QUESTION AssignmentExpression COLON AssignmentExpression; returns 'AssignmentExpression' although none is marked
+			new Action() {	// [269] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_t = _symbols[offset + 3];
+					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol _symbol_f = _symbols[offset + 5];
+					final JSNode f = (JSNode) _symbol_f.value;
+					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+				}
+			},
 			Action.RETURN,	// [270] ConditionalExpression_NoIn = LogicalOrExpression_NoIn
-			RETURN5,	// [271] ConditionalExpression_NoIn = LogicalOrExpression_NoIn QUESTION AssignmentExpression_NoIn COLON AssignmentExpression_NoIn; returns 'AssignmentExpression_NoIn' although none is marked
+			new Action() {	// [271] ConditionalExpression_NoIn = LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_l = _symbols[offset + 1];
+					final JSNode l = (JSNode) _symbol_l.value;
+					final Symbol _symbol_t = _symbols[offset + 3];
+					final JSNode t = (JSNode) _symbol_t.value;
+					final Symbol _symbol_f = _symbols[offset + 5];
+					final JSNode f = (JSNode) _symbol_f.value;
+					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
+				}
+			},
 			Action.RETURN,	// [272] AssignmentExpression = ConditionalExpression
 			new Action() {	// [273] AssignmentExpression = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
@@ -942,26 +1340,22 @@ public class JSParser extends Parser {
 			Action.RETURN,	// [287] AssignmentOperator = AMPERSAND_EQUAL
 			Action.RETURN,	// [288] AssignmentOperator = CARET_EQUAL
 			Action.RETURN,	// [289] AssignmentOperator = PIPE_EQUAL
-			new Action() {	// [290] Expression = Expression COMMA AssignmentExpression
+			RETURN3,	// [290] Expression = Expression COMMA AssignmentExpression; returns 'AssignmentExpression' although none is marked
+			new Action() {	// [291] Expression = AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
-				}
-			},
-			new Action() {	// [291] Expression = AssignmentExpression
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					return e;
 				}
 			},
 			RETURN3,	// [292] Expression_NoLBF = Expression_NoLBF COMMA AssignmentExpression; returns 'AssignmentExpression' although none is marked
 			Action.RETURN,	// [293] Expression_NoLBF = AssignmentExpression_NoLBF
-			new Action() {	// [294] Expression_NoIn = Expression_NoIn COMMA AssignmentExpression_NoIn
+			RETURN3,	// [294] Expression_NoIn = Expression_NoIn COMMA AssignmentExpression_NoIn; returns 'AssignmentExpression_NoIn' although none is marked
+			new Action() {	// [295] Expression_NoIn = AssignmentExpression_NoIn.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
-				}
-			},
-			new Action() {	// [295] Expression_NoIn = AssignmentExpression_NoIn
-				public Symbol reduce(Symbol[] _symbols, int offset) {
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_e = _symbols[offset + 1];
+					final JSNode e = (JSNode) _symbol_e.value;
+					return e;
 				}
 			},
 			new Action() {	// [296] Literal = NULL.n

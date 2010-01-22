@@ -46,7 +46,7 @@ public class JSNodeTypes
 
 	public static final short THIS = 20;
 
-	public static final short STATEMENT = 21;
+	public static final short STATEMENTS = 21;
 
 	public static final short CONTINUE = 22;
 
@@ -97,4 +97,52 @@ public class JSNodeTypes
 	public static final short SHIFT_RIGHT = 45;
 
 	public static final short SUBTRACT = 46;
+
+	public static final short GET_ELEMENT = 47;
+
+	public static final short GET_PROPERTY = 48;
+
+	public static final short DELETE = 49;
+
+	public static final short LOGICAL_NOT = 50;
+
+	public static final short NEGATIVE = 51;
+
+	public static final short PRE_DECREMENT = 52;
+
+	public static final short POSITIVE = 53;
+
+	public static final short PRE_INCREMENT = 54;
+
+	public static final short BITWISE_NOT = 55;
+
+	public static final short TYPEOF = 56;
+
+	public static final short VOID = 57;
+
+	public static final short GROUP = 58;
+
+	public static final short POST_DECREMENT = 59;
+
+	public static final short POST_INCREMENT = 60;
+
+	public static final short ARGUMENTS = 61;
+
+	public static final short INVOKE = 62;
+
+	public static final short DECLARATION = 63;
+
+	public static final short VAR = 64;
+
+	public static final short TRY = 65;
+
+	public static final short CATCH = 66;
+
+	public static final short FINALLY = 67;
+
+	public static final short CONDITIONAL = 68;
+
+	public static final short PARAMETERS = 69;
+
+	public static final short FUNCTION = 70;
 }

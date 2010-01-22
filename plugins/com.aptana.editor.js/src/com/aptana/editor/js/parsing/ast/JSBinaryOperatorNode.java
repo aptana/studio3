@@ -6,10 +6,17 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSBinaryOperatorNode extends JSNode
 {
 
-	public JSBinaryOperatorNode(JSNode left, String operator, JSNode right)
+	protected JSBinaryOperatorNode(JSNode left, JSNode right)
 	{
 		this.start = left.getStart();
 		this.end = right.getEnd();
+
+		setChildren(new JSNode[] { left, right });
+	}
+
+	public JSBinaryOperatorNode(JSNode left, String operator, JSNode right)
+	{
+		this(left, right);
 
 		short type = DEFAULT_TYPE;
 		short token = JSTokens.getToken(operator);
@@ -86,8 +93,6 @@ public class JSBinaryOperatorNode extends JSNode
 				break;
 		}
 		setType(type);
-
-		setChildren(new JSNode[] { left, right });
 	}
 
 	@Override
@@ -175,10 +180,6 @@ public class JSBinaryOperatorNode extends JSNode
 		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
 		text.append(children[1]);
 
-		if (getSemicolonIncluded())
-		{
-			text.append(";"); //$NON-NLS-1$
-		}
-		return text.toString();
+		return appendSemicolon(text.toString());
 	}
 }

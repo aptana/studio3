@@ -13,6 +13,6 @@ public class JSPrimitiveNode extends JSNode
 	@Override
 	public String toString()
 	{
-		return fText;
+		return appendSemicolon(fText);
 	}
 }
