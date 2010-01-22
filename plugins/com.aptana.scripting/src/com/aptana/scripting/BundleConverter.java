@@ -10,6 +10,8 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xml.sax.InputSource;
 
@@ -39,9 +41,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
@@ -51,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		// String[] bundleFilter = new String[] { "TODO" };
+		String[] bundleFilter = new String[] { "Text" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -62,14 +64,14 @@ public class BundleConverter
 		{
 			String nameWithoutExtension = textmateBundleDir.getName().substring(0,
 					textmateBundleDir.getName().length() - 9);
-			// for (String bundleToConvert : bundleFilter)
-			// {
-			// if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
-			// {
-			convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
-			// continue;
-			// }
-			// }
+			for (String bundleToConvert : bundleFilter)
+			{
+				if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
+				{
+					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
+					continue;
+				}
+			}
 		}
 	}
 
@@ -248,7 +250,7 @@ public class BundleConverter
 		String content = (String) properties.getProperty(key);
 		if (content == null)
 			return null;
-		return content.replace("'", "\\'").replace("É", "...").replace("Ñ", "-"); //$NON-NLS-1$ //$NON-NLS-2$
+		return content.replace("'", "\\'").replace("â€¦", "...").replace("â€”", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	static void writeToFile(String output, String outFilePath) throws IOException
@@ -284,13 +286,16 @@ public class BundleConverter
 			char c = keyBinding.charAt(i);
 			switch (c)
 			{
+				case 'ïœˆ':
+					builder.append("F5+"); //$NON-NLS-1$
+					break;
 				case '@':
 					builder.append("M1+M2+"); //$NON-NLS-1$
 					break;
 				case '^':
 					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
 					{
-						builder.append("CONTROL+SHIFT+COMMAND+"); //$NON-NLS-1$
+						builder.append("CONTROL+COMMAND+SHIFT+"); //$NON-NLS-1$
 						i++;
 					}
 					else
@@ -316,6 +321,18 @@ public class BundleConverter
 		}
 		if (keyBinding.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);
-		return builder.toString();
+
+		// Turn Shift+lowercase_letter into uppercase_letter
+		String result = builder.toString();
+		Pattern p = Pattern.compile("(SHIFT|M2)\\+([a-z])");
+		Matcher m = p.matcher(result);
+		StringBuffer sb = new StringBuffer();
+		while (m.find())
+		{
+			m.appendReplacement(sb, m.group(2).toUpperCase());
+		}
+		m.appendTail(sb);
+		result = sb.toString();
+		return result;
 	}
 }
