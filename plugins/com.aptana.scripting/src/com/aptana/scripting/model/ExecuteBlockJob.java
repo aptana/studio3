@@ -39,6 +39,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	private boolean _executedSuccessfully;
 	private CommandResult _result;
 	private RubyHash _originalEnvironment;
+	private Map<String, String> _contributedEnvironment;
 
 	/**
 	 * ExecuteScriptJob
@@ -86,6 +87,8 @@ public class ExecuteBlockJob extends AbstractScriptJob
 
 		this._command = command;
 		this._context = context;
+		this._contributedEnvironment = new HashMap<String, String>();
+		this._command.populateEnvironment(this._context.getMap(), this._contributedEnvironment);
 	}
 
 	/**
@@ -101,13 +104,11 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		if (env != null && env instanceof RubyHash)
 		{
 			RubyHash hash = (RubyHash) env;
-			Map<String, String> environment = new HashMap<String, String>();
 			
 			// save copy for later
 			this._originalEnvironment = (RubyHash) hash.dup();
 
-			this._command.populateEnvironment(this._context.getMap(), environment);
-			hash.putAll(environment);
+			hash.putAll(this._contributedEnvironment);
 		}
 	}
 
