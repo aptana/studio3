@@ -7,6 +7,8 @@ import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Point;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
@@ -72,6 +74,20 @@ public class CommandElementsProvider implements ICommandElementsProvider
 			CommonEditorPlugin.logError(e);
 		}
 		return commandElements;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.scripting.keybindings.ICommandElementsProvider#getCommandElementsPopupLocation()
+	 */
+	@Override
+	public Point getCommandElementsPopupLocation()
+	{
+		StyledText textWidget = abstractThemeableEditor.getSourceViewerNonFinal().getTextWidget();
+		int caretOffset = textWidget.getCaretOffset();
+		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
+		locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
+				+ textWidget.getLineHeight(caretOffset) + 2);
+		return locationAtOffset;
 	}
 
 	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
