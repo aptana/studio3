@@ -10,7 +10,6 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
-import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -31,27 +30,28 @@ public class ScriptUtils
 	{
 	}
 
-	/**
-	 * instantiateClass
-	 * 
-	 * @param fullyQualifiedName
-	 * @return
-	 */
-	public static IRubyObject instantiateClass(String name)
-	{
-		return instantiateClass(name, NO_ARGS);
-	}
+//	/**
+//	 * instantiateClass
+//	 * 
+//	 * @param runtime
+//	 * @param name
+//	 * @return
+//	 */
+//	public static IRubyObject instantiateClass(Ruby runtime, String name)
+//	{
+//		return instantiateClass(runtime, name, NO_ARGS);
+//	}
 	
 	/**
 	 * instantiateClass
 	 * 
+	 * @param runtime
 	 * @param name
 	 * @param args
 	 * @return
 	 */
-	public static IRubyObject instantiateClass(String name, IRubyObject[] args)
+	public static IRubyObject instantiateClass(Ruby runtime, String name, IRubyObject ... args)
 	{
-		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
 		IRubyObject result = null;
 		
@@ -67,28 +67,30 @@ public class ScriptUtils
 		return result;
 	}
 	
-	/**
-	 * instantiateClass
-	 * 
-	 * @param fullyQualifiedName
-	 * @return
-	 */
-	public static IRubyObject instantiateClass(String module, String name)
-	{
-		return instantiateClass(module, name, NO_ARGS);
-	}
+//	/**
+//	 * instantiateClass
+//	 * 
+//	 * @param runtime
+//	 * @param module
+//	 * @param name
+//	 * @return
+//	 */
+//	public static IRubyObject instantiateClass(Ruby runtime, String module, String name)
+//	{
+//		return instantiateClass(runtime, module, name, NO_ARGS);
+//	}
 	
 	/**
 	 * instantiateClass
 	 * 
+	 * @param runtime
 	 * @param module
 	 * @param name
 	 * @param args
 	 * @return
 	 */
-	public static IRubyObject instantiateClass(String module, String name, IRubyObject[] args)
+	public static IRubyObject instantiateClass(Ruby runtime, String module, String name, IRubyObject ... args)
 	{
-		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
 		IRubyObject result = null;
 		
@@ -129,19 +131,6 @@ public class ScriptUtils
 		}
 
 		return result;
-	}
-	
-	/**
-	 * javaToRuby
-	 * 
-	 * @param javaObject
-	 * @return
-	 */
-	public static IRubyObject javaToRuby(Object javaObject)
-	{
-		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-		
-		return JavaEmbedUtils.javaToRuby(runtime, javaObject);
 	}
 	
 	/**

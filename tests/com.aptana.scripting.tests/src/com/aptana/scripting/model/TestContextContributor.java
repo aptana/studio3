@@ -1,5 +1,7 @@
 package com.aptana.scripting.model;
 
+import org.jruby.Ruby;
+import org.jruby.RubyProc;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
@@ -26,11 +28,17 @@ public class TestContextContributor implements ContextContributor
 		
 		// We have to load a specific bundle in order for ContextContributor to exist, so
 		// we don't want to do anything when it doesn't exist.
-		IRubyObject value = ScriptUtils.instantiateClass("ContextContributor");
+		RubyProc proc = command.getInvokeBlock();
 		
-		if (value != null)
+		if (proc != null)
 		{
-			context.put("test2", value);
+			Ruby runtime = proc.getRuntime();
+			IRubyObject value = ScriptUtils.instantiateClass(runtime, "ContextContributor");
+	
+			if (value != null)
+			{
+				context.put("test2", value);
+			}
 		}
 	}
 }
