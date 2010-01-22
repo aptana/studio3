@@ -79,6 +79,10 @@ public abstract class ProcessUtil
 			if (read.endsWith("\n")) //$NON-NLS-1$
 				read = read.substring(0, read.length() - 1);
 			int exitValue = p.waitFor();
+			if (exitValue != 0 && (read == null || read.trim().length() == 0))
+			{
+				read = read(p.getErrorStream());
+			}
 			Map<Integer, String> result = new HashMap<Integer, String>();
 			result.put(exitValue, read);
 			return result;

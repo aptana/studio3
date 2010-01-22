@@ -3,7 +3,6 @@ package com.aptana.scripting.model;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -24,12 +23,13 @@ import org.jruby.runtime.builtin.IRubyObject;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.util.IOUtil;
+import com.aptana.util.ProcessUtil;
 
 public class CommandElement extends AbstractBundleElement
 {
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
-	
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private String[] _triggers;
@@ -58,6 +58,7 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
+		this._runType = RunType.CURRENT_THREAD;
 	}
 
 	/**
@@ -92,6 +93,9 @@ public class CommandElement extends AbstractBundleElement
 
 		if (this.isExecutable())
 		{
+			// set default output type, this may be changed by context.exit_with_message
+			context.setOutputType(this._outputType);
+
 			if (this.isShellCommand())
 			{
 				result = this.invokeStringCommand(context);
@@ -113,7 +117,7 @@ public class CommandElement extends AbstractBundleElement
 
 		return result;
 	}
-	
+
 	/**
 	 * getElementName
 	 */
@@ -182,7 +186,7 @@ public class CommandElement extends AbstractBundleElement
 			if (platform != Platform.UNDEFINED)
 			{
 				result = this._keyBindings.get(platform);
-				
+
 				if (result != null && result.length > 0)
 				{
 					break;
@@ -314,25 +318,31 @@ public class CommandElement extends AbstractBundleElement
 		
 		try
 		{
-			if (this._runType == RunType.JOB)
+			switch (this._runType)
 			{
-				job.setPriority(Job.SHORT);
-				job.schedule();
+				case JOB:
+					job.setPriority(Job.SHORT);
+					job.schedule();
+					
+					if (this._async == false)
+					{
+						job.join();
+					}
+					break;
 				
-				if (this._async == false)
-				{
-					job.join();
-				}
-			}
-			else
-			{
-				Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
-				thread.start();
-				
-				if (this._async == false)
-				{
-					thread.join();
-				}
+				case THREAD:
+					Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
+					thread.start();
+					
+					if (this._async == false)
+					{
+						thread.join();
+					}
+					break;
+					
+				case CURRENT_THREAD:
+				default:
+					job.run();
 			}
 		}
 		catch (InterruptedException e)
@@ -345,7 +355,7 @@ public class CommandElement extends AbstractBundleElement
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return (this._async) ? null : job.getCommandResult();
+		return (this._async && this._runType != RunType.CURRENT_THREAD) ? null : job.getCommandResult();
 	}
 
 	/**
@@ -355,9 +365,6 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeStringCommand(CommandContext context)
 	{
-		// TODO: hardly a robust implementation, but enough to start testing
-		// functionality
-
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 		File tempFile = null;
 		String resultText = ""; //$NON-NLS-1$
@@ -376,73 +383,43 @@ public class CommandElement extends AbstractBundleElement
 			pw.print(this._invoke);
 			pw.close();
 
-			// create process builder
-			ProcessBuilder builder = new ProcessBuilder();
-
+			Map<String, String> env = new HashMap<String, String>();
 			// augment environment with the context map
 			if (context != null)
 			{
-				this.populateEnvironment(context.getMap(), builder.environment());
+				this.populateEnvironment(context.getMap(), env);
 			}
 
 			// create the command to execute
-			List<String> commands = new ArrayList<String>();
-
+			String command = null;
 			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
 					|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
 			{
 				// FIXME: should we be using the user's preferred shell instead of hardcoding?
-				commands.add("/bin/bash"); //$NON-NLS-1$
+				command = "/bin/bash"; //$NON-NLS-1$
 			}
 			else
 			{
 				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-				commands.add("cmd"); //$NON-NLS-1$
+				command = "cmd"; //$NON-NLS-1$
 			}
 
-			commands.add(tempFile.getAbsolutePath());
-
-			// setup command-line
-			builder.command(commands);
-
-			// setup working directory
-			String path = this.getWorkingDirectory();
-			if (path != null && path.length() > 0)
+			String input = IOUtil.read(context.getInputStream(), "UTF-8"); //$NON-NLS-1$			
+			Map<Integer, String> result = ProcessUtil.runInBackground(command, getWorkingDirectory(), input, env,
+					new String[] { tempFile.getAbsolutePath() });
+			if (result == null)
 			{
-				builder.directory(new File(path));
-			}
-
-			// run process and get output
-			StringBuffer buffer = new StringBuffer();
-			Process process = builder.start();
-
-			InputStream is = process.getInputStream();
-			byte[] line = new byte[1024];
-			int count;
-
-			try
-			{
-				while ((count = is.read(line)) != -1)
-				{
-					buffer.append(new String(line, 0, count));
-				}
-			}
-			catch (IOException e)
-			{
-				ScriptLogger.logError(e.getMessage());
+				exitValue = 1;
 				executedSuccessfully = false;
 			}
-
-			exitValue = process.waitFor();
-			resultText = buffer.toString();
-			executedSuccessfully = (exitValue == 0);
+			else
+			{
+				exitValue = result.keySet().iterator().next();
+				resultText = result.values().iterator().next();
+				executedSuccessfully = (exitValue == 0);
+			}
 		}
 		catch (IOException e)
-		{
-			ScriptLogger.logError(e.getMessage());
-			executedSuccessfully = false;
-		}
-		catch (InterruptedException e)
 		{
 			ScriptLogger.logError(e.getMessage());
 			executedSuccessfully = false;
@@ -459,6 +436,8 @@ public class CommandElement extends AbstractBundleElement
 		result.setOutputString(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
+		result.setCommand(this);
+		result.setContext(context);
 
 		return result;
 	}
@@ -524,15 +503,15 @@ public class CommandElement extends AbstractBundleElement
 				{
 					Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
 					ThreadContext threadContext = runtime.getCurrentContext();
-					
+
 					try
 					{
 						IRubyObject methodResult = rubyObject.callMethod(threadContext, TO_ENV_METHOD_NAME);
-	
+
 						if (methodResult instanceof RubyHash)
 						{
 							RubyHash environmentHash = (RubyHash) methodResult;
-	
+
 							for (Object hashKey : environmentHash.keySet())
 							{
 								environment.put(hashKey.toString(), environmentHash.get(hashKey).toString());
@@ -541,11 +520,12 @@ public class CommandElement extends AbstractBundleElement
 					}
 					catch (RaiseException e)
 					{
-						String message = MessageFormat.format(
-							"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
-							new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() }
-						);
-						
+						String message = MessageFormat
+								.format(
+										"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
+										new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(),
+												e.getMessage() });
+
 						ScriptLogger.logError(message);
 						e.printStackTrace();
 					}

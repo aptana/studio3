@@ -55,6 +55,7 @@ import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.OutputType;
+
 //import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
@@ -109,18 +110,16 @@ public class CommandExecutionUtils
 			}
 			catch (FileNotFoundException e)
 			{
-				String message = MessageFormat.format(
-					Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
-					new Object[] { path }
-				);
-				
+				String message = MessageFormat.format(Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
+						new Object[] { path });
+
 				ScriptUtils.logErrorWithStackTrace(message, e);
 			}
 
 			return result;
 		}
 	}
-	
+
 	public static class StringInputProvider implements FilterInputProvider
 	{
 		private final String string;
@@ -375,7 +374,8 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command, InputType inputType)
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command,
+			InputType inputType)
 	{
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
@@ -436,7 +436,7 @@ public class CommandExecutionUtils
 
 		StyledText textWidget = textViewer.getTextWidget();
 		final int caretOffset = textWidget.getCaretOffset();
-		OutputType ouputType = commandResult.getOutputType(); //OutputType.get(command.getOutputType());
+		OutputType ouputType = commandResult.getOutputType(); // OutputType.get(command.getOutputType());
 		switch (ouputType)
 		{
 			case DISCARD:
@@ -453,6 +453,10 @@ public class CommandExecutionUtils
 				else
 				{
 					IRegion region = getSelectedRegion(textWidget);
+					if (commandResult.getInputType() == InputType.WORD)
+					{
+						region = findWordRegion(textWidget);
+					}
 					textWidget
 							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 				}
@@ -469,7 +473,18 @@ public class CommandExecutionUtils
 				replaceDocument(textWidget, commandResult);
 				break;
 			case INSERT_AS_TEXT:
-				textWidget.replaceTextRange(caretOffset, 0, commandResult.getOutputString());
+				int offsetToInsert = caretOffset;
+				if (commandResult.getInputType() == InputType.SELECTION)
+				{
+					IRegion region = getSelectedRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.LINE)
+				{
+					IRegion region = getCurrentLineRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				textWidget.replaceTextRange(offsetToInsert, 0, commandResult.getOutputString());
 				break;
 			case INSERT_AS_SNIPPET:
 				IRegion region = new Region(caretOffset, 0);
@@ -570,7 +585,7 @@ public class CommandExecutionUtils
 	{
 		FileWriter writer = null;
 		String path = commandResult.getCommand().getOutputPath();
-		
+
 		try
 		{
 			writer = new FileWriter(path);
@@ -578,11 +593,9 @@ public class CommandExecutionUtils
 		}
 		catch (IOException e)
 		{
-			String message = MessageFormat.format(
-				Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
-				new Object[] { path }
-			);
-			
+			String message = MessageFormat.format(Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
+					new Object[] { path });
+
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 		finally

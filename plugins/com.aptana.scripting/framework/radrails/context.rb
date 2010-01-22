@@ -13,6 +13,14 @@ module RadRails
       @jobj.output_type = output_type.to_s
       exit
     end
+    
+    def exit_show_tool_tip(message)
+      exit_with_message(message, :show_as_tooltip)
+    end
+    
+    def exit_discard
+      exit_with_message('', :discard)
+    end
     	
     def in
       @jobj.in

@@ -22,6 +22,7 @@ import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
 import com.aptana.scripting.model.ExecuteScriptJob;
+import com.aptana.scripting.model.RunType;
 import com.aptana.util.ResourceUtils;
 
 public class ScriptingEngine
@@ -41,12 +42,14 @@ public class ScriptingEngine
 	private ScriptingContainer _scriptingContainer;
 	private List<String> _loadPaths;
 	private List<String> _frameworkFiles;
+	private RunType _runType;
 
 	/**
 	 * ScriptingEngine
 	 */
 	private ScriptingEngine()
 	{
+		this._runType = RunType.CURRENT_THREAD;
 	}
 
 	/**
@@ -233,7 +236,7 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths)
 	{
-		return this.runScript(fullPath, loadPaths, true);
+		return this.runScript(fullPath, loadPaths, false);
 	}
 	
 	/**
@@ -248,18 +251,34 @@ public class ScriptingEngine
 	{
 		ExecuteScriptJob job = new ExecuteScriptJob(fullPath, loadPaths);
 		
-		job.setPriority(Job.SHORT);
-		job.schedule();
-		
-//		Thread thread = new Thread(job, "Load '" + fullPath + "'");
-//		thread.start();
-		
 		try
 		{
-			if (async == false)
+			switch (this._runType)
 			{
-				job.join();
-//				thread.join();
+				case JOB:
+					job.setPriority(Job.SHORT);
+					job.schedule();
+					
+					if (async == false)
+					{
+						job.join();
+					}
+					break;
+					
+				case THREAD:
+					Thread thread = new Thread(job, "Load '" + fullPath + "'");
+					thread.start();
+					
+					if (async == false)
+					{
+						thread.join();
+					}
+					break;
+					
+				case CURRENT_THREAD:
+				default:
+					job.run();
+					break;
 			}
 		}
 		catch (InterruptedException e)
@@ -272,6 +291,6 @@ public class ScriptingEngine
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return (async) ? null : job.getReturnValue();
+		return (async && this._runType != RunType.CURRENT_THREAD) ? null : job.getReturnValue();
 	}
 }

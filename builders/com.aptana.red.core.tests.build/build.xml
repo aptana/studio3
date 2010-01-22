@@ -204,6 +204,10 @@
 			<param name="test.plugin" value="com.aptana.scripting.tests" />
 			<param name="test.classname" value="com.aptana.scripting.tests.AllTests" />
 		</antcall>
+		<antcall target="run-core-test">
+			<param name="test.plugin" value="com.aptana.git.core.tests" />
+			<param name="test.classname" value="com.aptana.git.core.tests.AllTests" />
+		</antcall>
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.common.tests" />
 			<param name="test.classname" value="com.aptana.editor.common.tests.AllTests" />
@@ -227,6 +231,10 @@
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.editor.xml.tests" />
 			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
+		</antcall>
+		<antcall target="run-ui-test">
+			<param name="test.plugin" value="com.aptana.editor.sass.tests" />
+			<param name="test.classname" value="com.aptana.editor.sass.tests.AllTests" />
 		</antcall>
 		<antcall target="run-ui-test">
 			<param name="test.plugin" value="com.aptana.git.ui.tests" />

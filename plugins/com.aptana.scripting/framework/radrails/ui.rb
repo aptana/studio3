@@ -294,4 +294,3 @@ module RadRails
     end
   end
 end
-  

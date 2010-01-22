@@ -7,6 +7,7 @@ import java.util.Map;
 public enum RunType
 {
 	JOB("job"), //$NON-NLS-1$
+	CURRENT_THREAD("current_thread"), //$NON-NLS-1$
 	THREAD("thread"); //$NON-NLS-1$
 
 	private static Map<String, RunType> NAME_MAP;
