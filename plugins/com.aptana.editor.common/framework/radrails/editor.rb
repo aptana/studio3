@@ -229,12 +229,14 @@ module RadRails
         result["TM_DIRECTORY"] = file.parent_file.absolute_path
         result["TM_PROJECT_DIRECTORY"] = ifile.project.location.to_file.absolute_path # duplicate name in project.rb
         
-        result["TM_SELECTED_TEXT"] = selection.text
-        result["TM_LINE_NUMBER"] = selection.start_line + 1
-        result["TM_SELECTION_OFFSET"] = selection.offset
-        result["TM_SELECTION_LENGTH"] = selection.length
-        result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
-        result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+        if !selection.empty? and selection.text.length > 0
+          result["TM_SELECTED_TEXT"] = selection.text
+          result["TM_LINE_NUMBER"] = selection.start_line + 1
+          result["TM_SELECTION_OFFSET"] = selection.offset
+          result["TM_SELECTION_LENGTH"] = selection.length
+          result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
+          result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+        end
         
         result["TM_LINE_INDEX"] = caret_column
         result["TM_CARET_LINE_NUMBER"] = caret_line + 1
