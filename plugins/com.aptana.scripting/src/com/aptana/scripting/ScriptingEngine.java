@@ -49,7 +49,7 @@ public class ScriptingEngine
 	 */
 	private ScriptingEngine()
 	{
-		this._runType = RunType.CURRENT_THREAD;
+		this._runType = Activator.getDefaultRunType();
 	}
 
 	/**
