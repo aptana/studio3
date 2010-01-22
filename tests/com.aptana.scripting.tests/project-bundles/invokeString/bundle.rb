@@ -2,6 +2,6 @@ require "radrails"
 
 bundle "invokeString" do
   command "Test" do |cmd|
-    cmd.invoke = "echo hello"
+    cmd.invoke = "echo 'hello string'"
   end
 end
