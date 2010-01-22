@@ -38,6 +38,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	private CommandContext _context;
 	private boolean _executedSuccessfully;
 	private CommandResult _result;
+	private RubyHash _originalEnvironment;
 
 	/**
 	 * ExecuteScriptJob
@@ -99,8 +100,11 @@ public class ExecuteBlockJob extends AbstractScriptJob
 
 		if (env != null && env instanceof RubyHash)
 		{
-			Map<String, String> environment = new HashMap<String, String>();
 			RubyHash hash = (RubyHash) env;
+			Map<String, String> environment = new HashMap<String, String>();
+			
+			// save copy for later
+			this._originalEnvironment = (RubyHash) hash.dup();
 
 			this._command.populateEnvironment(this._context.getMap(), environment);
 			hash.putAll(environment);
@@ -285,6 +289,9 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		
 		// unapply load paths
 		this.unapplyLoadPaths(runtime);
+		
+		// unapply environment
+		this.unapplyEnvironment();
 
 		// process result
 		CommandResult result = new CommandResult();
@@ -396,6 +403,26 @@ public class ExecuteBlockJob extends AbstractScriptJob
 			runtime.defineGlobalConstant("STDOUT", io);
 			runtime.getGlobalVariables().alias("$>", "$stdout");
 			runtime.getGlobalVariables().alias("$defout", "$stdout");
+		}
+	}
+	
+	/**
+	 * unapplyEnvironment
+	 */
+	protected void unapplyEnvironment()
+	{
+		Ruby runtime = this.getRuntime();
+		IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
+
+		if (env != null && env instanceof RubyHash)
+		{
+			RubyHash hash = (RubyHash) env;
+			
+			// restore original content
+			hash.replace(runtime.getCurrentContext(), this._originalEnvironment);
+			
+			// lose reference
+			this._originalEnvironment = null;
 		}
 	}
 }
