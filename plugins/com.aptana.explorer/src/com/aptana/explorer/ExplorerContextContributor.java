@@ -5,7 +5,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.jruby.Ruby;
-import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -55,28 +54,22 @@ public class ExplorerContextContributor implements ContextContributor
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		IProject project = this.getActiveProject();
-		Ruby runtime = null;
 
 		if (project != null && command != null)
 		{
-			RubyProc proc = command.getInvokeBlock();
+			Ruby runtime = command.getRuntime();
 
-			if (proc != null)
+			if (runtime != null)
 			{
-				runtime = proc.getRuntime();
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+						PROJECT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, project));
+
+				context.put(PROJECT_PROPERTY_NAME, rubyInstance);
 			}
-		}
-
-		if (runtime != null)
-		{
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
-					PROJECT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, project));
-
-			context.put(PROJECT_PROPERTY_NAME, rubyInstance);
-		}
-		else
-		{
-			context.put(PROJECT_PROPERTY_NAME, null);
+			else
+			{
+				context.put(PROJECT_PROPERTY_NAME, null);
+			}
 		}
 	}
 }

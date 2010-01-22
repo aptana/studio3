@@ -1,7 +1,6 @@
 package com.aptana.scripting;
 
 import org.jruby.Ruby;
-import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -25,43 +24,36 @@ public class BundleContextContributor implements ContextContributor
 	@Override
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
-		Ruby runtime = null;
-
 		if (command != null)
 		{
-			RubyProc proc = command.getInvokeBlock();
-
-			if (proc != null)
+			Ruby runtime = command.getRuntime();
+			
+			if (runtime != null)
 			{
-				runtime = proc.getRuntime();
-			}
-		}
-
-		if (runtime != null)
-		{
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
-					COMMAND_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, command));
-
-			context.put(COMMAND_PROPERTY_NAME, rubyInstance);
-
-			BundleElement bundle = command.getOwningBundle();
-
-			if (bundle != null)
-			{
-				rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE, BUNDLE_RUBY_CLASS,
-						JavaEmbedUtils.javaToRuby(runtime, bundle));
-
-				context.put(BUNDLE_PROPERTY_NAME, rubyInstance);
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+						COMMAND_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, command));
+				
+				context.put(COMMAND_PROPERTY_NAME, rubyInstance);
+				
+				BundleElement bundle = command.getOwningBundle();
+				
+				if (bundle != null)
+				{
+					rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE, BUNDLE_RUBY_CLASS,
+							JavaEmbedUtils.javaToRuby(runtime, bundle));
+					
+					context.put(BUNDLE_PROPERTY_NAME, rubyInstance);
+				}
+				else
+				{
+					context.put(BUNDLE_PROPERTY_NAME, null);
+				}
 			}
 			else
 			{
+				context.put(COMMAND_PROPERTY_NAME, null);
 				context.put(BUNDLE_PROPERTY_NAME, null);
 			}
-		}
-		else
-		{
-			context.put(COMMAND_PROPERTY_NAME, null);
-			context.put(BUNDLE_PROPERTY_NAME, null);
 		}
 	}
 }

@@ -12,7 +12,8 @@ public class StreamContextContributor implements ContextContributor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.ContextContributor#modifyContext(com.aptana.scripting.model.CommandElement, com.aptana.scripting.model.CommandContext)
+	 * @see com.aptana.scripting.model.ContextContributor#modifyContext(com.aptana.scripting.model.CommandElement,
+	 * com.aptana.scripting.model.CommandContext)
 	 */
 	public void modifyContext(CommandElement command, CommandContext context)
 	{

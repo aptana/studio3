@@ -258,6 +258,23 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getRuntime
+	 * 
+	 * @return
+	 */
+	public Ruby getRuntime()
+	{
+		Ruby runtime = null;
+
+		if (this._invokeBlock != null)
+		{
+			runtime = this._invokeBlock.getRuntime();
+		}
+		
+		return runtime;
+	}
+	
+	/**
 	 * getRunType
 	 * 
 	 * @return

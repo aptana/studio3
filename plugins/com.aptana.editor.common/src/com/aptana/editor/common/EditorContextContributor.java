@@ -11,7 +11,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 import org.jruby.Ruby;
-import org.jruby.RubyProc;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -127,28 +126,22 @@ public class EditorContextContributor implements ContextContributor
 	public void modifyContext(CommandElement command, CommandContext context)
 	{
 		IEditorPart editor = this.getActiveEditor();
-		Ruby runtime = null;
 
 		if (editor != null && command != null)
 		{
-			RubyProc proc = command.getInvokeBlock();
+			Ruby runtime = command.getRuntime();
 
-			if (proc != null)
+			if (runtime != null)
 			{
-				runtime = proc.getRuntime();
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+						EDITOR_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, editor));
+
+				context.put(EDITOR_PROPERTY_NAME, rubyInstance);
 			}
-		}
-
-		if (runtime != null)
-		{
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
-					EDITOR_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, editor));
-
-			context.put(EDITOR_PROPERTY_NAME, rubyInstance);
-		}
-		else
-		{
-			context.put(EDITOR_PROPERTY_NAME, null);
+			else
+			{
+				context.put(EDITOR_PROPERTY_NAME, null);
+			}
 		}
 	}
 }
