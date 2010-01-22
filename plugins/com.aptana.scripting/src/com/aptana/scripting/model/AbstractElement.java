@@ -16,6 +16,8 @@ public abstract class AbstractElement
 	private String _displayName;
 	private Map<String,Object> _customProperties;
 	
+	private Object propertyLock = new Object();
+	
 	/**
 	 * static constructor
 	 */
@@ -174,12 +176,15 @@ public abstract class AbstractElement
 	{
 		if (property != null && property.length() > 0)
 		{
-			if (this._customProperties == null)
+			synchronized (propertyLock)
 			{
-				this._customProperties = new HashMap<String, Object>();
+				if (this._customProperties == null)
+				{
+					this._customProperties = new HashMap<String, Object>();
+				}
+				
+				this._customProperties.put(property, value);
 			}
-			
-			this._customProperties.put(property, value);
 		}
 	}
 	

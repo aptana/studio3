@@ -67,7 +67,7 @@ public class BundleElement extends AbstractElement
 				{
 					this._commands = new ArrayList<CommandElement>();
 				}
-	
+
 				// NOTE: Should we prevent the same element from being added twice?
 				this._commands.add(command);
 			}
@@ -184,14 +184,11 @@ public class BundleElement extends AbstractElement
 	{
 		CommandElement[] result = BundleManager.NO_COMMANDS;
 
-		if (this._commands != null)
+		synchronized (commandLock)
 		{
-			synchronized (commandLock)
+			if (this._commands != null && this._commands.size() > 0)
 			{
-				if (this._commands.size() > 0)
-				{
-					result = this._commands.toArray(new CommandElement[this._commands.size()]);
-				}
+				result = this._commands.toArray(new CommandElement[this._commands.size()]);
 			}
 		}
 
@@ -293,10 +290,10 @@ public class BundleElement extends AbstractElement
 	public List<String> getLoadPaths()
 	{
 		File bundleDirectory = new File(this.getPath()).getParentFile();
-		
+
 		return BundleManager.getInstance().getBundleLoadPaths(bundleDirectory);
 	}
-	
+
 	/**
 	 * getMenus
 	 * 
@@ -306,14 +303,11 @@ public class BundleElement extends AbstractElement
 	{
 		MenuElement[] result = BundleManager.NO_MENUS;
 
-		if (this._menus != null)
+		synchronized (menuLock)
 		{
-			synchronized (menuLock)
+			if (this._menus != null && this._menus.size() > 0)
 			{
-				if (this._menus.size() > 0)
-				{
-					result = this._menus.toArray(new MenuElement[this._menus.size()]);
-				}
+				result = this._menus.toArray(new MenuElement[this._menus.size()]);
 			}
 		}
 
@@ -328,15 +322,15 @@ public class BundleElement extends AbstractElement
 	public boolean hasCommands()
 	{
 		boolean result = false;
-		
-		if (this._commands != null)
+
+		synchronized (commandLock)
 		{
-			synchronized (commandLock)
+			if (this._commands != null)
 			{
 				result = this._commands.size() > 0;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -348,15 +342,15 @@ public class BundleElement extends AbstractElement
 	public boolean hasMenus()
 	{
 		boolean result = false;
-		
-		if (this._menus != null)
+
+		synchronized (menuLock)
 		{
-			synchronized (menuLock)
+			if (this._menus != null)
 			{
 				result = this._menus.size() > 0;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -409,20 +403,26 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 
 		// output commands
-		if (this._commands != null)
+		synchronized (commandLock)
 		{
-			for (CommandElement command : this._commands)
+			if (this._commands != null)
 			{
-				command.toSource(printer);
+				for (CommandElement command : this._commands)
+				{
+					command.toSource(printer);
+				}
 			}
 		}
 
 		// output menus
-		if (this._menus != null)
+		synchronized (menuLock)
 		{
-			for (MenuElement menu : this._menus)
+			if (this._menus != null)
 			{
-				menu.toSource(printer);
+				for (MenuElement menu : this._menus)
+				{
+					menu.toSource(printer);
+				}
 			}
 		}
 	}
@@ -434,23 +434,20 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeCommand(CommandElement command)
 	{
-		if (this._commands != null)
+		boolean removed = false;
+
+		synchronized (commandLock)
 		{
-			boolean removed;
-			
-			synchronized (commandLock)
+			if (this._commands != null && (removed = this._commands.remove(command)))
 			{
-				if (removed = this._commands.remove(command))
-				{
-					AbstractElement.unregisterElement(command);
-				}
+				AbstractElement.unregisterElement(command);
 			}
-			
-			if (removed)
-			{
-				// fire delete event
-				BundleManager.getInstance().fireElementDeletedEvent(command);
-			}
+		}
+
+		if (removed)
+		{
+			// fire delete event
+			BundleManager.getInstance().fireElementDeletedEvent(command);
 		}
 	}
 
@@ -478,25 +475,22 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeMenu(MenuElement menu)
 	{
-		if (this._menus != null)
+		boolean removed = false;
+
+		synchronized (menuLock)
 		{
-			boolean removed;
-			
-			synchronized (menuLock)
+			if (this._menus != null && (removed = this._menus.remove(menu)))
 			{
-				if (removed = this._menus.remove(menu))
-				{
-					AbstractElement.unregisterElement(menu);
-		
-					menu.removeChildren();
-				}
+				AbstractElement.unregisterElement(menu);
+
+				menu.removeChildren();
 			}
-			
-			if (removed)
-			{
-				// fire delete event
-				BundleManager.getInstance().fireElementDeletedEvent(menu);
-			}
+		}
+
+		if (removed)
+		{
+			// fire delete event
+			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
 	}
 

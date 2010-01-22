@@ -189,7 +189,7 @@ public class BundleEntry
 	{
 		BundleScope activeScope = this.getActiveScope();
 		
-		// NOTE: seems like a potentially long lock since we're runnging the processor
+		// NOTE: seems like a potentially long lock since we're running the processor
 		// on each instance
 		synchronized (this._bundles)
 		{
