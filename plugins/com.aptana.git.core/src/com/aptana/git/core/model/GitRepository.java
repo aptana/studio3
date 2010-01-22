@@ -619,11 +619,16 @@ public class GitRepository
 	 * @return
 	 */
 	public GitRef remoteTrackingBranch(String branchName)
-	{
+	{		
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (output == null || output.trim().length() == 0)
+		{
+			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there... 
+			// See http://kernel.org/pub/software/scm/git/docs/git-pull.html#REMOTES
+			// Git will look in a few places and assume use of remote defined
 			return null;
+		}
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
 	}
