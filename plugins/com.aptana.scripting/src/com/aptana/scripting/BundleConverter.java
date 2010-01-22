@@ -5,10 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xml.sax.InputSource;
 
@@ -28,10 +31,6 @@ import plistreader.PlistProperties;
 @SuppressWarnings("nls")
 public class BundleConverter
 {
-
-	// TODO Copy over the Support dir as lib.
-	// TODO Copy over other things we don't yet handle, like Preferences, DragCommands, Macros
-
 	/**
 	 * @param args
 	 * @throws Exception
@@ -41,19 +40,37 @@ public class BundleConverter
 		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			// User bundles
+			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			// Pre-installed TM bundle
+			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
-		for (String bundlesDir : args)
+		if (args.length > 1)
 		{
-			File[] bundles = gatherBundles(new File(bundlesDir));
-			if (bundles == null)
-				continue;
-			for (File commandFile : bundles)
+			outputDir = args[1];
+		}
+
+		// Only convert the following bundles
+		String[] bundleFilter = new String[] { "Text" };
+		File[] bundles = gatherBundles(new File(args[0]));
+		if (bundles == null)
+		{
+			System.out.println("No bundles found in dir: " + args[0]);
+			return;
+		}
+		for (File textmateBundleDir : bundles)
+		{
+			String nameWithoutExtension = textmateBundleDir.getName().substring(0,
+					textmateBundleDir.getName().length() - 9);
+			for (String bundleToConvert : bundleFilter)
 			{
-				String nameWithoutExtension = commandFile.getName().substring(0, commandFile.getName().length() - 9);
-				convert(commandFile, outputDir + File.separator + nameWithoutExtension);
+				if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
+				{
+					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
+					continue;
+				}
 			}
 		}
 	}
@@ -75,26 +92,60 @@ public class BundleConverter
 		});
 	}
 
-	private static void convert(File bundleDir, String outputBundlePath) throws IOException
+	private static void convertBundle(File bundleDir, String outputBundlePath) throws IOException
 	{
 		Map<String, String> uuidToName = new HashMap<String, String>();
-		// TODO Run SnippetConverter on snippets sub dir
+		// Run SnippetConverter on snippets sub dir
 		File snippetsDir = new File(bundleDir, "Snippets");
 		SnippetConverter.convert(snippetsDir, outputBundlePath + File.separator + "snippets" + File.separator
 				+ "snippets.rb");
 		uuidToName.putAll(SnippetConverter.uuidNameMap(snippetsDir));
-		// TODO Run Command Converter on Commands subdir
+		// Run Command Converter on Commands subdir
 		File commandsDir = new File(bundleDir, "Commands");
 		CommandConverter.convert(commandsDir, outputBundlePath + File.separator + "commands");
 		uuidToName.putAll(CommandConverter.uuidNameMap(commandsDir));
-		// TODO Convert the Info.plist to a bundle.rb
+		// Convert the Info.plist to a bundle.rb
 		String bundleRBPath = outputBundlePath + File.separator + "bundle.rb";
-		String contents = convertMain(new File(bundleDir, "Info.plist"), uuidToName);
+		String contents = convertInfoPlist(new File(bundleDir, "Info.plist"), uuidToName);
 		writeToFile(contents, bundleRBPath);
+		// Copy tests dir
+		copyDir(bundleDir + "/Tests/", outputBundlePath + "/tests");
+		// Copy Support to our "lib"
+		copyDir(bundleDir + "/Support/", outputBundlePath + "/lib");
+		// Copy over common dirs that we don't handle...
+		copyDir(bundleDir + "/Preferences/", outputBundlePath + "/unsupported/preferences");
+		copyDir(bundleDir + "/Macros/", outputBundlePath + "/unsupported/macros");
+		copyDir(bundleDir + "/DragCommands/", outputBundlePath + "/unsupported/drag_commands");
+		copyDir(bundleDir + "/Templates/", outputBundlePath + "/unsupported/templates");
+	}
+
+	private static void copyDir(String srcPath, String destPath)
+	{
+		if (!new File(srcPath).exists())
+			return;
+		try
+		{
+			File dest = new File(destPath);
+			dest.mkdirs();
+
+			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
+			Process p = builder.start();
+			p.waitFor();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static String convertMain(File plistFile, Map<String, String> uuidToName)
+	private static String convertInfoPlist(File plistFile, Map<String, String> uuidToName)
 	{
 		PlistProperties properties = parse(plistFile);
 
@@ -157,7 +208,10 @@ public class BundleConverter
 					continue;
 				}
 				// Not a sub-menu, must be an item
-				buffer.append(menuPrefix).append(".command '").append(uuidToName.get(uuid)).append("'\n");
+				String commandName = uuidToName.get(uuid);
+				if (commandName == null)
+					commandName = uuid;
+				buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
 			}
 		}
 		return buffer.toString();
@@ -167,21 +221,26 @@ public class BundleConverter
 	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile
-					.getAbsolutePath());
+			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", "\""
+					+ plistFile.getAbsolutePath() + "\"");
 			Process p = builder.start();
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
-				System.err.println("Bad exit code for conversion: " + exitCode);
+			{
+				// Not necessarily an error, it may already be XML
+				// System.err.println("Bad exit code for conversion: " + exitCode);
+			}
 			AbstractReader reader = PlistFactory.createReader();
-			reader.setSource(new InputSource(new FileInputStream(plistFile)));
+			// FIXME Often these files will have special characters that aren't proper in XML (like say Ctrl+C as a
+			// keybinding, 0x03 so we need it to become "&#x03;"), we need to massage the XML now!
+			InputSource source = new InputSource(new InputStreamReader(new FileInputStream(plistFile), "UTF-8"));
+			source.setEncoding("UTF-8");
+			reader.setSource(source);
 			return reader.parse();
 		}
 		catch (Exception e)
 		{
 			System.err.println("An error occurred processing: " + plistFile.getAbsolutePath());
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return null;
 	}
@@ -191,7 +250,7 @@ public class BundleConverter
 		String content = (String) properties.getProperty(key);
 		if (content == null)
 			return null;
-		return content.replace("'", "\\'").replace("�", "..."); //$NON-NLS-1$ //$NON-NLS-2$
+		return content.replace("'", "\\'").replace("…", "...").replace("—", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	static void writeToFile(String output, String outFilePath) throws IOException
@@ -215,5 +274,65 @@ public class BundleConverter
 				// ignore
 			}
 		}
+	}
+
+	static String convertKeyBinding(String keyBinding)
+	{
+		if (keyBinding == null)
+			return ""; //$NON-NLS-1$
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < keyBinding.length(); i++)
+		{
+			char c = keyBinding.charAt(i);
+			switch (c)
+			{
+				case '':
+					builder.append("F5+"); //$NON-NLS-1$
+					break;
+				case '@':
+					builder.append("M1+M2+"); //$NON-NLS-1$
+					break;
+				case '^':
+					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
+					{
+						builder.append("CONTROL+COMMAND+SHIFT+"); //$NON-NLS-1$
+						i++;
+					}
+					else
+					{
+						builder.append("CONTROL+M2+"); //$NON-NLS-1$
+					}
+					break;
+				case '~':
+					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
+					{
+						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
+						i++;
+					}
+					else
+					{
+						builder.append(c).append('+');
+					}
+					break;
+				default:
+					builder.append(c).append('+');
+					break;
+			}
+		}
+		if (keyBinding.length() > 0)
+			builder.deleteCharAt(builder.length() - 1);
+
+		// Turn Shift+lowercase_letter into uppercase_letter
+		String result = builder.toString();
+		Pattern p = Pattern.compile("(SHIFT|M2)\\+([a-z])");
+		Matcher m = p.matcher(result);
+		StringBuffer sb = new StringBuffer();
+		while (m.find())
+		{
+			m.appendReplacement(sb, m.group(2).toUpperCase());
+		}
+		m.appendTail(sb);
+		result = sb.toString();
+		return result;
 	}
 }

@@ -77,8 +77,7 @@ public class GitRevList
 		else
 			arguments.addAll(rev.parameters());
 
-		String directory = (rev != null && rev.getWorkingDirectory() != null) ? rev.getWorkingDirectory() : repository
-				.workingDirectory();
+		String directory = repository.workingDirectory();
 
 		if (subMonitor.isCanceled())
 			return Status.CANCEL_STATUS;
@@ -92,7 +91,7 @@ public class GitRevList
 			{
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
-				
+
 				String sha = getline(stream, '\1');
 				if (sha == null)
 					break;
@@ -162,9 +161,9 @@ public class GitRevList
 					GitPlugin.logError("Error", null); //$NON-NLS-1$
 
 				revisions.add(newCommit);
-				
+
 				subMonitor.worked(1);
-				
+
 				if (read == -1)
 					break;
 

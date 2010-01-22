@@ -10,6 +10,7 @@ import plistreader.PlistProperties;
 
 import com.aptana.scripting.model.OutputType;
 
+@SuppressWarnings("nls")
 public class CommandConverter
 {
 
@@ -17,7 +18,6 @@ public class CommandConverter
 	 * @param args
 	 * @throws Exception
 	 */
-	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception
 	{
 		String userHome = System.getProperty("user.home");
@@ -42,7 +42,6 @@ public class CommandConverter
 	{
 		return commandDirectory.listFiles(new FilenameFilter()
 		{
-			@SuppressWarnings("nls")
 			public boolean accept(File dir, String name)
 			{
 				return name.endsWith("plist") || name.endsWith("tmCommand");
@@ -50,18 +49,30 @@ public class CommandConverter
 		});
 	}
 
-	@SuppressWarnings("nls")
 	private static String convert(File commandFile)
 	{
 		PlistProperties properties = BundleConverter.parse(commandFile);
-
+		if (properties == null)
+			return null;
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("require 'radrails'\n\n");
 		buffer.append("command '").append(BundleConverter.sanitize(properties, "name")).append("' do |cmd|\n");
 		String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
-		keyBinding = convertKeyBinding(keyBinding);
-		buffer.append("  cmd.key_binding = '").append(keyBinding).append("'\n");
-		buffer.append("  cmd.scope = '").append(BundleConverter.sanitize(properties, "scope")).append("'\n");
+		if (keyBinding != null)
+		{
+			keyBinding = BundleConverter.convertKeyBinding(keyBinding);
+			buffer.append("  cmd.key_binding = '").append(keyBinding).append("'\n");
+		}
+		String scope = BundleConverter.sanitize(properties, "scope");
+		if (scope != null)
+		{
+			buffer.append("  cmd.scope = '").append(scope).append("'\n");
+		}
+		String trigger = BundleConverter.sanitize(properties, "tabTrigger");
+		if (trigger != null)
+		{
+			buffer.append("  cmd.trigger = '").append(scope).append("'\n");
+		}
 		String outputType = BundleConverter.sanitize(properties, "output");
 		outputType = camelcaseToUnderscores(outputType);
 		outputType = convertOutputTypes(outputType);
@@ -73,7 +84,6 @@ public class CommandConverter
 		buffer.append("\n");
 		buffer.append("  cmd.invoke =<<-EOF\n").append(properties.getProperty("command")).append("\nEOF\n");
 		buffer.append("end\n");
-
 		return buffer.toString();
 	}
 
@@ -90,44 +100,6 @@ public class CommandConverter
 		return name + ".rb"; //$NON-NLS-1$
 	}
 
-	private static String convertKeyBinding(String keyBinding)
-	{
-		if (keyBinding == null)
-			return ""; //$NON-NLS-1$
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < keyBinding.length(); i++)
-		{
-			char c = keyBinding.charAt(i);
-			switch (c)
-			{
-				case '@':
-					builder.append("M1+M2+"); //$NON-NLS-1$
-					break;
-				case '^':
-					builder.append("CONTROL+M2+"); //$NON-NLS-1$
-					break;
-				case '~':
-					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
-					{
-						builder.append("OPTION+COMMAND+"); //$NON-NLS-1$
-						i++;
-					}
-					else
-					{
-						builder.append(c).append('+');
-					}
-					break;
-				default:
-					builder.append(c).append('+');
-					break;
-			}
-		}
-		if (keyBinding.length() > 0)
-			builder.deleteCharAt(builder.length() - 1);
-		return builder.toString();
-	}
-
-	@SuppressWarnings("nls")
 	private static String convertOutputTypes(String outputType)
 	{
 		if (outputType.equals("replace_selected_text"))
@@ -206,7 +178,8 @@ public class CommandConverter
 		for (File commandFile : commandFiles)
 		{
 			PlistProperties properties = BundleConverter.parse(commandFile);
-
+			if (properties == null)
+				continue;
 			String name = BundleConverter.sanitize(properties, "name");
 			String uuid = (String) properties.getProperty("uuid");
 			uuidNameMap.put(uuid, name);

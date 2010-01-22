@@ -168,6 +168,9 @@
       <file
             name="radrails/editor.rb">
       </file>
+      <file
+            name="radrails/theme.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
