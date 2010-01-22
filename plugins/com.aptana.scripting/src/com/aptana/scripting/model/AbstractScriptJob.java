@@ -12,6 +12,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 public abstract class AbstractScriptJob extends Job implements Runnable
 {
 	private List<String> _loadPaths;
+	private RubyArray _originalLoadPaths;
 	
 	/**
 	 * AbstractScriptJob
@@ -45,18 +46,22 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	{
 		if (this._loadPaths != null && this._loadPaths.size() > 0)
 		{
-			// NOTE: the following works only when using THREADSAFE containers
-			// container.getProvider().setLoadPaths(this._loadPaths);
-
 			IRubyObject object = runtime.getLoadService().getLoadPath();
-			RubyArray loadpathArray = (RubyArray) object;
 			
-			// Add our custom loadpaths for this execution
-			for (String loadPath : this._loadPaths)
+			if (object != null && object instanceof RubyArray)
 			{
-				RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+				RubyArray loadPathArray = (RubyArray) object;
 				
-				loadpathArray.append(toAdd);
+				// save copy for later
+				this._originalLoadPaths = (RubyArray) loadPathArray.dup();
+				
+				// Add our custom load paths
+				for (String loadPath : this._loadPaths)
+				{
+					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+					
+					loadPathArray.append(toAdd);
+				}
 			}
 		}
 	}
@@ -79,14 +84,16 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 		if (this._loadPaths != null && this._loadPaths.size() > 0)
 		{
 			IRubyObject object = runtime.getLoadService().getLoadPath();
-			RubyArray loadpathArray = (RubyArray) object;
 			
-			// Remove our custom loadpaths from this execution
-			for (String loadPath : this._loadPaths)
+			if (object != null && object instanceof RubyArray)
 			{
-				RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
+				RubyArray loadPathArray = (RubyArray) object;
 				
-				loadpathArray.remove(toAdd);
+				// Restore original content
+				loadPathArray.replace(this._originalLoadPaths);
+				
+				// lose reference
+				this._originalLoadPaths = null;
 			}
 		}
 	}
