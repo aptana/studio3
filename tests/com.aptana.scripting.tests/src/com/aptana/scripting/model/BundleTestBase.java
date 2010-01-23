@@ -121,14 +121,6 @@ public abstract class BundleTestBase extends TestCase
 		
 		// load bundle
 		manager.loadBundle(bundleFile);
-		
-//		try
-//		{
-//			Thread.sleep(5000);
-//		}
-//		catch (InterruptedException e)
-//		{
-//		}
 	}
 
 	/*
