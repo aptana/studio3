@@ -32,7 +32,7 @@ public class CommandTests extends BundleTestBase
 	{
 		String resultText = this.executeCommand("invokeString", "Test");
 		
-		assertEquals("hello", resultText);
+		assertEquals("hello string", resultText);
 	}
 
 	/**
@@ -43,5 +43,15 @@ public class CommandTests extends BundleTestBase
 		String resultText = this.executeCommand("invokeBlock", "Test");
 		
 		assertEquals("hello", resultText);
+	}
+	
+	/**
+	 * testRequireInBlock
+	 */
+	public void testRequireInBlock()
+	{
+		String resultText = this.executeCommand("requireInCommand", "MyCommand");
+		
+		assertEquals("My Thing Name", resultText);
 	}
 }
