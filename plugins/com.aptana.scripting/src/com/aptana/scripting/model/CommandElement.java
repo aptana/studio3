@@ -43,6 +43,7 @@ public class CommandElement extends AbstractBundleElement
 	private String _outputPath;
 	private boolean _async;
 	private RunType _runType;
+	private Ruby _runtime;
 	
 	private String _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
@@ -264,14 +265,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public Ruby getRuntime()
 	{
-		Ruby runtime = null;
-
-		if (this._invokeBlock != null)
-		{
-			runtime = this._invokeBlock.getRuntime();
-		}
-		
-		return runtime;
+		return this._runtime;
 	}
 	
 	/**
@@ -758,6 +752,7 @@ public class CommandElement extends AbstractBundleElement
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
+		this._runtime = block.getRuntime();
 	}
 
 	/**
@@ -846,6 +841,16 @@ public class CommandElement extends AbstractBundleElement
 	public void setRunType(String type)
 	{
 		this._runType = RunType.get(type);
+	}
+	
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(IRubyObject object)
+	{
+		this._runtime = object.getRuntime();
 	}
 	
 	/**

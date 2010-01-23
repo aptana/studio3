@@ -58,6 +58,7 @@ module RadRails
 
     def invoke=(invoke)
       @jobj.invoke = invoke
+      @jobj.runtime = self # a little hack so we can get the runtime for this command
     end
 
     def key_binding
