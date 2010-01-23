@@ -400,14 +400,184 @@ public class JSParserTest extends TestCase
 		parseTest("function abc (a, b, c) {}" + EOL); //$NON-NLS-1$
 	}
 
-	public void testComma() throws Exception
+	public void testEmptyArray() throws Exception
 	{
-		parseTest("abc = 10, def = 20;" + EOL); //$NON-NLS-1$
+		parseTest("abc = [];" + EOL); //$NON-NLS-1$
+	}
+
+	public void testElisionArray() throws Exception
+	{
+		parseTest("abc = [,,];" + EOL, "abc = [null, null, null];" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArrayLiteral() throws Exception
+	{
+		parseTest("abc = [1, 2, 3];" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArrayLiteralTrailingComma() throws Exception
+	{
+		parseTest("abc = [1, 2, 3,];" + EOL, "abc = [1, 2, 3, null];" + EOL); //$NON-NLS-1$
+	}
+
+	public void testArrayLiteralTrailingElision() throws Exception
+	{
+		parseTest("abc = [1, 2, 3,,,];" + EOL, "abc = [1, 2, 3, null, null, null];" + EOL); //$NON-NLS-1$
 	}
 
 	public void testGroup() throws Exception
 	{
 		parseTest("a = (3 + 4) * 5;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testComma() throws Exception
+	{
+		parseTest("abc = 10, def = 20;" + EOL); //$NON-NLS-1$
+	}
+
+	public void testConstruct() throws Exception
+	{
+		parseTest("a = new Object(\"test\");" + EOL); //$NON-NLS-1$
+	}
+
+	public void testConstructWithoutArgs() throws Exception
+	{
+		parseTest("a = new Object();" + EOL); //$NON-NLS-1$
+	}
+
+	public void testObjectLiteral() throws Exception
+	{
+		parseTest("abc = {name: \"Name\", index: 2, id: 10};" + EOL); //$NON-NLS-1$
+	}
+
+	public void testThrow() throws Exception
+	{
+		parseTest("throw new Error(\"error\");" + EOL); //$NON-NLS-1$
+	}
+
+	public void testWhile() throws Exception
+	{
+		parseTest("while (true) {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testLabeledStatement() throws Exception
+	{
+		parseTest("myLabel: while (true) {}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testContinue() throws Exception
+	{
+		parseTest("while (true) {continue;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testBreak() throws Exception
+	{
+		parseTest("while (true) {break;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testDefault() throws Exception
+	{
+		parseTest("switch (abc) {default: break;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testCase() throws Exception
+	{
+		parseTest("switch (abc) {case 10: break;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testSwitch() throws Exception
+	{
+		parseTest("switch (abc) {case 10: break;default: break;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testReturn() throws Exception
+	{
+		parseTest("function abc () {return false;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testIf() throws Exception
+	{
+		parseTest("if (a < b) {a = 10;} else {a = 20;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testIfWithoutElse() throws Exception
+	{
+		parseTest("if (a < b) {a = 10;}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testDo() throws Exception
+	{
+		parseTest("do {a++;} while (a < 10);" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForBodyOnly() throws Exception
+	{
+		parseTest("for (;;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForAdvanceOnly() throws Exception
+	{
+		parseTest("for (;; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForConditionOnly() throws Exception
+	{
+		parseTest("for (; a < 10;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForNoInitialize() throws Exception
+	{
+		parseTest("for (; a < 10; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForInitializeOnly() throws Exception
+	{
+		parseTest("for (a = 0;;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForNoCondition() throws Exception
+	{
+		parseTest("for (a = 0;; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForNoAdvance() throws Exception
+	{
+		parseTest("for (a = 0; a < 10;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testFor() throws Exception
+	{
+		parseTest("for (a = 0; a < 10; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForVarInitializeOnly() throws Exception
+	{
+		parseTest("for (var a = 0;;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForVarNoCondition() throws Exception
+	{
+		parseTest("for (var a = 0;; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForVarNoAdvance() throws Exception
+	{
+		parseTest("for (var a = 0; a < 10;) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForVar() throws Exception
+	{
+		parseTest("for (var a = 0; a < 10; a++) {show(a);}" + EOL); //$NON-NLS-1$
+	}
+
+	public void testForIn() throws Exception
+	{
+		parseTest("for (a in obj) {show(a);}" + EOL);
+	}
+
+	public void testForVarIn() throws Exception
+	{
+		parseTest("for (var a in obj) {show(a);}" + EOL);
 	}
 
 	protected void parseTest(String source) throws Exception

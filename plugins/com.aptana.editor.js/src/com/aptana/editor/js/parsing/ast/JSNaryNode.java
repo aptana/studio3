@@ -30,9 +30,6 @@ public class JSNaryNode extends JSNode
 				}
 				text.append("}"); //$NON-NLS-1$
 				break;
-			case JSNodeTypes.ARGUMENTS:
-				appendText(text, children);
-				break;
 			case JSNodeTypes.VAR:
 				text.append("var "); //$NON-NLS-1$
 				appendText(text, children);
@@ -42,6 +39,25 @@ public class JSNaryNode extends JSNode
 				appendText(text, children);
 				text.append(")"); //$NON-NLS-1$
 				break;
+			case JSNodeTypes.ARRAY_LITERAL:
+				text.append("["); //$NON-NLS-1$
+				appendText(text, children);
+				text.append("]"); //$NON-NLS-1$
+				break;
+			case JSNodeTypes.OBJECT_LITERAL:
+				text.append("{"); //$NON-NLS-1$
+				appendText(text, children);
+				text.append("}"); //$NON-NLS-1$
+				break;
+			case JSNodeTypes.DEFAULT:
+				text.append("default: "); //$NON-NLS-1$
+				for (IParseNode child : children)
+				{
+					text.append(child);
+				}
+				break;
+			default:
+				appendText(text, children);
 		}
 
 		return appendSemicolon(text.toString());

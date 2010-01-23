@@ -2,6 +2,8 @@
 %class "JSParser";
 %import "com.aptana.editor.js.parsing.ast.*";
 %import "com.aptana.parsing.ast.ParseRootNode";
+%import "java.util.List";
+%import "java.util.ArrayList";
 
 %terminals FUNCTION, IDENTIFIER, STRING, NUMBER, NULL, TRUE, FALSE, REGEX;
 %terminals LCURLY, RCURLY, LPAREN, RPAREN, LBRACKET, RBRACKET, COMMA, COLON, SEMICOLON, EQUAL, DOT, QUESTION;
@@ -18,8 +20,9 @@
 %typeof ShiftExpression, ShiftExpression_NoLBF, EqualityExpression, EqualityExpression_NoIn, EqualityExpression_NoLBF = "JSNode";
 %typeof LogicalAndExpression, LogicalAndExpression_NoIn, LogicalAndExpression_NoLBF, LogicalOrExpression, LogicalOrExpression_NoIn, LogicalOrExpression_NoLBF = "JSNode";
 %typeof BitwiseOrExpression, BitwiseOrExpression_NoIn, BitwiseOrExpression_NoLBF, BitwiseXorExpression, BitwiseXorExpression_NoIn, BitwiseXorExpression_NoLBF, BitwiseAndExpression, BitwiseAndExpression_NoIn, BitwiseAndExpression_NoLBF = "JSNode";
-%typeof MemberExpression, MemberExpression_NoLBF, CallExpression, CallExpression_NoLBF, Expression, Expression_NoLBF, Statement, Arguments, Block, Catch, Finally = "JSNode";
-%typeof VariableDeclaration, VariableDeclaration_NoIn, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
+%typeof MemberExpression, MemberExpression_NoLBF, NewExpression, CallExpression, CallExpression_NoLBF, Expression, Expression_NoIn, Expression_NoLBF, Statement, Statement_NoIf, Arguments, Block, Catch, Finally = "JSNode";
+%typeof VariableDeclaration, VariableDeclaration_NoIn, PropertyName, PropertyNameAndValue, Elision, ElementList, FormalParameterList, FunctionParameters, FunctionBody, SourceElement = "JSNode";
+%typeof CaseClause, DefaultClause = "JSNode";
 
 %goal Program;
 
@@ -128,102 +131,103 @@ VariableDeclaration_NoIn
 	;
 
 IfStatement
-	=	IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement
-	|	IF LPAREN Expression RPAREN Statement
+	=	IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s {:return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());:}
+	|	IF.i LPAREN Expression.e RPAREN Statement.s {:return new JSNode(JSNodeTypes.IF, new JSNode[] { e, s, new JSNode() }, i.getStart(), s.getEnd());:}
 	;
 
 IfStatement_NoIf
-	=	IF LPAREN Expression RPAREN Statement_NoIf ELSE Statement_NoIf
+	=	IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement_NoIf.s {:return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());:}
 	;
 
 IterationStatement
-	=	DO Statement WHILE LPAREN Expression RPAREN SEMICOLON
-	|	WHILE LPAREN Expression RPAREN Statement
-	|	FOR LPAREN SEMICOLON SEMICOLON RPAREN Statement
-	|	FOR LPAREN SEMICOLON SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement
-	|	FOR LPAREN SEMICOLON Expression SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON RPAREN Statement
-	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement
-	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON RPAREN Statement
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement
-	|	FOR LPAREN LeftHandSideExpression IN Expression RPAREN Statement
-	|	FOR LPAREN VAR VariableDeclaration_NoIn IN Expression RPAREN Statement
+	=	DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r {:JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;:}
+	|	WHILE.w LPAREN Expression.e RPAREN Statement.s {:return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s  {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement.s {:return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] { i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());:}
 	;
 
 IterationStatement_NoIf
-	=	DO Statement WHILE LPAREN Expression RPAREN SEMICOLON
-	|	WHILE LPAREN Expression RPAREN Statement_NoIf
-	|	FOR LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN Expression_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN Expression_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON RPAREN Statement_NoIf
-	|	FOR LPAREN VAR VariableDeclarationList_NoIn SEMICOLON Expression SEMICOLON Expression RPAREN Statement_NoIf
-	|	FOR LPAREN LeftHandSideExpression IN Expression RPAREN Statement_NoIf
-	|	FOR LPAREN VAR VariableDeclaration_NoIn IN Expression RPAREN Statement_NoIf
+	=	DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r {:JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;:}
+	|	WHILE.w LPAREN Expression.e RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] {i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());:}
 	;
 
 ContinueStatement
-	=	CONTINUE.c SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
-	|	CONTINUE.c IDENTIFIER.i SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
+	=	CONTINUE.c SEMICOLON.s {:JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
+	|	CONTINUE.c IDENTIFIER.i SEMICOLON.s {:JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
 	;
 
 BreakStatement
-	=	BREAK.b SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
-	|	BREAK.b IDENTIFIER.i SEMICOLON.s {:
-			JSLabelStatementNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());
-			node.setSemicolonIncluded(true);
-			return node;
-		:}
+	=	BREAK.b SEMICOLON.s {:JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
+	|	BREAK.b IDENTIFIER.i SEMICOLON.s {:JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
 	;
 
 ReturnStatement
-	=	RETURN SEMICOLON
-	|	RETURN Expression SEMICOLON
+	=	RETURN.r SEMICOLON.s {:JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, new JSNode(), r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
+	|	RETURN.r Expression.e SEMICOLON.s {:JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, e, r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
 	;
 
 WithStatement
-	=	WITH LPAREN Expression RPAREN Statement
+	=	WITH.w LPAREN Expression.e RPAREN Statement.s {:return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());:}
 	;
 
 WithStatement_NoIf
-	=	WITH LPAREN Expression RPAREN Statement_NoIf
+	=	WITH.w LPAREN Expression.e RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());:}
 	;
 
 SwitchStatement
-	=	SWITCH LPAREN Expression RPAREN CaseBlock
-	;
-
-CaseBlock
-	=	LCURLY RCURLY
-	|	LCURLY CaseClauses RCURLY
-	|	LCURLY DefaultClause RCURLY
-	|	LCURLY DefaultClause CaseClauses RCURLY
-	|	LCURLY CaseClauses DefaultClause RCURLY
-	|	LCURLY CaseClauses DefaultClause CaseClauses RCURLY
+	=	SWITCH.s LPAREN Expression.e RPAREN LCURLY RCURLY.r {:return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, s.getStart(), r.getEnd());:}
+	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY.r {:return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, c, s.getStart(), r.getEnd());:}
+	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY.r {:return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, new JSNode[] { d }, s.getStart(), r.getEnd());:}
+	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY.r {:
+			List<JSNode> children = new ArrayList<JSNode>();
+			children.add(d);
+			for (JSNode statement : c) {
+				children.add(statement);
+			}
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());:}
+	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY.r {:
+			List<JSNode> children = new ArrayList<JSNode>();
+			for (JSNode statement : c) {
+				children.add(statement);
+			}
+			children.add(d);
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());:}
+	|	SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.r {:
+			List<JSNode> children = new ArrayList<JSNode>();
+			for (JSNode statement : c1) {
+				children.add(statement);
+			}
+			children.add(d);
+			for (JSNode statement : c2) {
+				children.add(statement);
+			}
+			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());:}
 	;
 
 CaseClauses
@@ -232,25 +236,25 @@ CaseClauses
 	;
 
 CaseClause
-	=	CASE Expression COLON
-	|	CASE Expression COLON StatementList
+	=	CASE.c Expression.e COLON.r {:return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, c.getStart(), r.getEnd());:}
+	|	CASE.c Expression.e COLON StatementList.s {:return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, s, c.getStart(), s[s.length - 1].getEnd());:}
 	;
 
 DefaultClause
-	=	DEFAULT COLON
-	|	DEFAULT COLON StatementList
+	=	DEFAULT.d COLON.c {:return new JSNaryNode(JSNodeTypes.DEFAULT, d.getStart(), c.getEnd());:}
+	|	DEFAULT.d COLON StatementList.s {:return new JSNaryNode(JSNodeTypes.DEFAULT, s, d.getStart(), s[s.length - 1].getEnd());:}
 	;
 
 LabelledStatement
-	=	IDENTIFIER COLON Statement
+	=	IDENTIFIER.i COLON Statement.s {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());:}
 	;
 
 LabelledStatement_NoIf
-	=	IDENTIFIER COLON Statement_NoIf
+	=	IDENTIFIER.i COLON Statement_NoIf.s {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());:}
 	;
 
 ThrowStatement
-	=	THROW Expression SEMICOLON
+	=	THROW.t Expression.e SEMICOLON.s {:JSNode node = new JSUnaryOperatorNode(JSNodeTypes.THROW, e, t.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;:}
 	;
 
 TryStatement
@@ -277,43 +281,47 @@ PrimaryExpression_NoLBF
 	|	IDENTIFIER.t {:return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());:}
 	|	Literal
 	|	ArrayLiteral
-	|	LPAREN.l Expression.e RPAREN.r {:JSNode node = new JSUnaryOperatorNode(JSNodeTypes.GROUP, e);node.setLocation(l.getStart(), r.getEnd());return node;:}
+	|	LPAREN.l Expression.e RPAREN.r {:return new JSUnaryOperatorNode(JSNodeTypes.GROUP, e, l.getStart(), r.getEnd());:}
 	;
 
 ArrayLiteral
-	=	LBRACKET RBRACKET
-	|	LBRACKET Elision RBRACKET
-	|	LBRACKET ElementList RBRACKET
-	|	LBRACKET ElementList COMMA RBRACKET
-	|	LBRACKET ElementList COMMA Elision RBRACKET
+	=	LBRACKET.l RBRACKET.r {:return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, l.getStart(), r.getEnd());:}
+	|	LBRACKET.l Elision.e RBRACKET.r {:return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());:}
+	|	LBRACKET.l ElementList.e RBRACKET.r {:return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());:}
+	|	LBRACKET.l ElementList.e COMMA RBRACKET.r  {:return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, l.getStart(), r.getEnd());:}
+	|	LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r {:return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, n }, l.getStart(), r.getEnd());:}
 	;
 
 ElementList
-	=	AssignmentExpression
-	|	Elision AssignmentExpression
-	|	ElementList COMMA AssignmentExpression
-	|	ElementList COMMA Elision AssignmentExpression
+	=	AssignmentExpression.e {:return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { e }, e.getStart(), e.getEnd());:}
+	|	Elision.n AssignmentExpression.e {:return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { n, e }, n.getStart(), e.getEnd());:}
+	|	ElementList.l COMMA AssignmentExpression.e {:l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;:}
+	|	ElementList.l COMMA Elision.n AssignmentExpression.e {:l.addChild(n);l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;:}
 	;
 
 Elision
-	=	Elision COMMA
-	|	COMMA
+	=	Elision.e COMMA {:e.addChild(new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0));return e;:}
+	|	COMMA {:return new JSNaryNode(JSNodeTypes.ELISION, new JSNode[] { new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0), new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, 0, 0);:}
 	;
 
 ObjectLiteral
-	=	LCURLY RCURLY
-	|	LCURLY PropertyNameAndValueList RCURLY
+	=	LCURLY.l RCURLY.r {:return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, l.getStart(), r.getEnd());:}
+	|	LCURLY.l PropertyNameAndValueList.p RCURLY.r {:return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, p, l.getStart(), r.getEnd());:}
 	;
 
 PropertyNameAndValueList
-	=	PropertyName COLON AssignmentExpression
-	|	PropertyNameAndValueList COMMA PropertyName COLON AssignmentExpression
+	=	PropertyNameAndValue
+	|	PropertyNameAndValueList COMMA PropertyNameAndValue
+	;
+
+PropertyNameAndValue
+	=	PropertyName.n COLON AssignmentExpression.v {:return new JSNode(JSNodeTypes.NAME_VALUE_PAIR, new JSNode[] { n, v }, n.getStart(), v.getEnd());:}
 	;
 
 PropertyName
-	=	IDENTIFIER
-	|	STRING
-	|	NUMBER
+	=	IDENTIFIER.i {:return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());:}
+	|	STRING.s {:return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());:}
+	|	NUMBER.n {:return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());:}
 	;
 
 MemberExpression
@@ -321,24 +329,24 @@ MemberExpression
 	|	FunctionExpression
 	|	MemberExpression.l LBRACKET Expression.r RBRACKET {:return new JSGetElementOperatorNode(l, r);:}
 	|	MemberExpression.l DOT IDENTIFIER.r {:return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));:}
-	|	NEW MemberExpression Arguments
+	|	NEW.l MemberExpression.e Arguments.a {:return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());:}
 	;
 
 MemberExpression_NoLBF
 	=	PrimaryExpression_NoLBF
 	|	MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET {:return new JSGetElementOperatorNode(l, r);:}
 	|	MemberExpression_NoLBF.l DOT IDENTIFIER.r {:return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));:}
-	|	NEW MemberExpression Arguments
+	|	NEW.l MemberExpression.e Arguments.a {:return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());:}
 	;
 
 NewExpression
 	=	MemberExpression
-	|	NEW NewExpression
+	|	NEW.l NewExpression.e {:return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());:}
 	;
 
 NewExpression_NoLBF
 	=	MemberExpression_NoLBF
-	|	NEW NewExpression
+	|	NEW.l NewExpression.e {:return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());:}
 	;
 
 CallExpression
@@ -377,12 +385,12 @@ LeftHandSideExpression_NoLBF
 
 PostfixExpression
 	=	LeftHandSideExpression
-	|	LeftHandSideExpression.e PostfixOperator.o {:JSNode node = new JSPostUnaryOperatorNode(e, o);node.setLocation(e.getStart(), _symbol_o.getEnd());return node;:}
+	|	LeftHandSideExpression.e PostfixOperator.o {:return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());:}
 	;
 
 PostfixExpression_NoLBF
 	=	LeftHandSideExpression_NoLBF
-	|	LeftHandSideExpression_NoLBF.e PostfixOperator.o {:JSNode node = new JSPostUnaryOperatorNode(e, o);node.setLocation(e.getStart(), _symbol_o.getEnd());return node;:}
+	|	LeftHandSideExpression_NoLBF.e PostfixOperator.o {:return new JSPostUnaryOperatorNode(e, o, e.getStart(),  _symbol_o.getEnd());:}
 	;
 
 PostfixOperator
@@ -392,12 +400,12 @@ PostfixOperator
 
 UnaryExpression
 	=	PostfixExpression
-	|	UnaryOperator.o UnaryExpression.e {:JSNode node = new JSUnaryOperatorNode(o, e);node.setLocation(_symbol_o.getStart(), e.getEnd());return node;:}
+	|	UnaryOperator.o UnaryExpression.e {:return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());:}
 	;
 
 UnaryExpression_NoLBF
 	=	PostfixExpression_NoLBF
-	|	UnaryOperator.o UnaryExpression.e {:JSNode node = new JSUnaryOperatorNode(o, e);node.setLocation(_symbol_o.getStart(), e.getEnd());return node;:}
+	|	UnaryOperator.o UnaryExpression.e {:return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());:}
 	;
 
 UnaryOperator
@@ -630,18 +638,18 @@ AssignmentOperator
 	;
 
 Expression
-	=	Expression COMMA AssignmentExpression
-	|	AssignmentExpression.e {:return e;:}
+	=	Expression.l COMMA AssignmentExpression.r {:return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());:}
+	|	AssignmentExpression
 	;
 
 Expression_NoLBF
-	=	Expression_NoLBF COMMA AssignmentExpression
+	=	Expression_NoLBF.l COMMA AssignmentExpression.r {:return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());:}
 	|	AssignmentExpression_NoLBF
 	;
 
 Expression_NoIn
-	=	Expression_NoIn COMMA AssignmentExpression_NoIn
-	|	AssignmentExpression_NoIn.e {:return e;:}
+	=	Expression_NoIn.l COMMA AssignmentExpression_NoIn.r {:return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());:}
+	|	AssignmentExpression_NoIn
 	;
 
 Literal

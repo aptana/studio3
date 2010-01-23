@@ -1,6 +1,6 @@
 package com.aptana.editor.js.parsing.ast;
 
-public class JSNodeTypes
+public interface JSNodeTypes
 {
 	public static final short ERROR = -1;
 
@@ -145,4 +145,42 @@ public class JSNodeTypes
 	public static final short PARAMETERS = 69;
 
 	public static final short FUNCTION = 70;
+
+	public static final short ELISION = 71;
+
+	public static final short ELEMENTS = 72;
+
+	public static final short ARRAY_LITERAL = 73;
+
+	public static final short COMMA = 74;
+
+	public static final short CONSTRUCT = 75;
+
+	public static final short NAME_VALUE_PAIR = 76;
+
+	public static final short OBJECT_LITERAL = 77;
+
+	public static final short THROW = 78;
+
+	public static final short LABELLED = 79;
+
+	public static final short WHILE = 80;
+
+	public static final short WITH = 81;
+
+	public static final short SWITCH = 82;
+
+	public static final short CASE = 83;
+
+	public static final short DEFAULT = 84;
+
+	public static final short RETURN = 85;
+
+	public static final short IF = 86;
+
+	public static final short DO = 87;
+
+	public static final short FOR = 88;
+
+	public static final short FOR_IN = 89;
 }

@@ -5,14 +5,15 @@ import com.aptana.editor.js.parsing.lexer.JSTokens;
 public class JSUnaryOperatorNode extends JSNode
 {
 
-	protected JSUnaryOperatorNode(JSNode expression)
+	protected JSUnaryOperatorNode(JSNode expression, int start, int end)
 	{
+		setLocation(start, end);
 		setChildren(new JSNode[] { expression });
 	}
 
-	public JSUnaryOperatorNode(String operator, JSNode expression)
+	public JSUnaryOperatorNode(String operator, JSNode expression, int start, int end)
 	{
-		this(expression);
+		this(expression, start, end);
 
 		short type = DEFAULT_TYPE;
 		short token = JSTokens.getToken(operator);
@@ -49,9 +50,9 @@ public class JSUnaryOperatorNode extends JSNode
 		setType(type);
 	}
 
-	public JSUnaryOperatorNode(short type, JSNode expression)
+	public JSUnaryOperatorNode(short type, JSNode expression, int start, int end)
 	{
-		this(expression);
+		this(expression, start, end);
 		setType(type);
 	}
 
@@ -100,6 +101,16 @@ public class JSUnaryOperatorNode extends JSNode
 					break;
 				case JSNodeTypes.VOID:
 					operator = "void "; //$NON-NLS-1$
+					break;
+				case JSNodeTypes.THROW:
+					operator = "throw "; //$NON-NLS-1$
+					break;
+				case JSNodeTypes.RETURN:
+					operator = "return"; //$NON-NLS-1$
+					if (!expression.isEmpty())
+					{
+						operator += " "; //$NON-NLS-1$
+					}
 					break;
 			}
 			text.append(operator).append(expression);

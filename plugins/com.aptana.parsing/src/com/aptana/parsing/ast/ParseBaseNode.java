@@ -8,6 +8,7 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	private IParseNode[] fChildren;
 	private IParseNode fParent;
+	private int fChildrenCount;
 
 	public ParseBaseNode()
 	{
@@ -16,12 +17,25 @@ public class ParseBaseNode extends Node implements IParseNode
 
 	public void addChild(IParseNode child)
 	{
-		// could use a more efficient way (e.g. doubling the array size when needed each time), but addChild() is not
-		// called often while setChildren() is the more preferred method
-		IParseNode[] newList = new IParseNode[fChildren.length + 1];
-		System.arraycopy(fChildren, 0, newList, 0, fChildren.length);
-		fChildren = newList;
-		fChildren[fChildren.length - 1] = child;
+		// makes sure our private buffer is large enough
+		int currentLength = fChildren.length;
+		int size = fChildrenCount + 1;
+		if (size > currentLength)
+		{
+			// it's not, so adds about 50% to our current buffer size
+			int newLength = (currentLength * 3) / 2 + 1;
+			// creates a new empty list
+			IParseNode[] newList = new IParseNode[newLength];
+			// moves the current contents to our new list
+			System.arraycopy(fChildren, 0, newList, 0, fChildrenCount);
+			// sets our current list to the new list
+			fChildren = newList;
+		}
+		fChildren[fChildrenCount++] = child;
+		if (child instanceof ParseBaseNode)
+		{
+			((ParseBaseNode) child).setParent(this);
+		}
 	}
 
 	@Override
@@ -30,9 +44,30 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	@Override
+	public IParseNode getChild(int index)
+	{
+		if (index >= 0 && index < fChildrenCount)
+		{
+			return fChildren[index];
+		}
+		return null;
+	}
+
+	@Override
 	public IParseNode[] getChildren()
 	{
-		return fChildren;
+		IParseNode[] result = new IParseNode[fChildrenCount];
+		if (fChildrenCount > 0)
+		{
+			System.arraycopy(fChildren, 0, result, 0, fChildrenCount);
+		}
+		return result;
+	}
+
+	@Override
+	public int getChildrenCount()
+	{
+		return fChildrenCount;
 	}
 
 	@Override
@@ -69,11 +104,10 @@ public class ParseBaseNode extends Node implements IParseNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		int count = fChildren.length;
-		for (int i = 0; i < count; ++i)
+		for (int i = 0; i < fChildrenCount; ++i)
 		{
 			text.append(fChildren[i]);
-			if (i < count - 1)
+			if (i < fChildrenCount - 1)
 			{
 				text.append(" "); //$NON-NLS-1$
 			}
@@ -89,6 +123,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	protected void setChildren(IParseNode[] children)
 	{
 		fChildren = children;
+		fChildrenCount = children.length;
 		for (IParseNode child : children)
 		{
 			((ParseBaseNode) child).setParent(this);

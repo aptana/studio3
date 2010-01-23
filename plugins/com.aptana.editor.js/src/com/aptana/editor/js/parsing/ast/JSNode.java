@@ -64,8 +64,6 @@ public class JSNode extends ParseBaseNode
 		int type = getType();
 		switch (type)
 		{
-			case JSNodeTypes.EMPTY:
-				break;
 			case JSNodeTypes.ASSIGN:
 				text.append(children[0]).append(" = ").append(children[1]); //$NON-NLS-1$
 				break;
@@ -99,6 +97,61 @@ public class JSNode extends ParseBaseNode
 				break;
 			case JSNodeTypes.CONDITIONAL:
 				text.append(children[0]).append(" ? ").append(children[1]).append(" : ").append(children[2]); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
+			case JSNodeTypes.CONSTRUCT:
+				text.append("new ").append(children[0]).append("(").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				break;
+			case JSNodeTypes.NAME_VALUE_PAIR:
+			case JSNodeTypes.LABELLED:
+				text.append(children[0]).append(": ").append(children[1]); //$NON-NLS-1$
+				break;
+			case JSNodeTypes.WHILE:
+				text.append("while (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
+			case JSNodeTypes.WITH:
+				text.append("with (").append(children[0]).append(") ").append(children[1]); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
+			case JSNodeTypes.IF:
+				text.append("if (").append(children[0]).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+				text.append(children[1]);
+				if (!((JSNode) children[2]).isEmpty())
+				{
+					if (((JSNode) children[1]).getType() != JSNodeTypes.STATEMENTS)
+					{
+						text.append(";"); //$NON-NLS-1$
+					}
+					text.append(" else ").append(children[2]); //$NON-NLS-1$
+				}
+				break;
+			case JSNodeTypes.DO:
+				text.append("do ").append(children[0]); //$NON-NLS-1$
+				if (((JSNode) children[0]).getType() != JSNodeTypes.STATEMENTS)
+				{
+					text.append(";"); //$NON-NLS-1$
+				}
+				text.append(" while (").append(children[1]).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+				break;
+			case JSNodeTypes.FOR:
+				text.append("for ("); //$NON-NLS-1$
+				if (!((JSNode) children[0]).isEmpty())
+				{
+					text.append(children[0]);
+				}
+				text.append(";"); //$NON-NLS-1$
+				if (!((JSNode) children[1]).isEmpty())
+				{
+					text.append(" ").append(children[1]); //$NON-NLS-1$
+				}
+				text.append(";"); //$NON-NLS-1$
+				if (!((JSNode) children[2]).isEmpty())
+				{
+					text.append(" ").append(children[2]); //$NON-NLS-1$
+				}
+				text.append(") ").append(children[3]); //$NON-NLS-1$
+				break;
+			case JSNodeTypes.FOR_IN:
+				text.append("for (").append(children[0]).append(" in ").append(children[1]).append(") ").append( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						children[2]);
 				break;
 			default:
 				text.append(super.toString());

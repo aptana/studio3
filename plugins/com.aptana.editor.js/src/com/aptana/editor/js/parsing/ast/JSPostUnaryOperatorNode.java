@@ -5,9 +5,9 @@ import com.aptana.editor.js.parsing.lexer.JSTokens;
 public class JSPostUnaryOperatorNode extends JSUnaryOperatorNode
 {
 
-	public JSPostUnaryOperatorNode(JSNode expression, String operator)
+	public JSPostUnaryOperatorNode(JSNode expression, String operator, int start, int end)
 	{
-		super(expression);
+		super(expression, start, end);
 
 		short type = DEFAULT_TYPE;
 		short token = JSTokens.getToken(operator);

@@ -35,11 +35,11 @@ public class JSTokens
 	static public final short WHILE = 26;
 	static public final short FOR = 27;
 	static public final short DO = 28;
-	static public final short IF = 29;
-	static public final short CONTINUE = 30;
-	static public final short BREAK = 31;
-	static public final short WITH = 32;
-	static public final short SWITCH = 33;
+	static public final short SWITCH = 29;
+	static public final short IF = 30;
+	static public final short CONTINUE = 31;
+	static public final short BREAK = 32;
+	static public final short WITH = 33;
 	static public final short RETURN = 34;
 	static public final short THROW = 35;
 	static public final short TRY = 36;
@@ -96,7 +96,7 @@ public class JSTokens
 	@SuppressWarnings("nls")
 	private static final String[] NAMES = { "EOF", "(", "IDENTIFIER", "{", "[", "++", "--", "STRING", "NUMBER", "-",
 			"+", "this", "new", "null", "true", "false", "REGEX", "delete", "!", "~", "typeof", "void", "function",
-			";", ",", "var", "while", "for", "do", "if", "continue", "break", "with", "switch", "return", "throw",
+			";", ",", "var", "while", "for", "do", "switch", "if", "continue", "break", "with", "return", "throw",
 			"try", ")", "else", "}", ":", "]", "in", "=", "case", ".", "<<", ">>", ">>>", "<", ">", "<=", ">=",
 			"instanceof", "==", "!=", "===", "!==", "&", "^", "|", "&&", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=",
 			">>>=", "&=", "^=", "|=", "*", "/", "%", "?", "||", "default", "finally", "catch", "SINGLELINE_COMMENT",
