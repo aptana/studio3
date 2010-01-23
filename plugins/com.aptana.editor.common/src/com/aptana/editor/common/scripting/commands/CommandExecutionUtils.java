@@ -484,7 +484,10 @@ public class CommandExecutionUtils
 					IRegion region = getCurrentLineRegion(textWidget);
 					offsetToInsert = region.getOffset() + region.getLength();
 				}
-				textWidget.replaceTextRange(offsetToInsert, 0, commandResult.getOutputString());
+				String outputString = commandResult.getOutputString();
+				textWidget.replaceTextRange(offsetToInsert, 0, outputString);
+				// Need to place cursor at end of inserted text!
+				textWidget.setCaretOffset(caretOffset + outputString.length());
 				break;
 			case INSERT_AS_SNIPPET:
 				IRegion region = new Region(caretOffset, 0);
@@ -568,7 +571,9 @@ public class CommandExecutionUtils
 	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
 	{
 		IRegion region = getCurrentLineRegion(textWidget);
-		textWidget.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
+		String output = commandResult.getOutputString();
+		textWidget.replaceTextRange(region.getOffset(), region.getLength(), output);
+		textWidget.setCaretOffset(region.getOffset() + output.length());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)
@@ -687,7 +692,7 @@ public class CommandExecutionUtils
 				+ textWidget.getLineHeight(caretOffset) + 2);
 		tooltip.setLocation(locationAtOffset);
 		tooltip.setVisible(true);
-		tooltip.setFocus();
+//		tooltip.setFocus();
 	}
 
 	private static void showAsHTML(CommandElement command, CommandResult commandResult)

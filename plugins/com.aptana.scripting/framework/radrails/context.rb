@@ -18,6 +18,14 @@ module RadRails
       exit_with_message(message, :show_as_tooltip)
     end
     
+    def exit_insert_snippet(snippet)
+      exit_with_message(snippet, :insert_as_snippet)
+    end
+    
+    def exit_insert_text(text)
+      exit_with_message(text, :insert_as_text)
+    end
+    
     def exit_discard
       exit_with_message('', :discard)
     end
