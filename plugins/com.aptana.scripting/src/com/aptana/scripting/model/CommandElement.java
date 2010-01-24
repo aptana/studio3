@@ -328,7 +328,7 @@ public class CommandElement extends AbstractBundleElement
 		context.setOutputStream(new ByteArrayOutputStream());
 		
 		// execute block using owning bundle's load paths
-		ExecuteBlockJob job = new ExecuteBlockJob(this, context, this.getOwningBundle().getLoadPaths());
+		CommandBlockJob job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
 		
 		try
 		{

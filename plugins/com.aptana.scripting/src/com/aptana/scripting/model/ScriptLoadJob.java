@@ -17,7 +17,7 @@ import com.aptana.scripting.Messages;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 
-public class ExecuteScriptJob extends AbstractScriptJob
+public class ScriptLoadJob extends AbstractScriptJob
 {
 	private String _filename;
 	private Object _returnValue;
@@ -27,7 +27,7 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	 * 
 	 * @param filename
 	 */
-	public ExecuteScriptJob(String filename)
+	public ScriptLoadJob(String filename)
 	{
 		this("Execute JRuby File", filename, null);
 	}
@@ -38,7 +38,7 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	 * @param filename
 	 * @param loadPaths
 	 */
-	public ExecuteScriptJob(String filename, List<String> loadPaths)
+	public ScriptLoadJob(String filename, List<String> loadPaths)
 	{
 		this("Execute JRuby File", filename, loadPaths);
 	}
@@ -49,7 +49,7 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	 * @param name
 	 * @param filename
 	 */
-	public ExecuteScriptJob(String name, String filename)
+	public ScriptLoadJob(String name, String filename)
 	{
 		this(name, filename, null);
 	}
@@ -61,7 +61,7 @@ public class ExecuteScriptJob extends AbstractScriptJob
 	 * @param filename
 	 * @param loadPaths
 	 */
-	public ExecuteScriptJob(String name, String filename, List<String> loadPaths)
+	public ScriptLoadJob(String name, String filename, List<String> loadPaths)
 	{
 		super(name, loadPaths);
 		

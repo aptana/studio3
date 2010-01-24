@@ -26,7 +26,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
 
-public class ExecuteBlockJob extends AbstractScriptJob
+public class CommandBlockJob extends AbstractScriptJob
 {
 	private static final String CONSOLE_CONSTANT = "CONSOLE";
 	private static final String CONSOLE_VARIABLE = "$console";
@@ -47,7 +47,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * @param command
 	 * @param context
 	 */
-	public ExecuteBlockJob(CommandElement command, CommandContext context)
+	public CommandBlockJob(CommandElement command, CommandContext context)
 	{
 		this("Execute JRuby Block", command, context, null);
 	}
@@ -58,7 +58,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * @param block
 	 * @param loadPaths
 	 */
-	public ExecuteBlockJob(CommandElement command, CommandContext context, List<String> loadPaths)
+	public CommandBlockJob(CommandElement command, CommandContext context, List<String> loadPaths)
 	{
 		this("Execute JRuby Block", command, context, loadPaths);
 	}
@@ -69,7 +69,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * @param name
 	 * @param block
 	 */
-	public ExecuteBlockJob(String name, CommandElement command, CommandContext context)
+	public CommandBlockJob(String name, CommandElement command, CommandContext context)
 	{
 		this(name, command, context, null);
 	}
@@ -81,7 +81,7 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 * @param block
 	 * @param loadPaths
 	 */
-	public ExecuteBlockJob(String name, CommandElement command, CommandContext context, List<String> loadPaths)
+	public CommandBlockJob(String name, CommandElement command, CommandContext context, List<String> loadPaths)
 	{
 		super(name, loadPaths);
 

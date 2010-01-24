@@ -21,7 +21,7 @@ import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
-import com.aptana.scripting.model.ExecuteScriptJob;
+import com.aptana.scripting.model.ScriptLoadJob;
 import com.aptana.scripting.model.RunType;
 import com.aptana.util.ResourceUtils;
 
@@ -249,7 +249,7 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths, boolean async)
 	{
-		ExecuteScriptJob job = new ExecuteScriptJob(fullPath, loadPaths);
+		ScriptLoadJob job = new ScriptLoadJob(fullPath, loadPaths);
 		
 		try
 		{
