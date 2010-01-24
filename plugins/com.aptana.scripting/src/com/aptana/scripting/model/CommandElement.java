@@ -322,6 +322,8 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeBlockCommand(CommandContext context)
 	{
+		boolean async = (this._async && this._outputType.allowAsync());
+		
 		// create output stream and attach to context
 		context.setOutputStream(new ByteArrayOutputStream());
 		
@@ -333,7 +335,7 @@ public class CommandElement extends AbstractBundleElement
 			switch (this._runType)
 			{
 				case JOB:
-					job.setPriority((this._async) ? Job.SHORT : Job.INTERACTIVE);
+					job.setPriority(async ? Job.SHORT : Job.INTERACTIVE);
 					job.schedule();
 					
 					if (this._async == false)
@@ -367,7 +369,7 @@ public class CommandElement extends AbstractBundleElement
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return (this._async && this._runType != RunType.CURRENT_THREAD) ? null : job.getCommandResult();
+		return (async && this._runType != RunType.CURRENT_THREAD) ? null : job.getCommandResult();
 	}
 
 	/**
