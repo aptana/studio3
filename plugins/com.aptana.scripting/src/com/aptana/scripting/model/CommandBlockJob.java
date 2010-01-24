@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jruby.Ruby;
+import org.jruby.RubyClass;
 import org.jruby.RubyHash;
 import org.jruby.RubyIO;
 import org.jruby.RubyProc;
@@ -28,8 +29,17 @@ import com.aptana.scripting.ScriptUtils;
 
 public class CommandBlockJob extends AbstractScriptJob
 {
-	private static final String CONSOLE_CONSTANT = "CONSOLE";
-	private static final String CONSOLE_VARIABLE = "$console";
+	private static final String STDIN_GLOBAL = "$stdin"; //$NON-NLS-1$
+	private static final String STDIN_CONSTANT = "STDIN"; //$NON-NLS-1$
+	private static final String DEFERR_GLOBAL = "$deferr"; //$NON-NLS-1$
+	private static final String STDERR_GLOBAL = "$stderr"; //$NON-NLS-1$
+	private static final String DEFOUT_GLOBAL = "$defout"; //$NON-NLS-1$
+	private static final String STDOUT_GLOBAL2 = "$>"; //$NON-NLS-1$
+	private static final String STDOUT_CONSTANT = "STDOUT"; //$NON-NLS-1$
+	private static final String STDOUT_GLOBAL = "$stdout"; //$NON-NLS-1$
+	private static final String STDERR_CONSTANT = "STDERR"; //$NON-NLS-1$
+	private static final String CONSOLE_CONSTANT = "CONSOLE"; //$NON-NLS-1$
+	private static final String CONSOLE_VARIABLE = "$console"; //$NON-NLS-1$
 	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
 	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
@@ -40,6 +50,10 @@ public class CommandBlockJob extends AbstractScriptJob
 	private CommandResult _result;
 	private RubyHash _originalEnvironment;
 	private Map<String, String> _contributedEnvironment;
+	private IRubyObject _oldReader;
+	private IRubyObject _oldWriter;
+	private IRubyObject _oldErrorWriter;
+	private IRubyObject _oldConsole;
 
 	/**
 	 * ExecuteScriptJob
@@ -49,7 +63,7 @@ public class CommandBlockJob extends AbstractScriptJob
 	 */
 	public CommandBlockJob(CommandElement command, CommandContext context)
 	{
-		this("Execute JRuby Block", command, context, null);
+		this("Execute JRuby Block", command, context, null); //$NON-NLS-1$
 	}
 
 	/**
@@ -60,7 +74,7 @@ public class CommandBlockJob extends AbstractScriptJob
 	 */
 	public CommandBlockJob(CommandElement command, CommandContext context, List<String> loadPaths)
 	{
-		this("Execute JRuby Block", command, context, loadPaths);
+		this("Execute JRuby Block", command, context, loadPaths); //$NON-NLS-1$
 	}
 
 	/**
@@ -89,6 +103,23 @@ public class CommandBlockJob extends AbstractScriptJob
 		this._context = context;
 		this._contributedEnvironment = new HashMap<String, String>();
 		this._command.populateEnvironment(this._context.getMap(), this._contributedEnvironment);
+	}
+
+	/**
+	 * afterExecute
+	 */
+	protected void afterExecute()
+	{
+		Ruby runtime = this.getRuntime();
+		
+		// unapply load paths
+		this.unapplyLoadPaths(runtime);
+		
+		// unapply streams
+		this.unapplyStreams();
+		
+		// unapply environment
+		this.unapplyEnvironment();
 	}
 
 	/**
@@ -126,13 +157,35 @@ public class CommandBlockJob extends AbstractScriptJob
 		runtime.setVerbose(runtime.getNil());
 
 		// set stdin/out/err and console
-		this.setReader(this._context.getInputStream());
-		this.setWriter(this._context.getOutputStream());
-		this.setErrorWriter(this._context.getErrorStream());
-		this.setConsole(this._context.getConsoleStream());
+		this._oldReader = this.setReader(this._context.getInputStream());
+		this._oldWriter = this.setWriter(this._context.getOutputStream());
+		this._oldErrorWriter = this.setErrorWriter(this._context.getErrorStream());
+		this._oldConsole = this.setConsole(this._context.getConsoleStream());
 
 		// restore verbose mode
 		runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
+	}
+
+	/**
+	 * beforeExecute
+	 * 
+	 * @return
+	 */
+	protected void beforeExecute()
+	{
+		Ruby runtime = this.getRuntime();
+
+		// apply load paths
+		this.applyLoadPaths(runtime);
+
+		// apply streams
+		this.applyStreams();
+
+		// setup ENV
+		this.applyEnvironment();
+
+		// set default output type, this may be changed by context.exit_with_message
+		this._context.setOutputType(this._command.getOutputType());
 	}
 
 	/**
@@ -295,52 +348,13 @@ public class CommandBlockJob extends AbstractScriptJob
 		}
 		else
 		{
-			result.setOutputString("");
+			result.setOutputString(""); //$NON-NLS-1$
 		}
 
 		// save result
 		this.setCommandResult(result);
 
 		return Status.OK_STATUS;
-	}
-
-	/**
-	 * afterExecute
-	 */
-	protected void afterExecute()
-	{
-		Ruby runtime = this.getRuntime();
-		
-		// unapply load paths
-		this.unapplyLoadPaths(runtime);
-		
-		// unapply streams
-		this.unapplyStreams();
-		
-		// unapply environment
-		this.unapplyEnvironment();
-	}
-
-	/**
-	 * beforeExecute
-	 * 
-	 * @return
-	 */
-	protected void beforeExecute()
-	{
-		Ruby runtime = this.getRuntime();
-
-		// apply load paths
-		this.applyLoadPaths(runtime);
-
-		// apply streams
-		this.applyStreams();
-
-		// setup ENV
-		this.applyEnvironment();
-
-		// set default output type, this may be changed by context.exit_with_message
-		this._context.setOutputType(this._command.getOutputType());
 	}
 
 	/**
@@ -358,17 +372,37 @@ public class CommandBlockJob extends AbstractScriptJob
 	 * 
 	 * @param ostream
 	 */
-	protected void setConsole(OutputStream ostream)
+	protected IRubyObject setConsole(OutputStream ostream)
 	{
+		Ruby runtime = getRuntime();
+		RubyClass object = runtime.getObject();
+		IRubyObject oldValue = null;
+		
+		// CONSOLE will only exist already if one command invokes another
+		if (object.hasConstant(CONSOLE_CONSTANT))
+		{
+			oldValue = object.getConstant(CONSOLE_CONSTANT);
+		}
+		
 		if (ostream != null)
 		{
-			Ruby runtime = getRuntime();
-			RubyIO io = new RubyIO(runtime, ostream);
-
-			io.getOpenFile().getMainStream().setSync(true);
-			runtime.getGlobalVariables().set(CONSOLE_VARIABLE, io);
-			runtime.getObject().setConstant(CONSOLE_CONSTANT, io);
+			setConsole(new RubyIO(runtime, ostream));
 		}
+		
+		return oldValue;
+	}
+
+	/**
+	 * setConsole
+	 * 
+	 * @param io
+	 */
+	protected void setConsole(IRubyObject io)
+	{
+		Ruby runtime = getRuntime();
+		
+		runtime.getGlobalVariables().set(CONSOLE_VARIABLE, io);
+		runtime.getObject().setConstant(CONSOLE_CONSTANT, io);
 	}
 
 	/**
@@ -376,19 +410,34 @@ public class CommandBlockJob extends AbstractScriptJob
 	 * 
 	 * @param ostream
 	 */
-	protected void setErrorWriter(OutputStream ostream)
+	protected IRubyObject setErrorWriter(OutputStream ostream)
 	{
+		Ruby runtime = getRuntime();
+		IRubyObject oldValue = runtime.getObject().getConstant(STDERR_CONSTANT);
+		
 		if (ostream != null)
 		{
 			PrintStream pstream = new PrintStream(ostream);
-			Ruby runtime = getRuntime();
 			RubyIO io = new RubyIO(runtime, pstream);
 
-			io.getOpenFile().getMainStream().setSync(true);
-			runtime.defineVariable(new OutputGlobalVariable(runtime, "$stderr", io));
-			runtime.defineGlobalConstant("STDERR", io);
-			runtime.getGlobalVariables().alias("$deferr", "$stderr");
+			setErrorWriter(io);
 		}
+		
+		return oldValue;
+	}
+
+	/**
+	 * setErrorWriter
+	 * 
+	 * @param io
+	 */
+	protected void setErrorWriter(IRubyObject io)
+	{
+		Ruby runtime = getRuntime();
+		
+		runtime.defineVariable(new OutputGlobalVariable(runtime, STDERR_GLOBAL, io));
+		runtime.defineGlobalConstant(STDERR_CONSTANT, io);
+		runtime.getGlobalVariables().alias(DEFERR_GLOBAL, STDERR_GLOBAL);
 	}
 
 	/**
@@ -396,17 +445,30 @@ public class CommandBlockJob extends AbstractScriptJob
 	 * 
 	 * @param istream
 	 */
-	protected void setReader(InputStream istream)
+	protected IRubyObject setReader(InputStream istream)
 	{
+		Ruby runtime = this.getRuntime();
+		IRubyObject oldValue = runtime.getObject().getConstant(STDIN_CONSTANT);
+		
 		if (istream != null)
 		{
-			Ruby runtime = this.getRuntime();
-			RubyIO io = new RubyIO(runtime, istream);
-
-			io.getOpenFile().getMainStream().setSync(true);
-			runtime.defineVariable(new InputGlobalVariable(runtime, "$stdin", io));
-			runtime.defineGlobalConstant("STDIN", io);
+			setReader(new RubyIO(runtime, istream));
 		}
+		
+		return oldValue;
+	}
+
+	/**
+	 * setReader
+	 * 
+	 * @param io
+	 */
+	protected void setReader(IRubyObject io)
+	{
+		Ruby runtime = this.getRuntime();
+		
+		runtime.defineVariable(new InputGlobalVariable(runtime, STDIN_GLOBAL, io));
+		runtime.defineGlobalConstant(STDIN_CONSTANT, io);
 	}
 
 	/**
@@ -414,20 +476,36 @@ public class CommandBlockJob extends AbstractScriptJob
 	 * 
 	 * @param ostream
 	 */
-	protected void setWriter(OutputStream ostream)
+	protected IRubyObject setWriter(OutputStream ostream)
 	{
+		Ruby runtime = this.getRuntime();
+		IRubyObject oldValue = runtime.getObject().getConstant(STDOUT_CONSTANT);
+		
 		if (ostream != null)
 		{
 			PrintStream pstream = new PrintStream(ostream);
-			Ruby runtime = this.getRuntime();
 			RubyIO io = new RubyIO(runtime, pstream);
 
 			io.getOpenFile().getMainStream().setSync(true);
-			runtime.defineVariable(new OutputGlobalVariable(runtime, "$stdout", io));
-			runtime.defineGlobalConstant("STDOUT", io);
-			runtime.getGlobalVariables().alias("$>", "$stdout");
-			runtime.getGlobalVariables().alias("$defout", "$stdout");
+			setWriter(io);
 		}
+		
+		return oldValue;
+	}
+
+	/**
+	 * setWriter
+	 * 
+	 * @param io
+	 */
+	protected void setWriter(IRubyObject io)
+	{
+		Ruby runtime = this.getRuntime();
+		
+		runtime.defineVariable(new OutputGlobalVariable(runtime, STDOUT_GLOBAL, io));
+		runtime.defineGlobalConstant(STDOUT_CONSTANT, io);
+		runtime.getGlobalVariables().alias(STDOUT_GLOBAL2, STDOUT_GLOBAL);
+		runtime.getGlobalVariables().alias(DEFOUT_GLOBAL, STDOUT_GLOBAL);
 	}
 	
 	/**
@@ -455,8 +533,28 @@ public class CommandBlockJob extends AbstractScriptJob
 	 */
 	protected void unapplyStreams()
 	{
+		Ruby runtime = this.getRuntime();
+
+		// turn off verbose mode (and warnings)
+		boolean isVerbose = runtime.isVerbose();
+		runtime.setVerbose(runtime.getNil());
+		
 		// restore original values for STDIN/OUT/ERR
+		this.setReader(this._oldReader);
+		this.setWriter(this._oldWriter);
+		this.setErrorWriter(this._oldErrorWriter);
 		
 		// remove CONSOLE/$console
+		if (this._oldConsole == null)
+		{
+			runtime.getObject().remove_const(runtime.getCurrentContext(), runtime.newString(CONSOLE_CONSTANT));
+		}
+		else
+		{
+			this.setConsole(this._oldConsole);
+		}
+		
+		// restore verbose mode
+		runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
 	}
 }
