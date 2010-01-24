@@ -189,7 +189,6 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		try
 		{
 			// invoke the block
-			runtime.incrementConstantGeneration();
 			IRubyObject result = this._command.getInvokeBlock().call(threadContext, new IRubyObject[] { rubyContext });
 
 			// close any streams we have
@@ -271,28 +270,15 @@ public class ExecuteBlockJob extends AbstractScriptJob
 	 */
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		Ruby runtime = this.getRuntime();
-
-		// apply load paths
-		this.applyLoadPaths(runtime);
-
-		// apply streams
-		this.applyStreams();
-
-		// setup ENV
-		this.applyEnvironment();
-
-		// set default output type, this may be changed by context.exit_with_message
-		this._context.setOutputType(this._command.getOutputType());
-
+		String resultText = null;
+		
 		// execute block
-		String resultText = this.executeBlock();
-		
-		// unapply load paths
-		this.unapplyLoadPaths(runtime);
-		
-		// unapply environment
-		this.unapplyEnvironment();
+		synchronized (this.getRuntime())
+		{
+			this.beforeExecute();
+			resultText = this.executeBlock();
+			this.afterExecute();
+		}
 
 		// process result
 		CommandResult result = new CommandResult();
@@ -318,6 +304,45 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		this.setCommandResult(result);
 
 		return Status.OK_STATUS;
+	}
+
+	/**
+	 * afterExecute
+	 */
+	protected void afterExecute()
+	{
+		Ruby runtime = this.getRuntime();
+		
+		// unapply load paths
+		this.unapplyLoadPaths(runtime);
+		
+		// unapply streams
+		this.unapplyStreams();
+		
+		// unapply environment
+		this.unapplyEnvironment();
+	}
+
+	/**
+	 * beforeExecute
+	 * 
+	 * @return
+	 */
+	protected void beforeExecute()
+	{
+		Ruby runtime = this.getRuntime();
+
+		// apply load paths
+		this.applyLoadPaths(runtime);
+
+		// apply streams
+		this.applyStreams();
+
+		// setup ENV
+		this.applyEnvironment();
+
+		// set default output type, this may be changed by context.exit_with_message
+		this._context.setOutputType(this._command.getOutputType());
 	}
 
 	/**
@@ -425,5 +450,15 @@ public class ExecuteBlockJob extends AbstractScriptJob
 			// lose reference
 			this._originalEnvironment = null;
 		}
+	}
+	
+	/**
+	 * unapplyStreams
+	 */
+	protected void unapplyStreams()
+	{
+		// restore original values for STDIN/OUT/ERR
+		
+		// remove CONSOLE/$console
 	}
 }
