@@ -29,7 +29,7 @@ public class ScriptLoadJob extends AbstractScriptJob
 	 */
 	public ScriptLoadJob(String filename)
 	{
-		this("Execute JRuby File", filename, null);
+		this("Execute JRuby File", filename, null); //$NON-NLS-1$
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class ScriptLoadJob extends AbstractScriptJob
 	 */
 	public ScriptLoadJob(String filename, List<String> loadPaths)
 	{
-		this("Execute JRuby File", filename, loadPaths);
+		this("Execute JRuby File", filename, loadPaths); //$NON-NLS-1$
 	}
 	
 	/**

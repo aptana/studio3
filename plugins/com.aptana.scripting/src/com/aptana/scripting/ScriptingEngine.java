@@ -266,7 +266,7 @@ public class ScriptingEngine
 					break;
 					
 				case THREAD:
-					Thread thread = new Thread(job, "Load '" + fullPath + "'");
+					Thread thread = new Thread(job, "Load '" + fullPath + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					thread.start();
 					
 					if (async == false)
@@ -284,7 +284,7 @@ public class ScriptingEngine
 		catch (InterruptedException e)
 		{
 			String message = MessageFormat.format(
-				"An error occurred while executing {0}",
+				Messages.ScriptingEngine_Error_Executing_Script,
 				new Object[] { fullPath }
 			);
 			

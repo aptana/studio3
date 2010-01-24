@@ -11,10 +11,10 @@ import com.aptana.scripting.model.ContextContributor;
 
 public class BundleContextContributor implements ContextContributor
 {
-	private static final String BUNDLE_PROPERTY_NAME = "bundle";
-	private static final String BUNDLE_RUBY_CLASS = "Bundle";
-	private static final String COMMAND_PROPERTY_NAME = "command";
-	private static final String COMMAND_RUBY_CLASS = "Command";
+	private static final String BUNDLE_PROPERTY_NAME = "bundle"; //$NON-NLS-1$
+	private static final String BUNDLE_RUBY_CLASS = "Bundle"; //$NON-NLS-1$
+	private static final String COMMAND_PROPERTY_NAME = "command"; //$NON-NLS-1$
+	private static final String COMMAND_RUBY_CLASS = "Command"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)

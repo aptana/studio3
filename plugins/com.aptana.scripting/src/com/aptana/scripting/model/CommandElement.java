@@ -345,7 +345,7 @@ public class CommandElement extends AbstractBundleElement
 					break;
 				
 				case THREAD:
-					Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'");
+					Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					thread.start();
 					
 					if (this._async == false)
@@ -362,7 +362,7 @@ public class CommandElement extends AbstractBundleElement
 		catch (InterruptedException e)
 		{
 			String message = MessageFormat.format(
-				"An error occurred while executing command {0}: {1}",
+				Messages.CommandElement_Error_Executing_Command,
 				new Object[] { this.getDisplayName(), this.getPath() }
 			);
 			
@@ -534,7 +534,7 @@ public class CommandElement extends AbstractBundleElement
 					{
 						String message = MessageFormat
 								.format(
-										"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
+										Messages.CommandElement_Error_Building_Env_Variables,
 										new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(),
 												e.getMessage() });
 

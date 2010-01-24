@@ -15,7 +15,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 public class ScriptUtils
 {
-	public static final String RADRAILS_MODULE = "RadRails";
+	public static final String RADRAILS_MODULE = "RadRails"; //$NON-NLS-1$
 	public static final IRubyObject[] NO_ARGS = new IRubyObject[0];
 	
 	private static final Pattern CONTROL_PLUS = Pattern.compile("control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
