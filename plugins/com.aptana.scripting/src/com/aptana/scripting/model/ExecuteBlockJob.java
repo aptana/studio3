@@ -281,11 +281,9 @@ public class ExecuteBlockJob extends AbstractScriptJob
 		}
 
 		// process result
-		CommandResult result = new CommandResult();
+		CommandResult result = new CommandResult(this._command, this._context);
 
 		result.setExecutedSuccessfully(this._executedSuccessfully);
-		result.setCommand(this._command);
-		result.setContext(this._context);
 
 		if (resultText != null)
 		{

@@ -446,12 +446,10 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 
-		CommandResult result = new CommandResult();
+		CommandResult result = new CommandResult(this, context);
 		result.setOutputString(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
 
 		return result;
 	}

@@ -18,8 +18,11 @@ public class CommandResult
 	/**
 	 * CommandResult
 	 */
-	public CommandResult()
+	public CommandResult(CommandElement command, CommandContext context)
 	{
+		this._command = command;
+		this._context = context;
+		this._outputType = (context != null) ? context.getOutputType() : OutputType.UNDEFINED;
 	}
 
 	/**
@@ -127,27 +130,6 @@ public class CommandResult
 	public int getReturnValue()
 	{
 		return this._returnValue;
-	}
-	
-	/**
-	 * setCommand
-	 * 
-	 * @param command
-	 */
-	void setCommand(CommandElement command)
-	{
-		this._command = command;
-	}
-
-	/**
-	 * setContext
-	 * 
-	 * @param context
-	 */
-	void setContext(CommandContext context)
-	{
-		this._context = context;
-		this._outputType = (context != null) ? context.getOutputType() : OutputType.UNDEFINED;
 	}
 
 	/**
