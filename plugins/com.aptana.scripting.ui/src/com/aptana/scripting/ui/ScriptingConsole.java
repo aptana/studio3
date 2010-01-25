@@ -90,35 +90,42 @@ public class ScriptingConsole
 	 */
 	private void applyTheme()
 	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		final Display display = workbench.getDisplay();
-		
-		if (display == null)
+		try
 		{
-			throw new IllegalStateException(new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS));
-		}
-		
-		display.syncExec(new Runnable()
-		{
-			public void run()
+			IWorkbench workbench = PlatformUI.getWorkbench();
+			final Display display = workbench.getDisplay();
+			
+			if (display == null)
 			{
-				// set colors
-				CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
-				ColorManager colorManager = plugin.getColorManager();
-				Theme theme = plugin.getThemeManager().getCurrentTheme();
-				
-				// set background color
-				console.setBackground(colorManager.getColor(theme.getBackground()));
-				console.setFont(JFaceResources.getTextFont());
-				
-				// set stream colors
-				applyTheme(CONSOLE_OUTPUT, outputConsoleStream, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
-				applyTheme(CONSOLE_ERROR, errorConsoleStream, display.getSystemColor(SWT.COLOR_DARK_RED));
-				applyTheme(CONSOLE_INFO, infoConsoleStream, display.getSystemColor(SWT.COLOR_DARK_BLUE));
-				applyTheme(CONSOLE_WARNING, warningConsoleStream, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
-				applyTheme(CONSOLE_TRACE, traceConsoleStream, display.getSystemColor(SWT.COLOR_DARK_GREEN));
+				throw new IllegalStateException(new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS));
 			}
-		});
+			
+			display.syncExec(new Runnable()
+			{
+				public void run()
+				{
+					// set colors
+					CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+					ColorManager colorManager = plugin.getColorManager();
+					Theme theme = plugin.getThemeManager().getCurrentTheme();
+					
+					// set background color
+					console.setBackground(colorManager.getColor(theme.getBackground()));
+					console.setFont(JFaceResources.getTextFont());
+					
+					// set stream colors
+					applyTheme(CONSOLE_OUTPUT, outputConsoleStream, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+					applyTheme(CONSOLE_ERROR, errorConsoleStream, display.getSystemColor(SWT.COLOR_DARK_RED));
+					applyTheme(CONSOLE_INFO, infoConsoleStream, display.getSystemColor(SWT.COLOR_DARK_BLUE));
+					applyTheme(CONSOLE_WARNING, warningConsoleStream, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
+					applyTheme(CONSOLE_TRACE, traceConsoleStream, display.getSystemColor(SWT.COLOR_DARK_GREEN));
+				}
+			});
+		}
+		catch (IllegalStateException e)
+		{
+			// do nothing -- happens during unit tests
+		}
 	}
 	
 	/**
