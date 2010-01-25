@@ -30,12 +30,12 @@ import com.aptana.editor.common.theme.Theme;
 
 public class ScriptingConsole
 {
-	private static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont";
-	private static final String CONSOLE_TRACE = "console.trace";
-	private static final String CONSOLE_WARNING = "console.warning";
-	private static final String CONSOLE_INFO = "console.info";
-	private static final String CONSOLE_ERROR = "console.error";
-	private static final String CONSOLE_OUTPUT = "console.output";
+	private static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont"; //$NON-NLS-1$
+	private static final String CONSOLE_TRACE = "console.trace"; //$NON-NLS-1$
+	private static final String CONSOLE_WARNING = "console.warning"; //$NON-NLS-1$
+	private static final String CONSOLE_INFO = "console.info"; //$NON-NLS-1$
+	private static final String CONSOLE_ERROR = "console.error"; //$NON-NLS-1$
+	private static final String CONSOLE_OUTPUT = "console.output"; //$NON-NLS-1$
 	
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
 
@@ -124,7 +124,7 @@ public class ScriptingConsole
 		}
 		catch (IllegalStateException e)
 		{
-			// do nothing -- happens during unit tests
+			CommonEditorPlugin.logError(e);
 		}
 	}
 	
