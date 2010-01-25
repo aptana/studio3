@@ -50,16 +50,6 @@ public class ScriptingConsole
 	
 	private IPropertyChangeListener _fontChangeListener;
 	private IPreferenceChangeListener _themeChangeListener;
-
-	static
-	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		final Display display = workbench.getDisplay();
-		
-		if (display != null)
-		{
-		}
-	}
 	
 	/**
 	 * ScriptingConsole
