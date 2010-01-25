@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
@@ -57,6 +58,7 @@ import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
 /**
@@ -121,6 +123,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
+
+		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext(Activator.CONTEXT_ID);
 	}
 
 	/*

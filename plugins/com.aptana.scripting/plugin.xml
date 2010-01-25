@@ -45,5 +45,13 @@
             name="Bundle Support Context Contributor">
       </contributor>
    </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.scripting.context"
+            name="Aptana Scriptable Context"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
+   </extension>
 
 </plugin>
