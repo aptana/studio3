@@ -43,7 +43,7 @@ public class CommandElement extends AbstractBundleElement
 	private boolean _async;
 	private RunType _runType;
 	private Ruby _runtime;
-	
+
 	private String _workingDirectoryPath;
 	private WorkingDirectoryType _workingDirectoryType;
 
@@ -266,7 +266,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._runtime;
 	}
-	
+
 	/**
 	 * getRunType
 	 * 
@@ -276,7 +276,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._runType.getName();
 	}
-	
+
 	/**
 	 * getTrigger
 	 * 
@@ -322,28 +322,27 @@ public class CommandElement extends AbstractBundleElement
 	private CommandResult invokeBlockCommand(CommandContext context)
 	{
 		boolean async = (this._async && this._outputType.allowAsync());
-		
+
 		// create output stream and attach to context
 		context.setOutputStream(new ByteArrayOutputStream());
-		
+
 		// execute block using owning bundle's load paths
 		CommandBlockJob job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
-		
+
 		try
 		{
 			job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
 		}
 		catch (InterruptedException e)
 		{
-			String message = MessageFormat.format(
-				Messages.CommandElement_Error_Executing_Command,
-				new Object[] { this.getDisplayName(), this.getPath() }
-			);
-			
+			String message = MessageFormat.format(Messages.CommandElement_Error_Executing_Command, new Object[] {
+					this.getDisplayName(), this.getPath() });
+
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job.getCommandResult();
+		return (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job
+				.getCommandResult();
 	}
 
 	/**
@@ -437,7 +436,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._async;
 	}
-	
+
 	/**
 	 * isBlockCommand
 	 * 
@@ -506,11 +505,8 @@ public class CommandElement extends AbstractBundleElement
 					}
 					catch (RaiseException e)
 					{
-						String message = MessageFormat
-								.format(
-										Messages.CommandElement_Error_Building_Env_Variables,
-										new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(),
-												e.getMessage() });
+						String message = MessageFormat.format(Messages.CommandElement_Error_Building_Env_Variables,
+								new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() });
 
 						ScriptLogger.logError(message);
 						e.printStackTrace();
@@ -645,7 +641,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this._async = value;
 	}
-	
+
 	/**
 	 * setInputPath
 	 * 
@@ -726,7 +722,7 @@ public class CommandElement extends AbstractBundleElement
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
-		this._runtime = block.getRuntime();
+		this.setRuntime((block != null) ? block.getRuntime() : null);
 	}
 
 	/**
@@ -816,7 +812,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this._runType = RunType.get(type);
 	}
-	
+
 	/**
 	 * setRuntime
 	 * 
@@ -824,9 +820,19 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setRuntime(IRubyObject object)
 	{
-		this._runtime = object.getRuntime();
+		this.setRuntime((object != null) ? object.getRuntime() : null);
 	}
-	
+
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(Ruby runtime)
+	{
+		this._runtime = runtime;
+	}
+
 	/**
 	 * setRunType
 	 * 
@@ -836,7 +842,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this._runType = type;
 	}
-	
+
 	/**
 	 * setTrigger
 	 * 
