@@ -619,12 +619,12 @@ public class GitRepository
 	 * @return
 	 */
 	public GitRef remoteTrackingBranch(String branchName)
-	{		
+	{
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (output == null || output.trim().length() == 0)
 		{
-			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there... 
+			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there...
 			// See http://kernel.org/pub/software/scm/git/docs/git-pull.html#REMOTES
 			// Git will look in a few places and assume use of remote defined
 			return null;
@@ -683,9 +683,21 @@ public class GitRepository
 
 	public IStatus deleteBranch(String branchName)
 	{
+		return deleteBranch(branchName, false);
+	}
+
+	public IStatus deleteBranch(String branchName, boolean force)
+	{
 		List<String> args = new ArrayList<String>();
 		args.add("branch"); //$NON-NLS-1$
-		args.add("-d"); //$NON-NLS-1$
+		if (!force)
+		{
+			args.add("-d"); //$NON-NLS-1$
+		}
+		else
+		{
+			args.add("-D"); //$NON-NLS-1$
+		}
 		args.add(branchName);
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),

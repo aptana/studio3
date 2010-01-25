@@ -10,6 +10,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
+import org.jruby.Ruby;
+import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
@@ -72,11 +74,11 @@ public class EditorContextContributor implements ContextContributor
 				try
 				{
 					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-	
+
 					if (window != null)
 					{
 						IWorkbenchPage page = window.getActivePage();
-	
+
 						if (page != null)
 						{
 							_editor = page.getActiveEditor();
@@ -90,7 +92,7 @@ public class EditorContextContributor implements ContextContributor
 				return Status.OK_STATUS;
 			}
 		};
-		
+
 		if (this.onUIThread())
 		{
 			job.runInUIThread(new NullProgressMonitor());
@@ -108,7 +110,7 @@ public class EditorContextContributor implements ContextContributor
 				// fail silently
 			}
 		}
-		
+
 		// grab the result and lose the editor reference
 		IEditorPart result = this._editor;
 		this._editor = null;
@@ -125,16 +127,21 @@ public class EditorContextContributor implements ContextContributor
 	{
 		IEditorPart editor = this.getActiveEditor();
 
-		if (editor != null)
+		if (editor != null && command != null)
 		{
-			IRubyObject[] args = new IRubyObject[] { ScriptUtils.javaToRuby(editor) };
-			IRubyObject rubyInstance = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, EDITOR_RUBY_CLASS, args);
+			Ruby runtime = command.getRuntime();
 
-			context.put(EDITOR_PROPERTY_NAME, rubyInstance);
-		}
-		else
-		{
-			context.put(EDITOR_PROPERTY_NAME, null);
+			if (runtime != null)
+			{
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+						EDITOR_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, editor));
+
+				context.put(EDITOR_PROPERTY_NAME, rubyInstance);
+			}
+			else
+			{
+				context.put(EDITOR_PROPERTY_NAME, null);
+			}
 		}
 	}
 }

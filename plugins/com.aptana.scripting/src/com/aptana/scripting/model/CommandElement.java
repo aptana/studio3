@@ -1,33 +1,25 @@
 package com.aptana.scripting.model;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyProc;
-import org.jruby.RubySystemExit;
-import org.jruby.embed.ScriptingContainer;
 import org.jruby.exceptions.RaiseException;
-import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
@@ -38,39 +30,7 @@ public class CommandElement extends AbstractBundleElement
 {
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
-
-	private static final String CONTEXT_RUBY_CLASS = "Context"; //$NON-NLS-1$
-	private static final String ENV_PROPERTY = "ENV"; //$NON-NLS-1$
-	private static final String OUTPUT_PROPERTY = "output"; //$NON-NLS-1$
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
-
-	private static final Pattern CONTROL_PLUS = Pattern.compile(
-			"control" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String CTRL_PLUS = Matcher.quoteReplacement(IKeyLookup.CTRL_NAME + KeyStroke.KEY_DELIMITER);
-	private static final Pattern OPTION_PLUS = Pattern.compile(
-			"option" + Pattern.quote(KeyStroke.KEY_DELIMITER), Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final String ALT_PLUS = Matcher.quoteReplacement(IKeyLookup.ALT_NAME + KeyStroke.KEY_DELIMITER);
-
-	/**
-	 * Normalize the keyBinding string.
-	 * <p>
-	 * Convert control+ to CTRL+ Convert option+ to ALT+
-	 * 
-	 * @param keyBinding
-	 * @return
-	 */
-	static String normalizeKeyBinding(String keyBinding)
-	{
-		String result = null;
-
-		if (keyBinding != null)
-		{
-			result = CONTROL_PLUS.matcher(keyBinding).replaceAll(CTRL_PLUS); // Convert control+ to CTRL+
-			result = OPTION_PLUS.matcher(result).replaceAll(ALT_PLUS); // Convert option+ to ALT+
-		}
-
-		return result;
-	}
 
 	private String[] _triggers;
 	private String _invoke;
@@ -80,9 +40,11 @@ public class CommandElement extends AbstractBundleElement
 	private String _inputPath;
 	private OutputType _outputType;
 	private String _outputPath;
+	private boolean _async;
+	private RunType _runType;
+	private Ruby _runtime;
 
 	private String _workingDirectoryPath;
-
 	private WorkingDirectoryType _workingDirectoryType;
 
 	/**
@@ -97,6 +59,7 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
+		this._runType = Activator.getDefaultRunType();
 	}
 
 	/**
@@ -257,7 +220,7 @@ public class CommandElement extends AbstractBundleElement
 				try
 				{
 					// Need to convert the format
-					String normalizedKeyBinding = normalizeKeyBinding(binding);
+					String normalizedKeyBinding = ScriptUtils.normalizeKeyBinding(binding);
 					KeySequence sequence = KeySequence.getInstance(normalizedKeyBinding);
 
 					result.add(sequence);
@@ -292,6 +255,26 @@ public class CommandElement extends AbstractBundleElement
 	public String getOutputType()
 	{
 		return this._outputType.getName();
+	}
+
+	/**
+	 * getRuntime
+	 * 
+	 * @return
+	 */
+	public Ruby getRuntime()
+	{
+		return this._runtime;
+	}
+
+	/**
+	 * getRunType
+	 * 
+	 * @return
+	 */
+	public String getRunType()
+	{
+		return this._runType.getName();
 	}
 
 	/**
@@ -338,98 +321,28 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeBlockCommand(CommandContext context)
 	{
-		ScriptingContainer container = ScriptingEngine.getInstance().getScriptingContainer();
-		Ruby runtime = container.getRuntime();
-		Map<String, String> environment = new HashMap<String, String>();
-		boolean executedSuccessfully = true;
-		String resultText = ""; //$NON-NLS-1$
+		boolean async = (this._async && this._outputType.allowAsync());
+
+		// create output stream and attach to context
+		context.setOutputStream(new ByteArrayOutputStream());
+
+		// execute block using owning bundle's load paths
+		CommandBlockJob job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
 
 		try
 		{
-			ThreadContext threadContext = runtime.getCurrentContext();
-			IRubyObject[] args = new IRubyObject[] { JavaEmbedUtils.javaToRuby(runtime, context) };
-			IRubyObject rubyContext = ScriptUtils.instantiateClass(ScriptUtils.RADRAILS_MODULE, CONTEXT_RUBY_CLASS,
-					args);
-
-			// TODO: Keep track of any env vars we may have clobbered here and restore back their original values!
-			IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-
-			if (env != null && env instanceof RubyHash)
-			{
-				RubyHash hash = (RubyHash) env;
-				populateEnvironment(context.getMap(), environment);
-				hash.putAll(environment);
-			}
-
-			// set STDOUT
-			StringWriter writer = new StringWriter();
-			container.setWriter(writer);
-			context.put(OUTPUT_PROPERTY, container.getOut());
-
-			// do "turn off warnings" hack and set STDIN
-			boolean isVerbose = runtime.isVerbose();
-			runtime.setVerbose(runtime.getNil());
-			container.setReader(new BufferedReader(new InputStreamReader(context.getInputStream())));
-			runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
-
-			// invoke the block
-			IRubyObject result = this._invokeBlock.call(threadContext, new IRubyObject[] { rubyContext });
-			String output = writer.toString();
-
-			// process return result, if any
-			if (result != null && result.isNil() == false)
-			{
-				resultText = result.asString().asJavaString();
-			}
-			else if (output != null && output.length() > 0)
-			{
-				resultText = output;
-			}
+			job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
 		}
-		catch (RaiseException e)
+		catch (InterruptedException e)
 		{
-			if ((e.getException() instanceof RubySystemExit) && context.isForcedExit())
-			{
-				// should be from the exit call in exit_with_message
-				resultText = context.get(OUTPUT_PROPERTY).toString();
-			}
-			else
-			{
-				String message = MessageFormat.format(Messages.CommandElement_Error_Processing_Command_Block,
-						new Object[] { this.getDisplayName(), this.getPath(), e.getMessage() });
-
-				ScriptUtils.logErrorWithStackTrace(message, e);
-				executedSuccessfully = false;
-			}
-		}
-		catch (Exception e)
-		{
-			String message = MessageFormat.format(Messages.CommandElement_Error_Processing_Command_Block, new Object[] {
-					this.getDisplayName(), this.getPath(), e.getMessage() });
+			String message = MessageFormat.format(Messages.CommandElement_Error_Executing_Command, new Object[] {
+					this.getDisplayName(), this.getPath() });
 
 			ScriptUtils.logErrorWithStackTrace(message, e);
-			executedSuccessfully = false;
 		}
 
-		// Now clear the environment
-		IRubyObject env = runtime.getObject().getConstant(ENV_PROPERTY);
-
-		if (env != null && env instanceof RubyHash)
-		{
-			RubyHash hash = (RubyHash) env;
-
-			for (String key : environment.keySet())
-			{
-				hash.remove(key);
-			}
-		}
-
-		CommandResult result = new CommandResult(resultText);
-		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
-
-		return result;
+		return (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job
+				.getCommandResult();
 	}
 
 	/**
@@ -439,9 +352,6 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	private CommandResult invokeStringCommand(CommandContext context)
 	{
-		// TODO: hardly a robust implementation, but enough to start testing
-		// functionality
-
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 		File tempFile = null;
 		String resultText = ""; //$NON-NLS-1$
@@ -509,13 +419,22 @@ public class CommandElement extends AbstractBundleElement
 			}
 		}
 
-		CommandResult result = new CommandResult(resultText);
+		CommandResult result = new CommandResult(this, context);
+		result.setOutputString(resultText);
 		result.setReturnValue(exitValue);
 		result.setExecutedSuccessfully(executedSuccessfully);
-		result.setCommand(this);
-		result.setContext(context);
 
 		return result;
+	}
+
+	/**
+	 * isAsync
+	 * 
+	 * @return
+	 */
+	public boolean isAsync()
+	{
+		return this._async;
 	}
 
 	/**
@@ -586,11 +505,8 @@ public class CommandElement extends AbstractBundleElement
 					}
 					catch (RaiseException e)
 					{
-						String message = MessageFormat
-								.format(
-										"An error occurred while building environment variables for the ''{0}'' context property in the ''{1}'' command ({2}): {3}",
-										new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(),
-												e.getMessage() });
+						String message = MessageFormat.format(Messages.CommandElement_Error_Building_Env_Variables,
+								new Object[] { entry.getKey(), this.getDisplayName(), this.getPath(), e.getMessage() });
 
 						ScriptLogger.logError(message);
 						e.printStackTrace();
@@ -717,6 +633,16 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * setAsync
+	 * 
+	 * @param value
+	 */
+	public void setAsync(boolean value)
+	{
+		this._async = value;
+	}
+
+	/**
 	 * setInputPath
 	 * 
 	 * @param path
@@ -796,6 +722,7 @@ public class CommandElement extends AbstractBundleElement
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
+		this.setRuntime((block != null) ? block.getRuntime() : null);
 	}
 
 	/**
@@ -874,6 +801,46 @@ public class CommandElement extends AbstractBundleElement
 	public void setOutputType(String output)
 	{
 		this._outputType = OutputType.get(output);
+	}
+
+	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(String type)
+	{
+		this._runType = RunType.get(type);
+	}
+
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(IRubyObject object)
+	{
+		this.setRuntime((object != null) ? object.getRuntime() : null);
+	}
+
+	/**
+	 * setRuntime
+	 * 
+	 * @param object
+	 */
+	public void setRuntime(Ruby runtime)
+	{
+		this._runtime = runtime;
+	}
+
+	/**
+	 * setRunType
+	 * 
+	 * @param type
+	 */
+	public void setRunType(RunType type)
+	{
+		this._runType = type;
 	}
 
 	/**

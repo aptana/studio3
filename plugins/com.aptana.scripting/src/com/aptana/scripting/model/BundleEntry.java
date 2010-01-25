@@ -37,30 +37,33 @@ public class BundleEntry
 	{
 		if (bundle != null)
 		{
-			this._bundles.add(bundle);
-			
-			// keep bundles in canonical order
-			Collections.sort(this._bundles, new Comparator<BundleElement>()
+			synchronized (this._bundles)
 			{
-				public int compare(BundleElement o1, BundleElement o2)
+				this._bundles.add(bundle);
+				
+				// keep bundles in canonical order
+				Collections.sort(this._bundles, new Comparator<BundleElement>()
 				{
-					int result = o1.getBundleScope().compareTo(o2.getBundleScope());
-					
-					if (result == 0)
+					public int compare(BundleElement o1, BundleElement o2)
 					{
-						if (o1.isReference() == o2.isReference())
+						int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+						
+						if (result == 0)
 						{
-							result = o1.getPath().compareTo(o2.getPath());
+							if (o1.isReference() == o2.isReference())
+							{
+								result = o1.getPath().compareTo(o2.getPath());
+							}
+							else
+							{
+								result = (o1.isReference()) ? -1 : 1;
+							}
 						}
-						else
-						{
-							result = (o1.isReference()) ? -1 : 1;
-						}
+						
+						return result;
 					}
-					
-					return result;
-				}
-			});
+				});
+			}
 		}
 	}
 	
@@ -71,12 +74,16 @@ public class BundleEntry
 	 */
 	public BundleScope getActiveScope()
 	{
-		int size = this._bundles.size();
 		BundleScope result = BundleScope.UNKNOWN;
 		
-		if (size > 0)
+		synchronized (this._bundles)
 		{
-			result = this._bundles.get(size - 1).getBundleScope();
+			int size = this._bundles.size();
+			
+			if (size > 0)
+			{
+				result = this._bundles.get(size - 1).getBundleScope();
+			}
 		}
 		
 		return result;
@@ -89,7 +96,14 @@ public class BundleEntry
 	 */
 	public BundleElement[] getBundles()
 	{
-		return this._bundles.toArray(new BundleElement[this._bundles.size()]);
+		BundleElement[] result;
+		
+		synchronized (this._bundles)
+		{
+			result = this._bundles.toArray(new BundleElement[this._bundles.size()]);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -175,24 +189,29 @@ public class BundleEntry
 	{
 		BundleScope activeScope = this.getActiveScope();
 		
-		// walk the list of bundles from highest bundle scope precedence to lowest
-		for (int i = this._bundles.size() - 1; i >= 0; i--)
+		// NOTE: seems like a potentially long lock since we're running the processor
+		// on each instance
+		synchronized (this._bundles)
 		{
-			BundleElement bundle = this._bundles.get(i);
-		
-			// we're done processing if we've left the active scope or
-			// if we've processed all bundle references and one non-ref bundle or
-			// out BundleProcessor tells us to stop
-			
-			// NOTE: the order of this conditional is important
-			if
-			(
-					bundle.getBundleScope() != activeScope
-				||	processor.processBundle(this, bundle) == false
-				||	bundle.isReference() == false
-			)
+			// walk the list of bundles from highest bundle scope precedence to lowest
+			for (int i = this._bundles.size() - 1; i >= 0; i--)
 			{
-				break;
+				BundleElement bundle = this._bundles.get(i);
+			
+				// we're done processing if we've left the active scope or
+				// if we've processed all bundle references and one non-ref bundle or
+				// out BundleProcessor tells us to stop
+				
+				// NOTE: the order of this conditional is important
+				if
+				(
+						bundle.getBundleScope() != activeScope
+					||	processor.processBundle(this, bundle) == false
+					||	bundle.isReference() == false
+				)
+				{
+					break;
+				}
 			}
 		}
 	}
@@ -204,6 +223,13 @@ public class BundleEntry
 	 */
 	public boolean removeBundle(BundleElement bundle)
 	{
-		return this._bundles.remove(bundle);
+		boolean result;
+		
+		synchronized (this._bundles)
+		{
+			result = this._bundles.remove(bundle);
+		}
+		
+		return result;
 	}
 }

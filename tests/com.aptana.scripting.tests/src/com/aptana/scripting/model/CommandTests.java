@@ -44,4 +44,14 @@ public class CommandTests extends BundleTestBase
 		
 		assertEquals("hello", resultText);
 	}
+	
+	/**
+	 * testRequireInBlock
+	 */
+	public void testRequireInBlock()
+	{
+		String resultText = this.executeCommand("requireInCommand", "MyCommand");
+		
+		assertEquals("My Thing Name", resultText);
+	}
 }

@@ -35,7 +35,7 @@ module RadRails
     end
     
     def input
-      self.in
+      @cache_input ||= STDIN.read
     end
     
     def [](arg)

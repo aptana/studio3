@@ -5,12 +5,12 @@ require "radrails/scope_selector"
 require "pathname"
 
 module RadRails
-  
+
   class Command < BaseElement
     def initialize(name)
       if name.kind_of? String
         super(name)
-        
+
         @key_binding = KeyBinding.new(java_object)
         bundle = BundleManager.bundle_from_path(path)
         bundle.apply_defaults(self) unless bundle.nil?
@@ -19,14 +19,22 @@ module RadRails
         @jobj = name
       end
     end
-    
+
+    def async
+      @jojb.async
+    end
+
+    def async=(flag)
+      @jobj.async = flag
+    end
+
     def input
      @jobj.input
     end
-    
+
     def input=(input)
       return if input.nil?
-      
+
       case input
       when Array
         @jobj.input_type = input.map { |element| element.to_s }.to_java(:String)
@@ -39,7 +47,7 @@ module RadRails
         @jobj.input_path = (base_path + Pathname.new(input.to_s)).to_s
       end
     end
-    
+
     def invoke(&block)
       if block_given?
         @jobj.invoke_block = block
@@ -47,26 +55,27 @@ module RadRails
         @jobj.invoke
       end
     end
-    
+
     def invoke=(invoke)
       @jobj.invoke = invoke
+      @jobj.runtime = self # a little hack so we can get the runtime for this command
     end
-    
+
     def key_binding
       @key_binding
     end
-    
+
     def key_binding=(key_binding)
       @key_binding[:all] = key_binding
     end
-    
+
     def output
       @jobj.output
     end
-    
+
     def output=(output)
       return if output.nil?
-      
+
       if output.kind_of? Symbol
         @jobj.output_type = output.to_s
       else
@@ -76,19 +85,19 @@ module RadRails
         @jobj.output_path = (base_path + Pathname.new(output.to_s)).to_s
       end
     end
-    
+
     def owning_bundle
       @jobj.owning_bundle
     end
-    
+
     def scope
       @jobj.scope
     end
-    
+
     def scope=(scope)
       @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
     end
-    
+
     def working_directory=(dir)
       if dir.kind_of? Symbol
         @jobj.working_directory_type = dir.to_s
@@ -108,7 +117,7 @@ module RadRails
         :TM_COMMAND_PATH => path
       }
     end
-    
+
     def to_s
       <<-EOS
       command(
@@ -122,35 +131,35 @@ module RadRails
       )
       EOS
     end
-    
+
     def trigger
       @jobj.trigger
     end
-    
+
     def trigger=(trigger)
       @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
     end
-    
+
     class << self
       def define_command(name, &block)
         log_info("loading command #{name}")
-        
+
         command = Command.new(name)
         block.call(command) if block_given?
-        
+
         # add command to bundle
         bundle = BundleManager.bundle_from_path(command.path)
         bundle.add_command(command) unless bundle.nil?
       end
     end
-    
+
     private
-    
+
     def create_java_object
       com.aptana.scripting.model.CommandElement.new($fullpath)
     end
   end
-  
+
 end
 
 # define top-level convenience methods

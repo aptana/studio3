@@ -281,7 +281,7 @@ module RadRails
       end
 
       def in_ui_thread?
-        !display.nil?
+        !org.eclipse.swt.widgets.Display.current.nil?
       end
       
       def display

@@ -7,18 +7,21 @@ import java.util.List;
 public class BundleElement extends AbstractElement
 {
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rrbundle"; //$NON-NLS-1$
-	
+
 	private String _author;
 	private String _copyright;
 	private String _description;
 	private String _license;
 	private String _licenseUrl;
 	private String _repository;
-	
+
 	private File _bundleDirectory;
 	private BundleScope _bundleScope;
 	private List<MenuElement> _menus;
 	private List<CommandElement> _commands;
+
+	private Object menuLock = new Object();
+	private Object commandLock = new Object();
 
 	/**
 	 * Bundle
@@ -28,22 +31,23 @@ public class BundleElement extends AbstractElement
 	public BundleElement(String path)
 	{
 		super(path);
-		
+
 		if (path != null)
 		{
 			// calculate bundle's root directory
 			File pathFile = new File(path);
 			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
 			String parentName = parentDirectory.getName();
-			
-			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+
+			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName)
+					|| BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
 			{
 				parentDirectory = parentDirectory.getParentFile();
 			}
-			
+
 			this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		}
-		
+
 		// calculate the bundle scope
 		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
 	}
@@ -57,21 +61,24 @@ public class BundleElement extends AbstractElement
 	{
 		if (command != null)
 		{
-			if (this._commands == null)
+			synchronized (commandLock)
 			{
-				this._commands = new ArrayList<CommandElement>();
+				if (this._commands == null)
+				{
+					this._commands = new ArrayList<CommandElement>();
+				}
+
+				// NOTE: Should we prevent the same element from being added twice?
+				this._commands.add(command);
 			}
 
-			// NOTE: Should we prevent the same element from being added twice?
-			this._commands.add(command);
-
 			command.setOwningBundle(this);
-			
+
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(command);
 		}
 	}
-	
+
 	/**
 	 * addMenu
 	 * 
@@ -81,21 +88,24 @@ public class BundleElement extends AbstractElement
 	{
 		if (menu != null)
 		{
-			if (this._menus == null)
+			synchronized (menuLock)
 			{
-				this._menus = new ArrayList<MenuElement>();
+				if (this._menus == null)
+				{
+					this._menus = new ArrayList<MenuElement>();
+				}
+
+				// NOTE: Should we prevent the same element from being added twice?
+				this._menus.add(menu);
 			}
-			
-			// NOTE: Should we prevent the same element from being added twice?
-			this._menus.add(menu);
-			
+
 			menu.setOwningBundle(this);
-			
+
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(menu);
 		}
 	}
-	
+
 	/**
 	 * clear - note that this only clears the bundle properties and not the bundle elements
 	 */
@@ -107,7 +117,7 @@ public class BundleElement extends AbstractElement
 		this._license = null;
 		this._licenseUrl = null;
 	}
-	
+
 	/**
 	 * getAuthor
 	 * 
@@ -127,7 +137,7 @@ public class BundleElement extends AbstractElement
 	{
 		return this._bundleDirectory;
 	}
-	
+
 	/**
 	 * getBundleScope
 	 * 
@@ -137,7 +147,7 @@ public class BundleElement extends AbstractElement
 	{
 		return this._bundleScope;
 	}
-	
+
 	/**
 	 * getCommandByName
 	 * 
@@ -146,22 +156,25 @@ public class BundleElement extends AbstractElement
 	public CommandElement getCommandByName(String name)
 	{
 		CommandElement result = null;
-		
-		if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
+
+		synchronized (commandLock)
 		{
-			for (CommandElement command : this._commands)
+			if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
 			{
-				if (name.equals(command.getDisplayName()))
+				for (CommandElement command : this._commands)
 				{
-					result = command;
-					break;
+					if (name.equals(command.getDisplayName()))
+					{
+						result = command;
+						break;
+					}
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getCommands
 	 * 
@@ -171,9 +184,12 @@ public class BundleElement extends AbstractElement
 	{
 		CommandElement[] result = BundleManager.NO_COMMANDS;
 
-		if (this._commands != null && this._commands.size() > 0)
+		synchronized (commandLock)
 		{
-			result = this._commands.toArray(new CommandElement[this._commands.size()]);
+			if (this._commands != null && this._commands.size() > 0)
+			{
+				result = this._commands.toArray(new CommandElement[this._commands.size()]);
+			}
 		}
 
 		return result;
@@ -207,27 +223,27 @@ public class BundleElement extends AbstractElement
 	public String getDisplayName()
 	{
 		String result = super.getDisplayName();
-		
+
 		if (result == null || result.length() == 0)
 		{
 			String path = this.getPath();
-			
+
 			if (path != null && path.length() > 0)
 			{
 				File file = new File(path).getParentFile();
-				
+
 				result = file.getName();
-				
+
 				if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
 				{
 					result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getElementName
 	 */
@@ -267,6 +283,18 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getLoadPaths
+	 * 
+	 * @return
+	 */
+	public List<String> getLoadPaths()
+	{
+		File bundleDirectory = new File(this.getPath()).getParentFile();
+
+		return BundleManager.getInstance().getBundleLoadPaths(bundleDirectory);
+	}
+
+	/**
 	 * getMenus
 	 * 
 	 * @return
@@ -274,12 +302,15 @@ public class BundleElement extends AbstractElement
 	public MenuElement[] getMenus()
 	{
 		MenuElement[] result = BundleManager.NO_MENUS;
-		
-		if (this._menus != null && this._menus.size() > 0)
+
+		synchronized (menuLock)
 		{
-			result = this._menus.toArray(new MenuElement[this._menus.size()]);
+			if (this._menus != null && this._menus.size() > 0)
+			{
+				result = this._menus.toArray(new MenuElement[this._menus.size()]);
+			}
 		}
-		
+
 		return result;
 	}
 
@@ -290,9 +321,19 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean hasCommands()
 	{
-		return this._commands != null && this._commands.size() > 0;
+		boolean result = false;
+
+		synchronized (commandLock)
+		{
+			if (this._commands != null)
+			{
+				result = this._commands.size() > 0;
+			}
+		}
+
+		return result;
 	}
-	
+
 	/**
 	 * hasMenus
 	 * 
@@ -300,9 +341,19 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean hasMenus()
 	{
-		return this._menus != null && this._menus.size() > 0;
+		boolean result = false;
+
+		synchronized (menuLock)
+		{
+			if (this._menus != null)
+			{
+				result = this._menus.size() > 0;
+			}
+		}
+
+		return result;
 	}
-	
+
 	/**
 	 * hasMetadata
 	 * 
@@ -310,15 +361,9 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean hasMetadata()
 	{
-		return (
-			this._author != null ||
-			this._copyright != null ||
-			this._description != null ||
-			this._license != null ||
-			this._licenseUrl != null
-		);
+		return (this._author != null || this._copyright != null || this._description != null || this._license != null || this._licenseUrl != null);
 	}
-	
+
 	/**
 	 * isEmpty
 	 * 
@@ -328,7 +373,7 @@ public class BundleElement extends AbstractElement
 	{
 		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false;
 	}
-	
+
 	/**
 	 * isReference
 	 * 
@@ -339,7 +384,7 @@ public class BundleElement extends AbstractElement
 		// NOTE: we need to check the actual display name field and not the
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
-		
+
 		return displayName != null && displayName.length() > 0;
 	}
 
@@ -356,26 +401,32 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
 		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
-		
+
 		// output commands
-		if (this._commands != null)
+		synchronized (commandLock)
 		{
-			for (CommandElement command : this._commands)
+			if (this._commands != null)
 			{
-				command.toSource(printer);
+				for (CommandElement command : this._commands)
+				{
+					command.toSource(printer);
+				}
 			}
 		}
-		
+
 		// output menus
-		if (this._menus != null)
+		synchronized (menuLock)
 		{
-			for (MenuElement menu : this._menus)
+			if (this._menus != null)
 			{
-				menu.toSource(printer);
+				for (MenuElement menu : this._menus)
+				{
+					menu.toSource(printer);
+				}
 			}
 		}
 	}
-	
+
 	/**
 	 * removeCommand
 	 * 
@@ -383,15 +434,23 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeCommand(CommandElement command)
 	{
-		if (this._commands != null && this._commands.remove(command))
+		boolean removed = false;
+
+		synchronized (commandLock)
 		{
-			AbstractElement.unregisterElement(command);
-			
+			if (this._commands != null && (removed = this._commands.remove(command)))
+			{
+				AbstractElement.unregisterElement(command);
+			}
+		}
+
+		if (removed)
+		{
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(command);
 		}
 	}
-	
+
 	/**
 	 * removeElement
 	 * 
@@ -408,7 +467,7 @@ public class BundleElement extends AbstractElement
 			this.removeMenu((MenuElement) element);
 		}
 	}
-	
+
 	/**
 	 * removeMenu
 	 * 
@@ -416,12 +475,20 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeMenu(MenuElement menu)
 	{
-		if (this._menus != null && this._menus.remove(menu))
+		boolean removed = false;
+
+		synchronized (menuLock)
 		{
-			AbstractElement.unregisterElement(menu);
-			
-			menu.removeChildren();
-			
+			if (this._menus != null && (removed = this._menus.remove(menu)))
+			{
+				AbstractElement.unregisterElement(menu);
+
+				menu.removeChildren();
+			}
+		}
+
+		if (removed)
+		{
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
 		}
@@ -436,7 +503,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._author = author;
 	}
-	
+
 	/**
 	 * setCopyright
 	 * 
@@ -476,7 +543,7 @@ public class BundleElement extends AbstractElement
 	{
 		this._license = license;
 	}
-	
+
 	/**
 	 * setLicenseUrl
 	 * 

@@ -1,22 +1,15 @@
 package com.aptana.scripting.ui;
 
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.eclipse.ui.IStartup;
-import org.jruby.Ruby;
-import org.jruby.RubyIO;
 
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
-import com.aptana.scripting.ScriptingEngine;
 
 public class EarlyStartup implements IStartup
 {
-	private static final String CONSOLE_CONSTANT = "CONSOLE";
-	private static final String CONSOLE_VARIABLE = "$console";
-
 	public void earlyStartup()
 	{
 		final ScriptingConsole console = ScriptingConsole.getDefault();
@@ -66,27 +59,5 @@ public class EarlyStartup implements IStartup
 				console.getErrorConsoleStream().println(message);
 			}
 		});
-
-		// create CONSOLE and $console streams
-		Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-		RubyIO rubyStream = new RubyIO(runtime, console.getOutputConsoleStream());
-		rubyStream.sync_set(runtime.getTrue());	// force immediate output
-		
-		// store as a global and a constant
-		runtime.getGlobalVariables().set(CONSOLE_VARIABLE, rubyStream);
-		runtime.getObject().setConstant(CONSOLE_CONSTANT, rubyStream);
-
-		// use console for STDERR
-		// NOTE: The whole isVerbose thing is a bit hacky. As a side-effect, if the verbose
-		// setting is nil, then warnings are turned off. We turn them off so we don't get the
-		// warning about redefining the STDERR constant. I would expect setErrorWriter to
-		// prevent that, but it doesn't. Obviously, this workaround is probably not future-
-		// proof and there may be a correct way of redefining STDERR which doesn't throw this
-		// warning
-		OutputStreamWriter writer = new OutputStreamWriter(console.getErrorConsoleStream());
-		boolean isVerbose = runtime.isVerbose();
-		runtime.setVerbose(runtime.getNil());
-		ScriptingEngine.getInstance().getScriptingContainer().setErrorWriter(writer);
-		runtime.setVerbose((isVerbose) ? runtime.getTrue() : runtime.getFalse());
 	}
 }
