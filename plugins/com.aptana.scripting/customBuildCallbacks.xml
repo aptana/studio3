@@ -59,43 +59,43 @@
 		<!-- Grab the pre-defined set of bundles -->
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/text-rbundle.git" />
+			<arg value="git clone git@github.com:aptana/text-rbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/source-rbundle.git" />
+			<arg value="git clone git@github.com:aptana/source-rbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/math-rbundle.git" />
+			<arg value="git clone git@github.com:aptana/math-rbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/ruby-rrbundle.git" />
+			<arg value="git clone git@github.com:aptana/ruby-rrbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/rails-rrbundle.git" />
+			<arg value="git clone git@github.com:aptana/rails-rrbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/html-rrbundle.git" />
+			<arg value="git clone git@github.com:aptana/html-rrbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/css-rrbundle.git" />
+			<arg value="git clone git@github.com:aptana/css-rrbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/js-rrbundle.git" />
+			<arg value="git clone git@github.com:aptana/js-rrbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/sass-rbundle.git" />
+			<arg value="git clone git@github.com:aptana/sass-rbundle.git" />
 		</exec>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
-			<arg value="${git.executable} clone git@github.com:aptana/xml-rbundle.git" />
+			<arg value="git clone git@github.com:aptana/xml-rbundle.git" />
 		</exec>
 	</target>
 
