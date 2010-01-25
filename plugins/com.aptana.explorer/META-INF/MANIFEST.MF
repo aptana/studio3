@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.scripting,
  com.aptana.editor.common;bundle-version="1.0.0",
- com.aptana.terminal;bundle-version="1.0.0"
+ com.aptana.terminal;bundle-version="1.0.0",
+ org.jruby;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
