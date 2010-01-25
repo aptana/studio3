@@ -54,9 +54,6 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.InvocationType;
-import com.aptana.scripting.model.OutputType;
-
-//import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils
@@ -366,7 +363,7 @@ public class CommandExecutionUtils
 
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
-		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
+		commandContext.put(CommandContext.INPUT_TYPE, selected.getName());
 
 		// Set invocation type
 		commandContext.put(CommandContext.INVOKED_VIA, invocationType.getName());
@@ -380,6 +377,10 @@ public class CommandExecutionUtils
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
 		{
+			// TODO Move this logic into the enum itself
+			case UNDEFINED:
+			case NONE:
+				return CommandExecutionUtils.EOF;
 			case SELECTION:
 				if (selectionRange.x == selectionRange.y)
 					return null;
@@ -397,6 +398,16 @@ public class CommandExecutionUtils
 						selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset));
 			case DOCUMENT:
 				return new CommandExecutionUtils.StringInputProvider(textWidget.getText());
+			case LEFT_CHAR:
+				if (textWidget.getCaretOffset() < 1)
+					return null;
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
+						.getCaretOffset() - 1, 1));
+			case RIGHT_CHAR:
+				if (textWidget.getCaretOffset() < textWidget.getCharCount())
+					return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
+							.getCaretOffset(), 1));
+				return null;
 			case CLIPBOARD:
 				String contents = getClipboardContents();
 				if (contents == null || contents.trim().length() == 0)
@@ -436,10 +447,11 @@ public class CommandExecutionUtils
 
 		StyledText textWidget = textViewer.getTextWidget();
 		final int caretOffset = textWidget.getCaretOffset();
-		OutputType ouputType = commandResult.getOutputType(); // OutputType.get(command.getOutputType());
-		switch (ouputType)
+		switch (commandResult.getOutputType())
 		{
+			// TODO Move this logic into the enum itself!
 			case DISCARD:
+			case UNDEFINED:
 				break;
 			case REPLACE_SELECTION:
 				if (commandResult.getInputType() == InputType.DOCUMENT)
@@ -450,12 +462,20 @@ public class CommandExecutionUtils
 				{
 					replaceLine(textWidget, commandResult);
 				}
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					replaceWord(textWidget, commandResult);
+				}
 				else
 				{
 					IRegion region = getSelectedRegion(textWidget);
-					if (commandResult.getInputType() == InputType.WORD)
+					if (commandResult.getInputType() == InputType.RIGHT_CHAR)
 					{
-						region = findWordRegion(textWidget);
+						region = new Region(textWidget.getCaretOffset(), 1);
+					}
+					else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+					{
+						region = new Region(textWidget.getCaretOffset() - 1, 1);
 					}
 					textWidget
 							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
@@ -468,6 +488,9 @@ public class CommandExecutionUtils
 				break;
 			case REPLACE_LINE:
 				replaceLine(textWidget, commandResult);
+				break;
+			case REPLACE_WORD:
+				replaceWord(textWidget, commandResult);
 				break;
 			case REPLACE_DOCUMENT:
 				replaceDocument(textWidget, commandResult);
@@ -511,6 +534,14 @@ public class CommandExecutionUtils
 				{
 					region = findWordRegion(textWidget);
 				}
+				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+				{
+					region = new Region(textWidget.getCaretOffset(), 1);
+				}
+				else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+				{
+					region = new Region(textWidget.getCaretOffset() - 1, 1);
+				}
 				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
 				break;
 			case SHOW_AS_HTML:
@@ -532,6 +563,12 @@ public class CommandExecutionUtils
 				outputToFile(commandResult);
 				break;
 		}
+	}
+
+	protected static void replaceWord(StyledText textWidget, CommandResult commandResult)
+	{
+		IRegion wordRegion = findWordRegion(textWidget);
+		textWidget.replaceTextRange(wordRegion.getOffset(), wordRegion.getLength(), commandResult.getOutputString());
 	}
 
 	private static IRegion getSelectedLinesRegion(StyledText textWidget)
@@ -692,7 +729,7 @@ public class CommandExecutionUtils
 				+ textWidget.getLineHeight(caretOffset) + 2);
 		tooltip.setLocation(locationAtOffset);
 		tooltip.setVisible(true);
-//		tooltip.setFocus();
+		// tooltip.setFocus();
 	}
 
 	private static void showAsHTML(CommandElement command, CommandResult commandResult)
