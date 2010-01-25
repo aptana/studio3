@@ -214,7 +214,7 @@ module RadRails
           options = options.collect { |e| e == nil ? { 'separator' => 1 } : { 'title' => e } }
         end
 
-		    dialog = com.aptana.scripting.MenuDialog.new(shell, options.to_java("java.util.Map"))
+		    dialog = com.aptana.scripting.ui.MenuDialog.new(shell, options.to_java("java.util.Map"))
 		    # TODO set selection to first item
 		    # TODO Open to caret, not mouse?
 		    index = dialog.open
