@@ -13,7 +13,7 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 {
 	private List<String> _loadPaths;
 	private RubyArray _originalLoadPaths;
-	
+
 	/**
 	 * AbstractScriptJob
 	 * 
@@ -33,7 +33,7 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	public AbstractScriptJob(String name, List<String> loadPaths)
 	{
 		super(name);
-		
+
 		this._loadPaths = loadPaths;
 	}
 
@@ -47,19 +47,19 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 		if (this._loadPaths != null && this._loadPaths.size() > 0)
 		{
 			IRubyObject object = runtime.getLoadService().getLoadPath();
-			
+
 			if (object != null && object instanceof RubyArray)
 			{
 				RubyArray loadPathArray = (RubyArray) object;
-				
+
 				// save copy for later
 				this._originalLoadPaths = (RubyArray) loadPathArray.dup();
-				
+
 				// Add our custom load paths
 				for (String loadPath : this._loadPaths)
 				{
 					RubyString toAdd = runtime.newString(loadPath.replace('\\', '/'));
-					
+
 					loadPathArray.append(toAdd);
 				}
 			}
@@ -73,7 +73,44 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	{
 		this.run(new NullProgressMonitor());
 	}
-	
+
+	/**
+	 * run
+	 * 
+	 * @param name
+	 * @param runType
+	 * @throws InterruptedException
+	 */
+	public void run(String name, RunType runType, boolean async) throws InterruptedException
+	{
+		switch (runType)
+		{
+			case JOB:
+				this.setPriority(async ? Job.SHORT : Job.INTERACTIVE);
+				this.schedule();
+
+				if (async == false)
+				{
+					this.join();
+				}
+				break;
+
+			case THREAD:
+				Thread thread = new Thread(this, name);
+				thread.start();
+
+				if (async == false)
+				{
+					thread.join();
+				}
+				break;
+
+			case CURRENT_THREAD:
+			default:
+				this.run();
+		}
+	}
+
 	/**
 	 * unapplyLoadPaths
 	 * 
@@ -84,14 +121,14 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 		if (this._loadPaths != null && this._loadPaths.size() > 0)
 		{
 			IRubyObject object = runtime.getLoadService().getLoadPath();
-			
+
 			if (object != null && object instanceof RubyArray)
 			{
 				RubyArray loadPathArray = (RubyArray) object;
-				
+
 				// Restore original content
 				loadPathArray.replace(this._originalLoadPaths);
-				
+
 				// lose reference
 				this._originalLoadPaths = null;
 			}

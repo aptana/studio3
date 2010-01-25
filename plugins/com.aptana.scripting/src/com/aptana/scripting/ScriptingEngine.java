@@ -15,14 +15,13 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.ScriptingContainer;
 import org.osgi.framework.Bundle;
 
-import com.aptana.scripting.model.ScriptLoadJob;
 import com.aptana.scripting.model.RunType;
+import com.aptana.scripting.model.ScriptLoadJob;
 import com.aptana.util.ResourceUtils;
 
 public class ScriptingEngine
@@ -253,33 +252,7 @@ public class ScriptingEngine
 		
 		try
 		{
-			switch (this._runType)
-			{
-				case JOB:
-					job.setPriority(Job.SHORT);
-					job.schedule();
-					
-					if (async == false)
-					{
-						job.join();
-					}
-					break;
-					
-				case THREAD:
-					Thread thread = new Thread(job, "Load '" + fullPath + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-					thread.start();
-					
-					if (async == false)
-					{
-						thread.join();
-					}
-					break;
-					
-				case CURRENT_THREAD:
-				default:
-					job.run();
-					break;
-			}
+			job.run("Load '" + fullPath + "'", this._runType, async);
 		}
 		catch (InterruptedException e)
 		{

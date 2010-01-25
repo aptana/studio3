@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.jruby.Ruby;
@@ -332,32 +331,7 @@ public class CommandElement extends AbstractBundleElement
 		
 		try
 		{
-			switch (this._runType)
-			{
-				case JOB:
-					job.setPriority(async ? Job.SHORT : Job.INTERACTIVE);
-					job.schedule();
-					
-					if (this._async == false)
-					{
-						job.join();
-					}
-					break;
-				
-				case THREAD:
-					Thread thread = new Thread(job, "Execute '" + this.getDisplayName() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-					thread.start();
-					
-					if (this._async == false)
-					{
-						thread.join();
-					}
-					break;
-					
-				case CURRENT_THREAD:
-				default:
-					job.run();
-			}
+			job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
 		}
 		catch (InterruptedException e)
 		{
@@ -369,7 +343,7 @@ public class CommandElement extends AbstractBundleElement
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
-		return (async && this._runType != RunType.CURRENT_THREAD) ? null : job.getCommandResult();
+		return (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job.getCommandResult();
 	}
 
 	/**
