@@ -26,32 +26,11 @@ public class ScriptLoadJob extends AbstractScriptJob
 	 * ExecuteScriptJob
 	 * 
 	 * @param filename
-	 */
-	public ScriptLoadJob(String filename)
-	{
-		this("Execute JRuby File", filename, null); //$NON-NLS-1$
-	}
-	
-	/**
-	 * ExecuteScriptJob
-	 * 
-	 * @param filename
 	 * @param loadPaths
 	 */
 	public ScriptLoadJob(String filename, List<String> loadPaths)
 	{
 		this("Execute JRuby File", filename, loadPaths); //$NON-NLS-1$
-	}
-	
-	/**
-	 * ExecuteScriptJob
-	 * 
-	 * @param name
-	 * @param filename
-	 */
-	public ScriptLoadJob(String name, String filename)
-	{
-		this(name, filename, null);
 	}
 	
 	/**

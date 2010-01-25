@@ -58,34 +58,12 @@ public class CommandBlockJob extends AbstractScriptJob
 	/**
 	 * ExecuteScriptJob
 	 * 
-	 * @param command
-	 * @param context
-	 */
-	public CommandBlockJob(CommandElement command, CommandContext context)
-	{
-		this("Execute JRuby Block", command, context, null); //$NON-NLS-1$
-	}
-
-	/**
-	 * ExecuteScriptJob
-	 * 
 	 * @param block
 	 * @param loadPaths
 	 */
 	public CommandBlockJob(CommandElement command, CommandContext context, List<String> loadPaths)
 	{
 		this("Execute JRuby Block", command, context, loadPaths); //$NON-NLS-1$
-	}
-
-	/**
-	 * ExecuteScriptJob
-	 * 
-	 * @param name
-	 * @param block
-	 */
-	public CommandBlockJob(String name, CommandElement command, CommandContext context)
-	{
-		this(name, command, context, null);
 	}
 
 	/**
@@ -244,6 +222,10 @@ public class CommandBlockJob extends AbstractScriptJob
 			// invoke the block
 			IRubyObject result = this._command.getInvokeBlock().call(threadContext, new IRubyObject[] { rubyContext });
 
+			// TODO: not sure if we need to perform the closing here or not. This will be
+			// resolved once we rework CommandExecutionUtils to support async calls. That's
+			// when the streams will come into play
+			
 			// close any streams we have
 			// this.closeStreams();
 
