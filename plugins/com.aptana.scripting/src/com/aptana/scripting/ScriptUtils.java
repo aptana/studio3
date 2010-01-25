@@ -29,18 +29,6 @@ public class ScriptUtils
 	private ScriptUtils()
 	{
 	}
-
-//	/**
-//	 * instantiateClass
-//	 * 
-//	 * @param runtime
-//	 * @param name
-//	 * @return
-//	 */
-//	public static IRubyObject instantiateClass(Ruby runtime, String name)
-//	{
-//		return instantiateClass(runtime, name, NO_ARGS);
-//	}
 	
 	/**
 	 * instantiateClass
@@ -66,19 +54,6 @@ public class ScriptUtils
 		
 		return result;
 	}
-	
-//	/**
-//	 * instantiateClass
-//	 * 
-//	 * @param runtime
-//	 * @param module
-//	 * @param name
-//	 * @return
-//	 */
-//	public static IRubyObject instantiateClass(Ruby runtime, String module, String name)
-//	{
-//		return instantiateClass(runtime, module, name, NO_ARGS);
-//	}
 	
 	/**
 	 * instantiateClass
