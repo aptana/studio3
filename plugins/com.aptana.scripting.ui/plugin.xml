@@ -68,10 +68,4 @@
             path="framework/">
       </loadPath>
    </extension>
-   <extension
-         point="com.aptana.scripting.frameworkFiles">
-      <file
-            name="radrails/ui.rb">
-      </file>
-   </extension>
 </plugin>
