@@ -59,40 +59,39 @@ public class ScriptingEngine
 	 */
 	public ScriptingContainer createScriptingContainer(LocalContextScope scope)
 	{
-//		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
+		// ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
 		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.TRANSIENT);
 
 		try
 		{
 			File jrubyHome = null;
-			
+			Bundle jruby = Platform.getBundle("org.jruby"); //$NON-NLS-1$
 			// try just exploding the jruby lib dir
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path("lib"), null); //$NON-NLS-1$
-			
+			URL url = FileLocator.find(jruby, new Path("lib"), null); //$NON-NLS-1$
+
 			if (url != null)
 			{
 				File lib = ResourceUtils.resourcePathToFile(url);
-				
 				// Ok, now use the parent of exploded lib dir as JRuby Home
 				jrubyHome = lib.getParentFile();
 			}
 			else
 			{
 				// Ok, just assume the plugin is unpacked and pass the root of the plugin as JRuby Home
-				jrubyHome = FileLocator.getBundleFile(Activator.getDefault().getBundle());
+				jrubyHome = FileLocator.getBundleFile(jruby);
 			}
-			
+
 			result.getProvider().getRubyInstanceConfig().setJRubyHome(jrubyHome.getAbsolutePath());
 		}
 		catch (IOException e)
 		{
-			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
-					new Object[] { e.getMessage() });
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home, new Object[] { e
+					.getMessage() });
 
 			Activator.logError(message, e);
 			ScriptLogger.logError(message);
 		}
-		
+
 		return result;
 	}
 
@@ -139,10 +138,9 @@ public class ScriptingEngine
 								else
 								{
 									String message = MessageFormat.format(
-										Messages.ScriptingEngine_Unable_To_Convert_Load_Path,
-										new Object[] { declaringPluginID, url }
-									);
-									
+											Messages.ScriptingEngine_Unable_To_Convert_Load_Path, new Object[] {
+													declaringPluginID, url });
+
 									Activator.logError(message, null);
 								}
 							}
@@ -156,7 +154,7 @@ public class ScriptingEngine
 
 		return this._loadPaths;
 	}
-	
+
 	/**
 	 * getFrameworkFiles
 	 * 
@@ -197,7 +195,7 @@ public class ScriptingEngine
 
 		return this._frameworkFiles;
 	}
-	
+
 	/**
 	 * getInstance
 	 * 
@@ -212,7 +210,7 @@ public class ScriptingEngine
 
 		return instance;
 	}
-	
+
 	/**
 	 * getScriptingContainer
 	 * 
@@ -237,7 +235,7 @@ public class ScriptingEngine
 	{
 		return this.runScript(fullPath, loadPaths, false);
 	}
-	
+
 	/**
 	 * runScript
 	 * 
@@ -249,18 +247,16 @@ public class ScriptingEngine
 	public Object runScript(String fullPath, List<String> loadPaths, boolean async)
 	{
 		ScriptLoadJob job = new ScriptLoadJob(fullPath, loadPaths);
-		
+
 		try
 		{
 			job.run("Load '" + fullPath + "'", this._runType, async);
 		}
 		catch (InterruptedException e)
 		{
-			String message = MessageFormat.format(
-				Messages.ScriptingEngine_Error_Executing_Script,
-				new Object[] { fullPath }
-			);
-			
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Executing_Script,
+					new Object[] { fullPath });
+
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 
