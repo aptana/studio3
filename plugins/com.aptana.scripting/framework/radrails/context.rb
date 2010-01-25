@@ -29,10 +29,6 @@ module RadRails
     def exit_discard
       exit_with_message('', :discard)
     end
-    	
-    def in
-      @jobj.in
-    end
     
     def input
       @cache_input ||= STDIN.read
