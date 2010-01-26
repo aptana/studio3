@@ -4,7 +4,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
@@ -29,18 +28,8 @@ public class CommandProposal extends SnippetTemplateProposal
 	}
 
 	@Override
-	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
+	protected void doApply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
-		if (contains(triggerChars, trigger))
-		{
-			if (triggerChar != trigger)
-			{
-				((ICompletionProposalExtension2) templateProposals[trigger - '1']).apply(viewer, trigger, stateMask,
-						offset);
-				return;
-			}
-		}
-
 		Template template = getTemplate();
 		if (template instanceof CommandTemplate)
 		{
