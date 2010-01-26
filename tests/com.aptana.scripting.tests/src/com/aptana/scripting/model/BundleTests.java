@@ -336,7 +336,7 @@ public class BundleTests extends BundleTestBase
 	public void testNameFromBundleDirectory2()
 	{
 		// load bundle
-		this.loadBundleEntry("bundleNameWithExtension.rrbundle", BundleScope.PROJECT);
+		this.loadBundleEntry("bundleNameWithExtension.ruble", BundleScope.PROJECT);
 		
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");

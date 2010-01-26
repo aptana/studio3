@@ -6,7 +6,7 @@ import java.util.List;
 
 public class BundleElement extends AbstractElement
 {
-	private static final String BUNDLE_DIRECTORY_SUFFIX = ".rrbundle"; //$NON-NLS-1$
+	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
 
 	private String _author;
 	private String _copyright;
