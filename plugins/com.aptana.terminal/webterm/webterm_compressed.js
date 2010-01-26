@@ -43,6 +43,9 @@ return ch!==null&&ch!==undefined&&ch.constructor===String&&ch.length>0;
 function isDefined(o){
 return o!==null&&o!==undefined;
 };
+function isFunction(f){
+return f!==null&&f!==undefined&&f.constructor===Function;
+};
 function isNumber(n){
 return n!==null&&n!==undefined&&n.constructor===Number;
 };
@@ -477,7 +480,7 @@ e=window.event;
 if(!e||e.metaKey){
 return true;
 }
-if((e.ctrlKey&&!e.altKey)||(e.which==0)||(e.keyCode==8)||(e.keyCode==16)){
+if((e.ctrlKey&&!e.altKey)||(e.which==0)||(e.keyCode==16)){
 }else{
 var _2b;
 if(e.keyCode){
@@ -486,10 +489,14 @@ _2b=e.keyCode;
 if(e.which){
 _2b=e.which;
 }
+if(_2b==8){
+this.addKeys(KeyHandler.BACKSPACE);
+}else{
 if(e.altKey&&!e.ctrlKey){
 this.addKeys(KeyHandler.ESCAPE);
 }
 this.addKeys(String.fromCharCode(_2b));
+}
 }
 return this.stopEvent(e);
 };
@@ -1278,6 +1285,7 @@ this._positions=[];
 this._currentAttribute=new Attribute();
 this._sendResizeSequence=(_d4&&_d4.hasOwnProperty("sendResizeSequence"))?_d4.sendResizeSequence:true;
 this._showTitle=(_d4&&_d4.hasOwnProperty("showTitle"))?_d4.showTitle:true;
+this._onTitleChange=(_d4&&_d4.hasOwnProperty("onTitleChange"))?_d4.onTitleChange:null;
 var _d5=(_d4&&_d4.hasOwnProperty("handler"))?_d4.handler:new XTermHandler(this);
 var _d6=(_d4&&_d4.hasOwnProperty("tables"))?_d4.tables:XTermTables;
 var _d7=(_d4&&_d4.hasOwnProperty("parser"))?_d4.parser:new TermParser(_d6,_d5);
@@ -1618,6 +1626,9 @@ this._keyHandler.addKeys(CSI+[8,this._height,this._width].join(";")+"t");
 };
 Term.prototype.setTitle=function(_107){
 this._title=_107;
+if(isFunction(this._onTitleChange)){
+this._onTitleChange(_107);
+}
 };
 Term.prototype.showTitle=function(_108){
 if(isBoolean(_108)){
