@@ -121,12 +121,12 @@ VariableDeclarationList_NoIn
 	;
 
 VariableDeclaration
-	=	IDENTIFIER.i {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id }, _symbol_i.getStart(), _symbol_i.getEnd());:}
+	=	IDENTIFIER.i {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression.e {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());:}
 	;
 
 VariableDeclaration_NoIn
-	=	IDENTIFIER.i {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id }, _symbol_i.getStart(), _symbol_i.getEnd());:}
+	=	IDENTIFIER.i {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());:}
 	|	IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e {:JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());:}
 	;
 
@@ -167,7 +167,7 @@ IterationStatement_NoIf
 	|	FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());:}
-	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
+	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());:}
 	|	FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());:}
 	|	FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s {:return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());:}

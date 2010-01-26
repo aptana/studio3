@@ -24,6 +24,12 @@ public class JSFunctionNode extends JSNode
 	}
 
 	@Override
+	public String getText()
+	{
+		return fName;
+	}
+
+	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();

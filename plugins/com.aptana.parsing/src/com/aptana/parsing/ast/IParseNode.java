@@ -11,5 +11,9 @@ public interface IParseNode extends ILexeme
 
 	public int getChildrenCount();
 
+	public int getIndex(IParseNode child);
+
 	public IParseNode getParent();
+
+	public short getType();
 }

@@ -58,13 +58,13 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	}
 
 	/**
-	 * Subclass could override to filter out specific nodes.
+	 * Subclass could override to return a specific list from the result.
 	 * 
 	 * @param nodes
 	 *            the array containing the parse result
-	 * @return the nodes that should be displayed
+	 * @return the specific top level objects to display
 	 */
-	protected IParseNode[] filter(IParseNode[] nodes)
+	protected Object[] filter(IParseNode[] nodes)
 	{
 		return nodes;
 	}

@@ -77,6 +77,19 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	@Override
+	public int getIndex(IParseNode child)
+	{
+		for (int i = 0; i < fChildrenCount; ++i)
+		{
+			if (fChildren[i] == child)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	@Override
 	public int getLength()
 	{
 		return getEnd() - getStart() + 1;
@@ -98,6 +111,12 @@ public class ParseBaseNode extends Node implements IParseNode
 	public String getText()
 	{
 		return toString();
+	}
+
+	@Override
+	public short getType()
+	{
+		return getId();
 	}
 
 	@Override

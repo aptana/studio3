@@ -72,7 +72,7 @@ public class JSNode extends ParseBaseNode
 				break;
 			case JSNodeTypes.DECLARATION:
 				text.append(children[0]);
-				if (children.length > 1 && !((JSNode) children[1]).isEmpty())
+				if (!((JSNode) children[1]).isEmpty())
 				{
 					text.append(" = ").append(children[1]); //$NON-NLS-1$
 				}
@@ -116,7 +116,7 @@ public class JSNode extends ParseBaseNode
 				text.append(children[1]);
 				if (!((JSNode) children[2]).isEmpty())
 				{
-					if (((JSNode) children[1]).getType() != JSNodeTypes.STATEMENTS)
+					if (children[1].getType() != JSNodeTypes.STATEMENTS)
 					{
 						text.append(";"); //$NON-NLS-1$
 					}
@@ -125,7 +125,7 @@ public class JSNode extends ParseBaseNode
 				break;
 			case JSNodeTypes.DO:
 				text.append("do ").append(children[0]); //$NON-NLS-1$
-				if (((JSNode) children[0]).getType() != JSNodeTypes.STATEMENTS)
+				if (children[0].getType() != JSNodeTypes.STATEMENTS)
 				{
 					text.append(";"); //$NON-NLS-1$
 				}
