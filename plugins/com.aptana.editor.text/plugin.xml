@@ -14,5 +14,13 @@
          </contentTypeBinding>
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <file-association
+            content-type="org.eclipse.core.runtime.text"
+            file-extensions="log"
+            file-names="README,TODO">
+      </file-association>
+   </extension>
 
 </plugin>
