@@ -30,6 +30,10 @@ module RadRails
       exit_with_message('', :discard)
     end
     
+    def dynamic_properties
+      @jobj.map.key_set.to_array
+    end
+    
     def input
       @cache_input ||= STDIN.read
     end

@@ -20,6 +20,10 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -27,12 +31,16 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -42,6 +50,7 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -75,6 +84,9 @@ public class CommandExecutionUtils
 	private static final String HTML_FILE_EXTENSION = ".html"; //$NON-NLS-1$
 
 	public static final FilterInputProvider EOF = new StringInputProvider();
+
+	// Delay after which the tooltip is hidden.
+	private static final long DELAY = 10000;
 
 	static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
 
@@ -719,7 +731,53 @@ public class CommandExecutionUtils
 		if (output == null || output.trim().length() == 0)
 			return;
 		DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell(), Messages.CommandExecutionUtils_TypeEscapeToDismiss, null);
+				.getActiveWorkbenchWindow().getShell(),
+				NLS.bind(Messages.CommandExecutionUtils_ClickToFocusTypeEscapeToDismissWhenFocused, DELAY/1000),
+				null)
+		{
+			@Override
+			public void setVisible(boolean visible)
+			{
+				super.setVisible(visible);
+
+				if (visible)
+				{
+					final Shell shell = getShell();
+					final UIJob hideJob = new UIJob("Hide tooltip") //$NON-NLS-1$
+					{
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor)
+						{
+							if (isVisible())
+							{
+								setVisible(false);
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					hideJob.setPriority(Job.INTERACTIVE);
+					hideJob.setSystem(true);
+					hideJob.schedule(DELAY);
+
+					shell.addShellListener(new ShellAdapter()
+					{
+						@Override
+						public void shellDeactivated(ShellEvent e)
+						{
+							// Hide
+							setVisible(false);
+						}
+
+						@Override
+						public void shellActivated(ShellEvent e)
+						{
+							// Cancel the job
+							hideJob.cancel();
+						}
+					});
+				}
+			}
+		};
 		tooltip.setInformation(output);
 		Point p = tooltip.computeSizeHint();
 		tooltip.setSize(p.x, p.y);
@@ -729,7 +787,6 @@ public class CommandExecutionUtils
 				+ textWidget.getLineHeight(caretOffset) + 2);
 		tooltip.setLocation(locationAtOffset);
 		tooltip.setVisible(true);
-		// tooltip.setFocus();
 	}
 
 	private static void showAsHTML(CommandElement command, CommandResult commandResult)
