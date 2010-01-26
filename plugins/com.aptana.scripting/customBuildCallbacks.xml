@@ -55,47 +55,64 @@
 	<target name="pre.name">
 	</target>
 
+	<target name="clone-bundle">
+		<exec executable="/bin/bash" dir="bundles">
+			<arg value="-c" />
+			<arg value="git clone git@github.com:aptana/${bundle.name}.git ${bundle.dir.name}" />
+		</exec>
+		<!-- Now checkout the revision of the bundle as of the latest commit date for red_core -->
+		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
+			<arg value="-c" />
+			<arg value="git checkout `git rev-list -n 1 --before=\"${last.commit.date}\" master`" />
+		</exec>
+	</target>
+
 	<target name="pre.@dot">
+	    <!-- Find last commit date for our normal repo, so we can checkout that time for each bundle... -->
+		<exec executable="/bin/bash" dir="." outputproperty="last.commit.date">
+			<arg value="-c" />
+		  	<arg value="git log -1 \"--pretty=format:%ct\"" />
+		</exec>
 		<!-- Grab the pre-defined set of bundles -->
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/text-rbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="text-rbundle" />
+		  	<param name="bundle.dir.name" value="text.rbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/source-rbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="source-rbundle" />
+		  	<param name="bundle.dir.name" value="source.rbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/math-rbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="math-rbundle" />
+		  	<param name="bundle.dir.name" value="math.rbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/ruby-rrbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="ruby-rrbundle" />
+		  	<param name="bundle.dir.name" value="ruby.rrbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/rails-rrbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="rails-rrbundle" />
+		  	<param name="bundle.dir.name" value="rails.rrbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/html-rrbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="html-rrbundle" />
+		  	<param name="bundle.dir.name" value="html.rrbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/css-rrbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="css-rrbundle" />
+		  	<param name="bundle.dir.name" value="css.rrbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/js-rrbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="js-rrbundle" />
+		  	<param name="bundle.dir.name" value="js.rrbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/sass-rbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="sass-rbundle" />
+		  	<param name="bundle.dir.name" value="sass.rbundle" />
 		</exec>
-		<exec executable="/bin/bash" dir="bundles">
-			<arg value="-c" />
-			<arg value="git clone git@github.com:aptana/xml-rbundle.git" />
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="xml-rbundle" />
+		  	<param name="bundle.dir.name" value="xml.rbundle" />
 		</exec>
 	</target>
 
