@@ -61,4 +61,11 @@
             name="RadRails Stream Contributor">
       </contributor>
    </extension>
+   <extension
+         point="com.aptana.scripting.loadPaths">
+      <loadPath
+            name="RadRails Framework Directory"
+            path="framework/">
+      </loadPath>
+   </extension>
 </plugin>

@@ -1,18 +1,17 @@
 package com.aptana.scripting;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.scripting.model.RunType;
-
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
+import com.aptana.scripting.model.RunType;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class Activator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
 	private static Activator plugin;

@@ -14,10 +14,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.Activator;
-import com.aptana.scripting.ScriptingEngine;
 
 public class CommandContext
 {
@@ -177,16 +175,6 @@ public class CommandContext
 	public OutputType getOutputType()
 	{
 		return this._outputType;
-	}
-	
-	/**
-	 * in
-	 * 
-	 * @return
-	 */
-	public IRubyObject in()
-	{
-		return ScriptingEngine.getInstance().getScriptingContainer().getRuntime().getObject().getConstant("STDIN"); //$NON-NLS-1$
 	}
 	
 	/**

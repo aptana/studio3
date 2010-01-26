@@ -2,8 +2,6 @@ package com.aptana.scripting.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +21,6 @@ import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
-import com.aptana.util.IOUtil;
-import com.aptana.util.ProcessUtil;
 
 public class CommandElement extends AbstractBundleElement
 {
@@ -94,16 +90,44 @@ public class CommandElement extends AbstractBundleElement
 
 		if (this.isExecutable())
 		{
+			AbstractCommandJob job = null;
+			
+			// determine if we are running asynchronously taking the output type into account
+			boolean async = (this._async && this._outputType.allowAsync());
+
 			// set default output type, this may be changed by context.exit_with_message
 			context.setOutputType(this._outputType);
 
+			// create job based on invocation type
 			if (this.isShellCommand())
 			{
-				result = this.invokeStringCommand(context);
+				job = new CommandScriptJob(this, context);
 			}
 			else if (this.isBlockCommand())
 			{
-				result = this.invokeBlockCommand(context);
+				// create output stream and attach to context
+				context.setOutputStream(new ByteArrayOutputStream());
+
+				job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
+			}
+
+			// run the job, if we have one
+			if (job != null)
+			{
+				try
+				{
+					job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
+				}
+				catch (InterruptedException e)
+				{
+					String message = MessageFormat.format(Messages.CommandElement_Error_Executing_Command,
+							new Object[] { this.getDisplayName(), this.getPath() });
+
+					ScriptUtils.logErrorWithStackTrace(message, e);
+				}
+
+				// get result, using a default shell if we're running async
+				result = (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job.getCommandResult();
 			}
 		}
 
@@ -311,120 +335,6 @@ public class CommandElement extends AbstractBundleElement
 			default:
 				return new File(this.getPath()).getParentFile().toString();
 		}
-	}
-
-	/**
-	 * invokeBlockCommand
-	 * 
-	 * @param resultText
-	 * @return
-	 */
-	private CommandResult invokeBlockCommand(CommandContext context)
-	{
-		boolean async = (this._async && this._outputType.allowAsync());
-
-		// create output stream and attach to context
-		context.setOutputStream(new ByteArrayOutputStream());
-
-		// execute block using owning bundle's load paths
-		CommandBlockJob job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
-
-		try
-		{
-			job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
-		}
-		catch (InterruptedException e)
-		{
-			String message = MessageFormat.format(Messages.CommandElement_Error_Executing_Command, new Object[] {
-					this.getDisplayName(), this.getPath() });
-
-			ScriptUtils.logErrorWithStackTrace(message, e);
-		}
-
-		return (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job
-				.getCommandResult();
-	}
-
-	/**
-	 * invokeStringCommand
-	 * 
-	 * @return
-	 */
-	private CommandResult invokeStringCommand(CommandContext context)
-	{
-		String OS = org.eclipse.core.runtime.Platform.getOS();
-		File tempFile = null;
-		String resultText = ""; //$NON-NLS-1$
-		boolean executedSuccessfully = true;
-		int exitValue = 0;
-
-		try
-		{
-			// create temporary file for execution
-			tempFile = File.createTempFile("command_temp_", //$NON-NLS-1$
-					(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
-					);
-
-			// dump "invoke" content into temp file
-			PrintWriter pw = new PrintWriter(tempFile);
-			pw.print(this._invoke);
-			pw.close();
-
-			Map<String, String> env = new HashMap<String, String>();
-			// augment environment with the context map
-			if (context != null)
-			{
-				this.populateEnvironment(context.getMap(), env);
-			}
-
-			// create the command to execute
-			String command = null;
-			if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
-					|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
-			{
-				// FIXME: should we be using the user's preferred shell instead of hardcoding?
-				command = "/bin/bash"; //$NON-NLS-1$
-			}
-			else
-			{
-				// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-				command = "cmd"; //$NON-NLS-1$
-			}
-
-			String input = IOUtil.read(context.getInputStream(), "UTF-8"); //$NON-NLS-1$			
-			Map<Integer, String> result = ProcessUtil.runInBackground(command, getWorkingDirectory(), input, env,
-					new String[] { tempFile.getAbsolutePath() });
-			if (result == null)
-			{
-				exitValue = 1;
-				executedSuccessfully = false;
-			}
-			else
-			{
-				exitValue = result.keySet().iterator().next();
-				resultText = result.values().iterator().next();
-				executedSuccessfully = (exitValue == 0);
-			}
-		}
-		catch (IOException e)
-		{
-			ScriptLogger.logError(e.getMessage());
-			executedSuccessfully = false;
-		}
-		finally
-		{
-			if (tempFile != null && tempFile.exists())
-			{
-				tempFile.delete();
-			}
-		}
-
-		CommandResult result = new CommandResult(this, context);
-		result.setOutputString(resultText);
-		result.setReturnValue(exitValue);
-		result.setExecutedSuccessfully(executedSuccessfully);
-
-		return result;
 	}
 
 	/**

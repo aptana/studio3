@@ -1,4 +1,4 @@
-package com.aptana.scripting;
+package com.aptana.scripting.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
