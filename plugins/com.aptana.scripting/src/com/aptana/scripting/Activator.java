@@ -38,7 +38,7 @@ public class Activator extends Plugin
 	 */
 	public static RunType getDefaultRunType()
 	{
-		return RunType.JOB;
+		return RunType.CURRENT_THREAD;
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 # Disclaimer
 
-The Bundle runtime described in this document is under active development and subject to major changes without notice. The bundle runtime itself is part of RadRails and as such is distributed under the GPL v3 and the Aptana Source License. You are, of course, welcome to distribute your own bundles under any license you like.
+The Ruble runtime described in this document is under active development and subject to major changes without notice. The bundle runtime itself is part of RadRails and as such is distributed under the GPL v3 and the Aptana Source License. You are, of course, welcome to distribute your own bundles under any license you like.
 
 # Runtime Architecture
 
@@ -10,7 +10,7 @@ The RadRails runtime includes a <code>radrails.rb</code> file that defines a DSL
 
 ## Bundles
 
-Bundles are the top-level distribution format for RadRails extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with a <code>.rrbundle</code> suffix but this is not required.
+Bundles are the top-level distribution format for RadRails extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with <code>.ruble</code> suffix but this is not required.
 
 In addition to the <code>bundle.rb</code> file, there are three top-level directories within a bundle that are treated specially:
 
@@ -236,7 +236,7 @@ Property      | Description
 <code>copyright</code>	| any copyright message associated with the bundle
 <code>license</code>		| the name or URL of the license associated with the bundle. E.g. "MIT License" or <code>http://www.gnu.org/licenses/gpl-3.0.txt</code>
 <code>website</code>		| the website where more information about the bundle can be found
-<code>repository</code>	| the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rrbundle_rails.git</code>
+<code>repository</code>	| the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rails-ruble.git</code>
 
 Additional properties can be accessed, though, simply by referring to them as though they already exist, e.g.:
 
@@ -259,7 +259,7 @@ The following is a real but extremely minimal bundle.rb file which defines a 'Ra
     RadRails.current_bundle do |bundle|
       bundle.name = "Ruby on Rails"
       bundle.author = "Many"
-      bundle.repository = "git://github.com/aptana/rrbundle_rails.git"
+      bundle.repository = "git://github.com/aptana/rails-ruble.git"
 
       bundle.menu "Rails" do |rails_menu|
         # this menu should be shown when any of the following scopes is active:
