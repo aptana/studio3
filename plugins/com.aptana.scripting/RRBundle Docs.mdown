@@ -12,12 +12,13 @@ The RadRails runtime includes a <code>radrails.rb</code> file that defines a DSL
 
 Bundles are the top-level distribution format for RadRails extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with a <code>.rrbundle</code> suffix but this is not required.
 
-In addition to the <code>bundle.rb</code> file, there are two top-level directories within a bundle that are treated specially:
+In addition to the <code>bundle.rb</code> file, there are three top-level directories within a bundle that are treated specially:
 
 File/Dir      | Description
 ------------- | -------------
 <code>commands/</code>	| contains the commands that make up the bundle. <code>.rb</code> files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast.
 <code>lib/</code>		| contains Ruby code that is on the load path when executing commands within your bundle. Put code here you wish to invoke from within your commands, but which you do not want loaded at startup.
+<code>snippets/</code>	| contains the snippets that make up the bundle. <code>.rb</code> files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast.
 
 By convention, there are several other files and directories found in most bundles:
 
@@ -34,7 +35,7 @@ Note that we are considering a change to the bundle format to turn all bundles i
 
 Bundles are loaded from the file system in a hierarchical order. The order, from highest to lowest priority, is:
 
-* The current project's "Bundle" subdirectory
+* The current project's "bundles" subdirectory
 * The <code>$USER_DOCUMENT_DIRECTORY/RadRails Bundles/</code>, where <code>$USER_DOCUMENT_DIRECTORY</code> is platform dependent.
 * The bundles directory within the RadRails installation
 
@@ -68,7 +69,7 @@ It is possible for a bundle to override or extend another bundle's functionality
       end
     end
 
-This example shows two separate bundle directories. The first bundle.rb file defines a bundle named "MyBundle" in the user's bundles directory. The second bundle.rb file defines a bundle of the same name, but within a project's bundles directory.
+This example shows two separate bundle directories. The first bundle.rb file defines a bundle named "MyBundle" in the user's bundles directory. The second bundle.rb file defines a bundle of the same name within a project's bundles directory.
 
 Bundle names are globally unique. This means that both files are referencing the same bundle. Since the user bundle is loaded first, the "MyBundle" bundle will contain two commands: A and B. Next, the project bundle will be loaded. It also defines an "A" command, so its definition will replace the user bundle's definition. The "B" command will remain and the "C" command will be added. As a result, "MyBundle" will consist of three commands: A, B, and C where A is the instance defined in the project bundle.
 
@@ -86,13 +87,13 @@ A scope selector describes a pattern of scopes and is composed of dotted names, 
 
     text
 
-A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics". A prefix match must end at dot within the scope or at the end of the scope itself.
+A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics". A prefix match must end at a dot within the scope or at the end of the scope itself.
 
 #### Example - Descendant Pattern
 
     text.html source.ruby
 
-A scope may be defined as a hierarchy of scopes. In this sense, scope selectors match against that hierarchy much like CSS matches against and HTML DOM. In the above example, the selector will match when the editor's cursor is within Ruby code which is within HTML. The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html" and likewise "source.ruby" is a prefix for "source.ruby.embedded.html".
+A scope may be defined as a hierarchy of scopes. In this sense, scope selectors match against that hierarchy much like CSS matches against the HTML DOM. In the above example, the selector will match when the editor's cursor is within Ruby code which is within HTML. The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html" and likewise "source.ruby" is a prefix for "source.ruby.embedded.html".
 
 It is important to note that descendant matching progresses right-to-left. If, in our example, we had defined our selector as simply "source.ruby", then we would not only match the previous case where Ruby was embedded within HTML, but we would also match any cursor location that is within any Ruby source, regardless of nesting.
 
@@ -100,11 +101,11 @@ It is important to note that descendant matching progresses right-to-left. If, i
 
     text.html.ruby, text.html source.ruby
 
-In this example, our selector defines a list of selectors to be used for matching. The comma serves as an OR operator. Specifically, this selector is saying match "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply; however, if an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or if all alternations have been exhausted.
+In this example, our selector defines a list of selectors to be used for matching. The comma serves as an OR operator. Specifically, this selector is saying match "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply; however, if an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or once all alternations have been exhausted.
 
 ### Menus Scope Selectors
 
-It is important to note that scope selectors work left-to-right when matching a menu scope. For example, if we have a menu scope of "text.html", this will match when the cursor is within HTML but also when the cursor is within Ruby which is within HTML.
+It is important to note that scope selectors for menus match at any point within a scope. The order of the selectors must be matched; however, this match can start at any point inside the scope. For example, if we have a menu scope of "b c", this will match when the cursor is within any of the following scopes: "a b c d", "b c d", "a b c", "b c", etc. It might help to think of this match as a kind of "contains" match that is commonly used to locate substrings within a string.
 
 ## Commands
 
@@ -125,8 +126,8 @@ Example command:
     command "Documentation for Word" do |cmd|
       cmd.scope = "source.ruby.rails, text.html.ruby, text.haml"
 
-      cmd.key_binding = [ :control, "h" ]
-      cmd.key_binding[:mac] =  [ :command, "h" ]
+      cmd.key_binding = "Control+H"
+      cmd.key_binding[:mac] = "Command+H"
 
       cmd.input = [ :selection, :word ]
       cmd.output = :show_as_html
@@ -178,7 +179,7 @@ Several properties defined in this document can have a variety of different valu
 Paths can be specified in many places in the API. Whenever you see the term PATH_SPECIFIER, the path can be specified as one of the following:
 
 * a string specifying either a full path or a relative path. If only a relative path is provided, it will be be interpreted relative to the bundle directory if it is evaluated at _command definition_ time, and relative to the command's working directory if it is evaluated at _command invocation_ time (the latter is more common).
-* an object that will return a path string as defined directly above when its <code>to_s</code> method is called (e.g. <code>File</code> or <code>Dir</code>)
+* an object that will return a path string as defined directly above when its <code>to_s</code> method is called (e.g. <code>File</code>)
 * a Ruby <code>symbol</code> with special meaning. For example, <code>:current_project</code> might refer to the currently loaded project (NOT YET IMPLEMENTED)
 
 ## INPUT_SPECIFIER
@@ -378,25 +379,21 @@ When a command's <code>invoke</code> property is set a ruby block, that block is
 
 Property      | Description
 ------------- | -------------
-<code>input</code>		| The input to the command, typically as a string. See the _Input During Command Invocation_ section below.
-<code>ouput</code>		| The output of the command, typically an output stream. See the _Output During Command Invocation_ section below.
-<code>invoked_via</code>	| How the command was invoked. Can be <code>:key_binding</code>, <code>:menu</code>, <code>:unknown</code>, <code>:command</code>, or a trigger string.
+<code>input</code>		| The input to the command as a string. See the _Input During Command Invocation_ section below.
+<code>invoked_via</code>	| How the command was invoked. Can be <code>:key_binding</code>, <code>:menu</code>, <code>:unknown</code>, <code>:command</code>, or <code>:trigger</code>.
 <code>command</code>		| The Command object being executed.
 <code>bundle</code>		| The Bundle in which the command is defined.
 <code>scope</code>		| The Scope in which the command was executed.
-<code>file</code>		| The File currently being edited, or nil
 <code>project</code>		| The Project that owns the file currently being edited, or nil. See _Project API_ for more information.
-<code>explorer</code>	| The app explorer. See _Project API_ for more information.
+<code>explorer</code>	| (NOT YET IMPLEMENTED) The app explorer. See _Project API_ for more information.
 <code>editor</code>		| The currently active Aptana file editor. See _Editor API_ for more information.
-<code>stdout</code>		| Stream useful for writing output to stdout. See the _Output During Command Invocation_ section below.
-<code>stderr</code>		| Stream useful for writing error output. See the _Output During Command Invocation_ section below.
 
 In addition, the context has a few handy-dandy functions for use by commands, as described below:
 
 Method      | Description
 ------------- | -------------
 <code>exit_with_message(message, OUTPUT_SPECIFIER)</code>	| Short-circuit the execution of the command, using the specified OUTPUT_SPECIFIER
-<code>invoke(name, INVOKE_OPTIONS)</code> | Invoke another command or snippet by name, and return its context object so that its output and other properties can be extracted. NOT YET IMPLEMENTED.
+<code>invoke(name, INVOKE_OPTIONS)</code> | (NOT YET IMPLEMENTED) Invoke another command or snippet by name, and return its context object so that its output and other properties can be extracted.
 
 #### INVOKE_OPTIONS
 
@@ -405,32 +402,23 @@ You can supply additional options to the <code>invoke</code> method via its INVO
 Key      | Description
 ------------- | -------------
 <code>:input</code>		| If specified, the context's <code>input</code> property will be set to this value. This is useful when you want your command to process user input and then have another command further process that input. If it is not defined the INPUT_SPECIFIER in the command's definition will be used as normal.
-<code>:ouput</code>		| If specified, this OUTPUT_SPECIFIER overrides the one defined by the command.
+<code>:output</code>		| If specified, this OUTPUT_SPECIFIER overrides the one defined by the command.
 <code>:scope</code>		| The scope specifier to be passed to the command
 <code>:bundle</code>		| If specified, look for the command to invoke in the named bundle instead of the current bundle.
 
 
 ### Input During Command Invocation
 
-If a command is defined to invoke a shell script, the command supplies the input text on <code>stdin</code> and as [environment variables](http://manual.macromates.com/en/environment_variables.html), for compatibility with TextMate.
+If a command is defined to invoke a shell script, the command supplies the input text on <code>STDIN</code> and as [environment variables](http://manual.macromates.com/en/environment_variables.html), for compatibility with TextMate.
 
-If a command is defined to invoke an inline Ruby block, the input is passed to the block via its context argument as described in _Context During Command Invocation_ above. The <code>input</code> property can be treated as a simple string, but the method has a few extra methods which can be used for processing input as a stream:
-
-Method      | Description
-------------- | -------------
-<code>is_stream?</code> | returns true if the input is coming from a file or other stream
-<code>to_stream</code> | returns the underlying stream object, or nil if is_stream? returns false
+If a command is defined to invoke an inline Ruby block, the input is passed to the block via <code>STDIN</code>. Alternately, the context's <code>input</code> property can be used to access the input a simple string. Note that all environment variables that are defined for shell script commands are also available to command blocks via the ENV hash.
 
 
 ### Output During Command Invocation
 
-By default, any output to <code>stdout</code> during command invocation is treated as the output of the command. If the command is defined to invoke a ruby inline block, the context variable passed to the block can also be used to set the output value directly via the <code>output</code> property of the context:
+By default, any output to <code>STDOUT</code> during command invocation is treated as the output of the command. If the command is defined to invoke a ruby inline block, the return value may be used to define the command result. The return value will be converted to a string via to_s. In the event output is written to <code>STDOUT</code> and a non-nil value is returned from the block, the return value will take precedence. Or said another way, if you want to make sure your output to STDOUT serves as your command's result, then be sure to return <code>nil</code> as your command's result.
 
-    context.output = "foo"
-
-There are also <code>stderr</code> and <code>stdout</code> properties on the context object that contain the streams used during command invocation. They cannot be re-assigned by the block. When the context is first passed to the command, <code>output</code> and <code>stdout</code> will be set to the same value.
-
-Output written to <code>stderr</code> during command execution will be displayed in the Console. Output written to <code>stdout</code> will also be written to the Console if the command block changes the value of <code>output</code>.
+Output written to <code>STDERR</code> during command execution will be displayed in the Console. Note that we are considering defining an error_output_type property on commands which will allow the developer to specify how <code>STDERR</code> output should be treated.
 
 # Project API
 
@@ -477,6 +465,7 @@ Property      | Description
 <code>document=(src)</code>				| Set the contents of the editor's document to <code>src</code>
 <code>document</code>		| Returns editor's document
 <code>editbale?</code>				| Returns true if the editor is editable otherwise false
+<code>file</code>		| (Not Yet Implemented) The File currently being edited, or nil
 <code>[]=(offset, length, src)</code>			| Replace a portion of the editor's contents
 <code>selection</code>		| Return the current selection. It has properties length, offset, text, start_line, end_line
 <code>selection=(array_or_range)</code>			| Argument is a 2 integer array with first being offset, second being length; or a Range object with the range of offsets - first and last
@@ -517,4 +506,4 @@ Key      | Description
 ------------- | -------------
 <code>:new_window</code>	| Boolean which specifies whether or not to open a new browser window (tab) or not. The default is <code>false</code>, which will re-use the last browser window opened if possible.
 <code>:title</code>		| The title of the browser window. Can be overridden by the HTML within the browser window.
-
+
