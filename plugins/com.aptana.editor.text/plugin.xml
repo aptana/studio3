@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.text.TextEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            id="com.aptana.editor.text"
+            name="Text Editor">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.core.runtime.text">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+
+</plugin>
