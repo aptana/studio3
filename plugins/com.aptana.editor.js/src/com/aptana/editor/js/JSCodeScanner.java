@@ -281,10 +281,14 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	public static final class OperatorDetector implements IWordDetector
+	protected static final class OperatorDetector implements IWordDetector
 	{
 
 		private int fPosition;
+
+		public OperatorDetector()
+		{
+		}
 
 		@Override
 		public boolean isWordPart(char c)
@@ -346,8 +350,13 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	public static final class LettersAndDigitsWordDetector implements IWordDetector
+	protected static final class LettersAndDigitsWordDetector implements IWordDetector
 	{
+
+		public LettersAndDigitsWordDetector()
+		{
+		}
+
 		@Override
 		public boolean isWordPart(char c)
 		{
@@ -366,8 +375,12 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	public static final class FunctionCallDetector implements IWordDetector
+	protected static final class FunctionCallDetector implements IWordDetector
 	{
+
+		public FunctionCallDetector()
+		{
+		}
 
 		@Override
 		public boolean isWordPart(char c)

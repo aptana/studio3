@@ -49,7 +49,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			fItemsByScope.clear();
 			return super.getChildren(parentElement);
 		}
-		if (parentElement instanceof JSOutlineItem)
+		else if (parentElement instanceof JSOutlineItem)
 		{
 			JSOutlineItem item = (JSOutlineItem) parentElement;
 			return filter(item.getAllReferenceNodes());

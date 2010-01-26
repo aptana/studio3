@@ -62,9 +62,7 @@ public class Activator extends AbstractUIPlugin {
 			{
 				return null;
 			}
-
-			image = id.createImage();
-			fImages.put(path, image);
+			fImages.put(path, id);
 		}
 		return image;
 	}
