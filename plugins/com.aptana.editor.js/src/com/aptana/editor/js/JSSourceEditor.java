@@ -34,14 +34,41 @@
  */
 package com.aptana.editor.js;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.js.outline.JSOutlineContentProvider;
+import com.aptana.editor.js.outline.JSOutlineLabelProvider;
+import com.aptana.editor.js.parsing.JSParserFactory;
 
-public class JSSourceEditor extends AbstractThemeableEditor {
+public class JSSourceEditor extends AbstractThemeableEditor
+{
 
-    protected void initializeEditor() {
-        super.initializeEditor();
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new JSDocumentProvider());
-    }
+		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new JSDocumentProvider());
+
+		getFileService().setParser(JSParserFactory.getInstance().getParser());
+	}
+
+	@Override
+	protected CommonOutlinePage getOutlinePage()
+	{
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new JSOutlineContentProvider());
+		outline.setLabelProvider(new JSOutlineLabelProvider());
+
+		return outline;
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return Activator.getDefault().getPreferenceStore();
+	}
 }

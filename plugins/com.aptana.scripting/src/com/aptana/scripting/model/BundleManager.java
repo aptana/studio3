@@ -459,6 +459,31 @@ public class BundleManager
 	}
 
 	/**
+	 * getApplicationBundles
+	 * 
+	 * @return
+	 */
+	public List<BundleElement> getApplicationBundles()
+	{
+		List<BundleElement> bundles = new ArrayList<BundleElement>();
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
+				{
+					String path = entry.getKey().getAbsolutePath();
+					if (path.startsWith(getApplicationBundlesPath()))
+					{
+						bundles.addAll(entry.getValue());
+					}
+				}
+			}
+		}
+		return bundles;
+	}
+
+	/**
 	 * getBundleLoadPaths
 	 * 
 	 * @param bundleDirectory

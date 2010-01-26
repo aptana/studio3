@@ -268,6 +268,7 @@ module RadRails
         end
         
         result["TM_CURRENT_SCOPE"] = current_scope
+        result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
       end
       
       result
