@@ -63,7 +63,7 @@
 		<!-- Now checkout the revision of the bundle as of the latest commit date for red_core -->
 		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
 			<arg value="-c" />
-			<arg value="git checkout `git rev-list -n 1 --before=\"${last.commit.date}\" master`" />
+			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} master`" />
 		</exec>
 	</target>
 
@@ -71,7 +71,7 @@
 	    <!-- Find last commit date for our normal repo, so we can checkout that time for each bundle... -->
 		<exec executable="/bin/bash" dir="." outputproperty="last.commit.date">
 			<arg value="-c" />
-		  	<arg value="git log -1 \"--pretty=format:%ct\"" />
+		  	<arg value="git log -1 --pretty=format:%ct" />
 		</exec>
 		<!-- Grab the pre-defined set of bundles -->
 		<antcall target="clone-bundle">
