@@ -1,8 +1,8 @@
 require "java"
-require "radrails/base_element"
-require "radrails/scope_selector"
+require "ruble/base_element"
+require "ruble/scope_selector"
 
-module RadRails
+module Ruble
   
   class Menu < BaseElement
     def initialize(name)
@@ -24,7 +24,7 @@ module RadRails
     end
     
     def command(name, &block)
-      RadRails::Command.define_command(name, &block) if block_given?
+      Ruble::Command.define_command(name, &block) if block_given?
     
       child_menu = Menu.new(name)
       add_menu(child_menu)
@@ -51,7 +51,7 @@ module RadRails
     end
     
     def scope=(scope)
-      @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
+      @jobj.scope = Ruble::ScopeSelector.new(scope).to_s
     end
     
     def separator
@@ -83,5 +83,5 @@ end
 # define top-level convenience methods
 
 def menu(name, &block)
-  RadRails::Menu.define_menu(name, &block)
+  Ruble::Menu.define_menu(name, &block)
 end

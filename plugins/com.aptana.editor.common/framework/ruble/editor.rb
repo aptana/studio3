@@ -1,8 +1,8 @@
 require "java"
 require "uri"
-require "radrails/ui"
+require "ruble/ui"
 
-module RadRails
+module Ruble
   class Editor
     class << self
       
@@ -15,8 +15,8 @@ module RadRails
         absolute_path = uri.path
         uri_string = uri.scheme ? uri.to_s : "file:#{absolute_path}"
         editor = nil
-        RadRails::UI.run("Opening editor") do          
-          page = RadRails::UI.active_page
+        Ruble::UI.run("Opening editor") do          
+          page = Ruble::UI.active_page
           return nil unless page
           ipath = org.eclipse.core.runtime.Path.new(absolute_path)
           ifile = org.eclipse.core.resources.ResourcesPlugin.workspace.root.getFileForLocation(ipath)
@@ -30,7 +30,7 @@ module RadRails
           end
           editor_id = "org.eclipse.ui.DefaultTextEditor" # FIXME Set to out own text editor if/when we have one!
           editor_id = desc.getId unless desc.nil?
-          editor = RadRails::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), editor_id, true))
+          editor = Ruble::Editor.new(org.eclipse.ui.ide.IDE.openEditor(page, java.net.URI.create(uri_string), editor_id, true))
         end
         return editor
       end
@@ -38,10 +38,10 @@ module RadRails
       # Return the active editor
       def active
         editor = nil
-        RadRails::UI.run("Getting reference to active editor") do          
-          page = RadRails::UI.active_page
+        Ruble::UI.run("Getting reference to active editor") do          
+          page = Ruble::UI.active_page
           return nil unless page
-          editor = RadRails::Editor.new(page.active_editor)
+          editor = Ruble::Editor.new(page.active_editor)
         end
         return editor
       end
@@ -49,15 +49,15 @@ module RadRails
       # Opens an editor to a specific file, line and column. If no file is specified, assume the active editor
       # Line numbers begin at 1. If not specified, line will be 1.
       # Columns begin at 1. If not specified, column will be 1.
-      # Returns reference to opened RadRails::Editor
+      # Returns reference to opened Ruble::Editor
       def go_to(options = {})
         default_line = options.has_key?(:file) ? 1 : ENV['TM_LINE_NUMBER']
         options = {:file => ENV['TM_FILEPATH'], :line => default_line, :column => 1}.merge(options)
         editor = nil
         if options[:file]
-          editor = RadRails::Editor.open("file://#{options[:file]}")
+          editor = Ruble::Editor.open("file://#{options[:file]}")
         else
-          editor = RadRails::Editor.active
+          editor = Ruble::Editor.active
         end
         return nil unless editor        
         region = editor.document.getLineInformation(options[:line].to_i - 1)
@@ -79,7 +79,7 @@ module RadRails
     # Closes the editor. Pass in false to avoid saving before closing.
     def close(save = true)     
       closed = false 
-      RadRails::UI.run("Close Editor") { closed = RadRails::UI.active_page.close_editor(editor_part, save) }
+      Ruble::UI.run("Close Editor") { closed = Ruble::UI.active_page.close_editor(editor_part, save) }
       closed
     end
     
@@ -91,7 +91,7 @@ module RadRails
     # Saves the editor. Pass in false to avoid confirm dialog if editor is dirty.
     def save(confirm = true)
       saved = false
-      RadRails::UI.run("Save Editor") { saved = RadRails::UI.active_page.save_editor(editor_part, confirm) }
+      Ruble::UI.run("Save Editor") { saved = Ruble::UI.active_page.save_editor(editor_part, confirm) }
       saved
     end
     
@@ -107,16 +107,16 @@ module RadRails
     
     # FIXME This method only exists in Eclipse 3.5+
     def hide
-      RadRails::UI.run("Hide Editor") { RadRails::UI.active_page.hide_editor(editor_reference) }
+      Ruble::UI.run("Hide Editor") { Ruble::UI.active_page.hide_editor(editor_reference) }
     end
     
     # FIXME This method only exists in Eclipse 3.5+
     def show
-      RadRails::UI.run("Show Editor") { RadRails::UI.active_page.show_editor(editor_reference) }
+      Ruble::UI.run("Show Editor") { Ruble::UI.active_page.show_editor(editor_reference) }
     end
     
     def editor_reference
-      RadRails::UI.active_page.editor_references.find {|ref| ref.getEditor(false) == editor_part }
+      Ruble::UI.active_page.editor_references.find {|ref| ref.getEditor(false) == editor_part }
     end
     
     def editor_input
@@ -129,7 +129,7 @@ module RadRails
     end
     
     def document=(src)
-      RadRails::UI.run("Change Editor Contents") { document.set(src) }
+      Ruble::UI.run("Change Editor Contents") { document.set(src) }
     end
     
     # Is the editor editable?
@@ -140,7 +140,7 @@ module RadRails
     # Replace a portion of the editor's contents
     # Assumes that the args in the brackets are offset and length, and that the value is a string
     def []=(offset, length, src)    
-      RadRails::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
+      Ruble::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
     end
     
     # TODO Just forward missing methods over to editor_part?
@@ -166,7 +166,7 @@ module RadRails
         offset = array_or_range.first
         length = array_or_range.last - offset
       end
-      RadRails::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
+      Ruble::UI.run("Changing Editor Selection") { editor_part.select_and_reveal(offset, length) }
     end
     
     def styled_text

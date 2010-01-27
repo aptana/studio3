@@ -1,6 +1,6 @@
 require "java"
 
-module RadRails
+module Ruble
 
   class Context
     def initialize(jobj=nil)

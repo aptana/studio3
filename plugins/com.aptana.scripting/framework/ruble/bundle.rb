@@ -1,8 +1,8 @@
 require "java"
-require "radrails/base_element"
-require "radrails/bundle_manager"
+require "ruble/base_element"
+require "ruble/bundle_manager"
 
-module RadRails
+module Ruble
   
   class Bundle < BaseElement
     @@defaults = {}
@@ -145,14 +145,14 @@ end
 # define top-level convenience methods
 
 def bundle(name, &block)
-  RadRails::Bundle.define_bundle(name, {}, &block)
+  Ruble::Bundle.define_bundle(name, {}, &block)
 end
 
 def with_defaults(values, &block)
-  bundle = RadRails::BundleManager.bundle_from_path(File.dirname($fullpath))
+  bundle = Ruble::BundleManager.bundle_from_path(File.dirname($fullpath))
   
   if bundle.nil?
-    bundle = RadRails::Bundle.define_bundle("", values, &block)
+    bundle = Ruble::Bundle.define_bundle("", values, &block)
   else
     bundle.defaults = values
     block.call(bundle) if block_given?
@@ -160,7 +160,7 @@ def with_defaults(values, &block)
   end
 end
 
-module RadRails
+module Ruble
   class << self
     def current_bundle(&block)
       with_defaults({}, &block)

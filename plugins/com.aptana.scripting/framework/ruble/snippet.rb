@@ -1,8 +1,8 @@
 require "java"
-require "radrails/bundle_manager"
-require "radrails/scope_selector"
+require "ruble/bundle_manager"
+require "ruble/scope_selector"
 
-module RadRails
+module Ruble
   
   class Snippet < Command
     def initialize(name)
@@ -68,5 +68,5 @@ end
 # define top-level convenience methods
 
 def snippet(name, &block)
-  RadRails::Snippet.define_snippet(name, &block)
+  Ruble::Snippet.define_snippet(name, &block)
 end

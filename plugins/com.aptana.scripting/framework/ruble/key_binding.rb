@@ -1,6 +1,6 @@
 require "java"
 
-module RadRails
+module Ruble
   
   class KeyBinding
     def initialize(jobj)

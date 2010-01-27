@@ -1,7 +1,7 @@
 require "java"
-require "radrails/bundle_manager"
+require "ruble/bundle_manager"
 
-module RadRails
+module Ruble
   
   class Logger
     class << self
@@ -36,17 +36,17 @@ end
 # define top-level convenience methods
 
 def log_error(error)
-  RadRails::Logger.log_error(error)
+  Ruble::Logger.log_error(error)
 end
 
 def log_info(info)
-  RadRails::Logger.log_info(info)
+  Ruble::Logger.log_info(info)
 end
 
 def log_warning(warning)
-  RadRails::Logger.log_warning(warning)
+  Ruble::Logger.log_warning(warning)
 end
 
 def trace(message)
-  RadRails::Logger.trace(message)
+  Ruble::Logger.trace(message)
 end
