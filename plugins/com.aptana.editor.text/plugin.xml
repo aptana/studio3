@@ -19,7 +19,7 @@
       <file-association
             content-type="org.eclipse.core.runtime.text"
             file-extensions="log"
-            file-names="README,TODO">
+            file-names="README,TODO,README_FOR_APP">
       </file-association>
    </extension>
 
