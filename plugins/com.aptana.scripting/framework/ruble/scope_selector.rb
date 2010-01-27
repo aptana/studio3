@@ -1,4 +1,4 @@
-module RadRails
+module Ruble
   class ScopeSelector
     
     def initialize(selector)

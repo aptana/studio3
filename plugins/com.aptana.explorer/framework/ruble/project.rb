@@ -1,7 +1,7 @@
 require "java"
-require 'radrails/progress'
+require 'ruble/progress'
 
-module RadRails
+module Ruble
   # Wraps the eclipse IProject
   class Project
   
@@ -11,13 +11,13 @@ module RadRails
     class << self
       # Find the named project in the workspace
       def find(name)
-        RadRails::Project.new(org.eclipse.core.resources.ResourcesPlugin.workspace.root.project(name))
+        Ruble::Project.new(org.eclipse.core.resources.ResourcesPlugin.workspace.root.project(name))
       end
       
       # Return all projects in an array
       def all
         projects = []
-        org.eclipse.core.resources.ResourcesPlugin.workspace.root.projects.each {|p| projects << RadRails::Project.new(p) }
+        org.eclipse.core.resources.ResourcesPlugin.workspace.root.projects.each {|p| projects << Ruble::Project.new(p) }
         projects
       end
       
@@ -26,7 +26,7 @@ module RadRails
         return_proj = find(name)
         return return_proj if return_proj.exists?
         # FIXME Allow setting a non-standard location or default set of nature Ids using the options hash!
-        job = RadRails::Job.new("Create project") {|monitor| find(name).project.create(monitor) }
+        job = Ruble::Job.new("Create project") {|monitor| find(name).project.create(monitor) }
         job.schedule
         job.join
         return_proj
@@ -66,7 +66,7 @@ module RadRails
     # Add a new nature to the project. +nature_id+ is a String 
     def add_nature(nature_id)
       return unless project.exists?
-      job = RadRails::Job.new("Add Nature to project") do |monitor| 
+      job = Ruble::Job.new("Add Nature to project") do |monitor| 
         description = project.description
         new_natures = natures + [nature_id]
         description.nature_ids = new_natures.to_java(:string)
@@ -97,7 +97,7 @@ module RadRails
     
     def open
       return if is_open?
-      job = RadRails::Job.new("Open project") {|monitor| project.open(monitor) }
+      job = Ruble::Job.new("Open project") {|monitor| project.open(monitor) }
       job.schedule
       job.join
     end
@@ -109,7 +109,7 @@ module RadRails
     # Close the project
     def close
       return if is_closed?
-      job = RadRails::Job.new("Close project") {|monitor| project.close(monitor) }
+      job = Ruble::Job.new("Close project") {|monitor| project.close(monitor) }
       job.schedule
       job.join
     end
@@ -117,7 +117,7 @@ module RadRails
     # Delete the project
     def delete
       return if !exists?
-      job = RadRails::Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
+      job = Ruble::Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
       job.schedule
       job.join
     end
@@ -157,7 +157,7 @@ class Dir
   # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
   def refresh(shallow = false)
     depth = shallow ? org.eclipse.core.resources.IResource::DEPTH_ONE : org.eclipse.core.resources.IResource::DEPTH_INFINITE
-    job = RadRails::Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
+    job = Ruble::Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end
@@ -180,7 +180,7 @@ class File
   def refresh
     return if resource.nil?
     depth = org.eclipse.core.resources.IResource::DEPTH_ZERO
-    job = RadRails::Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
+    job = Ruble::Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
     job.schedule
     job.join
   end

@@ -1,4 +1,4 @@
-require 'radrails'
+require 'ruble'
 
 command "Execute Line Inserting Results" do |cmd|
   cmd.key_binding = "CTRL+R"

@@ -1,5 +1,5 @@
-require 'radrails'
+require 'ruble'
 
-RadRails.current_bundle do |bundle|
+Ruble.current_bundle do |bundle|
 
 end

@@ -1,6 +1,6 @@
 require "java"
 
-module RadRails
+module Ruble
   
   # A class to make it easy to generate UIJobs. Takes a block which is 
   # then called as the body of runInUIThread

@@ -1,4 +1,4 @@
-module RadRails
+module Ruble
 
   # Wraps an Eclipse Job and allows us to use a block to implement the one abstract method we need
   class Job < org.eclipse.core.runtime.jobs.Job
@@ -13,13 +13,13 @@ module RadRails
     end
   end
   
-  def RadRails.call_with_progress( args, &block )
+  def Ruble.call_with_progress( args, &block )
     title           = args[:title] || 'Progress'
     message         = args[:message] || args[:summary] || 'Frobbing the widget...'
     details         = args[:details] || ''
     cancel_proc     = args[:cancel]
     indeterminate   = args[:indeterminate]
-    job = RadRails::Job.new(title, &block)
+    job = Ruble::Job.new(title, &block)
     job.schedule
     job.join
   end
