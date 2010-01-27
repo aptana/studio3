@@ -69,6 +69,9 @@ public class EarlyStartup implements IStartup
 			public void windowOpened(IWorkbenchWindow window)
 			{
 				window.addPerspectiveListener(_perspectiveListener);
+				
+				// treat opening a new window like a first run
+				EarlyStartup.this.openTerminalEditor();
 			}
 		};
 	}
