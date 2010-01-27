@@ -1,7 +1,7 @@
 require 'java'
-require 'radrails/ui'
+require 'ruble/ui'
 
-module RadRails
+module Ruble
   class Terminal
     class << self
       def open(command, working_dir = nil)

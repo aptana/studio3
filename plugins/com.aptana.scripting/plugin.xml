@@ -19,22 +19,22 @@
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/bundle.rb">
+            name="ruble/bundle.rb">
       </file>
       <file
-            name="radrails/command.rb">
+            name="ruble/command.rb">
       </file>
       <file
-            name="radrails/logger.rb">
+            name="ruble/logger.rb">
       </file>
       <file
-            name="radrails/menu.rb">
+            name="ruble/menu.rb">
       </file>
       <file
-            name="radrails/snippet.rb">
+            name="ruble/snippet.rb">
       </file>
       <file
-            name="radrails/context.rb">
+            name="ruble/context.rb">
       </file>
    </extension>
    <extension

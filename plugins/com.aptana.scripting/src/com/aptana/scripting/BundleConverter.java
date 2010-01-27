@@ -151,7 +151,7 @@ public class BundleConverter
 
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("require 'java'\n");
-		buffer.append("require 'radrails'\n\n");
+		buffer.append("require 'ruble'\n\n");
 		String name = sanitize(properties, "name");
 		buffer.append("bundle '").append(name).append("' do |bundle|\n");
 		// Author

@@ -1,7 +1,7 @@
 require 'java'
-require 'radrails'
+require 'ruble'
 
-module RadRails
+module Ruble
   class Theme
     # This method will add a theme to the IDE from a passed in Hash.
     # expected keys are:

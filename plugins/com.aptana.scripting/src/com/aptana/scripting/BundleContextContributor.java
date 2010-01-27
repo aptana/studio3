@@ -30,7 +30,7 @@ public class BundleContextContributor implements ContextContributor
 			
 			if (runtime != null)
 			{
-				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
 						COMMAND_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, command));
 				
 				context.put(COMMAND_PROPERTY_NAME, rubyInstance);
@@ -39,7 +39,7 @@ public class BundleContextContributor implements ContextContributor
 				
 				if (bundle != null)
 				{
-					rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE, BUNDLE_RUBY_CLASS,
+					rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE, BUNDLE_RUBY_CLASS,
 							JavaEmbedUtils.javaToRuby(runtime, bundle));
 					
 					context.put(BUNDLE_PROPERTY_NAME, rubyInstance);

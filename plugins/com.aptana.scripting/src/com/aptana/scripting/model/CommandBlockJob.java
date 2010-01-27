@@ -190,7 +190,7 @@ public class CommandBlockJob extends AbstractCommandJob
 		// create context
 		Ruby runtime = this.getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
-		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
 				CONTEXT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, context));
 		String resultText = null;
 

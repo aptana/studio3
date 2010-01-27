@@ -1,10 +1,10 @@
 require "java"
-require "radrails/base_element"
-require "radrails/key_binding"
-require "radrails/scope_selector"
+require "ruble/base_element"
+require "ruble/key_binding"
+require "ruble/scope_selector"
 require "pathname"
 
-module RadRails
+module Ruble
 
   class Command < BaseElement
     def initialize(name)
@@ -95,7 +95,7 @@ module RadRails
     end
 
     def scope=(scope)
-      @jobj.scope = RadRails::ScopeSelector.new(scope).to_s
+      @jobj.scope = Ruble::ScopeSelector.new(scope).to_s
     end
 
     def working_directory=(dir)
@@ -165,5 +165,5 @@ end
 # define top-level convenience methods
 
 def command(name, &block)
-  RadRails::Command.define_command(name, &block)
+  Ruble::Command.define_command(name, &block)
 end

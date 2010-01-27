@@ -1,4 +1,4 @@
-require 'radrails'
+require 'ruble'
 
 bundle 'Aptana' do |bundle|
   bundle.author = "Sandip Chitale"

@@ -68,7 +68,7 @@
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/project.rb">
+            name="ruble/project.rb">
       </file>
    </extension>
 </plugin>
