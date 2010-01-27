@@ -38,7 +38,15 @@ public class EarlyStartup implements IStartup
 			{
 				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId()) && "resetComplete".equals(changeId)) //$NON-NLS-1$
 				{
-					EarlyStartup.this.openTerminalEditor();
+					EarlyStartup.this.openTerminalEditor(page.getWorkbenchWindow());
+				}
+			}
+
+			public void perspectiveOpened(IWorkbenchPage page, IPerspectiveDescriptor perspective)
+			{
+				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId())) //$NON-NLS-1$
+				{
+					EarlyStartup.this.openTerminalEditor(page.getWorkbenchWindow());
 				}
 			}
 		};
@@ -71,7 +79,7 @@ public class EarlyStartup implements IStartup
 				window.addPerspectiveListener(_perspectiveListener);
 				
 				// treat opening a new window like a first run
-				EarlyStartup.this.openTerminalEditor();
+				EarlyStartup.this.openTerminalEditor(window);
 			}
 		};
 	}
@@ -103,28 +111,36 @@ public class EarlyStartup implements IStartup
 				workbench.addWindowListener(_windowListener);
 			}
 
-			private void openTerminalEditor()
-			{
-				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-				boolean firstRun = prefs.getBoolean(IPreferenceConstants.FIRST_RUN);
-
-				if (firstRun)
-				{
-					EarlyStartup.this.openTerminalEditor();
-
-					// set firstRun to false
-					prefs.setValue(IPreferenceConstants.FIRST_RUN, false);
-				}
-			}
-
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				// listen for window and perspective changes
 				addWindowListener();
 				addPerspectiveListeners();
 
-				// possibly open a terminal editor
-				openTerminalEditor();
+				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+				boolean firstRun = prefs.getBoolean(IPreferenceConstants.FIRST_RUN);
+
+				if (firstRun)
+				{
+					// possibly open a terminal editor
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					
+					// potentially open a terminal editor in each workbench window
+					for (IWorkbenchWindow workbenchWindow : workbench.getWorkbenchWindows())
+					{
+						IWorkbenchPage workbenchPage = workbenchWindow.getActivePage();
+						String perspectiveId = workbenchPage.getPerspective().getId();
+						
+						// only open a terminal editor
+						if (RAILS_PERSPECTIVE_ID.equals(perspectiveId))
+						{
+							EarlyStartup.this.openTerminalEditor(workbenchWindow);
+						}
+					}
+					
+					// set firstRun to false
+					prefs.setValue(IPreferenceConstants.FIRST_RUN, false);
+				}
 
 				return Status.OK_STATUS;
 			}
@@ -145,8 +161,8 @@ public class EarlyStartup implements IStartup
 	/**
 	 * openTerminalEditor
 	 */
-	private void openTerminalEditor()
+	private void openTerminalEditor(IWorkbenchWindow workbenchWindow)
 	{
-		Utils.openEditor(TerminalEditor.ID, true);
+		Utils.openEditor(workbenchWindow, TerminalEditor.ID, true);
 	}
 }
