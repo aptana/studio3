@@ -4,5 +4,5 @@ import com.aptana.terminal.Activator;
 
 public interface IPreferenceConstants
 {
-	public static final String FIRST_RUN = Activator.PLUGIN_ID + ".firstRun";
+	public static final String FIRST_RUN = Activator.PLUGIN_ID + ".firstRun"; //$NON-NLS-1$
 }

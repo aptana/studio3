@@ -7,6 +7,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener4;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -19,57 +20,123 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
 
 public class EarlyStartup implements IStartup
 {
-	private static final String RAILS_PERSPECTIVE_ID = "org.radrails.rails.ui.PerspectiveRails";
+	private static final String RAILS_PERSPECTIVE_ID = "org.radrails.rails.ui.PerspectiveRails"; //$NON-NLS-1$
+
 	private IPerspectiveListener4 _perspectiveListener;
+	private IWindowListener _windowListener;
 
 	/**
-	 * earlyStartup
+	 * createPerspectiveListener
+	 * 
+	 * @return
 	 */
-	public void earlyStartup()
+	private IPerspectiveListener4 createPerspectiveListener()
 	{
-		this._perspectiveListener = new PerspectiveAdapter()
+		return new PerspectiveAdapter()
 		{
 			public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
 			{
-				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId()) && "resetComplete".equals(changeId))
+				if (RAILS_PERSPECTIVE_ID.equals(perspective.getId()) && "resetComplete".equals(changeId)) //$NON-NLS-1$
 				{
-					openTerminalEditor();
+					EarlyStartup.this.openTerminalEditor();
 				}
 			}
 		};
+	}
 
-		WorkbenchJob job = new WorkbenchJob("Terminal Perspective Listener")
+	/**
+	 * createWindowListener
+	 * 
+	 * @return
+	 */
+	private IWindowListener createWindowListener()
+	{
+		return new IWindowListener()
 		{
-			public IStatus runInUIThread(IProgressMonitor monitor)
+			public void windowActivated(IWorkbenchWindow window)
+			{
+			}
+
+			public void windowClosed(IWorkbenchWindow window)
+			{
+				window.removePerspectiveListener(_perspectiveListener);
+			}
+
+			public void windowDeactivated(IWorkbenchWindow window)
+			{
+			}
+
+			public void windowOpened(IWorkbenchWindow window)
+			{
+				window.addPerspectiveListener(_perspectiveListener);
+			}
+		};
+	}
+
+	/**
+	 * createWorkbenchJob
+	 * 
+	 * @return
+	 */
+	private WorkbenchJob createWorkbenchJob()
+	{
+		return new WorkbenchJob("Terminal Perspective Listener") //$NON-NLS-1$
+		{
+			private void addPerspectiveListeners()
+			{
+				IWorkbench workbench = PlatformUI.getWorkbench();
+
+				// add our perspective listener to each workbench window
+				for (IWorkbenchWindow workbenchWindow : workbench.getWorkbenchWindows())
+				{
+					workbenchWindow.addPerspectiveListener(_perspectiveListener);
+				}
+			}
+
+			private void addWindowListener()
+			{
+				IWorkbench workbench = PlatformUI.getWorkbench();
+
+				workbench.addWindowListener(_windowListener);
+			}
+
+			private void openTerminalEditor()
 			{
 				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 				boolean firstRun = prefs.getBoolean(IPreferenceConstants.FIRST_RUN);
 
 				if (firstRun)
 				{
-					openTerminalEditor();
+					EarlyStartup.this.openTerminalEditor();
 
 					// set firstRun to false
 					prefs.setValue(IPreferenceConstants.FIRST_RUN, false);
 				}
+			}
 
-				try
-				{
-					IWorkbench workbench = PlatformUI.getWorkbench();
-					IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				// listen for window and perspective changes
+				addWindowListener();
+				addPerspectiveListeners();
 
-					workbenchWindow.addPerspectiveListener(_perspectiveListener);
-				}
-				catch (IllegalStateException e)
-				{
-					e.printStackTrace();
-				}
+				// possibly open a terminal editor
+				openTerminalEditor();
 
 				return Status.OK_STATUS;
 			}
 		};
-		
-		job.schedule();
+	}
+
+	/**
+	 * earlyStartup
+	 */
+	public void earlyStartup()
+	{
+		this._perspectiveListener = this.createPerspectiveListener();
+		this._windowListener = this.createWindowListener();
+
+		createWorkbenchJob().schedule();
 	}
 
 	/**
