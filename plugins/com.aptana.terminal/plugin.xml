@@ -49,25 +49,24 @@
       </factory>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="*">
-         <view
-               id="com.aptana.terminal.views.TerminalView"
-               minimized="false"
-               relationship="stack"
-               relative="org.eclipse.ui.console.ConsoleView"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-   </extension>
-   <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
             id="terminal"
             name="terminal"
             path="scripting">
       </loadPath>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.terminal.EarlyStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.terminal.preferences.PreferenceInitializer">
+      </initializer>
    </extension>
 
 </plugin>

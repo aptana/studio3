@@ -1,4 +1,4 @@
-require 'radrails'
+require 'ruble'
 
 bundle "requireInCommand" do
   command "MyCommand" do |cmd|

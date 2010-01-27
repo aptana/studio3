@@ -1,4 +1,4 @@
-require 'radrails'
+require 'ruble'
 
 bundle "bundleWithMenu" do
   menu "MyMenu"
