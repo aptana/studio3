@@ -9,6 +9,7 @@ import java.io.Reader;
 import org.eclipse.core.internal.content.TextContentDescriber;
 import org.eclipse.core.runtime.content.IContentDescription;
 
+@SuppressWarnings("restriction")
 public class RubyTextContentDescriber extends TextContentDescriber
 {
 
