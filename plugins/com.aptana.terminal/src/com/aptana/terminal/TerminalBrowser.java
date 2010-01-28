@@ -26,22 +26,25 @@ public class TerminalBrowser
 
 	private static List<String> startDirectories = new ArrayList<String>(2);
 
+	private static String grabStartDirectory()
+	{
+		synchronized (startDirectories)
+		{
+			if (!startDirectories.isEmpty())
+			{
+				return startDirectories.remove(0);
+			}
+		}
+
+		return null;
+	}
+
 	public static void setStartingDirectory(String startingDirectory)
 	{
 		synchronized (startDirectories)
 		{
 			startDirectories.add(startingDirectory);
 		}
-	}
-
-	private static String grabStartDirectory()
-	{
-		synchronized (startDirectories)
-		{
-			if (!startDirectories.isEmpty())
-				return startDirectories.remove(0);
-		}
-		return null;
 	}
 
 	/**
@@ -69,16 +72,19 @@ public class TerminalBrowser
 				HttpServer.getInstance().getPort() })
 				+ "?id=" + this._id; //$NON-NLS-1$
 		this.setUrl(url);
-		
-		final IBindingService bindingService = (IBindingService) _owningPart.getSite().getService(IBindingService.class);
-		this._browser.addFocusListener(new FocusListener() {
-			
-			public void focusLost(FocusEvent e) {
-				bindingService.setKeyFilterEnabled(true);
-			}
-			
-			public void focusGained(FocusEvent e) {
+
+		final IBindingService bindingService = (IBindingService) _owningPart.getSite()
+				.getService(IBindingService.class);
+		this._browser.addFocusListener(new FocusListener()
+		{
+			public void focusGained(FocusEvent e)
+			{
 				bindingService.setKeyFilterEnabled(false);
+			}
+
+			public void focusLost(FocusEvent e)
+			{
+				bindingService.setKeyFilterEnabled(true);
 			}
 		});
 	}
@@ -109,6 +115,11 @@ public class TerminalBrowser
 	public Control getControl()
 	{
 		return this._browser;
+	}
+
+	public String getId()
+	{
+		return _id;
 	}
 
 	/**
@@ -143,10 +154,5 @@ public class TerminalBrowser
 		{
 			this._browser.setUrl(string);
 		}
-	}
-
-	public String getId()
-	{
-		return _id;
 	}
 }
