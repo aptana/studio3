@@ -1,23 +1,36 @@
-# Disclaimer
+# Introducing Ruble
 
-The Ruble runtime described in this document is under active development and subject to major changes without notice. The bundle runtime itself is part of RadRails and as such is distributed under the GPL v3 and the Aptana Source License. You are, of course, welcome to distribute your own bundles under any license you like.
+Ruble (short for RUby BundLE) is a runtime environment that allows for the extensibility of IDEs and text editors using Ruby. The first implementation of Ruble will be in RadRails 3, but we're making the specification available now because we want to get feedback from the community and because we want to encourage the developers of other development tools to adopt the specification as well. To further that end, we are making the specification available in an open manner, with no limits on use or distribution of this specification. Please provide us with your feedback on our discussion boards, located [here](https://radrails.tenderapp.com/discussions/radrails-3-prerelease).
 
-# Runtime Architecture
+In addition, we are also making the source available for several working Ruble bundles, all of which are conversions of existing open-sourced TextMate bundles:
 
-RadRails can be extended via bundles of commands and snippets. Bundles are implemented in pure Ruby, using a JRuby runtime embedded in RadRails. Design-level compatibility with TextMate was a priority in the design - we wanted to make it reasonably straightforward to convert an existing TextMate bundle into a RadRails bundle, while still allowing commands and snippets to be more concise and more powerful. At the same time, we wanted RadRails to run on Linux and Windows as well as the Mac, so we had to make some changes to deal with issues like key bindings and OS-specific assumptions.
+* [css.ruble](https://github.com/aptana/css-ruble)
+* [html.ruble](https://github.com/aptana/html-ruble)
+* [js.ruble](https://github.com/aptana/js-ruble)
+* [math.ruble](https://github.com/aptana/math-ruble)
+* [rails.ruble](https://github.com/aptana/rails-ruble)
+* [ruby.ruble](https://github.com/aptana/ruby-ruble)
+* [sass.ruble](https://github.com/aptana/sass-ruble)
+* [source.ruble](https://github.com/aptana/source-ruble)
+* [text.ruble](https://github.com/aptana/text-ruble)
+* [xml.ruble](https://github.com/aptana/xml-ruble)
 
-The RadRails runtime includes a <code>radrails.rb</code> file that defines a DSL that can be used to create bundles, commands, and menus. <code>radrails.rb</code> must be included via a <code>require</code> in each file within the Bundle that defines bundles, commands, or snippets.
+Please keep in mind that the specification and the bundles themselves are in active development and are very likely to change over the coming weeks.
+
+Design-level compatibility with TextMate bundles was a priority in the design - we wanted to make it reasonably straightforward to convert an existing TextMate bundle into a Ruble bundle, while still allowing commands and snippets to be more concise and more powerful. At the same time, we wanted Ruble bundles to run on Linux and Windows as well as the Mac, so we had to make some changes to deal with issues like key bindings and OS-specific assumptions.
+
+The Ruble runtime includes a <code>ruble.rb</code> file that defines a DSL that can be used to create bundles, commands, and menus. <code>ruble.rb</code> must be included via a <code>require</code> in each file within the Bundle that defines bundles, commands, or snippets.
 
 ## Bundles
 
-Bundles are the top-level distribution format for RadRails extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with <code>.ruble</code> suffix but this is not required.
+Bundles are the top-level distribution format for Ruble extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with <code>.ruble</code> suffix but this is not required.
 
 In addition to the <code>bundle.rb</code> file, there are three top-level directories within a bundle that are treated specially:
 
 File/Dir      | Description
 ------------- | -------------
 <code>commands/</code>	| contains the commands that make up the bundle. <code>.rb</code> files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast.
-<code>lib/</code>		| contains Ruby code that is on the load path when executing commands within your bundle. Put code here you wish to invoke from within your commands, but which you do not want loaded at startup.
+<code>lib/</code>		| contains Ruby code that is on the load path when executing commands within your bundle. Put code here you wish to invoke from within your commands, but which you do not necessarily want loaded at startup.
 <code>snippets/</code>	| contains the snippets that make up the bundle. <code>.rb</code> files within this directory will be loaded at startup, so you should keep it as minimal as possible to keep things fast.
 
 By convention, there are several other files and directories found in most bundles:
@@ -33,7 +46,7 @@ Note that we are considering a change to the bundle format to turn all bundles i
 
 ### Bundle Loading
 
-Bundles are loaded from the file system in a hierarchical order. The order, from highest to lowest priority, is:
+In RadRails 3, Ruble bundles are loaded from the file system in a hierarchical order. The order, from highest to lowest priority, is:
 
 * The current project's "bundles" subdirectory
 * The <code>$USER_DOCUMENT_DIRECTORY/RadRails Bundles/</code>, where <code>$USER_DOCUMENT_DIRECTORY</code> is platform dependent.
@@ -41,13 +54,17 @@ Bundles are loaded from the file system in a hierarchical order. The order, from
 
 When a bundle is defined in multiple places, only the bundle code defined in the highest priority location is used. In this way, you can easily do a <code>git clone</code> (or the equivalent) of a bundle from within your <code>$USER_DOCUMENT_DIRECTORY/RadRails Bundles/</code> and it will override the ones built in to RadRails itself.
 
+Other implementations are free to keep bundles in whatever locations on disk they desire, but if an implementation does support multiple locations for bundles, it should also use the priority system for determining which bundles are active.
+
 ### Extending Bundles From Other Bundles
 
 It is possible for a bundle to override or extend another bundle's functionality. This is quite handy when you want to add a command or two to the menu of the existing bundle without having to maintain your own clone of a bundle repository.
 
+*FIXME: this example is wrong. according to the priority scheme mentioned above, the user bundle should not be active AT ALL in this particular case, since both bundles have the same name. What we need is an example of a bundle like the Rails bundle adding commands and menu items to the Ruby bundle.*
+
 #### Example
 
-    # $USER_DOCUMENT_DIRECTORY/RadRails Bundles//MyBundle/bundle.rb
+    # $USER_DOCUMENT_DIRECTORY/RadRails Bundles/MyBundle/bundle.rb
     bundle "MyBundle" do |b|
       command "A" do |cmd|
         # ...
@@ -161,11 +178,11 @@ Snippets are a specialized form of commands, designed to make it easier to speci
 
 Here are the properties specific to snippets. Note that the <code>trigger</code> is required, unlike the case for commands.
 
-Element		| Required?		| Description
-------------- | ------------- | -----------
+Element		            | Required?		| Description
+-------------           | ------------- | -----------
 <code>name</code>		| Yes			| A human-readable name for the command. Must be unique within the bundle.
 <code>scope</code>		| 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes.
-<code>trigger</code>	    | Yes			| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command.
+<code>trigger</code>	| Yes			| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command.
 <code>expansion</code>	| Yes			| The snippet text that will be substituted for the command trigger.
 
 FORTHCOMING: the syntax for the expansion string (which roughly follows TextMate, but doesn't support nesting at present)
@@ -186,39 +203,39 @@ Paths can be specified in many places in the API. Whenever you see the term PATH
 
 The possible input specifiers are:
 
-Specifier      | Description
-------------- | -------------
-<code>:selection</code>			| selected text in the editor
+Specifier                           | Description
+-------------                       | -------------
+<code>:selection</code>			    | selected text in the editor
 <code>:left_character</code>		| the character to the immediate left of the caret
-<code>:right_character</code>	| the character to the immediate right of the caret
-<code>:word</code>				| word surrounding the current caret
-<code>:line</code>				| the line containing the caret
-<code>:document</code>			| the entire current document
-<code>:clipboard</code>			| the contents of the clipboard
-<code>:scope</code>				| (NOT YET IMPLEMENTED) As in TextMate: search backwards and forwards for the first character which is not matched by the scope selector of the command and use those as boundaries for the input.
+<code>:right_character</code>	    | the character to the immediate right of the caret
+<code>:word</code>				    | word surrounding the current caret
+<code>:line</code>				    | the line containing the caret
+<code>:document</code>			    | the entire current document
+<code>:clipboard</code>			    | the contents of the clipboard
+<code>:scope</code>				    | (NOT YET IMPLEMENTED) As in TextMate: search backwards and forwards for the first character which is not matched by the scope selector of the command and use those as boundaries for the input.
 <code>:input_from_console</code>	| take input from a shell window? How do we specify which console?
-<code>:none</code>				| no input is needed by this command. When encountered in the *multiple symbol specifier* case, this symbol always terminates fallback evaluation
+<code>:none</code>				    | no input is needed by this command. When encountered in the *multiple symbol specifier* case, this symbol always terminates fallback evaluation
 <code>:selected_lines</code>		| I'm not sure what this does or how it differs from :selection!!!
 
 ## OUTPUT_SPECIFIER
 
 The possible output specifiers are:
 
-Specifier      | Description
-------------- | -------------
-<code>:insert_as_text</code>	| insert text at the caret position. If there is a selection, the text is inserted immediately following the selection and the selection is lost.
-<code>:insert_as_snippet</code>	| as with <code>:insert_as_text</code>, but the output is interpreted as snippet expansion text
-<code>:replace_selection</code>	| replace the currently selected text with the output. If no text is selected, this is equivalent to the <code>:insert_as_text</code> specifier
-<code>:replace_document</code>	| replace the entire document with the output
-<code>:copy_to_clipboard</code>	| replace the contents of the clipboard with the output
-<code>:show_as_html</code>	| open an html browser window and intepret the output as html
-<code>:show_as_tooltip</code>	| show a tooltip containing the output
-<code>:create_new_document</code>	| create a new editor document containing the output
-<code>:output_to_console</code>	| display the output in a console. HOW DO WE SPECIFY WHICH CONSOLE
-<code>:discard</code>	| throw any output away
+Specifier                               | Description
+-------------                           | -------------
+<code>:insert_as_text</code>	        | insert text at the caret position. If there is a selection, the text is inserted immediately following the selection and the selection is lost.
+<code>:insert_as_snippet</code>	        | as with <code>:insert_as_text</code>, but the output is interpreted as snippet expansion text
+<code>:replace_selection</code>	        | replace the currently selected text with the output. If no text is selected, this is equivalent to the <code>:insert_as_text</code> specifier
+<code>:replace_document</code>	        | replace the entire document with the output
+<code>:copy_to_clipboard</code>	        | replace the contents of the clipboard with the output
+<code>:show_as_html</code>	            | open an html browser window and intepret the output as html
+<code>:show_as_tooltip</code>	        | show a tooltip containing the output
+<code>:create_new_document</code>	    | create a new editor document containing the output
+<code>:output_to_console</code>	        | display the output in a console. HOW DO WE SPECIFY WHICH CONSOLE
+<code>:discard</code>	                | throw any output away
 <code>:replace_selected_lines</code>	| what does this do? probably unnecessary
-<code>:replace_line</code>	| replace the line around the caret. probably unnecessary
-<code>:replace_word</code>	| replace the word around the caret. probably unnecessary
+<code>:replace_line</code>	            | replace the line around the caret. probably unnecessary
+<code>:replace_word</code>	            | replace the word around the caret. probably unnecessary
 
 # Bundle.rb
 
@@ -228,15 +245,15 @@ As discussed in the _Runtime Architecture_ section above, the <code>bundle.rb</c
 
 Bundles have metadata associated with them. The following properties are pre-defined:
 
-Property      | Description
-------------- | -------------
-<code>name</code>		| the user-visible name of the bundle. E.g, "Ruby on Rails". This name will be shown in menus, error messages, and so forth.
+Property                    | Description
+-------------               | -------------
+<code>name</code>		    | the user-visible name of the bundle. E.g, "Ruby on Rails". This name will be shown in menus, error messages, and so forth.
 <code>description</code>	| a longer, textual description of the bundle and its purpose
-<code>author</code>		| the author(s) of the bundle
-<code>copyright</code>	| any copyright message associated with the bundle
+<code>author</code>		    | the author(s) of the bundle
+<code>copyright</code>	    | any copyright message associated with the bundle
 <code>license</code>		| the name or URL of the license associated with the bundle. E.g. "MIT License" or <code>http://www.gnu.org/licenses/gpl-3.0.txt</code>
 <code>website</code>		| the website where more information about the bundle can be found
-<code>repository</code>	| the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rails-ruble.git</code>
+<code>repository</code>	    | the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rails-ruble.git</code>
 
 Additional properties can be accessed, though, simply by referring to them as though they already exist, e.g.:
 
@@ -254,9 +271,9 @@ Menus also have a scope, which defines the contexts in which the entire menu is 
 
 The following is a real but extremely minimal bundle.rb file which defines a 'Rails' menu which in turn contains only a single 'Go To' submenu.
 
-    require 'radrails'
+    require 'ruble'
 
-    RadRails.current_bundle do |bundle|
+    Ruble.current_bundle do |bundle|
       bundle.name = "Ruby on Rails"
       bundle.author = "Many"
       bundle.repository = "git://github.com/aptana/rails-ruble.git"
@@ -303,27 +320,27 @@ The KEY_SEQUENCE syntax follows the Eclipse conventions, since those are more po
 
 The actual key is generally specified simply as the ASCII character, in uppercase. So, for example F or X, are examples of such keys. However, there are some special keys; keys that have no printable ASCII representation. The following is a list of the current special keys: 
 
-Key      | ... | ... | 
-------------- | ------------- |-----------
-ARROW_DOWN	| F1	| NUMPAD_0	|
-ARROW_LEFT	| F2	| NUMPAD_1	|
-ARROW_RIGHT	| F3	| NUMPAD_2	|
-ARROW_UP	| F4	| NUMPAD_3	|
-BREAK	| F5	| NUMPAD_4	|
-BS	| F6	| NUMPAD_5	|
-CAPS_LOCK	| F7	| NUMPAD_6	|
-CR	| F8	| NUMPAD_7	|
-DEL	| F9	| NUMPAD_8	|
-END	| F10	| NUMPAD_9	|
-ESC	| F11	| NUMPAD_ADD	|
-HOME	| F12	| NUMPAD_DECIMAL	|
-INSERT	| F13	| NUMPAD_DIVIDE	|
-LF	| F14	| NUMPAD_ENTER	|
-FF	| F15	| NUMPAD_EQUAL	|
-NUL	| PRINT_SCREEN	| NUMPAD_MULTIPLY	|
-PAGE_UP	| PAUSE	| NUMPAD_SUBTRACT	|
-PAGE_DOWN	| SCROLL_LOCK	| NUM_LOCK	|
-SPACE	| TAB	| VT	|
+Key         | ...           | ...               | 
+----------- | ------------- |-----------
+ARROW_DOWN	| F1	        | NUMPAD_0	        |
+ARROW_LEFT	| F2	        | NUMPAD_1	        |
+ARROW_RIGHT	| F3	        | NUMPAD_2	        |
+ARROW_UP	| F4	        | NUMPAD_3	        |
+BREAK	    | F5	        | NUMPAD_4	        |
+BS	        | F6	        | NUMPAD_5	        |
+CAPS_LOCK	| F7	        | NUMPAD_6	        |
+CR	        | F8	        | NUMPAD_7	        |
+DEL	        | F9	        | NUMPAD_8	        |
+END	        | F10	        | NUMPAD_9	        |
+ESC	        | F11	        | NUMPAD_ADD	    |
+HOME	    | F12	        | NUMPAD_DECIMAL	|
+INSERT	    | F13	        | NUMPAD_DIVIDE	    |
+LF	        | F14	        | NUMPAD_ENTER	    |
+FF	        | F15	        | NUMPAD_EQUAL	    |
+NUL	        | PRINT_SCREEN	| NUMPAD_MULTIPLY	|
+PAGE_UP	    | PAUSE	        | NUMPAD_SUBTRACT	|
+PAGE_DOWN	| SCROLL_LOCK	| NUM_LOCK      	|
+SPACE	    | TAB	        | VT	            |
 
 Alternate names for some common special keys are also allowed. For example, ESC/ESCAPE, and CR/ENTER/RETURN are synonyms.
 
@@ -360,7 +377,7 @@ Then the <code>:selection</code> specifier would be checked to see if it evaluat
 
 ## Output Definition
 
-As with input, commands may wish to generate output in a number of different ways. In RadRails, output can be specified using the *single output specifier* form:
+As with input, commands may wish to generate output in a number of different ways. In Ruble, output can be specified using the *single output specifier* form:
 
     command.output = OUTPUT_SPECIFIER
 
@@ -377,21 +394,21 @@ As with the input specifier, the *path specifier* form allows you to define a fi
 When a command's <code>invoke</code> property is set a ruby block, that block is passed a <code>context</code> object as an argument. The context object has the following properties:
 
 
-Property      | Description
-------------- | -------------
-<code>input</code>		| The input to the command as a string. See the _Input During Command Invocation_ section below.
+Property                    | Description
+-------------               | -------------
+<code>input</code>		    | The input to the command as a string. See the _Input During Command Invocation_ section below.
 <code>invoked_via</code>	| How the command was invoked. Can be <code>:key_binding</code>, <code>:menu</code>, <code>:unknown</code>, <code>:command</code>, or <code>:trigger</code>.
 <code>command</code>		| The Command object being executed.
-<code>bundle</code>		| The Bundle in which the command is defined.
-<code>scope</code>		| The Scope in which the command was executed.
-<code>project</code>		| The Project that owns the file currently being edited, or nil. See _Project API_ for more information.
-<code>explorer</code>	| (NOT YET IMPLEMENTED) The app explorer. See _Project API_ for more information.
-<code>editor</code>		| The currently active Aptana file editor. See _Editor API_ for more information.
+<code>bundle</code>		    | The Bundle in which the command is defined.
+<code>scope</code>		    | The Scope in which the command was executed.
+<code>project</code>	    | The Project that owns the file currently being edited, or nil. See _Project API_ for more information.
+<code>explorer</code>	    | (NOT YET IMPLEMENTED) The app explorer. See _Project API_ for more information.
+<code>editor</code>		    | The currently active Aptana file editor. See _Editor API_ for more information.
 
 In addition, the context has a few handy-dandy functions for use by commands, as described below:
 
-Method      | Description
-------------- | -------------
+Method                                                      | Description
+-------------                                               | -------------
 <code>exit_with_message(message, OUTPUT_SPECIFIER)</code>	| Short-circuit the execution of the command, using the specified OUTPUT_SPECIFIER
 <code>invoke(name, INVOKE_OPTIONS)</code> | (NOT YET IMPLEMENTED) Invoke another command or snippet by name, and return its context object so that its output and other properties can be extracted.
 
@@ -399,11 +416,11 @@ Method      | Description
 
 You can supply additional options to the <code>invoke</code> method via its INVOKE_OPTIONS hash. These options effect the state of the context object passed to the command when it is invoked:
 
-Key      | Description
-------------- | -------------
-<code>:input</code>		| If specified, the context's <code>input</code> property will be set to this value. This is useful when you want your command to process user input and then have another command further process that input. If it is not defined the INPUT_SPECIFIER in the command's definition will be used as normal.
+Key                         | Description
+-------------               | -------------
+<code>:input</code>	    	| If specified, the context's <code>input</code> property will be set to this value. This is useful when you want your command to process user input and then have another command further process that input. If it is not defined the INPUT_SPECIFIER in the command's definition will be used as normal.
 <code>:output</code>		| If specified, this OUTPUT_SPECIFIER overrides the one defined by the command.
-<code>:scope</code>		| The scope specifier to be passed to the command
+<code>:scope</code>	    	| The scope specifier to be passed to the command
 <code>:bundle</code>		| If specified, look for the command to invoke in the named bundle instead of the current bundle.
 
 
@@ -424,10 +441,10 @@ Output written to <code>STDERR</code> during command execution will be displayed
 
 Project objects have the following properties and methods:
 
-Property      | Description
-------------- | -------------
+Property                                | Description
+-------------                           | -------------
 <code>name</code>						| The name of the project. Usually the basename of the root project directory.
-<code>exists?</code>						| True if the project exists on disk.
+<code>exists?</code>					| True if the project exists on disk.
 <code>to_dir</code>						| Returns the <code>Dir</code> corresponding to the project's root
 <code>refresh(shallow = false)</code>	| Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
 <code>is_open?</code>					| Returns true if the project is open.
@@ -437,53 +454,55 @@ Property      | Description
 <code>make_current</code>				| Make the project the current/active one highlighted by the App Explorer
 <code>rails?</code>						| Query method to tell if a project has a rails nature
 
-There are also a number of useful static methods defined on the RadRails::Project class that can be useful in ruby code outside of a command:
+There are also a number of useful static methods defined on the Ruble::Project class that can be useful in ruby code outside of a command:
 
-Method      | Description
-------------- | -------------
+Method                                          | Description
+-------------                                   | -------------
 <code>find(name)</code>							| Find the named project in the workspace
-<code>all</code>									| Return all projects in an array
+<code>all</code>								| Return all projects in an array
 <code>create(name, PROJECT_OPTIONS = {})</code>	| Create a new project with the given name and PROJECT_OPTIONS
-<code>current</code>								| Returns the "current"/"active" project
+<code>current</code>							| Returns the "current"/"active" project
 
 
 ## PROJECT_OPTIONS
+
+FORTHCOMING
 
 # Editor API
 
 Editor objects have the following properties and methods.
 
-Property      | Description
-------------- | -------------
-<code>close(save = true)</code>	| Close the editor. Save or not based on the <code>save</code> argument
-<code>close!</code>			| Close without saving
-<code>save</code>			| Save the editor. Confirm or not based on the <code>confirm</code> argument
-<code>save!</code>			| Save the editor without confirming
-<code>dirty?</code>			| Return true if the editor dirty (has unsaved contents) else false.
-<code>hide</code>			| Hide the editor
-<code>show</code>			| Show the editor
-<code>document=(src)</code>				| Set the contents of the editor's document to <code>src</code>
-<code>document</code>		| Returns editor's document
-<code>editbale?</code>				| Returns true if the editor is editable otherwise false
-<code>file</code>		| (Not Yet Implemented) The File currently being edited, or nil
-<code>[]=(offset, length, src)</code>			| Replace a portion of the editor's contents
-<code>selection</code>		| Return the current selection. It has properties length, offset, text, start_line, end_line
-<code>selection=(array_or_range)</code>			| Argument is a 2 integer array with first being offset, second being length; or a Range object with the range of offsets - first and last
-<code>current_scope</code>				| Returns current scope
-<code>scope_at_offset(offset)</code>	| Return scope at given <code>offset</code>
-<code>caret_column</code>	| The caret column
-<code>caret_line</code>	| The line containing caret
-<code>caret_offset</code>	| The caret offset
-<code>current_line</code>	| The current line
-<code>line_number</code>	| The starting line number of <code>input</code>, numbered starting with 1.
-<code>line_index</code>	| The starting position on the line of <code>input</code>, numbered from 0.
-<code>soft_tabs</code>	| Boolean indicating whether or not soft tabs are being used for the current file.
-<code>tab_size</code>	| Tab width for the current file.
+Property                                    | Description
+-------------                               | -------------
+<code>close(save = true)</code>	            | Close the editor. Save or not based on the <code>save</code> argument
+<code>close!</code>			                | Close without saving
+<code>save</code>			                | Save the editor. Confirm or not based on the <code>confirm</code> argument
+<code>save!</code>			                | Save the editor without confirming
+<code>dirty?</code>			                | Return true if the editor dirty (has unsaved contents) else false.
+<code>hide</code>			                | Hide the editor
+<code>show</code>			                | Show the editor
+<code>document=(src)</code>			    	| Set the contents of the editor's document to <code>src</code>
+<code>document</code>		                | Returns editor's document
+<code>editbale?</code>		    		    | Returns true if the editor is editable otherwise false
+<code>file</code>		                    | (Not Yet Implemented) The File currently being edited, or nil
+<code>[]=(offset, length, src)</code>		| Replace a portion of the editor's contents
+<code>selection</code>		                | Return the current selection. It has properties length, offset, text, start_line, end_line
+<code>selection=(array_or_range)</code>		| Argument is a 2 integer array with first being offset, second being length; or a Range object with the range of offsets - first and last
+<code>current_scope</code>	    			| Returns current scope
+<code>scope_at_offset(offset)</code>	    | Return scope at given <code>offset</code>
+<code>caret_column</code>	                | The caret column
+<code>caret_line</code>	                    | The line containing caret
+<code>caret_offset</code>	                | The caret offset
+<code>current_line</code>	                | The current line
+<code>line_number</code>	                | The starting line number of <code>input</code>, numbered starting with 1.
+<code>line_index</code>	                    | The starting position on the line of <code>input</code>, numbered from 0.
+<code>soft_tabs</code>	                    | Boolean indicating whether or not soft tabs are being used for the current file.
+<code>tab_size</code>	                    | Tab width for the current file.
 
-There are also a number of useful static methods defined on the RadRails::Editor class that can be useful in ruby code outside of a command:
+There are also a number of useful static methods defined on the Ruble::Editor class that can be useful in ruby code outside of a command:
 
-Method      | Description
-------------- | -------------
+Method                              | Description
+-------------                       | -------------
 <code>open(absolute_path)</code>	| Open a file specified by the absolute path.
 <code>active</code>					| Returns the "active" editor.
 <code>go_to(options)</code>			| Where the options is a hash that can contains keys :file (active editor if not specified), :line (default to 1) or :column (defaults to 1)
@@ -494,16 +513,15 @@ FORTHCOMING
 
 Currently the Browser object only supports a single method:
 
-Method      | Description
-------------- | -------------
-<code>open(url, OPTIONS_SPECIFIER)</code> | Open a new browser pointed at the specified <code>url</code>, using the options in the OPTIONS_SPECIFIER hash.
+Method                                              | Description
+-------------                                       | -------------
+<code>open(url, BROWSER_OPTIONS_SPECIFIER)</code>   | Open a new browser pointed at the specified <code>url</code>, using the options in the BROWSER_OPTIONS_SPECIFIER hash.
 
-## OPTIONS_SPECIFIER
+## BROWSER_OPTIONS_SPECIFIER
 
 All the options are, as the name implies, optional.
 
-Key      | Description
-------------- | -------------
+Key                         | Description
+-------------               | -------------
 <code>:new_window</code>	| Boolean which specifies whether or not to open a new browser window (tab) or not. The default is <code>false</code>, which will re-use the last browser window opened if possible.
-<code>:title</code>		| The title of the browser window. Can be overridden by the HTML within the browser window.
-
+<code>:title</code>	    	| The title of the browser window. Can be overridden by the HTML within the browser window.

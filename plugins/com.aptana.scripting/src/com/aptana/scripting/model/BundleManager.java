@@ -475,7 +475,16 @@ public class BundleManager
 					String path = entry.getKey().getAbsolutePath();
 					if (path.startsWith(getApplicationBundlesPath()))
 					{
-						bundles.addAll(entry.getValue());
+						List<BundleElement> matchingBundles = entry.getValue();
+						if (matchingBundles != null)
+						{
+							int size = matchingBundles.size();
+
+							if (size > 0)
+							{
+								bundles.add(matchingBundles.get(size - 1));
+							}
+						}
 					}
 				}
 			}
