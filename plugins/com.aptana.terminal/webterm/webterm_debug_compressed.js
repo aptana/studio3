@@ -480,7 +480,7 @@ e=window.event;
 if(!e||e.metaKey){
 return true;
 }
-if((e.ctrlKey&&!e.altKey)||(e.which==0)||(e.keyCode==16)){
+if((e.ctrlKey&&!e.altKey)||(e.which==0)||(e.keyCode==8)||(e.keyCode==16)){
 }else{
 var _2b;
 if(e.keyCode){
@@ -489,14 +489,10 @@ _2b=e.keyCode;
 if(e.which){
 _2b=e.which;
 }
-if(_2b==8){
-this.addKeys(KeyHandler.BACKSPACE);
-}else{
 if(e.altKey&&!e.ctrlKey){
 this.addKeys(KeyHandler.ESCAPE);
 }
 this.addKeys(String.fromCharCode(_2b));
-}
 }
 return this.stopEvent(e);
 };
