@@ -109,6 +109,11 @@ module Ruble
       @jobj.license_url = license_url.join("\n")
     end
     
+    def register_file_type(file_type, scope, options = {})
+      # TODO Massage scope into a string.
+      @jobj.registerFileType(file_type, scope)
+    end
+    
     def to_env
       { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib") }
     end

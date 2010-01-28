@@ -21,6 +21,11 @@
             file-extensions="log"
             file-names="README,TODO,README_FOR_APP">
       </file-association>
+      <content-type
+            id="com.aptana.editor.text.content-type.generic"
+            name="Generic Content Type"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>

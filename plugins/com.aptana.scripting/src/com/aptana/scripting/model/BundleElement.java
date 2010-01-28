@@ -2,7 +2,13 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
 
 public class BundleElement extends AbstractElement
 {
@@ -22,6 +28,8 @@ public class BundleElement extends AbstractElement
 
 	private Object menuLock = new Object();
 	private Object commandLock = new Object();
+
+	private Map<String, String> _fileTypeRegistry;
 
 	/**
 	 * Bundle
@@ -532,6 +540,34 @@ public class BundleElement extends AbstractElement
 	public void setRepository(String gitRepo)
 	{
 		this._repository = gitRepo;
+	}
+	
+	public void registerfileType(String fileType, String scope)
+	{
+		// TODO Hook up file associations so that filetype gets associated with our generic editor if it's not already associated with an editor!
+		IContentType type = Platform.getContentTypeManager().getContentType("com.aptana.editor.text.content-type.generic"); // TODO Create the generic content type!
+		try
+		{
+			// TODO Check to see if files of this type already have an association!
+			// FIXME We need to determine if it's a filename or extension!
+			type.addFileSpec(fileType, IContentType.FILE_NAME_SPEC);
+			// TODO Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
+			getFileTypeRegistry().put(fileType, scope);
+		}
+		catch (CoreException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
+	public Map<String, String> getFileTypeRegistry()
+	{
+		if (_fileTypeRegistry == null)
+		{
+			_fileTypeRegistry = new HashMap<String, String>();
+		}
+		return _fileTypeRegistry;
 	}
 
 	/**
