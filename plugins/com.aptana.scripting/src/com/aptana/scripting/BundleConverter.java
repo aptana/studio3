@@ -41,9 +41,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
@@ -53,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "Text" };
+		String[] bundleFilter = new String[] { "rspec" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -210,8 +210,13 @@ public class BundleConverter
 				// Not a sub-menu, must be an item
 				String commandName = uuidToName.get(uuid);
 				if (commandName == null)
-					commandName = uuid;
-				buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				{
+					buffer.append("#").append(menuPrefix).append(".command '").append(uuid).append("'\n");
+				}
+				else
+				{
+					buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				}
 			}
 		}
 		return buffer.toString();
