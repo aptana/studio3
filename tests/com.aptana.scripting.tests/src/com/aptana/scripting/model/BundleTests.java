@@ -331,9 +331,9 @@ public class BundleTests extends BundleTestBase
 	}
 	
 	/**
-	 * testNameFromBundleDirectory2
+	 * testNameFromBundleDirectoryWithExtension
 	 */
-	public void testNameFromBundleDirectory2()
+	public void testNameFromBundleDirectoryWithExtension()
 	{
 		// load bundle
 		this.loadBundleEntry("bundleNameWithExtension.ruble", BundleScope.PROJECT);
@@ -344,9 +344,9 @@ public class BundleTests extends BundleTestBase
 	}
 	
 	/**
-	 * testBundleIsBundleDefinition
+	 * testBundleIsBundleDeclaration
 	 */
-	public void testBundleIsBundleDefinition()
+	public void testBundleIsBundleDeclaration()
 	{
 		String bundleName = "bundleDefinition";
 		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
@@ -361,9 +361,9 @@ public class BundleTests extends BundleTestBase
 	}
 	
 	/**
-	 * testBundleIsBundleDefinition2
+	 * testBundleIsBundleDeclaration2
 	 */
-	public void testBundleIsBundleDefinition2()
+	public void testBundleIsBundleDeclaration2()
 	{
 		String bundleName = "bundleDefinition2";
 		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
@@ -391,5 +391,23 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(bundles);
 		assertEquals(1, bundles.length);
 		assertTrue(bundles[0].isReference());
+	}
+	
+	public void testReferenceLoadingAcrossPrecendenceBounds()
+	{
+		this.loadBundleEntry("bundleWithCommand", BundleScope.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundleScope.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundleScope.PROJECT);
+		
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		assertNotNull(entry);
+		
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(3, bundles.length);
+		
+		CommandElement[] commands = entry.getCommands();
+		assertNotNull(commands);
+		assertEquals(3, commands.length);
 	}
 }
