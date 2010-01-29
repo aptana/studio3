@@ -187,30 +187,23 @@ public class BundleEntry
 	 */
 	protected void processBundles(BundleProcessor processor)
 	{
-		BundleScope activeScope = this.getActiveScope();
-		
 		// NOTE: seems like a potentially long lock since we're running the processor
-		// on each instance
+		// on each bundle instance
 		synchronized (this._bundles)
 		{
-			// walk the list of bundles from highest bundle scope precedence to lowest
+			// walk list of bundles in decreasing bundle scope precedence, processing
+			// references before declarations
 			for (int i = this._bundles.size() - 1; i >= 0; i--)
 			{
 				BundleElement bundle = this._bundles.get(i);
 			
-				// we're done processing if we've left the active scope or
-				// if we've processed all bundle references and one non-ref bundle or
-				// our BundleProcessor tells us to stop
+				// we're done processing if we've processed all bundle references and
+				// one bundle declaration OR if our BundleProcessor tells us to stop
 				
 				// NOTE: the order of this conditional is important. We need to run
 				// the processor on the current bundle before we decide to exit when
 				// we hit a non-reference bundle
-				if
-				(
-						bundle.getBundleScope() != activeScope
-					||	processor.processBundle(this, bundle) == false
-					||	bundle.isReference() == false
-				)
+				if (processor.processBundle(this, bundle) == false || bundle.isReference() == false)
 				{
 					break;
 				}
