@@ -47,7 +47,6 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
-import com.aptana.editor.common.actions.ShowScopesAction;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -589,7 +588,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void createActions()
 	{
 		super.createActions();
-		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
 		ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer instanceof ITextViewerExtension)
