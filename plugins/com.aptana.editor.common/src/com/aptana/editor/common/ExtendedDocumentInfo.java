@@ -97,12 +97,16 @@ import com.aptana.scripting.model.BundleManager;
 	 */
 	public QualifiedContentType modify(QualifiedContentType translation)
 	{
+		if (filename == null)
+			return translation;
 		String[] parts = translation.getParts();
 		String scope = BundleManager.getInstance().getScope(filename);
 		if (scope == null)
 		{
 			return translation;
 		}
+		// TODO If scope ends with generic DEFAULT PARTITION, cut that off
+		
 		String[] newParts = new String[parts.length];
 		newParts[0] = scope;
 		System.arraycopy(parts, 1, newParts, 1, parts.length - 1);
