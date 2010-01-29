@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
+import com.aptana.editor.common.CommonDocumentProvider;
 import com.aptana.editor.common.DocumentContentTypeManager;
 
-public class CSSDocumentProvider extends TextFileDocumentProvider {
+public class CSSDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
+	@Override
+	public void connect(Object element) throws CoreException
+	{
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new CSSSourcePartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new CSSSourcePartitionScanner(),
 					CSSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ICSSConstants.CONTENT_TYPE_CSS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, CSSSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().registerConfiguration(document,
+					CSSSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType()
+	{
+		return ICSSConstants.CONTENT_TYPE_CSS;
 	}
 }

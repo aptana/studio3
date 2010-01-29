@@ -364,6 +364,79 @@ public class BundleManager
 		return result;
 	}
 
+	public String getScope(String fileName)
+	{
+		String result = null;
+		String matchedPattern = null;
+
+		List<BundleElement> bundles = getBundles();
+		for (BundleElement bundle : bundles)
+		{
+			Map<String, String> registry = bundle.getFileTypeRegistry();
+			for (Map.Entry<String, String> entry : registry.entrySet())
+			{
+				String pattern = entry.getKey();
+				pattern = pattern.replaceAll("\\.", "\\\\.");
+				pattern = pattern.replaceAll("\\*", "\\.\\+\\?");
+				if (!fileName.matches(pattern))
+					continue;
+				
+				if (result == null)
+				{
+					result = entry.getValue();
+					matchedPattern = pattern;
+					continue;
+				}
+				// Now check to see if this is more specific than the existing match before we set this as our return value
+				// TODO Check for simple case where one is a subset scope of the other, use the more specific one and move on
+				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name
+				int newLength = entry.getValue().split("\\.").length;
+				if (newLength > existingLength)
+				{
+					result = entry.getValue();
+					matchedPattern = pattern;
+				}
+				else if (newLength == existingLength)
+				{
+					// Now we need to check if the file matching pattern is more specific FIXME Just using length is hacky and can be incorrect
+					if (pattern.length() > matchedPattern.length())
+					{
+						result = entry.getValue();
+						matchedPattern = pattern;
+					}
+				}
+			}
+		}
+		// TODO We need to filter down to one, by collapsing things like "source.ruby" and "source.ruby.rails", and when
+		// there's still multiple, using the most specific match!
+		return result;
+	}
+
+	private List<BundleElement> getBundles()
+	{
+		List<BundleElement> bundles = new ArrayList<BundleElement>();
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
+				{
+					List<BundleElement> matchingBundles = entry.getValue();
+					if (matchingBundles != null)
+					{
+						int size = matchingBundles.size();
+
+						if (size > 0)
+						{
+							bundles.add(matchingBundles.get(size - 1));
+						}
+					}
+				}
+			}
+		}
+		return bundles;
+	}
+
 	/**
 	 * getBundles
 	 * 

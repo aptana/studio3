@@ -38,7 +38,6 @@ package com.aptana.editor.common;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 
@@ -46,7 +45,7 @@ import com.aptana.editor.common.text.rules.CompositePartitionScanner;
  * @author Max Stepanov
  *
  */
-public class CompositeDocumentProvider extends TextFileDocumentProvider {
+public class CompositeDocumentProvider extends CommonDocumentProvider {
 
 	private String documentContentType;
 	private IPartitioningConfiguration defaultPartitioningConfiguration;
@@ -90,9 +89,13 @@ public class CompositeDocumentProvider extends TextFileDocumentProvider {
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, documentContentType);
 			DocumentContentTypeManager.getInstance().registerConfigurations(document,
 					new IPartitioningConfiguration[] { defaultPartitioningConfiguration, primaryPartitioningConfiguration });
 		}
+	}
+	
+	protected String getDefaultContentType()
+	{
+		return documentContentType;
 	}
 }

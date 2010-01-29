@@ -542,17 +542,36 @@ public class BundleElement extends AbstractElement
 		this._repository = gitRepo;
 	}
 	
-	public void registerfileType(String fileType, String scope)
+	public void registerFileType(String fileType, String scope)
 	{
-		// TODO Hook up file associations so that filetype gets associated with our generic editor if it's not already associated with an editor!
-		IContentType type = Platform.getContentTypeManager().getContentType("com.aptana.editor.text.content-type.generic"); // TODO Create the generic content type!
+		associateFileType(fileType);
+		associateScope(fileType, scope);
+	}
+	
+	public void associateScope(String filePattern, String scope)
+	{
+		// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
+		getFileTypeRegistry().put(filePattern, scope);
+	}
+	
+	public void associateFileType(String fileType)
+	{
+		// FIXME We need to massage the argument into file name or extension and then create a bogus name when we want to see if there's already a filetype for it!
+		// TODO Check to see if files of this type already have an association!		
+		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star"));
+		if (type != null)
+			return;
+		type = Platform.getContentTypeManager().getContentType("com.aptana.editor.text.content-type.generic"); // TODO Create the generic content type!
 		try
 		{
-			// TODO Check to see if files of this type already have an association!
 			// FIXME We need to determine if it's a filename or extension!
-			type.addFileSpec(fileType, IContentType.FILE_NAME_SPEC);
-			// TODO Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
-			getFileTypeRegistry().put(fileType, scope);
+			int assocType = IContentType.FILE_NAME_SPEC;
+			if (fileType.startsWith("*"))
+			{
+				assocType = IContentType.FILE_EXTENSION_SPEC;
+				fileType = fileType.substring(fileType.indexOf('.') + 1);
+			}
+			type.addFileSpec(fileType, assocType);
 		}
 		catch (CoreException e)
 		{

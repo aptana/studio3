@@ -34,34 +34,13 @@
  */
 package com.aptana.editor.text;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import com.aptana.editor.common.CommonDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
-
-public class TextDocumentProvider extends TextFileDocumentProvider
+public class TextDocumentProvider extends CommonDocumentProvider
 {
 
-	@Override
-	public void connect(Object element) throws CoreException
+	protected String getDefaultContentType()
 	{
-		super.connect(element);
-		
-		if (element instanceof IFileEditorInput)
-		{
-			IFileEditorInput input = (IFileEditorInput) element;
-			IFile file = input.getFile();
-			String fileName = file.getName();
-			// TODO Now we need to do some matching against the filenames/extensions that bundles have registered.
-			IDocument document = getDocument(element);
-			if (document != null)
-			{
-				DocumentContentTypeManager.getInstance()
-						.setDocumentContentType(document, "com.aptana.contenttype.whatever");
-			}
-		}		
+		return "text"; //$NON-NLS-1$
 	}
 }
