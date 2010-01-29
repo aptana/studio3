@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
+import com.aptana.util.StringUtil;
+
 public class BundleElement extends AbstractElement
 {
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
@@ -224,6 +226,31 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getDefaultName
+	 * 
+	 * @return
+	 */
+	protected String getDefaultName()
+	{
+		String path = this.getPath();
+		String result = null;
+
+		if (path != null && path.length() > 0)
+		{
+			File file = new File(path).getParentFile();
+
+			result = file.getName();
+
+			if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
+			{
+				result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getDisplayName
 	 * 
 	 * @return
@@ -234,19 +261,7 @@ public class BundleElement extends AbstractElement
 
 		if (result == null || result.length() == 0)
 		{
-			String path = this.getPath();
-
-			if (path != null && path.length() > 0)
-			{
-				File file = new File(path).getParentFile();
-
-				result = file.getName();
-
-				if (result.endsWith(BUNDLE_DIRECTORY_SUFFIX))
-				{
-					result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
-				}
-			}
+			result = this.getDefaultName();
 		}
 
 		return result;
@@ -393,7 +408,7 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return displayName != null && displayName.length() > 0;
+		return displayName != null && displayName.length() > 0 && StringUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**

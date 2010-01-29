@@ -3,14 +3,28 @@ package com.aptana.scripting.model;
 public interface ElementChangeListener
 {
 	/**
-	 * ElementAdded
+	 * bundleAdded
+	 * 
+	 * @param bundle
+	 */
+	void bundleAdded(BundleElement bundle);
+
+	/**
+	 * bundleDeleted
+	 * 
+	 * @param bundle
+	 */
+	void bundleDeleted(BundleElement bundle);
+
+	/**
+	 * elementAdded
 	 * 
 	 * @param element
 	 */
 	void elementAdded(AbstractElement element);
-	
+
 	/**
-	 * ElementDeleted
+	 * elementDeleted
 	 * 
 	 * @param element
 	 */

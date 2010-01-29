@@ -1,5 +1,3 @@
 require 'ruble'
 
-bundle "loneBundle" do
-  
-end
+bundle
