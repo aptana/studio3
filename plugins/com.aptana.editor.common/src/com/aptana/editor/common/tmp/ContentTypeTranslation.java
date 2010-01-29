@@ -44,30 +44,22 @@ import com.aptana.editor.common.QualifiedContentType;
 
 /**
  * @author Max Stepanov
- *
  */
-public class ContentTypeTranslation {
+public class ContentTypeTranslation
+{
 
 	private static ContentTypeTranslation instance;
-	
+
 	private Map<QualifiedContentType, QualifiedContentType> map = new HashMap<QualifiedContentType, QualifiedContentType>();
-	
+
 	/**
 	 * 
 	 */
-	private ContentTypeTranslation() {
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.js"), new QualifiedContentType("source.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.css"), new QualifiedContentType("source.css")); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html"), new QualifiedContentType("text.html.basic")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html", "com.aptana.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
-						new QualifiedContentType("text.html.basic", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html", "com.aptana.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.basic", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.ruby"), new QualifiedContentType("source.ruby.rails")); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+	private ContentTypeTranslation()
+	{
+		// FIXME Move these translations out into RXML and ERB editor code!
+		addTranslation(
+				new QualifiedContentType("com.aptana.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
@@ -82,56 +74,48 @@ public class ContentTypeTranslation {
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.html.ruby", "source.ruby.rails.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
-		addTranslation(new QualifiedContentType("__html_comment"), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__html_tag"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__html_script"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__html_style"), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		addTranslation(new QualifiedContentType("__css_multiline_comment"), new QualifiedContentType("comment.block.css")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		addTranslation(new QualifiedContentType("__js_string_double"), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__js_string_single"), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__js_regexp"), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__js_singleline_comment"), new QualifiedContentType("comment.line.double-slash.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__js_multiline_comment"), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__js_sdoc"), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		addTranslation(new QualifiedContentType("__rb_string"), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__rb_singleline_comment"), new QualifiedContentType("comment.line.number-sign.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__rb_multiline_comment"), new QualifiedContentType("comment.block.documentation.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("__rb_regular_expression"), new QualifiedContentType("string.regexp.classic.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
+		addTranslation(
+				new QualifiedContentType("com.aptana.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
 				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	
-	public static ContentTypeTranslation getDefault() {
-		if (instance == null) {
+
+	public static ContentTypeTranslation getDefault()
+	{
+		if (instance == null)
+		{
 			instance = new ContentTypeTranslation();
 		}
 		return instance;
 	}
-	
-	public void addTranslation(QualifiedContentType left, QualifiedContentType right) {
+
+	public void addTranslation(QualifiedContentType left, QualifiedContentType right)
+	{
 		map.put(left, right);
 	}
-	
-	public QualifiedContentType translate(QualifiedContentType contentType) {
+
+	public QualifiedContentType translate(QualifiedContentType contentType)
+	{
 		QualifiedContentType i = contentType;
 		QualifiedContentType result;
 		List<String> parts = new ArrayList<String>();
-		while((result = map.get(i)) == null && i.getPartCount() > 0) {
+		// Chop off last portion of scope until we find that the full scope is in our translation map
+		while ((result = map.get(i)) == null && i.getPartCount() > 0)
+		{
 			parts.add(0, i.getLastPart());
 			i = i.supertype();
 		}
-		if (result != null) {
-			for (String part : parts) {
+		if (result != null)
+		{
+			// Remaining scope is in our translation mapping
+			for (String part : parts)
+			{
+				// Now try to translate the chopped off parts
 				QualifiedContentType qtype = new QualifiedContentType(part);
-				if (map.containsKey(qtype)) {
+				if (map.containsKey(qtype))
+				{
 					result = result.subtype(map.get(qtype).getParts());
 				}
 			}
