@@ -2,8 +2,11 @@ package com.aptana.editor.common;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 public class CommonDocumentProvider extends TextFileDocumentProvider
@@ -14,18 +17,28 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 	{
 		super.connect(element);
 
-		// TODO Handle IPathEditorInput or IURI...
-		if (element instanceof IFileEditorInput)
+		IDocument document = getDocument(element);
+		if (document != null)
 		{
-			IFileEditorInput input = (IFileEditorInput) element;
-			IFile file = input.getFile();
-			String fileName = file.getName();
-			// Now we need to do some matching against the filenames/extensions that bundles have registered.
-			IDocument document = getDocument(element);
-			if (document != null)
+			String fileName = null;
+			if (element instanceof IFileEditorInput)
 			{
-				DocumentContentTypeManager.getInstance().setDocumentContentType(document, getDefaultContentType(), fileName);
+				IFileEditorInput input = (IFileEditorInput) element;
+				IFile file = input.getFile();
+				fileName = file.getName();
 			}
+			else if (element instanceof IPathEditorInput)
+			{
+				IPathEditorInput input = (IPathEditorInput) element;
+				fileName = input.getPath().lastSegment();
+			}
+			else if (element instanceof IURIEditorInput)
+			{
+				IURIEditorInput input = (IURIEditorInput) element;
+				fileName = new Path(input.getURI().getPath()).lastSegment();
+			}
+			DocumentContentTypeManager.getInstance()
+					.setDocumentContentType(document, getDefaultContentType(), fileName);
 		}
 	}
 
