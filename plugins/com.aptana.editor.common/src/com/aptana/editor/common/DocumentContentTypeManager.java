@@ -82,6 +82,17 @@ public final class DocumentContentTypeManager
 		infos.put(document, new ExtendedDocumentInfo(defaultContentType, filename));
 	}
 
+	/**
+	 * Another version to use when we are unable to grab the filename. Just returns the typical scope/content type.
+	 * 
+	 * @param document
+	 * @param defaultContentType
+	 */
+	public void setDocumentContentType(IDocument document, String defaultContentType)
+	{
+		setDocumentContentType(document, defaultContentType, null);
+	}
+
 	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations)
 	{
 		for (IPartitioningConfiguration i : configurations)
