@@ -1,5 +1,5 @@
 require 'ruble'
 
-bundle "bundleWithMenu" do
+bundle do
   menu "MyMenu"
 end
