@@ -40,56 +40,96 @@ import java.util.WeakHashMap;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
+
 /**
  * @author Max Stepanov
- *
  */
-public final class DocumentContentTypeManager {
+public final class DocumentContentTypeManager
+{
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
-	
+
 	private static DocumentContentTypeManager instance;
-	
+
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
-	
+
 	/**
 	 * 
 	 */
-	private DocumentContentTypeManager() {
+	private DocumentContentTypeManager()
+	{
 	}
-	
-	public static DocumentContentTypeManager getInstance() {
-		if (instance == null) {
+
+	public static DocumentContentTypeManager getInstance()
+	{
+		if (instance == null)
+		{
 			instance = new DocumentContentTypeManager();
 		}
 		return instance;
 	}
-	
-	public void setDocumentContentType(IDocument document, String documenContentType) {
-		infos.put(document, new ExtendedDocumentInfo(documenContentType));
+
+	/**
+	 * Store the filename for the document so we can dynamically look up the scope later.
+	 * 
+	 * @param document
+	 * @param defaultContentType
+	 * @param filename
+	 */
+	public void setDocumentContentType(IDocument document, String defaultContentType, String filename)
+	{
+		infos.put(document, new ExtendedDocumentInfo(defaultContentType, filename));
 	}
 
-	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations) {
-		for (IPartitioningConfiguration i : configurations) {
+	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations)
+	{
+		for (IPartitioningConfiguration i : configurations)
+		{
 			registerConfiguration(document, i);
 		}
 	}
 
-	public void registerConfiguration(IDocument document, IPartitioningConfiguration configuration) {
+	public void registerConfiguration(IDocument document, IPartitioningConfiguration configuration)
+	{
 		ExtendedDocumentInfo info = infos.get(document);
-		if (info != null) {
-			for (String i : configuration.getContentTypes()) {
+		if (info != null)
+		{
+			// associate raw partition names with top level scope/content type for document
+			for (String i : configuration.getContentTypes())
+			{
 				info.associateContentType(i, configuration.getDocumentContentType(i));
 			}
 		}
 	}
 
-	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException {
+	private QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
+	{
 		ExtendedDocumentInfo info = infos.get(document);
-		if (info != null) {
+		if (info != null)
+		{
 			return info.getContentType(document, offset);
 		}
+		// Return an unknown top level scope, with the raw partition name as sub-scope
 		return UNKNOWN.subtype(document.getContentType(offset));
+	}
+
+	public String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
+	{
+		QualifiedContentType contentType = getContentType(document, offset);
+		if (contentType != null)
+		{
+			// Now we translate our custom top level content types into scopes, and our partition names into scopes as
+			// well.
+			QualifiedContentType translation = ContentTypeTranslation.getDefault().translate(contentType);
+			ExtendedDocumentInfo info = infos.get(document);
+			if (info != null)
+			{
+				translation = info.modify(translation);
+			}
+			return translation.toString();
+		}
+		return document.getContentType(offset);
 	}
 
 }

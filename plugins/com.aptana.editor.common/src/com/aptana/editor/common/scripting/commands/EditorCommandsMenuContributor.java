@@ -140,7 +140,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						abstractThemeableEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
+				contentTypeAtOffset = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, caretOffset);
 			}
 			catch (BadLocationException e)
 			{
@@ -332,15 +332,5 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	public boolean isDynamic()
 	{
 		return true;
-	}
-
-	private static String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
-	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
 	}
 }

@@ -178,13 +178,7 @@ module Ruble
     end
     
     def scope_at_offset(offset)
-      ctype = content_type(offset)
-      
-      if ctype.nil?
-        document.content_type(offset)
-      else
-        com.aptana.editor.common.tmp.ContentTypeTranslation.default.translate(ctype).to_s
-      end
+      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type_at_offset(document, offset)
     end
     
     def caret_column
@@ -197,10 +191,6 @@ module Ruble
     
     def caret_offset
       styled_text.caret_offset
-    end
-    
-    def content_type(offset)
-      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type(document, offset)
     end
     
     def current_line
