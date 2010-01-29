@@ -116,6 +116,9 @@ public final class DocumentContentTypeManager
 
 	public String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
 	{
+		// TODO We still don't append the token to end of scope, which Textmate does. Unfortunately I have no idea how
+		// we'd get that unless we ran a token scanner on the whole partition until we hit the token for our offset, and
+		// even then we need the token name, not the text attribute.
 		QualifiedContentType contentType = getContentType(document, offset);
 		if (contentType != null)
 		{
