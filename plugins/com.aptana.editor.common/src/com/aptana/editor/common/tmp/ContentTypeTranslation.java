@@ -48,38 +48,14 @@ import com.aptana.editor.common.QualifiedContentType;
 public class ContentTypeTranslation
 {
 
+	// TODO Hide the implementation behind an interface, have clients grab singleton from the plugin, rather than
+	// directly on this class!
 	private static ContentTypeTranslation instance;
 
 	private Map<QualifiedContentType, QualifiedContentType> map = new HashMap<QualifiedContentType, QualifiedContentType>();
 
-	/**
-	 * 
-	 */
 	private ContentTypeTranslation()
 	{
-		// FIXME Move these translations out into RXML and ERB editor code!
-		addTranslation(
-				new QualifiedContentType("com.aptana.contenttype.html.erb"), new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.html"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.css"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.js"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.html.erb", "com.aptana.contenttype.ruby"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.html.ruby", "source.ruby.rails.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		addTranslation(
-				new QualifiedContentType("com.aptana.contenttype.xml.erb"), new QualifiedContentType("text.xml.ruby")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_start_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
-		addTranslation(new QualifiedContentType("com.aptana.contenttype.xml.erb", "__common_end_switch_tag"), //$NON-NLS-1$ //$NON-NLS-2$
-				new QualifiedContentType("text.xml.ruby", "source.erb.embedded.xml")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static ContentTypeTranslation getDefault()
@@ -91,6 +67,13 @@ public class ContentTypeTranslation
 		return instance;
 	}
 
+	/**
+	 * Allows plugins to contribute a scope translation. This is used to give different scope names to various
+	 * partitions based on their nesting within other languages.
+	 * 
+	 * @param left
+	 * @param right
+	 */
 	public void addTranslation(QualifiedContentType left, QualifiedContentType right)
 	{
 		map.put(left, right);

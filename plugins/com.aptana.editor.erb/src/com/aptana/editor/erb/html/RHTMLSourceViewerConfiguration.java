@@ -40,39 +40,76 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
+import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.editor.erb.IERBConstants;
 import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.html.IHTMLConstants;
+import com.aptana.editor.js.IJSConstants;
+import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
  * @author Max Stepanov
- *
  */
-public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration {
+public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration
+{
 
-    protected RHTMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-        super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(),
-                preferences, editor);
-    }
+	// FIXME Move these special strings out as constants on IERBConstants!
+	static
+	{
+		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB), new QualifiedContentType(
+				"text.html.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB,
+				CompositePartitionScanner.START_SWITCH_TAG), new QualifiedContentType(
+				"text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB,
+				CompositePartitionScanner.END_SWITCH_TAG), new QualifiedContentType(
+				"text.html.ruby", "source.erb.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 
-	/* (non-Javadoc)
+		c.addTranslation(
+				new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB, IHTMLConstants.CONTENT_TYPE_HTML),
+				new QualifiedContentType("text.html.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB, ICSSConstants.CONTENT_TYPE_CSS),
+				new QualifiedContentType("text.html.ruby", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB, IJSConstants.CONTENT_TYPE_JS),
+				new QualifiedContentType("text.html.ruby", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(
+				new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB, IRubyConstants.CONTENT_TYPE_RUBY),
+				new QualifiedContentType("text.html.ruby", "source.ruby.rails.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	protected RHTMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(HTMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(), preferences, editor);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()
 	 */
 	@Override
-	protected String getTopContentType() {
+	protected String getTopContentType()
+	{
 		return IERBConstants.CONTENT_TYPE_HTML_ERB;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getLanguageSpecification()
 	 */
 	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
-		return ERBPartitionerSwitchStrategy.getDafault();
+	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy()
+	{
+		return ERBPartitionerSwitchStrategy.getDefault();
 	}
-	
-	protected String getStartEndTokenType() {
+
+	protected String getStartEndTokenType()
+	{
 		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
 	}
 }
