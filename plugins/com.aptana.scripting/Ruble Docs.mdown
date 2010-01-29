@@ -23,7 +23,7 @@ The Ruble runtime includes a <code>ruble.rb</code> file that defines a DSL that 
 
 ## Bundles
 
-Bundles are the top-level distribution format for Ruble extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle director ends with <code>.ruble</code> suffix but this is not required.
+Bundles are the top-level distribution format for Ruble extensions. A bundle directory must contain a <code>bundle.rb</code> at the top level. The <code>bundle.rb</code> file defines the metadata for the bundle and its menu(s). By convention, the name of a bundle directory ends with <code>.ruble</code> suffix but this is not required.
 
 In addition to the <code>bundle.rb</code> file, there are three top-level directories within a bundle that are treated specially:
 
@@ -56,39 +56,88 @@ When a bundle is defined in multiple places, only the bundle code defined in the
 
 Other implementations are free to keep bundles in whatever locations on disk they desire, but if an implementation does support multiple locations for bundles, it should also use the priority system for determining which bundles are active.
 
-### Extending Bundles From Other Bundles
+### Redefining, Overriding, and Extending Bundles
 
-It is possible for a bundle to override or extend another bundle's functionality. This is quite handy when you want to add a command or two to the menu of the existing bundle without having to maintain your own clone of a bundle repository.
+It is possible for a bundle directory and its members to redefine, override or extend another bundle directory's functionality. This is quite handy when you want to add a command or two to the menu of the existing bundle without having to maintain your own clone of a bundle repository.
 
-*FIXME: this example is wrong. according to the priority scheme mentioned above, the user bundle should not be active AT ALL in this particular case, since both bundles have the same name. What we need is an example of a bundle like the Rails bundle adding commands and menu items to the Ruby bundle.*
+Before we can discuss these mechanisms, we need to get some terminology out of the way. Below is a list of terms you may encounter when talking about bundles and how they are defined.
 
-#### Example
+* Bundle Directory - A directory containing a top-level <code>bundle.rb</code> file and optionally other <code>.rb</code> files defining commands, menus, and snippets as discussed in the _Bundles_ section.
+* Bundle Name - The name of a bundle derived from its bundle directory name. If the directory name ends with .ruble, the bundle name is the directory name with that suffix removed; otherwise, the bundle name is simply the directory name itself.
+* Bundle Reference - When defining a bundle in a <code>bundle.rb</code> file, it is possible to include a name. This name refers to an existing bundle and is used as a mechanism to extend and override a bundle of equal or lower precedence.
+* Bundle Elements - A generic term for any item contained by a bundle: for example, commands, snippets, and menus.
+* Bundle Definition - A bundle instance created by the bundle method. This is a general term used when discussing bundle instances.
+* Active Bundle - This is the resulting bundle after all precedence and reference rules have been applied.
 
-    # $USER_DOCUMENT_DIRECTORY/RadRails Bundles/MyBundle/bundle.rb
-    bundle "MyBundle" do |b|
-      command "A" do |cmd|
-        # ...
-      end
+#### A Minimal Bundle
 
-      command "B" do |cmd|
-        # ...
-      end
+In it's simplest form, a bundle can be defined as follows:
+
+    # $APPLICATION_DIRECTORY/bundles/FunBundle/bundle.rb
+    require 'ruble'
+    bundle
+
+Of course, this bundle is not of much use, but it is important to understand what this minimal example does. We see that the bundle directory is contained within the application bundles directory; therefore, this bundle has the lowest precedence as defined in _Bundle Loading_. Interpreting this will become clearer shortly. We also know that since the name of the bundle is derived from its bundle directory, the bundle's name is "FunBundle".
+
+#### Redefining a Bundle
+
+In this next example, we flesh out our bundle with a little skeleton content as well as define a like-named bundle directory at a higher precedence.
+
+    # $APPLICATION_DIRECTORY/bundles/FunBundle/bundle.rb
+    require 'ruble'
+    bundle do |b|
+        command "A" { |cmd| ... }
     end
 
-    # $PROJECT_DIRECTORY/bundles/MyBundle/bundle.rb
-    bundle "MyBundle" do |b|
-      command "A" do |cmd|
-        # ...
-      end
-
-      command "C" do |cmd|
-        # ...
-      end
+    # $USER_DOCUMENT_DIRECTORY/bundles/FunBundle/bundle.rb
+    require 'ruble'
+    bundle do |b|
+        command "B" { |cmd| ... }
     end
 
-This example shows two separate bundle directories. The first bundle.rb file defines a bundle named "MyBundle" in the user's bundles directory. The second bundle.rb file defines a bundle of the same name within a project's bundles directory.
+We've added an "A" command to our application bundle. We've also defined a bundle with the same name, but this time within the user bundles directory. The user bundles directory has a higher precedence than the application bundles directory. This means that our active FunBundle bundle will contain the "B" command only.
 
-Bundle names are globally unique. This means that both files are referencing the same bundle. Since the user bundle is loaded first, the "MyBundle" bundle will contain two commands: A and B. Next, the project bundle will be loaded. It also defines an "A" command, so its definition will replace the user bundle's definition. The "B" command will remain and the "C" command will be added. As a result, "MyBundle" will consist of three commands: A, B, and C where A is the instance defined in the project bundle.
+When two bundle directories have the same name, the bundle directory with higher precedence completely obscures the content of the lower precedence bundle directory. This can come in handy, for example, if you need to alter an application bundle. You can simply git clone the bundle into your user bundles directory and make your changes there. Since each bundle directory will have the same name, your user version will hide the default bundle implementation.
+
+#### Extending a Bundle
+
+In another scenario, you may be perfectly happy with the content of the application bundle, but you need to add another command to it.
+
+    # $APPLICATION_DIRECTORY/bundles/FunBundle/bundle.rb
+    require 'ruble'
+    bundle do |b|
+        command "A" { |cmd| ... }
+    end
+
+    # $USER_DOCUMENT_DIRECTORY/bundles/FunBundleExtension/bundle.rb
+    require 'ruble'
+    bundle "FunBundle" do |b|
+        command "B" { |cmd| ... }
+    end
+
+This looks almost identical to the previous example; however, it has two very important differences. The first difference you may notice is that the bundle method now takes a string. This string changes this user bundle instance into a bundle reference.
+
+A bundle reference applies its content to a bundle definition of equal or lower precedence and the bundle it modifies is located by the bundle method's string argument, or said another way, the bundle it modifies is located by name. Applying these rules, our active "FunBundle" bundle now contains the two commands "A" and "B". Note that additional bundle references may also augment the "FunBundle" bundle. You are not limited to a single bundle reference.
+
+The second difference is that we've changed the bundle directory name to "FunBundleExtension". The importance of this is a bit tricky to explain. As mentioned earlier, when we use the bundle method without a string argument, the bundle instance's name is derived from the bundle directory name. Bundle's that have names that match their bundle directory's name have special functionality. As seen earlier, that functionality is to completely obscure like-named bundles of lower precedence. If we had not renamed our user bundle's directory, the bundle string argument would have matched the default name of "FunBundle". That would have made this example behave the same as our _Redefining a Bundle_ example.
+
+#### Overriding a Bundle Element
+
+In our last scenario, perhaps you find that you are happy with the content of the application "FunBundle" bundle, but you want to change the behavior of one command. The following shows how you would go about that.
+
+    # $APPLICATION_DIRECTORY/bundles/FunBundle/bundle.rb
+    require 'ruble'
+    bundle do |b|
+        command "A" { |cmd| ... }
+    end
+
+    # $USER_DOCUMENT_DIRECTORY/bundles/MyFunBundleExtension/bundle.rb
+    require 'ruble'
+    bundle "FunBundle" do |b|
+        command "A" { |cmd| ... }
+    end
+
+As you can see, we use the same mechanism we used to extend a bundle; however, this time since we are using the same name of a command that was defined in our target bundle, our active bundle only contains an "A" command and that is the command that is defined in the user bundles directory.
 
 ## Scopes
 
