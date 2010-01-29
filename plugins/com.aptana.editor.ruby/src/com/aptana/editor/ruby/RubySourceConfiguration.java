@@ -51,9 +51,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * @author Max Stepanov
@@ -92,6 +94,24 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	private RuleBasedScanner stringScanner;
 
 	private static RubySourceConfiguration instance;
+
+	static
+	{
+		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		c.addTranslation(new QualifiedContentType(IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(
+				"source.ruby.rails")); //$NON-NLS-1$ // FIXME Should just be source.ruby! Rails bundle should contribute the more specific scope
+		// FIXME Differentiate between single and double quoted strings!
+		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(SINGLE_LINE_COMMENT), new QualifiedContentType(
+				"comment.line.number-sign.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(MULTI_LINE_COMMENT), new QualifiedContentType(
+				"comment.block.documentation.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+				"string.regexp.classic.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
+				"string.interpolated.ruby")); //$NON-NLS-1$
+
+	}
 
 	public static RubySourceConfiguration getDefault()
 	{
