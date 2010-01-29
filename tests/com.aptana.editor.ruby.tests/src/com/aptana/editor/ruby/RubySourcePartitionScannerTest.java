@@ -11,10 +11,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.rules.IToken;
 
-import com.aptana.editor.ruby.MergingPartitionScanner;
-import com.aptana.editor.ruby.RubySourceConfiguration;
-import com.aptana.editor.ruby.RubySourcePartitionScanner;
-
 /**
  * @author Chris
  */
@@ -178,11 +174,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCommentAtEndOfLineWithStringAtBeginning()
 	{
-		String code = "hash = {\n" + 
-		"  \"string\" => { # comment\n" + 
-		"    123\n" + 
-		"  }\n" + 
-		"}";
+		String code = "hash = {\n" + "  \"string\" => { # comment\n" + "    123\n" + "  }\n" + "}";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 4);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 6);
@@ -199,11 +191,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testLinesWithJustSpaceBeforeComment()
 	{
-		String code = "  \n" + 
-		"  # comment\n" + 
-		"  def method\n" + 
-		"    \n" + 
-		"  end";
+		String code = "  \n" + "  # comment\n" + "  def method\n" + "    \n" + "  end";
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 5);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 17);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 20);
@@ -211,9 +199,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCommentsWithAlotOfPrecedingSpaces()
 	{
-		String code = "                # We \n" + 
-		"                # caller-requested until.\n" + 
-		"return self\n";
+		String code = "                # We \n" + "                # caller-requested until.\n" + "return self\n";
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, code, 16);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 64);
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 70);
@@ -389,19 +375,16 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testBraceFinderHandlesWeirdGlobal()
 	{
-		RubySourcePartitionScanner.EndBraceFinder finder = new RubySourcePartitionScanner.EndBraceFinder("$'}|\"\npp $~");
+		RubySourcePartitionScanner.EndBraceFinder finder = new RubySourcePartitionScanner.EndBraceFinder(
+				"$'}|\"\npp $~");
 		assertEquals(2, finder.find());
 	}
 
 	public void testNestedHeredocs()
 	{
 		String code = "methods += <<-BEGIN + nn_element_def(element) + <<-END\n"
-				+ "  def #{element.downcase}(attributes = {})\n" + 
-				"BEGIN\n" + 
-				"  end\n" + 
-				"END\n" + 
-				"\n" +
-				"puts :symbol\n";
+				+ "  def #{element.downcase}(attributes = {})\n" + "BEGIN\n" + "  end\n" + "END\n" + "\n"
+				+ "puts :symbol\n";
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 1);
 		// _<_<-BEGIN
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 11);
@@ -413,12 +396,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 62); // #'{'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 63); // #{'e'lem
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 79); // case'}'
-		
+
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 80); // }'('att
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 96); // )
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 102); // BEGI'N'
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 108); // en'd'
-		
+
 		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 112); // EN'D'
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 115); // 'p'uts
 		assertContentType(RubySourceConfiguration.DEFAULT, code, 120); // ':'sym
@@ -484,7 +467,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
 		}
 	}
-	
+
 	public void testLargeQString()
 	{
 		String code = "%Q(string)";
@@ -493,7 +476,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
 		}
 	}
-	
+
 	public void testPercentXCommand2()
 	{
 		String code = "%x(command)";
@@ -502,7 +485,16 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.COMMAND, code, i);
 		}
 	}
-	
+
+	public void testPercentSyntax()
+	{
+		String code = "%(unknown)";
+		for (int i = 0; i < code.length(); i++)
+		{
+			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
+		}
+	}
+
 	public void testPercentSSymbol()
 	{
 		String code = "%s(symbol)";
@@ -514,7 +506,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
 		}
 	}
-	
+
 	public void testSmallWString()
 	{
 		String code = "%w(string two)";
@@ -523,7 +515,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.STRING_SINGLE, code, i);
 		}
 	}
-	
+
 	public void testLargeWString()
 	{
 		String code = "%W(string two)";
@@ -532,7 +524,18 @@ public class RubySourcePartitionScannerTest extends TestCase
 			assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, i);
 		}
 	}
+
+	public void testSingleQuotedHeredoc()
+	{
+		String code = "heredoc =<<'END'\n  hello world!\nEND\n";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 8);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 9);
+		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 32);
+	}
 	
+	// TODO Write tests for nested heredocs and heredocs in middle of line with the heredoc being single-quoted (or mixture)
+
 	public void testROR975()
 	{
 		String code = "exist_sym = :\"#{row['PROVVPI']}.#{row['vpi']}.#{row['vci']}.#{row['seq_num']}\"";
@@ -652,28 +655,13 @@ public class RubySourcePartitionScannerTest extends TestCase
 
 	public void testCGI()
 	{
-		String src = "module TagMaker # :nodoc:\n" + 
-		"		\n" + 
-		"    # Generate code for an element with required start and end tags.\n" + 
-		"    #\n" +
-		"    #   - -\n" + 
-		"    def nn_element_def(element)\n" + 
-		"      nOE_element_def(element, <<-END)\n" +
-		"          if block_given?\n" + 
-		"            yield.to_s\n" + 
-		"          else\n" +
-		"            \"\"\n" + 
-		"          end +\n" + 
-		"          \"</#{element.upcase}>\"\n" + 
-		"      END\n" +
-		"    end\n" + 
-		"    \n" + 
-		"    # Generate code for an empty element.\n" + 
-		"    #\n" +
-		"    #   - O EMPTY\n" + 
-		"    def nOE_element_def(element, append = nil)\n" + 
-		"   end\n" + 
-		"end";
+		String src = "module TagMaker # :nodoc:\n" + "		\n"
+				+ "    # Generate code for an element with required start and end tags.\n" + "    #\n"
+				+ "    #   - -\n" + "    def nn_element_def(element)\n" + "      nOE_element_def(element, <<-END)\n"
+				+ "          if block_given?\n" + "            yield.to_s\n" + "          else\n"
+				+ "            \"\"\n" + "          end +\n" + "          \"</#{element.upcase}>\"\n" + "      END\n"
+				+ "    end\n" + "    \n" + "    # Generate code for an empty element.\n" + "    #\n"
+				+ "    #   - O EMPTY\n" + "    def nOE_element_def(element, append = nil)\n" + "   end\n" + "end";
 		// module TagMaker # :nodoc:
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 0); // m
 		assertContentType(RubySourceConfiguration.SINGLE_LINE_COMMENT, src, 16); // #
@@ -697,7 +685,7 @@ public class RubySourcePartitionScannerTest extends TestCase
 		// end
 		assertContentType(RubySourceConfiguration.DEFAULT, src, 329); // e
 	}
-	
+
 	public void testBlockComment()
 	{
 		String code = "=begin\n=end";

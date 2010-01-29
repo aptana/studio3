@@ -400,7 +400,6 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			String marker = new String(opening.substring(0, index).trim());
 			fOpeningString = generateOpeningStringForHeredocMarker(marker);
 		}
-		// TODO Need to determine single or double quoted by looking at heredoc marker!
 		fContentType = RubySourceConfiguration.STRING_DOUBLE;
 	}
 
@@ -411,7 +410,6 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private void addHereDocStartToken(int index)
 	{
-		// TODO Need to determine single or double quoted by looking at heredoc marker!
 		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), fOffset, index));
 	}
 
@@ -533,7 +531,6 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		generateHackedSource(heredocMarker);
 
 		// Add a token for the heredoc string we just ate up!
-		// TODO Need to determine single or double quoted by looking at heredoc marker!
 		fContentType = RubySourceConfiguration.STRING_DOUBLE;
 		int afterHeredoc = fOffset + heredocMarker.length();
 		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), afterHeredoc, getAdjustedOffset()
@@ -626,7 +623,11 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				else if (fOpeningString.startsWith(HEREDOC_MARKER_PREFIX))
 				{ // here-doc
 					fOpeningString = generateOpeningStringForHeredocMarker(fOpeningString);
-					// FIXME Need to look at heredoc marker to determine if we're in single or double quoted string!
+					if (fOpeningString.startsWith("'")) //$NON-NLS-1$
+					{
+						inSingleQuote = true;
+						fContentType = RubySourceConfiguration.STRING_SINGLE;
+					}
 				}
 				return new Token(fContentType);
 			case Tokens.tXSTRING_BEG:
@@ -646,7 +647,12 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tSTRING_END:
 				// If we're ending a heredoc, make sure we're not nested and ending one of the earlier ones!
 				if (insideHeredoc() && !reachedEndOfHeredoc())
-					return new Token(RubySourceConfiguration.STRING_DOUBLE);
+				{
+					String contentTypeToReturn = RubySourceConfiguration.STRING_DOUBLE;
+					if (fOpeningString.startsWith("'")) //$NON-NLS-1$
+						contentTypeToReturn = RubySourceConfiguration.STRING_SINGLE;
+					return new Token(contentTypeToReturn);
+				}
 
 				String oldContentType = fContentType;
 				fContentType = RubySourceConfiguration.DEFAULT;
