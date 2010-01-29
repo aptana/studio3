@@ -50,10 +50,12 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
+import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
@@ -94,6 +96,26 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private RuleBasedScanner cdataScanner;
 
 	private static HTMLSourceConfiguration instance;
+
+	static
+	{
+		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		// Top-level HTML
+		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML), new QualifiedContentType(
+				"text.html.basic")); //$NON-NLS-1$
+		// Embedded CSS and JS
+		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML, ICSSConstants.CONTENT_TYPE_CSS),
+				new QualifiedContentType("text.html.basic", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML, IJSConstants.CONTENT_TYPE_JS),
+				new QualifiedContentType("text.html.basic", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		// Partitions
+		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_SCRIPT), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_STYLE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType("string.unquoted.cdata.xml")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType("meta.tag.sgml.doctype")); //$NON-NLS-1$
+	}
 
 	public static HTMLSourceConfiguration getDefault()
 	{
