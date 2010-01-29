@@ -342,4 +342,54 @@ public class BundleTests extends BundleTestBase
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");
 		assertNotNull(entry);
 	}
+	
+	/**
+	 * testBundleIsBundleDefinition
+	 */
+	public void testBundleIsBundleDefinition()
+	{
+		String bundleName = "bundleDefinition";
+		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		assertNotNull(entry);
+		
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(1, bundles.length);
+		assertFalse(bundles[0].isReference());
+	}
+	
+	/**
+	 * testBundleIsBundleDefinition2
+	 */
+	public void testBundleIsBundleDefinition2()
+	{
+		String bundleName = "bundleDefinition2";
+		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		assertNotNull(entry);
+		
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(1, bundles.length);
+		assertFalse(bundles[0].isReference());
+	}
+	
+	/**
+	 * testBundleIsBundleReference
+	 */
+	public void testBundleIsBundleReference()
+	{
+		this.loadBundleEntry("bundleReference", BundleScope.PROJECT);
+		
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("MyBundle");
+		assertNotNull(entry);
+		
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(1, bundles.length);
+		assertTrue(bundles[0].isReference());
+	}
 }
