@@ -56,7 +56,7 @@ public class BundleEntry
 							}
 							else
 							{
-								result = (o1.isReference()) ? -1 : 1;
+								result = (o1.isReference()) ? 1 : -1;
 							}
 						}
 						
@@ -66,7 +66,7 @@ public class BundleEntry
 			}
 		}
 	}
-	
+
 	/**
 	 * getActiveScope
 	 * 
@@ -105,7 +105,7 @@ public class BundleEntry
 		
 		return result;
 	}
-
+	
 	/**
 	 * getCommands
 	 * 
@@ -169,7 +169,7 @@ public class BundleEntry
 		
 		return result.toArray(new MenuElement[result.size()]);
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -200,9 +200,11 @@ public class BundleEntry
 			
 				// we're done processing if we've left the active scope or
 				// if we've processed all bundle references and one non-ref bundle or
-				// out BundleProcessor tells us to stop
+				// our BundleProcessor tells us to stop
 				
-				// NOTE: the order of this conditional is important
+				// NOTE: the order of this conditional is important. We need to run
+				// the processor on the current bundle before we decide to exit when
+				// we hit a non-reference bundle
 				if
 				(
 						bundle.getBundleScope() != activeScope
@@ -231,5 +233,22 @@ public class BundleEntry
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * size
+	 * 
+	 * @return
+	 */
+	public int size()
+	{
+		int size = 0;
+		
+		if (this._bundles != null)
+		{
+			size = this._bundles.size();
+		}
+		
+		return size;
 	}
 }
