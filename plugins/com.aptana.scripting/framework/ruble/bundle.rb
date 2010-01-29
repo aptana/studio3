@@ -110,8 +110,7 @@ module Ruble
     end
     
     def register_file_type(file_type, scope, options = {})
-      # TODO Massage scope into a string.
-      @jobj.registerFileType(file_type, scope)
+      @jobj.registerFileType(file_type, scope.to_s.gsub(/_/, '.'))
     end
     
     def to_env
