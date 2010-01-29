@@ -183,6 +183,8 @@ public class BundleManager
 					entry.addBundle(bundle);
 				}
 			}
+			
+			this.fireBundleAddedEvent(bundle);
 		}
 	}
 
@@ -221,7 +223,39 @@ public class BundleManager
 			this._loadCycleListeners.add(listener);
 		}
 	}
+	
+	/**
+	 * fireBundleAddedEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleAddedEvent(BundleElement bundle)
+	{
+		if (this._elementListeners != null && bundle != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.bundleAdded(bundle);
+			}
+		}
+	}
 
+	/**
+	 * fireBundleDeletedEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleDeletedEvent(BundleElement bundle)
+	{
+		if (this._elementListeners != null && bundle != null)
+		{
+			for (ElementChangeListener listener : this._elementListeners)
+			{
+				listener.bundleDeleted(bundle);
+			}
+		}
+	}
+	
 	/**
 	 * fireElementAddedEvent
 	 * 
@@ -994,6 +1028,49 @@ public class BundleManager
 		}
 	}
 
+	private void removeBundle(BundleElement bundle)
+	{
+		if (bundle != null)
+		{
+			File bundleFile = bundle.getBundleDirectory();
+			String name = bundle.getDisplayName();
+			
+			synchronized (bundlePathsLock)
+			{
+				if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
+				{
+					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
+					
+					bundles.remove(bundle);
+					
+					if (bundles.size() == 0)
+					{
+						this._bundlesByPath.remove(bundleFile);
+					}
+				}
+			}
+			
+			synchronized (entryNamesLock)
+			{
+				if (this._entriesByName != null && this._entriesByName.containsKey(name))
+				{
+					BundleEntry entry = this._entriesByName.get(name);
+					
+					entry.removeBundle(bundle);
+					
+					if (entry.size() == 0)
+					{
+						this._entriesByName.remove(name);
+					}
+				}
+			}
+			
+			AbstractElement.unregisterElement(bundle);
+			
+			this.fireBundleDeletedEvent(bundle);
+		}
+	}
+	
 	/**
 	 * removeElementChangeListener
 	 * 
@@ -1097,7 +1174,7 @@ public class BundleManager
 
 					if (bundle.isEmpty())
 					{
-						AbstractElement.unregisterElement(bundle);
+						this.removeBundle(bundle);
 					}
 				}
 			}
