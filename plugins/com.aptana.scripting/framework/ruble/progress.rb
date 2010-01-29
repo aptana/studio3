@@ -23,4 +23,14 @@ module Ruble
     job.schedule
     job.join
   end
+  
+  def Ruble.run(title, &blk)
+#    if in_ui_thread?
+      blk.call(org.eclipse.core.runtime.NullProgressMonitor.new)
+#    else
+#      job = Ruble::Job.new(title, &blk)
+#      job.schedule
+#      job.join
+#    end
+  end
 end

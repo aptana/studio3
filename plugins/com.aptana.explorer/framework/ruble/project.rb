@@ -1,4 +1,3 @@
-require "java"
 require 'ruble/progress'
 
 module Ruble
@@ -25,10 +24,11 @@ module Ruble
       def create(name, options = {})
         return_proj = find(name)
         return return_proj if return_proj.exists?
-        # FIXME Allow setting a non-standard location or default set of nature Ids using the options hash!
-        job = Ruble::Job.new("Create project") {|monitor| find(name).project.create(monitor) }
-        job.schedule
-        job.join
+        # FIXME Allow setting a default set of nature IDs using the options hash!
+        workspace = org.eclipse.core.resources.ResourcesPlugin.workspace
+        description = workspace.newProjectDescription(return_proj.name)
+        description.location = org.eclipse.core.runtime.Path.new(options[:location].to_s) if options[:location]
+        Ruble.run("Create project") {|monitor| find(name).project.create(description, monitor) }
         return_proj
       end
       
@@ -66,14 +66,12 @@ module Ruble
     # Add a new nature to the project. +nature_id+ is a String 
     def add_nature(nature_id)
       return unless project.exists?
-      job = Ruble::Job.new("Add Nature to project") do |monitor| 
+      Ruble.run("Add Nature to project") do |monitor| 
         description = project.description
         new_natures = natures + [nature_id]
         description.nature_ids = new_natures.to_java(:string)
         project.setDescription(description, monitor)
       end
-      job.schedule
-      job.join 
     end
     
     # Query to see if a project has a particular nature
@@ -97,9 +95,7 @@ module Ruble
     
     def open
       return if is_open?
-      job = Ruble::Job.new("Open project") {|monitor| project.open(monitor) }
-      job.schedule
-      job.join
+      Ruble.run("Open project") {|monitor| project.open(monitor) }
     end
     
     def is_closed?
@@ -109,17 +105,13 @@ module Ruble
     # Close the project
     def close
       return if is_closed?
-      job = Ruble::Job.new("Close project") {|monitor| project.close(monitor) }
-      job.schedule
-      job.join
+      Ruble.run("Close project") {|monitor| project.close(monitor) }
     end
     
     # Delete the project
     def delete
       return if !exists?
-      job = Ruble::Job.new("Delete project") {|monitor| project.delete(true, true, monitor) }
-      job.schedule
-      job.join
+      Ruble.run("Delete project") {|monitor| project.delete(true, true, monitor) }
     end
     
     # Make the project the current/active one highlighted by the App Explorer
@@ -157,9 +149,7 @@ class Dir
   # Forces a refresh of the project. Pass in true to force only a shallow refresh of the project and direct members
   def refresh(shallow = false)
     depth = shallow ? org.eclipse.core.resources.IResource::DEPTH_ONE : org.eclipse.core.resources.IResource::DEPTH_INFINITE
-    job = Ruble::Job.new("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
-    job.schedule
-    job.join
+    Ruble.run("Refresh Directory") {|monitor| resource.refresh_local(depth, monitor) }
   end
   
   # Grabs the IResource (IContainer) that Eclipse uses that we then operate on
@@ -180,9 +170,7 @@ class File
   def refresh
     return if resource.nil?
     depth = org.eclipse.core.resources.IResource::DEPTH_ZERO
-    job = Ruble::Job.new("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
-    job.schedule
-    job.join
+    Ruble.run("Refresh File") {|monitor| resource.refresh_local(depth, monitor) }
   end
   
   # Grabs the IResource (IFile) that Eclipse uses that we then operate on
