@@ -81,10 +81,6 @@ module Ruble
       @jobj.display_name
     end
     
-    def name=(name)
-      @jobj.display_name = name
-    end
-    
     def repository
       @jobj.repository
     end
@@ -122,7 +118,7 @@ module Ruble
     end
     
     class << self
-      def define_bundle(name, values, &block)
+      def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
         
         # create new bundle and add to bundle manager so the block, if given
@@ -144,7 +140,7 @@ end
 
 # define top-level convenience methods
 
-def bundle(name, &block)
+def bundle(name="", &block)
   Ruble::Bundle.define_bundle(name, {}, &block)
 end
 
@@ -157,13 +153,5 @@ def with_defaults(values, &block)
     bundle.defaults = values
     block.call(bundle) if block_given?
     bundle.defaults = {}
-  end
-end
-
-module Ruble
-  class << self
-    def current_bundle(&block)
-      with_defaults({}, &block)
-    end
   end
 end
