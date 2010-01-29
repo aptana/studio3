@@ -1,5 +1,5 @@
 require 'ruble'
 
-Ruble.current_bundle do |bundle|
+bundle do |bundle|
 
 end
