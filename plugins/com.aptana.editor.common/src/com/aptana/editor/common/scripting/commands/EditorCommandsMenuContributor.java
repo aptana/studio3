@@ -39,6 +39,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.model.ScopeContainsFilter;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.util.CollectionsUtil;
@@ -150,16 +151,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			// First pull all possible menus from the current caret position's scopes
 			if (contentTypeAtOffset != null)
 			{
-				String[] splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-				for (int i = 0; i < splitContentTypesAtOffset.length; i++)
+				ScopeContainsFilter filter = new ScopeContainsFilter(contentTypeAtOffset);
+				menusFromScope = BundleManager.getInstance().getMenus(filter);
+				if (menusFromScope.length > 0)
 				{
-					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
-					if (menusFromScope.length > 0)
-					{
-						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
-						break;
-					}
+					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 				}
 			}
 
@@ -319,7 +315,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				// 2. The command did not specify the scope
 				// 3. The command specified the scope and it matches the current scope
 				menuItem.setEnabled(command == null || command.getScope() == null
-						|| command.getScopeSelector().matches(contentTypeAtOffset));
+						|| command.getScopeSelector().matches(ScopeSelector.splitScope(contentTypeAtOffset)));
 			}
 		}
 	}
