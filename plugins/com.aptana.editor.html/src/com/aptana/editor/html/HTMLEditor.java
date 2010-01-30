@@ -34,7 +34,14 @@
  */
 package com.aptana.editor.html;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
+import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
+import com.aptana.editor.html.parsing.HTMLParserFactory;
+import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
@@ -49,6 +56,8 @@ public class HTMLEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
+
+		getFileService().setParser(HTMLParserFactory.getInstance().getParser());
 	}
 
 	/**
@@ -60,5 +69,21 @@ public class HTMLEditor extends AbstractThemeableEditor
 	protected char[] getPairMatchingCharacters()
 	{
 		return HTML_PAIR_MATCHING_CHARS;
+	}
+
+	@Override
+	protected CommonOutlinePage getOutlinePage()
+	{
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new HTMLOutlineContentProvider());
+		outline.setLabelProvider(new HTMLOutlineLabelProvider());
+
+		return outline;
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return Activator.getDefault().getPreferenceStore();
 	}
 }

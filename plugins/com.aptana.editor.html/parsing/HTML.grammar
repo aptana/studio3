@@ -1,0 +1,29 @@
+%package "com.aptana.editor.html.parsing";
+%class "HTMLParser";
+%import "com.aptana.editor.html.parsing.ast.*";
+%import "com.aptana.parsing.ast.ParseRootNode";
+
+%terminals START_TAG, END_TAG, SELF_CLOSING, TEXT;
+
+%typeof START_TAG, END_TAG, SELF_CLOSING, TEXT = "String";
+%typeof Statement = "HTMLElementNode";
+
+%goal Program;
+
+Program
+	=	Statements.p {:return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	;
+
+Statements
+	=	Statements Statement
+	|	Statement
+	;
+
+Statement
+	=	START_TAG.t Statements.s {:return new HTMLElementNode(t, s, _symbol_t.getStart(), s[s.length - 1].getEnd());:}
+	|	START_TAG.t Statements.s END_TAG.e {:return new HTMLElementNode(t, s, _symbol_t.getStart(), _symbol_e.getEnd());:}
+	|	START_TAG.t END_TAG.e {:return new HTMLElementNode(t, _symbol_t.getStart(), _symbol_e.getEnd());:}
+	|	SELF_CLOSING.s {:return new HTMLElementNode(s, _symbol_s.getStart(), _symbol_s.getEnd());:}
+	|	TEXT.t {:return new HTMLElementNode("", _symbol_t.getStart(), _symbol_t.getEnd());:}
+	|	error
+	;
