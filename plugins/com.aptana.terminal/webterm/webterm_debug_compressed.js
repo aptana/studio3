@@ -43,6 +43,9 @@ return ch!==null&&ch!==undefined&&ch.constructor===String&&ch.length>0;
 function isDefined(o){
 return o!==null&&o!==undefined;
 };
+function isFunction(f){
+return f!==null&&f!==undefined&&f.constructor===Function;
+};
 function isNumber(n){
 return n!==null&&n!==undefined&&n.constructor===Number;
 };
@@ -1362,6 +1365,7 @@ this._positions=[];
 this._currentAttribute=new Attribute();
 this._sendResizeSequence=(_e1&&_e1.hasOwnProperty("sendResizeSequence"))?_e1.sendResizeSequence:true;
 this._showTitle=(_e1&&_e1.hasOwnProperty("showTitle"))?_e1.showTitle:true;
+this._onTitleChange=(_e1&&_e1.hasOwnProperty("onTitleChange"))?_e1.onTitleChange:null;
 var _e2=(_e1&&_e1.hasOwnProperty("handler"))?_e1.handler:new XTermHandler(this);
 var _e3=(_e1&&_e1.hasOwnProperty("tables"))?_e1.tables:XTermTables;
 var _e4=(_e1&&_e1.hasOwnProperty("parser"))?_e1.parser:new TermParser(_e3,_e2);
@@ -1702,6 +1706,9 @@ this._keyHandler.addKeys(CSI+[8,this._height,this._width].join(";")+"t");
 };
 Term.prototype.setTitle=function(_112){
 this._title=_112;
+if(isFunction(this._onTitleChange)){
+this._onTitleChange(_112);
+}
 };
 Term.prototype.showTitle=function(_113){
 if(isBoolean(_113)){

@@ -10,7 +10,6 @@ import com.aptana.util.StringUtil;
 
 public class StringUtilTest extends TestCase
 {
-
 	public void testMd5()
 	{
 		assertEquals("d41d8cd98f00b204e9800998ecf8427e", StringUtil.md5(""));
@@ -65,5 +64,30 @@ public class StringUtilTest extends TestCase
 		assertEquals(2, tokens.size());
 		assertEquals("chris", tokens.get(0));
 		assertEquals(" williams", tokens.get(1));
+	}
+	
+	public void testAreNotEqualWithNulls()
+	{
+		assertFalse(StringUtil.areNotEqual(null, null));
+	}
+	
+	public void testAreNotEqualFirstIsNull()
+	{
+		assertTrue(StringUtil.areNotEqual(null, "test"));
+	}
+	
+	public void testAreNotEqualLastIsNull()
+	{
+		assertTrue(StringUtil.areNotEqual("test", null));
+	}
+	
+	public void testAreNotEqual()
+	{
+		assertFalse(StringUtil.areNotEqual("test", "test"));
+	}
+	
+	public void testAreNotEqual2()
+	{
+		assertTrue(StringUtil.areNotEqual("test", "tes"));
 	}
 }

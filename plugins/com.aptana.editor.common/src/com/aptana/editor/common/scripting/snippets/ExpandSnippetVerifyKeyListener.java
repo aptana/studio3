@@ -6,6 +6,7 @@ import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -50,6 +51,11 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener {
 			return;
 		}
 		if (document == null) {
+			return;
+		}
+
+		// If the editor is linked editing mode - let it do the TAB key processing
+		if (LinkedModeModel.hasInstalledModel(document)) {
 			return;
 		}
 

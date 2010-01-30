@@ -160,3 +160,4 @@ Export-Package: com.kenai.constantine,
  org.objectweb.asm.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Eclipse-BuddyPolicy: global
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"

@@ -56,7 +56,7 @@ public class CommandConverter
 		if (properties == null)
 			return null;
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("require 'radrails'\n\n");
+		buffer.append("require 'ruble'\n\n");
 		buffer.append("command '").append(BundleConverter.sanitize(properties, "name")).append("' do |cmd|\n");
 		String keyBinding = BundleConverter.sanitize(properties, "keyEquivalent");
 		if (keyBinding != null)

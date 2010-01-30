@@ -30,8 +30,11 @@ public class SnippetElement extends CommandElement
 	 */
 	public CommandResult execute(CommandContext context)
 	{
+		// set output type
+		context.setOutputType(getOutputType());
+
 		CommandResult result = new CommandResult(this, context);
-		
+
 		// set result
 		result.setOutputString(this.getExpansion());
 

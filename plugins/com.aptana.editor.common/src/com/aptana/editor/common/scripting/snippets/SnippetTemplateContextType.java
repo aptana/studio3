@@ -27,7 +27,7 @@ class SnippetTemplateContextType extends TemplateContextType {
 		// Tab stops
 		addResolver(new TabStopVariableResolver("1", "1st tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
 		addResolver(new TabStopVariableResolver("2", "2nd tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
-		addResolver(new TabStopVariableResolver("3", "3rt tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
+		addResolver(new TabStopVariableResolver("3", "3rd tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
 		addResolver(new TabStopVariableResolver("4", "4th tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
 		addResolver(new TabStopVariableResolver("5", "5th tab stop")); //$NON-NLS-1$ //$NON-NLS-2$
 		addResolver(new TabStopVariableResolver("6", "6th tab stop")); //$NON-NLS-1$ //$NON-NLS-2$

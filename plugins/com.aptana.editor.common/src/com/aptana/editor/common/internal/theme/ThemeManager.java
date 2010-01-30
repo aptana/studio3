@@ -282,7 +282,7 @@ public class ThemeManager implements IThemeManager
 
 	public void addTheme(Theme newTheme)
 	{
-		fThemeMap.put(newTheme.getName(), newTheme);
+		getThemeMap().put(newTheme.getName(), newTheme);
 		newTheme.save();
 		saveThemeList();
 	}
@@ -290,7 +290,7 @@ public class ThemeManager implements IThemeManager
 	public void removeTheme(Theme theme)
 	{
 		Theme activeTheme = getCurrentTheme();
-		fThemeMap.remove(theme.getName());
+		getThemeMap().remove(theme.getName());
 		saveThemeList();
 		// change active theme if we just removed it
 		if (activeTheme.getName().equals(theme.getName()))

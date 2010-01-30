@@ -32,6 +32,20 @@ public class Utils
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		
+		return openEditor(window, editorId, activate);
+	}
+	
+	/**
+	 * openEditor
+	 * 
+	 * @param window
+	 * @param editorId
+	 * @param activate
+	 * @return
+	 */
+	public static IEditorPart openEditor(IWorkbenchWindow window, String editorId, boolean activate)
+	{
+		
 		if (window != null)
 		{
 			IWorkbenchPage page = window.getActivePage();

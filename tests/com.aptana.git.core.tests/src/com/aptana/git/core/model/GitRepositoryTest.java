@@ -231,22 +231,31 @@ public class GitRepositoryTest extends TestCase
 
 		testSwitchBranch();
 
-		// 6 index changes, 2 branch changes
-		assertEquals(8, eventsReceived.size());
-		assertBranchChangedEvent(eventsReceived.get(6), "master", "my_new_branch");
-		assertBranchChangedEvent(eventsReceived.get(7), "my_new_branch", "master");
+		int size = eventsReceived.size();
+		assertTrue(size > 0);
+		assertBranchChangedEvent(eventsReceived, "master", "my_new_branch");
+		assertBranchChangedEvent(eventsReceived, "my_new_branch", "master");
 
 		GitRepository.removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
 		assertSwitchBranch("my_new_branch");
-		assertEquals(8, eventsReceived.size());
+		assertEquals(size, eventsReceived.size());
 	}
 
-	protected void assertBranchChangedEvent(final RepositoryEvent event, String oldName, String newName)
+	protected void assertBranchChangedEvent(List<RepositoryEvent> events, String oldName, String newName)
 	{
-		BranchChangedEvent branchChangeEvent = (BranchChangedEvent) event;
-		assertEquals(oldName, branchChangeEvent.getOldBranchName());
-		assertEquals(newName, branchChangeEvent.getNewBranchName());
+		for (RepositoryEvent event : events)
+		{
+			if (event instanceof BranchChangedEvent)
+			{
+				BranchChangedEvent branchChangeEvent = (BranchChangedEvent) event;
+				if (branchChangeEvent.getOldBranchName().equals(oldName) && branchChangeEvent.getNewBranchName().equals(newName))
+				{
+					return;
+				}
+			}
+		}
+		fail("No matching branch event");
 	}
 
 	// TODO Test deleting folder

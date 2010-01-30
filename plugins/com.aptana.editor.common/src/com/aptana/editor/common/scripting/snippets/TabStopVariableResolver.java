@@ -6,6 +6,7 @@ import org.eclipse.jface.text.templates.TemplateVariable;
 
 class TabStopVariableResolver extends SimpleTemplateVariableResolver
 {
+	static final String TABSTOPS = "123456789"; //$NON-NLS-1$
 
 	TabStopVariableResolver(String type, String description)
 	{

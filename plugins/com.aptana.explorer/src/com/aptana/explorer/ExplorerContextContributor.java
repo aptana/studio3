@@ -61,7 +61,7 @@ public class ExplorerContextContributor implements ContextContributor
 
 			if (runtime != null)
 			{
-				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
 						PROJECT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, project));
 
 				context.put(PROJECT_PROPERTY_NAME, rubyInstance);

@@ -133,7 +133,7 @@ public class EditorContextContributor implements ContextContributor
 
 			if (runtime != null)
 			{
-				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RADRAILS_MODULE,
+				IRubyObject rubyInstance = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
 						EDITOR_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, editor));
 
 				context.put(EDITOR_PROPERTY_NAME, rubyInstance);
