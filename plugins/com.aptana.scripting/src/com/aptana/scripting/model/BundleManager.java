@@ -183,7 +183,7 @@ public class BundleManager
 					entry.addBundle(bundle);
 				}
 			}
-			
+
 			this.fireBundleAddedEvent(bundle);
 		}
 	}
@@ -223,7 +223,7 @@ public class BundleManager
 			this._loadCycleListeners.add(listener);
 		}
 	}
-	
+
 	/**
 	 * fireBundleAddedEvent
 	 * 
@@ -255,7 +255,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * fireElementAddedEvent
 	 * 
@@ -403,74 +403,55 @@ public class BundleManager
 		String result = null;
 		String matchedPattern = null;
 
-		List<BundleElement> bundles = getBundles();
-		for (BundleElement bundle : bundles)
+		synchronized (entryNamesLock)
 		{
-			Map<String, String> registry = bundle.getFileTypeRegistry();
-			for (Map.Entry<String, String> entry : registry.entrySet())
+			if (this._entriesByName != null)
 			{
-				String pattern = entry.getKey();
-				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
-				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (!fileName.matches(pattern))
-					continue;
-				
-				if (result == null)
+				for (BundleEntry bundleEntry : _entriesByName.values())
 				{
-					result = entry.getValue();
-					matchedPattern = pattern;
-					continue;
-				}
-				// Now check to see if this is more specific than the existing match before we set this as our return value
-				// TODO Check for simple case where one is a subset scope of the other, use the more specific one and move on
-				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-				int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
-				if (newLength > existingLength)
-				{
-					result = entry.getValue();
-					matchedPattern = pattern;
-				}
-				else if (newLength == existingLength)
-				{
-					// Now we need to check if the file matching pattern is more specific FIXME Just using length is hacky and can be incorrect
-					if (pattern.length() > matchedPattern.length())
+					Map<String, String> registry = bundleEntry.getFileTypeRegistry();
+					for (Map.Entry<String, String> entry : registry.entrySet())
 					{
-						result = entry.getValue();
-						matchedPattern = pattern;
-					}
-				}
-			}
-		}
-		// TODO We need to filter down to one, by collapsing things like "source.ruby" and "source.ruby.rails", and when
-		// there's still multiple, using the most specific match!
-		return result;
-	}
+						String pattern = entry.getKey();
+						// Escape periods in pattern (for regexp)
+						pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+						// Replace * wildcard pattern with .+? regexp
+						pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (!fileName.matches(pattern))
+							continue;
 
-	private List<BundleElement> getBundles()
-	{
-		List<BundleElement> bundles = new ArrayList<BundleElement>();
-		synchronized (bundlePathsLock)
-		{
-			if (this._bundlesByPath != null)
-			{
-				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
-				{
-					List<BundleElement> matchingBundles = entry.getValue();
-					if (matchingBundles != null)
-					{
-						int size = matchingBundles.size();
-
-						if (size > 0)
+						if (result == null)
 						{
-							bundles.add(matchingBundles.get(size - 1));
+							result = entry.getValue();
+							matchedPattern = pattern;
+							continue;
+						}
+						// Now check to see if this is more specific than the existing match before we set this as our
+						// return value
+						// TODO Check for simple case where one is a subset scope of the other, use the more specific
+						// one and move on
+						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
+						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+						if (newLength > existingLength)
+						{
+							result = entry.getValue();
+							matchedPattern = pattern;
+						}
+						else if (newLength == existingLength)
+						{
+							// Now we need to check if the file matching pattern is more specific FIXME Just using
+							// length is hacky and can be incorrect
+							if (pattern.length() > matchedPattern.length())
+							{
+								result = entry.getValue();
+								matchedPattern = pattern;
+							}
 						}
 					}
 				}
 			}
 		}
-		return bundles;
+		return result;
 	}
 
 	/**
@@ -1109,43 +1090,43 @@ public class BundleManager
 		{
 			File bundleFile = bundle.getBundleDirectory();
 			String name = bundle.getDisplayName();
-			
+
 			synchronized (bundlePathsLock)
 			{
 				if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
 				{
 					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
-					
+
 					bundles.remove(bundle);
-					
+
 					if (bundles.size() == 0)
 					{
 						this._bundlesByPath.remove(bundleFile);
 					}
 				}
 			}
-			
+
 			synchronized (entryNamesLock)
 			{
 				if (this._entriesByName != null && this._entriesByName.containsKey(name))
 				{
 					BundleEntry entry = this._entriesByName.get(name);
-					
+
 					entry.removeBundle(bundle);
-					
+
 					if (entry.size() == 0)
 					{
 						this._entriesByName.remove(name);
 					}
 				}
 			}
-			
+
 			AbstractElement.unregisterElement(bundle);
-			
+
 			this.fireBundleDeletedEvent(bundle);
 		}
 	}
-	
+
 	/**
 	 * removeElementChangeListener
 	 * 
