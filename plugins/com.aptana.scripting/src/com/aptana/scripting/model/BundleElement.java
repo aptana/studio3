@@ -10,10 +10,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
+import com.aptana.scripting.Activator;
 import com.aptana.util.StringUtil;
 
 public class BundleElement extends AbstractElement
 {
+	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
+
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
 
 	private String _author;
@@ -246,10 +249,10 @@ public class BundleElement extends AbstractElement
 				result = result.substring(0, result.length() - BUNDLE_DIRECTORY_SUFFIX.length());
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getDisplayName
 	 * 
@@ -408,7 +411,8 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return displayName != null && displayName.length() > 0 && StringUtil.areNotEqual(displayName, this.getDefaultName());
+		return displayName != null && displayName.length() > 0
+				&& StringUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**
@@ -556,32 +560,32 @@ public class BundleElement extends AbstractElement
 	{
 		this._repository = gitRepo;
 	}
-	
+
 	public void registerFileType(String fileType, String scope)
 	{
 		associateFileType(fileType);
 		associateScope(fileType, scope);
 	}
-	
+
 	public void associateScope(String filePattern, String scope)
 	{
 		// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
 		getFileTypeRegistry().put(filePattern, scope);
 	}
-	
+
 	public void associateFileType(String fileType)
 	{
-		// FIXME We need to massage the argument into file name or extension and then create a bogus name when we want to see if there's already a filetype for it!
-		// TODO Check to see if files of this type already have an association!		
-		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star"));
+		// We need to massage the argument into file name or extension and then create a bogus name when we want to see
+		// if there's already a filetype for it!
+		// Check to see if files of this type already have an association
+		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star")); //$NON-NLS-1$ //$NON-NLS-2$
 		if (type != null)
 			return;
-		type = Platform.getContentTypeManager().getContentType("com.aptana.editor.text.content-type.generic"); // TODO Create the generic content type!
+		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		try
 		{
-			// FIXME We need to determine if it's a filename or extension!
 			int assocType = IContentType.FILE_NAME_SPEC;
-			if (fileType.startsWith("*"))
+			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
 			{
 				assocType = IContentType.FILE_EXTENSION_SPEC;
 				fileType = fileType.substring(fileType.indexOf('.') + 1);
@@ -590,11 +594,10 @@ public class BundleElement extends AbstractElement
 		}
 		catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+			Activator.logError(e.getMessage(), e);
+		}
 	}
-	
+
 	public Map<String, String> getFileTypeRegistry()
 	{
 		if (_fileTypeRegistry == null)
