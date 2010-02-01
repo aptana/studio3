@@ -27,6 +27,84 @@ public class FilterTests extends BundleTestBase
 	}
 
 	/**
+	 * testScopeContainsFilterExact
+	 */
+	public void testScopeContainsFilterExact()
+	{
+		ScopeContainsFilter filter;
+		CommandElement[] commands;
+
+		filter = new ScopeContainsFilter("source.css string.double.quoted");
+		commands = BundleManager.getInstance().getCommands(filter);
+
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("CSS String", commands[0].getDisplayName());
+	}
+
+	/**
+	 * testScopeContainsFilterEndsWith
+	 */
+	public void testScopeContainsFilterEndsWith()
+	{
+		ScopeContainsFilter filter;
+		CommandElement[] commands;
+
+		filter = new ScopeContainsFilter("text.html source.css string.double.quoted");
+		commands = BundleManager.getInstance().getCommands(filter);
+
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("CSS String", commands[0].getDisplayName());
+	}
+
+	/**
+	 * testScopeContainsFilterBeginsWith
+	 */
+	public void testScopeContainsFilterBeginsWith()
+	{
+		ScopeContainsFilter filter;
+		CommandElement[] commands;
+
+		filter = new ScopeContainsFilter("text.html source.css string.double.quoted punctuation");
+		commands = BundleManager.getInstance().getCommands(filter);
+
+		assertNotNull(commands);
+		assertEquals(1, commands.length);
+		assertEquals("CSS String", commands[0].getDisplayName());
+	}
+
+	/**
+	 * testScopeContainsFilterNotFull
+	 */
+	public void testScopeContainsFilterNotFull()
+	{
+		ScopeContainsFilter filter;
+		CommandElement[] commands;
+
+		filter = new ScopeContainsFilter("text.html source.css");
+		commands = BundleManager.getInstance().getCommands(filter);
+
+		assertNotNull(commands);
+		assertEquals(0, commands.length);
+	}
+
+	/**
+	 * testScopeContainsFilterSomethingInMiddle
+	 */
+	public void testScopeContainsFilterSomethingInMiddle()
+	{
+		ScopeContainsFilter filter;
+		CommandElement[] commands;
+
+		filter = new ScopeContainsFilter("source.css punctuation string.double.quoted");
+		commands = BundleManager.getInstance().getCommands(filter);
+
+		assertNotNull(commands);
+		assertEquals(0, commands.length);
+	}
+
+	/**
 	 * testHasTriggerFilter
 	 */
 	public void testHasTriggerFilter()
@@ -35,11 +113,12 @@ public class FilterTests extends BundleTestBase
 		CommandElement[] commands = BundleManager.getInstance().getCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
+		assertEquals(3, commands.length);
 		assertEquals("HTML", commands[0].getDisplayName());
 		assertEquals("JS", commands[1].getDisplayName());
+		assertEquals("CSS String", commands[2].getDisplayName());
 	}
-	
+
 	/**
 	 * testAndFilter
 	 */

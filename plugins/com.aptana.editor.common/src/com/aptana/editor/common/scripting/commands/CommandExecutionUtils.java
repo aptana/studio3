@@ -39,6 +39,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -783,8 +784,33 @@ public class CommandExecutionUtils
 		tooltip.setSize(p.x, p.y);
 
 		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
-		locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
-				+ textWidget.getLineHeight(caretOffset) + 2);
+		Rectangle bounds = textWidget.getClientArea();
+		// Is caret visible in the client area
+		if (bounds.contains(locationAtOffset))
+		{
+			// Show the tooltip near it
+			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
+					+ textWidget.getLineHeight(caretOffset) + 2);
+		}
+		else
+		{
+			// Is y offset in the client area
+			if (locationAtOffset.y > bounds.y && locationAtOffset.y < bounds.y+bounds.height)
+			{
+				// Show the tooltip near left margin below the current line
+				locationAtOffset = textWidget.toDisplay(bounds.x + 2, locationAtOffset.y
+						+ textWidget.getLineHeight(caretOffset) + 2);
+			}
+			else
+			{
+				int topIndex = textWidget.getTopIndex();
+				int offsetAtLine = textWidget.getOffsetAtLine(topIndex);
+				locationAtOffset = textWidget.getLocationAtOffset(offsetAtLine);
+				// Show the tool tip below first visible line
+				locationAtOffset = textWidget.toDisplay(locationAtOffset.x + 2, locationAtOffset.y
+						+ textWidget.getLineHeight(caretOffset) + 2);
+			}
+		}
 		tooltip.setLocation(locationAtOffset);
 		tooltip.setVisible(true);
 	}
