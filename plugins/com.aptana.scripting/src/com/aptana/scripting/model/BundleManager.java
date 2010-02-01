@@ -410,8 +410,10 @@ public class BundleManager
 			for (Map.Entry<String, String> entry : registry.entrySet())
 			{
 				String pattern = entry.getKey();
-				pattern = pattern.replaceAll("\\.", "\\\\.");
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?");
+				// Escape periods in pattern (for regexp)
+				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+				// Replace * wildcard pattern with .+? regexp
+				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (!fileName.matches(pattern))
 					continue;
 				
@@ -423,8 +425,8 @@ public class BundleManager
 				}
 				// Now check to see if this is more specific than the existing match before we set this as our return value
 				// TODO Check for simple case where one is a subset scope of the other, use the more specific one and move on
-				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name
-				int newLength = entry.getValue().split("\\.").length;
+				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
+				int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
 				if (newLength > existingLength)
 				{
 					result = entry.getValue();
