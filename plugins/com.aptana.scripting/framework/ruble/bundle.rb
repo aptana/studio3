@@ -105,8 +105,27 @@ module Ruble
       @jobj.license_url = license_url.join("\n")
     end
     
-    def register_file_type(file_type, scope, options = {})
-      @jobj.registerFileType(file_type, scope.to_s.gsub(/_/, '.'))
+    # This method does two things:
+    # If the given file type is not associated with any editor, we associate it with our generic text editor
+    # We also register a top=level scope to report back for any file whose name matches the file type pattern.
+    # Understands * wildcard. Typical values for first arg: '*.yml', '*_spec.rb', 'Rakefile'
+    # scope is a string our a symbol. Underscores are converted to spaces (so 'source.yaml' and :source_yaml are equivalent)
+    def register_file_type(file_type, scope)
+      associate_scope(file_type, scope.to_s.gsub(/_/, '.'))
+      associate_file_type(file_type)
+    end
+    
+    # Given a filename pattern, we register files that match to our generic text editor (uses our theme and scripting)
+    # file_type must be either an exact filename to match, or a *.ext extension to associate with.
+    def associate_file_type(file_type)
+      @jobj.associateFileType(file_type.to_s)
+    end
+    
+    # Registers a top-level scope to report back for any file whose name matches the passed in pattern.
+    # Understands * wildcard. Typical values for first arg: '*.yml', '*_spec.rb', 'Rakefile'
+    # scope is a string our a symbol. Underscores are converted to spaces (so 'source.yaml' and :source_yaml are equivalent)
+    def associate_scope(file_type, scope)
+      @jobj.associateScope(file_type, scope.to_s.gsub(/_/, '.'))
     end
     
     def to_env
