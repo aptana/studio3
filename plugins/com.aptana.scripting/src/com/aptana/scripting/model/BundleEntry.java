@@ -3,8 +3,10 @@ package com.aptana.scripting.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class BundleEntry
@@ -136,6 +138,27 @@ public class BundleEntry
 		});
 		
 		return result.toArray(new CommandElement[result.size()]);
+	}
+	
+	/**
+	 * getCommands
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getFileTypeRegistry()
+	{
+		final Map<String, String> result = new HashMap<String, String>();
+		
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				result.putAll(bundle.getFileTypeRegistry());				
+				return true;
+			}
+		});
+		
+		return result;
 	}
 
 	/**
