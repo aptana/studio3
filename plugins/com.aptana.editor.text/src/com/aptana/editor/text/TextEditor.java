@@ -11,6 +11,7 @@ public class TextEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		setSourceViewerConfiguration(new TextSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new TextDocumentProvider());
 	}
 
 }

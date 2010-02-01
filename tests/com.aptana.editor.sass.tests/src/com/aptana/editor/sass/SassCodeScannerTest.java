@@ -47,6 +47,32 @@ public class SassCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
+	
+	public void testCSS3PropertyNames()
+	{
+		String src = "border-radius: 1px\n" +
+				"border-image-width: 1px\n" +
+				"box-decoration-break: clone";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 13);
+		assertToken(getToken("punctuation.separator.key-value.css"), 13, 1);
+		assertToken(Token.WHITESPACE, 14, 1);
+		assertToken(getToken("constant.numeric.css"), 15, 1);
+		assertToken(getToken("keyword.other.unit.css"), 16, 2);
+		assertToken(Token.WHITESPACE, 18, 1);
+		assertToken(getToken("support.type.property-name.css"), 19, 18);
+		assertToken(getToken("punctuation.separator.key-value.css"), 37, 1);
+		assertToken(Token.WHITESPACE, 38, 1);
+		assertToken(getToken("constant.numeric.css"), 39, 1);
+		assertToken(getToken("keyword.other.unit.css"), 40, 2);
+		assertToken(Token.WHITESPACE, 42, 1);
+		assertToken(getToken("support.type.property-name.css"), 43, 20);
+		assertToken(getToken("punctuation.separator.key-value.css"), 63, 1);
+		assertToken(Token.WHITESPACE, 64, 1);
+	}
+	
 	// FIXME Test actual Sass, not CSS!
 	
 	public void testSmallCaps()
@@ -171,8 +197,8 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
 		assertToken(Token.WHITESPACE, 26, 1);
 		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 1);
-		assertToken(getToken("punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("punctuation.section.function.css"), 30, 2);
+//		assertToken(getToken("punctuation.section.function.css"), 31, 1);
 		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
 		assertToken(Token.WHITESPACE, 33, 3);
 		// line 3

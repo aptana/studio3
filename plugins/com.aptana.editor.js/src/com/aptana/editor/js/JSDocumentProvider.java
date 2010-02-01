@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
+import com.aptana.editor.common.CommonDocumentProvider;
 import com.aptana.editor.common.DocumentContentTypeManager;
 
-public class JSDocumentProvider extends TextFileDocumentProvider {
+public class JSDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
+	@Override
+	public void connect(Object element) throws CoreException
+	{
 		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new JSSourcePartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new JSSourcePartitionScanner(),
 					JSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IJSConstants.CONTENT_TYPE_JS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, JSSourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance()
+					.registerConfiguration(document, JSSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType()
+	{
+		return IJSConstants.CONTENT_TYPE_JS;
 	}
 }

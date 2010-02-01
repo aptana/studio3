@@ -12,13 +12,12 @@ import org.eclipse.swt.graphics.Point;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
-import com.aptana.scripting.model.ScopeFilter;
+import com.aptana.scripting.model.ScopeContainsFilter;
 import com.aptana.scripting.model.SnippetElement;
 
 public class CommandElementsProvider implements ICommandElementsProvider
@@ -49,8 +48,9 @@ public class CommandElementsProvider implements ICommandElementsProvider
 				abstractThemeableEditor.getEditorInput());
 		try
 		{
-			String contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
-			ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+			String contentTypeAtOffset = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, caretOffset);
+			ScopeContainsFilter filter = new ScopeContainsFilter(contentTypeAtOffset);
+			
 			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 			for (CommandElement commandElement : commandsFromScope)
 			{
@@ -88,16 +88,6 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
 				+ textWidget.getLineHeight(caretOffset) + 2);
 		return locationAtOffset;
-	}
-
-	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
-	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
 	}
 
 }

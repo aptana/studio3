@@ -51,7 +51,7 @@ public class RXMLDocumentProvider extends CompositeDocumentProvider {
 		super(IERBConstants.CONTENT_TYPE_XML_ERB,
 				XMLSourceConfiguration.getDefault(),
 				RubySourceConfiguration.getDefault(),
-				ERBPartitionerSwitchStrategy.getDafault());
+				ERBPartitionerSwitchStrategy.getDefault());
 	}
 	
 }

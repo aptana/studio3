@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
+import com.aptana.editor.common.CommonDocumentProvider;
 import com.aptana.editor.common.DocumentContentTypeManager;
 
-public class RubyDocumentProvider extends TextFileDocumentProvider {
+public class RubyDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
+	@Override
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new MergingPartitionScanner(new RubySourcePartitionScanner()),
-					RubySourceConfiguration.CONTENT_TYPES);
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new MergingPartitionScanner(
+					new RubySourcePartitionScanner()), RubySourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IRubyConstants.CONTENT_TYPE_RUBY);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, RubySourceConfiguration.getDefault());
+			DocumentContentTypeManager.getInstance().registerConfiguration(document,
+					RubySourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType()
+	{
+		return IRubyConstants.CONTENT_TYPE_RUBY;
 	}
 }

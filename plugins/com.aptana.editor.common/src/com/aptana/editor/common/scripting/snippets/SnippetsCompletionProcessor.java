@@ -30,14 +30,12 @@ import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.DocumentContentTypeManager;
-import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.HasTriggerFilter;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.scripting.model.HasTriggerFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
@@ -53,23 +51,13 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength());
+			contentTypeString = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
 		{
 			CommonEditorPlugin.logError(e);
 		}
 		return new SnippetTemplateContextType(contentTypeString);
-	}
-
-	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
-	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
 	}
 
 	@Override
