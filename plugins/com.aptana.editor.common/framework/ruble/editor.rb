@@ -224,10 +224,15 @@ module Ruble
           result["TM_LINE_NUMBER"] = selection.start_line + 1
           result["TM_SELECTION_OFFSET"] = selection.offset
           result["TM_SELECTION_LENGTH"] = selection.length
-          result["TM_SELECTION_START_LINE_NUMBER"] = selection.start_line
-          result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line
+          result["TM_SELECTION_START_LINE_NUMBER"] = result["TM_LINE_NUMBER"]
+          result["TM_SELECTION_END_LINE_NUMBER"] = selection.end_line + 1
+          result["TM_INPUT_START_LINE_INDEX"] = caret_column
+          result["TM_INPUT_START_COLUMN"] = result['TM_INPUT_START_LINE_INDEX'] + 1
+          result["TM_INPUT_START_LINE"] = result["TM_SELECTION_START_LINE_NUMBER"]
+        else
+          result["TM_LINE_NUMBER"] = caret_line + 1
+          result["TM_COLUMN_NUMBER"] = caret_column + 1
         end
-        
         result["TM_LINE_INDEX"] = caret_column
         result["TM_CARET_LINE_NUMBER"] = caret_line + 1
         result["TM_CARET_LINE_TEXT"] = current_line
