@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
+import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -12,6 +13,7 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
@@ -69,26 +71,29 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
 
 	@SuppressWarnings("nls")
-	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-color",
-			"background-image", "background-position-x", "background-position-y", "background-position",
-			"background-repeat", "background", "border-bottom-color", "border-bottom-style", "border-bottom-width",
-			"border-bottom", "border-collapse", "border-color", "border-left-color", "border-left-style",
-			"border-left-width", "border-left", "border-right-color", "border-right-style", "border-right-width",
+	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
+			"background-color", "background-image", "background-origin", "background-position-x",
+			"background-position-y", "background-position", "background-repeat", "background-size", "background",
+			"border-bottom-color", "border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse",
+			"border-color", "border-image-source", "border-image-slice", "border-image-width", "border-image-outset",
+			"border-image-repeat", "border-image", "border-left-color", "border-left-style", "border-left-width",
+			"border-left", "border-radius", "border-right-color", "border-right-style", "border-right-width",
 			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-style",
-			"border-top-width", "border-top", "border-width", "border", "bottom", "caption-side", "clear", "clip",
-			"color", "content", "counter-increment", "counter-reset", "cue-after", "cue-before", "cue", "cursor",
-			"direction", "display", "elevation", "empty-cells", "float", "font-family", "font-size-adjust",
-			"font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font", "height", "left",
-			"letter-spacing", "line-height", "list-style-image", "list-style-position", "list-style-type",
-			"list-style", "margin-bottom", "margin-left", "margin-right", "margin-top", "marker-offset", "margin",
-			"marks", "max-height", "max-width", "min-height", "min-width", "-moz-border-radius", "opacity", "orphans",
-			"outline-color", "outline-style", "outline-width", "outline", "overflow-x", "overflow-y", "overflow",
-			"padding-bottom", "padding-left", "padding-right", "padding-top", "padding", "page-break-after",
-			"page-break-before", "page-break-inside", "page", "pause-after", "pause-before", "pause", "pitch-range",
-			"pitch", "play-during", "position", "quotes", "richness", "right", "size", "speak-header", "speak-numeral",
-			"speak-punctuation", "speech-rate", "speak", "stress", "table-layout", "text-align", "text-decoration",
-			"text-indent", "text-shadow", "text-transform", "top", "unicode-bidi", "vertical-align", "visibility",
-			"voice-family", "volume", "white-space", "widows", "width", "word-spacing", "z-index" };
+			"border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break",
+			"caption-side", "clear", "clip", "color", "content", "counter-increment", "counter-reset", "cue-after",
+			"cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float", "font-family",
+			"font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font",
+			"height", "left", "letter-spacing", "line-height", "list-style-image", "list-style-position",
+			"list-style-type", "list-style", "margin-bottom", "margin-left", "margin-right", "margin-top",
+			"marker-offset", "margin", "marks", "max-height", "max-width", "min-height", "min-width",
+			"-moz-border-radius", "opacity", "orphans", "outline-color", "outline-style", "outline-width", "outline",
+			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
+			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
+			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "richness", "right",
+			"size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress",
+			"table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top",
+			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
+			"word-spacing", "z-index" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_VALUES = { "absolute", "all-scroll", "always", "armenian", "auto",
@@ -137,7 +142,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule2, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
 		rules.add(wordRule2);
-		
+
 		// normal words
 		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
@@ -148,12 +153,41 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
 		rules.add(wordRule);
 
-		
-
 		// letters and hyphens, ignore case
 		WordRule wordRule3 = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
 		addWordsToRule(wordRule3, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
 		rules.add(wordRule3);
+
+		// Browser-specific property names
+		IWordDetector browserSpecificProperties = new LettersAndHyphensWordDetector()
+		{
+			@Override
+			public boolean isWordStart(char c)
+			{
+				return c == '-';
+			}
+		};
+		rules.add(new ExtendedWordRule(browserSpecificProperties, createToken("support.type.property-name.css"), true) //$NON-NLS-1$
+				{
+					@Override
+					protected boolean wordOK(String word, ICharacterScanner scanner)
+					{
+						// Table 1. Vendor Extension Prefixes
+						// Prefix Organisation
+						// -ms- Microsoft
+						// mso- Microsoft Office
+						// -moz- Mozilla Foundation (Gecko-based browsers)
+						// -o- Opera Software
+						// -atsc- Advanced Television Standards Committee
+						// -wap- The WAP Forum
+						// -webkit- Safari (and other WebKit-based browsers)
+						// -khtml-
+
+						return word.startsWith("-moz-") || word.startsWith("-webkit-") || word.startsWith("-ms-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								|| word.startsWith("-o-") || word.startsWith("-atsc-") || word.startsWith("-khtml-") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								|| word.startsWith("-wap-"); //$NON-NLS-1$
+					}
+				});
 
 		// curly braces
 		rules.add(new SingleCharacterRule('{', createToken("punctuation.section.property-list.css"))); //$NON-NLS-1$
@@ -163,8 +197,12 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// semicolon
 		rules.add(new SingleCharacterRule(';', createToken("punctuation.terminator.rule.css"))); //$NON-NLS-1$
 		// parens
-		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		// HACK these rules are more correct, but for now we eat up the stuff inside parens too, to avoid weirder
+		// coloring
+		//		rules.add(new SingleCharacterRule('(', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		//		rules.add(new SingleCharacterRule(')', createToken("punctuation.section.function.css"))); //$NON-NLS-1$
+		rules.add(new RegexpRule("\\([^)]*?\\)", //$NON-NLS-1$
+				createToken("punctuation.section.function.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// Now onto to more expensive regexp rules
 		// rgb values
