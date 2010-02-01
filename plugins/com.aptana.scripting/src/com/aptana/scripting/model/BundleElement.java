@@ -597,6 +597,25 @@ public class BundleElement extends AbstractElement
 			Activator.logError(e.getMessage(), e);
 		}
 	}
+	
+	public void unassociateFileType(String fileType)
+	{
+		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
+		try
+		{
+			int assocType = IContentType.FILE_NAME_SPEC;
+			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
+			{
+				assocType = IContentType.FILE_EXTENSION_SPEC;
+				fileType = fileType.substring(fileType.indexOf('.') + 1);
+			}
+			type.removeFileSpec(fileType, assocType);
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+	}
 
 	public Map<String, String> getFileTypeRegistry()
 	{
