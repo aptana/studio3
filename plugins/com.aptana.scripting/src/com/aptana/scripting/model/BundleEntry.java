@@ -25,7 +25,7 @@ public class BundleEntry
 		{
 			throw new IllegalArgumentException(Messages.BundleEntry_Name_Not_Defined);
 		}
-		
+
 		this._name = name;
 		this._bundles = new ArrayList<BundleElement>();
 	}
@@ -42,14 +42,14 @@ public class BundleEntry
 			synchronized (this._bundles)
 			{
 				this._bundles.add(bundle);
-				
+
 				// keep bundles in canonical order
 				Collections.sort(this._bundles, new Comparator<BundleElement>()
 				{
 					public int compare(BundleElement o1, BundleElement o2)
 					{
 						int result = o1.getBundleScope().compareTo(o2.getBundleScope());
-						
+
 						if (result == 0)
 						{
 							if (o1.isReference() == o2.isReference())
@@ -61,7 +61,7 @@ public class BundleEntry
 								result = (o1.isReference()) ? 1 : -1;
 							}
 						}
-						
+
 						return result;
 					}
 				});
@@ -77,20 +77,20 @@ public class BundleEntry
 	public BundleScope getActiveScope()
 	{
 		BundleScope result = BundleScope.UNKNOWN;
-		
+
 		synchronized (this._bundles)
 		{
 			int size = this._bundles.size();
-			
+
 			if (size > 0)
 			{
 				result = this._bundles.get(size - 1).getBundleScope();
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getBundles
 	 * 
@@ -99,15 +99,15 @@ public class BundleEntry
 	public BundleElement[] getBundles()
 	{
 		BundleElement[] result;
-		
+
 		synchronized (this._bundles)
 		{
 			result = this._bundles.toArray(new BundleElement[this._bundles.size()]);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getCommands
 	 * 
@@ -117,7 +117,7 @@ public class BundleEntry
 	{
 		final Set<String> names = new HashSet<String>();
 		final List<CommandElement> result = new ArrayList<CommandElement>();
-		
+
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
@@ -125,21 +125,21 @@ public class BundleEntry
 				for (CommandElement command : bundle.getCommands())
 				{
 					String name = command.getDisplayName();
-					
+
 					if (names.contains(name) == false)
 					{
 						names.add(name);
 						result.add(command);
 					}
 				}
-				
+
 				return true;
 			}
 		});
-		
+
 		return result.toArray(new CommandElement[result.size()]);
 	}
-	
+
 	/**
 	 * getCommands
 	 * 
@@ -148,16 +148,21 @@ public class BundleEntry
 	public Map<String, String> getFileTypeRegistry()
 	{
 		final Map<String, String> result = new HashMap<String, String>();
-		
+
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
-				result.putAll(bundle.getFileTypeRegistry());				
+				Map<String, String> registry = bundle.getFileTypeRegistry();
+				if (registry != null)
+				{
+					result.putAll(registry);
+					return false;
+				}
 				return true;
 			}
 		});
-		
+
 		return result;
 	}
 
@@ -170,7 +175,7 @@ public class BundleEntry
 	{
 		final Set<String> names = new HashSet<String>();
 		final List<MenuElement> result = new ArrayList<MenuElement>();
-		
+
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
@@ -178,18 +183,18 @@ public class BundleEntry
 				for (MenuElement menu : bundle.getMenus())
 				{
 					String name = menu.getDisplayName();
-					
+
 					if (names.contains(name) == false)
 					{
 						names.add(name);
 						result.add(menu);
 					}
 				}
-				
+
 				return true;
 			}
 		});
-		
+
 		return result.toArray(new MenuElement[result.size()]);
 	}
 
@@ -202,7 +207,7 @@ public class BundleEntry
 	{
 		return this._name;
 	}
-	
+
 	/**
 	 * processBundles
 	 * 
@@ -219,10 +224,10 @@ public class BundleEntry
 			for (int i = this._bundles.size() - 1; i >= 0; i--)
 			{
 				BundleElement bundle = this._bundles.get(i);
-			
+
 				// we're done processing if we've processed all bundle references and
 				// one bundle declaration OR if our BundleProcessor tells us to stop
-				
+
 				// NOTE: the order of this conditional is important. We need to run
 				// the processor on the current bundle before we decide to exit when
 				// we hit a non-reference bundle
@@ -233,24 +238,23 @@ public class BundleEntry
 			}
 		}
 	}
-	
+
 	/**
-	 * 
 	 * @param bundle
 	 * @return
 	 */
 	public boolean removeBundle(BundleElement bundle)
 	{
 		boolean result;
-		
+
 		synchronized (this._bundles)
 		{
 			result = this._bundles.remove(bundle);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * size
 	 * 
@@ -259,12 +263,12 @@ public class BundleEntry
 	public int size()
 	{
 		int size = 0;
-		
+
 		if (this._bundles != null)
 		{
 			size = this._bundles.size();
 		}
-		
+
 		return size;
 	}
 }
