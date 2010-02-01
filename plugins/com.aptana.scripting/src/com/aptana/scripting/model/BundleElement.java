@@ -570,6 +570,10 @@ public class BundleElement extends AbstractElement
 	public void associateScope(String filePattern, String scope)
 	{
 		// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
+		if (_fileTypeRegistry == null)
+		{
+			_fileTypeRegistry = new HashMap<String, String>();
+		}
 		getFileTypeRegistry().put(filePattern, scope);
 	}
 
@@ -597,7 +601,7 @@ public class BundleElement extends AbstractElement
 			Activator.logError(e.getMessage(), e);
 		}
 	}
-	
+
 	public void unassociateFileType(String fileType)
 	{
 		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
@@ -619,10 +623,6 @@ public class BundleElement extends AbstractElement
 
 	public Map<String, String> getFileTypeRegistry()
 	{
-		if (_fileTypeRegistry == null)
-		{
-			_fileTypeRegistry = new HashMap<String, String>();
-		}
 		return _fileTypeRegistry;
 	}
 

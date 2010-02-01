@@ -403,50 +403,46 @@ public class BundleManager
 		String result = null;
 		String matchedPattern = null;
 
-		synchronized (entryNamesLock)
+		for (String bundleName : getBundleNames())
 		{
-			if (this._entriesByName != null)
-			{
-				for (BundleEntry bundleEntry : _entriesByName.values())
-				{
-					Map<String, String> registry = bundleEntry.getFileTypeRegistry();
-					for (Map.Entry<String, String> entry : registry.entrySet())
-					{
-						String pattern = entry.getKey();
-						// Escape periods in pattern (for regexp)
-						pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
-						// Replace * wildcard pattern with .+? regexp
-						pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
-						if (!fileName.matches(pattern))
-							continue;
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
 
-						if (result == null)
-						{
-							result = entry.getValue();
-							matchedPattern = pattern;
-							continue;
-						}
-						// Now check to see if this is more specific than the existing match before we set this as our
-						// return value
-						// TODO Check for simple case where one is a subset scope of the other, use the more specific
-						// one and move on
-						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
-						if (newLength > existingLength)
-						{
-							result = entry.getValue();
-							matchedPattern = pattern;
-						}
-						else if (newLength == existingLength)
-						{
-							// Now we need to check if the file matching pattern is more specific FIXME Just using
-							// length is hacky and can be incorrect
-							if (pattern.length() > matchedPattern.length())
-							{
-								result = entry.getValue();
-								matchedPattern = pattern;
-							}
-						}
+			Map<String, String> registry = bundleEntry.getFileTypeRegistry();
+			for (Map.Entry<String, String> entry : registry.entrySet())
+			{
+				String pattern = entry.getKey();
+				// Escape periods in pattern (for regexp)
+				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+				// Replace * wildcard pattern with .+? regexp
+				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!fileName.matches(pattern))
+					continue;
+
+				if (result == null)
+				{
+					result = entry.getValue();
+					matchedPattern = pattern;
+					continue;
+				}
+				// Now check to see if this is more specific than the existing match before we set this as our
+				// return value
+				// TODO Check for simple case where one is a subset scope of the other, use the more specific
+				// one and move on
+				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
+				int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+				if (newLength > existingLength)
+				{
+					result = entry.getValue();
+					matchedPattern = pattern;
+				}
+				else if (newLength == existingLength)
+				{
+					// Now we need to check if the file matching pattern is more specific FIXME Just using
+					// length is hacky and can be incorrect
+					if (pattern.length() > matchedPattern.length())
+					{
+						result = entry.getValue();
+						matchedPattern = pattern;
 					}
 				}
 			}
