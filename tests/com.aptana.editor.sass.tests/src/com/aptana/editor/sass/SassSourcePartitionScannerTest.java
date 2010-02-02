@@ -10,14 +10,11 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
-import com.aptana.editor.sass.ISassConstants;
-import com.aptana.editor.sass.SassSourceConfiguration;
 
 /**
  * @author Chris
@@ -55,9 +52,6 @@ public class SassSourcePartitionScannerTest extends TestCase
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, ISassConstants.CONTENT_TYPE_SASS);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
-					SassSourceConfiguration.getDefault());
 		}
 		return partitioner.getContentType(offset);
 	}

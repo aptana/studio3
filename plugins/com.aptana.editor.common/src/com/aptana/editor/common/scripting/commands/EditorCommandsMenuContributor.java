@@ -29,7 +29,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.tmp.ContentTypeTranslation;
@@ -141,7 +140,8 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						abstractThemeableEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, caretOffset);
+				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentTypeAtOffset(
+						document, caretOffset);
 			}
 			catch (BadLocationException e)
 			{

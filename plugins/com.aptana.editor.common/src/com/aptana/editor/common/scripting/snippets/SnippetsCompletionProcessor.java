@@ -29,7 +29,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -51,13 +51,18 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, region.getOffset() + region.getLength());
+			contentTypeString = getDocumentScopeManager().getContentTypeAtOffset(document, region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
 		{
 			CommonEditorPlugin.logError(e);
 		}
 		return new SnippetTemplateContextType(contentTypeString);
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	@Override
