@@ -12,15 +12,23 @@
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.text">
          </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.editor.text.content-type.generic">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <file-association
             content-type="org.eclipse.core.runtime.text"
-            file-extensions="log"
-            file-names="README,TODO,README_FOR_APP">
+            file-extensions="log,opts"
+            file-names="README,TODO,README_FOR_APP,CHANGELOG,LICENSE,ABOUT">
       </file-association>
+      <content-type
+            id="com.aptana.editor.text.content-type.generic"
+            name="Generic Content Type"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>

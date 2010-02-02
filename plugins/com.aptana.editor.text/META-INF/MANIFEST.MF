@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.editor.text.TextEditorPlugin
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.4.0",
  org.eclipse.ui,
  com.aptana.editor.common;bundle-version="1.0.0",
  org.eclipse.ui.editors;bundle-version="3.4.0",

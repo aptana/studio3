@@ -11,12 +11,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.textEditor"
-            description="%command.scope.description"
-            id="com.aptana.editor.common.showscopes"
-            name="%command.scope.name">
-      </command>
        <command
        		categoryId="org.eclipse.ui.category.edit"
             description="%command.filter.description"
@@ -26,12 +20,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
-      <key
-            commandId="com.aptana.editor.common.showscopes"
-            contextId="org.eclipse.ui.textEditorScope"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="Ctrl+Shift+P">
-      </key>
       <key
             commandId="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             contextId="org.eclipse.ui.textEditorScope"

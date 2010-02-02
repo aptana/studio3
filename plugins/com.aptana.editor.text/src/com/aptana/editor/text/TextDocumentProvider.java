@@ -32,13 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css;
+package com.aptana.editor.text;
 
-import org.eclipse.swt.graphics.RGB;
+import com.aptana.editor.common.CommonDocumentProvider;
 
-public interface ICSSColorConstants {
-	RGB RESERVED_WORD = new RGB(128, 0, 0);
-	RGB MULTILINE_COMMENT = new RGB(128, 128, 128);
-	RGB STRING = new RGB(0, 128, 0);
-	RGB DEFAULT = new RGB(0, 0, 0);
+public class TextDocumentProvider extends CommonDocumentProvider
+{
+
+	protected String getDefaultContentType()
+	{
+		return "text"; //$NON-NLS-1$
+	}
 }

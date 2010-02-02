@@ -28,7 +28,7 @@
       <content-type
             base-type="com.aptana.contenttype.ruby"
             describer="com.aptana.editor.ruby.RubyTextContentDescriber"
-            file-names="plugin,server,runner,generate,dbconsole,about,console,destroy"
+            file-names="plugin,server,runner,generate,dbconsole,about,console,destroy,autospec,spec"
             id="com.aptana.contenttype.ruby.ambiguous"
             name="Ambiguously Ruby"
             priority="normal">
