@@ -51,7 +51,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = getDocumentScopeManager().getContentTypeAtOffset(document, region.getOffset() + region.getLength());
+			contentTypeString = getDocumentScopeManager().getScopeAtOffset(document, region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
 		{

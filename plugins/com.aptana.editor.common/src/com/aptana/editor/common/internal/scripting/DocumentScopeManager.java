@@ -81,20 +81,9 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	 * @param defaultContentType
 	 * @param filename
 	 */
-	public void setDocumentContentType(IDocument document, String defaultContentType, String filename)
+	public void setDocumentScope(IDocument document, String defaultContentType, String filename)
 	{
 		infos.put(document, new ExtendedDocumentInfo(defaultContentType, filename));
-	}
-
-	/**
-	 * Another version to use when we are unable to grab the filename. Just returns the typical scope/content type.
-	 * 
-	 * @param document
-	 * @param defaultContentType
-	 */
-	public void setDocumentContentType(IDocument document, String defaultContentType)
-	{
-		setDocumentContentType(document, defaultContentType, null);
 	}
 
 	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations)
@@ -129,7 +118,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		return UNKNOWN.subtype(document.getContentType(offset));
 	}
 
-	public String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
+	public String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 	{
 		// TODO We still don't append the token to end of scope, which Textmate does. Unfortunately I have no idea how
 		// we'd get that unless we ran a token scanner on the whole partition until we hit the token for our offset, and

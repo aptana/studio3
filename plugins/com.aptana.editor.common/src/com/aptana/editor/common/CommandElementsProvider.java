@@ -48,7 +48,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 				abstractThemeableEditor.getEditorInput());
 		try
 		{
-			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentTypeAtOffset(document, caretOffset);
+			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
 			ScopeContainsFilter filter = new ScopeContainsFilter(contentTypeAtOffset);
 			
 			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);

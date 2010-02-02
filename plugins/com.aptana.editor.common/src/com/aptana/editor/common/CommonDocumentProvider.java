@@ -37,7 +37,7 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 				IURIEditorInput input = (IURIEditorInput) element;
 				fileName = new Path(input.getURI().getPath()).lastSegment();
 			}
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().setDocumentContentType(document,
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().setDocumentScope(document,
 					getDefaultContentType(), fileName);
 		}
 	}

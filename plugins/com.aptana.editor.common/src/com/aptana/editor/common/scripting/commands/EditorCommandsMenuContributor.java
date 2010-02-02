@@ -140,7 +140,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						abstractThemeableEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentTypeAtOffset(
+				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
 						document, caretOffset);
 			}
 			catch (BadLocationException e)

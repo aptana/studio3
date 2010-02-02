@@ -143,7 +143,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		String scope = ""; //$NON-NLS-1$
 		try
 		{
-			scope = getDocumentScopeManager().getContentTypeAtOffset(document, offset);
+			scope = getDocumentScopeManager().getScopeAtOffset(document, offset);
 		}
 		catch (BadLocationException e)
 		{
