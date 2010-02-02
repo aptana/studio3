@@ -3,28 +3,39 @@ package com.aptana.editor.html.outline;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
+import com.aptana.editor.css.outline.CSSOutlineContentProvider;
+import com.aptana.editor.css.parsing.ast.CSSNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
+import com.aptana.editor.js.outline.JSOutlineContentProvider;
+import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.parsing.ast.IParseNode;
 
-public class HTMLOutlineContentProvider extends CommonOutlineContentProvider
+public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
-	@Override
-	public Object[] getChildren(Object parentElement)
+	public HTMLOutlineContentProvider()
 	{
-		if (parentElement instanceof HTMLElementNode)
+		addSubLanguage(CSSNode.LANGUAGE, new CSSOutlineContentProvider());
+		addSubLanguage(JSNode.LANGUAGE, new JSOutlineContentProvider());
+	}
+
+	@Override
+	protected Object[] getDefaultChildren(Object parent)
+	{
+		if (parent instanceof HTMLElementNode)
 		{
-			IParseNode[] children = ((HTMLElementNode) parentElement).getChildren();
+			IParseNode[] children = ((HTMLElementNode) parent).getChildren();
 			List<IParseNode> result = new ArrayList<IParseNode>();
 			for (IParseNode child : children)
 			{
-				if (child instanceof HTMLElementNode && ((HTMLElementNode) child).getName().length() > 0)
+				if (child instanceof HTMLElementNode && ((HTMLElementNode) child).getName().length() == 0)
 				{
-					result.add(child);
+					continue;
 				}
+				result.add(child);
 			}
 			return result.toArray(new IParseNode[result.size()]);
 		}
-		return super.getChildren(parentElement);
+		return super.getDefaultChildren(parent);
 	}
 }

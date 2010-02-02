@@ -3,15 +3,15 @@
 %import "com.aptana.editor.html.parsing.ast.*";
 %import "com.aptana.parsing.ast.ParseRootNode";
 
-%terminals START_TAG, END_TAG, SELF_CLOSING, TEXT;
+%terminals START_TAG, END_TAG, SELF_CLOSING, TEXT, STYLE, SCRIPT;
 
-%typeof START_TAG, END_TAG, SELF_CLOSING, TEXT = "String";
-%typeof Statement = "HTMLElementNode";
+%typeof START_TAG, END_TAG, SELF_CLOSING, TEXT, STYLE, SCRIPT = "String";
+%typeof Statement = "HTMLNode";
 
 %goal Program;
 
 Program
-	=	Statements.p {:return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	=	Statements.p {:return new ParseRootNode(HTMLNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
 	;
 
 Statements
@@ -25,5 +25,17 @@ Statement
 	|	START_TAG.t END_TAG.e {:return new HTMLElementNode(t, _symbol_t.getStart(), _symbol_e.getEnd());:}
 	|	SELF_CLOSING.s {:return new HTMLElementNode(s, _symbol_s.getStart(), _symbol_s.getEnd());:}
 	|	TEXT.t {:return new HTMLElementNode("", _symbol_t.getStart(), _symbol_t.getEnd());:}
+	|	CSSBlock.b {:return new HTMLSpecialNode(HTMLSpecialNode.CSS, _symbol_b.getStart(), _symbol_b.getEnd());:}
+	|	JSBlock.b {:return new HTMLSpecialNode(HTMLSpecialNode.JS, _symbol_b.getStart(), _symbol_b.getEnd());:}
 	|	error
+	;
+
+CSSBlock
+	=	CSSBlock STYLE
+	|	STYLE
+	;
+
+JSBlock
+	=	JSBlock SCRIPT
+	|	SCRIPT
 	;

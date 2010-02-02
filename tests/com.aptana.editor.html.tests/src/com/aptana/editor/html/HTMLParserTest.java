@@ -39,11 +39,13 @@ public class HTMLParserTest extends TestCase
 	public void testStyle() throws Exception
 	{
 		String source = "<html><head><style>html {color: red;}</style></head></html>\n";
+		parseTest(source);
 	}
 
 	public void testScript() throws Exception
 	{
 		String source = "<html><head><script>var one = 1;</script></head></html>\n";
+		parseTest(source);
 	}
 
 	protected void parseTest(String source) throws Exception

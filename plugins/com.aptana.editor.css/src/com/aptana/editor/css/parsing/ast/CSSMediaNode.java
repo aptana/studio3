@@ -8,9 +8,8 @@ public class CSSMediaNode extends CSSNode
 
 	public CSSMediaNode(String[] medias, int start, int end)
 	{
+		super(start, end);
 		fMedias = medias;
-		this.start = start;
-		this.end = end;
 	}
 
 	@Override

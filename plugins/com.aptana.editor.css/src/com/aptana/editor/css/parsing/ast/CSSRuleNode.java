@@ -71,6 +71,20 @@ public class CSSRuleNode extends CSSNode
 	}
 
 	@Override
+	public void addOffset(int offset)
+	{
+		super.addOffset(offset);
+		for (CSSSelectorNode node : fSelectors)
+		{
+			node.addOffset(offset);
+		}
+		for (CSSDeclarationNode node : fDeclarations)
+		{
+			node.addOffset(offset);
+		}
+	}
+
+	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();

@@ -13,16 +13,19 @@ import com.aptana.parsing.ast.ParseRootNode;
 public class HTMLParser extends Parser {
 	static public class Terminals {
 		static public final short EOF = 0;
-		static public final short START_TAG = 1;
-		static public final short SELF_CLOSING = 2;
-		static public final short TEXT = 3;
-		static public final short END_TAG = 4;
+		static public final short STYLE = 1;
+		static public final short SCRIPT = 2;
+		static public final short START_TAG = 3;
+		static public final short SELF_CLOSING = 4;
+		static public final short TEXT = 5;
+		static public final short END_TAG = 6;
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9nzZziEmZ0CGzqoEZOgWH1l#zbzDPTnCKwJyRX8nuwSI4q1J7oZGuy32euOa7aZ8t4Tmss" +
-		"wnqvg00bPNQUijFcQhBcxJqqDeCveTHP3zDLatY3g4lr9N3Tsgnk$JLzyyi4x5txiJLsQT5" +
-		"4MIJVbzYVtzAVy0Bin7QC=");
+		"U9nzKCiEWZ0Gd1PK2YBAHGyUF6lYD$B9ljyw3bW2mUWcipFPcMxQ0bZpWH4oX1WWGXyJE2H" +
+		"8ORaXMqwZnYrTfti8lAev1Z0K3AnceHBzweIJatISTgRHJRfMDHlTp6f3Ng2gcP1wdPUjQ4" +
+		"6rzBmgEbudLzRSwwcm#9V$iIF$45zLl$FA2yyyyCGTZznponkViZBzWT7Rh63qCYi4diqN8" +
+		"iqZiHCxSVm679Gorm==");
 
 	private final Action[] actions;
 
@@ -33,8 +36,8 @@ public class HTMLParser extends Parser {
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
-					final HTMLElementNode[] p = _list_p == null ? new HTMLElementNode[0] : (HTMLElementNode[]) _list_p.toArray(new HTMLElementNode[_list_p.size()]);
-					return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());
+					final HTMLNode[] p = _list_p == null ? new HTMLNode[0] : (HTMLNode[]) _list_p.toArray(new HTMLNode[_list_p.size()]);
+					return new ParseRootNode(HTMLNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] Statements = Statements Statement
@@ -53,7 +56,7 @@ public class HTMLParser extends Parser {
 					final String t = (String) _symbol_t.value;
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
-					final HTMLElementNode[] s = _list_s == null ? new HTMLElementNode[0] : (HTMLElementNode[]) _list_s.toArray(new HTMLElementNode[_list_s.size()]);
+					final HTMLNode[] s = _list_s == null ? new HTMLNode[0] : (HTMLNode[]) _list_s.toArray(new HTMLNode[_list_s.size()]);
 					return new HTMLElementNode(t, s, _symbol_t.getStart(), s[s.length - 1].getEnd());
 				}
 			},
@@ -63,7 +66,7 @@ public class HTMLParser extends Parser {
 					final String t = (String) _symbol_t.value;
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final ArrayList _list_s = (ArrayList) _symbol_s.value;
-					final HTMLElementNode[] s = _list_s == null ? new HTMLElementNode[0] : (HTMLElementNode[]) _list_s.toArray(new HTMLElementNode[_list_s.size()]);
+					final HTMLNode[] s = _list_s == null ? new HTMLNode[0] : (HTMLNode[]) _list_s.toArray(new HTMLNode[_list_s.size()]);
 					final Symbol _symbol_e = _symbols[offset + 3];
 					final String e = (String) _symbol_e.value;
 					return new HTMLElementNode(t, s, _symbol_t.getStart(), _symbol_e.getEnd());
@@ -92,7 +95,43 @@ public class HTMLParser extends Parser {
 					return new HTMLElementNode("", _symbol_t.getStart(), _symbol_t.getEnd());
 				}
 			},
-			Action.RETURN	// [8] Statement = error
+			new Action() {	// [8] Statement = CSSBlock.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_b = _symbols[offset + 1];
+					final ArrayList _list_b = (ArrayList) _symbol_b.value;
+					final String[] b = _list_b == null ? new String[0] : (String[]) _list_b.toArray(new String[_list_b.size()]);
+					return new HTMLSpecialNode(HTMLSpecialNode.CSS, _symbol_b.getStart(), _symbol_b.getEnd());
+				}
+			},
+			new Action() {	// [9] Statement = JSBlock.b
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol _symbol_b = _symbols[offset + 1];
+					final ArrayList _list_b = (ArrayList) _symbol_b.value;
+					final String[] b = _list_b == null ? new String[0] : (String[]) _list_b.toArray(new String[_list_b.size()]);
+					return new HTMLSpecialNode(HTMLSpecialNode.JS, _symbol_b.getStart(), _symbol_b.getEnd());
+				}
+			},
+			Action.RETURN,	// [10] Statement = error
+			new Action() {	// [11] CSSBlock = CSSBlock STYLE
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
+				}
+			},
+			new Action() {	// [12] CSSBlock = STYLE
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+				}
+			},
+			new Action() {	// [13] JSBlock = JSBlock SCRIPT
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
+				}
+			},
+			new Action() {	// [14] JSBlock = SCRIPT
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+				}
+			}
 		};
 	}
 

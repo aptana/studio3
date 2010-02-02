@@ -19,9 +19,16 @@ public class HTMLParserScanner extends Scanner
 	private ITokenScanner fTokenScanner;
 	private IDocument fDocument;
 
+	private int fScannerIndex;
+
 	public HTMLParserScanner()
 	{
 		fTokenScanner = new HTMLTokenScanner();
+	}
+
+	public IDocument getSource()
+	{
+		return fDocument;
 	}
 
 	public void setSource(String text)
@@ -54,14 +61,44 @@ public class HTMLParserScanner extends Scanner
 		{
 			type = HTMLTokens.getToken(data.toString());
 		}
+
 		try
 		{
 			String text = fDocument.get(offset, length);
-			if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
+			if (fScannerIndex == 1)
+			{
+				type = HTMLTokens.STYLE;
+				if (text.equals("</style>"))
+				{
+					fScannerIndex = 0;
+					return nextToken();
+				}
+			}
+			else if (fScannerIndex == 2)
+			{
+				type = HTMLTokens.SCRIPT;
+				if (text.equals("</script>"))
+				{
+					fScannerIndex = 0;
+					return nextToken();
+				}
+			}
+			else if (type == HTMLTokens.STYLE)
+			{
+				fScannerIndex = 1;
+				return nextToken();
+			}
+			else if (type == HTMLTokens.SCRIPT)
+			{
+				fScannerIndex = 2;
+				return nextToken();
+			}
+			else if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
 			{
 				// self closing
 				type = HTMLTokens.SELF_CLOSING;
 			}
+
 			return new Symbol(type, offset, offset + length - 1, text);
 		}
 		catch (BadLocationException e)
