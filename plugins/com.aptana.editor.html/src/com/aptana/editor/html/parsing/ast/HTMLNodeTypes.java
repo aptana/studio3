@@ -2,6 +2,8 @@ package com.aptana.editor.html.parsing.ast;
 
 public interface HTMLNodeTypes
 {
+	public static final short ERROR = -1;
+
 	public static final short UNKNOWN = 0;
 
 	public static final short DECLARATION = 1;

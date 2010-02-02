@@ -25,9 +25,29 @@ Statement
 	|	START_TAG.t END_TAG.e {:return new HTMLElementNode(t, _symbol_t.getStart(), _symbol_e.getEnd());:}
 	|	SELF_CLOSING.s {:return new HTMLElementNode(s, _symbol_s.getStart(), _symbol_s.getEnd());:}
 	|	TEXT.t {:return new HTMLElementNode("", _symbol_t.getStart(), _symbol_t.getEnd());:}
-	|	CSSBlock.b {:return new HTMLSpecialNode(HTMLSpecialNode.CSS, _symbol_b.getStart(), _symbol_b.getEnd());:}
-	|	JSBlock.b {:return new HTMLSpecialNode(HTMLSpecialNode.JS, _symbol_b.getStart(), _symbol_b.getEnd());:}
-	|	error
+	|	CSSBlock.b {:
+			IParseNode[] nested = new IParseNode[0];
+			try {
+				String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
+				IParseNode node = CSSParserFactory.getInstance().getParser().parse(text);
+				addOffset(node, _symbol_b.getStart());
+				nested = new IParseNode[] { node };
+			} catch (java.lang.Exception e) {
+			}
+			return new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, _symbol_b.getStart(), _symbol_b.getEnd());
+		:}
+	|	JSBlock.b {:
+			IParseNode[] nested = new IParseNode[0];
+			try {
+				String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
+				IParseNode node = JSParserFactory.getInstance().getParser().parse(text);
+				addOffset(node, _symbol_b.getStart());
+				nested = new IParseNode[] { node };
+			} catch (java.lang.Exception e) {
+			}
+			return new HTMLSpecialNode(HTMLSpecialNode.JS, nested, _symbol_b.getStart(), _symbol_b.getEnd());
+		:}
+	|	error.e {:return new HTMLNode(HTMLNodeTypes.ERROR, e.getStart(), e.getEnd());:}
 	;
 
 CSSBlock

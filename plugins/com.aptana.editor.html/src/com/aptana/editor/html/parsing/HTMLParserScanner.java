@@ -65,38 +65,41 @@ public class HTMLParserScanner extends Scanner
 		try
 		{
 			String text = fDocument.get(offset, length);
-			if (fScannerIndex == 1)
+			if (type != HTMLTokens.EOF)
 			{
-				type = HTMLTokens.STYLE;
-				if (text.equals("</style>"))
+				if (fScannerIndex == 1)
 				{
-					fScannerIndex = 0;
+					type = HTMLTokens.STYLE;
+					if (text.equals("</style>"))
+					{
+						fScannerIndex = 0;
+						return nextToken();
+					}
+				}
+				else if (fScannerIndex == 2)
+				{
+					type = HTMLTokens.SCRIPT;
+					if (text.equals("</script>"))
+					{
+						fScannerIndex = 0;
+						return nextToken();
+					}
+				}
+				else if (type == HTMLTokens.STYLE)
+				{
+					fScannerIndex = 1;
 					return nextToken();
 				}
-			}
-			else if (fScannerIndex == 2)
-			{
-				type = HTMLTokens.SCRIPT;
-				if (text.equals("</script>"))
+				else if (type == HTMLTokens.SCRIPT)
 				{
-					fScannerIndex = 0;
+					fScannerIndex = 2;
 					return nextToken();
 				}
-			}
-			else if (type == HTMLTokens.STYLE)
-			{
-				fScannerIndex = 1;
-				return nextToken();
-			}
-			else if (type == HTMLTokens.SCRIPT)
-			{
-				fScannerIndex = 2;
-				return nextToken();
-			}
-			else if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
-			{
-				// self closing
-				type = HTMLTokens.SELF_CLOSING;
+				else if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
+				{
+					// self closing
+					type = HTMLTokens.SELF_CLOSING;
+				}
 			}
 
 			return new Symbol(type, offset, offset + length - 1, text);

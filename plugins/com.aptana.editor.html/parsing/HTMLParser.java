@@ -100,7 +100,16 @@ public class HTMLParser extends Parser {
 					final Symbol _symbol_b = _symbols[offset + 1];
 					final ArrayList _list_b = (ArrayList) _symbol_b.value;
 					final String[] b = _list_b == null ? new String[0] : (String[]) _list_b.toArray(new String[_list_b.size()]);
-					return new HTMLSpecialNode(HTMLSpecialNode.CSS, _symbol_b.getStart(), _symbol_b.getEnd());
+					
+			IParseNode[] nested = new IParseNode[0];
+			try {
+				String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
+				IParseNode node = CSSParserFactory.getInstance().getParser().parse(text);
+				addOffset(node, _symbol_b.getStart());
+				nested = new IParseNode[] { node };
+			} catch (java.lang.Exception e) {
+			}
+			return new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, _symbol_b.getStart(), _symbol_b.getEnd());
 				}
 			},
 			new Action() {	// [9] Statement = JSBlock.b
@@ -108,10 +117,24 @@ public class HTMLParser extends Parser {
 					final Symbol _symbol_b = _symbols[offset + 1];
 					final ArrayList _list_b = (ArrayList) _symbol_b.value;
 					final String[] b = _list_b == null ? new String[0] : (String[]) _list_b.toArray(new String[_list_b.size()]);
-					return new HTMLSpecialNode(HTMLSpecialNode.JS, _symbol_b.getStart(), _symbol_b.getEnd());
+					
+			IParseNode[] nested = new IParseNode[0];
+			try {
+				String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
+				IParseNode node = JSParserFactory.getInstance().getParser().parse(text);
+				addOffset(node, _symbol_b.getStart());
+				nested = new IParseNode[] { node };
+			} catch (java.lang.Exception e) {
+			}
+			return new HTMLSpecialNode(HTMLSpecialNode.JS, nested, _symbol_b.getStart(), _symbol_b.getEnd());
 				}
 			},
-			Action.RETURN,	// [10] Statement = error
+			new Action() {	// [10] Statement = error.e
+				public Symbol reduce(Symbol[] _symbols, int offset) {
+					final Symbol e = _symbols[offset + 1];
+					return new HTMLNode(HTMLNodeTypes.ERROR, e.getStart(), e.getEnd());
+				}
+			},
 			new Action() {	// [11] CSSBlock = CSSBlock STYLE
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
