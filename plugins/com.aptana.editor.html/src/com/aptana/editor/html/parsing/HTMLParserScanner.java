@@ -39,6 +39,7 @@ public class HTMLParserScanner extends Scanner
 	public void setSource(IDocument document)
 	{
 		fDocument = document;
+		fScannerIndex = 0;
 		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
 	}
 
