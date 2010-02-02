@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.scripting;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

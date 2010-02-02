@@ -163,7 +163,7 @@
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
-            class="com.aptana.editor.common.EditorContextContributor">
+            class="com.aptana.editor.common.internal.scripting.EditorContextContributor">
       </contributor>
    </extension>
 </plugin>
