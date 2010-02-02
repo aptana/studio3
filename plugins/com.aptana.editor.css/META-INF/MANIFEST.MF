@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.editor.css
+Export-Package: com.aptana.editor.css,
+ com.aptana.editor.css.internal;x-friends:="com.aptana.editor.html,com.aptana.editor.erb"
