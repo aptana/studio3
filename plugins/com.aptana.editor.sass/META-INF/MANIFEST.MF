@@ -15,3 +15,4 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.common,
  com.aptana.editor.css;bundle-version="1.0.0"
 Export-Package: com.aptana.editor.sass
+Bundle-Localization: plugin
