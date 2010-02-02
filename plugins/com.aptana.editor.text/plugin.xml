@@ -21,7 +21,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <file-association
             content-type="org.eclipse.core.runtime.text"
-            file-extensions="log"
+            file-extensions="log,opts"
             file-names="README,TODO,README_FOR_APP,CHANGELOG,LICENSE,ABOUT">
       </file-association>
       <content-type
