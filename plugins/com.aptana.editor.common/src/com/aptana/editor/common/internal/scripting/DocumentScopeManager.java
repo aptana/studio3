@@ -49,27 +49,27 @@ import com.aptana.editor.common.tmp.ContentTypeTranslation;
 /**
  * @author Max Stepanov
  */
-public class DocumentContentTypeManager implements IDocumentScopeManager
+public class DocumentScopeManager implements IDocumentScopeManager
 {
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
 
-	private static DocumentContentTypeManager instance;
+	private static DocumentScopeManager instance;
 
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
 
 	/**
 	 * 
 	 */
-	private DocumentContentTypeManager()
+	private DocumentScopeManager()
 	{
 	}
 
-	public static DocumentContentTypeManager getInstance()
+	public static DocumentScopeManager getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new DocumentContentTypeManager();
+			instance = new DocumentScopeManager();
 		}
 		return instance;
 	}

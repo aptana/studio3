@@ -15,7 +15,7 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.editor.common.internal.scripting.DocumentContentTypeManager;
+import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.internal.theme.ThemeManager;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
@@ -202,6 +202,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	public IDocumentScopeManager getDocumentScopeManager()
 	{
-		return DocumentContentTypeManager.getInstance();
+		return DocumentScopeManager.getInstance();
 	}
 }
