@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common.tmp;
+package com.aptana.editor.common.internal.scripting;
 
 import java.util.ArrayList;
 import java.util.HashMap;

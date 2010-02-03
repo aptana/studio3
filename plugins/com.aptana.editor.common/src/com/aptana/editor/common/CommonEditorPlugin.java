@@ -15,13 +15,13 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.internal.theme.ThemeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * The activator class controls the plug-in life cycle
