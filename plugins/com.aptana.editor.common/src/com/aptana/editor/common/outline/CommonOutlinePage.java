@@ -4,8 +4,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -13,9 +16,12 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
@@ -24,6 +30,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.parsing.lexer.ILexeme;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
@@ -62,6 +69,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
+	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
+
 	private AbstractThemeableEditor fEditor;
 
 	private ITreeContentProvider fContentProvider;
@@ -99,11 +108,57 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.setInput(fEditor);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
 
+		hookToThemes();
+
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
 		actionBars.updateActionBars();
 
 		fPrefs.addPropertyChangeListener(this);
+	}
+
+	private void hookToThemes()
+	{
+		getTreeViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
+		overrideLabelProvider();
+	}
+
+	private void overrideLabelProvider()
+	{
+		ViewerColumn viewer = (ViewerColumn) getTreeViewer().getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
+		ColumnViewer colViewer = viewer.getViewer();
+		final ILabelProvider provider = (ILabelProvider) colViewer.getLabelProvider();
+		viewer.setLabelProvider(new CellLabelProvider()
+		{
+
+			@Override
+			public void update(ViewerCell cell)
+			{
+				// provider.update(cell);
+				Object element = cell.getElement();
+				cell.setText(provider.getText(element));
+				cell.setImage(provider.getImage(element));
+				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				if (font == null)
+				{
+					font = JFaceResources.getTextFont();
+				}
+				if (font != null)
+				{
+					cell.setFont(font);
+				}
+
+				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getForeground()));
+			}
+		});
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
 	@Override
