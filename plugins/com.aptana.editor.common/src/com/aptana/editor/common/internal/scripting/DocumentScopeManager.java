@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -33,39 +33,44 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.scripting;
 
 import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.ICommonConstants;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 
 /**
  * @author Max Stepanov
  */
-public final class DocumentContentTypeManager
+public class DocumentScopeManager implements IDocumentScopeManager
 {
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
 
-	private static DocumentContentTypeManager instance;
+	private static DocumentScopeManager instance;
 
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
 
 	/**
 	 * 
 	 */
-	private DocumentContentTypeManager()
+	private DocumentScopeManager()
 	{
 	}
 
-	public static DocumentContentTypeManager getInstance()
+	public static DocumentScopeManager getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new DocumentContentTypeManager();
+			instance = new DocumentScopeManager();
 		}
 		return instance;
 	}
@@ -77,20 +82,9 @@ public final class DocumentContentTypeManager
 	 * @param defaultContentType
 	 * @param filename
 	 */
-	public void setDocumentContentType(IDocument document, String defaultContentType, String filename)
+	public void setDocumentScope(IDocument document, String defaultContentType, String filename)
 	{
 		infos.put(document, new ExtendedDocumentInfo(defaultContentType, filename));
-	}
-
-	/**
-	 * Another version to use when we are unable to grab the filename. Just returns the typical scope/content type.
-	 * 
-	 * @param document
-	 * @param defaultContentType
-	 */
-	public void setDocumentContentType(IDocument document, String defaultContentType)
-	{
-		setDocumentContentType(document, defaultContentType, null);
 	}
 
 	public void registerConfigurations(IDocument document, IPartitioningConfiguration[] configurations)
@@ -125,7 +119,7 @@ public final class DocumentContentTypeManager
 		return UNKNOWN.subtype(document.getContentType(offset));
 	}
 
-	public String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
+	public String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 	{
 		// TODO We still don't append the token to end of scope, which Textmate does. Unfortunately I have no idea how
 		// we'd get that unless we ran a token scanner on the whole partition until we hit the token for our offset, and
@@ -135,7 +129,7 @@ public final class DocumentContentTypeManager
 		{
 			// Now we translate our custom top level content types into scopes, and our partition names into scopes as
 			// well.
-			QualifiedContentType translation = ContentTypeTranslation.getDefault().translate(contentType);
+			QualifiedContentType translation = getContentTypeTranslator().translate(contentType);
 			ExtendedDocumentInfo info = infos.get(document);
 			if (info != null)
 			{
@@ -144,6 +138,11 @@ public final class DocumentContentTypeManager
 			return translation.toString();
 		}
 		return document.getContentType(offset);
+	}
+
+	protected IContentTypeTranslator getContentTypeTranslator()
+	{
+		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}
 
 }

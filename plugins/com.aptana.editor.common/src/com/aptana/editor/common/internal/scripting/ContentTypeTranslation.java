@@ -33,23 +33,22 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common.tmp;
+package com.aptana.editor.common.internal.scripting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 
 /**
  * @author Max Stepanov
  */
-public class ContentTypeTranslation
+public class ContentTypeTranslation implements IContentTypeTranslator
 {
 
-	// TODO Hide the implementation behind an interface, have clients grab singleton from the plugin, rather than
-	// directly on this class!
 	private static ContentTypeTranslation instance;
 
 	private Map<QualifiedContentType, QualifiedContentType> map = new HashMap<QualifiedContentType, QualifiedContentType>();
@@ -67,12 +66,9 @@ public class ContentTypeTranslation
 		return instance;
 	}
 
-	/**
-	 * Allows plugins to contribute a scope translation. This is used to give different scope names to various
-	 * partitions based on their nesting within other languages.
-	 * 
-	 * @param left
-	 * @param right
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.scripting.IContentTypeTranslator#addTranslation(com.aptana.editor.common.QualifiedContentType, com.aptana.editor.common.QualifiedContentType)
 	 */
 	public void addTranslation(QualifiedContentType left, QualifiedContentType right)
 	{

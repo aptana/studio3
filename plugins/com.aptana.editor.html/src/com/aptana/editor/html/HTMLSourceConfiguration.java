@@ -49,13 +49,13 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.NonRuleBasedDamagerRepairer;
-import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
@@ -99,7 +99,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	static
 	{
-		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		// Top-level HTML
 		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML), new QualifiedContentType(
 				"text.html.basic")); //$NON-NLS-1$

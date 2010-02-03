@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.scripting;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +10,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -48,7 +50,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 				abstractThemeableEditor.getEditorInput());
 		try
 		{
-			String contentTypeAtOffset = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, caretOffset);
+			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
 			ScopeContainsFilter filter = new ScopeContainsFilter(contentTypeAtOffset);
 			
 			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);

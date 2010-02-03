@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.theme.fontloader;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -11,6 +11,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+
 /**
  * Copies the included font to the plugin state location. Then sets the theme to a custom one we've added which sets the
  * text editor and block selection fonts to Inconsolata-14. Once we've forced our theme, store a pref boolean so we
@@ -18,7 +20,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * 
  * @author cwilliams
  */
-class EditorFontOverride extends UIJob
+public class EditorFontOverride extends UIJob
 {
 
 	/**

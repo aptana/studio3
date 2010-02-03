@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal.scripting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +41,14 @@ import java.util.Map;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.scripting.model.BundleManager;
 
 /**
+ * This class stores the association between an IDocument in an editor and the filename of teh file it represents. This
+ * is used to do dynamic top-level scope associations, since bundles can define filename patterns to override top level
+ * scopes returned for scripting purposes.
+ * 
  * @author Max Stepanov
  */
 /* package */class ExtendedDocumentInfo
@@ -106,7 +111,7 @@ import com.aptana.scripting.model.BundleManager;
 			return translation;
 		}
 		// TODO If scope ends with generic DEFAULT PARTITION, cut that off
-		
+
 		String[] newParts = new String[parts.length];
 		newParts[0] = scope;
 		System.arraycopy(parts, 1, newParts, 1, parts.length - 1);

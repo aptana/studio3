@@ -40,7 +40,7 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 
 import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class XMLDocumentProvider extends CommonDocumentProvider
 {
@@ -57,7 +57,7 @@ public class XMLDocumentProvider extends CommonDocumentProvider
 					XMLSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
 					XMLSourceConfiguration.getDefault());
 		}
 	}

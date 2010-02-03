@@ -15,7 +15,12 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
+import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.internal.theme.ThemeManager;
+import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
 import com.aptana.editor.common.theme.IThemeManager;
 
@@ -196,5 +201,15 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			}
 		}
 		return store;
+	}
+
+	public IDocumentScopeManager getDocumentScopeManager()
+	{
+		return DocumentScopeManager.getInstance();
+	}
+
+	public IContentTypeTranslator getContentTypeTranslator()
+	{
+		return ContentTypeTranslation.getDefault();
 	}
 }
