@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.core.runtime.Platform;
+
 /**
  * @author Kevin Lindsey
  */
@@ -94,7 +96,7 @@ public class HttpServer extends Thread
 	{
 		String result = LOCALHOST;
 		
-		if (this.serverSocket != null)
+		if (this.serverSocket != null && Platform.OS_WIN32.equals(Platform.getOS()) == false)
 		{
 			result = this.serverSocket.getInetAddress().getHostAddress();
 		}
