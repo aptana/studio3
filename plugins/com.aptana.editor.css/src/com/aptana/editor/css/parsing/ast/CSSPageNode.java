@@ -29,13 +29,18 @@ public class CSSPageNode extends CSSNode
 		fPageSelector = pageSelector;
 		if (declarations instanceof CSSDeclarationNode)
 		{
-			setChildren(new CSSNode[] { (CSSDeclarationNode) declarations });
+			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
 		}
 		else if (declarations instanceof List<?>)
 		{
 			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
 			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
 		}
+	}
+
+	public CSSDeclarationNode[] getDeclarations()
+	{
+		return (CSSDeclarationNode[]) getChildren();
 	}
 
 	@Override

@@ -13,8 +13,18 @@ public class CSSTermListNode extends CSSExpressionNode
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right, String separator)
 	{
 		super(left.getStart(), right.getEnd());
-		setChildren(new CSSNode[] { left, right });
+		setChildren(new CSSExpressionNode[] { left, right });
 		fSeparator = separator;
+	}
+
+	public CSSExpressionNode getLeftExpression()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	public CSSExpressionNode getRightExpression()
+	{
+		return (CSSExpressionNode) getChild(1);
 	}
 
 	@Override

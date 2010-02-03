@@ -23,6 +23,11 @@ public class CSSAttributeSelectorNode extends CSSNode
 		setChildren(new CSSNode[] { function });
 	}
 
+	public CSSExpressionNode getFunction()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
 	@Override
 	public String toString()
 	{

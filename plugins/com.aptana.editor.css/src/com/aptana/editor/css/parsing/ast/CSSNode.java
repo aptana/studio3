@@ -7,7 +7,7 @@ public class CSSNode extends ParseBaseNode
 
 	public static final String LANGUAGE = "text/css"; //$NON-NLS-1$
 
-	public CSSNode()
+	protected CSSNode()
 	{
 		this(0, 0);
 	}

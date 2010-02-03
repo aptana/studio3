@@ -9,6 +9,11 @@ public class CSSFunctionNode extends CSSExpressionNode
 		setChildren(new CSSNode[] { expression });
 	}
 
+	public CSSExpressionNode getExpression()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
 	@Override
 	public String toString()
 	{

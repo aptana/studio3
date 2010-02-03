@@ -9,8 +9,9 @@ public class CSSDeclarationNode extends CSSNode
 	private String fStatus;
 	private boolean fHasSemicolon;
 
-	public CSSDeclarationNode()
+	public CSSDeclarationNode(int start, int end)
 	{
+		super(start, end);
 	}
 
 	public CSSDeclarationNode(Symbol semicolon)
@@ -39,6 +40,11 @@ public class CSSDeclarationNode extends CSSNode
 		{
 			this.end = status.getEnd();
 		}
+	}
+
+	public CSSExpressionNode getAssignedValue()
+	{
+		return (CSSExpressionNode) getChild(0);
 	}
 
 	public void setHasSemicolon(Symbol semicolon)

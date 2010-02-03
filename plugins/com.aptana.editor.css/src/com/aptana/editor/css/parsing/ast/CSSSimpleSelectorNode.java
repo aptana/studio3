@@ -44,6 +44,11 @@ public class CSSSimpleSelectorNode extends CSSNode
 		}
 	}
 
+	public CSSAttributeSelectorNode[] getAttributeSelectors()
+	{
+		return (CSSAttributeSelectorNode[]) getChildren();
+	}
+
 	@Override
 	public String toString()
 	{
