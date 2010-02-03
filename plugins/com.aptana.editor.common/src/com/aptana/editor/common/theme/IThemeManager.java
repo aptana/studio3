@@ -14,6 +14,12 @@ public interface IThemeManager
 	 */
 	public static final String THEME_CHANGED = "THEME_CHANGED"; //$NON-NLS-1$
 
+	/**
+	 * The font that we use to control the App Explorer, outline view and other views that will use the theming and will
+	 * default to the text editor font.
+	 */
+	public static final String VIEW_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
+
 	// FIXME Rather than having pref listeners register by knowing the node and everything, have them register through
 	// this interface like Eclipse's IThemeManager
 
