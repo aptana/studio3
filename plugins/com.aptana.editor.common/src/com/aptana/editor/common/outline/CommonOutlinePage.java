@@ -77,8 +77,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
-
 	private AbstractThemeableEditor fEditor;
 
 	private ITreeContentProvider fContentProvider;
@@ -171,7 +169,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		{
 			public void handleEvent(Event event)
 			{
-				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 				if (font == null)
 				{
 					font = JFaceResources.getTextFont();
@@ -196,7 +194,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
-				if (!event.getProperty().equals(APP_EXPLORER_FONT_NAME))
+				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
 					return;
 				Display.getCurrent().asyncExec(new Runnable()
 				{

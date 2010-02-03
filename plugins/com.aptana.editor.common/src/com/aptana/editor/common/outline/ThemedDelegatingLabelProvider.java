@@ -21,9 +21,6 @@ import com.aptana.editor.common.theme.IThemeManager;
 public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
 
-	// FIXME This constant is repeated throughout files!
-	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
-
 	private ILabelProvider wrapped;
 
 	ThemedDelegatingLabelProvider(ILabelProvider wrapped)
@@ -64,7 +61,7 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 	@Override
 	public Font getFont(Object element)
 	{
-		Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 		if (font == null)
 		{
 			font = JFaceResources.getTextFont();
