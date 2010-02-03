@@ -40,11 +40,12 @@ import java.util.WeakHashMap;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * @author Max Stepanov
@@ -128,7 +129,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		{
 			// Now we translate our custom top level content types into scopes, and our partition names into scopes as
 			// well.
-			QualifiedContentType translation = ContentTypeTranslation.getDefault().translate(contentType);
+			QualifiedContentType translation = getContentTypeTranslator().translate(contentType);
 			ExtendedDocumentInfo info = infos.get(document);
 			if (info != null)
 			{
@@ -137,6 +138,11 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			return translation.toString();
 		}
 		return document.getContentType(offset);
+	}
+
+	protected IContentTypeTranslator getContentTypeTranslator()
+	{
+		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}
 
 }

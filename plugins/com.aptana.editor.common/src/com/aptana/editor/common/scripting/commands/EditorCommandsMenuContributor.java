@@ -31,7 +31,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -169,7 +169,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				for (String[] topContentType : topContentTypes)
 				{
 					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-					String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
+					String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
 					// Get menus
 					ScopeFilter filter = new ScopeFilter(contentType);
 					menusFromScope = BundleManager.getInstance().getMenus(filter);
@@ -210,6 +210,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			menuItemForOtherScopes.setMenu(menuForOtherScopes);
 			// TODO Need API in Bundle Manager to implement this.
 		}
+	}
+
+	protected static IContentTypeTranslator getContentTypeTranslator()
+	{
+		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}
 
 	/**

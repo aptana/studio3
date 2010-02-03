@@ -52,10 +52,10 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * @author Max Stepanov
@@ -98,7 +98,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 
 	static
 	{
-		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(
 				"source.ruby.rails")); //$NON-NLS-1$ // FIXME Should just be source.ruby! Rails bundle should contribute the more specific scope
 		c
