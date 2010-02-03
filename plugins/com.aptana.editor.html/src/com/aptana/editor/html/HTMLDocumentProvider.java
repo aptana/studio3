@@ -39,7 +39,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 
 import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.IExtendedPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
@@ -65,7 +65,7 @@ public class HTMLDocumentProvider extends CommonDocumentProvider
 			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
 					HTMLSourceConfiguration.getDefault());
 		}
 	}

@@ -50,11 +50,11 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 
 /**
  * @author Max Stepanov
@@ -68,8 +68,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String COMMENT = PREFIX + "comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, STRING_SINGLE,
-			STRING_DOUBLE };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ISassConstants.CONTENT_TYPE_SASS } };
 
@@ -88,7 +87,9 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		{
 			instance = new SassSourceConfiguration();
 			// TODO Probably need to do some other massaging!
-			ContentTypeTranslation.getDefault().addTranslation(new QualifiedContentType("com.aptana.contenttype.sass"), new QualifiedContentType("source.sass")); //$NON-NLS-1$ //$NON-NLS-2$
+			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+			c.addTranslation(new QualifiedContentType(ISassConstants.CONTENT_TYPE_SASS), new QualifiedContentType(
+					"source.sass")); //$NON-NLS-1$
 		}
 		return instance;
 	}
@@ -97,8 +98,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		IToken comment = new Token(COMMENT);
 
-		partitioningRules = new IPredicateRule[] { 
-				new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
+		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new EndOfLineRule("/*", comment), //$NON-NLS-1$ // FIXME What about nested comments!
 				new EndOfLineRule("//", comment) //$NON-NLS-1$ // FIXME What about nested comments!
