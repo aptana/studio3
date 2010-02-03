@@ -1,120 +1,60 @@
 package com.aptana.editor.html.parsing;
 
-import java.io.IOException;
-
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
 
-import beaver.Scanner;
 import beaver.Symbol;
 
+import com.aptana.editor.common.parsing.CompositeParserScanner;
+import com.aptana.editor.common.parsing.IScannerSwitchStrategy;
+import com.aptana.editor.common.parsing.ScannerSwitchStrategy;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 
-public class HTMLParserScanner extends Scanner
+public class HTMLParserScanner extends CompositeParserScanner
 {
 
-	private ITokenScanner fTokenScanner;
-	private IDocument fDocument;
+	private static final String[] CSS_ENTER_TOKENS = new String[] { HTMLTokens.getTokenName(HTMLTokens.STYLE) };
+	private static final String[] CSS_EXIT_SEQUENCES = new String[] { "</style>" }; //$NON-NLS-1$
+	private static final String[] JS_ENTER_TOKENS = new String[] { HTMLTokens.getTokenName(HTMLTokens.SCRIPT) };
+	private static final String[] JS_EXIT_SEQUENCES = new String[] { "</script>" }; //$NON-NLS-1$
 
-	private int fScannerIndex;
+	private static final short[] TOKEN_TYPES = new short[] { HTMLTokens.STYLE, HTMLTokens.SCRIPT };
 
 	public HTMLParserScanner()
 	{
-		fTokenScanner = new HTMLTokenScanner();
-	}
-
-	public IDocument getSource()
-	{
-		return fDocument;
-	}
-
-	public void setSource(String text)
-	{
-		setSource(new Document(text));
-	}
-
-	public void setSource(IDocument document)
-	{
-		fDocument = document;
-		fScannerIndex = 0;
-		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
+		super(new HTMLTokenScanner(), new IScannerSwitchStrategy[] {
+				new ScannerSwitchStrategy(CSS_ENTER_TOKENS, CSS_EXIT_SEQUENCES),
+				new ScannerSwitchStrategy(JS_ENTER_TOKENS, JS_EXIT_SEQUENCES) });
 	}
 
 	@Override
-	public Symbol nextToken() throws IOException, Exception
+	protected Symbol createSymbol(int start, int end, String text, IToken token)
 	{
-		IToken token = fTokenScanner.nextToken();
-		Object data = token.getData();
-		while (isIgnored(token))
-		{
-			token = fTokenScanner.nextToken();
-			data = token.getData();
-		}
-
-		int offset = fTokenScanner.getTokenOffset();
-		int length = fTokenScanner.getTokenLength();
-
 		short type = HTMLTokens.EOF;
+		Object data = token.getData();
 		if (data != null)
 		{
-			type = HTMLTokens.getToken(data.toString());
-		}
-
-		try
-		{
-			String text = fDocument.get(offset, length);
-			if (type != HTMLTokens.EOF)
+			int index = getCurrentStrategyIndex();
+			if (index == DEFAULT_INDEX)
 			{
-				if (fScannerIndex == 1)
-				{
-					type = HTMLTokens.STYLE;
-					if (text.equals("</style>"))
-					{
-						fScannerIndex = 0;
-						return nextToken();
-					}
-				}
-				else if (fScannerIndex == 2)
-				{
-					type = HTMLTokens.SCRIPT;
-					if (text.equals("</script>"))
-					{
-						fScannerIndex = 0;
-						return nextToken();
-					}
-				}
-				else if (type == HTMLTokens.STYLE)
-				{
-					fScannerIndex = 1;
-					return nextToken();
-				}
-				else if (type == HTMLTokens.SCRIPT)
-				{
-					fScannerIndex = 2;
-					return nextToken();
-				}
-				else if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
-				{
-					// self closing
-					type = HTMLTokens.SELF_CLOSING;
-				}
+				type = HTMLTokens.getToken(data.toString());
 			}
-
-			return new Symbol(type, offset, offset + length - 1, text);
+			else
+			{
+				type = TOKEN_TYPES[index];
+			}
 		}
-		catch (BadLocationException e)
+		if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
 		{
-			throw new Scanner.Exception(e.getLocalizedMessage());
+			// self closing
+			type = HTMLTokens.SELF_CLOSING;
 		}
+		return new Symbol(type, start, end, text);
 	}
 
+	@Override
 	protected boolean isIgnored(IToken token)
 	{
-		// ignores whitespace
-		if (token.isWhitespace())
+		if (super.isIgnored(token))
 		{
 			return true;
 		}
