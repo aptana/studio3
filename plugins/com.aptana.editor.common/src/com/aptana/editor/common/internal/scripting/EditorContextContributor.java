@@ -21,8 +21,8 @@ import com.aptana.scripting.model.ContextContributor;
 
 public class EditorContextContributor implements ContextContributor
 {
-	private static final String EDITOR_PROPERTY_NAME = "editor";
-	private static final String EDITOR_RUBY_CLASS = "Editor";
+	private static final String EDITOR_PROPERTY_NAME = "editor"; //$NON-NLS-1$
+	private static final String EDITOR_RUBY_CLASS = "Editor"; //$NON-NLS-1$
 
 	private IEditorPart _editor;
 
@@ -67,7 +67,7 @@ public class EditorContextContributor implements ContextContributor
 	 */
 	private IEditorPart getActiveEditor()
 	{
-		UIJob job = new UIJob("Get active editor")
+		UIJob job = new UIJob("Get active editor") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
