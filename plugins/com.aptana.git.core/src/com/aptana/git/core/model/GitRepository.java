@@ -142,7 +142,8 @@ public class GitRepository
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance()
+				.runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null || result.isEmpty())
 			return null;
 		Integer exitCode = result.keySet().iterator().next();
@@ -742,13 +743,17 @@ public class GitRepository
 		return true;
 	}
 
-	public boolean moveFile(String source, String dest)
+	public IStatus moveFile(String source, String dest)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest); //$NON-NLS-1$
-		if (result.keySet().iterator().next() != 0)
-			return false;
+		int exitCode = result.keySet().iterator().next();
+		if (exitCode != 0)
+		{
+			String message = result.values().iterator().next();
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, message, null);
+		}
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	public String relativePath(IResource theResource)
