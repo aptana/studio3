@@ -6,8 +6,8 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.ICommonConstants;
-import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 
 public class TextSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {

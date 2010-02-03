@@ -1,6 +1,5 @@
 package com.aptana.editor.common.scripting;
 
-import com.aptana.editor.common.QualifiedContentType;
 
 public interface IContentTypeTranslator
 {

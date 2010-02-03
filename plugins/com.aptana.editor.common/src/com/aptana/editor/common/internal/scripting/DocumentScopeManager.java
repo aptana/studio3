@@ -43,9 +43,9 @@ import org.eclipse.jface.text.IDocument;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.IPartitioningConfiguration;
-import com.aptana.editor.common.QualifiedContentType;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 
 /**
  * @author Max Stepanov

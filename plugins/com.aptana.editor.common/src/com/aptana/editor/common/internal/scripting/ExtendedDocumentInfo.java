@@ -41,7 +41,7 @@ import java.util.Map;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.scripting.model.BundleManager;
 
 /**
