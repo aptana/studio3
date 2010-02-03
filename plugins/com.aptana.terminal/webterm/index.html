@@ -87,8 +87,8 @@
 					characterHeight = divHeight / terminal.getHeight();
 				}
 				
-				var viewWidth = window.innerWidth;
-				var viewHeight = window.innerHeight;
+				var viewWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				var viewHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 				var width = Math.floor(viewWidth / characterWidth);
 				var height = Math.floor(viewHeight / characterHeight);
 				

@@ -214,17 +214,20 @@
 					characterHeight = divHeight / terminal.getHeight();
 				}
 				
-				var viewWidth = window.innerWidth;
-				var viewHeight = window.innerHeight;
+				var viewWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				var viewHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 				var width = Math.floor(viewWidth / characterWidth);
 				var height = Math.floor(viewHeight / characterHeight);
+				
+				print("viewWidth = " + viewWidth);
+				print("viewHeight = " + viewHeight);
 				
 				terminal.setSize(width,height);
 			}
 			
 			function print(msg)
 			{
-				document.getElementById("stdout").innerHTML += msg + "\n";
+				document.getElementById("stdout").innerHTML += msg + "<br />";
 			}
 			
 			function play()
@@ -257,7 +260,7 @@
 	    	<button onclick="stop()">Stop</button>
 	    	<button onclick="play()">Play</button>
 	    	<button onclick="resetDebugInfo()">Reset</button>
-	        <pre style="color: black" id="stdout">result:</pre>
+	        <pre style="color: white" id="stdout">result:</pre>
 		</div>
     </body>
 </html>
