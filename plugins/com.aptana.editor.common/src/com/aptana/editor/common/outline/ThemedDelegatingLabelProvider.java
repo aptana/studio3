@@ -18,7 +18,7 @@ import com.aptana.editor.common.theme.IThemeManager;
  * 
  * @author cwilliams
  */
-public class WrappingLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
+public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
 
 	// FIXME This constant is repeated throughout files!
@@ -26,7 +26,7 @@ public class WrappingLabelProvider implements ILabelProvider, IColorProvider, IF
 
 	private ILabelProvider wrapped;
 
-	WrappingLabelProvider(ILabelProvider wrapped)
+	ThemedDelegatingLabelProvider(ILabelProvider wrapped)
 	{
 		this.wrapped = wrapped;
 	}

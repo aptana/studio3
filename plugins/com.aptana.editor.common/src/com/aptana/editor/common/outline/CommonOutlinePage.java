@@ -97,7 +97,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fEditor = editor;
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
-		fLabelProvider = new WrappingLabelProvider(new LabelProvider());
+		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
 
 		// TODO: needs to be improved
 		editor.getSourceViewerNonFinal().getTextWidget().addFocusListener(new FocusAdapter()
@@ -321,7 +321,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	public void setLabelProvider(ILabelProvider provider)
 	{
-		fLabelProvider = new WrappingLabelProvider(provider);
+		fLabelProvider = new ThemedDelegatingLabelProvider(provider);
 		if (!isDisposed())
 		{
 			getTreeViewer().setLabelProvider(fLabelProvider);
