@@ -12,9 +12,16 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 
+/**
+ * This label provider wraps another label provider and extends it to use them active theme's colors and font. This is
+ * basically used to wrap label providers for the outline view.
+ * 
+ * @author cwilliams
+ */
 public class WrappingLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
 
+	// FIXME This constant is repeated throughout files!
 	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
 
 	private ILabelProvider wrapped;
