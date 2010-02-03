@@ -98,7 +98,7 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final beaver.Symbol[] p = _list_p == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_p.toArray(new beaver.Symbol[_list_p.size()]);
-					return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());
+					return new ParseRootNode(CSSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] Statements = Statements Statement

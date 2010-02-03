@@ -18,7 +18,7 @@
 %goal Program;
 
 Program
-	=	Statements.p {:return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	=	Statements.p {:return new ParseRootNode(CSSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
 	;
 
 Statements

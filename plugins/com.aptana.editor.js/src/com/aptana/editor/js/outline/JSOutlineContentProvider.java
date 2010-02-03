@@ -13,6 +13,7 @@ import com.aptana.editor.common.outline.CommonOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 
 public class JSOutlineContentProvider extends CommonOutlineContentProvider
 {
@@ -44,7 +45,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
-		if (parentElement instanceof AbstractThemeableEditor)
+		if (parentElement instanceof AbstractThemeableEditor || parentElement instanceof ParseRootNode)
 		{
 			fItemsByScope.clear();
 			return super.getChildren(parentElement);

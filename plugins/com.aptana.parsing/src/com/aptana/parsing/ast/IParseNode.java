@@ -2,7 +2,7 @@ package com.aptana.parsing.ast;
 
 import com.aptana.parsing.lexer.ILexeme;
 
-public interface IParseNode extends ILexeme
+public interface IParseNode extends ILexeme, ILanguageNode
 {
 
 	public IParseNode getChild(int index);
@@ -16,4 +16,6 @@ public interface IParseNode extends ILexeme
 	public IParseNode getParent();
 
 	public short getType();
+
+	public String getLanguage();
 }

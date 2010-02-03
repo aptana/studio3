@@ -6,19 +6,18 @@ public class CSSDeclarationNode extends CSSNode
 {
 
 	private String fIdentifier;
-	private CSSExpressionNode fValue;
 	private String fStatus;
 	private boolean fHasSemicolon;
 
-	public CSSDeclarationNode()
+	public CSSDeclarationNode(int start, int end)
 	{
+		super(start, end);
 	}
 
 	public CSSDeclarationNode(Symbol semicolon)
 	{
+		super(semicolon.getStart(), semicolon.getEnd());
 		fHasSemicolon = true;
-		this.start = semicolon.getStart();
-		this.end = semicolon.getEnd();
 	}
 
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value)
@@ -29,8 +28,8 @@ public class CSSDeclarationNode extends CSSNode
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value, Symbol status)
 	{
 		fIdentifier = identifier.value.toString();
-		fValue = value;
 		fStatus = (status == null) ? null : status.value.toString();
+		setChildren(new CSSNode[] { value });
 
 		this.start = identifier.getStart();
 		if (status == null)
@@ -41,6 +40,11 @@ public class CSSDeclarationNode extends CSSNode
 		{
 			this.end = status.getEnd();
 		}
+	}
+
+	public CSSExpressionNode getAssignedValue()
+	{
+		return (CSSExpressionNode) getChild(0);
 	}
 
 	public void setHasSemicolon(Symbol semicolon)
@@ -56,7 +60,7 @@ public class CSSDeclarationNode extends CSSNode
 		if (fIdentifier != null)
 		{
 			text.append(fIdentifier);
-			text.append(": ").append(fValue); //$NON-NLS-1$
+			text.append(": ").append(getChild(0)); //$NON-NLS-1$
 			if (fStatus != null)
 			{
 				text.append(" ").append(fStatus); //$NON-NLS-1$

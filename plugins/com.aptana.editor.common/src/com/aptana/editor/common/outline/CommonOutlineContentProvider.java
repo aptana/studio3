@@ -22,6 +22,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 				return filter(root.getChildren());
 			}
 		}
+		else if (parentElement instanceof IParseNode)
+		{
+			return filter(((IParseNode) parentElement).getChildren());
+		}
 		return EMPTY;
 	}
 

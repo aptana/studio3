@@ -195,7 +195,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final JSNode[] p = _list_p == null ? new JSNode[0] : (JSNode[]) _list_p.toArray(new JSNode[_list_p.size()]);
-					return new ParseRootNode(p, _symbol_p.getStart(), _symbol_p.getEnd());
+					return new ParseRootNode(JSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] SourceElements = SourceElements SourceElement
