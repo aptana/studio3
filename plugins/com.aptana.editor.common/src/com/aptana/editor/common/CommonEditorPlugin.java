@@ -18,6 +18,7 @@ import org.osgi.framework.BundleContext;
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.internal.theme.ThemeManager;
+import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
