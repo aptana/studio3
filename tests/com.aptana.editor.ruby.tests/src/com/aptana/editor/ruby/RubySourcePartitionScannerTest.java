@@ -533,8 +533,9 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 9);
 		assertContentType(RubySourceConfiguration.STRING_SINGLE, code, 32);
 	}
-	
-	// TODO Write tests for nested heredocs and heredocs in middle of line with the heredoc being single-quoted (or mixture)
+
+	// TODO Write tests for nested heredocs and heredocs in middle of line with the heredoc being single-quoted (or
+	// mixture)
 
 	public void testROR975()
 	{
@@ -691,5 +692,55 @@ public class RubySourcePartitionScannerTest extends TestCase
 		String code = "=begin\n=end";
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, 0);
 		assertContentType(RubySourceConfiguration.MULTI_LINE_COMMENT, code, code.length() - 1);
+	}
+
+	public void testSymbolBeginningWithS()
+	{
+		String code = "hash[:symbol]";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+
+	public void testSymbolWithString()
+	{
+		String code = "hash[:\"symbol\"]";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 5);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 6);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 13);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 14);
+	}
+
+	public void testSymbolHitsEndOfFile()
+	{
+		String code = "hash[:";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+	
+	public void testPercentSSymbolHitsEndOfFile()
+	{
+		String code = "hash[%s";
+		for (int i = 0; i < code.length(); i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+	}
+
+	public void testSymbolStringHitsEndOfFile()
+	{
+		String code = "hash[:\"";
+		for (int i = 0; i < code.length() - 1; i++)
+			assertContentType(RubySourceConfiguration.DEFAULT, code, i);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, code.length() - 1);
+	}
+
+	public void testHeredoc()
+	{
+		String code = "def index\n    heredoc =<<-END\n" + "  This is a heredoc, I think\n" + "END\nend\n";
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 0);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 22);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 23);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 35);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 61);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 63);
 	}
 }
