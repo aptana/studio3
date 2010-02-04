@@ -33,12 +33,11 @@ public class HttpServer extends Thread
 		
 		return instance;
 	}
+	
 	protected int port;
 	protected ServerSocket serverSocket;
-	protected Thread runningThread;
 	protected ExecutorService threadPool;
 	protected boolean isRunning;
-
 	protected Map<String, ProcessWrapper> processById;
 
 	/**
@@ -175,11 +174,6 @@ public class HttpServer extends Thread
 	 */
 	public void run()
 	{
-		synchronized (this)
-		{
-			this.runningThread = Thread.currentThread();
-		}
-
 		this.openServerSocket();
 
 		while (this.isRunning)
