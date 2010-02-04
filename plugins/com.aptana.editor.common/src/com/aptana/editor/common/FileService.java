@@ -2,7 +2,9 @@ package com.aptana.editor.common;
 
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
 public class FileService
@@ -10,10 +12,11 @@ public class FileService
 
 	private IDocument fDocument;
 	private IParser fParser;
-	private IParseNode fResult;
+	private IParseState fParseState;
 
 	public FileService()
 	{
+		fParseState = new ParseState();
 	}
 
 	public void parse()
@@ -24,9 +27,10 @@ public class FileService
 		}
 
 		String source = fDocument.get();
+		fParseState.setEditState(source, source, 0, 0);
 		try
 		{
-			fResult = fParser.parse(source);
+			fParser.parse(fParseState);
 		}
 		catch (Exception e)
 		{
@@ -36,17 +40,24 @@ public class FileService
 
 	public IParseNode getParseResult()
 	{
-		if (fResult == null)
+		IParseNode result = fParseState.getParseResult();
+		if (result == null)
 		{
 			// performs an initial parse
 			parse();
+			result = fParseState.getParseResult();
 		}
-		return fResult;
+		return result;
 	}
 
 	public void setParser(IParser parser)
 	{
 		fParser = parser;
+	}
+
+	public void setParseState(IParseState parseState)
+	{
+		fParseState = parseState;
 	}
 
 	public void setDocument(IDocument document)

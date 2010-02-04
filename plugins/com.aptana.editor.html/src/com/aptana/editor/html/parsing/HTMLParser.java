@@ -13,7 +13,9 @@ import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.parsing.JSParserFactory;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -113,7 +115,9 @@ public class HTMLParser extends Parser implements IParser
 				IParseNode[] nested = new IParseNode[0];
 				try {
 					String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
-					IParseNode node = CSSParserFactory.getInstance().getParser().parse(text);
+					IParseState parseState = new ParseState();
+					parseState.setEditState(text, text, 0, 0);
+					IParseNode node = CSSParserFactory.getInstance().getParser().parse(parseState);
 					addOffset(node, _symbol_b.getStart());
 					nested = new IParseNode[] { node };
 				} catch (java.lang.Exception e) {
@@ -130,7 +134,9 @@ public class HTMLParser extends Parser implements IParser
 				IParseNode[] nested = new IParseNode[0];
 				try {
 					String text = fScanner.getSource().get(_symbol_b.getStart(), _symbol_b.getEnd() - _symbol_b.getStart() + 1);
-					IParseNode node = JSParserFactory.getInstance().getParser().parse(text);
+					IParseState parseState = new ParseState();
+					parseState.setEditState(text, text, 0, 0);
+					IParseNode node = JSParserFactory.getInstance().getParser().parse(parseState);
 					addOffset(node, _symbol_b.getStart());
 					nested = new IParseNode[] { node };
 				} catch (java.lang.Exception e) {
@@ -173,10 +179,12 @@ public class HTMLParser extends Parser implements IParser
 	}
 
 	@Override
-	public IParseNode parse(String source) throws java.lang.Exception
+	public IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
-		fScanner.setSource(source);
-		return (IParseNode) super.parse(fScanner);
+		fScanner.setSource(new String(parseState.getSource()));
+		IParseNode result = (IParseNode) super.parse(fScanner);
+		parseState.setParseResult(result);
+		return result;
 	}
 
 	private void addOffset(IParseNode node, int offset)

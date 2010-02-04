@@ -3,6 +3,7 @@ package com.aptana.editor.html;
 import junit.framework.TestCase;
 import beaver.Symbol;
 
+import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.HTMLParserScanner;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
@@ -12,10 +13,12 @@ public class HTMLParserTest extends TestCase
 {
 
 	private HTMLParser fParser;
+	private HTMLParseState fParseState;
 
 	protected void setUp() throws Exception
 	{
 		fParser = new HTMLParser();
+		fParseState = new HTMLParseState();
 	}
 
 	protected void tearDown() throws Exception
@@ -55,7 +58,8 @@ public class HTMLParserTest extends TestCase
 
 	protected void parseTest(String source, String expected) throws Exception
 	{
-		IParseNode result = fParser.parse(source);
+		fParseState.setEditState(source, source, 0, 0);
+		IParseNode result = fParser.parse(fParseState);
 
 		StringBuilder text = new StringBuilder();
 		IParseNode[] children = result.getChildren();

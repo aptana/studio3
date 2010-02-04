@@ -25,6 +25,7 @@ import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode;
 import com.aptana.editor.js.parsing.lexer.JSTokens;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -2067,9 +2068,11 @@ public class JSParser extends Parser implements IParser {
 	}
 
 	@Override
-	public IParseNode parse(String source) throws java.lang.Exception
+	public IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
-		fScanner.setSource(source);
-		return (IParseNode) parse(fScanner);
+		fScanner.setSource(new String(parseState.getSource()));
+		IParseNode result = (IParseNode) parse(fScanner);
+		parseState.setParseResult(result);
+		return result;
 	}
 }
