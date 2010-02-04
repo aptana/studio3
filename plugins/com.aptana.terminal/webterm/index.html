@@ -87,12 +87,56 @@
 					characterHeight = divHeight / terminal.getHeight();
 				}
 				
-				var viewWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-				var viewHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-				var width = Math.floor(viewWidth / characterWidth);
-				var height = Math.floor(viewHeight / characterHeight);
+				var width = Math.floor(getWindowWidth() / characterWidth);
+				var height = Math.floor(getWindowHeight() / characterHeight);
 				
 				terminal.setSize(width,height);
+			}
+			
+			/**
+			 * getWindowWidth
+			 */
+			function getWindowWidth()
+			{
+				var result = 0;
+				
+				if (window.innerWidth)
+				{
+					result = window.innerWidth;
+				}
+				else if (document.documentElement && document.documentElement.clientWidth)
+				{
+					result = document.documentElement.clientWidth;
+				}
+				else if (document.body && document.body.clientWidth)
+				{
+					result = document.body.clientWidth;
+				}
+				
+				return result;
+			}
+			
+			/**
+			 * getWindowHeight
+			 */
+			function getWindowHeight()
+			{
+				var result = 0;
+				
+				if (window.innerHeight)
+				{
+					result = window.innerHeight;
+				}
+				else if (document.documentElement && document.documentElement.clientHeight)
+				{
+					result = document.documentElement.clientHeight;
+				}
+				else if (document.body && document.body.clientHeight)
+				{
+					result = document.body.clientHeight;
+				}
+				
+				return result;
 			}
         </script>
     </head>
