@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
@@ -19,12 +21,11 @@ import com.aptana.terminal.server.HttpServer;
 public class TerminalBrowser
 {
 	private static final String TERMINAL_URL = "http://{0}:{1}/webterm/"; //$NON-NLS-1$
+	private static List<String> startDirectories = new ArrayList<String>(2);
 
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
 	private String _id;
-
-	private static List<String> startDirectories = new ArrayList<String>(2);
 
 	/**
 	 * grabStartDirectory
@@ -75,30 +76,48 @@ public class TerminalBrowser
 	 */
 	public void createControl(Composite parent)
 	{
+		// create browser control
 		this._browser = new Browser(parent, SWT.NONE);
-
-		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
-		String url = NLS.bind(TERMINAL_URL, new Object[] { HttpServer.getInstance().getHost(),
-				HttpServer.getInstance().getPort() })
-				+ "?id=" + this._id; //$NON-NLS-1$
-		this.setUrl(url);
-
-		final IBindingService bindingService = (IBindingService) _owningPart.getSite()
-				.getService(IBindingService.class);
+		
+//		// create progress listener so we can set focus after a page has loaded
+//		this._browser.addProgressListener(new ProgressListener()
+//		{
+//			public void changed(ProgressEvent event)
+//			{
+//			}
+//
+//			public void completed(ProgressEvent event)
+//			{
+//				_owningPart.setFocus();
+//			}
+//		});
+		
+		// create focus listener so we can enable/disable key bindings
+		final IBindingService bindingService = (IBindingService) _owningPart.getSite().getService(IBindingService.class);
+		
 		this._browser.addFocusListener(new FocusListener()
 		{
 			public void focusGained(FocusEvent e)
 			{
 				bindingService.setKeyFilterEnabled(false);
 			}
-
+		
 			public void focusLost(FocusEvent e)
 			{
 				bindingService.setKeyFilterEnabled(true);
 			}
 		});
-	}
 
+		// create our supporting process for access to the system's shell
+		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
+		
+		// load the terminal
+		String url = NLS.bind(TERMINAL_URL, new Object[] { HttpServer.getInstance().getHost(),
+				HttpServer.getInstance().getPort() })
+				+ "?id=" + this._id; //$NON-NLS-1$
+		this.setUrl(url);
+	}
+	
 	/**
 	 * dispose
 	 */
