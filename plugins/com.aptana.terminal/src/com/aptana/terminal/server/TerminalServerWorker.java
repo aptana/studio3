@@ -25,7 +25,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.util.StringUtil;
 
-public class HttpWorker implements Runnable
+public class TerminalServerWorker implements Runnable
 {
 	private static final String ID_PARAMETER = "id"; //$NON-NLS-1$
 	private static final String INDEX_PAGE_NAME = "index.html"; //$NON-NLS-1$
@@ -34,7 +34,7 @@ public class HttpWorker implements Runnable
 	private static final String STATUS_200 = "200"; //$NON-NLS-1$
 	private static final String STATUS_404 = "404"; //$NON-NLS-1$
 
-	private HttpServer _server;
+	private TerminalServer _server;
 	private Socket _clientSocket;
 
 	/**
@@ -42,7 +42,7 @@ public class HttpWorker implements Runnable
 	 * 
 	 * @param clientSocket
 	 */
-	public HttpWorker(HttpServer server, Socket clientSocket)
+	public TerminalServerWorker(TerminalServer server, Socket clientSocket)
 	{
 		this._server = server;
 		this._clientSocket = clientSocket;

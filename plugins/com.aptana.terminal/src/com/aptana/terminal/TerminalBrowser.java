@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
 
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalBrowser
 {
@@ -109,11 +109,11 @@ public class TerminalBrowser
 		});
 
 		// create our supporting process for access to the system's shell
-		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
+		TerminalServer.getInstance().createProcess(this._id, this.getStartingDirectory());
 		
 		// load the terminal
-		String url = NLS.bind(TERMINAL_URL, new Object[] { HttpServer.getInstance().getHost(),
-				HttpServer.getInstance().getPort() })
+		String url = NLS.bind(TERMINAL_URL, new Object[] { TerminalServer.getInstance().getHost(),
+				TerminalServer.getInstance().getPort() })
 				+ "?id=" + this._id; //$NON-NLS-1$
 		this.setUrl(url);
 	}

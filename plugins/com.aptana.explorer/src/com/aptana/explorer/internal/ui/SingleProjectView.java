@@ -79,7 +79,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.views.TerminalView;
 
@@ -184,7 +184,7 @@ public abstract class SingleProjectView extends CommonNavigator
 						.getLocation().toOSString());
 				if (tv == null)
 					return;
-				ProcessWrapper wrapper = HttpServer.getInstance().getProcess(tv.getId());
+				ProcessWrapper wrapper = TerminalServer.getInstance().getProcess(tv.getId());
 				wrapper.sendText("script/server\n"); //$NON-NLS-1$
 			}
 		}));

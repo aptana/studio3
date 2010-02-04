@@ -22,7 +22,7 @@ import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalView extends ViewPart
 {
@@ -144,7 +144,7 @@ public class TerminalView extends ViewPart
 	{
 		super.init(site);
 
-		HttpServer server = HttpServer.getInstance();
+		TerminalServer server = TerminalServer.getInstance();
 
 		if (server == null)
 		{

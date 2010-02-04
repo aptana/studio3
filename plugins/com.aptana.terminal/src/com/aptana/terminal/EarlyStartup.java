@@ -17,7 +17,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.preferences.IPreferenceConstants;
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 
 public class EarlyStartup implements IStartup
 {
@@ -138,7 +138,7 @@ public class EarlyStartup implements IStartup
 							// NOTE: This forces the terminal server to startup before we try to
 							// open the terminal editor. Apparently, on Windows, the editor will
 							// open the URL before the server has started resulting in a "page not found"
-							HttpServer.getInstance();
+							TerminalServer.getInstance();
 							
 							EarlyStartup.this.openTerminalEditor(workbenchWindow);
 						}

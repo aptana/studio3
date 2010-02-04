@@ -13,22 +13,22 @@ import org.eclipse.core.runtime.Platform;
 /**
  * @author Kevin Lindsey
  */
-public class HttpServer extends Thread
+public class TerminalServer extends Thread
 {
 	private static final int DEFAULT_PORT = 8181;
 	private static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
-	private static HttpServer instance;
+	private static TerminalServer instance;
 
 	/**
 	 * getInstance
 	 * 
 	 * @return
 	 */
-	public static synchronized HttpServer getInstance()
+	public static synchronized TerminalServer getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new HttpServer();
+			instance = new TerminalServer();
 		}
 		
 		return instance;
@@ -43,7 +43,7 @@ public class HttpServer extends Thread
 	/**
 	 * HttpServer
 	 */
-	public HttpServer()
+	public TerminalServer()
 	{
 		this.threadPool = Executors.newFixedThreadPool(5);
 		this.isRunning = true;
@@ -184,7 +184,7 @@ public class HttpServer extends Thread
 			{
 				clientSocket = this.serverSocket.accept();
 
-				this.threadPool.execute(new HttpWorker(this, clientSocket));
+				this.threadPool.execute(new TerminalServerWorker(this, clientSocket));
 			}
 			catch (IOException e)
 			{
