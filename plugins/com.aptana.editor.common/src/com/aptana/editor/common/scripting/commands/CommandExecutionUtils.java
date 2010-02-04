@@ -490,6 +490,10 @@ public class CommandExecutionUtils
 					{
 						region = new Region(textWidget.getCaretOffset() - 1, 1);
 					}
+					else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+					{
+						region = getSelectedLinesRegion(textWidget);
+					}
 					textWidget
 							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 				}
@@ -515,10 +519,28 @@ public class CommandExecutionUtils
 					IRegion region = getSelectedRegion(textWidget);
 					offsetToInsert = region.getOffset() + region.getLength();
 				}
+				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+				{
+					IRegion region = getSelectedLinesRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
 				else if (commandResult.getInputType() == InputType.LINE)
 				{
 					IRegion region = getCurrentLineRegion(textWidget);
 					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					IRegion region = findWordRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+				{
+					offsetToInsert = textWidget.getCaretOffset() + 1;
+				}
+				else if (commandResult.getInputType() == InputType.DOCUMENT)
+				{
+					offsetToInsert = textWidget.getCharCount();
 				}
 				String outputString = commandResult.getOutputString();
 				textWidget.replaceTextRange(offsetToInsert, 0, outputString);
@@ -732,9 +754,8 @@ public class CommandExecutionUtils
 		if (output == null || output.trim().length() == 0)
 			return;
 		DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell(),
-				NLS.bind(Messages.CommandExecutionUtils_ClickToFocusTypeEscapeToDismissWhenFocused, DELAY/1000),
-				null)
+				.getActiveWorkbenchWindow().getShell(), NLS.bind(
+				Messages.CommandExecutionUtils_ClickToFocusTypeEscapeToDismissWhenFocused, DELAY / 1000), null)
 		{
 			@Override
 			public void setVisible(boolean visible)
@@ -795,7 +816,7 @@ public class CommandExecutionUtils
 		else
 		{
 			// Is y offset in the client area
-			if (locationAtOffset.y > bounds.y && locationAtOffset.y < bounds.y+bounds.height)
+			if (locationAtOffset.y > bounds.y && locationAtOffset.y < bounds.y + bounds.height)
 			{
 				// Show the tooltip near left margin below the current line
 				locationAtOffset = textWidget.toDisplay(bounds.x + 2, locationAtOffset.y
