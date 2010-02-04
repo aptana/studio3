@@ -39,33 +39,34 @@ public class TerminalView extends ViewPart
 	 */
 	public static TerminalView open(String id, String title, String workingDirectory)
 	{
+		TerminalView term = null;
+		
 		try
 		{
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			
 			if (workingDirectory != null)
 			{
-				TerminalBrowser.setStartingDirectory(workingDirectory);
+				TerminalBrowser.pushStartingDirectory(workingDirectory);
 			}
 			
-			TerminalView term = (TerminalView) page.showView(TerminalView.ID, id,
-					org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
-			if (term == null)
-			{
-				return null;
-			}
-			else
-			{
-				term.setPartName(title);
-				return term;
-			}
+			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
 		}
-		catch (PartInitException e1)
+		catch (IllegalStateException e)
 		{
-			Activator.logError(e1.getMessage(), e1);
+			Activator.logError(e.getMessage(), e);
+		}
+		catch (PartInitException e)
+		{
+			Activator.logError(e.getMessage(), e);
 		}
 		
-		return null;
+		if (term != null)
+		{
+			term.setPartName(title);
+		}
+		
+		return term;
 	}
 	
 	private TerminalBrowser browser;
