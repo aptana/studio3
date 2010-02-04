@@ -43,8 +43,6 @@ public class HttpServer extends Thread
 
 	/**
 	 * HttpServer
-	 * 
-	 * @param s
 	 */
 	public HttpServer()
 	{
