@@ -28,14 +28,48 @@ public class TerminalView extends ViewPart
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
 
+	/**
+	 * @param id
+	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
+	 * @param title
+	 *            the title used in the UI tab for the instance of the view.
+	 * @param workingDirectory
+	 *            The directory in which to set the view initially.
+	 * @return
+	 */
+	public static TerminalView open(String id, String title, String workingDirectory)
+	{
+		try
+		{
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			
+			if (workingDirectory != null)
+			{
+				TerminalBrowser.setStartingDirectory(workingDirectory);
+			}
+			
+			TerminalView term = (TerminalView) page.showView(TerminalView.ID, id,
+					org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
+			if (term == null)
+			{
+				return null;
+			}
+			else
+			{
+				term.setPartName(title);
+				return term;
+			}
+		}
+		catch (PartInitException e1)
+		{
+			Activator.logError(e1.getMessage(), e1);
+		}
+		
+		return null;
+	}
+	
 	private TerminalBrowser browser;
 	private Action openEditor;
-
-	@Override
-	public void setPartName(String partName)
-	{
-		super.setPartName(partName);
-	}
 
 	/**
 	 * contributeToActionBars
@@ -115,6 +149,16 @@ public class TerminalView extends ViewPart
 	}
 
 	/**
+	 * getId
+	 * 
+	 * @return
+	 */
+	public String getId()
+	{
+		return browser.getId();
+	}
+
+	/**
 	 * hookContextMenu
 	 */
 	private void hookContextMenu()
@@ -179,40 +223,9 @@ public class TerminalView extends ViewPart
 		browser.setFocus();
 	}
 
-	public String getId()
+	@Override
+	public void setPartName(String partName)
 	{
-		return browser.getId();
-	}
-
-	/**
-	 * @param id
-	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
-	 * @param title
-	 *            the title used in the UI tab for the instance of the view.
-	 * @param workingDirectory
-	 *            The directory in which to set the view initially.
-	 * @return
-	 */
-	public static TerminalView open(String id, String title, String workingDirectory)
-	{
-		try
-		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			if (workingDirectory != null)
-			{
-				TerminalBrowser.setStartingDirectory(workingDirectory);
-			}
-			TerminalView term = (TerminalView) page.showView(TerminalView.ID, id,
-					org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
-			if (term == null)
-				return null;
-			term.setPartName(title);
-			return term;
-		}
-		catch (PartInitException e1)
-		{
-			Activator.logError(e1.getMessage(), e1);
-		}
-		return null;
+		super.setPartName(partName);
 	}
 }
