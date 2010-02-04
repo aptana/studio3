@@ -484,7 +484,70 @@ public class ScriptingInputOutputTest extends TestCase
 		assertContents("output\nSecond line!");
 	}
 
-	// TODO Test INSERT_AS_SNIPPET
+	public void testInsertAsSnippetWithNoInputInsertsAtCaret() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_no_input.txt", "Hello world!\nSecond line!");
+		select(6, 13);
+		applyCommandResult(InputType.NONE, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("Hello world!\nSecondoutput line!");
+		// TODO Test tab stop variables/cursor position after
+	}
+
+	public void testInsertAsSnippetWithDocumentInputReplacesDocumentWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_doc_input.txt", "Hello world!\nSecond line!");
+		setCaretOffset(21);
+		applyCommandResult(InputType.DOCUMENT, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("output");
+	}
+
+	public void testInsertAsSnippetWithWordInputReplacesWordWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_word_input.txt", "Hello world!\nSecond line!");
+		setCaretOffset(21);
+		applyCommandResult(InputType.WORD, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("Hello world!\nSecond output!");
+	}
+
+	public void testInsertAsSnippetWithLeftCharInputReplacesCharWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_lchar_input.txt", "Hello world!\nSecond line!");
+		setCaretOffset(21);
+		applyCommandResult(InputType.LEFT_CHAR, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("Hello world!\nSecond outputine!");
+	}
+
+	public void testInsertAsSnippetWithRightCharInputReplacesCharWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_rchar_input.txt", "Hello world!\nSecond line!");
+		setCaretOffset(21);
+		applyCommandResult(InputType.RIGHT_CHAR, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("Hello world!\nSecond loutputne!");
+	}
+
+	public void testInsertAsSnippetWithSelectionInputReplacesSelectionWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_selection_input.txt", "Hello world!\nSecond line!");
+		select(6, 5);
+		applyCommandResult(InputType.SELECTION, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("Hello output!\nSecond line!");
+	}
+
+	public void testInsertAsSnippetWithSelectedLinesInputReplacesSelectedLinesWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_selected_lines_input.txt", "Hello world!\nSecond line!");
+		select(6, 13);
+		applyCommandResult(InputType.SELECTED_LINES, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("output");
+	}
+
+	public void testInsertAsSnippetWithLineInputReplacesLineWithSnippet() throws Exception
+	{
+		createAndOpenFile("insert_as_snippet_line_input.txt", "Hello world!\nSecond line!");
+		setCaretOffset(4);
+		applyCommandResult(InputType.LINE, OutputType.INSERT_AS_SNIPPET, "output");
+		assertContents("output\nSecond line!");
+	}
 
 	protected IFile createAndOpenFile(String fileName, String contents) throws CoreException, PartInitException
 	{
