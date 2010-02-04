@@ -77,19 +77,6 @@ public class TerminalBrowser
 		// create browser control
 		this._browser = new Browser(parent, SWT.NONE);
 		
-//		// create progress listener so we can set focus after a page has loaded
-//		this._browser.addProgressListener(new ProgressListener()
-//		{
-//			public void changed(ProgressEvent event)
-//			{
-//			}
-//
-//			public void completed(ProgressEvent event)
-//			{
-//				_owningPart.setFocus();
-//			}
-//		});
-		
 		// create focus listener so we can enable/disable key bindings
 		final IBindingService bindingService = (IBindingService) _owningPart.getSite().getService(IBindingService.class);
 		
