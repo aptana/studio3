@@ -85,7 +85,7 @@ public class JSTokenScanner extends JSCodeScanner
 		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		// regex
-		rules.add(new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\)/[igm]*", createToken(getTokenName(JSTokens.REGEX)), true)); //$NON-NLS-1$
+		rules.add(new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\|\\\\/)/[igm]*", createToken(getTokenName(JSTokens.REGEX)), true)); //$NON-NLS-1$
 
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
 		for (String keyword : KEYWORD_OPERATORS)
