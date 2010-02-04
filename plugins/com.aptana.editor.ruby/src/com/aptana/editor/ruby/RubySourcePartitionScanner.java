@@ -55,6 +55,7 @@ import org.jrubyparser.lexer.Lexer;
 import org.jrubyparser.lexer.LexerSource;
 import org.jrubyparser.lexer.SyntaxException;
 import org.jrubyparser.lexer.Lexer.LexState;
+import org.jrubyparser.lexer.SyntaxException.PID;
 import org.jrubyparser.parser.ParserConfiguration;
 import org.jrubyparser.parser.ParserResult;
 import org.jrubyparser.parser.ParserSupport;
@@ -192,7 +193,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			if (se.getMessage().equals("embedded document meets end of file")) { //$NON-NLS-1$
 				return handleUnterminedMultilineComment(se);
 			}
-			else if (se.getMessage().equals("unterminated string meets end of file")) { //$NON-NLS-1$
+			else if (se.getPid().equals(PID.STRING_MARKER_MISSING) || se.getPid().equals(PID.STRING_HITS_EOF)) {
 				return handleUnterminatedString(se);
 			}
 
@@ -638,7 +639,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tWORDS_BEG:
 				fOpeningString = getOpeningString();
 				fContentType = RubySourceConfiguration.STRING_SINGLE;
-				if (fOpeningString.startsWith("%") && fOpeningString.length() > 1
+				if (fOpeningString.startsWith("%") && fOpeningString.length() > 1 //$NON-NLS-1$
 						&& Character.isUpperCase(fOpeningString.charAt(1)))
 				{
 					fContentType = RubySourceConfiguration.STRING_DOUBLE;
@@ -668,33 +669,38 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tSYMBEG:
 				// Sometimes we need to add 1, sometimes two. Depends on if there's
 				// a space preceding the ':'
+				int charAt = fOffset - origOffset;
+				char c = fContents.charAt(charAt);
 				int nextCharOffset = (fOffset + 1);
-				int charAt = nextCharOffset - origOffset;
-				if (fContents.length() <= charAt)
+				while (c == ' ') // skip past space if it's there
+				{
+					nextCharOffset++;
+					c = fContents.charAt(++charAt);
+				}				
+				if (fContents.length() <= charAt + 1)
 				{
 					return new Token(RubySourceConfiguration.DEFAULT);
 				}
-				char c = fContents.charAt(charAt);
-				if (c == 's') // %s syntax
+				if (c == '%') // %s syntax
 				{
 					fOpeningString = getOpeningString();
 					fContentType = RubySourceConfiguration.STRING_SINGLE;
 				}
-				if (c == ':')
+				else if (c == ':') // normal syntax (i.e. ":symbol")
 				{
 					if (fContents.length() <= charAt + 1)
 					{
 						return new Token(RubySourceConfiguration.DEFAULT);
 					}
 					nextCharOffset++;
-					c = fContents.charAt(charAt + 1);
-				}
-				if (c == '"')
-				{
-					fOpeningString = "\""; //$NON-NLS-1$
-					push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), nextCharOffset, 1));
-					fContentType = RubySourceConfiguration.STRING_DOUBLE;
-				}
+					c = fContents.charAt(++charAt);
+					if (c == '"') // Check for :"symbol" syntax
+					{
+						fOpeningString = "\""; //$NON-NLS-1$
+						push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), nextCharOffset - 1, 1));
+						fContentType = RubySourceConfiguration.STRING_DOUBLE;
+					}
+				}				
 				return new Token(RubySourceConfiguration.DEFAULT);
 			default:
 				return new Token(fContentType);
