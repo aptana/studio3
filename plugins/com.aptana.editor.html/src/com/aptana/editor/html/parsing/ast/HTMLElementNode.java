@@ -1,5 +1,7 @@
 package com.aptana.editor.html.parsing.ast;
 
+import java.util.StringTokenizer;
+
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLElementNode extends HTMLNode
@@ -22,11 +24,11 @@ public class HTMLElementNode extends HTMLNode
 				if (tag.endsWith("/>")) //$NON-NLS-1$
 				{
 					// self-closing
-					fName = tag.substring(1, tag.length() - 2);
+					fName = getTagName(tag.substring(1, tag.length() - 2));
 				}
 				else
 				{
-					fName = tag.substring(1, tag.length() - 1);
+					fName = getTagName(tag.substring(1, tag.length() - 1));
 				}
 			}
 			catch (IndexOutOfBoundsException e)
@@ -56,5 +58,11 @@ public class HTMLElementNode extends HTMLNode
 			text.append("</").append(fName).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return text.toString();
+	}
+
+	private static String getTagName(String tag)
+	{
+		StringTokenizer token = new StringTokenizer(tag);
+		return token.nextToken();
 	}
 }
