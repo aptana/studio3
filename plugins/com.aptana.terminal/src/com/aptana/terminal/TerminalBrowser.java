@@ -26,7 +26,12 @@ public class TerminalBrowser
 
 	private static List<String> startDirectories = new ArrayList<String>(2);
 
-	private static String grabStartDirectory()
+	/**
+	 * grabStartDirectory
+	 * 
+	 * @return
+	 */
+	private static String grabStartingDirectory()
 	{
 		synchronized (startDirectories)
 		{
@@ -39,6 +44,11 @@ public class TerminalBrowser
 		return null;
 	}
 
+	/**
+	 * setStartingDirectory
+	 * 
+	 * @param startingDirectory
+	 */
 	public static void setStartingDirectory(String startingDirectory)
 	{
 		synchronized (startDirectories)
@@ -129,7 +139,7 @@ public class TerminalBrowser
 	 */
 	private String getStartingDirectory()
 	{
-		return grabStartDirectory();
+		return grabStartingDirectory();
 	}
 
 	/**
