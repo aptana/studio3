@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
@@ -32,7 +31,6 @@ public class HttpWorker implements Runnable
 	private static final String INDEX_PAGE_NAME = "index.html"; //$NON-NLS-1$
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
-	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
 	private static final String STATUS_200 = "200"; //$NON-NLS-1$
 	private static final String STATUS_404 = "404"; //$NON-NLS-1$
 
@@ -251,11 +249,6 @@ public class HttpWorker implements Runnable
 
 				if (wrapper != null)
 				{
-					if (content.equals("\r") && IS_WINDOWS) //$NON-NLS-1$
-					{
-						content += "\n"; //$NON-NLS-1$
-					}
-
 					wrapper.sendText(content);
 				}
 			}
