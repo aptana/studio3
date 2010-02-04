@@ -7,8 +7,6 @@ import java.util.UUID;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
@@ -146,6 +144,11 @@ public class TerminalBrowser
 		return this._browser;
 	}
 
+	/**
+	 * getId
+	 * 
+	 * @return
+	 */
 	public String getId()
 	{
 		return _id;
