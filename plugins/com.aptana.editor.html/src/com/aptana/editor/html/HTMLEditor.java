@@ -40,6 +40,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
+import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParserFactory;
 import com.aptana.editor.js.Activator;
 
@@ -58,6 +59,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		setDocumentProvider(new HTMLDocumentProvider());
 
 		getFileService().setParser(HTMLParserFactory.getInstance().getParser());
+		getFileService().setParseState(new HTMLParseState());
 	}
 
 	/**
