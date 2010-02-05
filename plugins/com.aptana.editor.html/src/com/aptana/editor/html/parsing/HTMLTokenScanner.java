@@ -36,6 +36,8 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new TagRule("script", createToken(getTokenName(HTMLTokens.SCRIPT)))); //$NON-NLS-1$
 		// style
 		rules.add(new TagRule("style", createToken(getTokenName(HTMLTokens.STYLE)))); //$NON-NLS-1$
+		// xml declaration
+		rules.add(new TagRule("?xml", createToken(getTokenName(HTMLTokens.XML_DECL)))); //$NON-NLS-1$
 		// tags
 		rules.add(new TagRule("/", createToken(getTokenName(HTMLTokens.END_TAG)))); //$NON-NLS-1$
 		rules.add(new TagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
