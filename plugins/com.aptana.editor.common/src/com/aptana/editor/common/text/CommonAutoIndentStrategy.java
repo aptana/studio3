@@ -240,7 +240,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		int indentSize = 0;
-		int tabWidth = fViewerConfiguration.getTabWidth(fSourceViewer);
+		int tabWidth = getTabWidth();
 		char[] indentChars = lineIndent.toCharArray();
 		for (char e : indentChars)
 		{
@@ -276,6 +276,11 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		return indentation;
+	}
+
+	protected int getTabWidth()
+	{
+		return fViewerConfiguration.getTabWidth(fSourceViewer);
 	}
 
 	protected String getIndentCharString()
