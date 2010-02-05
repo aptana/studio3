@@ -1,6 +1,5 @@
 package com.aptana.terminal.server;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,10 +79,7 @@ public class DefaultMacOsXConfiguration implements ProcessConfiguration
 	@Override
 	public boolean isValid()
 	{
-		Path executable = new Path(REDTTY);
-		File file = executable.toFile();
-		
-		return file.canExecute();
+		return true;
 	}
 
 	/*
