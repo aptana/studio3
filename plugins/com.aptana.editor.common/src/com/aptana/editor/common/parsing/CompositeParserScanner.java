@@ -14,7 +14,7 @@ import beaver.Symbol;
 public class CompositeParserScanner extends Scanner
 {
 
-	protected static int DEFAULT_INDEX = -1;
+	protected static final int DEFAULT_INDEX = -1;
 
 	private ITokenScanner fPrimaryTokenScanner;
 	private IDocument fDocument;
@@ -75,7 +75,6 @@ public class CompositeParserScanner extends Scanner
 					{
 						// exits out to the top level
 						reset();
-						return nextToken();
 					}
 				}
 			}

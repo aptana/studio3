@@ -1,12 +1,9 @@
 package com.aptana.editor.html;
 
 import junit.framework.TestCase;
-import beaver.Symbol;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.parsing.HTMLParserScanner;
-import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLParserTest extends TestCase

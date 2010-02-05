@@ -43,11 +43,6 @@ public class HTMLParserScanner extends CompositeParserScanner
 				type = TOKEN_TYPES[index];
 			}
 		}
-		if (type == HTMLTokens.START_TAG && text.endsWith("/>")) //$NON-NLS-1$
-		{
-			// self closing
-			type = HTMLTokens.SELF_CLOSING;
-		}
 		return new Symbol(type, start, end, text);
 	}
 

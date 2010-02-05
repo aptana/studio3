@@ -10,19 +10,18 @@ public class HTMLTokens
 	static public final short STYLE = 1;
 	static public final short SCRIPT = 2;
 	static public final short START_TAG = 3;
-	static public final short SELF_CLOSING = 4;
-	static public final short TEXT = 5;
-	static public final short END_TAG = 6;
-	public static final short XML_DECL = 7;
-	public static final short STRING = 8;
-	public static final short COMMENT = 9;
-	public static final short DOCTYPE = 10;
+	static public final short TEXT = 4;
+	static public final short END_TAG = 5;
+	public static final short XML_DECL = 6;
+	public static final short STRING = 7;
+	public static final short COMMENT = 8;
+	public static final short DOCTYPE = 9;
 
-	private static final short MAXIMUM = 10;
+	private static final short MAXIMUM = 9;
 
 	@SuppressWarnings("nls")
-	private static final String[] NAMES = { "EOF", "STYLE", "SCRIPT", "START_TAG", "SELF_CLOSING", "TEXT", "END_TAG",
-			"XML_DECL", "STRING", "COMMENT", "DOCTYPE" };
+	private static final String[] NAMES = { "EOF", "STYLE", "SCRIPT", "START_TAG", "TEXT", "END_TAG", "XML_DECL",
+			"STRING", "COMMENT", "DOCTYPE" };
 	private static final String NAME_UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
 	private static Map<String, Short> nameIndexMap;

@@ -67,9 +67,6 @@ public class HTMLParser implements IParser
 				case HTMLTokens.END_TAG:
 					processEndTag();
 					break;
-				case HTMLTokens.SELF_CLOSING:
-					processSelfClosing();
-					break;
 				case HTMLTokens.STYLE:
 					processCSSStyle();
 					break;
@@ -112,16 +109,6 @@ public class HTMLParser implements IParser
 		advance();
 	}
 
-	private void processSelfClosing() throws IOException, Exception
-	{
-		HTMLElementNode node = new HTMLElementNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
-				fCurrentSymbol.getEnd());
-		openElement(node);
-		closeElement();
-
-		advance();
-	}
-
 	private void processCSSStyle() throws IOException, Exception
 	{
 		Symbol styleTag = fCurrentSymbol;
@@ -157,6 +144,7 @@ public class HTMLParser implements IParser
 			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, styleTag.getStart(), styleTag
 					.getEnd()));
 		}
+		advance();
 	}
 
 	private void processJSScript() throws IOException, Exception
@@ -194,6 +182,7 @@ public class HTMLParser implements IParser
 			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.JS, nested, scriptTag.getStart(), scriptTag
 					.getEnd()));
 		}
+		advance();
 	}
 
 	/**
