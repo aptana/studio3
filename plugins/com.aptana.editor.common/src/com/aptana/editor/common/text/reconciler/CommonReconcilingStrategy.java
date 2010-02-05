@@ -139,7 +139,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fPositions.clear();
 		try
 		{
-			emitFoldingRegions2(monitor);
+			emitFoldingRegions(monitor);
 		}
 		catch (BadLocationException e)
 		{
@@ -156,7 +156,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	}
 
-	private void emitFoldingRegions2(IProgressMonitor monitor) throws BadLocationException
+	private void emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
 	{
 		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
 		if (monitor != null)
@@ -184,8 +184,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			RubyRegexp endRegexp = getEndFoldRegexp(scope);
 			if (endRegexp == null)
 				continue;
-			// FIXME This doesn't take indents into account, which Textmate does. Kevin L tackled this before when we
-			// were playing around with this in eclipsemate!
 			String partitionText = fDocument.get(offset, length);
 			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
 			for (String line : lines)
