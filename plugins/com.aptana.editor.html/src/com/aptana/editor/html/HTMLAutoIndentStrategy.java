@@ -11,12 +11,14 @@ import com.aptana.editor.common.text.AbstractRegexpAutoIndentStrategy;
 public class HTMLAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 {
 
-	private static final String INCREASE_INDENT_REGEXP = "<(body|div|form|frame|head|html|menu|ol|script|style|table|ul)([^>]*)?>$"; //$NON-NLS-1$
+	private static final String BLOCK_TAGS = "body|div|form|frame|head|html|menu|ol|script|style|table|ul|thead|tbody|tfoot|tr|select|fieldset|li|dl"; //$NON-NLS-1$
+	private static final String INCREASE_INDENT_REGEXP = "<(" + BLOCK_TAGS + ")([^>]*)?>$"; //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String DECREASE_INDENT_REGEXP = "</(" + BLOCK_TAGS + ")([^>]*)?>$"; //$NON-NLS-1$ //$NON-NLS-2$
 
 	public HTMLAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
 			ISourceViewer sourceViewer)
 	{
-		super(INCREASE_INDENT_REGEXP, contentType, configuration, sourceViewer);
+		super(INCREASE_INDENT_REGEXP, DECREASE_INDENT_REGEXP, contentType, configuration, sourceViewer);
 	}
 
 	/**
@@ -26,7 +28,8 @@ public class HTMLAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 	 * @param contentAfterNewline
 	 * @return
 	 */
-	protected boolean indentAndPushTrailingContentAfterNewlineAndCursor(String contentBeforeNewline, String contentAfterNewline)
+	protected boolean indentAndPushTrailingContentAfterNewlineAndCursor(String contentBeforeNewline,
+			String contentAfterNewline)
 	{
 		if (contentBeforeNewline == null || contentAfterNewline == null || contentBeforeNewline.trim().length() == 0
 				|| contentAfterNewline.trim().length() == 0)

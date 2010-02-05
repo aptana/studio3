@@ -46,6 +46,9 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 /**
+ * This class will auto-indent after curly braces {} by default (and won't auto dedent on close brace). Subclasses
+ * should override to provide their own rules for indenting.
+ * 
  * @author Ingo Muschenetz
  * @author Michael Xia (mxia@aptana.com)
  */
@@ -68,7 +71,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		if (command.length == 0 && command.text != null && isLineDelimiter(document, command.text))
 		{
-			if (!autoIndent(document, command))
+			if (shouldAutoIndent() && !autoIndent(document, command))
 			{
 				autoIndentAfterNewLine(document, command);
 			}
@@ -240,7 +243,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		int indentSize = 0;
-		int tabWidth = fViewerConfiguration.getTabWidth(fSourceViewer);
+		int tabWidth = getTabWidth();
 		char[] indentChars = lineIndent.toCharArray();
 		for (char e : indentChars)
 		{
@@ -278,6 +281,11 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		return indentation;
 	}
 
+	protected int getTabWidth()
+	{
+		return fViewerConfiguration.getTabWidth(fSourceViewer);
+	}
+
 	protected String getIndentCharString()
 	{
 		String[] indents = fViewerConfiguration.getIndentPrefixes(fSourceViewer, fContentType);
@@ -293,5 +301,15 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 			return false;
 		}
 		return TextUtilities.equals(delimiters, text) > -1;
+	}
+
+	/**
+	 * Subclasses can override to allow users to set a pref to determine if we have auto-indent on.
+	 * 
+	 * @return
+	 */
+	protected boolean shouldAutoIndent()
+	{
+		return true;
 	}
 }

@@ -45,6 +45,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.internal.JSAutoIndentStrategy;
@@ -124,7 +125,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 				return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this,
 						sourceViewer) };
 			}
-			return super.getAutoEditStrategies(sourceViewer, contentType);
+			return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
 		}
 		return new IAutoEditStrategy[] { new HTMLAutoIndentStrategy(contentType, this, sourceViewer) };
 	}

@@ -54,6 +54,27 @@ public class HTMLAutoIndentStrategyTest extends TestCase
 		for (String tag : tags)
 			assertDidntIndent("<" + tag + ">");
 	}
+	
+	public void testDedentsAfterBlockCloseTag()
+	{
+		String[] tags = { "html", "head", "div" };
+		for (String tag : tags)
+			assertDedent("\t<p>Testing</p>\n\t</" + tag + ">", "\t<p>Testing</p>\n</" + tag + ">");
+	}
+	// TODO Add tests for when file has mixed indentation that doesn't match prefs!
+	
+	protected void assertDedent(String src, String expected)
+	{
+		IDocument document = new Document(src);
+		DocumentCommand command = new DocumentCommand()
+		{
+		};
+		command.text = NEWLINE;
+		command.offset = src.length();
+		command.caretOffset = src.length();
+		strat.customizeDocumentCommand(document, command);
+		assertEquals(expected, document.get());	
+	}
 
 	protected void assertIndent(String line)
 	{
