@@ -46,6 +46,9 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 /**
+ * This class will auto-indent after curly braces {} by default (and won't auto dedent on close brace). Subclasses
+ * should override to provide their own rules for indenting.
+ * 
  * @author Ingo Muschenetz
  * @author Michael Xia (mxia@aptana.com)
  */
