@@ -1,7 +1,5 @@
 package com.aptana.terminal;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.osgi.util.NLS;
@@ -19,42 +17,11 @@ import com.aptana.terminal.server.TerminalServer;
 public class TerminalBrowser
 {
 	private static final String TERMINAL_URL = "http://{0}:{1}/webterm/"; //$NON-NLS-1$
-	private static List<String> startDirectories = new ArrayList<String>(2);
 
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
 	private String _id;
-
-	/**
-	 * grabStartDirectory
-	 * 
-	 * @return
-	 */
-	private static String grabStartingDirectory()
-	{
-		synchronized (startDirectories)
-		{
-			if (!startDirectories.isEmpty())
-			{
-				return startDirectories.remove(0);
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * setStartingDirectory
-	 * 
-	 * @param startingDirectory
-	 */
-	public static void setStartingDirectory(String startingDirectory)
-	{
-		synchronized (startDirectories)
-		{
-			startDirectories.add(startingDirectory);
-		}
-	}
+	private String _startingDirectory;
 
 	/**
 	 * TerminalBrowser
@@ -63,7 +30,19 @@ public class TerminalBrowser
 	 */
 	public TerminalBrowser(WorkbenchPart owningPart)
 	{
+		this(owningPart, null);
+	}
+	
+	/**
+	 * TerminalBrowser
+	 * 
+	 * @param owningPart
+	 * @param startingDirectory
+	 */
+	public TerminalBrowser(WorkbenchPart owningPart, String startingDirectory)
+	{
 		this._owningPart = owningPart;
+		this._startingDirectory = startingDirectory;
 		this._id = UUID.randomUUID().toString();
 	}
 
@@ -78,7 +57,7 @@ public class TerminalBrowser
 		this._browser = new Browser(parent, SWT.NONE);
 		
 		// create focus listener so we can enable/disable key bindings
-		final IBindingService bindingService = (IBindingService) _owningPart.getSite().getService(IBindingService.class);
+		final IBindingService bindingService = (IBindingService) this._owningPart.getSite().getService(IBindingService.class);
 		
 		this._browser.addFocusListener(new FocusListener()
 		{
@@ -148,7 +127,7 @@ public class TerminalBrowser
 	 */
 	private String getStartingDirectory()
 	{
-		return grabStartingDirectory();
+		return this._startingDirectory;
 	}
 
 	/**

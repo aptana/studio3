@@ -1,5 +1,8 @@
 package com.aptana.terminal.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -27,7 +30,41 @@ import com.aptana.terminal.server.TerminalServer;
 public class TerminalView extends ViewPart
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
+	private static List<String> startDirectories = new ArrayList<String>(2);
 
+	/**
+	 * pullStartDirectory
+	 * 
+	 * @return
+	 */
+	private static String pullStartingDirectory()
+	{
+		String result = null;
+		
+		synchronized (startDirectories)
+		{
+			if (startDirectories.isEmpty() == false)
+			{
+				result = startDirectories.remove(0);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * pushStartingDirectory
+	 * 
+	 * @param startingDirectory
+	 */
+	public static void pushStartingDirectory(String startingDirectory)
+	{
+		synchronized (startDirectories)
+		{
+			startDirectories.add(startingDirectory);
+		}
+	}
+	
 	/**
 	 * @param id
 	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
@@ -47,7 +84,7 @@ public class TerminalView extends ViewPart
 			
 			if (workingDirectory != null)
 			{
-				TerminalBrowser.pushStartingDirectory(workingDirectory);
+				pushStartingDirectory(workingDirectory);
 			}
 			
 			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
@@ -88,7 +125,7 @@ public class TerminalView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		this.browser = new TerminalBrowser(this);
+		this.browser = new TerminalBrowser(this, pullStartingDirectory());
 		this.browser.createControl(parent);
 
 		// Create the help context id for the viewer's control
