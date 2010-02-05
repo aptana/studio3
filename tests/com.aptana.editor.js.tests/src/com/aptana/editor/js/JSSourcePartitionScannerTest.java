@@ -111,6 +111,20 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_SINGLELINE_COMMENT, source, 27);
 	}
 
+	public void testEndDoubleSlashRegexp()
+	{
+
+		String source =
+		//           1          2
+		// 01234567890 123456789012
+		  "if (/Mobile\\//.test(){}";
+
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 4);
+		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 13);
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 14);
+	}
+
 	public void testPartitioningOfCommentSpanningMultipleLines()
 	{
 		String source =
