@@ -9,6 +9,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.jruby.RubyRegexp;
 
 import com.aptana.scripting.Activator;
 import com.aptana.util.StringUtil;
@@ -35,6 +36,9 @@ public class BundleElement extends AbstractElement
 	private Object commandLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
+
+	private Map<String, RubyRegexp> startFolding = new HashMap<String, RubyRegexp>();
+	private Map<String, RubyRegexp> stopfolding = new HashMap<String, RubyRegexp>();
 
 	/**
 	 * Bundle
@@ -560,7 +564,13 @@ public class BundleElement extends AbstractElement
 	{
 		this._repository = gitRepo;
 	}
-
+	
+	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
+	{
+		startFolding.put(scope, startRegexp);
+		stopfolding.put(scope, endRegexp);
+	}
+	
 	public void registerFileType(String fileType, String scope)
 	{
 		associateFileType(fileType);
@@ -644,5 +654,15 @@ public class BundleElement extends AbstractElement
 	public void setLicenseUrl(String licenseUrl)
 	{
 		this._licenseUrl = licenseUrl;
+	}
+
+	public Map<String, RubyRegexp> getFoldingStartMap()
+	{
+		return startFolding;
+	}
+	
+	public Map<String, RubyRegexp> getFoldingStopMap()
+	{
+		return stopfolding;
 	}
 }

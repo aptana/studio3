@@ -16,6 +16,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.jruby.RubyRegexp;
 
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
@@ -1242,5 +1243,53 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
+	}
+
+	public RubyRegexp getFoldingStartRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<String, RubyRegexp> map = bundleEntry.getFoldingStartMap();
+			for (Map.Entry<String, RubyRegexp> entry : map.entrySet())
+			{
+				String matchedScope = entry.getKey();
+				if (scope.startsWith(matchedScope))
+				{
+					if (matchedPattern != null && matchedScope.length() < matchedPattern.length())
+						continue;
+					result = entry.getValue();
+					matchedPattern = matchedScope;
+				}
+			}
+		}
+		return result;
+	}
+
+	public RubyRegexp getFoldingStopRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<String, RubyRegexp> map = bundleEntry.getFoldingStopMap();
+			for (Map.Entry<String, RubyRegexp> entry : map.entrySet())
+			{
+				String matchedScope = entry.getKey();
+				if (scope.startsWith(matchedScope))
+				{
+					if (matchedPattern != null && matchedScope.length() < matchedPattern.length())
+						continue;
+					result = entry.getValue();
+					matchedPattern = matchedScope;
+				}
+			}
+		}
+		return result;
 	}
 }

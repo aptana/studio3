@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jruby.RubyRegexp;
+
 public class BundleEntry
 {
 	private String _name;
@@ -158,6 +160,46 @@ public class BundleEntry
 				{
 					result.putAll(registry);
 					return false;
+				}
+				return true;
+			}
+		});
+
+		return result;
+	}
+	
+	public Map<String, RubyRegexp> getFoldingStartMap()
+	{
+		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<String, RubyRegexp> registry = bundle.getFoldingStartMap();
+				if (registry != null)
+				{
+					result.putAll(registry);
+				}
+				return true;
+			}
+		});
+
+		return result;
+	}
+	
+	public Map<String, RubyRegexp> getFoldingStopMap()
+	{
+		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<String, RubyRegexp> registry = bundle.getFoldingStopMap();
+				if (registry != null)
+				{
+					result.putAll(registry);
 				}
 				return true;
 			}

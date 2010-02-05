@@ -37,8 +37,6 @@ package com.aptana.editor.common.text.reconciler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -50,9 +48,19 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
+import org.jruby.Ruby;
+import org.jruby.RubyFixnum;
+import org.jruby.RubyMatchData;
+import org.jruby.RubyNumeric;
+import org.jruby.RubyRegexp;
+import org.jruby.RubyString;
+import org.jruby.runtime.ThreadContext;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.BundleManager;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
@@ -155,8 +163,8 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			monitor.beginTask("Finding folding regions", -1);
 		}
 
-		// TODO Go through the partitions, in each partition go through each line and match regexps for that scope
-		// against the line
+		// Go through the partitions, in each partition go through each line and match regexps for that scope
+		// against the line. Regexps are contributed by the bundles for given scopes
 		ITypedRegion[] partitions = fDocument.getDocumentPartitioner().computePartitioning(0, fDocument.getLength());
 		for (ITypedRegion region : partitions)
 		{
@@ -165,29 +173,53 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getScopeAtOffset(fDocument, offset);
-			Pattern startRegexp = getStartFoldRegexp(scope);
-			Pattern endRegexp = getEndFoldRegexp(scope);
+
+			Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
+			ThreadContext threadContext = runtime.getCurrentContext();
+
+			RubyRegexp startRegexp = getStartFoldRegexp(scope);
+			if (startRegexp == null)
+				continue;
+			RubyRegexp endRegexp = getEndFoldRegexp(scope);
+			if (endRegexp == null)
+				continue;
 
 			String partitionText = fDocument.get(offset, length);
 			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
-				Matcher startMatcher = startRegexp.matcher(line);
-				if (startMatcher.find())
+
+				RubyString rLine = runtime.newString(line);
+				IRubyObject startMatcher = startRegexp.match_m(threadContext, rLine);
+				if (!startMatcher.isNil())
 				{
-					openCurlies.push(startMatcher.start() + offset);
+					int start = 0;
+					IRubyObject posStart = ((RubyMatchData) startMatcher).begin(threadContext, runtime.newFixnum(0));
+					if (posStart instanceof RubyFixnum)
+					{
+						start = RubyNumeric.num2int(posStart);
+					}
+					openCurlies.push(start + offset);
 				}
 
-				Matcher endMatcher = endRegexp.matcher(line);
-				if (endMatcher.find())
+				IRubyObject endMatcher = endRegexp.match_m(threadContext, rLine);
+				if (!endMatcher.isNil())
 				{
 					if (openCurlies.size() > 0)
 					{
 						int startingOffset = openCurlies.pop();
-						int posLength = (endMatcher.end() + offset) - startingOffset;
+
+						int end = 0;
+						IRubyObject posStart = ((RubyMatchData) endMatcher).end(threadContext, runtime.newFixnum(0));
+						if (posStart instanceof RubyFixnum)
+						{
+							end = RubyNumeric.num2int(posStart);
+						}
+
+						int posLength = (end + offset) - startingOffset;
 						if (posLength > 0)
 						{
-							// FIXME Don't add if the starta nd end are on the same line
+							// FIXME Don't add if the start and end are on the same line
 							Position position = new Position(startingOffset, posLength);
 							fPositions.add(position);
 						}
@@ -203,53 +235,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		}
 	}
 
-	@SuppressWarnings("nls")
-	private Pattern getEndFoldRegexp(String scope)
+	private RubyRegexp getEndFoldRegexp(String scope)
 	{
-		if (scope.startsWith("source.ruby"))
-		{
-			return Pattern.compile("((^|;)\\s*+end\\s*+([#].*)?$" +
-"|(^|;)\\s*+end\\..*$" +
-"|^\\s*+[}\\]],?\\s*+([#].*)?$" +
-"|[#].*?\\(end\\)\\s*+$" +
-"|^=end" +
-")");
-		}
-		return Pattern.compile("^\\s*\\}"); //$NON-NLS-1$
+		return BundleManager.getInstance().getFoldingStopRegexp(scope);
 	}
 
-	@SuppressWarnings("nls")
-	private Pattern getStartFoldRegexp(String scope)
+	private RubyRegexp getStartFoldRegexp(String scope)
 	{
-		if (scope.startsWith("source.ruby"))
-		{
-			return Pattern.compile("(\\s*+" +
-"(module|class|def(?!.*\\bend\\s*$)" +
-"|unless|if" +
-"|case" +
-"|begin" +
-"|for|while|until" +
-"|^=begin" +
-"|(\"(\\\\.|[^\"])*+\"" +
-"|'(\\\\.|[^'])*+'" +
-"|[^#\"']" +
-")*" +
-"(\\s(do|begin|case)" +
-"|(?<!\\$)[-+=&|*/~%^<>~]\\s*+(if|unless)" +
-")" +
-")\\b" +
-"(?![^;]*+;.*?\\bend\\b)" +
-"|(\"(\\\\.|[^\"])*+\"" +
-"|'(\\\\.|[^'])*+'" +
-"|[^#\"']" +
-")*" +
-"(\\{(?![^}]*+\\})" +
-"|\\[(?![^\\]]*+\\])" +
-")" +
-").*$" +
-"|[#].*?\\(fold\\)\\s*+$");
-		}
-		return Pattern.compile("\\{\\s*$"); //$NON-NLS-1$
+		return BundleManager.getInstance().getFoldingStartRegexp(scope);
 	}
 
 	private void reconcile(boolean initialReconcile)
