@@ -34,20 +34,38 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
 
 	private AbstractThemeableEditor fEditor;
+
+	/**
+	 * Code Folding.
+	 */
+	final List<Position> fPositions = new ArrayList<Position>();
+
+	private IDocument fDocument;
+	private IProgressMonitor fMonitor;
 
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
@@ -62,18 +80,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void reconcile(IRegion partition)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void setDocument(IDocument document)
 	{
+		fDocument = document;
 		fEditor.getFileService().setDocument(document);
 	}
 
@@ -86,6 +107,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor)
 	{
+		fMonitor = monitor;
 	}
 
 	public void aboutToBeReconciled()
@@ -104,10 +126,134 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+
+		fPositions.clear();
+		try
+		{
+			emitFoldingRegions2(monitor);
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				fEditor.updateFoldingStructure(fPositions);
+			}
+		});
+
+	}
+
+	private void emitFoldingRegions2(IProgressMonitor monitor) throws BadLocationException
+	{
+		Stack<Integer> openCurlies = new Stack<Integer>();
+		if (monitor != null)
+		{
+			monitor.beginTask("Finding folding regions", -1);
+		}
+
+		// TODO Go through the partitions, in each partition go through each line and match regexps for that scope
+		// against the line
+		ITypedRegion[] partitions = fDocument.getDocumentPartitioner().computePartitioning(0, fDocument.getLength());
+		for (ITypedRegion region : partitions)
+		{
+			int offset = region.getOffset();
+			int length = region.getLength();
+
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(fDocument, offset);
+			Pattern startRegexp = getStartFoldRegexp(scope);
+			Pattern endRegexp = getEndFoldRegexp(scope);
+
+			String partitionText = fDocument.get(offset, length);
+			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
+			for (String line : lines)
+			{
+				Matcher startMatcher = startRegexp.matcher(line);
+				if (startMatcher.find())
+				{
+					openCurlies.push(startMatcher.start() + offset);
+				}
+
+				Matcher endMatcher = endRegexp.matcher(line);
+				if (endMatcher.find())
+				{
+					if (openCurlies.size() > 0)
+					{
+						int startingOffset = openCurlies.pop();
+						int posLength = (endMatcher.end() + offset) - startingOffset;
+						if (posLength > 0)
+						{
+							// FIXME Don't add if the starta nd end are on the same line
+							Position position = new Position(startingOffset, posLength);
+							fPositions.add(position);
+						}
+					}
+				}
+				offset += line.length() + 1; // FIXME This assumes line delimiter is 1 char!
+			}
+		}
+
+		if (monitor != null)
+		{
+			monitor.done();
+		}
+	}
+
+	@SuppressWarnings("nls")
+	private Pattern getEndFoldRegexp(String scope)
+	{
+		if (scope.startsWith("source.ruby"))
+		{
+			return Pattern.compile("((^|;)\\s*+end\\s*+([#].*)?$" +
+"|(^|;)\\s*+end\\..*$" +
+"|^\\s*+[}\\]],?\\s*+([#].*)?$" +
+"|[#].*?\\(end\\)\\s*+$" +
+"|^=end" +
+")");
+		}
+		return Pattern.compile("^\\s*\\}"); //$NON-NLS-1$
+	}
+
+	@SuppressWarnings("nls")
+	private Pattern getStartFoldRegexp(String scope)
+	{
+		if (scope.startsWith("source.ruby"))
+		{
+			return Pattern.compile("(\\s*+" +
+"(module|class|def(?!.*\\bend\\s*$)" +
+"|unless|if" +
+"|case" +
+"|begin" +
+"|for|while|until" +
+"|^=begin" +
+"|(\"(\\\\.|[^\"])*+\"" +
+"|'(\\\\.|[^'])*+'" +
+"|[^#\"']" +
+")*" +
+"(\\s(do|begin|case)" +
+"|(?<!\\$)[-+=&|*/~%^<>~]\\s*+(if|unless)" +
+")" +
+")\\b" +
+"(?![^;]*+;.*?\\bend\\b)" +
+"|(\"(\\\\.|[^\"])*+\"" +
+"|'(\\\\.|[^'])*+'" +
+"|[^#\"']" +
+")*" +
+"(\\{(?![^}]*+\\})" +
+"|\\[(?![^\\]]*+\\])" +
+")" +
+").*$" +
+"|[#].*?\\(fold\\)\\s*+$");
+		}
+		return Pattern.compile("\\{\\s*$"); //$NON-NLS-1$
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(new NullProgressMonitor());
+		calculatePositions(fMonitor);
 	}
 }
