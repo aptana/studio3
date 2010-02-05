@@ -41,7 +41,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParserFactory;
+import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
@@ -58,7 +58,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
 
-		getFileService().setParser(HTMLParserFactory.getInstance().getParser());
+		getFileService().setParser(new HTMLParser());
 		getFileService().setParseState(new HTMLParseState());
 	}
 

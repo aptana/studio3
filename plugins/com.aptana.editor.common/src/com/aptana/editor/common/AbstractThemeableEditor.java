@@ -51,6 +51,7 @@ import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.common.theme.IThemeManager;

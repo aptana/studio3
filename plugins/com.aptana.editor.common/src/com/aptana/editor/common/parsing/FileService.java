@@ -1,7 +1,9 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.parsing;
 
 import org.eclipse.jface.text.IDocument;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.Messages;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;

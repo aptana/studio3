@@ -24,8 +24,8 @@ import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSPrimitiveNode;
 import com.aptana.editor.js.parsing.ast.JSUnaryOperatorNode;
 import com.aptana.editor.js.parsing.lexer.JSTokens;
-import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
@@ -196,7 +196,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
 					final JSNode[] p = _list_p == null ? new JSNode[0] : (JSNode[]) _list_p.toArray(new JSNode[_list_p.size()]);
-					return new ParseRootNode(JSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
+					return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 				}
 			},
 			new Action() {	// [1] SourceElements = SourceElements SourceElement

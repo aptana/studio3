@@ -5,18 +5,17 @@ import java.util.List;
 
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
-import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
-import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
 	public HTMLOutlineContentProvider()
 	{
-		addSubLanguage(CSSNode.LANGUAGE, new CSSOutlineContentProvider());
-		addSubLanguage(JSNode.LANGUAGE, new JSOutlineContentProvider());
+		addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineContentProvider());
+		addSubLanguage(ICSSParserConstants.LANGUAGE, new JSOutlineContentProvider());
 	}
 
 	@Override

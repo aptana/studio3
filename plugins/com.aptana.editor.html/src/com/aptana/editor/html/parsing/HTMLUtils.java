@@ -12,8 +12,8 @@ public class HTMLUtils
 	 */
 	public static String stripTagEndings(String tag)
 	{
-		String name = tag.replaceAll("</", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		name = name.replaceAll(">", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		return name.replaceAll("<", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		String name = tag.replaceAll("^\\s*</", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		name = name.replaceAll(">\\s*$", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return name.replaceAll("^\\s*<", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

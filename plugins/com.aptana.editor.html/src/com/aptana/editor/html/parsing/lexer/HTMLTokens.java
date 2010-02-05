@@ -6,12 +6,12 @@ import java.util.Map;
 public class HTMLTokens
 {
 	public static final short UNKNOWN = -1;
-	static public final short EOF = 0;
-	static public final short STYLE = 1;
-	static public final short SCRIPT = 2;
-	static public final short START_TAG = 3;
-	static public final short TEXT = 4;
-	static public final short END_TAG = 5;
+	public static final short EOF = 0;
+	public static final short STYLE = 1;
+	public static final short SCRIPT = 2;
+	public static final short START_TAG = 3;
+	public static final short TEXT = 4;
+	public static final short END_TAG = 5;
 	public static final short XML_DECL = 6;
 	public static final short STRING = 7;
 	public static final short COMMENT = 8;

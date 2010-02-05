@@ -4,13 +4,12 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.ast.JSNode;
 
 public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 {
@@ -19,8 +18,8 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 
 	public HTMLOutlineLabelProvider()
 	{
-		addSubLanguage(CSSNode.LANGUAGE, new CSSOutlineLabelProvider());
-		addSubLanguage(JSNode.LANGUAGE, new JSOutlineLabelProvider());
+		addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineLabelProvider());
+		addSubLanguage(ICSSParserConstants.LANGUAGE, new JSOutlineLabelProvider());
 	}
 
 	@Override

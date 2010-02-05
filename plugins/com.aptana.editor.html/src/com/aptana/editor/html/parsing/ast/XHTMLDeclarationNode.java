@@ -1,6 +1,9 @@
 package com.aptana.editor.html.parsing.ast;
 
-public class HTMLDeclarationNode extends HTMLNode
+/**
+ * This contains XHTML declaration tag.
+ */
+public class XHTMLDeclarationNode extends HTMLNode
 {
 
 	private String fVersion;
@@ -9,13 +12,13 @@ public class HTMLDeclarationNode extends HTMLNode
 
 	private String fText;
 
-	public HTMLDeclarationNode(String version, int start, int end)
+	public XHTMLDeclarationNode(String version, int start, int end)
 	{
 		super(HTMLNodeTypes.DECLARATION, start, end);
 		fVersion = version;
 	}
 
-	public HTMLDeclarationNode(String version, String encoding, String standalone, int start, int end)
+	public XHTMLDeclarationNode(String version, String encoding, String standalone, int start, int end)
 	{
 		this(version, start, end);
 		fEncoding = encoding;

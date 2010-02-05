@@ -1,11 +1,10 @@
 package com.aptana.editor.css.parsing.ast;
 
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.parsing.ast.ParseBaseNode;
 
 public class CSSNode extends ParseBaseNode
 {
-
-	public static final String LANGUAGE = "text/css"; //$NON-NLS-1$
 
 	protected CSSNode()
 	{
@@ -14,7 +13,7 @@ public class CSSNode extends ParseBaseNode
 
 	public CSSNode(int start, int end)
 	{
-		super(LANGUAGE);
+		super(ICSSParserConstants.LANGUAGE);
 		this.start = start;
 		this.end = end;
 	}
