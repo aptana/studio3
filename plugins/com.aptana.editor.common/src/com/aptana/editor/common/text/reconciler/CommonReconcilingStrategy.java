@@ -35,8 +35,9 @@
 package com.aptana.editor.common.text.reconciler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -157,7 +158,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private void emitFoldingRegions2(IProgressMonitor monitor) throws BadLocationException
 	{
-		Stack<Integer> openCurlies = new Stack<Integer>();
+		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
 		if (monitor != null)
 		{
 			monitor.beginTask("Finding folding regions", -1);
@@ -183,12 +184,13 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			RubyRegexp endRegexp = getEndFoldRegexp(scope);
 			if (endRegexp == null)
 				continue;
-
+			// FIXME This doesn't take indents into account, which Textmate does. Kevin L tackled this before when we
+			// were playing around with this in eclipsemate!
 			String partitionText = fDocument.get(offset, length);
 			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
-
+				// Look for an open...
 				RubyString rLine = runtime.newString(line);
 				IRubyObject startMatcher = startRegexp.match_m(threadContext, rLine);
 				if (!startMatcher.isNil())
@@ -199,29 +201,35 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 					{
 						start = RubyNumeric.num2int(posStart);
 					}
-					openCurlies.push(start + offset);
+					starts.put(findIndent(line), start + offset); // need to push the indent level too...
 				}
-
-				IRubyObject endMatcher = endRegexp.match_m(threadContext, rLine);
-				if (!endMatcher.isNil())
+				// Don't look for an end if there's no open yet!
+				if (starts.size() > 0)
 				{
-					if (openCurlies.size() > 0)
+					// check to see if we have an open folding region at this indent level...
+					int indent = findIndent(line);
+					if (starts.containsKey(indent))
 					{
-						int startingOffset = openCurlies.pop();
-
-						int end = 0;
-						IRubyObject posStart = ((RubyMatchData) endMatcher).end(threadContext, runtime.newFixnum(0));
-						if (posStart instanceof RubyFixnum)
+						IRubyObject endMatcher = endRegexp.match_m(threadContext, rLine);
+						if (!endMatcher.isNil())
 						{
-							end = RubyNumeric.num2int(posStart);
-						}
+							int startingOffset = starts.remove(indent);
 
-						int posLength = (end + offset) - startingOffset;
-						if (posLength > 0)
-						{
-							// FIXME Don't add if the start and end are on the same line
-							Position position = new Position(startingOffset, posLength);
-							fPositions.add(position);
+							int end = 0;
+							IRubyObject posStart = ((RubyMatchData) endMatcher)
+									.end(threadContext, runtime.newFixnum(0));
+							if (posStart instanceof RubyFixnum)
+							{
+								end = RubyNumeric.num2int(posStart);
+							}
+
+							int posLength = (end + offset) - startingOffset;
+							if (posLength > 0)
+							{
+								// FIXME Don't add if the start and end are on the same line
+								Position position = new Position(startingOffset, posLength);
+								fPositions.add(position);
+							}
 						}
 					}
 				}
@@ -233,6 +241,25 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		{
 			monitor.done();
 		}
+	}
+
+	private int findIndent(String text)
+	{
+		// TODO Handle tab characters and expanding them out to their tab width?
+		int indent = 0;
+		while (indent < text.length())
+		{
+			if (Character.isWhitespace(text.charAt(indent)))
+			{
+				indent++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return indent;
 	}
 
 	private RubyRegexp getEndFoldRegexp(String scope)
