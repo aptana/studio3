@@ -8,9 +8,8 @@ public class CSSCharSetNode extends CSSNode
 
 	public CSSCharSetNode(String encoding, int start, int end)
 	{
+		super(start, end);
 		fEncoding = encoding;
-		this.start = start;
-		this.end = end;
 	}
 
 	@Override

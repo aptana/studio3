@@ -178,7 +178,7 @@ module Ruble
     end
     
     def scope_at_offset(offset)
-      com.aptana.editor.common.DocumentContentTypeManager.instance.get_content_type_at_offset(document, offset)
+      com.aptana.editor.common.CommonEditorPlugin.getDefault.get_document_scope_manager.get_scope_at_offset(document, offset)
     end
     
     def caret_column

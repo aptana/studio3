@@ -3,10 +3,11 @@ package com.aptana.editor.js.outline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.ILexeme;
 
-public class JSOutlineItem implements ILexeme
+public class JSOutlineItem implements ILexeme, ILanguageNode
 {
 
 	public static enum Type
@@ -108,5 +109,11 @@ public class JSOutlineItem implements ILexeme
 	public String getText()
 	{
 		return fSourceRange.getText();
+	}
+
+	@Override
+	public String getLanguage()
+	{
+		return fReferenceNode.getLanguage();
 	}
 }

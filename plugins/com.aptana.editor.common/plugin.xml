@@ -123,6 +123,13 @@
                value="Inconsolata-regular-14">
          </fontOverride>
       </theme>
+      <fontDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="com.aptana.explorer.font"
+            isEditable="true"
+            label="%appExplorerFont.label">
+      </fontDefinition>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
@@ -163,7 +170,7 @@
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
-            class="com.aptana.editor.common.EditorContextContributor">
+            class="com.aptana.editor.common.internal.scripting.EditorContextContributor">
       </contributor>
    </extension>
 </plugin>

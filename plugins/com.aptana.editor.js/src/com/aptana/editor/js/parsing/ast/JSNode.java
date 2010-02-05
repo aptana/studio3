@@ -6,6 +6,8 @@ import com.aptana.parsing.ast.ParseBaseNode;
 public class JSNode extends ParseBaseNode
 {
 
+	public static final String LANGUAGE = "text/javascript"; //$NON-NLS-1$
+
 	protected static final short DEFAULT_TYPE = JSNodeTypes.EMPTY;
 
 	private short fType;
@@ -14,11 +16,12 @@ public class JSNode extends ParseBaseNode
 
 	public JSNode()
 	{
-		fType = DEFAULT_TYPE;
+		this(DEFAULT_TYPE, 0, 0);
 	}
 
 	public JSNode(short type, int start, int end)
 	{
+		super(LANGUAGE);
 		fType = type;
 		this.start = start;
 		this.end = end;

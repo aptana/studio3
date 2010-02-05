@@ -93,8 +93,6 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
-	protected static final String APP_EXPLORER_FONT_NAME = "com.aptana.explorer.font"; //$NON-NLS-1$
-
 	private ToolItem projectToolItem;
 
 	protected IProject selectedProject;
@@ -627,7 +625,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			public void handleEvent(Event event)
 			{
-				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 				if (font == null)
 				{
 					font = JFaceResources.getTextFont();
@@ -652,7 +650,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void propertyChange(PropertyChangeEvent event)
 			{
-				if (!event.getProperty().equals(APP_EXPLORER_FONT_NAME))
+				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
 					return;
 				Display.getCurrent().asyncExec(new Runnable()
 				{
@@ -684,7 +682,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			public void update(ViewerCell cell)
 			{
 				provider.update(cell);
-				Font font = JFaceResources.getFont(APP_EXPLORER_FONT_NAME);
+				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 				if (font == null)
 				{
 					font = JFaceResources.getTextFont();

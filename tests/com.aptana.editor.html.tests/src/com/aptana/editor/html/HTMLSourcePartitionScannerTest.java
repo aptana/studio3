@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ExtendedFastPartitioner;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
@@ -52,9 +51,6 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 			partitionScanner.setPartitioner(partitioner);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IHTMLConstants.CONTENT_TYPE_HTML);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document,
-					HTMLSourceConfiguration.getDefault());
 		}
 		return partitioner.getContentType(offset);
 	}

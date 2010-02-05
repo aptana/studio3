@@ -9,9 +9,8 @@ public class CSSTermNode extends CSSExpressionNode
 
 	public CSSTermNode(Symbol term)
 	{
+		super(term.getStart(), term.getEnd());
 		fTerm = term.value.toString();
-		this.start = term.getStart();
-		this.end = term.getEnd();
 	}
 
 	@Override

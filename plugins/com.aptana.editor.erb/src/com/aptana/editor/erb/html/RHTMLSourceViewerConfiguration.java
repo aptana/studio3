@@ -40,11 +40,12 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CompositeSourceViewerConfiguration;
 import com.aptana.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.editor.common.QualifiedContentType;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
@@ -71,7 +72,7 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 
 	static
 	{
-		ContentTypeTranslation c = ContentTypeTranslation.getDefault();
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB), new QualifiedContentType(
 				TOPLEVEL_RHTML_SCOPE));
 		c.addTranslation(new QualifiedContentType(IERBConstants.CONTENT_TYPE_HTML_ERB,

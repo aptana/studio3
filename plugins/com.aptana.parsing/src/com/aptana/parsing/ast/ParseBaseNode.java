@@ -10,8 +10,11 @@ public class ParseBaseNode extends Node implements IParseNode
 	private IParseNode fParent;
 	private int fChildrenCount;
 
-	public ParseBaseNode()
+	private String fLanguage;
+
+	public ParseBaseNode(String language)
 	{
+		fLanguage = language;
 		fChildren = new IParseNode[0];
 	}
 
@@ -36,6 +39,11 @@ public class ParseBaseNode extends Node implements IParseNode
 		{
 			((ParseBaseNode) child).setParent(this);
 		}
+	}
+
+	public void addOffset(int offset)
+	{
+		setLocation(getStart() + offset, getEnd() + offset);
 	}
 
 	@Override
@@ -87,6 +95,12 @@ public class ParseBaseNode extends Node implements IParseNode
 			}
 		}
 		return -1;
+	}
+
+	@Override
+	public String getLanguage()
+	{
+		return fLanguage;
 	}
 
 	@Override

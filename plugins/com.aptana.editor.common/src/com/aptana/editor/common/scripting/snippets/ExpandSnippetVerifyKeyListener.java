@@ -13,7 +13,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.ITextEditorExtension2;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -80,9 +81,9 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 							if (!Character.isWhitespace(previousChar.charAt(0)))
 							{
 								int caretOffset = textViewer.getTextWidget().getCaretOffset();
-								String contextTypeId = getContextType(document, caretOffset);
+								String scope = getScope(document, caretOffset);
 								boolean found = false;
-								AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
+								AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
 								CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 								if (commandsFromScope.length > 0)
 								{
@@ -137,17 +138,22 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			return false;
 	}
 
-	private static String getContextType(IDocument document, int offset)
+	private static String getScope(IDocument document, int offset)
 	{
-		String contentTypeString = ""; //$NON-NLS-1$
+		String scope = ""; //$NON-NLS-1$
 		try
 		{
-			contentTypeString = DocumentContentTypeManager.getInstance().getContentTypeAtOffset(document, offset);
+			scope = getDocumentScopeManager().getScopeAtOffset(document, offset);
 		}
 		catch (BadLocationException e)
 		{
 			// TODO
 		}
-		return contentTypeString;
+		return scope;
+	}
+
+	protected static IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 }
