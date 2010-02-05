@@ -25,7 +25,6 @@ import com.aptana.editor.common.CommonSourceViewerConfiguration;
 public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 {
 
-	private static final String SPACE_CHAR = " "; //$NON-NLS-1$
 	private static final String TAB_CHAR = "\t"; //$NON-NLS-1$
 
 	private Pattern increaseIndentRegexp;
@@ -127,10 +126,9 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 	}
 
 	/**
-	 * This method determines the corrected indent string for the current line. By default this will attempt to remove
-	 * one level of indent if the previous line has the same indent level or greater than the current line. Subclasses
-	 * may want to do more intelligent determinations (i.e. HTML could try to find the matching open tag's indent level
-	 * and use that).
+	 * This method determines the corrected indent string for the current line on dedent trigger. We walk the lines
+	 * backward and try to find the matching open/indent (by using the increase indent regexp). If found, we grab that
+	 * line's exact indent string and re-use it.
 	 * 
 	 * @param d
 	 * @param lineNumber
@@ -139,6 +137,46 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 	 * @throws BadLocationException
 	 */
 	protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
+			throws BadLocationException
+	{
+		// Walk lines backward and find the corresponding indenting line for this one. This means we need to match the
+		// regexps against each line and keep a stack of them...
+		int stack = 0;
+		for (int i = lineNumber - 1; i >= 0; i--)
+		{
+			IRegion region = d.getLineInformation(i);
+			String lineText = d.get(region.getOffset(), region.getLength());
+			if (increaseIndentRegexp.matcher(lineText).find())
+			{
+				// Found an open
+				stack++;
+				if (stack >= 1)
+				{
+					// Yay, we found our open! Grab it's indent!
+					int endIndex = findEndOfWhiteSpace(d, region.getOffset(), region.getOffset() + region.getLength());
+					return d.get(region.getOffset(), endIndex - region.getOffset());
+				}
+			}
+			else if (decreaseIndentRegexp.matcher(lineText).find())
+			{
+				// found a close
+				stack--;
+			}
+		}
+		return dedentBasedOnPreviousLine(d, lineNumber, currentLineIndent);
+	}
+
+	/**
+	 * A less intelligent way of determining new indent on dedent trigger. We look at previous line and if our indent is
+	 * of same length or greater, we just assume we need to dedent from that previous line.
+	 * 
+	 * @param d
+	 * @param lineNumber
+	 * @param currentLineIndent
+	 * @return
+	 * @throws BadLocationException
+	 */
+	protected String dedentBasedOnPreviousLine(IDocument d, int lineNumber, String currentLineIndent)
 			throws BadLocationException
 	{
 		int endIndex;
