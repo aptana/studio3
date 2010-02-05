@@ -48,6 +48,7 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.editor.erb.IERBConstants;
@@ -156,7 +157,7 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 				return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this,
 						sourceViewer) };
 			}
-			return super.getAutoEditStrategies(sourceViewer, contentType);
+			return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
 		}
 		return new IAutoEditStrategy[] { new HTMLAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
