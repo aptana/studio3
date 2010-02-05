@@ -28,8 +28,8 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	public void createPartControl(Composite parent)
 	{
 		// NOTE: This forces the terminal server to startup before we try to
-//		// open the terminal editor. Apparently, on Windows, the editor will
-//		// open the URL before the server has started resulting in a "page not found"
+		// open the terminal editor. Apparently, on Windows, the editor will
+		// open the URL before the server has started resulting in a "page not found"
 		TerminalServer.getInstance();
 		
 		this._browser = new TerminalBrowser(this);
