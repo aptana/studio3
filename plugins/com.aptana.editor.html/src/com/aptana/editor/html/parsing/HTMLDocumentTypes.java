@@ -9,6 +9,7 @@ public class HTMLDocumentTypes
 {
 	public enum Type
 	{
+		OTHER,
 		HTML_2_0,
 		HTML_3_2,
 		HTML_4_0_1_STRICT,
@@ -19,7 +20,6 @@ public class HTMLDocumentTypes
 		XHTML_1_0_TRANSITIONAL,
 		XHTML_1_0_FRAMESET,
 		XHTML_1_1_STRICT,
-		OTHER
 	}
 
 	private static final String HTML_2_0 = "-//IETF//DTD HTML//EN"; //$NON-NLS-1$

@@ -10,6 +10,7 @@ import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 
 public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 {
@@ -19,7 +20,7 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 	public HTMLOutlineLabelProvider()
 	{
 		addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineLabelProvider());
-		addSubLanguage(ICSSParserConstants.LANGUAGE, new JSOutlineLabelProvider());
+		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineLabelProvider());
 	}
 
 	@Override
