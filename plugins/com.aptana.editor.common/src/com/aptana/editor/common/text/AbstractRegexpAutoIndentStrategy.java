@@ -68,13 +68,13 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 		try
 		{
 			// Get the line and run a regexp check against it
-			IRegion region = d.getLineInformationOfOffset(c.offset);
-			String lineContent = d.get(region.getOffset(), c.offset - region.getOffset());
+			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
+			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
 
 			if (increaseIndentRegexp.matcher(lineContent).find())
 			{
 				String previousLineIndent = getAutoIndentAfterNewLine(d, c);
-				String restOfLine = d.get(c.offset, region.getLength() - (c.offset - region.getOffset()));
+				String restOfLine = d.get(c.offset, curLineRegion.getLength() - (c.offset - curLineRegion.getOffset()));
 				String startIndent = newline + previousLineIndent + indentString;
 				if (indentAndPushTrailingContentAfterNewlineAndCursor(lineContent, restOfLine))
 				{
@@ -95,40 +95,14 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 				{
 					return true;
 				}
-				// Grab previous line's indent level
-				IRegion previousLine = d.getLineInformation(lineNumber - 1);
-				int endIndex = findEndOfWhiteSpace(d, previousLine.getOffset(), previousLine.getOffset()
-						+ previousLine.getLength());
-				String previousLineIndent = d.get(previousLine.getOffset(), endIndex - previousLine.getOffset());
-				// Try to generate a string for a decreased indent level...
-				String decreasedIndent = previousLineIndent;
-				if (previousLineIndent.contains(TAB_CHAR))
+				int endIndex = findEndOfWhiteSpace(d, curLineRegion.getOffset(), curLineRegion.getOffset()
+						+ curLineRegion.getLength());
+				String currentLineIndent = d.get(curLineRegion.getOffset(), endIndex - curLineRegion.getOffset());
+				if (currentLineIndent.length() == 0)
 				{
-					if (previousLineIndent.contains(SPACE_CHAR))
-					{
-						// mixed tabs and spaces
-						if (previousLineIndent.endsWith(TAB_CHAR))
-						{
-							// Just remove the tab at end
-							decreasedIndent = decreasedIndent.substring(0, decreasedIndent.length() - 1);
-						}
-						else
-						{
-							// TODO We need to try and remove upto tab-width spaces from end, stop if we hit a tab first
-						}
-					}
-					else
-					{
-						// all tabs, just remove a tab
-						decreasedIndent = decreasedIndent.substring(0, decreasedIndent.length() - 1);
-					}
+					return true;
 				}
-				else
-				{
-					// all spaces? (FIXME check if empty before declaring so, We may need to try multiple lines to see)
-					int tabWidth = guessTabWidth(d, lineNumber);
-					decreasedIndent = decreasedIndent.substring(0, decreasedIndent.length() - tabWidth);
-				}
+				String decreasedIndent = findCorrectIndentString(d, lineNumber, currentLineIndent);
 				// Shift the current line...
 				int i = 0;
 				while (Character.isWhitespace(lineContent.charAt(i)))
@@ -136,12 +110,11 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 					i++;
 				}
 				String newContent = decreasedIndent + lineContent.substring(i);
-				d.replace(region.getOffset(), region.getLength(), newContent);
+				d.replace(curLineRegion.getOffset(), curLineRegion.getLength(), newContent);
 				// Set the new indent level for next line
 				c.text = newline + decreasedIndent;
-				c.offset -= previousLineIndent.length() - decreasedIndent.length();
+				c.offset = curLineRegion.getOffset() + newContent.length();
 				c.shiftsCaret = false;
-				c.doit = true;
 				return true;
 			}
 		}
@@ -151,6 +124,55 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 		}
 
 		return false;
+	}
+
+	/**
+	 * This method determines the corrected indent string for the current line. By default this will attempt to remove
+	 * one level of indent if the previous line has the same indent level or greater than the current line. Subclasses
+	 * may want to do more intelligent determinations (i.e. HTML could try to find the matching open tag's indent level
+	 * and use that).
+	 * 
+	 * @param d
+	 * @param lineNumber
+	 * @param currentLineIndent
+	 * @return
+	 * @throws BadLocationException
+	 */
+	protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
+			throws BadLocationException
+	{
+		int endIndex;
+		// Grab previous line's indent level
+		IRegion previousLine = d.getLineInformation(lineNumber - 1);
+		endIndex = findEndOfWhiteSpace(d, previousLine.getOffset(), previousLine.getOffset() + previousLine.getLength());
+		String previousLineIndent = d.get(previousLine.getOffset(), endIndex - previousLine.getOffset());
+
+		// Try to generate a string for a decreased indent level... First, just set to previous line's indent.
+		String decreasedIndent = previousLineIndent;
+		if (previousLineIndent.length() >= currentLineIndent.length())
+		{
+			// previous indent level is same or greater than current line's, we should shift current back one
+			// level
+			if (previousLineIndent.endsWith(TAB_CHAR))
+			{
+				// Just remove the tab at end
+				decreasedIndent = decreasedIndent.substring(0, decreasedIndent.length() - 1);
+			}
+			else
+			{
+				// We need to try and remove upto tab-width spaces from end, stop if we hit a tab first
+				int tabWidth = guessTabWidth(d, lineNumber);
+				String toRemove = decreasedIndent.substring(decreasedIndent.length() - tabWidth);
+				int lastTabIndex = toRemove.lastIndexOf(TAB_CHAR);
+				if (lastTabIndex != -1)
+				{
+					// compare last tab index to number of spaces we want to remove.
+					tabWidth -= lastTabIndex + 1;
+				}
+				decreasedIndent = decreasedIndent.substring(0, decreasedIndent.length() - tabWidth);
+			}
+		}
+		return decreasedIndent;
 	}
 
 	/**
