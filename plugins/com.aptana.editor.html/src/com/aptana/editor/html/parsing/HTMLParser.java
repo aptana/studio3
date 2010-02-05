@@ -124,9 +124,11 @@ public class HTMLParser implements IParser
 
 	private void processCSSStyle() throws IOException, Exception
 	{
-		int start = fCurrentSymbol.getStart();
-		int end = fCurrentSymbol.getEnd();
+		Symbol styleTag = fCurrentSymbol;
 		advance();
+
+		int start = fCurrentSymbol.getStart();
+		int end = start;
 		while (fCurrentSymbol.getId() == HTMLTokens.STYLE)
 		{
 			end = fCurrentSymbol.getEnd();
@@ -134,29 +136,36 @@ public class HTMLParser implements IParser
 		}
 
 		IParseNode[] nested = new IParseNode[0];
-		try
+		if (start != end)
 		{
-			String text = fScanner.getSource().get(start, end - start + 1);
-			ParseState parseState = new ParseState();
-			parseState.setEditState(text, text, 0, 0);
-			IParseNode node = CSSParserFactory.getInstance().getParser().parse(parseState);
-			addOffset(node, start);
-			nested = new IParseNode[] { node };
-		}
-		catch (java.lang.Exception e)
-		{
+			// has CSS content
+			try
+			{
+				String text = fScanner.getSource().get(start, end - start + 1);
+				ParseState parseState = new ParseState();
+				parseState.setEditState(text, text, 0, 0);
+				IParseNode node = CSSParserFactory.getInstance().getParser().parse(parseState);
+				addOffset(node, start);
+				nested = new IParseNode[] { node };
+			}
+			catch (java.lang.Exception e)
+			{
+			}
 		}
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, start, end));
+			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, styleTag.getStart(), styleTag
+					.getEnd()));
 		}
 	}
 
 	private void processJSScript() throws IOException, Exception
 	{
+		Symbol scriptTag = fCurrentSymbol;
+		advance();
+
 		int start = fCurrentSymbol.getStart();
 		int end = start;
-		advance();
 		while (fCurrentSymbol.getId() == HTMLTokens.SCRIPT)
 		{
 			end = fCurrentSymbol.getEnd();
@@ -164,21 +173,26 @@ public class HTMLParser implements IParser
 		}
 
 		IParseNode[] nested = new IParseNode[0];
-		try
+		if (start != end)
 		{
-			String text = fScanner.getSource().get(start, end - start + 1);
-			ParseState parseState = new ParseState();
-			parseState.setEditState(text, text, 0, 0);
-			IParseNode node = JSParserFactory.getInstance().getParser().parse(parseState);
-			addOffset(node, start);
-			nested = new IParseNode[] { node };
-		}
-		catch (java.lang.Exception e)
-		{
+			// has JS content
+			try
+			{
+				String text = fScanner.getSource().get(start, end - start + 1);
+				ParseState parseState = new ParseState();
+				parseState.setEditState(text, text, 0, 0);
+				IParseNode node = JSParserFactory.getInstance().getParser().parse(parseState);
+				addOffset(node, start);
+				nested = new IParseNode[] { node };
+			}
+			catch (java.lang.Exception e)
+			{
+			}
 		}
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.JS, nested, start, end));
+			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.JS, nested, scriptTag.getStart(), scriptTag
+					.getEnd()));
 		}
 	}
 

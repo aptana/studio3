@@ -68,11 +68,6 @@ public class CompositeParserScanner extends Scanner
 				if (fCurrentIndex == DEFAULT_INDEX)
 				{
 					fCurrentIndex = getScannerIndex(data.toString());
-					if (fCurrentIndex != DEFAULT_INDEX)
-					{
-						// has switched to a nested language
-						return nextToken();
-					}
 				}
 				else
 				{
