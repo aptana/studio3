@@ -168,7 +168,7 @@ public class BundleEntry
 		return result;
 	}
 	
-	public Map<String, RubyRegexp> getFoldingStartMap()
+	public Map<String, RubyRegexp> getFoldingStartMarkers()
 	{
 		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
 
@@ -176,7 +176,7 @@ public class BundleEntry
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
-				Map<String, RubyRegexp> registry = bundle.getFoldingStartMap();
+				Map<String, RubyRegexp> registry = bundle.getFoldingStartMarkers();
 				if (registry != null)
 				{
 					result.putAll(registry);
@@ -188,7 +188,7 @@ public class BundleEntry
 		return result;
 	}
 	
-	public Map<String, RubyRegexp> getFoldingStopMap()
+	public Map<String, RubyRegexp> getFoldingStopMarkers()
 	{
 		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
 
@@ -196,7 +196,7 @@ public class BundleEntry
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
-				Map<String, RubyRegexp> registry = bundle.getFoldingStopMap();
+				Map<String, RubyRegexp> registry = bundle.getFoldingStopMarkers();
 				if (registry != null)
 				{
 					result.putAll(registry);

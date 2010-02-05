@@ -1253,7 +1253,7 @@ public class BundleManager
 		for (String bundleName : getBundleNames())
 		{
 			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<String, RubyRegexp> map = bundleEntry.getFoldingStartMap();
+			Map<String, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
 			for (Map.Entry<String, RubyRegexp> entry : map.entrySet())
 			{
 				String matchedScope = entry.getKey();
@@ -1277,7 +1277,7 @@ public class BundleManager
 		for (String bundleName : getBundleNames())
 		{
 			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<String, RubyRegexp> map = bundleEntry.getFoldingStopMap();
+			Map<String, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
 			for (Map.Entry<String, RubyRegexp> entry : map.entrySet())
 			{
 				String matchedScope = entry.getKey();

@@ -2,6 +2,7 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,8 @@ public class BundleElement extends AbstractElement
 
 	private Map<String, String> _fileTypeRegistry;
 
-	private Map<String, RubyRegexp> startFolding = new HashMap<String, RubyRegexp>();
-	private Map<String, RubyRegexp> stopfolding = new HashMap<String, RubyRegexp>();
+	private Map<String, RubyRegexp> foldingStartMarkers;
+	private Map<String, RubyRegexp> foldingStopMarkers;
 
 	/**
 	 * Bundle
@@ -564,13 +565,17 @@ public class BundleElement extends AbstractElement
 	{
 		this._repository = gitRepo;
 	}
-	
+
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		startFolding.put(scope, startRegexp);
-		stopfolding.put(scope, endRegexp);
+		if (foldingStopMarkers == null)
+			foldingStopMarkers = new HashMap<String, RubyRegexp>();
+		if (foldingStartMarkers == null)
+			foldingStartMarkers = new HashMap<String, RubyRegexp>();
+		foldingStartMarkers.put(scope, startRegexp);
+		foldingStopMarkers.put(scope, endRegexp);
 	}
-	
+
 	public void registerFileType(String fileType, String scope)
 	{
 		associateFileType(fileType);
@@ -656,13 +661,13 @@ public class BundleElement extends AbstractElement
 		this._licenseUrl = licenseUrl;
 	}
 
-	public Map<String, RubyRegexp> getFoldingStartMap()
+	public Map<String, RubyRegexp> getFoldingStartMarkers()
 	{
-		return startFolding;
+		return Collections.unmodifiableMap(foldingStartMarkers);
 	}
-	
-	public Map<String, RubyRegexp> getFoldingStopMap()
+
+	public Map<String, RubyRegexp> getFoldingStopMarkers()
 	{
-		return stopfolding;
+		return Collections.unmodifiableMap(foldingStopMarkers);
 	}
 }
