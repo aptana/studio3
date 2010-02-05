@@ -14,6 +14,14 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
+/**
+ * This implementation takes in regular expressions to match against the line to determine whether or not to indent or
+ * dedent. Subclasses should pass in the regular expressions that make sense for their language, and should override the
+ * abstract method to determine if we simply indent or we indent and push matching pair characters onto next line with
+ * cursor in middle (i.e. for things like parens, braces, etc).
+ * 
+ * @author cwilliams
+ */
 public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 {
 
