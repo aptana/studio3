@@ -35,37 +35,36 @@
 package com.aptana.editor.js.internal;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.text.DocumentCommand;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
-import com.aptana.editor.common.text.CommonAutoIndentStrategy;
+import com.aptana.editor.common.text.AbstractRegexpAutoIndentStrategy;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.editor.js.preferences.PreferenceInitializer;
 
-public class JSAutoIndentStrategy extends CommonAutoIndentStrategy {
+public class JSAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
+{
 
-    public JSAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
-            ISourceViewer sourceViewer) {
-        super(contentType, configuration, sourceViewer);
-    }
+	private static final String DECREASE_INDENT_REGEXP = "^(.*\\*/)?\\s*(\\}|\\))([^{]*\\{)?([;,]?\\s*|\\.[^{]*|\\s*\\)[;\\s]*)$"; //$NON-NLS-1$
+	private static final String INCREASE_INDENT_REGEXP = "^.*(\\{[^}\"']*|\\([^)\"']*)$"; //$NON-NLS-1$
 
-    @Override
-    public void customizeDocumentCommand(IDocument document, DocumentCommand command) {
-        if (command.length == 0 && command.text != null) {
-            if (isLineDelimiter(document, command.text)) {
-                if (shouldAutoIndent()) {
-                    super.customizeDocumentCommand(document, command);
-                }
-            }
-        }
-    }
+	public JSAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration, ISourceViewer sourceViewer)
+	{
+		super(INCREASE_INDENT_REGEXP, DECREASE_INDENT_REGEXP, contentType, configuration, sourceViewer);
+	}
 
-    private static boolean shouldAutoIndent() {
-        return Platform.getPreferencesService().getBoolean(Activator.PLUGIN_ID,
-                IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN,
-                PreferenceInitializer.DEFAULT_AUTO_INDENT_ON_RETURN, null);
-    }
+	protected boolean shouldAutoIndent()
+	{
+		return Platform.getPreferencesService().getBoolean(Activator.PLUGIN_ID,
+				IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN,
+				PreferenceInitializer.DEFAULT_AUTO_INDENT_ON_RETURN, null);
+	}
+
+	@Override
+	protected boolean indentAndPushTrailingContentAfterNewlineAndCursor(String contentBeforeNewline,
+			String contentAfterNewline)
+	{
+		return true;
+	}
 }

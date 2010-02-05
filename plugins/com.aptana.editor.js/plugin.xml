@@ -19,7 +19,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="js"
+            file-extensions="js,htc,jsx"
             id="com.aptana.contenttype.js"
             name="%content-type.js.name"
             priority="normal">

@@ -46,69 +46,85 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
 import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.css.internal.CSSContentAssistProcessor;
 
-public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration {
+public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
+{
 
-    private ILanguageService fLanguageService;
+	private ILanguageService fLanguageService;
 
-    public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-        super(preferences, editor);
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				CSSSourceConfiguration.CONTENT_TYPES
-			});
+	public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	{
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				CSSSourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes() {
+	public String[][] getTopContentTypes()
+	{
 		return CSSSourceConfiguration.getDefault().getTopContentTypes();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @seeorg.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.
+	 * ISourceViewer, java.lang.String)
 	 */
-    @Override
-    public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
-        String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-        if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT)) {
-            return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning,
-                    contentType, this, sourceViewer) };
-        }
-        return super.getAutoEditStrategies(sourceViewer, contentType);
-    }
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT))
+		{
+			String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
+			return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this, sourceViewer) };
+		}
+		return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
 
-    @Override
-    protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer,
-            String contentType) {
-        return new CSSContentAssistProcessor();
-    }
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		return new CSSContentAssistProcessor();
+	}
 
-    @Override
-    protected ILanguageService getLanguageService() {
-        if (fLanguageService == null) {
-            fLanguageService = new CSSLanguageService();
-        }
-        return fLanguageService;
-    }
+	@Override
+	protected ILanguageService getLanguageService()
+	{
+		if (fLanguageService == null)
+		{
+			fLanguageService = new CSSLanguageService();
+		}
+		return fLanguageService;
+	}
 }

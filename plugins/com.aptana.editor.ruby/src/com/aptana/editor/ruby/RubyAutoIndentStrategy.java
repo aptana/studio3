@@ -14,11 +14,12 @@ public class RubyAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 	 * Nasty regexp taken from Textmate for auto-indenting.
 	 */
 	private static final String INCREASE_INDENT_REGEXP = "(\\s*(module|class|def|unless|if|else|elsif|case|when|begin|rescue|ensure|for|while|until|(?=.*?\\b(do|begin|case|if|unless)\\b)(\"(\\.|[^\\\"])*+\"|''(\\.|[^\\''])*+''|[^#\"''])*(\\s(do|begin|case)|[-+=&|*/~%^<>~](?<!\\$.)\\s*+(if|unless)))\\b(?![^;]*+;.*?\bend\b)|(\"(\\.|[^\\\"])*+\"|''(\\.|[^\\''])*+''|[^#\"''])*(\\{(?![^}]*+\\})|\\[(?![^\\]]*+\\]))).*$"; //$NON-NLS-1$
-
+	private static final String DECREASE_INDENT_REGEXP = "((^|;)\\s*+end\\s*+([#].*)?$|(^|;)\\s*+end\\..*$|^\\s*+[}\\]],?\\s*+([#].*)?$|[#].*?\\(end\\)\\s*+$|^=end)"; //$NON-NLS-1$
+	
 	public RubyAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
 			ISourceViewer sourceViewer)
 	{
-		super(INCREASE_INDENT_REGEXP, contentType, configuration, sourceViewer);
+		super(INCREASE_INDENT_REGEXP, DECREASE_INDENT_REGEXP, contentType, configuration, sourceViewer);
 	}
 
 	/**
