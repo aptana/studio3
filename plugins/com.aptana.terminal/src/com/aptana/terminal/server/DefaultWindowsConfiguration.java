@@ -46,7 +46,7 @@ public class DefaultWindowsConfiguration implements ProcessConfiguration
 			}
 		}
 		
-		wrapper.sendText("cmd.exe\n");
+		wrapper.sendText("cmd.exe;exit\n");
 	}
 
 	/*
