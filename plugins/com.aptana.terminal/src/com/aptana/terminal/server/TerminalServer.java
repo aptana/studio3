@@ -8,43 +8,42 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.eclipse.core.runtime.Platform;
+
 /**
  * @author Kevin Lindsey
  */
-public class HttpServer extends Thread
+public class TerminalServer extends Thread
 {
 	private static final int DEFAULT_PORT = 8181;
 	private static final String LOCALHOST = "127.0.0.1"; //$NON-NLS-1$
-	private static HttpServer instance;
+	private static TerminalServer instance;
 
 	/**
 	 * getInstance
 	 * 
 	 * @return
 	 */
-	public static synchronized HttpServer getInstance()
+	public static synchronized TerminalServer getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new HttpServer();
+			instance = new TerminalServer();
 		}
 		
 		return instance;
 	}
+	
 	protected int port;
 	protected ServerSocket serverSocket;
-	protected Thread runningThread;
 	protected ExecutorService threadPool;
 	protected boolean isRunning;
-
 	protected Map<String, ProcessWrapper> processById;
 
 	/**
 	 * HttpServer
-	 * 
-	 * @param s
 	 */
-	public HttpServer()
+	public TerminalServer()
 	{
 		this.threadPool = Executors.newFixedThreadPool(5);
 		this.isRunning = true;
@@ -94,7 +93,7 @@ public class HttpServer extends Thread
 	{
 		String result = LOCALHOST;
 		
-		if (this.serverSocket != null)
+		if (this.serverSocket != null && Platform.OS_WIN32.equals(Platform.getOS()) == false)
 		{
 			result = this.serverSocket.getInetAddress().getHostAddress();
 		}
@@ -175,11 +174,6 @@ public class HttpServer extends Thread
 	 */
 	public void run()
 	{
-		synchronized (this)
-		{
-			this.runningThread = Thread.currentThread();
-		}
-
 		this.openServerSocket();
 
 		while (this.isRunning)
@@ -190,7 +184,7 @@ public class HttpServer extends Thread
 			{
 				clientSocket = this.serverSocket.accept();
 
-				this.threadPool.execute(new HttpWorker(this, clientSocket));
+				this.threadPool.execute(new TerminalServerWorker(this, clientSocket));
 			}
 			catch (IOException e)
 			{

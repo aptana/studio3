@@ -2,62 +2,28 @@ package com.aptana.terminal.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.terminal.Activator;
-import com.aptana.terminal.Utils;
 
 public class ProcessWrapper
 {
-	public class Message
-	{
-		public final Date timestamp;
-		public final String name;
-		public final String content;
-		
-		/**
-		 * Message
-		 * 
-		 * @param name
-		 * @param content
-		 */
-		public Message(String name, String content)
-		{
-			this.timestamp = new Date();
-			this.name = (name != null) ? name : ""; //$NON-NLS-1$
-			this.content = (content != null) ? content : ""; //$NON-NLS-1$
-		}
-		
-		/*
-		 * (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
-		public String toString()
-		{
-			return this.timestamp + ": " + this.name + ": " + Utils.encodeString(this.content); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
-	
-	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
-	
 	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
 	// so as not to create a dependency on the two projects.
 	private static final String ACTIVE_PROJECT_PROPERTY = "activeProject"; //$NON-NLS-1$
-	public static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
+	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
+	
+	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
+	private static Map<String,List<ProcessConfiguration>> configurationMap;
 	
 	private Process _process;
 	private ProcessReader _stdout;
@@ -65,8 +31,58 @@ public class ProcessWrapper
 	private ProcessWriter _stdin;
 	private StringBuffer _output;
 	private String _startingDirectory;
-	private boolean _trackMessages = false;
-	private List<Message> _messages;
+	
+	/**
+	 * getCurrentConfiguration
+	 * 
+	 * @return
+	 */
+	protected static ProcessConfiguration getCurrentConfiguration()
+	{
+		ProcessConfiguration result = null;
+		
+		// make sure we've loaded our configurations
+		loadConfigurations();
+		
+		// return default for now
+		List<ProcessConfiguration> configurations = configurationMap.get(Platform.getOS());
+		
+		if (configurations != null && configurations.size() > 0)
+		{
+			result = configurations.get(0);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * loadConfigurations
+	 */
+	protected static void loadConfigurations()
+	{
+		// TODO: read from extension point
+		if (configurationMap == null)
+		{
+			configurationMap = new HashMap<String, List<ProcessConfiguration>>();
+			
+			List<ProcessConfiguration> configurations;
+			
+			// MAC OS X
+			configurations = new ArrayList<ProcessConfiguration>();
+			configurations.add(new DefaultMacOsXConfiguration());
+			configurationMap.put(Platform.OS_MACOSX, configurations);
+			
+			// LINUX
+			configurations = new ArrayList<ProcessConfiguration>();
+			configurations.add(new DefaultLinuxConfiguration());
+			configurationMap.put(Platform.OS_LINUX, configurations);
+			
+			// WIN32
+			configurations = new ArrayList<ProcessConfiguration>();
+			configurations.add(new DefaultWindowsConfiguration());
+			configurationMap.put(Platform.OS_WIN32, configurations);
+		}
+	}
 	
 	/**
 	 * ProcessWrapper
@@ -77,7 +93,7 @@ public class ProcessWrapper
 	{
 		this(null);
 	}
-
+	
 	/**
 	 * ProcessWrapper
 	 * 
@@ -86,112 +102,6 @@ public class ProcessWrapper
 	public ProcessWrapper(String startingDirectory)
 	{
 		this._startingDirectory = startingDirectory;
-	}
-	
-	/**
-	 * clearMessages
-	 */
-	public void clearMessages()
-	{
-		if (this._messages != null)
-		{
-			this._messages.clear();
-		}
-	}
-	
-	/**
-	 * getCommandLineArguments
-	 * 
-	 * @return
-	 */
-	protected String[] getCommandLineArguments()
-	{
-		String OS = Platform.getOS();
-		String[] result = new String[0];
-		
-		if (OS.equals(Platform.OS_WIN32))
-		{
-			result = new String[] { "/K", "cd" }; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * getMessages
-	 * 
-	 * @return
-	 */
-	public Message[] getMessages()
-	{
-		Message[] result;
-		
-		if (this._messages != null)
-		{
-			result = this._messages.toArray(new Message[this._messages.size()]);
-			
-			Arrays.sort(result, new Comparator<Message>()
-			{
-				public int compare(Message o1, Message o2)
-				{
-					return o1.timestamp.compareTo(o2.timestamp);
-				}
-			});
-		}
-		else
-		{
-			result = new Message[0];
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * getProcessFile
-	 * 
-	 * @return
-	 */
-	protected String getProcessName()
-	{
-		String OS = Platform.getOS();
-		String OSARCH = Platform.getOSArch();
-
-		String result = null;
-		
-		if (OS.equals(Platform.OS_WIN32))
-		{
-			result = "cmd.exe"; //$NON-NLS-1$
-		}
-		else if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
-		{
-			URL url;
-
-			if (OS.equals(Platform.OS_MACOSX))
-			{
-				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty"), null); //$NON-NLS-1$
-			}
-			else
-			{
-				url = FileLocator.find(Activator.getDefault().getBundle(), new Path("redtty." + OS + "." + OSARCH), null); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			
-			try
-			{
-				URL fileURL = FileLocator.toFileURL(url);
-
-				File file = new File(new Path(fileURL.getPath()).toOSString());
-
-				result = file.getAbsolutePath();
-			}
-			catch (IOException e)
-			{
-				String message = MessageFormat.format(Messages.ProcessWrapper_Error_Locating_Terminal_Executable, new Object[] { url.toString() });
-
-				Activator.logError(message, e);
-			}
-		}
-		
-		return result;
 	}
 	
 	/**
@@ -204,11 +114,10 @@ public class ProcessWrapper
 		if (this._startingDirectory == null)
 		{
 			String value = Platform.getPreferencesService().getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_PROPERTY, null, null);
-			IProject project = null;
 			
 			if (value != null)
 			{
-				project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(value);
 				
 				if (project != null)
 				{
@@ -246,36 +155,25 @@ public class ProcessWrapper
 				result = this._output.toString();
 				this._output.setLength(0);
 			}
-			
-			if (this._trackMessages)
-			{
-				this.logMessage("<", result); //$NON-NLS-1$
-			}
 		}
 
 		return result;
-	}
-
-	/**
-	 * logMessage
-	 * 
-	 * @param name
-	 * @param content
-	 */
-	protected void logMessage(String name, String content)
-	{
-		if (this._messages == null)
-		{
-			this._messages = new ArrayList<Message>();
-		}
-		
-		this._messages.add(new Message(name, content));
 	}
 	
 	/**
 	 * sendText
 	 * 
-	 * @param text
+	 * @param ch
+	 */
+	public void sendText(char ch)
+	{
+		this.sendText(Character.toString(ch));
+	}
+	
+	/**
+	 * sendText
+	 * 
+	 * @param chars
 	 */
 	public void sendText(char[] chars)
 	{
@@ -292,26 +190,6 @@ public class ProcessWrapper
 		if (this._stdin != null)
 		{
 			this._stdin.sendText(text);
-			
-			if (this._trackMessages)
-			{
-				this.logMessage(">", text); //$NON-NLS-1$
-			}
-		}
-	}
-	
-	/**
-	 * Set up environment variables for the new process
-	 * 
-	 * @param env
-	 */
-	protected void setupEnvironment(Map<String, String> env)
-	{
-		String OS = Platform.getOS();
-		
-		if (OS.equals(Platform.OS_WIN32) == false)
-		{
-			env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	
@@ -320,39 +198,30 @@ public class ProcessWrapper
 	 */
 	public void start()
 	{
-		String file = this.getProcessName();
-
-		if (file != null && file.length() > 0)
+		ProcessConfiguration configuration = getCurrentConfiguration();
+		
+		if (configuration != null && configuration.isValid())
 		{
-			List<String> argList = new ArrayList<String>();
-			String[] args;
+			List<String> argList = configuration.getCommandLineArguments();
+			String file = configuration.getProcessName();
+
+			// prepend the executable to run
+			argList.add(0, file);
 			
-			argList.add(file);
-			argList.addAll(Arrays.asList(this.getCommandLineArguments()));
-			args = argList.toArray(new String[argList.size()]);
-			
-			ProcessBuilder builder = new ProcessBuilder(args);
+			ProcessBuilder builder = new ProcessBuilder(argList);
 			
 			// setup the TERM environment variable to be compatible with WebTerm
-			this.setupEnvironment(builder.environment());
-			
-			// grab a working directory
-			String startingDirectory = this.getStartingDirectory();
-			
-			// apply working directory to the process
-			if (startingDirectory != null)
-			{
-				File dir = new File(startingDirectory);
-				
-				if (dir.exists())
-				{
-					builder.directory(dir);
-				}
-			}
+			configuration.setupEnvironment(builder.environment());
+
+			// set the working directory
+			builder.directory(new File(this.getStartingDirectory()));
 
 			// start up and begin processing I/O
 			try
 			{
+				// perform any last-minute configuration before we start the process
+				configuration.beforeStart(this, builder);
+				
 				this._process = builder.start();
 				this._output = new StringBuffer();
 				this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output); //$NON-NLS-1$
@@ -361,6 +230,9 @@ public class ProcessWrapper
 	
 				this._stdout.start();
 				this._stderr.start();
+				
+				// perform any post-start configuration
+				configuration.afterStart(this);
 			}
 			catch (IOException e)
 			{
@@ -374,7 +246,7 @@ public class ProcessWrapper
 		}
 		else
 		{
-			Activator.logWarning(Messages.ProcessWrapper_Process_File_Does_Not_Exist);
+			// no config or it's invalid
 		}
 	}
 
@@ -383,17 +255,6 @@ public class ProcessWrapper
 	 */
 	public void stop()
 	{
-		if (this._messages != null)
-		{
-			for (Message message : this.getMessages())
-			{
-				if (message.content != null && message.content.length() > 0)
-				{
-					System.out.println(message.toString());
-				}
-			}
-		}
-		
 		if (this._process != null)
 		{
 			this._process.destroy();
@@ -408,15 +269,5 @@ public class ProcessWrapper
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	/**
-	 * trackMessages
-	 * 
-	 * @param value
-	 */
-	public void trackMessages(boolean value)
-	{
-		this._trackMessages = value;
 	}
 }
