@@ -5,6 +5,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -801,5 +802,21 @@ public class CommandElement extends AbstractBundleElement
 	public void setWorkingDirectoryType(WorkingDirectoryType type)
 	{
 		this._workingDirectoryType = type;
+	}
+
+	/**
+	 * Return the environment based on the current context.
+	 *
+	 * @return environment map
+	 */
+	public Map<String, String> getEnvironment()
+	{
+		CommandContext commandContext = createCommandContext();
+
+		// Get the process's environment
+		Map<String, String> environment = new LinkedHashMap<String, String>(new ProcessBuilder().environment());
+		populateEnvironment(commandContext.getMap(), environment);
+
+		return environment;
 	}
 }

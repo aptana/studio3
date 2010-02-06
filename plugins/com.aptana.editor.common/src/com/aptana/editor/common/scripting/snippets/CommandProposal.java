@@ -34,7 +34,7 @@ public class CommandProposal extends SnippetTemplateProposal
 		if (template instanceof CommandTemplate)
 		{
 			CommandTemplate commandTemplate = (CommandTemplate) template;
-			CommandElement command = commandTemplate.getCommand();
+			CommandElement commandElement = commandTemplate.getCommandElement();
 			// Wipe the prefix before we run command so our input is as we expect
 			try
 			{
@@ -75,8 +75,8 @@ public class CommandProposal extends SnippetTemplateProposal
 					}
 				}
 			}
-			CommandResult commandResult = CommandExecutionUtils.executeCommand(command, InvocationType.TRIGGER, viewer, textEditor);
-			CommandExecutionUtils.processCommandResult(command, commandResult, viewer);
+			CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.TRIGGER, viewer, textEditor);
+			CommandExecutionUtils.processCommandResult(commandElement, commandResult, viewer);
 		}
 	}
 

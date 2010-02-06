@@ -18,6 +18,7 @@ module Ruble
         # hack to pass in java object...should test type
         @jobj = name
       end
+      @jobj.runtime = self # set the runtime for this command
     end
 
     def async
@@ -58,7 +59,6 @@ module Ruble
 
     def invoke=(invoke)
       @jobj.invoke = invoke
-      @jobj.runtime = self # a little hack so we can get the runtime for this command
     end
 
     def key_binding

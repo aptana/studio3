@@ -11,6 +11,7 @@ module Ruble
       else
         # hack to pass in java object...should test type
         @jobj = name
+        @jobj.runtime = self # set the runtime for this command
       end
     end
     
