@@ -15,7 +15,7 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
-public class AbstractFoldingEditor extends AbstractDecoratedTextEditor
+class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
 {
 
 	private ProjectionAnnotationModel annotationModel;
@@ -51,6 +51,9 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor
 		return viewer;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.List)
+	 */
 	public void updateFoldingStructure(List<Position> positions)
 	{
 		Map<ProjectionAnnotation, Position> newAnnotations = new HashMap<ProjectionAnnotation, Position>();
