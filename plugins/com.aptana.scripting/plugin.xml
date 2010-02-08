@@ -45,7 +45,7 @@
             name="Bundle Support Context Contributor">
       </contributor>
       <contributor
-            class="com.aptana.scripting.EnvContextContributor"
+            class="com.aptana.scripting.FullnameEnvContextContributor"
             id="com.aptana.scripting.EnvContextContributor"
             name="Environment Contributor">
       </contributor>

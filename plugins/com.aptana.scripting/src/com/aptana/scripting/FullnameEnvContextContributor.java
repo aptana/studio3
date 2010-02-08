@@ -14,10 +14,9 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
 import com.aptana.scripting.model.EnvironmentContributor;
 
-public class EnvContextContributor implements ContextContributor, EnvironmentContributor
+public class FullnameEnvContextContributor implements ContextContributor, EnvironmentContributor
 {
 
-	// FIXME There was a class that held common env vars before...
 	private static final String TM_FULLNAME = "TM_FULLNAME"; //$NON-NLS-1$
 
 	@Override
