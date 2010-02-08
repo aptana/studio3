@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 import org.jruby.RubyRegexp;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.util.StringUtil;
 
@@ -38,8 +39,8 @@ public class BundleElement extends AbstractElement
 
 	private Map<String, String> _fileTypeRegistry;
 
-	private Map<String, RubyRegexp> foldingStartMarkers;
-	private Map<String, RubyRegexp> foldingStopMarkers;
+	private Map<ScopeSelector, RubyRegexp> foldingStartMarkers;
+	private Map<ScopeSelector, RubyRegexp> foldingStopMarkers;
 
 	/**
 	 * Bundle
@@ -570,14 +571,14 @@ public class BundleElement extends AbstractElement
 	{
 		if (foldingStopMarkers == null)
 		{
-			foldingStopMarkers = new HashMap<String, RubyRegexp>();
+			foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 		}
 		if (foldingStartMarkers == null)
 		{
-			foldingStartMarkers = new HashMap<String, RubyRegexp>();
+			foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 		}
-		foldingStartMarkers.put(scope, startRegexp);
-		foldingStopMarkers.put(scope, endRegexp);
+		foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
+		foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
 	}
 
 	public void registerFileType(String fileType, String scope)
@@ -665,12 +666,12 @@ public class BundleElement extends AbstractElement
 		this._licenseUrl = licenseUrl;
 	}
 
-	public Map<String, RubyRegexp> getFoldingStartMarkers()
+	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
 		return Collections.unmodifiableMap(foldingStartMarkers);
 	}
 
-	public Map<String, RubyRegexp> getFoldingStopMarkers()
+	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
 		return Collections.unmodifiableMap(foldingStopMarkers);
 	}

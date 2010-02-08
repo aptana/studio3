@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.scope.ScopeSelector;
+
 public class BundleEntry
 {
 	private String _name;
@@ -168,15 +170,15 @@ public class BundleEntry
 		return result;
 	}
 	
-	public Map<String, RubyRegexp> getFoldingStartMarkers()
+	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
-		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
 
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
-				Map<String, RubyRegexp> registry = bundle.getFoldingStartMarkers();
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStartMarkers();
 				if (registry != null)
 				{
 					result.putAll(registry);
@@ -188,15 +190,15 @@ public class BundleEntry
 		return result;
 	}
 	
-	public Map<String, RubyRegexp> getFoldingStopMarkers()
+	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
-		final Map<String, RubyRegexp> result = new HashMap<String, RubyRegexp>();
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
 
 		this.processBundles(new BundleProcessor()
 		{
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
-				Map<String, RubyRegexp> registry = bundle.getFoldingStopMarkers();
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStopMarkers();
 				if (registry != null)
 				{
 					result.putAll(registry);
