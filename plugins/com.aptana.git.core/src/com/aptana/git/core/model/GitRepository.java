@@ -99,7 +99,7 @@ public class GitRepository
 	 */
 	public static synchronized GitRepository getUnattachedExisting(URI path)
 	{
-		if (GitExecutable.instance().path() == null)
+		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
 			return null;
 
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
