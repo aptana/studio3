@@ -44,6 +44,11 @@
             id="com.aptana.scripting.model.BundleSupportContextContributor"
             name="Bundle Support Context Contributor">
       </contributor>
+      <contributor
+            class="com.aptana.scripting.EnvContextContributor"
+            id="com.aptana.scripting.EnvContextContributor"
+            name="Environment Contributor">
+      </contributor>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
