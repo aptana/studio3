@@ -163,12 +163,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		overrideRulerColors();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void overrideRulerColors()
 	{
 		// Use normal parent gray bg
 		if (parent == null || fLineColumn == null)
 			return;
 		fLineColumn.setBackground(parent.getBackground());
+		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
 		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) getVerticalRuler()).getDecoratorIterator();
 		while (iter.hasNext())
 		{
@@ -189,7 +191,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
-
+		// Need to make it a projection viewer now that we have folding...
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
 			protected Layout createLayout()
