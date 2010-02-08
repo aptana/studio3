@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jruby.RubyRegexp;
+
+import com.aptana.scope.ScopeSelector;
+
 public class BundleEntry
 {
 	private String _name;
@@ -158,6 +162,46 @@ public class BundleEntry
 				{
 					result.putAll(registry);
 					return false;
+				}
+				return true;
+			}
+		});
+
+		return result;
+	}
+	
+	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
+	{
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStartMarkers();
+				if (registry != null)
+				{
+					result.putAll(registry);
+				}
+				return true;
+			}
+		});
+
+		return result;
+	}
+	
+	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
+	{
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStopMarkers();
+				if (registry != null)
+				{
+					result.putAll(registry);
 				}
 				return true;
 			}

@@ -16,7 +16,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.jruby.RubyRegexp;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
@@ -1243,4 +1245,58 @@ public class BundleManager
 			ScriptLogger.logError(message);
 		}
 	}
+
+	public RubyRegexp getFoldingStartRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry, scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+		return result;
+	}
+
+	public RubyRegexp getFoldingStopRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry, scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+		return result;
+	}
+
+	private boolean betterMatch(Map.Entry<ScopeSelector, RubyRegexp> entry, String scope, String matchedPattern)
+	{
+		ScopeSelector matchedScope = entry.getKey();
+		if (!matchedScope.matches(scope))
+			return false;
+		// FIXME This assumes that the length of the scope selector is the best determination of which one is "most specific" to the scope we're trying to match, which is not necessarily true!
+		if (matchedPattern != null && matchedScope.toString().length() < matchedPattern.length())
+			return false;
+		return true;
+	}
+
 }
