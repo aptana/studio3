@@ -668,11 +668,19 @@ public class BundleElement extends AbstractElement
 
 	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
+		if (foldingStartMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
 		return Collections.unmodifiableMap(foldingStartMarkers);
 	}
 
 	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
+		if (foldingStopMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
 		return Collections.unmodifiableMap(foldingStopMarkers);
 	}
 }
