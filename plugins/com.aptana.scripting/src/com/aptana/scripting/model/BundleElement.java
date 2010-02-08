@@ -569,9 +569,13 @@ public class BundleElement extends AbstractElement
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
 		if (foldingStopMarkers == null)
+		{
 			foldingStopMarkers = new HashMap<String, RubyRegexp>();
+		}
 		if (foldingStartMarkers == null)
+		{
 			foldingStartMarkers = new HashMap<String, RubyRegexp>();
+		}
 		foldingStartMarkers.put(scope, startRegexp);
 		foldingStopMarkers.put(scope, endRegexp);
 	}
