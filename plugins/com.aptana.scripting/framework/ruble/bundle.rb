@@ -128,6 +128,10 @@ module Ruble
       @jobj.associateScope(file_type, scope.to_s.gsub(/_/, '.'))
     end
     
+    def set_folding_markers(scope, start_regexp, end_regexp)
+      @jobj.setFoldingMarkers(scope.to_s.gsub(/_/, '.'), start_regexp, end_regexp)
+    end
+    
     def to_env
       { :TM_BUNDLE_SUPPORT => File.join(File.dirname(path), "lib") }
     end

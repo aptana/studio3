@@ -34,20 +34,44 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.swt.widgets.Display;
+import org.jruby.RubyFixnum;
+import org.jruby.RubyMatchData;
+import org.jruby.RubyNumeric;
+import org.jruby.RubyRegexp;
+import org.jruby.RubyString;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scripting.model.BundleManager;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
 
 	private AbstractThemeableEditor fEditor;
+
+	/**
+	 * Code Folding.
+	 */
+	final List<Position> fPositions = new ArrayList<Position>();
+
+	private IDocument fDocument;
+	private IProgressMonitor fMonitor;
 
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
@@ -62,18 +86,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void reconcile(IRegion partition)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void setDocument(IDocument document)
 	{
+		fDocument = document;
 		fEditor.getFileService().setDocument(document);
 	}
 
@@ -86,6 +113,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor)
 	{
+		fMonitor = monitor;
 	}
 
 	public void aboutToBeReconciled()
@@ -104,10 +132,142 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+
+		fPositions.clear();
+		try
+		{
+			emitFoldingRegions(monitor);
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				fEditor.updateFoldingStructure(fPositions);
+			}
+		});
+
+	}
+
+	private void emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
+	{
+		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
+		if (monitor != null)
+		{
+			monitor.beginTask(Messages.CommonReconcilingStrategy_FoldingTaskName, -1);
+		}
+
+		// Go through the partitions, in each partition go through each line and match regexps for that scope
+		// against the line. Regexps are contributed by the bundles for given scopes
+		ITypedRegion[] partitions = fDocument.getDocumentPartitioner().computePartitioning(0, fDocument.getLength());
+		for (ITypedRegion region : partitions)
+		{
+			int offset = region.getOffset();
+			int length = region.getLength();
+
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(fDocument, offset);
+
+			RubyRegexp startRegexp = getStartFoldRegexp(scope);
+			if (startRegexp == null)
+				continue;
+			RubyRegexp endRegexp = getEndFoldRegexp(scope);
+			if (endRegexp == null)
+				continue;
+
+			String partitionText = fDocument.get(offset, length);
+			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
+			for (String line : lines)
+			{
+				// Look for an open...
+				RubyString rLine = startRegexp.getRuntime().newString(line);
+				IRubyObject startMatcher = startRegexp.match_m(startRegexp.getRuntime().getCurrentContext(), rLine);
+				if (!startMatcher.isNil())
+				{
+					int start = 0;
+					IRubyObject posStart = ((RubyMatchData) startMatcher).begin(startRegexp.getRuntime()
+							.getCurrentContext(), startRegexp.getRuntime().newFixnum(0));
+					if (posStart instanceof RubyFixnum)
+					{
+						start = RubyNumeric.num2int(posStart);
+					}
+					starts.put(findIndent(line), start + offset); // need to push the indent level too...
+				}
+				// Don't look for an end if there's no open yet!
+				if (starts.size() > 0)
+				{
+					// check to see if we have an open folding region at this indent level...
+					int indent = findIndent(line);
+					if (starts.containsKey(indent))
+					{
+						IRubyObject endMatcher = endRegexp.match_m(endRegexp.getRuntime().getCurrentContext(), rLine);
+						if (!endMatcher.isNil())
+						{
+							int startingOffset = starts.remove(indent);
+
+							int end = 0;
+							IRubyObject posStart = ((RubyMatchData) endMatcher).end(endRegexp.getRuntime()
+									.getCurrentContext(), endRegexp.getRuntime().newFixnum(0));
+							if (posStart instanceof RubyFixnum)
+							{
+								end = RubyNumeric.num2int(posStart);
+							}
+
+							int posLength = (end + offset) - startingOffset;
+							if (posLength > 0)
+							{
+								// FIXME Don't add if the start and end are on the same line
+								Position position = new Position(startingOffset, posLength);
+								fPositions.add(position);
+							}
+						}
+					}
+				}
+				offset += line.length() + 1; // FIXME This assumes line delimiter is 1 char!
+			}
+		}
+
+		if (monitor != null)
+		{
+			monitor.done();
+		}
+	}
+
+	private int findIndent(String text)
+	{
+		// TODO Handle tab characters and expanding them out to their tab width?
+		int indent = 0;
+		while (indent < text.length())
+		{
+			if (Character.isWhitespace(text.charAt(indent)))
+			{
+				indent++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return indent;
+	}
+
+	private RubyRegexp getEndFoldRegexp(String scope)
+	{
+		return BundleManager.getInstance().getFoldingStopRegexp(scope);
+	}
+
+	private RubyRegexp getStartFoldRegexp(String scope)
+	{
+		return BundleManager.getInstance().getFoldingStartRegexp(scope);
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(new NullProgressMonitor());
+		calculatePositions(fMonitor);
 	}
 }

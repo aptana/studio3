@@ -2,6 +2,7 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +10,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
+import org.jruby.RubyRegexp;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.util.StringUtil;
 
@@ -35,6 +38,9 @@ public class BundleElement extends AbstractElement
 	private Object commandLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
+
+	private Map<ScopeSelector, RubyRegexp> foldingStartMarkers;
+	private Map<ScopeSelector, RubyRegexp> foldingStopMarkers;
 
 	/**
 	 * Bundle
@@ -561,6 +567,20 @@ public class BundleElement extends AbstractElement
 		this._repository = gitRepo;
 	}
 
+	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
+	{
+		if (foldingStopMarkers == null)
+		{
+			foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+		}
+		if (foldingStartMarkers == null)
+		{
+			foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+		}
+		foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
+		foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+	}
+
 	public void registerFileType(String fileType, String scope)
 	{
 		associateFileType(fileType);
@@ -644,5 +664,23 @@ public class BundleElement extends AbstractElement
 	public void setLicenseUrl(String licenseUrl)
 	{
 		this._licenseUrl = licenseUrl;
+	}
+
+	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
+	{
+		if (foldingStartMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		return Collections.unmodifiableMap(foldingStartMarkers);
+	}
+
+	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
+	{
+		if (foldingStopMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		return Collections.unmodifiableMap(foldingStopMarkers);
 	}
 }

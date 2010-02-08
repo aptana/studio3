@@ -1,6 +1,7 @@
 package com.aptana.editor.common;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Platform;
@@ -13,11 +14,13 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -38,7 +41,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
@@ -47,6 +49,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
+import com.aptana.editor.common.internal.AbstractFoldingEditor;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
 import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
@@ -70,7 +73,7 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
  * @author schitale
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
+public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 {
 	private static final int RULER_EDITOR_GAP = 5;
 
@@ -161,12 +164,20 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		overrideRulerColors();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void overrideRulerColors()
 	{
 		// Use normal parent gray bg
 		if (parent == null || fLineColumn == null)
 			return;
 		fLineColumn.setBackground(parent.getBackground());
+		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
+		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) getVerticalRuler()).getDecoratorIterator();
+		while (iter.hasNext())
+		{
+			IVerticalRulerColumn column = iter.next();
+			column.getControl().setBackground(parent.getBackground());
+		}
 	}
 
 	@Override
@@ -181,8 +192,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
-
-		ISourceViewer viewer = new SourceViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
+		// Need to make it a projection viewer now that we have folding...
+		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
 			protected Layout createLayout()
 			{
