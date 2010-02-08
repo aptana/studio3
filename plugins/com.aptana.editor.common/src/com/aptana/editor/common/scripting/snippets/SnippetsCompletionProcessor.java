@@ -256,7 +256,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
 			}
 
-			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont"); //$NON-NLS-1$
+			textStyle.font = JFaceResources.getTextFont();
 		}
 	}
 
