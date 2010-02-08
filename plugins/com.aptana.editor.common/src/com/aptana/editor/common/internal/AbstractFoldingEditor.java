@@ -1,4 +1,4 @@
-package com.aptana.editor.common;
+package com.aptana.editor.common.internal;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,9 @@ import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
-class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
+import com.aptana.editor.common.IFoldingEditor;
+
+public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
 {
 
 	private ProjectionAnnotationModel annotationModel;
