@@ -131,7 +131,7 @@ public class EarlyStartup implements IStartup
 						IWorkbenchPage workbenchPage = workbenchWindow.getActivePage();
 						String perspectiveId = workbenchPage.getPerspective().getId();
 						
-						// only open a terminal editor
+						// only open a terminal editor if the Rails perspective is the active perspective
 						if (RAILS_PERSPECTIVE_ID.equals(perspectiveId))
 						{
 							EarlyStartup.this.openTerminalEditor(workbenchWindow);

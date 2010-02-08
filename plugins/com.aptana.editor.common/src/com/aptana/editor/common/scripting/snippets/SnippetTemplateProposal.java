@@ -55,6 +55,13 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		fRegion = region;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.templates.TemplateProposal#getAdditionalProposalInfo()
+	 */
+	public String getAdditionalProposalInfo() {
+		return getTemplate().getPattern();
+	}
+	
 	@Override
 	public void apply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
@@ -116,13 +123,20 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			for (TemplateVariable templateVariable : variables)
 			{
 				String type = templateVariable.getType();
-				if (type != null && type.length() == 1 && TabStopVariableResolver.TABSTOPS.contains(type))
+				if (TabStopVariableResolver.VARIABLE_TYPE.equals(type))
 				{
-					// 1 thru 9 are taken by tab stops
-					// The non tab stop variables are visited after
-					// visiting the tab stop variables
-					defaultSequenceNumber = 10;
-					break;
+					try
+					{
+						Integer.parseInt(templateVariable.getName());
+						// The non tab stop variables are visited after
+						// visiting the tab stop variables
+						defaultSequenceNumber = Integer.MAX_VALUE - 1;
+						break;
+					}
+					catch (NumberFormatException nfe)
+					{
+						// ignore
+					}
 				}
 			}
 
@@ -142,9 +156,16 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				int sequenceNumber = defaultSequenceNumber;
 
 				String type = variable.getType();
-				if (type != null && type.length() == 1 && TabStopVariableResolver.TABSTOPS.contains(type))
+				if (TabStopVariableResolver.VARIABLE_TYPE.equals(type))
 				{
-					sequenceNumber = (type.charAt(0) - '1') + 1;
+					try
+					{
+						sequenceNumber = Integer.parseInt(variable.getName());
+					}
+					catch (NumberFormatException nfe)
+					{
+						// ignore
+					}
 				}
 
 				LinkedPosition first;

@@ -214,17 +214,61 @@
 					characterHeight = divHeight / terminal.getHeight();
 				}
 				
-				var viewWidth = window.innerWidth;
-				var viewHeight = window.innerHeight;
-				var width = Math.floor(viewWidth / characterWidth);
-				var height = Math.floor(viewHeight / characterHeight);
+				var width = Math.floor(getWindowWidth() / characterWidth);
+				var height = Math.floor(getWindowHeight() / characterHeight);
 				
 				terminal.setSize(width,height);
 			}
 			
+			/**
+			 * getWindowWidth
+			 */
+			function getWindowWidth()
+			{
+				var result = 0;
+				
+				if (window.innerWidth)
+				{
+					result = window.innerWidth;
+				}
+				else if (document.documentElement && document.documentElement.clientWidth)
+				{
+					result = document.documentElement.clientWidth;
+				}
+				else if (document.body && document.body.clientWidth)
+				{
+					result = document.body.clientWidth;
+				}
+				
+				return result;
+			}
+			
+			/**
+			 * getWindowHeight
+			 */
+			function getWindowHeight()
+			{
+				var result = 0;
+				
+				if (window.innerHeight)
+				{
+					result = window.innerHeight;
+				}
+				else if (document.documentElement && document.documentElement.clientHeight)
+				{
+					result = document.documentElement.clientHeight;
+				}
+				else if (document.body && document.body.clientHeight)
+				{
+					result = document.body.clientHeight;
+				}
+				
+				return result;
+			}
+			
 			function print(msg)
 			{
-				document.getElementById("stdout").innerHTML += msg + "\n";
+				document.getElementById("stdout").innerHTML += msg + "<br />";
 			}
 			
 			function play()
@@ -257,7 +301,7 @@
 	    	<button onclick="stop()">Stop</button>
 	    	<button onclick="play()">Play</button>
 	    	<button onclick="resetDebugInfo()">Reset</button>
-	        <pre style="color: black" id="stdout">result:</pre>
+	        <pre style="color: white" id="stdout">result:</pre>
 		</div>
     </body>
 </html>

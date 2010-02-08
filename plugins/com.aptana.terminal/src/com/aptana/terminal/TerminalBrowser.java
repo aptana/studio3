@@ -1,7 +1,5 @@
 package com.aptana.terminal;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.osgi.util.NLS;
@@ -14,7 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
 
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalBrowser
 {
@@ -23,29 +21,7 @@ public class TerminalBrowser
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
 	private String _id;
-
-	private static List<String> startDirectories = new ArrayList<String>(2);
-
-	private static String grabStartDirectory()
-	{
-		synchronized (startDirectories)
-		{
-			if (!startDirectories.isEmpty())
-			{
-				return startDirectories.remove(0);
-			}
-		}
-
-		return null;
-	}
-
-	public static void setStartingDirectory(String startingDirectory)
-	{
-		synchronized (startDirectories)
-		{
-			startDirectories.add(startingDirectory);
-		}
-	}
+	private String _startingDirectory;
 
 	/**
 	 * TerminalBrowser
@@ -54,7 +30,19 @@ public class TerminalBrowser
 	 */
 	public TerminalBrowser(WorkbenchPart owningPart)
 	{
+		this(owningPart, null);
+	}
+	
+	/**
+	 * TerminalBrowser
+	 * 
+	 * @param owningPart
+	 * @param startingDirectory
+	 */
+	public TerminalBrowser(WorkbenchPart owningPart, String startingDirectory)
+	{
 		this._owningPart = owningPart;
+		this._startingDirectory = startingDirectory;
 		this._id = UUID.randomUUID().toString();
 	}
 
@@ -65,30 +53,35 @@ public class TerminalBrowser
 	 */
 	public void createControl(Composite parent)
 	{
+		// create browser control
 		this._browser = new Browser(parent, SWT.NONE);
-
-		HttpServer.getInstance().createProcess(this._id, this.getStartingDirectory());
-		String url = NLS.bind(TERMINAL_URL, new Object[] { HttpServer.getInstance().getHost(),
-				HttpServer.getInstance().getPort() })
-				+ "?id=" + this._id; //$NON-NLS-1$
-		this.setUrl(url);
-
-		final IBindingService bindingService = (IBindingService) _owningPart.getSite()
-				.getService(IBindingService.class);
+		
+		// create focus listener so we can enable/disable key bindings
+		final IBindingService bindingService = (IBindingService) this._owningPart.getSite().getService(IBindingService.class);
+		
 		this._browser.addFocusListener(new FocusListener()
 		{
 			public void focusGained(FocusEvent e)
 			{
 				bindingService.setKeyFilterEnabled(false);
 			}
-
+		
 			public void focusLost(FocusEvent e)
 			{
 				bindingService.setKeyFilterEnabled(true);
 			}
 		});
-	}
 
+		// create our supporting process for access to the system's shell
+		TerminalServer.getInstance().createProcess(this._id, this.getStartingDirectory());
+		
+		// load the terminal
+		String url = NLS.bind(TERMINAL_URL, new Object[] { TerminalServer.getInstance().getHost(),
+				TerminalServer.getInstance().getPort() })
+				+ "?id=" + this._id; //$NON-NLS-1$
+		this.setUrl(url);
+	}
+	
 	/**
 	 * dispose
 	 */
@@ -117,6 +110,11 @@ public class TerminalBrowser
 		return this._browser;
 	}
 
+	/**
+	 * getId
+	 * 
+	 * @return
+	 */
 	public String getId()
 	{
 		return _id;
@@ -129,7 +127,7 @@ public class TerminalBrowser
 	 */
 	private String getStartingDirectory()
 	{
-		return grabStartDirectory();
+		return this._startingDirectory;
 	}
 
 	/**

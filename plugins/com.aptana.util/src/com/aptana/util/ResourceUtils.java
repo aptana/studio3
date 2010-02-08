@@ -68,8 +68,8 @@ public class ResourceUtils
 	static public String resourcePathToString(URL url)
 	{
 		String result = null;
-		
 		File file = resourcePathToFile(url);
+		
 		if (file != null)
 		{
 			result = file.getAbsolutePath();

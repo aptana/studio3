@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
@@ -26,17 +25,16 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.util.StringUtil;
 
-public class HttpWorker implements Runnable
+public class TerminalServerWorker implements Runnable
 {
 	private static final String ID_PARAMETER = "id"; //$NON-NLS-1$
 	private static final String INDEX_PAGE_NAME = "index.html"; //$NON-NLS-1$
 	private static final String ID_URL = "/id"; //$NON-NLS-1$
 	private static final String STREAM_URL = "/stream"; //$NON-NLS-1$
-	private static final boolean IS_WINDOWS = Platform.getOS().equals(Platform.OS_WIN32);
 	private static final String STATUS_200 = "200"; //$NON-NLS-1$
 	private static final String STATUS_404 = "404"; //$NON-NLS-1$
 
-	private HttpServer _server;
+	private TerminalServer _server;
 	private Socket _clientSocket;
 
 	/**
@@ -44,7 +42,7 @@ public class HttpWorker implements Runnable
 	 * 
 	 * @param clientSocket
 	 */
-	public HttpWorker(HttpServer server, Socket clientSocket)
+	public TerminalServerWorker(TerminalServer server, Socket clientSocket)
 	{
 		this._server = server;
 		this._clientSocket = clientSocket;
@@ -251,11 +249,6 @@ public class HttpWorker implements Runnable
 
 				if (wrapper != null)
 				{
-					if (content.equals("\r") && IS_WINDOWS) //$NON-NLS-1$
-					{
-						content += "\n"; //$NON-NLS-1$
-					}
-
 					wrapper.sendText(content);
 				}
 			}

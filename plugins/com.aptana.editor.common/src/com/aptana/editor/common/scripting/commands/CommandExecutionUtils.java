@@ -577,7 +577,7 @@ public class CommandExecutionUtils
 				{
 					region = new Region(textWidget.getCaretOffset() - 1, 1);
 				}
-				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString(), commandResult.getCommand());
 				break;
 			case SHOW_AS_HTML:
 				showAsHTML(command, commandResult);

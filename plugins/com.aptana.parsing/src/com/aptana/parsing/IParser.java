@@ -5,5 +5,5 @@ import com.aptana.parsing.ast.IParseNode;
 public interface IParser
 {
 
-	public IParseNode parse(String source) throws Exception;
+	public IParseNode parse(IParseState parseState) throws Exception;
 }
