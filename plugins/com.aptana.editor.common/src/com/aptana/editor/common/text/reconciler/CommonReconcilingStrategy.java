@@ -161,7 +161,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
 		if (monitor != null)
 		{
-			monitor.beginTask("Finding folding regions", -1);
+			monitor.beginTask(Messages.CommonReconcilingStrategy_FoldingTaskName, -1);
 		}
 
 		// Go through the partitions, in each partition go through each line and match regexps for that scope
