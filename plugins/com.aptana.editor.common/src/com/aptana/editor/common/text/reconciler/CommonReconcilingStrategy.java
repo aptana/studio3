@@ -49,18 +49,15 @@ import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
-import org.jruby.Ruby;
 import org.jruby.RubyFixnum;
 import org.jruby.RubyMatchData;
 import org.jruby.RubyNumeric;
 import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
-import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.scripting.ScriptingEngine;
 import com.aptana.scripting.model.BundleManager;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
@@ -175,26 +172,25 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getScopeAtOffset(fDocument, offset);
 
-			Ruby runtime = ScriptingEngine.getInstance().getScriptingContainer().getRuntime();
-			ThreadContext threadContext = runtime.getCurrentContext();
-
 			RubyRegexp startRegexp = getStartFoldRegexp(scope);
 			if (startRegexp == null)
 				continue;
 			RubyRegexp endRegexp = getEndFoldRegexp(scope);
 			if (endRegexp == null)
 				continue;
+
 			String partitionText = fDocument.get(offset, length);
 			String[] lines = partitionText.split("\r|\n|\r\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
 				// Look for an open...
-				RubyString rLine = runtime.newString(line);
-				IRubyObject startMatcher = startRegexp.match_m(threadContext, rLine);
+				RubyString rLine = startRegexp.getRuntime().newString(line);
+				IRubyObject startMatcher = startRegexp.match_m(startRegexp.getRuntime().getCurrentContext(), rLine);
 				if (!startMatcher.isNil())
 				{
 					int start = 0;
-					IRubyObject posStart = ((RubyMatchData) startMatcher).begin(threadContext, runtime.newFixnum(0));
+					IRubyObject posStart = ((RubyMatchData) startMatcher).begin(startRegexp.getRuntime()
+							.getCurrentContext(), startRegexp.getRuntime().newFixnum(0));
 					if (posStart instanceof RubyFixnum)
 					{
 						start = RubyNumeric.num2int(posStart);
@@ -208,14 +204,14 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 					int indent = findIndent(line);
 					if (starts.containsKey(indent))
 					{
-						IRubyObject endMatcher = endRegexp.match_m(threadContext, rLine);
+						IRubyObject endMatcher = endRegexp.match_m(endRegexp.getRuntime().getCurrentContext(), rLine);
 						if (!endMatcher.isNil())
 						{
 							int startingOffset = starts.remove(indent);
 
 							int end = 0;
-							IRubyObject posStart = ((RubyMatchData) endMatcher)
-									.end(threadContext, runtime.newFixnum(0));
+							IRubyObject posStart = ((RubyMatchData) endMatcher).end(endRegexp.getRuntime()
+									.getCurrentContext(), endRegexp.getRuntime().newFixnum(0));
 							if (posStart instanceof RubyFixnum)
 							{
 								end = RubyNumeric.num2int(posStart);
