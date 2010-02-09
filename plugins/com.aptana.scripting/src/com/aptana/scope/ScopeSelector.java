@@ -109,7 +109,23 @@ public class ScopeSelector
 		{
 			MatchContext context = new MatchContext(scope);
 			
-			result = this._root.matches(context);
+			for (int i = 0; i < context.getLength(); i++)
+			{
+				// save current position so we can advance later
+				context.pushCurrentStep();
+				
+				// see if we match at this point within the context
+				if (this._root.matches(context))
+				{
+					// we matched, so report success and stop looking for a match
+					result = true;
+					break;
+				}
+				
+				// restore position where we started and move forward one
+				context.popCurrentStep(true);
+				context.advance();
+			}
 		}
 		
 		return result;
