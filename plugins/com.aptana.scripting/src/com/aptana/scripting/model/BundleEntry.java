@@ -116,7 +116,7 @@ public class BundleEntry
 		becameHidden.removeAll(becameVisible);
 		becameVisible.removeAll(preVisibleBundles);
 
-		// fire visibility events
+		// fire hidden events
 		if (becameHidden.size() > 0)
 		{
 			List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
@@ -135,6 +135,7 @@ public class BundleEntry
 			manager.fireBundleBecameHiddenEvent(hiddenEntry);
 		}
 		
+		// fire visible events
 		if (becameVisible.size() > 0)
 		{
 			List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
