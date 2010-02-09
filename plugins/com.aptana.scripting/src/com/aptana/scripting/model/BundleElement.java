@@ -734,6 +734,16 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * setVisible
+	 * 
+	 * @param flag
+	 */
+	public void setVisible(boolean flag)
+	{
+		this._visible = flag;
+	}
+	
+	/**
 	 * unassociateFileType
 	 * 
 	 * @param fileType
