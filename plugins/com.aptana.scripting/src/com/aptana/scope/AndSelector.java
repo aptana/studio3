@@ -49,7 +49,7 @@ public class AndSelector implements ISelectorNode
 		{
 			context.pushCurrentStep();
 			
-			result = this._right.matches(context) && this._left.matches(context);
+			result = this._left.matches(context) && this._right.matches(context);
 			
 			context.popCurrentStep(!result);
 		}

@@ -4,16 +4,16 @@ Ruble (short for RUby BundLE) is a runtime environment that allows for the exten
 
 In addition, we are also making the source available for several working Ruble bundles, all of which are conversions of existing open-sourced TextMate bundles:
 
-* [css.ruble](https://github.com/aptana/css-ruble)
-* [html.ruble](https://github.com/aptana/html-ruble)
-* [js.ruble](https://github.com/aptana/js-ruble)
-* [math.ruble](https://github.com/aptana/math-ruble)
-* [rails.ruble](https://github.com/aptana/rails-ruble)
-* [ruby.ruble](https://github.com/aptana/ruby-ruble)
-* [sass.ruble](https://github.com/aptana/sass-ruble)
-* [source.ruble](https://github.com/aptana/source-ruble)
-* [text.ruble](https://github.com/aptana/text-ruble)
-* [xml.ruble](https://github.com/aptana/xml-ruble)
+* [css.ruble](https://github.com/aptana/css.ruble)
+* [html.ruble](https://github.com/aptana/html.ruble)
+* [js.ruble](https://github.com/aptana/js.ruble)
+* [math.ruble](https://github.com/aptana/math.ruble)
+* [rails.ruble](https://github.com/aptana/rails.ruble)
+* [ruby.ruble](https://github.com/aptana/ruby.ruble)
+* [sass.ruble](https://github.com/aptana/sass.ruble)
+* [source.ruble](https://github.com/aptana/source.ruble)
+* [text.ruble](https://github.com/aptana/text.ruble)
+* [xml.ruble](https://github.com/aptana/xml.ruble)
 
 Please keep in mind that the specification and the bundles themselves are in active development and are very likely to change over the coming weeks.
 
@@ -139,6 +139,16 @@ In our last scenario, perhaps you find that you are happy with the content of th
 
 As you can see, we use the same mechanism we used to extend a bundle; however, this time since we are using the same name of a command that was defined in our target bundle, our active bundle only contains an "A" command and that is the command that is defined in the user bundles directory.
 
+### Associating a Bundle with a File-Type
+
+A bundle can be associated with one or more file types. This makes it possible for a bundle to be created that defines a set of commands and snippets for a file type that doesn't have a built-in editor and parser. A future version of this API will also allow the definition of syntax coloring elements, auto-indent rules, and perhaps even the ability to create full fledged language parsers.
+
+Method		                            | Description
+-------------                           | -------------
+<code>register_file_type(file_type, scope)</code>  | This is a convenience method that first calls <code>associate_file_type</code> and then registers that <code>file_type</code> to a particular scope by calling <code>associate_scope</code>
+<code>associate_file_type(file_type)</code>       |    Given a filename pattern, we register files that match to our generic text editor (uses our theme and scripting). <code>file_type</code> must be either an exact filename to match, or a <code>*.ext</code> extension to associate with.
+<code>associate_scope(file_type, scope)</code>      | Registers a top-level scope to report back for any file whose name matches the passed in pattern. Understands * wildcard. Typical values for first arg: <code>*.yml</code>, <code>*_spec.rb</code>, <code>Rakefile</code>. <code>scope</code> is a string our a symbol. Underscores are converted to spaces (so <code>'source.yaml'</code> and <code>:source_yaml</code> are equivalent)
+    
 ## Scopes
 
 A scope specifies a context within the IDE. For example, when editing a document, the current cursor position within that document has a context associated with it. These scopes are supplied by the IDE and may be queried using the Shift-Control-P key command.
@@ -314,7 +324,7 @@ Property                    | Description
 <code>copyright</code>	    | any copyright message associated with the bundle
 <code>license</code>		| the name or URL of the license associated with the bundle. E.g. "MIT License" or <code>http://www.gnu.org/licenses/gpl-3.0.txt</code>
 <code>website</code>		| the website where more information about the bundle can be found
-<code>repository</code>	    | the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rails-ruble.git</code>
+<code>repository</code>	    | the public repository url where the canonical version of this bundle lives. E.g. <code>git://github.com/aptana/rails.ruble.git</code>
 
 Additional properties can be accessed, though, simply by referring to them as though they already exist, e.g.:
 
@@ -337,7 +347,7 @@ The following is a real but extremely minimal bundle.rb file which defines a 'Ra
     Ruble.current_bundle do |bundle|
       bundle.name = "Ruby on Rails"
       bundle.author = "Many"
-      bundle.repository = "git://github.com/aptana/rails-ruble.git"
+      bundle.repository = "git://github.com/aptana/rails.ruble.git"
 
       bundle.menu "Rails" do |rails_menu|
         # this menu should be shown when any of the following scopes is active:
