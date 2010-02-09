@@ -14,16 +14,16 @@ public interface BundleChangeListener
 	 * This event fires whenever a bundle that was previously visible is now hidden
 	 * by another bundle
 	 * 
-	 * @param bundle
+	 * @param entry
 	 */
-	void becameHidden(BundleElement bundle);
+	void becameHidden(BundleEntry entry);
 	
 	/**
 	 * This event fires whenever a bundle that was previously hidden has become visible
 	 * 
-	 * @param bundle
+	 * @param entry
 	 */
-	void becameVisible(BundleElement bundle);
+	void becameVisible(BundleEntry entry);
 	
 	/**
 	 * This event fires whenever a bundle has been removed from its bundle entry.

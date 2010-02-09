@@ -264,13 +264,13 @@ public class BundleManager
 	 * 
 	 * @param bundle
 	 */
-	void fireBundleBecameHiddenEvent(BundleElement bundle)
+	void fireBundleBecameHiddenEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (this._bundleListeners != null && entry != null)
 		{
 			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.becameHidden(bundle);
+				listener.becameHidden(entry);
 			}
 		}
 	}
@@ -280,13 +280,13 @@ public class BundleManager
 	 * 
 	 * @param bundle
 	 */
-	void fireBundleBecameVisibleEvent(BundleElement bundle)
+	void fireBundleBecameVisibleEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && bundle != null)
+		if (this._bundleListeners != null && entry != null)
 		{
 			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.becameVisible(bundle);
+				listener.becameVisible(entry);
 			}
 		}
 	}
