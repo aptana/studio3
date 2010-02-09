@@ -54,6 +54,7 @@ public class BundleManager
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
 
+	private List<BundleChangeListener> _bundleListeners;
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
 
@@ -185,8 +186,24 @@ public class BundleManager
 					entry.addBundle(bundle);
 				}
 			}
-
-			this.fireBundleAddedEvent(bundle);
+		}
+	}
+	
+	/**
+	 * addBundleChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void addBundleChangeListener(BundleChangeListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._bundleListeners == null)
+			{
+				this._bundleListeners = new ArrayList<BundleChangeListener>();
+			}
+			
+			this._bundleListeners.add(listener);
 		}
 	}
 
@@ -233,15 +250,47 @@ public class BundleManager
 	 */
 	void fireBundleAddedEvent(BundleElement bundle)
 	{
-		if (this._elementListeners != null && bundle != null)
+		if (this._bundleListeners != null && bundle != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.bundleAdded(bundle);
+				listener.added(bundle);
 			}
 		}
 	}
-
+	
+	/**
+	 * fireBundleBecameHiddenEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleBecameHiddenEvent(BundleElement bundle)
+	{
+		if (this._bundleListeners != null && bundle != null)
+		{
+			for (BundleChangeListener listener : this._bundleListeners)
+			{
+				listener.becameHidden(bundle);
+			}
+		}
+	}
+	
+	/**
+	 * fireBundleBecameVisibleEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleBecameVisibleEvent(BundleElement bundle)
+	{
+		if (this._bundleListeners != null && bundle != null)
+		{
+			for (BundleChangeListener listener : this._bundleListeners)
+			{
+				listener.becameVisible(bundle);
+			}
+		}
+	}
+	
 	/**
 	 * fireBundleDeletedEvent
 	 * 
@@ -249,15 +298,15 @@ public class BundleManager
 	 */
 	void fireBundleDeletedEvent(BundleElement bundle)
 	{
-		if (this._elementListeners != null && bundle != null)
+		if (this._bundleListeners != null && bundle != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.bundleDeleted(bundle);
+				listener.deleted(bundle);
 			}
 		}
 	}
-
+	
 	/**
 	 * fireElementAddedEvent
 	 * 
@@ -1120,8 +1169,6 @@ public class BundleManager
 			}
 
 			AbstractElement.unregisterElement(bundle);
-
-			this.fireBundleDeletedEvent(bundle);
 		}
 	}
 
