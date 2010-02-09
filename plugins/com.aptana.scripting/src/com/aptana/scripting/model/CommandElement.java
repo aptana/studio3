@@ -92,7 +92,7 @@ public class CommandElement extends AbstractBundleElement
 		if (this.isExecutable())
 		{
 			AbstractCommandJob job = null;
-			
+
 			// determine if we are running asynchronously taking the output type into account
 			boolean async = (this._async && this._outputType.allowAsync());
 
@@ -128,7 +128,8 @@ public class CommandElement extends AbstractBundleElement
 				}
 
 				// get result, using a default shell if we're running async
-				result = (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job.getCommandResult();
+				result = (async && this._runType != RunType.CURRENT_THREAD) ? new CommandResult(this, context) : job
+						.getCommandResult();
 			}
 		}
 
@@ -321,21 +322,22 @@ public class CommandElement extends AbstractBundleElement
 	{
 		switch (this._workingDirectoryType)
 		{
-			case CURRENT_BUNDLE:
-				return new File(this.getPath()).getParentFile().toString();
-
 			case PATH:
-				return this._workingDirectoryPath;
-
-				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-				// can't implement these yet because they require us to hook into higher level functionality in the
-				// editor.common and explorer plugins. AAAARGH.
-			case UNDEFINED:
 			case CURRENT_PROJECT:
+				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for this type and will turn it into a PATH type and set the path to the current project
+				return this._workingDirectoryPath;
+			case CURRENT_BUNDLE:
+				return getOwningBundle().getBundleDirectory().toString();
+			case UNDEFINED:
 			case CURRENT_FILE:
 			default:
 				return new File(this.getPath()).getParentFile().toString();
 		}
+	}
+	
+	public WorkingDirectoryType getWorkingDirectoryType()
+	{
+		return this._workingDirectoryType;
 	}
 
 	/**
@@ -806,7 +808,7 @@ public class CommandElement extends AbstractBundleElement
 
 	/**
 	 * Return the environment based on the current context.
-	 *
+	 * 
 	 * @return environment map
 	 */
 	public Map<String, String> getEnvironment()
