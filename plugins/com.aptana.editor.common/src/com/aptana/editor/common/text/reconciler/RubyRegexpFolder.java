@@ -9,17 +9,15 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
-import org.jruby.RubyFixnum;
-import org.jruby.RubyMatchData;
-import org.jruby.RubyNumeric;
 import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
 
-public class RubyRegexpFolder
+class RubyRegexpFolder
 {
 
 	private IDocument fDocument;
@@ -29,7 +27,8 @@ public class RubyRegexpFolder
 		this.fDocument = document;
 	}
 
-	public List<Position> emitFoldingRegions(List<Position> positions, IProgressMonitor monitor) throws BadLocationException
+	public List<Position> emitFoldingRegions(List<Position> positions, IProgressMonitor monitor)
+			throws BadLocationException
 	{
 		int lineCount = fDocument.getNumberOfLines();
 		Map<Integer, Integer> starts = new HashMap<Integer, Integer>();
@@ -43,8 +42,7 @@ public class RubyRegexpFolder
 			int offset = lineRegion.getOffset();
 			String line = fDocument.get(offset, lineRegion.getLength());
 
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(fDocument, offset);
+			String scope = getScopeAtOffset(offset);
 
 			RubyRegexp startRegexp = getStartFoldRegexp(scope);
 			if (startRegexp == null)
@@ -65,14 +63,8 @@ public class RubyRegexpFolder
 			IRubyObject startMatcher = startRegexp.match_m(startRegexp.getRuntime().getCurrentContext(), rLine);
 			if (!startMatcher.isNil())
 			{
-				int start = 0;
-				IRubyObject posStart = ((RubyMatchData) startMatcher).begin(startRegexp.getRuntime()
-						.getCurrentContext(), startRegexp.getRuntime().newFixnum(0));
-				if (posStart instanceof RubyFixnum)
-				{
-					start = RubyNumeric.num2int(posStart);
-				}
-				starts.put(findIndent(line), start + offset); // need to push the indent level too...
+				starts.put(findIndent(line), offset); // cheat and just give offset of line since line resolution is all
+														// that matters
 			}
 			// Don't look for an end if there's no open yet!
 			if (starts.size() > 0)
@@ -85,16 +77,8 @@ public class RubyRegexpFolder
 					if (!endMatcher.isNil())
 					{
 						int startingOffset = starts.remove(indent);
-
-						int end = 0;
-						IRubyObject posStart = ((RubyMatchData) endMatcher).end(endRegexp.getRuntime()
-								.getCurrentContext(), endRegexp.getRuntime().newFixnum(0));
-						if (posStart instanceof RubyFixnum)
-						{
-							end = RubyNumeric.num2int(posStart);
-						}
-
-						int posLength = (end + offset) - startingOffset;
+						int end = lineRegion.getOffset() + lineRegion.getLength(); // cheat and just use end of line
+						int posLength = end - startingOffset;
 						if (posLength > 0)
 						{
 							Position position = new Position(startingOffset, posLength);
@@ -112,6 +96,16 @@ public class RubyRegexpFolder
 			monitor.done();
 		}
 		return positions;
+	}
+
+	protected String getScopeAtOffset(int offset) throws BadLocationException
+	{
+		return getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	private int findIndent(String text)

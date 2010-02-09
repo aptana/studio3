@@ -1,0 +1,13 @@
+body {
+	color: red;
+}
+
+div p {
+	background-color: green;
+}
+
+.one-liner { color: orange; }
+
+#id { 
+	font-family: monospace;
+}
