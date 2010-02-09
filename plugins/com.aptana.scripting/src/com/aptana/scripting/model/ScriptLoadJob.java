@@ -17,7 +17,7 @@ import com.aptana.scripting.Messages;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 
-public class ScriptLoadJob extends AbstractScriptJob
+public class ScriptLoadJob extends AbstractScriptRunner
 {
 	private String _filename;
 	private Object _returnValue;

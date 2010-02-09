@@ -91,7 +91,7 @@ public class CommandElement extends AbstractBundleElement
 
 		if (this.isExecutable())
 		{
-			AbstractCommandJob job = null;
+			AbstractCommandRunner job = null;
 
 			// determine if we are running asynchronously taking the output type into account
 			boolean async = (this._async && this._outputType.allowAsync());
@@ -102,14 +102,14 @@ public class CommandElement extends AbstractBundleElement
 			// create job based on invocation type
 			if (this.isShellCommand())
 			{
-				job = new CommandScriptJob(this, context);
+				job = new CommandScriptRunner(this, context);
 			}
 			else if (this.isBlockCommand())
 			{
 				// create output stream and attach to context
 				context.setOutputStream(new ByteArrayOutputStream());
 
-				job = new CommandBlockJob(this, context, this.getOwningBundle().getLoadPaths());
+				job = new CommandBlockRunner(this, context, this.getOwningBundle().getLoadPaths());
 			}
 
 			// run the job, if we have one

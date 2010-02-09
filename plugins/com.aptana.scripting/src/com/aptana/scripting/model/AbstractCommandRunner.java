@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractCommandJob extends AbstractScriptJob
+public abstract class AbstractCommandRunner extends AbstractScriptRunner
 {
 	private CommandElement _command;
 	private CommandContext _context;
@@ -20,7 +20,7 @@ public abstract class AbstractCommandJob extends AbstractScriptJob
 	 * @param context
 	 * @param loadPaths
 	 */
-	public AbstractCommandJob(String name, CommandElement command, CommandContext context, List<String> loadPaths)
+	public AbstractCommandRunner(String name, CommandElement command, CommandContext context, List<String> loadPaths)
 	{
 		super(name, loadPaths);
 
