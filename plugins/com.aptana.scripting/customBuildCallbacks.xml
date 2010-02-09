@@ -75,47 +75,47 @@
 		</exec>
 		<!-- Grab the pre-defined set of bundles -->
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="text-ruble" />
+		  	<param name="bundle.name" value="text.ruble" />
 		  	<param name="bundle.dir.name" value="text.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="source-ruble" />
+		  	<param name="bundle.name" value="source.ruble" />
 		  	<param name="bundle.dir.name" value="source.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="math-ruble" />
+		  	<param name="bundle.name" value="math.ruble" />
 		  	<param name="bundle.dir.name" value="math.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="ruby-ruble" />
+		  	<param name="bundle.name" value="ruby.ruble" />
 		  	<param name="bundle.dir.name" value="ruby.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="rails-ruble" />
+		  	<param name="bundle.name" value="rails.ruble" />
 		  	<param name="bundle.dir.name" value="rails.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="html-ruble" />
+		  	<param name="bundle.name" value="html.ruble" />
 		  	<param name="bundle.dir.name" value="html.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="css-ruble" />
+		  	<param name="bundle.name" value="css.ruble" />
 		  	<param name="bundle.dir.name" value="css.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="js-ruble" />
+		  	<param name="bundle.name" value="js.ruble" />
 		  	<param name="bundle.dir.name" value="js.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="sass-ruble" />
+		  	<param name="bundle.name" value="sass.ruble" />
 		  	<param name="bundle.dir.name" value="sass.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="xml-ruble" />
+		  	<param name="bundle.name" value="xml.ruble" />
 		  	<param name="bundle.dir.name" value="xml.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="bundle-dev-ruble" />
+		  	<param name="bundle.name" value="bundle-dev.ruble" />
 		  	<param name="bundle.dir.name" value="bundle-development.ruble" />
 		</antcall>
 	</target>
