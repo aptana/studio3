@@ -17,6 +17,27 @@ public class BundleEntry
 {
 	private String _name;
 	private List<BundleElement> _bundles;
+	private Comparator<BundleElement> _comparator = new Comparator<BundleElement>()
+	{
+		public int compare(BundleElement o1, BundleElement o2)
+		{
+			int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+
+			if (result == 0)
+			{
+				if (o1.isReference() == o2.isReference())
+				{
+					result = o1.getPath().compareTo(o2.getPath());
+				}
+				else
+				{
+					result = (o1.isReference()) ? 1 : -1;
+				}
+			}
+
+			return result;
+		}
+	};
 
 	/**
 	 * BundleEntry
@@ -35,6 +56,20 @@ public class BundleEntry
 	}
 
 	/**
+	 * BundleEntry
+	 * 
+	 * @param name
+	 * @param bundles
+	 */
+	private BundleEntry(String name, List<BundleElement> bundles)
+	{
+		this._name = name;
+		this._bundles = bundles;
+		
+		Collections.sort(this._bundles, this._comparator);
+	}
+	
+	/**
 	 * add
 	 * 
 	 * @param bundle
@@ -45,31 +80,55 @@ public class BundleEntry
 		{
 			synchronized (this._bundles)
 			{
+				// get list of visible bundles before adding this new one
+				Set<BundleElement> preVisibleBundles = new HashSet<BundleElement>(this.getContributingBundles());
+
+				// add the bundle
 				this._bundles.add(bundle);
 
 				// keep bundles in canonical order
-				Collections.sort(this._bundles, new Comparator<BundleElement>()
-				{
-					public int compare(BundleElement o1, BundleElement o2)
-					{
-						int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+				Collections.sort(this._bundles, this._comparator);
 
-						if (result == 0)
-						{
-							if (o1.isReference() == o2.isReference())
-							{
-								result = o1.getPath().compareTo(o2.getPath());
-							}
-							else
-							{
-								result = (o1.isReference()) ? 1 : -1;
-							}
-						}
-
-						return result;
-					}
-				});
+				// fire visibility change events
+				this.fireVisibilityEvents(preVisibleBundles);
+				
+				// fire add event
+				BundleManager.getInstance().fireBundleAddedEvent(bundle);
 			}
+		}
+	}
+
+	/**
+	 * fireVisibilityEvents
+	 * 
+	 * @param preVisibleBundles
+	 */
+	private void fireVisibilityEvents(Set<BundleElement> preVisibleBundles)
+	{
+		BundleManager manager = BundleManager.getInstance();
+		
+		// get current list of visible bundles
+		Set<BundleElement> becameVisible = new HashSet<BundleElement>(this.getContributingBundles());
+		
+		// determine which bundles lost visibility and which gained visibility
+		Set<BundleElement> becameHidden = new HashSet<BundleElement>(preVisibleBundles);
+		
+		becameHidden.removeAll(becameVisible);
+		becameVisible.removeAll(preVisibleBundles);
+
+		// fire visibility events
+		if (becameHidden.size() > 0)
+		{
+			BundleEntry hiddenEntry = new BundleEntry(this.getName(), new ArrayList<BundleElement>(becameHidden));
+			
+			manager.fireBundleBecameHiddenEvent(hiddenEntry);
+		}
+		
+		if (becameVisible.size() > 0)
+		{
+			BundleEntry visibleEntry = new BundleEntry(this.getName(), new ArrayList<BundleElement>(becameVisible));
+			
+			manager.fireBundleBecameVisibleEvent(visibleEntry);
 		}
 	}
 
@@ -145,7 +204,28 @@ public class BundleEntry
 	}
 
 	/**
-	 * getCommands
+	 * getContributingBundles
+	 * 
+	 * @return
+	 */
+	public List<BundleElement> getContributingBundles()
+	{
+		final List<BundleElement> result = new ArrayList<BundleElement>();
+		
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				result.add(bundle);
+				return true;
+			}
+		});
+		
+		return Collections.unmodifiableList(result);
+	}
+	
+	/**
+	 * getFileTypeRegistry
 	 * 
 	 * @return
 	 */
@@ -158,18 +238,25 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<String, String> registry = bundle.getFileTypeRegistry();
+				
 				if (registry != null)
 				{
 					result.putAll(registry);
 					return false;
 				}
+				
 				return true;
 			}
 		});
 
 		return result;
 	}
-	
+
+	/**
+	 * getFoldingStartMarkers
+	 * 
+	 * @return
+	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
 		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
@@ -179,17 +266,24 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStartMarkers();
+				
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
+				
 				return true;
 			}
 		});
 
 		return result;
 	}
-	
+
+	/**
+	 * getFoldingStopMarkers
+	 * 
+	 * @return
+	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
 		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
@@ -199,10 +293,12 @@ public class BundleEntry
 			public boolean processBundle(BundleEntry entry, BundleElement bundle)
 			{
 				Map<ScopeSelector, RubyRegexp> registry = bundle.getFoldingStopMarkers();
+				
 				if (registry != null)
 				{
 					result.putAll(registry);
 				}
+				
 				return true;
 			}
 		});
@@ -284,6 +380,8 @@ public class BundleEntry
 	}
 
 	/**
+	 * removeBundle
+	 * 
 	 * @param bundle
 	 * @return
 	 */
@@ -293,7 +391,19 @@ public class BundleEntry
 
 		synchronized (this._bundles)
 		{
+			// get list of visible bundles before adding this new one
+			Set<BundleElement> preVisibleBundles = new HashSet<BundleElement>(this.getContributingBundles());
+			
 			result = this._bundles.remove(bundle);
+			
+			if (result)
+			{
+				// fire bundle deleted event
+				BundleManager.getInstance().fireBundleDeletedEvent(bundle);
+				
+				// fire visibility change events
+				this.fireVisibilityEvents(preVisibleBundles);
+			}
 		}
 
 		return result;
