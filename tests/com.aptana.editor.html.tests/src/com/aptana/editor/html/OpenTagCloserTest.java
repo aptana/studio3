@@ -77,6 +77,17 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals("<p <b></b></p>", document.get());
 		assertTrue(event.doit);
 	}
+	
+	public void testDoesCloseIfNotClosedButPairFollows()
+	{
+		IDocument document = setDocument("<p <b></b><p></p>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(2);
+		closer.verifyKey(event);
+
+		assertEquals("<p></p> <b></b><p></p>", document.get());
+		assertFalse(event.doit);
+	}
 
 	public void testDoesntCloseIfNextCharIsLessThan()
 	{
