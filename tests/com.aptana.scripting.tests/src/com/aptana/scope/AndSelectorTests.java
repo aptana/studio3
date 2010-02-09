@@ -103,4 +103,34 @@ public class AndSelectorTests extends TestCase
 
 		assertFalse(selector.matches((String) null));
 	}
+	
+	/**
+	 * testBeginsWith
+	 */
+	public void testBeginsWith()
+	{
+		ScopeSelector selector = new ScopeSelector("source.ruby");
+
+		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
+	}
+	
+	/**
+	 * testWithin
+	 */
+	public void testWithin()
+	{
+		ScopeSelector selector = new ScopeSelector("source.ruby");
+
+		assertTrue(selector.matches("text.html.ruby source.ruby.rails.embedded.html string.quoted.double.ruby punctuation.definition.string.end.ruby"));
+	}
+	
+	/**
+	 * testEndsWith
+	 */
+	public void testEndsWith()
+	{
+		ScopeSelector selector = new ScopeSelector("source.ruby");
+
+		assertTrue(selector.matches("text.html.ruby source.ruby.rails.embedded.html"));
+	}
 }
