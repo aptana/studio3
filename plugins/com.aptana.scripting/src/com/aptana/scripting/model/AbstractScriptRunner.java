@@ -9,7 +9,7 @@ import org.jruby.RubyArray;
 import org.jruby.RubyString;
 import org.jruby.runtime.builtin.IRubyObject;
 
-public abstract class AbstractScriptJob extends Job implements Runnable
+public abstract class AbstractScriptRunner extends Job implements Runnable
 {
 	private List<String> _loadPaths;
 	private RubyArray _originalLoadPaths;
@@ -19,7 +19,7 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	 * 
 	 * @param name
 	 */
-	public AbstractScriptJob(String name)
+	public AbstractScriptRunner(String name)
 	{
 		this(name, null);
 	}
@@ -30,7 +30,7 @@ public abstract class AbstractScriptJob extends Job implements Runnable
 	 * @param name
 	 * @param loadPaths
 	 */
-	public AbstractScriptJob(String name, List<String> loadPaths)
+	public AbstractScriptRunner(String name, List<String> loadPaths)
 	{
 		super(name);
 

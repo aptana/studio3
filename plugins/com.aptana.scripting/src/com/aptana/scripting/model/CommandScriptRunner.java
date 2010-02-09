@@ -14,7 +14,7 @@ import com.aptana.scripting.ScriptLogger;
 import com.aptana.util.IOUtil;
 import com.aptana.util.ProcessUtil;
 
-public class CommandScriptJob extends AbstractCommandJob
+public class CommandScriptRunner extends AbstractCommandRunner
 {
 	private int _exitValue;
 	private File _tempFile;
@@ -23,7 +23,7 @@ public class CommandScriptJob extends AbstractCommandJob
 	/**
 	 * CommandScriptJob
 	 */
-	public CommandScriptJob(CommandElement command, CommandContext context)
+	public CommandScriptRunner(CommandElement command, CommandContext context)
 	{
 		super("Execute Command Script", command, context, null);
 	}

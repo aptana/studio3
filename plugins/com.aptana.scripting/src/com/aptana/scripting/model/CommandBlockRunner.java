@@ -24,7 +24,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
 
-public class CommandBlockJob extends AbstractCommandJob
+public class CommandBlockRunner extends AbstractCommandRunner
 {
 	private static final String STDIN_GLOBAL = "$stdin"; //$NON-NLS-1$
 	private static final String STDIN_CONSTANT = "STDIN"; //$NON-NLS-1$
@@ -53,7 +53,7 @@ public class CommandBlockJob extends AbstractCommandJob
 	 * @param block
 	 * @param loadPaths
 	 */
-	public CommandBlockJob(CommandElement command, CommandContext context, List<String> loadPaths)
+	public CommandBlockRunner(CommandElement command, CommandContext context, List<String> loadPaths)
 	{
 		super("Execute JRuby Block", command, context, loadPaths); //$NON-NLS-1$
 	}
