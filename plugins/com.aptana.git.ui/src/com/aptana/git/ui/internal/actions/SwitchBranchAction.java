@@ -1,7 +1,8 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
@@ -40,7 +41,7 @@ public class SwitchBranchAction extends MenuAction
 		if (repo == null)
 			return;
 
-		Set<String> localBranches = repo.localBranches();
+		SortedSet<String> localBranches = new TreeSet<String>(repo.localBranches());
 		int index = 0;
 		for (final String branchName : localBranches)
 		{

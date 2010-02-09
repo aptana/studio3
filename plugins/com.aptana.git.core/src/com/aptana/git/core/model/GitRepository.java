@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -191,7 +194,21 @@ public class GitRepository
 
 	public Set<String> allBranches()
 	{
-		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
+		// Return local branches first!
+		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
+		{
+			@Override
+			public int compare(String o1, String o2)
+			{
+				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+					return 1;
+				if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+					return -1;
+				return o1.compareTo(o2);
+			}
+		});
+		localFirst.addAll(branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE));
+		return localFirst;
 	}
 
 	private Set<String> branches(GitRef.TYPE... types)
