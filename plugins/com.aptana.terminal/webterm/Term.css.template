@@ -16,8 +16,8 @@ div.webterm pre {
 	margin: 0px 0px 0px;
 	/*font-family: Monaco, Courier, monospace;*/
 	font-family: {font-name}, Monaco, monospace;
-	font-size: {font-size}pt;
-	line-height: {line-height}pt;
+	font-size: {font-size};
+	line-height: {line-height};
 }
 
 /* title bar */
