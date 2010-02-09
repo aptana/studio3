@@ -33,8 +33,9 @@ public class NameSelector implements ISelectorNode
 				int nameLength = this._name.length();
 				int scopeLength = step.length();
 				
-				if (result = (scopeLength == nameLength || step.charAt(nameLength) == '.'))
+				if (scopeLength == nameLength || step.charAt(nameLength) == '.')
 				{
+					result = true;
 					context.advance();
 				}
 			}
