@@ -184,6 +184,7 @@ Element		| Required?		| Description
 <code>scope</code>		| 				| The scope in which the command can be executed. If no scope is specified, the command is assumed to be active in all scopes.
 <code>input</code>		|				| The input to the command. See the _Input Definition_ section below.
 <code>output</code>	    | 	 			| The output of the command. See the _Output Definition_ section below.
+<code>working_directory</code>	    | 	 			| The working directory to use when invoking the command as a shell script. See the _Working Directory Definition_ section below.
 <code>key_binding</code>	| 	 			| The keyboard binding for the command. It is also possible to define platform-specific key bindings, as described in the _Key Bindings_ section below.
 <code>trigger</code>	    |				| A tab trigger that will invoke the command if typed into an editor window and then the <TAB> key is pressed. It is possible to define both a trigger and a key_binding for a single command.
 
@@ -285,6 +286,17 @@ Specifier                               | Description
 <code>:replace_selected_lines</code>	| what does this do? probably unnecessary
 <code>:replace_line</code>	            | replace the line around the caret. probably unnecessary
 <code>:replace_word</code>	            | replace the word around the caret. probably unnecessary
+
+## WORKING_DIRECTORY
+
+The possible working directory specifiers are:
+
+Specifier                               | Description
+-------------                           | -------------
+<code>'any string'</code>	        | the string is interpreted as an absolute path
+<code>:current_file</code>	        | Use the command's parent dir as the working dir. This is the default behavior.
+<code>:current_project</code>	        | Use the active project in the App Explorer as the working directory.
+<code>:current_bundle</code>	        | Use the command's owning bundle's directory as the working directory. Typically this is the parent dir of what you'd get with <code>:current_file</code>
 
 # Bundle.rb
 
