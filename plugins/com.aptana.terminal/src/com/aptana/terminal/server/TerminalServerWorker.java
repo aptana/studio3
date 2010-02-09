@@ -128,7 +128,7 @@ public class TerminalServerWorker implements Runnable
 				String units = (Platform.getOS().equals(Platform.OS_WIN32)) ? "pt" : "px";
 				
 				variables.put("\\{font-name\\}", data.getName()); //$NON-NLS-1$
-				variables.put("\\{font-size\\}" + units, Integer.toString(data.getHeight())); //$NON-NLS-1$
+				variables.put("\\{font-size\\}", Integer.toString(data.getHeight()) + units); //$NON-NLS-1$
 				Display display = Display.getCurrent();
 				
 				if (display == null)
@@ -147,7 +147,7 @@ public class TerminalServerWorker implements Runnable
 						gc.dispose();
 					}
 				});
-				variables.put("\\{line-height\\}" + units, Integer.toString(lineHeight[0])); //$NON-NLS-1$
+				variables.put("\\{line-height\\}", Integer.toString(lineHeight[0]) + units); //$NON-NLS-1$
 			}
 		}
 		return StringUtil.replaceAll(content, variables);
