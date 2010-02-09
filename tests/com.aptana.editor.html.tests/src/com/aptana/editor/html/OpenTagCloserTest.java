@@ -65,6 +65,7 @@ public class OpenTagCloserTest extends TestCase
 
 		assertEquals("<p></p> <div></div>", document.get());
 		assertFalse(event.doit);
+		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
 	public void testDoesntCloseIfClosedLater()
@@ -77,7 +78,7 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals("<p <b></b></p>", document.get());
 		assertTrue(event.doit);
 	}
-	
+
 	public void testDoesCloseIfNotClosedButPairFollows()
 	{
 		IDocument document = setDocument("<p <b></b><p></p>");
@@ -87,16 +88,76 @@ public class OpenTagCloserTest extends TestCase
 
 		assertEquals("<p></p> <b></b><p></p>", document.get());
 		assertFalse(event.doit);
+		assertEquals(3, viewer.getSelectedRange().x);
 	}
 
-	public void testDoesntCloseIfNextCharIsLessThan()
+	public void testDoesCloseIfNextCharIsLessThanAndWeNeedToClose()
 	{
 		IDocument document = setDocument("<p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createLessThanKeyEvent(2);
 		closer.verifyKey(event);
 
-		assertEquals("<p>", document.get());
+		assertEquals("<p></p>", document.get());
+		assertFalse(event.doit);
+		assertEquals(3, viewer.getSelectedRange().x);
+	}
+	
+	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose()
+	{
+		IDocument document = setDocument("<a href=\"\">");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(10);
+		closer.verifyKey(event);
+
+		assertEquals("<a href=\"\"></a>", document.get());
+		assertFalse(event.doit);
+		assertEquals(11, viewer.getSelectedRange().x);
+	}
+
+	public void testDoesntCloseIfNextCharIsLessThanAndWeDontNeedToCloseButOverwritesExistingLessThan()
+	{
+		IDocument document = setDocument("<p></p>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(2);
+		closer.verifyKey(event);
+
+		assertEquals("<p></p>", document.get());
+		assertFalse(event.doit);
+		assertEquals(3, viewer.getSelectedRange().x);
+	}
+
+	public void testDoesntCloseImplicitSelfClosingTag()
+	{
+		IDocument document = setDocument("<br");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(4);
+		closer.verifyKey(event);
+
+		assertEquals("<br", document.get());
+		assertTrue(event.doit);
+	}
+
+	public void testDoesntCloseExplicitSelfClosingTag()
+	{
+		IDocument document = setDocument("<br/");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(4);
+		closer.verifyKey(event);
+
+		assertEquals("<br/", document.get());
+		assertTrue(event.doit);
+		assertEquals(4, viewer.getSelectedRange().x);
+	}
+
+	public void testDoesntCloseExplicitSelfClosingTagWithExtraSpaces()
+	{
+		IDocument document = setDocument("<br /");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(5);
+		closer.verifyKey(event);
+
+		assertEquals("<br /", document.get());
 		assertTrue(event.doit);
 	}
 

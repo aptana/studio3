@@ -55,17 +55,24 @@ public class OpenTagCloser implements VerifyKeyListener
 
 		IDocument document = textViewer.getDocument();
 		final Point selection = textViewer.getSelectedRange();
-		final int offset = selection.x;
+		int offset = selection.x;
 		final int length = selection.y;
 
 		try
 		{
+			// FIXME There's still a case where this breaks in live editing, typing the following: <a href="">
+			boolean nextIsLessThan = false;
 			if (offset < document.getLength())
 			{
 				char c = document.getChar(offset);
 				if (c == '>')
-					return;
+				{
+					nextIsLessThan = true;
+					event.doit = false; // no matter what we'll auto-close or overwrite the existing '>'
+					textViewer.setSelectedRange(offset + 1, 0);
+				}
 			}
+
 			String openTag = isUnclosedOpenTag(document, offset, event);
 			if (openTag == null)
 				return;
@@ -76,17 +83,34 @@ public class OpenTagCloser implements VerifyKeyListener
 
 			// Read forward to see if the next non-WS is the close tag for this, and if so do nothing!
 			if (tagClosed(document, offset, openTag, closeTag))
+			{				
 				return;
+			}
 
 			final StringBuffer buffer = new StringBuffer();
 			// check if the char already exists next in doc! This is the special case of when we auto-paired the '<>' in
 			// linked mode...
-			if (!openTag.endsWith(">>"))
+			boolean overwrite = openTag.endsWith(">>");
+			if (nextIsLessThan)
+			{
+				overwrite = true;
+				offset++;
+			}
+			if (!overwrite)
 			{
 				buffer.append(event.character);
 			}
 			buffer.append(closeTag);
 			document.replace(offset, length, buffer.toString());
+			if (nextIsLessThan)
+			{
+				// move cursor one?
+				textViewer.setSelectedRange(offset, 0);
+			}
+			else
+			{
+				textViewer.setSelectedRange(offset + 1, 0);
+			}
 			event.doit = false;
 		}
 		catch (BadLocationException e)
@@ -166,12 +190,13 @@ public class OpenTagCloser implements VerifyKeyListener
 		if (length <= 0)
 			return null;
 		String tagName = document.get(start, length).trim();
-		int spaceIndex = tagName.indexOf(' ');
+		// Modify tag for some tag name checks
+		String toCheck = tagName;
+		int spaceIndex = toCheck.indexOf(' ');
 		if (spaceIndex != -1)
 		{
-			tagName = tagName.substring(0, spaceIndex);
+			toCheck = toCheck.substring(0, spaceIndex);
 		}
-		String toCheck = tagName;
 		if (toCheck.endsWith(">"))
 		{
 			toCheck = toCheck.substring(0, toCheck.length() - 1);
@@ -180,6 +205,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			return null;
 		}
+		// Return a not necessarily good tag. May contain attrs and an additional ">", but we rely on that later...
 		return "<" + tagName + ">";
 	}
 
