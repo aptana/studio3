@@ -323,15 +323,11 @@ public class CommandElement extends AbstractBundleElement
 		switch (this._workingDirectoryType)
 		{
 			case PATH:
-				return this._workingDirectoryPath;
-
-				// FIXME: implement for story https://www.pivotaltracker.com/story/show/2031417
-				// can't implement these yet because they require us to hook into higher level functionality in the
-				// editor.common and explorer plugins. AAAARGH.
-			case CURRENT_BUNDLE:
-				return getOwningBundle().getBundleDirectory().toString();
 			case CURRENT_PROJECT:
 				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for this type and will turn it into a PATH type and set the path to the current project
+				return this._workingDirectoryPath;
+			case CURRENT_BUNDLE:
+				return getOwningBundle().getBundleDirectory().toString();
 			case UNDEFINED:
 			case CURRENT_FILE:
 			default:

@@ -58,9 +58,9 @@ public class ExplorerContextContributor implements ContextContributor
 
 		if (project != null && command != null)
 		{
+			// This contributor is responsible for setting the path for this working dir type
 			if (command.getWorkingDirectoryType().equals(WorkingDirectoryType.CURRENT_PROJECT))
 			{
-				command.setWorkingDirectoryType(WorkingDirectoryType.PATH);
 				command.setWorkingDirectoryPath(project.getLocation().toOSString());
 			}
 
