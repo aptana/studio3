@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
@@ -117,14 +118,19 @@ public class TerminalServerWorker implements Runnable
 
 		// Now add the text editor font
 		FontDescriptor fd = JFaceResources.getTextFontDescriptor();
+		
 		if (fd != null && fd.getFontData() != null && fd.getFontData().length > 0)
 		{
 			FontData data = fd.getFontData()[0];
+			
 			if (data != null)
 			{
+				String units = (Platform.getOS().equals(Platform.OS_WIN32)) ? "pt" : "px";
+				
 				variables.put("\\{font-name\\}", data.getName()); //$NON-NLS-1$
-				variables.put("\\{font-size\\}", Integer.toString(data.getHeight())); //$NON-NLS-1$
+				variables.put("\\{font-size\\}" + units, Integer.toString(data.getHeight())); //$NON-NLS-1$
 				Display display = Display.getCurrent();
+				
 				if (display == null)
 					display = Display.getDefault();
 				final Display theDisplay = display;
@@ -141,7 +147,7 @@ public class TerminalServerWorker implements Runnable
 						gc.dispose();
 					}
 				});
-				variables.put("\\{line-height\\}", Integer.toString(lineHeight[0])); //$NON-NLS-1$
+				variables.put("\\{line-height\\}" + units, Integer.toString(lineHeight[0])); //$NON-NLS-1$
 			}
 		}
 		return StringUtil.replaceAll(content, variables);
