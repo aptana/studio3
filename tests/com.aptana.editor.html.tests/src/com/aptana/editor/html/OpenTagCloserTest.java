@@ -58,14 +58,35 @@ public class OpenTagCloserTest extends TestCase
 
 	public void testDoesCloseIfNextTagIsNotClosingTag()
 	{
-		// FIXME This particular case is actually incorrect since the tag is eventually closed
+		IDocument document = setDocument("<p <div></div>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(2);
+		closer.verifyKey(event);
+
+		assertEquals("<p></p> <div></div>", document.get());
+		assertFalse(event.doit);
+	}
+
+	public void testDoesntCloseIfClosedLater()
+	{
 		IDocument document = setDocument("<p <b></b></p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
 		VerifyEvent event = createLessThanKeyEvent(2);
 		closer.verifyKey(event);
 
-		assertEquals("<p></p> <b></b></p>", document.get());
-		assertFalse(event.doit);
+		assertEquals("<p <b></b></p>", document.get());
+		assertTrue(event.doit);
+	}
+
+	public void testDoesntCloseIfNextCharIsLessThan()
+	{
+		IDocument document = setDocument("<p>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(2);
+		closer.verifyKey(event);
+
+		assertEquals("<p>", document.get());
+		assertTrue(event.doit);
 	}
 
 	protected VerifyEvent createLessThanKeyEvent(int offset)

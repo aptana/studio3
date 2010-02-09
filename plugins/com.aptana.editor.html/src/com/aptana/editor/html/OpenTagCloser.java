@@ -60,6 +60,12 @@ public class OpenTagCloser implements VerifyKeyListener
 
 		try
 		{
+			if (offset < document.getLength())
+			{
+				char c = document.getChar(offset);
+				if (c == '>')
+					return;
+			}
 			String openTag = isUnclosedOpenTag(document, offset, event);
 			if (openTag == null)
 				return;
@@ -68,11 +74,8 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (closeTag == null)
 				return;
 
-			// TODO Under what conditions should we auto-close? Only if next char is whitespace/newline?
-
 			// Read forward to see if the next non-WS is the close tag for this, and if so do nothing!
-			String nextnonWS = getNextTag(document, offset, closeTag);
-			if (nextnonWS.equals(closeTag))
+			if (tagClosed(document, offset, openTag, closeTag))
 				return;
 
 			final StringBuffer buffer = new StringBuffer();
@@ -92,22 +95,35 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 	}
 
-	private String getNextTag(IDocument document, int offset, String closeTag) throws BadLocationException
+	private boolean tagClosed(IDocument document, int offset, String openTag, String closeTag)
+			throws BadLocationException
 	{
-		int length = document.getLength();
-		int nextNonWS = offset;
-		for (int i = offset; i < length; i++)
+		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
+		String tagName = openTag.substring(1, openTag.indexOf(">"));
+
+		int stack = 0;
+		String src = document.get();
+		int x = 0;
+		while (true)
 		{
-			char c = document.getChar(i);
-			if (!Character.isWhitespace(c))
-			{
-				nextNonWS = i;
+			x = src.indexOf("<" + tagName, x);
+			if (x == -1)
 				break;
-			}
+			x += tagName.length() + 1;
+			stack++;
 		}
-		if (nextNonWS + closeTag.length() > length)
-			return "";
-		return document.get(nextNonWS, closeTag.length());
+
+		x = 0;
+		while (true)
+		{
+			x = src.indexOf("</" + tagName, x);
+			if (x == -1)
+				break;
+			x += tagName.length() + 2;
+			stack--;
+		}
+
+		return stack <= 0;
 	}
 
 	private String getMatchingCloseTag(String openTag)
@@ -155,7 +171,12 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			tagName = tagName.substring(0, spaceIndex);
 		}
-		if (tagName.startsWith("/") || SELF_CLOSING_TAGS.contains(tagName))
+		String toCheck = tagName;
+		if (toCheck.endsWith(">"))
+		{
+			toCheck = toCheck.substring(0, toCheck.length() - 1);
+		}
+		if (toCheck.startsWith("/") || SELF_CLOSING_TAGS.contains(toCheck))
 		{
 			return null;
 		}
