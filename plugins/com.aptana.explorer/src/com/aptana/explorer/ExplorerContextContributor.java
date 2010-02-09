@@ -12,11 +12,12 @@ import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
+import com.aptana.scripting.model.WorkingDirectoryType;
 
 public class ExplorerContextContributor implements ContextContributor
 {
-	private static final String PROJECT_PROPERTY_NAME = "project";
-	private static final String PROJECT_RUBY_CLASS = "Project";
+	private static final String PROJECT_PROPERTY_NAME = "project"; //$NON-NLS-1$
+	private static final String PROJECT_RUBY_CLASS = "Project"; //$NON-NLS-1$
 
 	/**
 	 * ExplorerContextContributor
@@ -57,6 +58,12 @@ public class ExplorerContextContributor implements ContextContributor
 
 		if (project != null && command != null)
 		{
+			// This contributor is responsible for setting the path for this working dir type
+			if (command.getWorkingDirectoryType().equals(WorkingDirectoryType.CURRENT_PROJECT))
+			{
+				command.setWorkingDirectoryPath(project.getLocation().toOSString());
+			}
+
 			Ruby runtime = command.getRuntime();
 
 			if (runtime != null)

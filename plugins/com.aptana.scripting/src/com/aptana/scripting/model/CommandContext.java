@@ -20,7 +20,6 @@ import com.aptana.scripting.Activator;
 public class CommandContext
 {
 	// Key names for well known keys in the map
-	public static final String WORKING_DIRECTORY = "working_directory"; //$NON-NLS-1$
 	public static final String INPUT_TYPE = "input_type"; //$NON-NLS-1$
 	public static final String INVOKED_VIA = "invoked_via"; //$NON-NLS-1$
 
