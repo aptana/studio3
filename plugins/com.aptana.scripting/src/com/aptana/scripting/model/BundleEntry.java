@@ -119,15 +119,37 @@ public class BundleEntry
 		// fire visibility events
 		if (becameHidden.size() > 0)
 		{
-			BundleEntry hiddenEntry = new BundleEntry(this.getName(), new ArrayList<BundleElement>(becameHidden));
+			List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
 			
+			// set visibility flag
+			for (BundleElement bundle : hiddenList)
+			{
+				bundle.setVisible(false);
+			}
+			
+			// create new entry with these bundle elements. This is needed so the precedence
+			// rules can be applied to this collection
+			BundleEntry hiddenEntry = new BundleEntry(this.getName(), hiddenList);
+			
+			// fire hidden event
 			manager.fireBundleBecameHiddenEvent(hiddenEntry);
 		}
 		
 		if (becameVisible.size() > 0)
 		{
-			BundleEntry visibleEntry = new BundleEntry(this.getName(), new ArrayList<BundleElement>(becameVisible));
+			List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
 			
+			// set visibility flag
+			for (BundleElement bundle : visibleList)
+			{
+				bundle.setVisible(true);
+			}
+			
+			// create new entry with these bundle elements. This is needed so the precedence
+			// rules can be applied to this collection
+			BundleEntry visibleEntry = new BundleEntry(this.getName(), visibleList);
+			
+			// fire visible event
 			manager.fireBundleBecameVisibleEvent(visibleEntry);
 		}
 	}
