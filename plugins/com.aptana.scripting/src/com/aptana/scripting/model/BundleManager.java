@@ -1290,8 +1290,8 @@ public class BundleManager
 
 	private boolean betterMatch(Map.Entry<ScopeSelector, RubyRegexp> entry, String scope, String matchedPattern)
 	{
-		ScopeSelector matchedScope = entry.getKey();
-		if (!matchedScope.matches(scope))
+		ScopeSelector matchedScope = entry.getKey();		
+		if (!matchedScope.matches(ScopeSelector.splitScope(scope)))
 			return false;
 		// FIXME This assumes that the length of the scope selector is the best determination of which one is "most specific" to the scope we're trying to match, which is not necessarily true!
 		if (matchedPattern != null && matchedScope.toString().length() < matchedPattern.length())
