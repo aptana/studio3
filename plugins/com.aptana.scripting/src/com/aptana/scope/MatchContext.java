@@ -59,6 +59,14 @@ public class MatchContext
 	
 	/**
 	 * popCurrentStep
+	 */
+	public void popCurrentStep()
+	{
+		this.popCurrentStep(true);
+	}
+	
+	/**
+	 * popCurrentStep
 	 * 
 	 * @param restore
 	 */

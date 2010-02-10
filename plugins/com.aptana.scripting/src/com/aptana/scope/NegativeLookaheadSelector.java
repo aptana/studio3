@@ -1,14 +1,14 @@
 package com.aptana.scope;
 
-public class AndSelector extends BinarySelector
+public class NegativeLookaheadSelector extends BinarySelector
 {
 	/**
-	 * AndSelector
+	 * NegativeLookaheadSelector
 	 * 
 	 * @param left
 	 * @param right
 	 */
-	public AndSelector(ISelectorNode left, ISelectorNode right)
+	public NegativeLookaheadSelector(ISelectorNode left, ISelectorNode right)
 	{
 		super(left, right);
 	}
@@ -19,17 +19,26 @@ public class AndSelector extends BinarySelector
 	 */
 	public boolean matches(MatchContext context)
 	{
-		boolean result = false;
-		
+		boolean result = true;
+
 		if (context != null && this._left != null && this._right != null)
 		{
 			context.pushCurrentStep();
-			
-			result = this._left.matches(context) && this._right.matches(context);
-			
+
+			result = this._left.matches(context);
+
+			if (result)
+			{
+				context.pushCurrentStep();
+
+				result = (this._right.matches(context) == false);
+
+				context.popCurrentStep();
+			}
+
 			context.popCurrentStep(!result);
 		}
-		
+
 		return result;
 	}
 
@@ -39,6 +48,6 @@ public class AndSelector extends BinarySelector
 	 */
 	protected String getOperator()
 	{
-		return "";
+		return " -";
 	}
 }

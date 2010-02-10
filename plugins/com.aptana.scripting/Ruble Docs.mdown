@@ -157,31 +157,41 @@ Our bundle runtime contains an implementation of scopes that is intended to be [
 
 ### Scope Selectors
 
-A scope selector describes a pattern of scopes and is composed of dotted names, descendant operators, and grouping operators. In its simplest form, the scope selector consists of a single name.
+A scope selector describes a pattern of scopes and is composed of dotted names, descendant operators, grouping operators, and negative lookahead operators. It may be helpful to think of a scope selector as performing the equivalent of a "contains" operation in a string. The pattern described by the scope selector may appear anywhere within the current scope to be considered a match.
 
-#### Example - Simple Name Pattern
+#### Simple Name Pattern
+
+In its simplest form, the scope selector consists of a single name.
 
     text
 
-A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics". A prefix match must end at a dot within the scope or at the end of the scope itself.
+A scope selector needs only to match the prefix of a name to be considered a match. In the above example, the selector will match "text", "text.html", "text.html.ruby"; however, it will not match "texts.physics" since the prefix match must end at a dot within the scope or at the end of the scope itself.
 
-#### Example - Descendant Pattern
+#### Descendant Pattern
+
+A scope may be defined as a hierarchy of scopes. Scope selectors match against that hierarchy much like CSS matches against the HTML DOM. In the following example, the selector will match when the editor's cursor is within Ruby code which is within HTML.
 
     text.html source.ruby
 
-A scope may be defined as a hierarchy of scopes. In this sense, scope selectors match against that hierarchy much like CSS matches against the HTML DOM. In the above example, the selector will match when the editor's cursor is within Ruby code which is within HTML. The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html" and likewise "source.ruby" is a prefix for "source.ruby.embedded.html".
+The same matching rules described in the simple name pattern apply to each dotted name. For instance, the last example will match "text.html.ruby source.ruby.embedded.html" since "text.html" is a prefix for "text.html.ruby" and "source.ruby" is a prefix for "source.ruby.embedded.html".
 
-It is important to note that descendant matching progresses right-to-left. If, in our example, we had defined our selector as simply "source.ruby", then we would not only match the previous case where Ruby was embedded within HTML, but we would also match any cursor location that is within any Ruby source, regardless of nesting.
+#### Group Pattern
 
-#### Example - Group Pattern
+In this next example, our selector defines a list of selectors used for matching.
 
     text.html.ruby, text.html source.ruby
 
-In this example, our selector defines a list of selectors to be used for matching. The comma serves as an OR operator. Specifically, this selector is saying match "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply; however, if an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or once all alternations have been exhausted.
+The comma serves as an OR operator. Specifically, this selector will try to match using "text.html.ruby" OR "text.html source.ruby". All matching rules described previously apply to each alternation. If an alternation fails, matching will restart using the next alternation. Matching ends when either an alternation returns success or once all alternations have been exhausted.
 
-### Menus Scope Selectors
+#### Negative Lookahead Pattern
 
-It is important to note that scope selectors for menus match at any point within a scope. The order of the selectors must be matched; however, this match can start at any point inside the scope. For example, if we have a menu scope of "b c", this will match when the cursor is within any of the following scopes: "a b c d", "b c d", "a b c", "b c", etc. It might help to think of this match as a kind of "contains" match that is commonly used to locate substrings within a string.
+There are times when a scope selector may be too general resulting in commands and snippets being available in contexts where they do not apply. The negative lookahead operator (also referred to as the minus operator) allows the bundle developer to list descendant scopes that should not be present in order for the scope selector to match. For example, the following pattern will match within a scope of "source.ruby.rails" as long as the current context does not contain a string scope.
+
+    source.ruby.rails - string
+
+The minus operator must appear at the end of a simple name pattern, a descendant pattern, or another negative lookahead pattern. When using group patterns, each alternation may have its own negative lookaheads. Each negative lookahead applies to the alternation in which it is defined.
+
+In groups of more than one negative lookahead pattern, the scope selector will require that none of the minus operator patterns follow the preceding pattern. For example, "A B - C - D" indicates that A must contain B, but B cannot contain C nor D.
 
 ## Commands
 
