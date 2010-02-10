@@ -19,7 +19,6 @@ import com.aptana.util.StringUtil;
 public class BundleElement extends AbstractElement
 {
 	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
-
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
 
 	private String _author;
@@ -30,17 +29,18 @@ public class BundleElement extends AbstractElement
 	private String _repository;
 
 	private File _bundleDirectory;
-	private BundleScope _bundleScope;
+	private BundlePrecedence _bundlePrecedence;
 	private List<MenuElement> _menus;
 	private List<CommandElement> _commands;
+	private boolean _visible;
 
 	private Object menuLock = new Object();
 	private Object commandLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
 
-	private Map<ScopeSelector, RubyRegexp> foldingStartMarkers;
-	private Map<ScopeSelector, RubyRegexp> foldingStopMarkers;
+	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
+	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
 
 	/**
 	 * Bundle
@@ -68,7 +68,7 @@ public class BundleElement extends AbstractElement
 		}
 
 		// calculate the bundle scope
-		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
+		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedenceFromPath(path);
 	}
 
 	/**
@@ -126,6 +126,61 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * associateFileType
+	 * 
+	 * @param fileType
+	 */
+	public void associateFileType(String fileType)
+	{
+		// We need to massage the argument into file name or extension and then create a bogus name when we want to see
+		// if there's already a filetype for it!
+		// Check to see if files of this type already have an association
+		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star")); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		if (type == null)
+		{
+			type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
+			
+			try
+			{
+				int assocType = IContentType.FILE_NAME_SPEC;
+				
+				if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
+				{
+					assocType = IContentType.FILE_EXTENSION_SPEC;
+					fileType = fileType.substring(fileType.indexOf('.') + 1);
+				}
+				
+				type.addFileSpec(fileType, assocType);
+			}
+			catch (CoreException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * associateScope
+	 * 
+	 * @param filePattern
+	 * @param scope
+	 */
+	public void associateScope(String filePattern, String scope)
+	{
+		if (filePattern != null && filePattern.length() > 0 && scope != null && scope.length() > 0)
+		{
+			// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
+			if (this._fileTypeRegistry == null)
+			{
+				this._fileTypeRegistry = new HashMap<String, String>();
+			}
+			
+			this._fileTypeRegistry.put(filePattern, scope);
+		}
+	}
+
+	/**
 	 * clear - note that this only clears the bundle properties and not the bundle elements
 	 */
 	public void clearMetadata()
@@ -158,13 +213,13 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getBundleScope
+	 * getBundlePrecedence
 	 * 
 	 * @return
 	 */
-	public BundleScope getBundleScope()
+	public BundlePrecedence getBundlePrecedence()
 	{
-		return this._bundleScope;
+		return this._bundlePrecedence;
 	}
 
 	/**
@@ -225,16 +280,6 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getDescription
-	 * 
-	 * @return
-	 */
-	public String getDescription()
-	{
-		return this._description;
-	}
-
-	/**
 	 * getDefaultName
 	 * 
 	 * @return
@@ -257,6 +302,16 @@ public class BundleElement extends AbstractElement
 		}
 
 		return result;
+	}
+
+	/**
+	 * getDescription
+	 * 
+	 * @return
+	 */
+	public String getDescription()
+	{
+		return this._description;
 	}
 
 	/**
@@ -285,13 +340,43 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getGitRepo
+	 * getFileTypeRegistry
 	 * 
 	 * @return
 	 */
-	public String getRepository()
+	public Map<String, String> getFileTypeRegistry()
 	{
-		return this._repository;
+		return this._fileTypeRegistry;
+	}
+
+	/**
+	 * getFoldingStartMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
+	{
+		if (this._foldingStartMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		
+		return Collections.unmodifiableMap(this._foldingStartMarkers);
+	}
+
+	/**
+	 * getFoldingStopMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
+	{
+		if (this._foldingStopMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		
+		return Collections.unmodifiableMap(this._foldingStopMarkers);
 	}
 
 	/**
@@ -347,6 +432,16 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getGitRepo
+	 * 
+	 * @return
+	 */
+	public String getRepository()
+	{
+		return this._repository;
+	}
+
+	/**
 	 * hasCommands
 	 * 
 	 * @return
@@ -365,7 +460,7 @@ public class BundleElement extends AbstractElement
 
 		return result;
 	}
-
+	
 	/**
 	 * hasMenus
 	 * 
@@ -422,13 +517,23 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * isVisible
+	 * 
+	 * @return
+	 */
+	public boolean isVisible()
+	{
+		return this._visible;
+	}
+
+	/**
 	 * printBody
 	 * 
 	 * @return
 	 */
 	public void printBody(SourcePrinter printer)
 	{
-		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
+		printer.printWithIndent("bundle_precedence: ").println(this._bundlePrecedence.toString()); //$NON-NLS-1$
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
 		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$
@@ -458,6 +563,18 @@ public class BundleElement extends AbstractElement
 				}
 			}
 		}
+	}
+
+	/**
+	 * registerFileType
+	 * 
+	 * @param fileType
+	 * @param scope
+	 */
+	public void registerFileType(String fileType, String scope)
+	{
+		this.associateFileType(fileType);
+		this.associateScope(fileType, scope);
 	}
 
 	/**
@@ -558,92 +675,32 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * setGitRepo
+	 * setFoldingMarkers
 	 * 
-	 * @param gitRepo
+	 * @param scope
+	 * @param startRegexp
+	 * @param endRegexp
 	 */
-	public void setRepository(String gitRepo)
-	{
-		this._repository = gitRepo;
-	}
-
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (foldingStopMarkers == null)
+		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
-			foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-		}
-		if (foldingStartMarkers == null)
-		{
-			foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-		}
-		foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
-		foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
-	}
-
-	public void registerFileType(String fileType, String scope)
-	{
-		associateFileType(fileType);
-		associateScope(fileType, scope);
-	}
-
-	public void associateScope(String filePattern, String scope)
-	{
-		// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
-		if (_fileTypeRegistry == null)
-		{
-			_fileTypeRegistry = new HashMap<String, String>();
-		}
-		getFileTypeRegistry().put(filePattern, scope);
-	}
-
-	public void associateFileType(String fileType)
-	{
-		// We need to massage the argument into file name or extension and then create a bogus name when we want to see
-		// if there's already a filetype for it!
-		// Check to see if files of this type already have an association
-		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star")); //$NON-NLS-1$ //$NON-NLS-2$
-		if (type != null)
-			return;
-		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
-		try
-		{
-			int assocType = IContentType.FILE_NAME_SPEC;
-			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
+			// store starting regular expression
+			if (this._foldingStartMarkers == null)
 			{
-				assocType = IContentType.FILE_EXTENSION_SPEC;
-				fileType = fileType.substring(fileType.indexOf('.') + 1);
+				this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 			}
-			type.addFileSpec(fileType, assocType);
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-	}
-
-	public void unassociateFileType(String fileType)
-	{
-		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
-		try
-		{
-			int assocType = IContentType.FILE_NAME_SPEC;
-			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
+			
+			this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
+			
+			// store ending regular expression
+			if (this._foldingStopMarkers == null)
 			{
-				assocType = IContentType.FILE_EXTENSION_SPEC;
-				fileType = fileType.substring(fileType.indexOf('.') + 1);
+				this._foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
 			}
-			type.removeFileSpec(fileType, assocType);
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
-	}
 
-	public Map<String, String> getFileTypeRegistry()
-	{
-		return _fileTypeRegistry;
+			this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+		}
 	}
 
 	/**
@@ -666,21 +723,50 @@ public class BundleElement extends AbstractElement
 		this._licenseUrl = licenseUrl;
 	}
 
-	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
+	/**
+	 * setGitRepo
+	 * 
+	 * @param gitRepo
+	 */
+	public void setRepository(String gitRepo)
 	{
-		if (foldingStartMarkers == null)
-		{
-			return Collections.emptyMap();
-		}
-		return Collections.unmodifiableMap(foldingStartMarkers);
+		this._repository = gitRepo;
 	}
 
-	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
+	/**
+	 * setVisible
+	 * 
+	 * @param flag
+	 */
+	public void setVisible(boolean flag)
 	{
-		if (foldingStopMarkers == null)
+		this._visible = flag;
+	}
+	
+	/**
+	 * unassociateFileType
+	 * 
+	 * @param fileType
+	 */
+	public void unassociateFileType(String fileType)
+	{
+		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
+		
+		try
 		{
-			return Collections.emptyMap();
+			int assocType = IContentType.FILE_NAME_SPEC;
+			
+			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
+			{
+				assocType = IContentType.FILE_EXTENSION_SPEC;
+				fileType = fileType.substring(fileType.indexOf('.') + 1);
+			}
+			
+			type.removeFileSpec(fileType, assocType);
 		}
-		return Collections.unmodifiableMap(foldingStopMarkers);
+		catch (CoreException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
 	}
 }

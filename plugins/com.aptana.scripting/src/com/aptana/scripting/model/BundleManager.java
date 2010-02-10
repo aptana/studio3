@@ -54,6 +54,7 @@ public class BundleManager
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
 
+	private List<BundleChangeListener> _bundleListeners;
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
 
@@ -185,8 +186,24 @@ public class BundleManager
 					entry.addBundle(bundle);
 				}
 			}
-
-			this.fireBundleAddedEvent(bundle);
+		}
+	}
+	
+	/**
+	 * addBundleChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void addBundleChangeListener(BundleChangeListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._bundleListeners == null)
+			{
+				this._bundleListeners = new ArrayList<BundleChangeListener>();
+			}
+			
+			this._bundleListeners.add(listener);
 		}
 	}
 
@@ -233,15 +250,47 @@ public class BundleManager
 	 */
 	void fireBundleAddedEvent(BundleElement bundle)
 	{
-		if (this._elementListeners != null && bundle != null)
+		if (this._bundleListeners != null && bundle != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.bundleAdded(bundle);
+				listener.added(bundle);
 			}
 		}
 	}
-
+	
+	/**
+	 * fireBundleBecameHiddenEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleBecameHiddenEvent(BundleEntry entry)
+	{
+		if (this._bundleListeners != null && entry != null)
+		{
+			for (BundleChangeListener listener : this._bundleListeners)
+			{
+				listener.becameHidden(entry);
+			}
+		}
+	}
+	
+	/**
+	 * fireBundleBecameVisibleEvent
+	 * 
+	 * @param bundle
+	 */
+	void fireBundleBecameVisibleEvent(BundleEntry entry)
+	{
+		if (this._bundleListeners != null && entry != null)
+		{
+			for (BundleChangeListener listener : this._bundleListeners)
+			{
+				listener.becameVisible(entry);
+			}
+		}
+	}
+	
 	/**
 	 * fireBundleDeletedEvent
 	 * 
@@ -249,15 +298,15 @@ public class BundleManager
 	 */
 	void fireBundleDeletedEvent(BundleElement bundle)
 	{
-		if (this._elementListeners != null && bundle != null)
+		if (this._bundleListeners != null && bundle != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (BundleChangeListener listener : this._bundleListeners)
 			{
-				listener.bundleDeleted(bundle);
+				listener.deleted(bundle);
 			}
 		}
 	}
-
+	
 	/**
 	 * fireElementAddedEvent
 	 * 
@@ -644,14 +693,14 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleScopeFromPath
+	 * getBundlePrecedenceFromPath
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundleScope getBundleScopeFromPath(File path)
+	public BundlePrecedence getBundlePrecedenceFromPath(File path)
 	{
-		return this.getBundleScopeFromPath(path.getAbsolutePath());
+		return this.getBundlePrecedenceFromPath(path.getAbsolutePath());
 	}
 
 	/**
@@ -660,19 +709,19 @@ public class BundleManager
 	 * @param path
 	 * @return
 	 */
-	public BundleScope getBundleScopeFromPath(String path)
+	public BundlePrecedence getBundlePrecedenceFromPath(String path)
 	{
-		BundleScope result = BundleScope.PROJECT;
+		BundlePrecedence result = BundlePrecedence.PROJECT;
 
 		if (path != null)
 		{
 			if (path.startsWith(this.applicationBundlesPath))
 			{
-				result = BundleScope.APPLICATION;
+				result = BundlePrecedence.APPLICATION;
 			}
 			else if (path.startsWith(this.userBundlesPath))
 			{
-				result = BundleScope.USER;
+				result = BundlePrecedence.USER;
 			}
 		}
 
@@ -1120,8 +1169,6 @@ public class BundleManager
 			}
 
 			AbstractElement.unregisterElement(bundle);
-
-			this.fireBundleDeletedEvent(bundle);
 		}
 	}
 

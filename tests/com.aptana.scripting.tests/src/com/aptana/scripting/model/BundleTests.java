@@ -7,22 +7,22 @@ public class BundleTests extends BundleTestBase
 	 * compareScopedBundles
 	 * 
 	 * @param bundleName
-	 * @param scope1
-	 * @param scope2
+	 * @param prec1
+	 * @param prec2
 	 * @param command1
 	 * @param command2
 	 */
-	private void compareScopedBundles(String bundleName, BundleScope scope1, BundleScope scope2, String command1, String command2)
+	private void compareScopedBundles(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2, String command1, String command2)
 	{
 		// confirm first bundle loaded properly
-		BundleEntry entry = this.getBundleEntry(bundleName, scope1);
+		BundleEntry entry = this.getBundleEntry(bundleName, prec1);
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals(command1, commands[0].getInvoke());
 		
 		// confirm second bundle overrides application
-		entry = this.getBundleEntry(bundleName, scope2);
+		entry = this.getBundleEntry(bundleName, prec2);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -33,14 +33,14 @@ public class BundleTests extends BundleTestBase
 	 * compareScopedBundlesWithDelete
 	 * 
 	 * @param bundleName
-	 * @param scope1
-	 * @param scope2
+	 * @param prec1
+	 * @param prec2
 	 * @param command1
 	 * @param command2
 	 */
-	private void compareScopedBundlesWithDelete(String bundleName, BundleScope scope1, BundleScope scope2, String command1, String command2)
+	private void compareScopedBundlesWithDelete(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2, String command1, String command2)
 	{
-		this.compareScopedBundles(bundleName, scope1, scope2, command1, command2);
+		this.compareScopedBundles(bundleName, prec1, prec2, command1, command2);
 		
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		BundleElement[] bundles = entry.getBundles();
@@ -69,7 +69,7 @@ public class BundleTests extends BundleTestBase
 	public void testLoadLoneBundle()
 	{
 		String bundleName = "loneBundle";
-		BundleElement bundle = this.loadBundle(bundleName, BundleScope.APPLICATION);
+		BundleElement bundle = this.loadBundle(bundleName, BundlePrecedence.APPLICATION);
 		
 		assertNotNull(bundle);
 		assertEquals(bundleName, bundle.getDisplayName());
@@ -81,7 +81,7 @@ public class BundleTests extends BundleTestBase
 	public void testLoadBundleWithCommand()
 	{
 		String bundleName = "bundleWithCommand";
-		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		CommandElement[] commands = entry.getCommands();
 		
 		assertNotNull(commands);
@@ -94,7 +94,7 @@ public class BundleTests extends BundleTestBase
 	public void testLoadBundleWithMenu()
 	{
 		String bundleName = "bundleWithMenu";
-		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		MenuElement[] menus = entry.getMenus();
 		
 		assertNotNull(menus);
@@ -107,7 +107,7 @@ public class BundleTests extends BundleTestBase
 	public void testLoadBundleWithSnippet()
 	{
 		String bundleName = "bundleWithSnippet";
-		BundleEntry entry = this.getBundleEntry(bundleName, BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		CommandElement[] snippets = entry.getCommands();
 		
 		assertNotNull(snippets);
@@ -122,8 +122,8 @@ public class BundleTests extends BundleTestBase
 	{
 		compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.APPLICATION,
-			BundleScope.USER,
+			BundlePrecedence.APPLICATION,
+			BundlePrecedence.USER,
 			"cd",
 			"cd .."
 		);
@@ -136,8 +136,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.USER,
-			BundleScope.APPLICATION,
+			BundlePrecedence.USER,
+			BundlePrecedence.APPLICATION,
 			"cd ..",
 			"cd .."
 		);
@@ -150,8 +150,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.APPLICATION,
-			BundleScope.PROJECT,
+			BundlePrecedence.APPLICATION,
+			BundlePrecedence.PROJECT,
 			"cd",
 			"cd /"
 		);
@@ -164,8 +164,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.PROJECT,
-			BundleScope.APPLICATION,
+			BundlePrecedence.PROJECT,
+			BundlePrecedence.APPLICATION,
 			"cd /",
 			"cd /"
 		);
@@ -178,8 +178,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.USER,
-			BundleScope.PROJECT,
+			BundlePrecedence.USER,
+			BundlePrecedence.PROJECT,
 			"cd ..",
 			"cd /"
 		);
@@ -192,8 +192,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(
 			"bundleWithCommand",
-			BundleScope.PROJECT,
-			BundleScope.USER,
+			BundlePrecedence.PROJECT,
+			BundlePrecedence.USER,
 			"cd /",
 			"cd /"
 		);
@@ -206,8 +206,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundlesWithDelete(
 			"bundleWithCommand",
-			BundleScope.APPLICATION,
-			BundleScope.USER,
+			BundlePrecedence.APPLICATION,
+			BundlePrecedence.USER,
 			"cd",
 			"cd .."
 		);
@@ -220,8 +220,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundlesWithDelete(
 			"bundleWithCommand",
-			BundleScope.APPLICATION,
-			BundleScope.PROJECT,
+			BundlePrecedence.APPLICATION,
+			BundlePrecedence.PROJECT,
 			"cd",
 			"cd /"
 		);
@@ -234,8 +234,8 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundlesWithDelete(
 			"bundleWithCommand",
-			BundleScope.USER,
-			BundleScope.PROJECT,
+			BundlePrecedence.USER,
+			BundlePrecedence.PROJECT,
 			"cd ..",
 			"cd /"
 		);
@@ -247,14 +247,14 @@ public class BundleTests extends BundleTestBase
 	public void testSamePrecedenceOverride()
 	{
 		// confirm first bundle loaded properly
-		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.USER);
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals("cd ..", commands[0].getInvoke());
 		
 		// confirm second bundle overrides application
-		this.loadBundleEntry("bundleWithSameCommand", BundleScope.USER);
+		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -267,7 +267,7 @@ public class BundleTests extends BundleTestBase
 	public void testSamePrecedenceOverride2()
 	{
 		// confirm first bundle loaded properly
-		this.loadBundleEntry("bundleWithSameCommand", BundleScope.USER);
+		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
@@ -275,7 +275,7 @@ public class BundleTests extends BundleTestBase
 		assertEquals("cd", commands[0].getInvoke());
 		
 		// confirm second bundle overrides application
-		this.loadBundleEntry("bundleWithCommand", BundleScope.USER);
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -289,14 +289,14 @@ public class BundleTests extends BundleTestBase
 	public void testSamePrecedenceAugmentation()
 	{
 		// confirm first bundle loaded properly
-		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.USER);
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals("cd ..", commands[0].getInvoke());
 		
 		// confirm second bundle overrides application
-		this.loadBundleEntry("bundleWithDifferentCommand", BundleScope.USER);
+		this.loadBundleEntry("bundleWithDifferentCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(2, commands.length);
@@ -323,7 +323,7 @@ public class BundleTests extends BundleTestBase
 	{
 		// load bundle
 		String bundleName = "bundleName";
-		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 		
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
@@ -336,7 +336,7 @@ public class BundleTests extends BundleTestBase
 	public void testNameFromBundleDirectoryWithExtension()
 	{
 		// load bundle
-		this.loadBundleEntry("bundleNameWithExtension.ruble", BundleScope.PROJECT);
+		this.loadBundleEntry("bundleNameWithExtension.ruble", BundlePrecedence.PROJECT);
 		
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");
@@ -349,7 +349,7 @@ public class BundleTests extends BundleTestBase
 	public void testBundleIsBundleDeclaration()
 	{
 		String bundleName = "bundleDefinition";
-		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 		
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
@@ -366,7 +366,7 @@ public class BundleTests extends BundleTestBase
 	public void testBundleIsBundleDeclaration2()
 	{
 		String bundleName = "bundleDefinition2";
-		this.loadBundleEntry(bundleName, BundleScope.PROJECT);
+		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 		
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
@@ -382,7 +382,7 @@ public class BundleTests extends BundleTestBase
 	 */
 	public void testBundleIsBundleReference()
 	{
-		this.loadBundleEntry("bundleReference", BundleScope.PROJECT);
+		this.loadBundleEntry("bundleReference", BundlePrecedence.PROJECT);
 		
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("MyBundle");
 		assertNotNull(entry);
@@ -395,9 +395,9 @@ public class BundleTests extends BundleTestBase
 	
 	public void testReferenceLoadingAcrossPrecendenceBounds()
 	{
-		this.loadBundleEntry("bundleWithCommand", BundleScope.APPLICATION);
-		this.loadBundleEntry("bundleWithCommandReference", BundleScope.APPLICATION);
-		this.loadBundleEntry("bundleWithCommandReference", BundleScope.PROJECT);
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.PROJECT);
 		
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);

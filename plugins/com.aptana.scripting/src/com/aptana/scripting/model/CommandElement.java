@@ -117,7 +117,7 @@ public class CommandElement extends AbstractBundleElement
 			{
 				try
 				{
-					job.run("Execute '" + this.getDisplayName() + "'", this._runType, async);
+					job.run("Execute '" + this.getDisplayName() + "'", this._runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				catch (InterruptedException e)
 				{
