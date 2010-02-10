@@ -21,7 +21,7 @@ public class BundleEntry
 	{
 		public int compare(BundleElement o1, BundleElement o2)
 		{
-			int result = o1.getBundleScope().compareTo(o2.getBundleScope());
+			int result = o1.getBundlePrecedence().compareTo(o2.getBundlePrecedence());
 
 			if (result == 0)
 			{
@@ -153,28 +153,6 @@ public class BundleEntry
 			// fire visible event
 			manager.fireBundleBecameVisibleEvent(visibleEntry);
 		}
-	}
-
-	/**
-	 * getActiveScope
-	 * 
-	 * @return
-	 */
-	public BundleScope getActiveScope()
-	{
-		BundleScope result = BundleScope.UNKNOWN;
-
-		synchronized (this._bundles)
-		{
-			int size = this._bundles.size();
-
-			if (size > 0)
-			{
-				result = this._bundles.get(size - 1).getBundleScope();
-			}
-		}
-
-		return result;
 	}
 
 	/**

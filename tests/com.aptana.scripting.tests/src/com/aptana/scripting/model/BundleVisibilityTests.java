@@ -50,7 +50,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testAddedBundle()
 	{
-		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
 		
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);
@@ -66,7 +66,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testDeleteBundle()
 	{
-		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
 		
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);
@@ -88,7 +88,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testVisibleWhenAdded()
 	{
-		this.loadBundle("bundleWithCommand", BundleScope.APPLICATION);
+		this.loadBundle("bundleWithCommand", BundlePrecedence.APPLICATION);
 		
 		List<BundleEntry> visible = this._bundleListener._visibleEntries;
 		assertEquals(1, visible.size());
@@ -107,7 +107,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testHiddenWhenDeleted()
 	{
-		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundleScope.APPLICATION);
+		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
 		
 		List<BundleElement> added = this._bundleListener._addedBundles;
 		assertEquals(1, added.size());

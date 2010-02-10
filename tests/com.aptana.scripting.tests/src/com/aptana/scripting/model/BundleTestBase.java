@@ -55,12 +55,12 @@ public abstract class BundleTestBase extends TestCase
 	 * getBundleEntry
 	 * 
 	 * @param bundleName
-	 * @param scope
+	 * @param precedence
 	 * @return
 	 */
-	protected BundleEntry getBundleEntry(String bundleName, BundleScope scope)
+	protected BundleEntry getBundleEntry(String bundleName, BundlePrecedence precedence)
 	{
-		this.loadBundleEntry(bundleName, scope);
+		this.loadBundleEntry(bundleName, precedence);
 		
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
@@ -73,12 +73,12 @@ public abstract class BundleTestBase extends TestCase
 	 * loadBundle
 	 * 
 	 * @param bundleName
-	 * @param scope
+	 * @param precedence
 	 * @return
 	 */
-	protected BundleElement loadBundle(String bundleName, BundleScope scope)
+	protected BundleElement loadBundle(String bundleName, BundlePrecedence precedence)
 	{
-		BundleEntry entry = this.getBundleEntry(bundleName, scope);
+		BundleEntry entry = this.getBundleEntry(bundleName, precedence);
 		
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);
@@ -90,15 +90,15 @@ public abstract class BundleTestBase extends TestCase
 	 * loadBundleEntry
 	 * 
 	 * @param bundleName
-	 * @param scope
+	 * @param precedence
 	 */
-	protected void loadBundleEntry(String bundleName, BundleScope scope)
+	protected void loadBundleEntry(String bundleName, BundlePrecedence precedence)
 	{
 		BundleManager manager = BundleManager.getInstance(APPLICATION_BUNDLES, USER_BUNDLES);
 		String baseDirectory = null;
 		
 		// make sure we have a test bundle
-		switch (scope)
+		switch (precedence)
 		{
 			case APPLICATION:
 				baseDirectory = APPLICATION_BUNDLES;
@@ -113,7 +113,7 @@ public abstract class BundleTestBase extends TestCase
 				break;
 				
 			default:
-				fail("Unrecognized bundle scope: " + scope);
+				fail("Unrecognized bundle scope: " + precedence);
 		}
 		
 		File bundleFile = new File(baseDirectory + File.separator + bundleName);

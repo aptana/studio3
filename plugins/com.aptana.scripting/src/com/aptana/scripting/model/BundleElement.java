@@ -29,7 +29,7 @@ public class BundleElement extends AbstractElement
 	private String _repository;
 
 	private File _bundleDirectory;
-	private BundleScope _bundleScope;
+	private BundlePrecedence _bundlePrecedence;
 	private List<MenuElement> _menus;
 	private List<CommandElement> _commands;
 	private boolean _visible;
@@ -68,7 +68,7 @@ public class BundleElement extends AbstractElement
 		}
 
 		// calculate the bundle scope
-		this._bundleScope = BundleManager.getInstance().getBundleScopeFromPath(path);
+		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedenceFromPath(path);
 	}
 
 	/**
@@ -213,13 +213,13 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getBundleScope
+	 * getBundlePrecedence
 	 * 
 	 * @return
 	 */
-	public BundleScope getBundleScope()
+	public BundlePrecedence getBundlePrecedence()
 	{
-		return this._bundleScope;
+		return this._bundlePrecedence;
 	}
 
 	/**
@@ -533,7 +533,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void printBody(SourcePrinter printer)
 	{
-		printer.printWithIndent("bundle_scope: ").println(this._bundleScope.toString()); //$NON-NLS-1$
+		printer.printWithIndent("bundle_precedence: ").println(this._bundlePrecedence.toString()); //$NON-NLS-1$
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("author: ").println(this._author); //$NON-NLS-1$
 		printer.printWithIndent("copyright: ").println(this._copyright); //$NON-NLS-1$

@@ -2,7 +2,7 @@ package com.aptana.scripting.model;
 
 import java.util.Comparator;
 
-public enum BundleScope implements Comparator<BundleScope>
+public enum BundlePrecedence implements Comparator<BundlePrecedence>
 {
 	UNKNOWN(0),
 	APPLICATION(1),
@@ -16,7 +16,7 @@ public enum BundleScope implements Comparator<BundleScope>
 	 * 
 	 * @param value
 	 */
-	private BundleScope(int value)
+	private BundlePrecedence(int value)
 	{
 		this._index = value;
 	}
@@ -24,7 +24,7 @@ public enum BundleScope implements Comparator<BundleScope>
 	/**
 	 * compare
 	 */
-	public int compare(BundleScope o1, BundleScope o2)
+	public int compare(BundlePrecedence o1, BundlePrecedence o2)
 	{
 		return o1._index - o2._index;
  	}

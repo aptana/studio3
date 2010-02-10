@@ -693,14 +693,14 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleScopeFromPath
+	 * getBundlePrecedenceFromPath
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundleScope getBundleScopeFromPath(File path)
+	public BundlePrecedence getBundlePrecedenceFromPath(File path)
 	{
-		return this.getBundleScopeFromPath(path.getAbsolutePath());
+		return this.getBundlePrecedenceFromPath(path.getAbsolutePath());
 	}
 
 	/**
@@ -709,19 +709,19 @@ public class BundleManager
 	 * @param path
 	 * @return
 	 */
-	public BundleScope getBundleScopeFromPath(String path)
+	public BundlePrecedence getBundlePrecedenceFromPath(String path)
 	{
-		BundleScope result = BundleScope.PROJECT;
+		BundlePrecedence result = BundlePrecedence.PROJECT;
 
 		if (path != null)
 		{
 			if (path.startsWith(this.applicationBundlesPath))
 			{
-				result = BundleScope.APPLICATION;
+				result = BundlePrecedence.APPLICATION;
 			}
 			else if (path.startsWith(this.userBundlesPath))
 			{
-				result = BundleScope.USER;
+				result = BundlePrecedence.USER;
 			}
 		}
 

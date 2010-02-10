@@ -11,7 +11,7 @@ public class CommandTests extends BundleTestBase
 	 */
 	protected String executeCommand(String bundleName, String commandName)
 	{
-		BundleElement bundle = this.loadBundle(bundleName, BundleScope.PROJECT);
+		BundleElement bundle = this.loadBundle(bundleName, BundlePrecedence.PROJECT);
 
 		// get command
 		CommandElement command = bundle.getCommandByName(commandName);

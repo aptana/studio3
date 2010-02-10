@@ -10,7 +10,7 @@ public class FilterTests extends BundleTestBase
 	{
 		super.setUp();
 		
-		this.loadBundleEntry("modelFilters", BundleScope.PROJECT);
+		this.loadBundleEntry("modelFilters", BundlePrecedence.PROJECT);
 	}
 
 	/**
