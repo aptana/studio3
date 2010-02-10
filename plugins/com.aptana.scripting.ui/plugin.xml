@@ -51,7 +51,7 @@
    <extension
          point="org.eclipse.ui.startup">
       <startup
-            class="com.aptana.scripting.ui.EarlyStartup">
+            class="com.aptana.scripting.ui.ScriptingConsole">
       </startup>
    </extension>
    <extension
@@ -67,5 +67,13 @@
             name="RadRails Framework Directory"
             path="framework/">
       </loadPath>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.scripting.ui.ScriptingConsole"
+            id="com.aptana.scripting.ui.consolePageParticipant">
+         <enablement></enablement>
+      </consolePageParticipant>
    </extension>
 </plugin>
