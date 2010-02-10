@@ -2,7 +2,7 @@ package com.aptana.editor.ruby.parsing;
 
 import com.aptana.editor.ruby.core.IRubyMethod.Visibility;
 
-public interface ISourceElementRequestor
+interface ISourceElementRequestor
 {
 
 	public static class TypeInfo
