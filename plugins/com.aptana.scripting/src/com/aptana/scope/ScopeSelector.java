@@ -123,7 +123,7 @@ public class ScopeSelector
 				}
 				
 				// restore position where we started and move forward one
-				context.popCurrentStep(true);
+				context.popCurrentStep();
 				context.advance();
 			}
 		}
