@@ -40,6 +40,10 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
+import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
+import com.aptana.editor.ruby.parsing.RubyParser;
 
 @SuppressWarnings("restriction")
 public class RubySourceEditor extends AbstractThemeableEditor
@@ -59,10 +63,22 @@ public class RubySourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new RubyDocumentProvider());
+		
+		getFileService().setParser(new RubyParser());
 	}
 
 	protected char[] getPairMatchingCharacters()
 	{
 		return PAIR_MATCHING_CHARS;
+	}
+
+	@Override
+	protected CommonOutlinePage getOutlinePage()
+	{
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new RubyOutlineContentProvider());
+		outline.setLabelProvider(new RubyOutlineLabelProvider());
+
+		return outline;
 	}
 }
