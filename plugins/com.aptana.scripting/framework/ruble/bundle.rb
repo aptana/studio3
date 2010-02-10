@@ -128,8 +128,43 @@ module Ruble
       @jobj.associateScope(file_type, scope.to_s.gsub(/_/, '.'))
     end
     
+    # A proxy class to make syntax pretty...
+    class FoldingProxy
+      def initialize(jobj)
+        @jobj = jobj
+      end
+      
+      def []=(scope, array)
+        raise "Need two regexp to define folding" if array.size != 2
+        @jobj.setFoldingMarkers(scope.to_s.gsub(/_/, '.'), array.first, array.last)
+      end
+    end    
+    
+    def folding
+      # return an object that responds to hash methods
+      FoldingProxy.new(@jobj)
+    end
+    
+    # TODO Deprecate
     def set_folding_markers(scope, start_regexp, end_regexp)
-      @jobj.setFoldingMarkers(scope.to_s.gsub(/_/, '.'), start_regexp, end_regexp)
+      folding[scope] = start_regexp, end_regexp
+    end
+    
+    # A proxy class to make syntax pretty...
+    class IndentProxy
+      def initialize(jobj)
+        @jobj = jobj
+      end
+      
+      def []=(scope, array)
+        raise "Need two regexp to define indent" if array.size != 2
+        @jobj.setIndentMarkers(scope.to_s.gsub(/_/, '.'), array.first, array.last)
+      end
+    end    
+    
+    def indent
+      # return an object that responds to hash methods
+      IndentProxy.new(@jobj)
     end
     
     def to_env

@@ -1,7 +1,5 @@
 package com.aptana.explorer.internal.ui;
 
-import java.text.MessageFormat;
-
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -19,10 +17,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -79,8 +74,6 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.terminal.server.TerminalServer;
-import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.views.TerminalView;
 
 /**
@@ -170,22 +163,12 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		// Run (script/server in terminal)
-		commandsMenuManager.add(new ActionContributionItem(new Action(Messages.SingleProjectView_RunMenuTitle,
-				IAction.AS_PUSH_BUTTON)
-		{
-			@Override
-			public void run()
-			{
-				TerminalView tv = TerminalView.open(selectedProject.getName(), MessageFormat.format(
-						Messages.SingleProjectView_Run_TerminalTitle, selectedProject.getName()), selectedProject
-						.getLocation().toOSString());
-				if (tv == null)
-					return;
-				ProcessWrapper wrapper = TerminalServer.getInstance().getProcess(tv.getId());
-				wrapper.sendText("script/server\n"); //$NON-NLS-1$
-			}
-		}));
+		// Run script/server
+		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
+				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
+				SWT.PUSH);
+		commandsMenuManager.add(new CommandContributionItem(runScriptServer));
+
 		// Run Last launched
 		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$

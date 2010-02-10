@@ -306,6 +306,60 @@ public class BundleEntry
 
 		return result;
 	}
+	
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getDecreaseIndentMarkers();
+				
+				if (registry != null)
+				{
+					result.putAll(registry);
+				}
+				
+				return true;
+			}
+		});
+
+		return result;
+	}
+
+	/**
+	 * getIncreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getIncreaseIndentMarkers()
+	{
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getIncreaseIndentMarkers();
+				
+				if (registry != null)
+				{
+					result.putAll(registry);
+				}
+				
+				return true;
+			}
+		});
+
+		return result;
+	}
 
 	/**
 	 * geMenus
