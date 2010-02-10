@@ -66,8 +66,8 @@ import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.information.CommonInformationProvider;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
@@ -88,7 +88,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IAutoEditStrategy[] { new CommonAutoIndentStrategy(contentType, this, sourceViewer) };
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 
 	@Override

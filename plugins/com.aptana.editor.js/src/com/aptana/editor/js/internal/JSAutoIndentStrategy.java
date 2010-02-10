@@ -43,6 +43,10 @@ import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.editor.js.preferences.PreferenceInitializer;
 
+/**
+ * @deprecated
+ **/
+//TODO Remove now that it's not used
 public class JSAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 {
 

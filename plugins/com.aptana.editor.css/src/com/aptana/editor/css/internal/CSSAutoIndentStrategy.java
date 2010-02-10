@@ -5,6 +5,10 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 import com.aptana.editor.common.text.AbstractRegexpAutoIndentStrategy;
 
+/**
+ * @deprecated
+ **/
+//TODO Remove now that it's not used
 public class CSSAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 {
 

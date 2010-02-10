@@ -41,6 +41,9 @@ public class BundleElement extends AbstractElement
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
+	
+	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
+	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
 
 	/**
 	 * Bundle
@@ -378,6 +381,36 @@ public class BundleElement extends AbstractElement
 		
 		return Collections.unmodifiableMap(this._foldingStopMarkers);
 	}
+	
+	/**
+	 * getFoldingStartMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getIncreaseIndentMarkers()
+	{
+		if (this._increaseIndentMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		
+		return Collections.unmodifiableMap(this._increaseIndentMarkers);
+	}
+
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		if (this._decreaseIndentMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+		
+		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
+	}
 
 	/**
 	 * getLicense
@@ -700,6 +733,35 @@ public class BundleElement extends AbstractElement
 			}
 
 			this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+		}
+	}
+	
+	/**
+	 * setIndentMarkers
+	 * 
+	 * @param scope
+	 * @param startRegexp
+	 * @param endRegexp
+	 */
+	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
+	{
+		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		{
+			// store increasing regular expression
+			if (this._increaseIndentMarkers == null)
+			{
+				this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+			}
+			
+			this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
+			
+			// store decreasing regular expression
+			if (this._decreaseIndentMarkers == null)
+			{
+				this._decreaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+			}
+
+			this._decreaseIndentMarkers.put(new ScopeSelector(scope), endRegexp);
 		}
 	}
 
