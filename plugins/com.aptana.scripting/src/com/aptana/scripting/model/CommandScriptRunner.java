@@ -25,7 +25,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	public CommandScriptRunner(CommandElement command, CommandContext context)
 	{
-		super("Execute Command Script", command, context, null);
+		super("Execute Command Script", command, context, null); //$NON-NLS-1$
 	}
 
 	/**
