@@ -99,6 +99,8 @@ public class CommitDialog extends StatusDialog
 		createDiffArea(container);
 
 		SashForm sashForm = new SashForm(container, SWT.HORIZONTAL);
+		// Make it fill grid, so when we resize it still does...
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		sashForm.setLayout(new FillLayout());
 
 		createUnstagedFileArea(sashForm);
