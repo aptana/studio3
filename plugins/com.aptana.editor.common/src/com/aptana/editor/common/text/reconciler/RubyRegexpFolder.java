@@ -77,10 +77,14 @@ class RubyRegexpFolder
 					if (!endMatcher.isNil())
 					{
 						int startingOffset = starts.remove(indent);
-						int end = lineRegion.getOffset() + lineRegion.getLength(); // cheat and just use end of line
+						int end = lineRegion.getOffset() + lineRegion.getLength() + 1; // cheat and just use end of line
+						if (end > fDocument.getLength())
+						{
+							end = fDocument.getLength();
+						}
 						int posLength = end - startingOffset;
 						if (posLength > 0)
-						{
+						{							
 							Position position = new Position(startingOffset, posLength);
 							positions.add(position);
 						}

@@ -35,7 +35,6 @@
 package com.aptana.editor.html;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -45,12 +44,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
-import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.js.JSSourceConfiguration;
-import com.aptana.editor.js.internal.JSAutoIndentStrategy;
-import com.aptana.editor.js.internal.JSCommentIndentStrategy;
-import com.aptana.editor.js.internal.JSDocIndentStrategy;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -95,38 +89,5 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
-	}
-
-	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
-	{
-		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
-		{
-
-			if (contentType.equals(JSSourceConfiguration.JS_SINGLELINE_COMMENT)
-					|| contentType.equals(JSSourceConfiguration.JS_MULTILINE_COMMENT))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new JSCommentIndentStrategy(partitioning, contentType, this,
-						sourceViewer) };
-			}
-			if (contentType.equals(JSSourceConfiguration.JS_DOC))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new JSDocIndentStrategy(partitioning, contentType, this, sourceViewer) };
-			}
-			return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer) };
-		}
-		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
-		{
-			if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this,
-						sourceViewer) };
-			}
-			return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
-		}
-		return new IAutoEditStrategy[] { new HTMLAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 }

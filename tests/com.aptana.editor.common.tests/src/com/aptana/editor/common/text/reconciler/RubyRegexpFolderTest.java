@@ -36,7 +36,7 @@ public class RubyRegexpFolderTest extends TestCase
 	public void testBasicCSSFolding() throws Exception
 	{
 		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
-				+ "\n" + ".one-liner { color: orange; }\n" + "\n" + "#id { \n" + "	font-family: monospace;\n" + "}\n";
+				+ "\n" + ".one-liner { color: orange; }\n" + "\n" + "#id { \n" + "	font-family: monospace;\n" + "}";
 		IDocument document = new Document(src);
 		List<Position> positions = new ArrayList<Position>();
 		RubyRegexpFolder folder = new RubyRegexpFolder(document)
@@ -61,8 +61,8 @@ public class RubyRegexpFolderTest extends TestCase
 		};
 		positions = folder.emitFoldingRegions(positions, new NullProgressMonitor());
 		assertEquals(3, positions.size());
-		assertEquals(new Position(0, 21), positions.get(0));
-		assertEquals(new Position(23, 35), positions.get(1));
-		assertEquals(new Position(91, 33), positions.get(2));
+		assertEquals(new Position(0, 22), positions.get(0)); // eats whole line at end
+		assertEquals(new Position(23, 36), positions.get(1)); // eats whole line at end
+		assertEquals(new Position(91, 33), positions.get(2)); // only can go so far as EOF
 	}
 }

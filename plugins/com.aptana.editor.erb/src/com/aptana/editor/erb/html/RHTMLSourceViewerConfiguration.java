@@ -36,8 +36,6 @@
 package com.aptana.editor.erb.html;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IAutoEditStrategy;
-import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -46,22 +44,13 @@ import com.aptana.editor.common.IPartitionerSwitchStrategy;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
-import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
-import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.erb.ERBPartitionerSwitchStrategy;
 import com.aptana.editor.erb.IERBConstants;
-import com.aptana.editor.html.HTMLAutoIndentStrategy;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.js.IJSConstants;
-import com.aptana.editor.js.JSSourceConfiguration;
-import com.aptana.editor.js.internal.JSAutoIndentStrategy;
-import com.aptana.editor.js.internal.JSCommentIndentStrategy;
-import com.aptana.editor.js.internal.JSDocIndentStrategy;
 import com.aptana.editor.ruby.IRubyConstants;
-import com.aptana.editor.ruby.RubyAutoIndentStrategy;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
@@ -123,42 +112,5 @@ public class RHTMLSourceViewerConfiguration extends CompositeSourceViewerConfigu
 	protected String getStartEndTokenType()
 	{
 		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
-	}
-
-	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
-	{
-		// Return correct strategy based on HTML/CSS/JS/Ruby/etc
-		if (contentType.startsWith(RubySourceConfiguration.PREFIX))
-		{
-			return new IAutoEditStrategy[] { new RubyAutoIndentStrategy(contentType, this, sourceViewer) };
-		}
-		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
-		{
-			if (contentType.equals(JSSourceConfiguration.JS_SINGLELINE_COMMENT)
-					|| contentType.equals(JSSourceConfiguration.JS_MULTILINE_COMMENT))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new JSCommentIndentStrategy(partitioning, contentType, this,
-						sourceViewer) };
-			}
-			if (contentType.equals(JSSourceConfiguration.JS_DOC))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new JSDocIndentStrategy(partitioning, contentType, this, sourceViewer) };
-			}
-			return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer) };
-		}
-		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
-		{
-			if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT))
-			{
-				String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-				return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this,
-						sourceViewer) };
-			}
-			return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
-		}
-		return new IAutoEditStrategy[] { new HTMLAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 }
