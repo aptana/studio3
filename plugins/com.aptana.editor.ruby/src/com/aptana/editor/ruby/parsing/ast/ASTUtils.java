@@ -3,12 +3,38 @@ package com.aptana.editor.ruby.parsing.ast;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.jrubyparser.StaticScope;
-import org.jrubyparser.ast.*;
+import org.jrubyparser.ast.ArgsNode;
+import org.jrubyparser.ast.ArgumentNode;
+import org.jrubyparser.ast.ArrayNode;
+import org.jrubyparser.ast.CallNode;
+import org.jrubyparser.ast.ClassNode;
+import org.jrubyparser.ast.Colon2Node;
+import org.jrubyparser.ast.ConstNode;
+import org.jrubyparser.ast.DAsgnNode;
+import org.jrubyparser.ast.DStrNode;
+import org.jrubyparser.ast.FCallNode;
+import org.jrubyparser.ast.FalseNode;
+import org.jrubyparser.ast.FixnumNode;
+import org.jrubyparser.ast.HashNode;
+import org.jrubyparser.ast.IArgumentNode;
+import org.jrubyparser.ast.INameNode;
+import org.jrubyparser.ast.IterNode;
+import org.jrubyparser.ast.ListNode;
+import org.jrubyparser.ast.LocalAsgnNode;
+import org.jrubyparser.ast.ModuleNode;
+import org.jrubyparser.ast.MultipleAsgnNode;
+import org.jrubyparser.ast.NilNode;
+import org.jrubyparser.ast.Node;
+import org.jrubyparser.ast.SelfNode;
+import org.jrubyparser.ast.SplatNode;
+import org.jrubyparser.ast.StrNode;
+import org.jrubyparser.ast.SymbolNode;
+import org.jrubyparser.ast.TrueNode;
+import org.jrubyparser.ast.ZArrayNode;
 
 public class ASTUtils
 {
