@@ -31,6 +31,14 @@ public class BundleVisibilityTests extends BundleTestBase
 		{
 			this._deletedBundles.add(bundle);
 		}
+		
+		public void reset()
+		{
+			this._addedBundles.clear();
+			this._deletedBundles.clear();
+			this._hiddenEntries.clear();
+			this._visibleEntries.clear();
+		}
 	}
 	
 	private BundleTestListener _bundleListener;
@@ -132,7 +140,40 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testExposeBundles()
 	{
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		
+		this._bundleListener.reset();
+		
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		assertNotNull(entry);
+		
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(3, bundles.length);
+		
+		BundleElement lastBundle = bundles[bundles.length - 1];
+		entry.removeBundle(lastBundle);
+		
+		List<BundleElement> deleted = this._bundleListener._deletedBundles;
+		assertEquals(1, deleted.size());
+		assertSame(lastBundle, deleted.get(0));
+		
+		List<BundleEntry> hidden = this._bundleListener._hiddenEntries;
+		assertEquals(1, hidden.size());
+		BundleElement[] hiddenBundles = hidden.get(0).getBundles();
+		assertNotNull(hiddenBundles);
+		assertEquals(1, hiddenBundles.length);
+		assertSame(lastBundle, hiddenBundles[0]);
+		
+		List<BundleEntry> visible = this._bundleListener._visibleEntries;
+		assertEquals(1, visible.size());
+		BundleElement[] visibleBundles = visible.get(0).getBundles();
+		assertNotNull(visibleBundles);
+		assertEquals(2, visibleBundles.length);
+		assertSame(bundles[0], visibleBundles[0]);
+		assertSame(bundles[1], visibleBundles[1]);
 	}
 	
 	/**
@@ -140,7 +181,37 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testHideBundles()
 	{
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
+		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
 		
+		this._bundleListener.reset();
+		
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		assertNotNull(entry);
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(3, bundles.length);
+		BundleElement lastBundle = bundles[bundles.length - 1];
+		
+		List<BundleElement> added = this._bundleListener._addedBundles;
+		assertEquals(1, added.size());
+		assertSame(lastBundle, added.get(0));
+		
+		List<BundleEntry> hidden = this._bundleListener._hiddenEntries;
+		assertEquals(1, hidden.size());
+		BundleElement[] hiddenBundles = hidden.get(0).getBundles();
+		assertNotNull(hiddenBundles);
+		assertEquals(2, hiddenBundles.length);
+		assertSame(bundles[0], hiddenBundles[0]);
+		assertSame(bundles[1], hiddenBundles[1]);
+		
+		List<BundleEntry> visible = this._bundleListener._visibleEntries;
+		assertEquals(1, visible.size());
+		BundleElement[] visibleBundles = visible.get(0).getBundles();
+		assertNotNull(visibleBundles);
+		assertEquals(1, visibleBundles.length);
+		assertSame(lastBundle, visibleBundles[0]);
 	}
 	
 	/**
@@ -148,6 +219,26 @@ public class BundleVisibilityTests extends BundleTestBase
 	 */
 	public void testAddWithNoChange()
 	{
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		
+		this._bundleListener.reset();
+		
+		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		assertNotNull(entry);
+		BundleElement[] bundles = entry.getBundles();
+		assertNotNull(bundles);
+		assertEquals(2, bundles.length);
+		BundleElement firstBundle = bundles[0];
+		
+		List<BundleElement> added = this._bundleListener._addedBundles;
+		assertEquals(1, added.size());
+		assertSame(firstBundle, added.get(0));
+		
+		List<BundleEntry> hidden = this._bundleListener._hiddenEntries;
+		assertEquals(0, hidden.size());
+		
+		List<BundleEntry> visible = this._bundleListener._visibleEntries;
+		assertEquals(0, visible.size());
 	}
 }
