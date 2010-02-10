@@ -40,7 +40,7 @@ public abstract class BinarySelector implements ISelectorNode
 	/**
 	 * getOperator
 	 */
-	public abstract String getOperator();
+	protected abstract String getOperator();
 
 	/*
 	 * (non-Javadoc)

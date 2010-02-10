@@ -37,7 +37,7 @@ public class AndSelector extends BinarySelector
 	 * (non-Javadoc)
 	 * @see com.aptana.scope.BinarySelector#getOperator()
 	 */
-	public String getOperator()
+	protected String getOperator()
 	{
 		return "";
 	}
