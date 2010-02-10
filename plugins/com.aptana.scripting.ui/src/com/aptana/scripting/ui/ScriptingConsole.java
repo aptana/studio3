@@ -138,6 +138,9 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 					Theme theme = plugin.getThemeManager().getCurrentTheme();
 
 					// set background color
+					// NOTE: we have to force the background color to change; otherwise, even
+					// with a forced redraw, the background will not be drawn
+					console.setBackground(null);
 					console.setBackground(colorManager.getColor(theme.getBackground()));
 
 					// set font
