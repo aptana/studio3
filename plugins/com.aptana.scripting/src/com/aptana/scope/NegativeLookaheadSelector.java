@@ -47,6 +47,6 @@ public class NegativeLookaheadSelector extends BinarySelector
 	 */
 	public String getOperator()
 	{
-		return "-";
+		return " -";
 	}
 }
