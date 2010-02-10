@@ -60,7 +60,6 @@ public class OpenTagCloser implements VerifyKeyListener
 
 		try
 		{
-			// FIXME There's still a case where this breaks in live editing, typing the following: <a href="">
 			boolean nextIsLessThan = false;
 			if (offset < document.getLength())
 			{
@@ -81,9 +80,9 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (closeTag == null)
 				return;
 
-			// Read forward to see if the next non-WS is the close tag for this, and if so do nothing!
-			if (tagClosed(document, offset, openTag, closeTag))
-			{				
+			// Check to see if this tag is already closed...
+			if (tagClosed(document, offset, openTag))
+			{
 				return;
 			}
 
@@ -119,34 +118,37 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 	}
 
-	private boolean tagClosed(IDocument document, int offset, String openTag, String closeTag)
-			throws BadLocationException
+	private boolean tagClosed(IDocument document, int offset, String openTag) throws BadLocationException
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
-		String tagName = openTag.substring(1, openTag.indexOf(">"));
+		String tagName = openTag.substring(1, openTag.indexOf(">")).trim();
 
 		int stack = 0;
 		String src = document.get();
 		int x = 0;
+		int toAdd = tagName.length() + 1;
+		// Count number of open tags
 		while (true)
 		{
 			x = src.indexOf("<" + tagName, x);
 			if (x == -1)
 				break;
-			x += tagName.length() + 1;
+			x += toAdd;
 			stack++;
 		}
 
+		// Subtract number of close tags
 		x = 0;
+		toAdd = tagName.length() + 2;
 		while (true)
 		{
 			x = src.indexOf("</" + tagName, x);
 			if (x == -1)
 				break;
-			x += tagName.length() + 2;
+			x += toAdd;
 			stack--;
 		}
-
+		// if we had more equal number of closed (or more than open), then the tag is closed.
 		return stack <= 0;
 	}
 
