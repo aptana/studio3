@@ -73,7 +73,6 @@
       <consolePageParticipant
             class="com.aptana.scripting.ui.ScriptingConsole"
             id="com.aptana.scripting.ui.consolePageParticipant">
-         <enablement></enablement>
       </consolePageParticipant>
    </extension>
 </plugin>
