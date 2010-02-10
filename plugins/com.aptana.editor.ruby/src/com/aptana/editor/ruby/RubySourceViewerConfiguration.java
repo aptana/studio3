@@ -35,7 +35,6 @@
 package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
@@ -87,11 +86,5 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
-	}
-
-	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
-	{
-		return new IAutoEditStrategy[] { new RubyAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 }

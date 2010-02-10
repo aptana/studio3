@@ -2,7 +2,6 @@ package com.aptana.editor.common.text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
@@ -10,41 +9,29 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.jruby.RubyRegexp;
+import org.jruby.RubyString;
+import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.scripting.model.BundleManager;
 
 /**
- * This implementation takes in regular expressions to match against the line to determine whether or not to indent or
- * dedent. Subclasses should pass in the regular expressions that make sense for their language, and should override the
- * abstract method to determine if we simply indent or we indent and push matching pair characters onto next line with
- * cursor in middle (i.e. for things like parens, braces, etc).
+ * This implementation uses ruby regular expressions contributed by bundles. It grabs the regexp with the best match for
+ * the current scope and then applies that regexp against the line.
  * 
  * @author cwilliams
- * @deprecated
  */
-//TODO Remove now that it's not used
-public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
+public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 {
 
 	private static final String TAB_CHAR = "\t"; //$NON-NLS-1$
 
-	private Pattern increaseIndentRegexp;
-	private Pattern decreaseIndentRegexp;
-
-	public AbstractRegexpAutoIndentStrategy(String regexp, String decreaseRegexp, String contentType,
-			SourceViewerConfiguration configuration, ISourceViewer sourceViewer)
-	{
-		super(contentType, configuration, sourceViewer);
-		this.increaseIndentRegexp = Pattern.compile(regexp);
-		if (decreaseRegexp != null)
-			this.decreaseIndentRegexp = Pattern.compile(decreaseRegexp);
-	}
-
-	public AbstractRegexpAutoIndentStrategy(String regexp, String contentType, SourceViewerConfiguration configuration,
+	public RubyRegexpAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
 			ISourceViewer sourceViewer)
 	{
-		this(regexp, null, contentType, configuration, sourceViewer);
+		super(contentType, configuration, sourceViewer);
 	}
 
 	/**
@@ -70,9 +57,13 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 		{
 			// Get the line and run a regexp check against it
 			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d, c.offset);
+			RubyRegexp increaseIndentRegexp = BundleManager.getInstance().getIncreaseIndentRegexp(scope);
+			RubyRegexp decreaseIndentRegexp = BundleManager.getInstance().getDecreaseIndentRegexp(scope);
+
 			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
 
-			if (increaseIndentRegexp.matcher(lineContent).find())
+			if (matchesRegexp(increaseIndentRegexp, lineContent))
 			{
 				String previousLineIndent = getAutoIndentAfterNewLine(d, c);
 				String restOfLine = d.get(c.offset, curLineRegion.getLength() - (c.offset - curLineRegion.getOffset()));
@@ -89,7 +80,7 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 				c.caretOffset = c.offset + startIndent.length();
 				return true;
 			}
-			else if (decreaseIndentRegexp != null && decreaseIndentRegexp.matcher(lineContent).find())
+			else if (matchesRegexp(decreaseIndentRegexp, lineContent))
 			{
 				int lineNumber = d.getLineOfOffset(c.offset);
 				if (lineNumber == 0) // first line, should be no indent yet...
@@ -127,6 +118,15 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 		return false;
 	}
 
+	private boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+	{
+		if (regexp == null)
+			return false;
+		RubyString string = regexp.getRuntime().newString(lineContent);
+		IRubyObject matcher = regexp.match_m(regexp.getRuntime().getCurrentContext(), string);
+		return !matcher.isNil();
+	}
+
 	/**
 	 * This method determines the corrected indent string for the current line on dedent trigger. We walk the lines
 	 * backward and try to find the matching open/indent (by using the increase indent regexp). If found, we grab that
@@ -147,8 +147,13 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 		for (int i = lineNumber - 1; i >= 0; i--)
 		{
 			IRegion region = d.getLineInformation(i);
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d,
+					region.getOffset());
+			RubyRegexp increaseIndentRegexp = BundleManager.getInstance().getIncreaseIndentRegexp(scope);
+			RubyRegexp decreaseIndentRegexp = BundleManager.getInstance().getDecreaseIndentRegexp(scope);
+
 			String lineText = d.get(region.getOffset(), region.getLength());
-			if (increaseIndentRegexp.matcher(lineText).find())
+			if (matchesRegexp(increaseIndentRegexp, lineText))
 			{
 				// Found an open
 				stack++;
@@ -159,7 +164,7 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 					return d.get(region.getOffset(), endIndex - region.getOffset());
 				}
 			}
-			else if (decreaseIndentRegexp.matcher(lineText).find())
+			else if (matchesRegexp(decreaseIndentRegexp, lineText))
 			{
 				// found a close
 				stack--;
@@ -270,6 +275,24 @@ public abstract class AbstractRegexpAutoIndentStrategy extends CommonAutoIndentS
 	 * @param contentAfterNewline
 	 * @return
 	 */
-	protected abstract boolean indentAndPushTrailingContentAfterNewlineAndCursor(String contentBeforeNewline,
-			String contentAfterNewline);
+	protected boolean indentAndPushTrailingContentAfterNewlineAndCursor(String contentBeforeNewline,
+			String contentAfterNewline)
+	{
+		// TODO How would bundles specify something like this? Should we just hard-code the common cases of [], (), {},
+		// <tag></tag>?
+		if (contentBeforeNewline == null || contentAfterNewline == null || contentBeforeNewline.trim().length() == 0
+				|| contentAfterNewline.trim().length() == 0)
+			return false;
+		contentBeforeNewline = contentBeforeNewline.trim();
+		contentAfterNewline = contentAfterNewline.trim();
+		char before = contentBeforeNewline.charAt(contentBeforeNewline.length() - 1);
+		char after = contentAfterNewline.charAt(0);
+		if (before == '[' && after == ']')
+			return true;
+		if (before == '{' && after == '}')
+			return true;
+		if (before == '(' && after == ')')
+			return true;
+		return false;
+	}
 }

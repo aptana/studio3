@@ -49,7 +49,9 @@ import com.aptana.editor.common.text.CommonAutoIndentStrategy;
 /**
  * @author Ingo Muschenetz
  * @author Michael Xia (mxia@aptana.com)
+ * @deprecated
  */
+//TODO Remove now that it's not used
 public class CSSCommentIndentStrategy extends CommonAutoIndentStrategy {
 
     private String fPartitioning;

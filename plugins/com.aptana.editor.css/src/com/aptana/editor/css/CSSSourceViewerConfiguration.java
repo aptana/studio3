@@ -35,7 +35,6 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -46,8 +45,6 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.ILanguageService;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.css.internal.CSSAutoIndentStrategy;
-import com.aptana.editor.css.internal.CSSCommentIndentStrategy;
 import com.aptana.editor.css.internal.CSSContentAssistProcessor;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
@@ -94,22 +91,6 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @seeorg.eclipse.jface.text.source.SourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.
-	 * ISourceViewer, java.lang.String)
-	 */
-	@Override
-	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
-	{
-		if (contentType.equals(CSSSourceConfiguration.MULTILINE_COMMENT))
-		{
-			String partitioning = getConfiguredDocumentPartitioning(sourceViewer);
-			return new IAutoEditStrategy[] { new CSSCommentIndentStrategy(partitioning, contentType, this, sourceViewer) };
-		}
-		return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
 
 	@Override

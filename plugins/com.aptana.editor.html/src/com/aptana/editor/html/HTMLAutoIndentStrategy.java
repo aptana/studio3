@@ -7,7 +7,9 @@ import com.aptana.editor.common.text.AbstractRegexpAutoIndentStrategy;
 
 /**
  * @author cwilliams
+ * @deprecated
  */
+//TODO Remove now that it's not used
 public class HTMLAutoIndentStrategy extends AbstractRegexpAutoIndentStrategy
 {
 

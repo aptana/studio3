@@ -1334,6 +1334,48 @@ public class BundleManager
 		}
 		return result;
 	}
+	
+	public RubyRegexp getIncreaseIndentRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getIncreaseIndentMarkers();
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry, scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+		return result;
+	}
+
+	public RubyRegexp getDecreaseIndentRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : getBundleNames())
+		{
+			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getDecreaseIndentMarkers();
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry, scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+		return result;
+	}
 
 	private boolean betterMatch(Map.Entry<ScopeSelector, RubyRegexp> entry, String scope, String matchedPattern)
 	{

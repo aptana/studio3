@@ -37,6 +37,12 @@ package com.aptana.editor.js.internal;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
+/**
+ * @deprecated
+ * @author cwilliams
+ *
+ */
+//TODO Remove now that it's not used
 public class JSDocIndentStrategy extends JSCommentIndentStrategy {
 
     public JSDocIndentStrategy(String partitioning, String contentType,
