@@ -35,6 +35,7 @@
 package com.aptana.editor.html;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -47,8 +48,8 @@ import com.aptana.editor.js.Activator;
 public class HTMLEditor extends AbstractThemeableEditor
 {
 
-	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`',
-			'\'', '\'', '"', '"', '<', '>', 'Ò', 'Ó' };
+	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
+			'\'', '"', '"', '<', '>', 'Ò', 'Ó' };
 
 	@Override
 	protected void initializeEditor()
@@ -81,6 +82,14 @@ public class HTMLEditor extends AbstractThemeableEditor
 		outline.setLabelProvider(new HTMLOutlineLabelProvider());
 
 		return outline;
+	}
+
+	@Override
+	public void createPartControl(Composite parent)
+	{
+		super.createPartControl(parent);
+		// Install a verify key listener that auto-closes unclosed open tags!
+		OpenTagCloser.install(getSourceViewer());
 	}
 
 	@Override
