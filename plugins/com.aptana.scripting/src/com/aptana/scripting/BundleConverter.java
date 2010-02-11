@@ -41,9 +41,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			 args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-//			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
@@ -53,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "todo" };
+		String[] bundleFilter = new String[] { "json" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -172,10 +172,21 @@ public class BundleConverter
 
 		// Menu
 		PlistProperties mainMenu = (PlistProperties) properties.getProperty("mainMenu");
-		PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
-		buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
-		buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"), uuidToName));
-		buffer.append("  end\n");
+		if (mainMenu != null)
+		{
+			PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"),
+					uuidToName));
+			buffer.append("  end\n");
+		}
+		else
+		{
+			List<String> items = (List<String>) properties.getProperty("ordering");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", new PlistProperties(), items, uuidToName));
+			buffer.append("  end\n");
+		}
 		// end menu
 
 		buffer.append("end\n");
