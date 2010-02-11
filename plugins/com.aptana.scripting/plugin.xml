@@ -36,6 +36,9 @@
       <file
             name="ruble/context.rb">
       </file>
+      <file
+            name="ruble/platform.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
