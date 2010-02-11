@@ -1,6 +1,9 @@
 package com.aptana.terminal.server;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.aptana.terminal.Activator;
 
@@ -9,6 +12,7 @@ public class ProcessReader extends Thread
 	private InputStream _input;
 	private String _name;
 	private StringBuffer _output;
+	private Pattern _filter;
 
 	/**
 	 * ProcessReader
@@ -31,7 +35,17 @@ public class ProcessReader extends Thread
 	{
 		return this._name;
 	}
-	
+
+	/**
+	 * setFilter
+	 * 
+	 * @param pattern
+	 */
+	public void setFilter(Pattern pattern)
+	{
+		this._filter = pattern;
+	}
+
 	/**
 	 * run
 	 */
@@ -41,17 +55,39 @@ public class ProcessReader extends Thread
 		{
 			byte[] line = new byte[1024];
 			int count;
-			
+
 			while ((count = this._input.read(line)) != -1)
 			{
 				String text = new String(line, 0, count);
-				
-				synchronized (this._output)
+				boolean sendText = true;
+
+				if (this._filter != null)
 				{
-					this._output.append(text);
+					// assume we're still inside filtered text
+					sendText = false;
+
+					Matcher matcher = this._filter.matcher(text);
+
+					if (matcher.find())
+					{
+						// grab any text after the EOFilter marker
+						text = text.substring(matcher.end());
+
+						// only send text if we have some
+						sendText = (text.length() > 0);
+
+						// turn off filtering
+						this._filter = null;
+					}
 				}
-				
-				//System.out.println(this._name + ":~" + encodeString(text) + "~");
+
+				if (sendText)
+				{
+					synchronized (this._output)
+					{
+						this._output.append(text);
+					}
+				}
 			}
 		}
 		catch (IOException e)
@@ -59,29 +95,4 @@ public class ProcessReader extends Thread
 			Activator.logError(Messages.ProcessReader_Error_Reading_From_Process, e);
 		}
 	}
-	
-//	/**
-//	 * encodeString
-//	 * 
-//	 * @param text
-//	 * @return
-//	 */
-//	protected String encodeString(String text)
-//	{
-//		StringBuilder builder = new StringBuilder();
-//		
-//		for (char c : text.toCharArray())
-//		{
-//			if (c < 32 || 127 < c)
-//			{
-//				builder.append("\\x").append(Integer.toString((int) c, 16));
-//			}
-//			else
-//			{
-//				builder.append(c);
-//			}
-//		}
-//		
-//		return builder.toString();
-//	}
 }
