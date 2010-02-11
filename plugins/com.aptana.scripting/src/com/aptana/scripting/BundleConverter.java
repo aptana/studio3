@@ -41,9 +41,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
@@ -53,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "HAML-Handcrafted" };
+		String[] bundleFilter = new String[] { "XML" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -119,10 +119,10 @@ public class BundleConverter
 		copyDir(bundleDir + "/Templates/", outputBundlePath + "/unsupported/templates");
 	}
 
-	private static void copyDir(String srcPath, String destPath)
+	private static boolean copyDir(String srcPath, String destPath)
 	{
 		if (!new File(srcPath).exists())
-			return;
+			return true;
 		try
 		{
 			File dest = new File(destPath);
@@ -131,6 +131,7 @@ public class BundleConverter
 			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
 			Process p = builder.start();
 			p.waitFor();
+			return true;
 		}
 		catch (IOException e)
 		{
@@ -142,6 +143,7 @@ public class BundleConverter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -161,7 +163,9 @@ public class BundleConverter
 		// Description
 		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description")).append(
 				"\nEND\n");
-		// TODO Indentation! this can be in a random file in the Preference folder...
+
+		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
+
 		File syntaxesDir = new File(plistFile.getParentFile(), "Syntaxes");
 		buffer.append(addFolding(syntaxesDir));
 		buffer.append(addFileTypes(syntaxesDir));
@@ -178,6 +182,47 @@ public class BundleConverter
 		return buffer.toString();
 	}
 
+	private static String addIndents(File prefsDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (prefsDir == null || !prefsDir.isDirectory())
+			return builder.toString();
+		File[] files = prefsDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File prefsFile : files)
+		{
+			PlistProperties properties = parse(prefsFile);
+			if (properties == null || !properties.hasKey("settings"))
+				continue;
+			PlistProperties settings = (PlistProperties) properties.getProperty("settings");
+			if (!settings.hasKey("increaseIndentPattern"))
+				continue;
+
+			String scope = (String) properties.getProperty("scope");
+			String increase = (String) settings.getProperty("increaseIndentPattern");
+			increase = increase.replace("''", "'");
+			builder.append("  increase_indent = /").append(increase).append("/\n");
+			if (settings.hasKey("decreaseIndentPattern"))
+			{
+				String decrease = (String) settings.getProperty("decreaseIndentPattern");
+				decrease = decrease.replace("''", "'");
+				builder.append("  decrease_indent = /").append(decrease).append("/\n");
+				builder.append("  bundle.indent['").append(scope).append("'] = increase_indent, decrease_indent\n");
+			}
+		}
+		return builder.toString();
+	}
+
 	@SuppressWarnings("unchecked")
 	private static String addFileTypes(File syntaxesDir)
 	{
@@ -190,7 +235,7 @@ public class BundleConverter
 			@Override
 			public boolean accept(File dir, String name)
 			{
-				return name.endsWith(".tmLanguage");
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
 			}
 		});
 		if (files == null || files.length < 1)
@@ -227,32 +272,34 @@ public class BundleConverter
 			@Override
 			public boolean accept(File dir, String name)
 			{
-				return name.endsWith(".tmLanguage");
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
 			}
 		});
 		if (files == null || files.length < 1)
 			return builder.toString();
 
-		File syntaxFile = files[0];
-		PlistProperties properties = parse(syntaxFile);
-		String scope = (String) properties.getProperty("scopeName");
-		boolean hasStart = properties.hasKey("foldingStartMarker");
-		if (hasStart)
+		for (File syntaxFile : files)
 		{
-			String folding = (String) properties.getProperty("foldingStartMarker");
-			folding = folding.replace("''", "'");
-			builder.append("  start_folding = /").append(folding).append("/\n");
-		}
-		boolean hasStop = properties.hasKey("foldingStopMarker");
-		if (hasStop)
-		{
-			String folding = (String) properties.getProperty("foldingStopMarker");
-			folding = folding.replace("''", "'");
-			builder.append("  end_folding = /").append(folding).append("/\n");
-		}
-		if (hasStart && hasStop)
-		{
-			builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			boolean hasStart = properties.hasKey("foldingStartMarker");
+			if (hasStart)
+			{
+				String folding = (String) properties.getProperty("foldingStartMarker");
+				folding = folding.replace("''", "'");
+				builder.append("  start_folding = /").append(folding).append("/\n");
+			}
+			boolean hasStop = properties.hasKey("foldingStopMarker");
+			if (hasStop)
+			{
+				String folding = (String) properties.getProperty("foldingStopMarker");
+				folding = folding.replace("''", "'");
+				builder.append("  end_folding = /").append(folding).append("/\n");
+			}
+			if (hasStart && hasStop)
+			{
+				builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+			}
 		}
 		return builder.toString();
 	}
@@ -308,8 +355,8 @@ public class BundleConverter
 	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", "\""
-					+ plistFile.getAbsolutePath() + "\"");
+			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile.getName());
+			builder.directory(plistFile.getParentFile());
 			Process p = builder.start();
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
