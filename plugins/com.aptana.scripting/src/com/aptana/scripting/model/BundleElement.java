@@ -71,7 +71,7 @@ public class BundleElement extends AbstractElement
 		}
 
 		// calculate the bundle scope
-		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedenceFromPath(path);
+		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
 
 	/**
