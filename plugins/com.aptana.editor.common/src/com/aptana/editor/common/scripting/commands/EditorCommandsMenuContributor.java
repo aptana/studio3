@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -32,6 +33,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
@@ -191,7 +193,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 					// that do not match the top level scopes. We will use this
 					// later to build the "Other" menu.
 					NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
-					menusFromOtherScopes =  BundleManager.getInstance().getMenus(notFilter);
+					menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
 				}
 			}
 
@@ -342,6 +344,37 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						|| command.getScopeSelector().matches(contentTypeAtOffset));
 			}
 		}
+		if (menusFromScope.length > 0)
+		{
+			MenuElement menuForScope = menusFromScope[0];
+			// if we're inside a bundle's main menu
+			if (menuForScope.getParent() != null && menuForScope.getParent().getParent() == null)
+			{
+				new MenuItem(menu, SWT.SEPARATOR);
+				final MenuItem editBundleItem = new MenuItem(menu, SWT.PUSH);
+				editBundleItem.setText("Edit this bundle");
+				final BundleElement bundleElement = menuForScope.getOwningBundle();
+				editBundleItem.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetSelected(SelectionEvent e)
+					{
+						editBundle(bundleElement);
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e)
+					{
+					}
+				});
+			}
+		}
+	}
+
+	protected static void editBundle(final BundleElement owningBundle)
+	{
+		Job job = new EditBundleJob(owningBundle);
+		job.schedule();
 	}
 
 	/*
