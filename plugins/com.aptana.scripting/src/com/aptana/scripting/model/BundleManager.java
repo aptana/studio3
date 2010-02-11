@@ -253,10 +253,8 @@ public class BundleManager
 	 * @param matchedPattern
 	 * @return
 	 */
-	private boolean betterMatch(Map.Entry<ScopeSelector, RubyRegexp> entry, String scope, String matchedPattern)
+	private boolean betterMatch(ScopeSelector matchedScope, String scope, String matchedPattern)
 	{
-		ScopeSelector matchedScope = entry.getKey();
-
 		if (matchedScope.matches(scope) == false)
 		{
 			return false;
@@ -676,23 +674,23 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundlePrecedenceFromPath
+	 * getBundlePrecedence
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundlePrecedence getBundlePrecedenceFromPath(File path)
+	public BundlePrecedence getBundlePrecedence(File path)
 	{
-		return this.getBundlePrecedenceFromPath(path.getAbsolutePath());
+		return this.getBundlePrecedence(path.getAbsolutePath());
 	}
 
 	/**
-	 * getBundleScopeFromPath
+	 * getBundleScope
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundlePrecedence getBundlePrecedenceFromPath(String path)
+	public BundlePrecedence getBundlePrecedence(String path)
 	{
 		BundlePrecedence result = BundlePrecedence.PROJECT;
 
@@ -799,14 +797,14 @@ public class BundleManager
 		RubyRegexp result = null;
 		String matchedPattern = null;
 
-		for (String bundleName : getBundleNames())
+		for (String bundleName : this.getBundleNames())
 		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
 			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getDecreaseIndentMarkers();
 
 			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
 			{
-				if (betterMatch(entry, scope, matchedPattern))
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
 				{
 					result = entry.getValue();
 					matchedPattern = entry.getKey().toString();
@@ -828,14 +826,14 @@ public class BundleManager
 		RubyRegexp result = null;
 		String matchedPattern = null;
 
-		for (String bundleName : getBundleNames())
+		for (String bundleName : this.getBundleNames())
 		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
 			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
 
 			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
 			{
-				if (betterMatch(entry, scope, matchedPattern))
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
 				{
 					result = entry.getValue();
 					matchedPattern = entry.getKey().toString();
@@ -857,14 +855,14 @@ public class BundleManager
 		RubyRegexp result = null;
 		String matchedPattern = null;
 
-		for (String bundleName : getBundleNames())
+		for (String bundleName : this.getBundleNames())
 		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
 			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
 
 			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
 			{
-				if (betterMatch(entry, scope, matchedPattern))
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
 				{
 					result = entry.getValue();
 					matchedPattern = entry.getKey().toString();
@@ -886,14 +884,14 @@ public class BundleManager
 		RubyRegexp result = null;
 		String matchedPattern = null;
 
-		for (String bundleName : getBundleNames())
+		for (String bundleName : this.getBundleNames())
 		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
 			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getIncreaseIndentMarkers();
 
 			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
 			{
-				if (betterMatch(entry, scope, matchedPattern))
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
 				{
 					result = entry.getValue();
 					matchedPattern = entry.getKey().toString();
@@ -944,7 +942,7 @@ public class BundleManager
 
 		for (String bundleName : this.getBundleNames())
 		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
 			Map<String, String> registry = bundleEntry.getFileTypeRegistry();
 
 			for (Map.Entry<String, String> entry : registry.entrySet())
