@@ -118,6 +118,10 @@
 		  	<param name="bundle.name" value="bundle-dev.ruble" />
 		  	<param name="bundle.dir.name" value="bundle-development.ruble" />
 		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="haml.ruble" />
+		  	<param name="bundle.dir.name" value="haml.ruble" />
+		</antcall>
 	</target>
 
 	<!-- ===================================================================== -->
