@@ -53,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "rspec" };
+		String[] bundleFilter = new String[] { "HAML-Handcrafted" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -68,7 +68,7 @@ public class BundleConverter
 			{
 				if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
 				{
-					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
+					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension + ".ruble");
 					continue;
 				}
 			}
@@ -150,7 +150,6 @@ public class BundleConverter
 		PlistProperties properties = parse(plistFile);
 
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("require 'java'\n");
 		buffer.append("require 'ruble'\n\n");
 		String name = sanitize(properties, "name");
 		buffer.append("bundle '").append(name).append("' do |bundle|\n");
@@ -162,6 +161,10 @@ public class BundleConverter
 		// Description
 		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description")).append(
 				"\nEND\n");
+		// TODO Indentation! this can be in a random file in the Preference folder...
+		File syntaxesDir = new File(plistFile.getParentFile(), "Syntaxes");
+		buffer.append(addFolding(syntaxesDir));
+		buffer.append(addFileTypes(syntaxesDir));
 
 		// Menu
 		PlistProperties mainMenu = (PlistProperties) properties.getProperty("mainMenu");
@@ -173,6 +176,85 @@ public class BundleConverter
 
 		buffer.append("end\n");
 		return buffer.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static String addFileTypes(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			List<String> fileTypes = (List<String>) properties.getProperty("fileTypes");
+			for (String fileType : fileTypes)
+			{
+				String pattern = "*." + fileType;
+				// If fileType has a period or begins with a capital letter we should assume exact filename match
+				if (fileType.contains(".") || Character.isUpperCase(fileType.charAt(0)))
+				{
+					pattern = fileType;
+				}
+				builder.append("  bundle.register_file_type('").append(pattern).append("', '").append(scope).append(
+						"')\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private static String addFolding(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		File syntaxFile = files[0];
+		PlistProperties properties = parse(syntaxFile);
+		String scope = (String) properties.getProperty("scopeName");
+		boolean hasStart = properties.hasKey("foldingStartMarker");
+		if (hasStart)
+		{
+			String folding = (String) properties.getProperty("foldingStartMarker");
+			folding = folding.replace("''", "'");
+			builder.append("  start_folding = /").append(folding).append("/\n");
+		}
+		boolean hasStop = properties.hasKey("foldingStopMarker");
+		if (hasStop)
+		{
+			String folding = (String) properties.getProperty("foldingStopMarker");
+			folding = folding.replace("''", "'");
+			builder.append("  end_folding = /").append(folding).append("/\n");
+		}
+		if (hasStart && hasStop)
+		{
+			builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+		}
+		return builder.toString();
 	}
 
 	@SuppressWarnings("unchecked")
