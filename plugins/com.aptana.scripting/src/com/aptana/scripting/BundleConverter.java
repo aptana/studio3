@@ -41,9 +41,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			 args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+//			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/RadRails Bundles";
@@ -53,7 +53,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "XML" };
+		String[] bundleFilter = new String[] { "todo" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -210,17 +210,22 @@ public class BundleConverter
 
 			String scope = (String) properties.getProperty("scope");
 			String increase = (String) settings.getProperty("increaseIndentPattern");
-			increase = increase.replace("''", "'");
+			increase = sanitizeRegexp(increase);
 			builder.append("  increase_indent = /").append(increase).append("/\n");
 			if (settings.hasKey("decreaseIndentPattern"))
 			{
 				String decrease = (String) settings.getProperty("decreaseIndentPattern");
-				decrease = decrease.replace("''", "'");
+				decrease = sanitizeRegexp(decrease);
 				builder.append("  decrease_indent = /").append(decrease).append("/\n");
 				builder.append("  bundle.indent['").append(scope).append("'] = increase_indent, decrease_indent\n");
 			}
 		}
 		return builder.toString();
+	}
+
+	protected static String sanitizeRegexp(String regexp)
+	{
+		return regexp.replace("''", "'").replace("/", "\\/");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -286,14 +291,14 @@ public class BundleConverter
 			if (hasStart)
 			{
 				String folding = (String) properties.getProperty("foldingStartMarker");
-				folding = folding.replace("''", "'");
+				folding = sanitizeRegexp(folding);
 				builder.append("  start_folding = /").append(folding).append("/\n");
 			}
 			boolean hasStop = properties.hasKey("foldingStopMarker");
 			if (hasStop)
 			{
 				String folding = (String) properties.getProperty("foldingStopMarker");
-				folding = folding.replace("''", "'");
+				folding = sanitizeRegexp(folding);
 				builder.append("  end_folding = /").append(folding).append("/\n");
 			}
 			if (hasStart && hasStop)
