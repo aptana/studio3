@@ -48,15 +48,27 @@ public class BundleManager
 
 	private String applicationBundlesPath;
 	private String userBundlesPath;
+
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
 
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
-
 	private List<BundleChangeListener> _bundleListeners;
+
 	private List<ElementChangeListener> _elementListeners;
+
 	private List<LoadCycleListener> _loadCycleListeners;
+
+	/**
+	 * getInstance
+	 * 
+	 * @return
+	 */
+	public static BundleManager getInstance()
+	{
+		return getInstance(null, null);
+	}
 
 	/**
 	 * getInstance - used for unit testing
@@ -107,16 +119,6 @@ public class BundleManager
 		}
 
 		return INSTANCE;
-	}
-
-	/**
-	 * getInstance
-	 * 
-	 * @return
-	 */
-	public static BundleManager getInstance()
-	{
-		return getInstance(null, null);
 	}
 
 	/**
@@ -188,7 +190,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * addBundleChangeListener
 	 * 
@@ -202,7 +204,7 @@ public class BundleManager
 			{
 				this._bundleListeners = new ArrayList<BundleChangeListener>();
 			}
-			
+
 			this._bundleListeners.add(listener);
 		}
 	}
@@ -244,6 +246,31 @@ public class BundleManager
 	}
 
 	/**
+	 * betterMatch
+	 * 
+	 * @param entry
+	 * @param scope
+	 * @param matchedPattern
+	 * @return
+	 */
+	private boolean betterMatch(ScopeSelector matchedScope, String scope, String matchedPattern)
+	{
+		if (matchedScope.matches(scope) == false)
+		{
+			return false;
+		}
+
+		// FIXME This assumes that the length of the scope selector is the best determination of which one is
+		// "most specific" to the scope we're trying to match, which is not necessarily true!
+		if (matchedPattern != null && matchedScope.toString().length() < matchedPattern.length())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * fireBundleAddedEvent
 	 * 
 	 * @param bundle
@@ -258,7 +285,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * fireBundleBecameHiddenEvent
 	 * 
@@ -274,7 +301,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * fireBundleBecameVisibleEvent
 	 * 
@@ -290,7 +317,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * fireBundleDeletedEvent
 	 * 
@@ -306,7 +333,7 @@ public class BundleManager
 			}
 		}
 	}
-	
+
 	/**
 	 * fireElementAddedEvent
 	 * 
@@ -416,6 +443,46 @@ public class BundleManager
 	}
 
 	/**
+	 * getApplicationBundles
+	 * 
+	 * @return
+	 */
+	public List<BundleElement> getApplicationBundles()
+	{
+		List<BundleElement> bundles = new ArrayList<BundleElement>();
+
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				String applicationBundlesPath = this.getApplicationBundlesPath();
+
+				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
+				{
+					String path = entry.getKey().getAbsolutePath();
+
+					if (path.startsWith(applicationBundlesPath))
+					{
+						List<BundleElement> matchingBundles = entry.getValue();
+
+						if (matchingBundles != null)
+						{
+							int size = matchingBundles.size();
+
+							if (size > 0)
+							{
+								bundles.add(matchingBundles.get(size - 1));
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return bundles;
+	}
+
+	/**
 	 * getBuiltinsLoadPath
 	 * 
 	 * @return
@@ -446,58 +513,6 @@ public class BundleManager
 			}
 		}
 
-		return result;
-	}
-
-	public String getScope(String fileName)
-	{
-		String result = null;
-		String matchedPattern = null;
-
-		for (String bundleName : getBundleNames())
-		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
-
-			Map<String, String> registry = bundleEntry.getFileTypeRegistry();
-			for (Map.Entry<String, String> entry : registry.entrySet())
-			{
-				String pattern = entry.getKey();
-				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
-				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
-				if (!fileName.matches(pattern))
-					continue;
-
-				if (result == null)
-				{
-					result = entry.getValue();
-					matchedPattern = pattern;
-					continue;
-				}
-				// Now check to see if this is more specific than the existing match before we set this as our
-				// return value
-				// TODO Check for simple case where one is a subset scope of the other, use the more specific
-				// one and move on
-				int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-				int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
-				if (newLength > existingLength)
-				{
-					result = entry.getValue();
-					matchedPattern = pattern;
-				}
-				else if (newLength == existingLength)
-				{
-					// Now we need to check if the file matching pattern is more specific FIXME Just using
-					// length is hacky and can be incorrect
-					if (pattern.length() > matchedPattern.length())
-					{
-						result = entry.getValue();
-						matchedPattern = pattern;
-					}
-				}
-			}
-		}
 		return result;
 	}
 
@@ -552,24 +567,6 @@ public class BundleManager
 	 * @param path
 	 * @return
 	 */
-	public BundleElement getBundleFromPath(String path)
-	{
-		BundleElement result = null;
-
-		if (path != null)
-		{
-			result = this.getBundleFromPath(new File(path));
-		}
-
-		return result;
-	}
-
-	/**
-	 * getBundleFromPath
-	 * 
-	 * @param path
-	 * @return
-	 */
 	public BundleElement getBundleFromPath(File bundleDirectory)
 	{
 		BundleElement result = null;
@@ -596,37 +593,21 @@ public class BundleManager
 	}
 
 	/**
-	 * getApplicationBundles
+	 * getBundleFromPath
 	 * 
+	 * @param path
 	 * @return
 	 */
-	public List<BundleElement> getApplicationBundles()
+	public BundleElement getBundleFromPath(String path)
 	{
-		List<BundleElement> bundles = new ArrayList<BundleElement>();
-		synchronized (bundlePathsLock)
-		{
-			if (this._bundlesByPath != null)
-			{
-				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
-				{
-					String path = entry.getKey().getAbsolutePath();
-					if (path.startsWith(getApplicationBundlesPath()))
-					{
-						List<BundleElement> matchingBundles = entry.getValue();
-						if (matchingBundles != null)
-						{
-							int size = matchingBundles.size();
+		BundleElement result = null;
 
-							if (size > 0)
-							{
-								bundles.add(matchingBundles.get(size - 1));
-							}
-						}
-					}
-				}
-			}
+		if (path != null)
+		{
+			result = this.getBundleFromPath(new File(path));
 		}
-		return bundles;
+
+		return result;
 	}
 
 	/**
@@ -693,23 +674,23 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundlePrecedenceFromPath
+	 * getBundlePrecedence
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundlePrecedence getBundlePrecedenceFromPath(File path)
+	public BundlePrecedence getBundlePrecedence(File path)
 	{
-		return this.getBundlePrecedenceFromPath(path.getAbsolutePath());
+		return this.getBundlePrecedence(path.getAbsolutePath());
 	}
 
 	/**
-	 * getBundleScopeFromPath
+	 * getBundleScope
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public BundlePrecedence getBundlePrecedenceFromPath(String path)
+	public BundlePrecedence getBundlePrecedence(String path)
 	{
 		BundlePrecedence result = BundlePrecedence.PROJECT;
 
@@ -806,6 +787,122 @@ public class BundleManager
 	}
 
 	/**
+	 * getDecreaseIndentRegexp
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public RubyRegexp getDecreaseIndentRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getDecreaseIndentMarkers();
+
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getFoldingStartRegexp
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public RubyRegexp getFoldingStartRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
+
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getFoldingStopRegexp
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public RubyRegexp getFoldingStopRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
+
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getIncreaseIndentRegexp
+	 * 
+	 * @param scope
+	 * @return
+	 */
+	public RubyRegexp getIncreaseIndentRegexp(String scope)
+	{
+		RubyRegexp result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getIncreaseIndentMarkers();
+
+			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
+			{
+				if (betterMatch(entry.getKey(), scope, matchedPattern))
+				{
+					result = entry.getValue();
+					matchedPattern = entry.getKey().toString();
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getMenus
 	 * 
 	 * @param filter
@@ -830,6 +927,71 @@ public class BundleManager
 		}
 
 		return result.toArray(new MenuElement[result.size()]);
+	}
+
+	/**
+	 * getTopLevelScope
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	public String getTopLevelScope(String fileName)
+	{
+		String result = null;
+		String matchedPattern = null;
+
+		for (String bundleName : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+			Map<String, String> registry = bundleEntry.getFileTypeRegistry();
+
+			for (Map.Entry<String, String> entry : registry.entrySet())
+			{
+				String pattern = entry.getKey();
+
+				// Escape periods in pattern (for regexp)
+				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// Replace * wildcard pattern with .+? regexp
+				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				if (fileName.matches(pattern))
+				{
+					if (result == null)
+					{
+						result = entry.getValue();
+						matchedPattern = pattern;
+					}
+					else
+					{
+						// Now check to see if this is more specific than the existing match before we set this as our
+						// return value
+						// TODO: Check for simple case where one is a subset scope of the other, use the more specific
+						// one and move on
+						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
+						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+
+						if (newLength > existingLength)
+						{
+							result = entry.getValue();
+							matchedPattern = pattern;
+						}
+						else if (newLength == existingLength)
+						{
+							// Now we need to check if the file matching pattern is more specific
+							// FIXME: Just using length is hacky and can be incorrect
+							if (pattern.length() > matchedPattern.length())
+							{
+								result = entry.getValue();
+								matchedPattern = pattern;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -1131,6 +1293,11 @@ public class BundleManager
 		}
 	}
 
+	/**
+	 * removeBundle
+	 * 
+	 * @param bundle
+	 */
 	private void removeBundle(BundleElement bundle)
 	{
 		if (bundle != null)
@@ -1291,101 +1458,6 @@ public class BundleManager
 
 			ScriptLogger.logError(message);
 		}
-	}
-
-	public RubyRegexp getFoldingStartRegexp(String scope)
-	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
-		for (String bundleName : getBundleNames())
-		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStartMarkers();
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry, scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
-		}
-		return result;
-	}
-
-	public RubyRegexp getFoldingStopRegexp(String scope)
-	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
-		for (String bundleName : getBundleNames())
-		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getFoldingStopMarkers();
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry, scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
-		}
-		return result;
-	}
-	
-	public RubyRegexp getIncreaseIndentRegexp(String scope)
-	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
-		for (String bundleName : getBundleNames())
-		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getIncreaseIndentMarkers();
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry, scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
-		}
-		return result;
-	}
-
-	public RubyRegexp getDecreaseIndentRegexp(String scope)
-	{
-		RubyRegexp result = null;
-		String matchedPattern = null;
-
-		for (String bundleName : getBundleNames())
-		{
-			BundleEntry bundleEntry = getBundleEntry(bundleName);
-			Map<ScopeSelector, RubyRegexp> map = bundleEntry.getDecreaseIndentMarkers();
-			for (Map.Entry<ScopeSelector, RubyRegexp> entry : map.entrySet())
-			{
-				if (betterMatch(entry, scope, matchedPattern))
-				{
-					result = entry.getValue();
-					matchedPattern = entry.getKey().toString();
-				}
-			}
-		}
-		return result;
-	}
-
-	private boolean betterMatch(Map.Entry<ScopeSelector, RubyRegexp> entry, String scope, String matchedPattern)
-	{
-		ScopeSelector matchedScope = entry.getKey();		
-		if (!matchedScope.matches(ScopeSelector.splitScope(scope)))
-			return false;
-		// FIXME This assumes that the length of the scope selector is the best determination of which one is "most specific" to the scope we're trying to match, which is not necessarily true!
-		if (matchedPattern != null && matchedScope.toString().length() < matchedPattern.length())
-			return false;
-		return true;
 	}
 
 }

@@ -105,7 +105,7 @@ import com.aptana.scripting.model.BundleManager;
 		if (filename == null)
 			return translation;
 		String[] parts = translation.getParts();
-		String scope = BundleManager.getInstance().getScope(filename);
+		String scope = BundleManager.getInstance().getTopLevelScope(filename);
 		if (scope == null)
 		{
 			return translation;

@@ -177,7 +177,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			BundleManager manager = BundleManager.getInstance();
 			File file = resource.getLocation().toFile();
 			
-			BundlePrecedence scope = manager.getBundlePrecedenceFromPath(file);
+			BundlePrecedence scope = manager.getBundlePrecedence(file);
 			
 			// don't process user bundles that are projects since file watcher will handle those
 			if (scope != BundlePrecedence.USER)
