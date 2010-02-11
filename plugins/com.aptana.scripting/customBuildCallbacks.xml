@@ -122,6 +122,10 @@
 		  	<param name="bundle.name" value="haml.ruble" />
 		  	<param name="bundle.dir.name" value="haml.ruble" />
 		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="json.ruble" />
+		  	<param name="bundle.dir.name" value="json.ruble" />
+		</antcall>
 	</target>
 
 	<!-- ===================================================================== -->
