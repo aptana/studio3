@@ -167,19 +167,40 @@ public abstract class SingleProjectView extends CommonNavigator
 		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
 				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
 				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(runScriptServer));
+		commandsMenuManager.add(new CommandContributionItem(runScriptServer)
+		{
+			@Override
+			public boolean isEnabled()
+			{
+				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+			}
+		});
 
 		// Run Last launched
 		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
 				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(runLastCCIP));
+		commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
+		{
+			@Override
+			public boolean isEnabled()
+			{
+				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+			}
+		});
 
 		// Debug last launched
 		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
 				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
 				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(debugLastCCIP));
+		commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
+		{
+			@Override
+			public boolean isEnabled()
+			{
+				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+			}
+		});
 
 		new MenuItem(commandsMenu, SWT.SEPARATOR);
 
@@ -221,6 +242,7 @@ public abstract class SingleProjectView extends CommonNavigator
 								.getLocation().toOSString());
 					}
 				});
+				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
 
 				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 				if (projects.length > 0)
@@ -730,8 +752,10 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	protected void setActiveProject(String projectName)
 	{
-		IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (selectedProject != null && selectedProject.equals(newSelectedProject))
+		IProject newSelectedProject = null;
+		if (projectName != null && projectName.trim().length() > 0)
+			newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+		if (selectedProject != null && newSelectedProject != null && selectedProject.equals(newSelectedProject))
 			return;
 
 		if (selectedProject != null)
@@ -788,21 +812,27 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				FileWatcher.removeWatch(watcher);
 			}
-			if (newProject == null || !newProject.exists() || newProject.getLocation() == null)
-				return;
-			watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
-					new FileDeltaRefreshAdapter());
+			if (newProject != null && newProject.exists() && newProject.getLocation() != null)
+			{
+				watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
+						new FileDeltaRefreshAdapter());
+			}
 		}
 		catch (JNotifyException e)
 		{
 			ExplorerPlugin.logError(e.getMessage(), e);
 		}
+		String newProjectName = ""; //$NON-NLS-1$
+		if (newProject != null && newProject.exists())
+		{
+			newProjectName = newProject.getName();
+		}
 
-		projectToolItem.setText(newProject.getName());
+		projectToolItem.setText(newProjectName);
 		MenuItem[] menuItems = projectsMenu.getItems();
 		for (MenuItem menuItem : menuItems)
 		{
-			menuItem.setSelection(menuItem.getText().equals(newProject.getName()));
+			menuItem.setSelection(menuItem.getText().equals(newProjectName));
 		}
 	}
 

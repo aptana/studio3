@@ -126,7 +126,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				if (selectedProject != null)
+				if (selectedProject != null && selectedProject.exists())
 				{
 					GitRepository repository = GitRepository.getAttached(selectedProject);
 					new MenuItem(menu, SWT.SEPARATOR);
