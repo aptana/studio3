@@ -31,6 +31,37 @@ import plistreader.PlistProperties;
 @SuppressWarnings("nls")
 public class BundleConverter
 {
+
+	/**
+	 * Characters that naturally occur only with hitting shift, so if keybinding contains shift plus these characters,
+	 * replace with their base character.
+	 */
+	private static Map<Character, Character> shiftChars = new HashMap<Character, Character>();
+	static
+	{
+		shiftChars.put('_', '-');
+		shiftChars.put('!', '1');
+		shiftChars.put('@', '2');
+		shiftChars.put('#', '3');
+		shiftChars.put('$', '4');
+		shiftChars.put('%', '5');
+		shiftChars.put('^', '6');
+		shiftChars.put('&', '7');
+		shiftChars.put('*', '8');
+		shiftChars.put('(', '9');
+		shiftChars.put(')', '0');
+		shiftChars.put('+', '=');
+		shiftChars.put('{', '[');
+		shiftChars.put('}', ']');
+		shiftChars.put('|', '\\');
+		shiftChars.put(':', ';');
+		shiftChars.put('"', '\'');
+		shiftChars.put('<', ',');
+		shiftChars.put('>', '.');
+		shiftChars.put('?', '/');
+		shiftChars.put('~', '`');
+	}
+
 	/**
 	 * @param args
 	 * @throws Exception
@@ -262,16 +293,21 @@ public class BundleConverter
 			PlistProperties properties = parse(syntaxFile);
 			String scope = (String) properties.getProperty("scopeName");
 			List<String> fileTypes = (List<String>) properties.getProperty("fileTypes");
-			for (String fileType : fileTypes)
+			if (fileTypes != null && !fileTypes.isEmpty())
 			{
-				String pattern = "*." + fileType;
-				// If fileType has a period or begins with a capital letter we should assume exact filename match
-				if (fileType.contains(".") || Character.isUpperCase(fileType.charAt(0)))
+				builder.append("  bundle.file_types['").append(scope).append("'] = ");
+				for (String fileType : fileTypes)
 				{
-					pattern = fileType;
+					String pattern = "*." + fileType;
+					// If fileType has a period or begins with a capital letter we should assume exact filename match
+					if (fileType.contains(".") || Character.isUpperCase(fileType.charAt(0)))
+					{
+						pattern = fileType;
+					}
+					builder.append("'").append(pattern).append("', ");
 				}
-				builder.append("  bundle.register_file_type('").append(pattern).append("', '").append(scope).append(
-						"')\n");
+				builder.delete(builder.length() - 2, builder.length());
+				builder.append("\n");
 			}
 		}
 		return builder.toString();
@@ -483,6 +519,13 @@ public class BundleConverter
 		}
 		m.appendTail(sb);
 		result = sb.toString();
+
+		// We really need to convert any characters that only occur with a shift into their "unshifted chars + shift"
+		for (Map.Entry<Character, Character> entry : shiftChars.entrySet())
+		{
+			result = result.replace("SHIFT+" + entry.getKey(), "SHIFT+" + entry.getValue());
+			result = result.replace("M2+" + entry.getKey(), "M2+" + entry.getValue());
+		}
 		return result;
 	}
 }
