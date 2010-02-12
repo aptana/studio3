@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -158,6 +159,26 @@ public class ProcessWrapper
 		}
 
 		return result;
+	}
+	
+	/**
+	 * setStandardErrorFilter
+	 * 
+	 * @param pattern
+	 */
+	public void setStandardErrorFilter(Pattern pattern)
+	{
+		this._stderr.setFilter(pattern);
+	}
+	
+	/**
+	 * setStandardOutputFilter
+	 * 
+	 * @param pattern
+	 */
+	public void setStandardOutputFilter(Pattern pattern)
+	{
+		this._stdout.setFilter(pattern);
 	}
 	
 	/**

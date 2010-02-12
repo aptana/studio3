@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -34,6 +36,13 @@ public class DefaultWindowsConfiguration implements ProcessConfiguration
 	@Override
 	public void afterStart(ProcessWrapper wrapper)
 	{
+		// Turn on filtering
+		String marker = UUID.randomUUID().toString();
+		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE);
+		
+		wrapper.setStandardOutputFilter(filter);
+		
+		// Set current directory, if needed
 		String startingDirectory = wrapper.getStartingDirectory();
 		
 		if (startingDirectory != null && startingDirectory.length() > 0)
@@ -46,7 +55,10 @@ public class DefaultWindowsConfiguration implements ProcessConfiguration
 			}
 		}
 		
-		wrapper.sendText("cmd.exe;exit\n");
+		// startup cmd.exe and turn filtering off
+		String command = "cmd.exe /K '@echo " + marker + "'";
+		
+		wrapper.sendText(command + ";exit\n");
 	}
 
 	/*
