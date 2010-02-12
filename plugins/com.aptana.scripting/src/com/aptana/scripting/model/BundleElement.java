@@ -18,7 +18,7 @@ import com.aptana.util.StringUtil;
 
 public class BundleElement extends AbstractElement
 {
-	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
+	public static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
 
 	private String _author;
@@ -139,7 +139,8 @@ public class BundleElement extends AbstractElement
 		// if there's already a filetype for it!
 		// Check to see if files of this type already have an association
 		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+		// TODO Make this much more intelligent! If we're associating a scope that is more specific than an existing scope that is associated with a non-generic content type, we should associate with that parent content type!
+		// i.e. 'source.ruby.rspec' => '*.spec' should get associated to same content type that 'source.ruby' did (the ruby content type).
 		if (type == null)
 		{
 			type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
@@ -596,18 +597,6 @@ public class BundleElement extends AbstractElement
 				}
 			}
 		}
-	}
-
-	/**
-	 * registerFileType
-	 * 
-	 * @param fileType
-	 * @param scope
-	 */
-	public void registerFileType(String fileType, String scope)
-	{
-		this.associateFileType(fileType);
-		this.associateScope(fileType, scope);
 	}
 
 	/**
