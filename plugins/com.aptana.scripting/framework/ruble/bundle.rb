@@ -124,26 +124,7 @@ module Ruble
     def file_types
       FileTypesProxy.new(@jobj)
     end    
-    
-    # TODO These following two methods should be deprecated in place of new syntax: file_types['scope'] = ['patterns', ...]
-    
-    # This method does two things:
-    # If the given file type is not associated with any editor, we associate it with our generic text editor
-    # We also register a top-level scope to report back for any file whose name matches the file type pattern.
-    # Understands * wildcard. Typical values for first arg: '*.yml', '*_spec.rb', 'Rakefile'
-    # scope is a string or a symbol. Underscores are converted to spaces (so 'source.yaml' and :source_yaml are equivalent)
-    def register_file_type(file_type, scope)
-      associate_scope(file_type, scope)
-      @jobj.associateFileType(file_type.to_s)
-    end
-    
-    # Registers a top-level scope to report back for any file whose name matches the passed in pattern.
-    # Understands * wildcard. Typical values for first arg: '*.yml', '*_spec.rb', 'Rakefile'
-    # scope is a string or a symbol. Underscores are converted to spaces (so 'source.yaml' and :source_yaml are equivalent)
-    def associate_scope(file_type, scope)
-      @jobj.associateScope(file_type, scope.to_s.gsub(/_/, '.'))
-    end
-    
+        
     # A proxy class to make syntax pretty...
     class FoldingProxy
       def initialize(jobj)
@@ -159,11 +140,6 @@ module Ruble
     def folding
       # return an object that responds to hash methods
       FoldingProxy.new(@jobj)
-    end
-    
-    # TODO Deprecate
-    def set_folding_markers(scope, start_regexp, end_regexp)
-      folding[scope] = start_regexp, end_regexp
     end
     
     # A proxy class to make syntax pretty...
