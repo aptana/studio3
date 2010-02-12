@@ -105,6 +105,28 @@ module Ruble
       @jobj.license_url = license_url.join("\n")
     end
     
+    # A proxy class to make syntax pretty...
+    class FileTypesProxy
+      def initialize(jobj)
+        @jobj = jobj
+      end
+      
+      def []=(scope, array)
+        array.each do |file_type|
+          @jobj.associateFileType(file_type.to_s)
+          @jobj.associateScope(file_type.to_s, scope.to_s.gsub(/_/, '.'))
+        end
+      end
+    end
+    
+    # Used to associate a top-level scope and the Aptana editors with an array of filetype patterns
+    # i.e. bundle.file_types['scope.name'] = '*.xml', '*xsl', '*.xslt'
+    def file_types
+      FileTypesProxy.new(@jobj)
+    end    
+    
+    # TODO These following two methods should be deprecated in place of new syntax: file_types['scope'] = ['patterns', ...]
+    
     # This method does two things:
     # If the given file type is not associated with any editor, we associate it with our generic text editor
     # We also register a top-level scope to report back for any file whose name matches the file type pattern.
@@ -112,12 +134,6 @@ module Ruble
     # scope is a string or a symbol. Underscores are converted to spaces (so 'source.yaml' and :source_yaml are equivalent)
     def register_file_type(file_type, scope)
       associate_scope(file_type, scope)
-      associate_file_type(file_type)
-    end
-    
-    # Given a filename pattern, we register files that match to our generic text editor (uses our theme and scripting)
-    # file_type must be either an exact filename to match, or a *.ext extension to associate with. (i.e. 'Rakefile', '*.yml')
-    def associate_file_type(file_type)
       @jobj.associateFileType(file_type.to_s)
     end
     
@@ -138,7 +154,7 @@ module Ruble
         raise "Need two regexp to define folding" if array.size != 2
         @jobj.setFoldingMarkers(scope.to_s.gsub(/_/, '.'), array.first, array.last)
       end
-    end    
+    end
     
     def folding
       # return an object that responds to hash methods
