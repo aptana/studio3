@@ -36,22 +36,22 @@ class RubyRegexpFolder
 		{
 			monitor.beginTask(Messages.CommonReconcilingStrategy_FoldingTaskName, lineCount);
 		}
-		for (int i = 0; i < lineCount; i++)
+		for (int currentLine = 0; currentLine < lineCount; currentLine++)
 		{
-			IRegion lineRegion = fDocument.getLineInformation(i);
+			IRegion lineRegion = fDocument.getLineInformation(currentLine);
 			int offset = lineRegion.getOffset();
 			String line = fDocument.get(offset, lineRegion.getLength());
 
-			String scope = getScopeAtOffset(offset);
-
-			RubyRegexp startRegexp = getStartFoldRegexp(scope);
+			// Use scope at beginning of line for start regexp
+			RubyRegexp startRegexp = getStartFoldRegexp(getScopeAtOffset(offset));
 			if (startRegexp == null)
 			{
 				if (monitor != null)
 					monitor.worked(1);
 				continue;
 			}
-			RubyRegexp endRegexp = getEndFoldRegexp(scope);
+			// Use scope at end of line for end regexp
+			RubyRegexp endRegexp = getEndFoldRegexp(getScopeAtOffset(offset + lineRegion.getLength()));
 			if (endRegexp == null)
 			{
 				if (monitor != null)
@@ -77,16 +77,21 @@ class RubyRegexpFolder
 					if (!endMatcher.isNil())
 					{
 						int startingOffset = starts.remove(indent);
-						int end = lineRegion.getOffset() + lineRegion.getLength() + 1; // cheat and just use end of line
-						if (end > fDocument.getLength())
+						int startLine = fDocument.getLineOfOffset(startingOffset);
+						if (startLine != currentLine)
 						{
-							end = fDocument.getLength();
-						}
-						int posLength = end - startingOffset;
-						if (posLength > 0)
-						{							
-							Position position = new Position(startingOffset, posLength);
-							positions.add(position);
+							int end = lineRegion.getOffset() + lineRegion.getLength() + 1; // cheat and just use end of
+																							// line
+							if (end > fDocument.getLength())
+							{
+								end = fDocument.getLength();
+							}
+							int posLength = end - startingOffset;
+							if (posLength > 0)
+							{
+								Position position = new Position(startingOffset, posLength);
+								positions.add(position);
+							}
 						}
 					}
 				}
