@@ -24,7 +24,7 @@ module Ruble
           bundle = @@bundles_by_path[test_path]
         end
         
-        return (bundle.nil?) ? nil : bundle
+        return bundle
       end
       
       def reference_bundle(bundle)
