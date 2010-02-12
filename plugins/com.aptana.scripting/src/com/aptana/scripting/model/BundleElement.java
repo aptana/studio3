@@ -7,18 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
 import org.jruby.RubyRegexp;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.Activator;
 import com.aptana.util.StringUtil;
 
 public class BundleElement extends AbstractElement
 {
-	public static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
 	private static final String BUNDLE_DIRECTORY_SUFFIX = ".ruble"; //$NON-NLS-1$
 
 	private String _author;
@@ -38,6 +33,7 @@ public class BundleElement extends AbstractElement
 	private Object commandLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
+	private List<String> fileTypes;
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
@@ -135,33 +131,11 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateFileType(String fileType)
 	{
-		// We need to massage the argument into file name or extension and then create a bogus name when we want to see
-		// if there's already a filetype for it!
-		// Check to see if files of this type already have an association
-		IContentType type = Platform.getContentTypeManager().findContentTypeFor(fileType.replaceAll("\\*", "star")); //$NON-NLS-1$ //$NON-NLS-2$
-		// TODO Make this much more intelligent! If we're associating a scope that is more specific than an existing scope that is associated with a non-generic content type, we should associate with that parent content type!
-		// i.e. 'source.ruby.rspec' => '*.spec' should get associated to same content type that 'source.ruby' did (the ruby content type).
-		if (type == null)
+		if (fileTypes == null)
 		{
-			type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
-			
-			try
-			{
-				int assocType = IContentType.FILE_NAME_SPEC;
-				
-				if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
-				{
-					assocType = IContentType.FILE_EXTENSION_SPEC;
-					fileType = fileType.substring(fileType.indexOf('.') + 1);
-				}
-				
-				type.addFileSpec(fileType, assocType);
-			}
-			catch (CoreException e)
-			{
-				Activator.logError(e.getMessage(), e);
-			}
+			fileTypes = new ArrayList<String>();
 		}
+		fileTypes.add(fileType);
 	}
 
 	/**
@@ -793,31 +767,14 @@ public class BundleElement extends AbstractElement
 	{
 		this._visible = flag;
 	}
-	
+
+
 	/**
-	 * unassociateFileType
-	 * 
-	 * @param fileType
+	 * getFileTypes
+	 * @return
 	 */
-	public void unassociateFileType(String fileType)
+	List<String> getFileTypes()
 	{
-		IContentType type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
-		
-		try
-		{
-			int assocType = IContentType.FILE_NAME_SPEC;
-			
-			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
-			{
-				assocType = IContentType.FILE_EXTENSION_SPEC;
-				fileType = fileType.substring(fileType.indexOf('.') + 1);
-			}
-			
-			type.removeFileSpec(fileType, assocType);
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e.getMessage(), e);
-		}
+		return fileTypes;
 	}
 }
