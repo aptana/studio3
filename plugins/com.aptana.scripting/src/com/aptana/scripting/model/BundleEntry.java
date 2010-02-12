@@ -252,6 +252,33 @@ public class BundleEntry
 
 		return result;
 	}
+	
+	/**
+	 * getFileTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getFileTypes()
+	{
+		final List<String> result = new ArrayList<String>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				List<String> registry = bundle.getFileTypes();
+				
+				if (registry != null)
+				{
+					result.addAll(registry);
+				}
+				
+				return true;
+			}
+		});
+
+		return result;
+	}
 
 	/**
 	 * getFoldingStartMarkers

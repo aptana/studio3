@@ -1340,6 +1340,19 @@ public class BundleManager
 	}
 
 	/**
+	 * removeBundleChangeListener
+	 * 
+	 * @param listener
+	 */
+	public void removeBundleChangeListener(BundleChangeListener listener)
+	{
+		if (this._bundleListeners != null)
+		{
+			this._bundleListeners.remove(listener);
+		}
+	}
+	
+	/**
 	 * removeElementChangeListener
 	 * 
 	 * @param listener

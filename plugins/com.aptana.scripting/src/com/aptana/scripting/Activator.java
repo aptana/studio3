@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
+import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.RunType;
 
 /**
@@ -40,7 +41,7 @@ public class Activator extends Plugin
 	{
 		return RunType.CURRENT_THREAD;
 	}
-	
+
 	/**
 	 * logError
 	 * 
@@ -82,6 +83,8 @@ public class Activator extends Plugin
 		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
+	private FileTypeAssociationListener fileTypeListener;
+
 	/**
 	 * The constructor
 	 */
@@ -97,6 +100,8 @@ public class Activator extends Plugin
 	{
 		super.start(context);
 		plugin = this;
+		fileTypeListener = new FileTypeAssociationListener();
+		BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
 	}
 
 	/*
@@ -105,8 +110,24 @@ public class Activator extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		KeybindingsManager.uninstall();
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			KeybindingsManager.uninstall();
+			if (fileTypeListener != null)
+			{
+				fileTypeListener.cleanup();
+				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
+			}
+			fileTypeListener = null;
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 }
