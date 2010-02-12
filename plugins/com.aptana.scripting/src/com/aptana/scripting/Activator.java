@@ -1,11 +1,14 @@
 package com.aptana.scripting;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentType;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
+import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.RunType;
 
 /**
@@ -40,7 +43,7 @@ public class Activator extends Plugin
 	{
 		return RunType.CURRENT_THREAD;
 	}
-	
+
 	/**
 	 * logError
 	 * 
@@ -105,8 +108,29 @@ public class Activator extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		KeybindingsManager.uninstall();
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			KeybindingsManager.uninstall();
+			// Clean up the generic content type in bundle
+			IContentType type = Platform.getContentTypeManager().getContentType(BundleElement.GENERIC_CONTENT_TYPE_ID);
+			int[] specTypes = new int[] { IContentType.FILE_EXTENSION_SPEC, IContentType.FILE_NAME_SPEC };
+			for (int specType : specTypes)
+			{
+				String[] specs = type.getFileSpecs(specType);
+				for (String spec : specs)
+				{
+					type.removeFileSpec(spec, specType);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 }
