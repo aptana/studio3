@@ -1,5 +1,6 @@
 package com.aptana.commandline.launcher.application;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,6 +8,8 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -112,6 +115,17 @@ public class LauncherApplication implements IApplication
 
 	public static boolean sendArguments(int port, String[] arguments)
 	{
+		// Convert to absolute paths
+		List<String> filesList = new LinkedList<String>();
+		for (String argument : arguments)
+		{
+			File file = new File(argument);
+			if (file.exists()) {
+				filesList.add(file.getAbsolutePath());
+			}
+		}
+		arguments = filesList.toArray(new String[0]);
+
 		Socket socket = null;
 		InputStream is = null;
 		OutputStream os = null;

@@ -42,7 +42,8 @@ public class CommandlineArgumentsHandler
 				for (String argument : arguments)
 				{
 					File file = new File(argument);
-					if (file.exists())
+					// Process an existing file.
+					if (file.exists() && file.isFile())
 					{
 						Path path = new Path(argument);
 						IFile fileForLocation = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
