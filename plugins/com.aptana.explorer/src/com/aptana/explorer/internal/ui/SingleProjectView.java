@@ -590,9 +590,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	private void hookToThemes()
 	{
-		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getBackground()));
+		themeChanged();
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -718,10 +716,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					getCommonViewer().refresh();
-					getCommonViewer().getTree().setBackground(
-							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									getThemeManager().getCurrentTheme().getBackground()));
+					themeChanged();
 				}
 			}
 		};
@@ -1055,6 +1050,13 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			ExplorerPlugin.logError(e);
 		}
+	}
+
+	protected void themeChanged()
+	{
+		getCommonViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput
