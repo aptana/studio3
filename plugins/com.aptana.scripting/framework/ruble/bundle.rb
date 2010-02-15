@@ -212,24 +212,29 @@ module Ruble
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
         
-        # create new bundle
-        bundle = Bundle.new(name)
+        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets)$/
+          log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{$fullpath}")
+          return
+        end
         
-        # associate default values
-        bundle.push_defaults values
-        
-        # add to bundle manager so the block, if given,
-        # can lookup the bundle by path name
-        BundleManager.reference_bundle bundle
-        
-        # process block
-        block.call(bundle) if block_given?
-        
-        # remove defaults
-        bundle.pop_defaults
-        
-        # add the bundle
-        BundleManager.add_bundle(bundle)
+	    # create new bundle
+	    bundle = Bundle.new(name)
+	    
+	    # associate default values
+	    bundle.push_defaults values
+	    
+	    # add to bundle manager so the block, if given,
+	    # can lookup the bundle by path name
+	    BundleManager.reference_bundle bundle
+	    
+	    # process block
+	    block.call(bundle) if block_given?
+	    
+	    # remove defaults
+	    bundle.pop_defaults
+	    
+	    # add the bundle
+	    BundleManager.add_bundle(bundle)
       end
     end
   

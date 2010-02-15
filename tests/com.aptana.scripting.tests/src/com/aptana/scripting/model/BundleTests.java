@@ -1,8 +1,64 @@
 package com.aptana.scripting.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import com.aptana.scripting.ScriptLogListener;
+import com.aptana.scripting.ScriptLogger;
+
 
 public class BundleTests extends BundleTestBase
 {
+	public class LogListener implements ScriptLogListener
+	{
+		List<String> errors = new LinkedList<String>();
+		List<String> infos = new LinkedList<String>();
+		List<String> warnings = new LinkedList<String>();
+		List<String> prints = new LinkedList<String>();
+		List<String> printErrors = new LinkedList<String>();
+		List<String> traces = new LinkedList<String>();
+		
+		public void logError(String error)
+		{
+			this.errors.add(error);
+		}
+
+		public void logInfo(String info)
+		{
+			this.infos.add(info);
+		}
+
+		public void logWarning(String warning)
+		{
+			this.warnings.add(warning);
+		}
+
+		public void print(String message)
+		{
+			this.prints.add(message);
+		}
+
+		public void printError(String message)
+		{
+			this.printErrors.add(message);
+		}
+
+		public void trace(String message)
+		{
+			this.traces.add(message);
+		}
+		
+		public void reset()
+		{
+			this.errors.clear();
+			this.infos.clear();
+			this.warnings.clear();
+			this.prints.clear();
+			this.printErrors.clear();
+			this.traces.clear();
+		}
+	};
+	
 	/**
 	 * compareScopedBundles
 	 * 
@@ -314,6 +370,32 @@ public class BundleTests extends BundleTestBase
 			assertEquals("cd", command1.getInvoke());
 			assertEquals("cd ..", command2.getInvoke());
 		}
+	}
+	
+	/**
+	 * testBundleInCommandsDirectory
+	 */
+	public void testBundleInCommandsDirectory()
+	{
+		LogListener listener = new LogListener();
+		ScriptLogger.getInstance().addLogListener(listener);
+		this.loadBundleEntry("bundleInCommands", BundlePrecedence.PROJECT);
+		
+		assertEquals(1, listener.errors.size());
+		assertTrue(listener.errors.get(0).contains("Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
+	}
+	
+	/**
+	 * testBundleFileInCommandsDirectory
+	 */
+	public void testBundleFileInCommandsDirectory()
+	{
+		LogListener listener = new LogListener();
+		ScriptLogger.getInstance().addLogListener(listener);
+		this.loadBundleEntry("bundleFileInCommands", BundlePrecedence.PROJECT);
+		
+		assertEquals(1, listener.errors.size());
+		assertTrue(listener.errors.get(0).contains("Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
 	}
 	
 	/**
