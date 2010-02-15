@@ -4,12 +4,12 @@ public class ScannerSwitchStrategy implements IScannerSwitchStrategy
 {
 
 	private String[] fEnterTokens;
-	private String[] fExitSequences;
+	private String[] fExitTokens;
 
-	public ScannerSwitchStrategy(String[] enterTokens, String[] exitSequences)
+	public ScannerSwitchStrategy(String[] enterTokens, String[] exitTokens)
 	{
 		fEnterTokens = enterTokens;
-		fExitSequences = exitSequences;
+		fExitTokens = exitTokens;
 	}
 
 	@Override
@@ -19,8 +19,8 @@ public class ScannerSwitchStrategy implements IScannerSwitchStrategy
 	}
 
 	@Override
-	public String[] getExitSequences()
+	public String[] getExitTokens()
 	{
-		return fExitSequences;
+		return fExitTokens;
 	}
 }

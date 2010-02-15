@@ -6,7 +6,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
 
 import beaver.Scanner;
 import beaver.Symbol;
@@ -14,19 +13,12 @@ import beaver.Symbol;
 public class CompositeParserScanner extends Scanner
 {
 
-	protected static final int DEFAULT_INDEX = -1;
-
-	private ITokenScanner fPrimaryTokenScanner;
+	private CompositeTokenScanner fTokenScanner;
 	private IDocument fDocument;
-	private IScannerSwitchStrategy[] fSwitchStrategies;
 
-	private int fCurrentIndex;
-
-	public CompositeParserScanner(ITokenScanner primaryTokenScanner, IScannerSwitchStrategy[] switchStrategies)
+	public CompositeParserScanner(CompositeTokenScanner tokenScanner)
 	{
-		fPrimaryTokenScanner = primaryTokenScanner;
-		fSwitchStrategies = switchStrategies;
-		fCurrentIndex = DEFAULT_INDEX;
+		fTokenScanner = tokenScanner;
 	}
 
 	public IDocument getSource()
@@ -42,43 +34,27 @@ public class CompositeParserScanner extends Scanner
 	public void setSource(IDocument document)
 	{
 		fDocument = document;
-		fCurrentIndex = DEFAULT_INDEX;
-		fPrimaryTokenScanner.setRange(fDocument, 0, fDocument.getLength());
+		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
 	}
 
 	@Override
 	public Symbol nextToken() throws IOException, Exception
 	{
-		IToken token = fPrimaryTokenScanner.nextToken();
-		Object data = token.getData();
+		IToken token = fTokenScanner.nextToken();
 		while (isIgnored(token))
 		{
-			token = fPrimaryTokenScanner.nextToken();
-			data = token.getData();
+			token = fTokenScanner.nextToken();
 		}
 
-		int offset = fPrimaryTokenScanner.getTokenOffset();
-		int length = fPrimaryTokenScanner.getTokenLength();
+		int offset = fTokenScanner.getTokenOffset();
+		int length = fTokenScanner.getTokenLength();
+		if (token.isEOF()) {
+			return createSymbol(offset, offset, "", token); //$NON-NLS-1$
+		}
 
 		try
 		{
 			String text = fDocument.get(offset, length);
-			if (data != null)
-			{
-				if (fCurrentIndex == DEFAULT_INDEX)
-				{
-					fCurrentIndex = getScannerIndex(data.toString());
-				}
-				else
-				{
-					if (hasExitSequence(text))
-					{
-						// exits out to the top level
-						reset();
-					}
-				}
-			}
-
 			return createSymbol(offset, offset + length - 1, text, token);
 		}
 		catch (BadLocationException e)
@@ -98,43 +74,8 @@ public class CompositeParserScanner extends Scanner
 		return token.isWhitespace();
 	}
 
-	protected int getCurrentStrategyIndex()
+	protected CompositeTokenScanner getTokenScanner()
 	{
-		return fCurrentIndex;
-	}
-
-	private int getScannerIndex(String data)
-	{
-		String[] tokens;
-		for (int i = 0; i < fSwitchStrategies.length; ++i)
-		{
-			tokens = fSwitchStrategies[i].getEnterTokens();
-			for (String token : tokens)
-			{
-				if (data.equals(token))
-				{
-					return i;
-				}
-			}
-		}
-		return DEFAULT_INDEX;
-	}
-
-	private boolean hasExitSequence(String text)
-	{
-		String[] sequences = fSwitchStrategies[fCurrentIndex].getExitSequences();
-		for (String sequence : sequences)
-		{
-			if (text.equals(sequence))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void reset()
-	{
-		fCurrentIndex = DEFAULT_INDEX;
+		return fTokenScanner;
 	}
 }
