@@ -53,6 +53,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
 
 	/**
+	 * Default set to use when bg is very dark!
+	 */
+	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
+	private static final RGB DEFAULT_DARK_RED_FG = new RGB(255, 224, 224);
+	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
+	private static final RGB DEFAULT_DARK_GREEN_FG = new RGB(212, 255, 212);
+
+	/**
 	 * The token used from the theme for staged file decorations.
 	 */
 	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
@@ -264,6 +272,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getForeground(STAGED_TOKEN);
 		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_FG);
+		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
 
@@ -272,6 +284,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
 			return getActiveTheme().getBackground(STAGED_TOKEN);
+		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
@@ -282,6 +298,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
 		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_FG);
+		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
 
@@ -291,7 +311,18 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
+		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
+	}
+
+	private boolean currentThemeHasDarkBG()
+	{
+		RGB themeBG = getActiveTheme().getBackground();
+		int total = themeBG.blue + themeBG.red + themeBG.green;
+		return total <= 256;
 	}
 
 	protected Theme getActiveTheme()
