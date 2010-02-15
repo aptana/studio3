@@ -1,12 +1,8 @@
 package com.aptana.editor.common.outline;
 
-public class IParseListener
+public interface IParseListener
 {
 
-	public void parseFinished()
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	public void parseFinished();
 
 }
