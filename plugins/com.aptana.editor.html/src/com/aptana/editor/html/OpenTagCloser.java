@@ -101,7 +101,7 @@ public class OpenTagCloser implements VerifyKeyListener
 			}
 			buffer.append(closeTag);
 			document.replace(offset, length, buffer.toString());
-			if (nextIsLessThan)
+			if (nextIsLessThan || overwrite)
 			{
 				// move cursor one?
 				textViewer.setSelectedRange(offset, 0);

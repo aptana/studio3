@@ -161,6 +161,20 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	
+	public void testDoesStickCursorBetweenAutoClosedTagPair()
+	{
+		IDocument document = setDocument("<html>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(6);
+		closer.verifyKey(event);
+
+		assertEquals("<html></html>", document.get());
+		assertFalse(event.doit);
+		assertEquals(6, viewer.getTextWidget().getCaretOffset());
+		assertEquals(6, viewer.getSelectedRange().x);
+	}
+	
 	protected VerifyEvent createLessThanKeyEvent(int offset)
 	{
 		Event e = new Event();
