@@ -6,7 +6,6 @@ import java.util.List;
 import com.aptana.scripting.ScriptLogListener;
 import com.aptana.scripting.ScriptLogger;
 
-
 public class BundleTests extends BundleTestBase
 {
 	public class LogListener implements ScriptLogListener
@@ -17,7 +16,7 @@ public class BundleTests extends BundleTestBase
 		List<String> prints = new LinkedList<String>();
 		List<String> printErrors = new LinkedList<String>();
 		List<String> traces = new LinkedList<String>();
-		
+
 		public void logError(String error)
 		{
 			this.errors.add(error);
@@ -47,7 +46,7 @@ public class BundleTests extends BundleTestBase
 		{
 			this.traces.add(message);
 		}
-		
+
 		public void reset()
 		{
 			this.errors.clear();
@@ -58,7 +57,7 @@ public class BundleTests extends BundleTestBase
 			this.traces.clear();
 		}
 	};
-	
+
 	/**
 	 * compareScopedBundles
 	 * 
@@ -68,7 +67,8 @@ public class BundleTests extends BundleTestBase
 	 * @param command1
 	 * @param command2
 	 */
-	private void compareScopedBundles(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2, String command1, String command2)
+	private void compareScopedBundles(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2,
+			String command1, String command2)
 	{
 		// confirm first bundle loaded properly
 		BundleEntry entry = this.getBundleEntry(bundleName, prec1);
@@ -76,7 +76,7 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals(command1, commands[0].getInvoke());
-		
+
 		// confirm second bundle overrides application
 		entry = this.getBundleEntry(bundleName, prec2);
 		commands = entry.getCommands();
@@ -84,7 +84,7 @@ public class BundleTests extends BundleTestBase
 		assertEquals(1, commands.length);
 		assertEquals(command2, commands[0].getInvoke());
 	}
-	
+
 	/**
 	 * compareScopedBundlesWithDelete
 	 * 
@@ -94,28 +94,29 @@ public class BundleTests extends BundleTestBase
 	 * @param command1
 	 * @param command2
 	 */
-	private void compareScopedBundlesWithDelete(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2, String command1, String command2)
+	private void compareScopedBundlesWithDelete(String bundleName, BundlePrecedence prec1, BundlePrecedence prec2,
+			String command1, String command2)
 	{
 		this.compareScopedBundles(bundleName, prec1, prec2, command1, command2);
-		
+
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(2, bundles.length);
 		entry.removeBundle(bundles[1]);
-		
+
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals(command1, commands[0].getInvoke());
 	}
-	
+
 	/**
 	 * setUp
 	 */
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		
+
 		BundleManager.getInstance().reset();
 	}
 
@@ -126,7 +127,7 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "loneBundle";
 		BundleElement bundle = this.loadBundle(bundleName, BundlePrecedence.APPLICATION);
-		
+
 		assertNotNull(bundle);
 		assertEquals(bundleName, bundle.getDisplayName());
 	}
@@ -139,7 +140,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleWithCommand";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		CommandElement[] commands = entry.getCommands();
-		
+
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 	}
@@ -152,7 +153,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleWithMenu";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		MenuElement[] menus = entry.getMenus();
-		
+
 		assertNotNull(menus);
 		assertEquals(1, menus.length);
 	}
@@ -165,24 +166,18 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleWithSnippet";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
 		CommandElement[] snippets = entry.getCommands();
-		
+
 		assertNotNull(snippets);
 		assertEquals(1, snippets.length);
 		assertTrue(snippets[0] instanceof SnippetElement);
 	}
-	
+
 	/**
 	 * testUserOverridesApplication
 	 */
 	public void testUserOverridesApplication()
 	{
-		compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.APPLICATION,
-			BundlePrecedence.USER,
-			"cd",
-			"cd .."
-		);
+		compareScopedBundles("bundleWithCommand", BundlePrecedence.APPLICATION, BundlePrecedence.USER, "cd", "cd ..");
 	}
 
 	/**
@@ -190,113 +185,73 @@ public class BundleTests extends BundleTestBase
 	 */
 	public void testUserOverridesApplication2()
 	{
-		this.compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.USER,
-			BundlePrecedence.APPLICATION,
-			"cd ..",
-			"cd .."
-		);
+		this.compareScopedBundles("bundleWithCommand", BundlePrecedence.USER, BundlePrecedence.APPLICATION, "cd ..",
+				"cd ..");
 	}
-	
+
 	/**
 	 * testUserOverridesApplication
 	 */
 	public void testProjectOverridesApplication()
 	{
-		this.compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.APPLICATION,
-			BundlePrecedence.PROJECT,
-			"cd",
-			"cd /"
-		);
+		this.compareScopedBundles("bundleWithCommand", BundlePrecedence.APPLICATION, BundlePrecedence.PROJECT, "cd",
+				"cd /");
 	}
-	
+
 	/**
 	 * testUserOverridesApplication2
 	 */
 	public void testProjectOverridesApplication2()
 	{
-		this.compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.PROJECT,
-			BundlePrecedence.APPLICATION,
-			"cd /",
-			"cd /"
-		);
+		this.compareScopedBundles("bundleWithCommand", BundlePrecedence.PROJECT, BundlePrecedence.APPLICATION, "cd /",
+				"cd /");
 	}
-	
+
 	/**
 	 * testUserOverridesApplication
 	 */
 	public void testProjectOverridesUser()
 	{
-		this.compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.USER,
-			BundlePrecedence.PROJECT,
-			"cd ..",
-			"cd /"
-		);
+		this
+				.compareScopedBundles("bundleWithCommand", BundlePrecedence.USER, BundlePrecedence.PROJECT, "cd ..",
+						"cd /");
 	}
-	
+
 	/**
 	 * testUserOverridesApplication2
 	 */
 	public void testProjectOverridesUser2()
 	{
-		this.compareScopedBundles(
-			"bundleWithCommand",
-			BundlePrecedence.PROJECT,
-			BundlePrecedence.USER,
-			"cd /",
-			"cd /"
-		);
+		this.compareScopedBundles("bundleWithCommand", BundlePrecedence.PROJECT, BundlePrecedence.USER, "cd /", "cd /");
 	}
-	
+
 	/**
 	 * testApplicationOverrideAndDelete
 	 */
 	public void testApplicationOverrideAndDelete()
 	{
-		this.compareScopedBundlesWithDelete(
-			"bundleWithCommand",
-			BundlePrecedence.APPLICATION,
-			BundlePrecedence.USER,
-			"cd",
-			"cd .."
-		);
+		this.compareScopedBundlesWithDelete("bundleWithCommand", BundlePrecedence.APPLICATION, BundlePrecedence.USER,
+				"cd", "cd ..");
 	}
-	
+
 	/**
 	 * testApplicationOverrideAndDelete
 	 */
 	public void testApplicationOverrideAndDelete2()
 	{
-		this.compareScopedBundlesWithDelete(
-			"bundleWithCommand",
-			BundlePrecedence.APPLICATION,
-			BundlePrecedence.PROJECT,
-			"cd",
-			"cd /"
-		);
+		this.compareScopedBundlesWithDelete("bundleWithCommand", BundlePrecedence.APPLICATION,
+				BundlePrecedence.PROJECT, "cd", "cd /");
 	}
-	
+
 	/**
 	 * testUserOverridesApplication
 	 */
 	public void testUserOverrideAndDelete()
 	{
-		this.compareScopedBundlesWithDelete(
-			"bundleWithCommand",
-			BundlePrecedence.USER,
-			BundlePrecedence.PROJECT,
-			"cd ..",
-			"cd /"
-		);
+		this.compareScopedBundlesWithDelete("bundleWithCommand", BundlePrecedence.USER, BundlePrecedence.PROJECT,
+				"cd ..", "cd /");
 	}
-	
+
 	/**
 	 * testSamePrecedenceOverride
 	 */
@@ -308,7 +263,7 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals("cd ..", commands[0].getInvoke());
-		
+
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
@@ -316,7 +271,7 @@ public class BundleTests extends BundleTestBase
 		assertEquals(1, commands.length);
 		assertEquals("cd", commands[0].getInvoke());
 	}
-	
+
 	/**
 	 * testSamePrecedenceOverride2
 	 */
@@ -329,7 +284,7 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals("cd", commands[0].getInvoke());
-		
+
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
@@ -337,8 +292,7 @@ public class BundleTests extends BundleTestBase
 		assertEquals(1, commands.length);
 		assertEquals("cd", commands[0].getInvoke());
 	}
-	
-	
+
 	/**
 	 * testSamePrecedenceAugmentation
 	 */
@@ -350,16 +304,16 @@ public class BundleTests extends BundleTestBase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 		assertEquals("cd ..", commands[0].getInvoke());
-		
+
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithDifferentCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(2, commands.length);
-		
+
 		CommandElement command1 = commands[0];
 		CommandElement command2 = commands[1];
-		
+
 		if (command1.getDisplayName().equals("MyCommand"))
 		{
 			assertEquals("cd ..", command1.getInvoke());
@@ -371,7 +325,7 @@ public class BundleTests extends BundleTestBase
 			assertEquals("cd ..", command2.getInvoke());
 		}
 	}
-	
+
 	/**
 	 * testBundleInCommandsDirectory
 	 */
@@ -380,11 +334,12 @@ public class BundleTests extends BundleTestBase
 		LogListener listener = new LogListener();
 		ScriptLogger.getInstance().addLogListener(listener);
 		this.loadBundleEntry("bundleInCommands", BundlePrecedence.PROJECT);
-		
+
 		assertEquals(1, listener.errors.size());
-		assertTrue(listener.errors.get(0).contains("Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
+		assertTrue(listener.errors.get(0).contains(
+				"Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
 	}
-	
+
 	/**
 	 * testBundleFileInCommandsDirectory
 	 */
@@ -393,11 +348,12 @@ public class BundleTests extends BundleTestBase
 		LogListener listener = new LogListener();
 		ScriptLogger.getInstance().addLogListener(listener);
 		this.loadBundleEntry("bundleFileInCommands", BundlePrecedence.PROJECT);
-		
+
 		assertEquals(1, listener.errors.size());
-		assertTrue(listener.errors.get(0).contains("Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
+		assertTrue(listener.errors.get(0).contains(
+				"Attempted to define a bundle in a file other than the bundle's bundle.rb file:"));
 	}
-	
+
 	/**
 	 * testNameFromBundleDirectory
 	 */
@@ -406,12 +362,12 @@ public class BundleTests extends BundleTestBase
 		// load bundle
 		String bundleName = "bundleName";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
-		
+
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 	}
-	
+
 	/**
 	 * testNameFromBundleDirectoryWithExtension
 	 */
@@ -419,12 +375,12 @@ public class BundleTests extends BundleTestBase
 	{
 		// load bundle
 		this.loadBundleEntry("bundleNameWithExtension.ruble", BundlePrecedence.PROJECT);
-		
+
 		// get bundle entry
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");
 		assertNotNull(entry);
 	}
-	
+
 	/**
 	 * testBundleIsBundleDeclaration
 	 */
@@ -432,16 +388,16 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleDefinition";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
-		
+
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
-		
+
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
 		assertEquals(1, bundles.length);
 		assertFalse(bundles[0].isReference());
 	}
-	
+
 	/**
 	 * testBundleIsBundleDeclaration2
 	 */
@@ -449,45 +405,45 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleDefinition2";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
-		
+
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
-		
+
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
 		assertEquals(1, bundles.length);
 		assertFalse(bundles[0].isReference());
 	}
-	
+
 	/**
 	 * testBundleIsBundleReference
 	 */
 	public void testBundleIsBundleReference()
 	{
 		this.loadBundleEntry("bundleReference", BundlePrecedence.PROJECT);
-		
+
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("MyBundle");
 		assertNotNull(entry);
-		
+
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
 		assertEquals(1, bundles.length);
 		assertTrue(bundles[0].isReference());
 	}
-	
+
 	public void testReferenceLoadingAcrossPrecendenceBounds()
 	{
 		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.PROJECT);
-		
+
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
-		
+
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
 		assertEquals(3, bundles.length);
-		
+
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(3, commands.length);
