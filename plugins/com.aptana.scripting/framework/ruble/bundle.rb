@@ -7,10 +7,9 @@ module Ruble
   class Bundle < BaseElement
     @@defaults = {}
     
-    def initialize(name, default_values={})
+    def initialize(name)
       if name.kind_of? String
         super(name)
-        @@defaults[path.to_sym] = default_values
       else
         # hack to pass in java object...should test type
         @jobj = name
@@ -58,11 +57,25 @@ module Ruble
     end
     
     def defaults
-      @@defaults[path.to_sym] ||= {}
+      value_hashes = @@defaults[path.to_sym]
+      
+      (value_hashes.nil? || value_hashes.length == 0) ? {} : value_hashes[-1] 
     end
     
-    def defaults=(defaults)
-      @@defaults[path.to_sym] = defaults
+    def pop_defaults()
+      value_hashes = @@defaults[path.to_sym]
+      
+      value_hashes.pop if !value_hashes.nil?
+    end
+    
+    def push_defaults(defaults)
+      value_hashes = @@defaults[path.to_sym]
+      
+      if value_hashes.nil?
+        @@defaults[path.to_sym] = [defaults]
+      else
+        value_hashes.push((value_hashes.length == 0) ? defaults : value_hashes[-1].merge(defaults))
+      end
     end
     
     def description
@@ -199,13 +212,21 @@ module Ruble
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
         
-        # create new bundle and add to bundle manager so the block, if given,
+        # create new bundle
+        bundle = Bundle.new(name)
+        
+        # associate default values
+        bundle.push_defaults values
+        
+        # add to bundle manager so the block, if given,
         # can lookup the bundle by path name
-        bundle = Bundle.new(name, values)
         BundleManager.reference_bundle bundle
         
         # process block
         block.call(bundle) if block_given?
+        
+        # remove defaults
+        bundle.pop_defaults
         
         # add the bundle
         BundleManager.add_bundle(bundle)
@@ -233,8 +254,8 @@ def with_defaults(values, &block)
   if bundle.nil?
     bundle = Ruble::Bundle.define_bundle("", values, &block)
   else
-    bundle.defaults = values
+    bundle.push_defaults values
     block.call(bundle) if block_given?
-    bundle.defaults = {}
+    bundle.pop_defaults
   end
 end
