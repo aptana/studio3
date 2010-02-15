@@ -63,6 +63,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		plugin = this;
 
 		new EditorFontOverride().schedule();
+		new InvasiveThemeHijacker().schedule();
 	}
 
 	/*
