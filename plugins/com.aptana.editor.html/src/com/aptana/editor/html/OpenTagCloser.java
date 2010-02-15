@@ -121,7 +121,7 @@ public class OpenTagCloser implements VerifyKeyListener
 	private boolean tagClosed(IDocument document, int offset, String openTag) throws BadLocationException
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
-		String tagName = openTag.substring(1, openTag.indexOf(">")).trim();
+		String tagName = getTagName(openTag);
 
 		int stack = 0;
 		String src = document.get();
@@ -150,6 +150,23 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 		// if we had more equal number of closed (or more than open), then the tag is closed.
 		return stack <= 0;
+	}
+
+	/**
+	 * Assumes tag is in format <tag.name(\s*.*)>, returns tag.name
+	 * 
+	 * @param openTag
+	 * @return
+	 */
+	protected String getTagName(String openTag)
+	{
+		String tagName = openTag.substring(1, openTag.indexOf(">")).trim();
+		int spaceIndex = tagName.indexOf(' ');
+		if (spaceIndex != -1)
+		{
+			tagName = tagName.substring(0, spaceIndex);
+		}
+		return tagName;
 	}
 
 	private String getMatchingCloseTag(String openTag)

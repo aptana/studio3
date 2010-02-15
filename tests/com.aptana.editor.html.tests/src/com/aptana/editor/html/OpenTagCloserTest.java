@@ -175,6 +175,18 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals(6, viewer.getSelectedRange().x);
 	}
 	
+	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag()
+	{
+		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createLessThanKeyEvent(39);
+		closer.verifyKey(event);
+
+		assertEquals("<script src=\"http://example.org/src.js\">\n\n</script>", document.get());
+		assertFalse(event.doit); // don't insert it, we'll just overwrite '>'
+		assertEquals(40, viewer.getSelectedRange().x);
+	}
+	
 	protected VerifyEvent createLessThanKeyEvent(int offset)
 	{
 		Event e = new Event();
