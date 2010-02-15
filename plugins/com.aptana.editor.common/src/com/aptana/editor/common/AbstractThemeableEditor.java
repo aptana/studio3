@@ -148,13 +148,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return super.getAdapter(adapter);
 	}
 
-	protected CommonOutlinePage getOutlinePage()
+	public CommonOutlinePage getOutlinePage()
 	{
 		if (fOutlinePage == null)
 		{
-			fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
+			fOutlinePage = createOutlinePage();
 		}
 		return fOutlinePage;
+	}
+
+	protected CommonOutlinePage createOutlinePage()
+	{
+		return new CommonOutlinePage(this, getOutlinePreferenceStore());
 	}
 
 	private void overrideThemeColors()

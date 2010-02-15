@@ -55,4 +55,28 @@ public class RubyElement extends ParseBaseNode implements IRubyElement
 	{
 		occurrenceCount++;
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		// TODO Auto-generated method stub
+		return toString().equals(obj.toString());
+	}
+
+	@Override
+	public String toString()
+	{
+		Object parent = getParent();
+		if (parent != null)
+		{
+			return parent.toString() + "/" + getName();
+		}
+		return getName();
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
 }
