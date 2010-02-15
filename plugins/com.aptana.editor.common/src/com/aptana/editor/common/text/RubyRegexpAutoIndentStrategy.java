@@ -57,9 +57,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		{
 			// Get the line and run a regexp check against it
 			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d, c.offset);
-			RubyRegexp increaseIndentRegexp = BundleManager.getInstance().getIncreaseIndentRegexp(scope);
-			RubyRegexp decreaseIndentRegexp = BundleManager.getInstance().getDecreaseIndentRegexp(scope);
+			String scope = getScopeAtOffset(d, c.offset);
+			RubyRegexp increaseIndentRegexp = getIncreaseIndentRegexp(scope);
+			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
 
 			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
 
@@ -101,11 +101,12 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				{
 					i++;
 				}
-				String newContent = decreasedIndent + lineContent.substring(i);
+				String restOfLine = d.get(c.offset, curLineRegion.getLength() - (c.offset - curLineRegion.getOffset()));
+				String newContent = decreasedIndent + lineContent.substring(i) + decreasedIndent + restOfLine;
 				d.replace(curLineRegion.getOffset(), curLineRegion.getLength(), newContent);
 				// Set the new indent level for next line
 				c.text = newline + decreasedIndent;
-				c.offset = curLineRegion.getOffset() + newContent.length();
+				c.offset = curLineRegion.getOffset() + newContent.length() - restOfLine.length();
 				c.shiftsCaret = false;
 				return true;
 			}
@@ -118,7 +119,22 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		return false;
 	}
 
-	private boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+	protected RubyRegexp getDecreaseIndentRegexp(String scope)
+	{
+		return BundleManager.getInstance().getDecreaseIndentRegexp(scope);
+	}
+
+	protected RubyRegexp getIncreaseIndentRegexp(String scope)
+	{
+		return BundleManager.getInstance().getIncreaseIndentRegexp(scope);
+	}
+
+	protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d, offset);
+	}
+
+	protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
 	{
 		if (regexp == null)
 			return false;
@@ -149,8 +165,10 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			IRegion region = d.getLineInformation(i);
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d,
 					region.getOffset());
-			RubyRegexp increaseIndentRegexp = BundleManager.getInstance().getIncreaseIndentRegexp(scope);
-			RubyRegexp decreaseIndentRegexp = BundleManager.getInstance().getDecreaseIndentRegexp(scope);
+			String endScope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d,
+					region.getOffset() + region.getLength());
+			RubyRegexp increaseIndentRegexp = getIncreaseIndentRegexp(scope);
+			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(endScope);
 
 			String lineText = d.get(region.getOffset(), region.getLength());
 			if (matchesRegexp(increaseIndentRegexp, lineText))

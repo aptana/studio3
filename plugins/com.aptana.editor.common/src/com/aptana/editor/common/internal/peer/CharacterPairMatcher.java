@@ -107,10 +107,19 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 	 */
 	private IRegion performMatch(IDocument doc, int caretOffset) throws BadLocationException
 	{
-		final int charOffset = caretOffset - 1;
-		final char prevChar = doc.getChar(Math.max(charOffset, 0));
+		int charOffset = Math.max(caretOffset - 1, 0);
+		char prevChar = doc.getChar(charOffset);
 		if (!fPairs.contains(prevChar))
-			return null;
+		{
+			// Now try to right of caret
+			charOffset = caretOffset;
+			caretOffset += 1;
+			prevChar = doc.getChar(charOffset);
+			if (!fPairs.contains(prevChar))
+			{
+				return null;
+			}
+		}
 
 		boolean isForward = fPairs.isStartCharacter(prevChar);
 		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
@@ -130,7 +139,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
-		final int searchStartPosition = isForward ? caretOffset : caretOffset - 2;
+		final int searchStartPosition = isForward ? charOffset + 1 : caretOffset - 2;
 		final int adjustedOffset = isForward ? charOffset : caretOffset;
 
 		final DocumentPartitionAccessor partDoc = new DocumentPartitionAccessor(doc, fPartitioning, partition);
