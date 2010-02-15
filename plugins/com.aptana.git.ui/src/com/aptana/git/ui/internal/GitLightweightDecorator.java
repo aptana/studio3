@@ -56,9 +56,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	 * Default set to use when bg is very dark!
 	 */
 	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
-	private static final RGB DEFAULT_DARK_RED_FG = new RGB(255, 224, 224);
+	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
 	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
-	private static final RGB DEFAULT_DARK_GREEN_FG = new RGB(212, 255, 212);
+	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
 
 	/**
 	 * The token used from the theme for staged file decorations.
@@ -274,7 +274,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		if (currentThemeHasDarkBG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_FG);
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
@@ -285,10 +285,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getBackground(STAGED_TOKEN);
 		}
-		if (currentThemeHasDarkBG())
+		if (currentThemeHasLightFG())
 		{
 			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
 		}
+		// TODO Test if current theme's bg is too close to color we return here?
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
@@ -300,7 +301,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		if (currentThemeHasDarkBG())
 		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_FG);
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
@@ -311,18 +312,26 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
-		if (currentThemeHasDarkBG())
+		if (currentThemeHasLightFG())
 		{
 			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
 		}
+		// TODO Test if current theme's bg is too close to color we return here?
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
 	}
 
 	private boolean currentThemeHasDarkBG()
 	{
 		RGB themeBG = getActiveTheme().getBackground();
-		int total = themeBG.blue + themeBG.red + themeBG.green;
-		return total <= 256;
+		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		return grey <= 128;
+	}
+	
+	private boolean currentThemeHasLightFG()
+	{
+		RGB themeBG = getActiveTheme().getForeground();
+		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		return grey >= 90;
 	}
 
 	protected Theme getActiveTheme()
