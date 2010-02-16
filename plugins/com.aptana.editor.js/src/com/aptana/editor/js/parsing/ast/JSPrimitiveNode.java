@@ -15,4 +15,21 @@ public class JSPrimitiveNode extends JSNode
 	{
 		return appendSemicolon(fText);
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof JSPrimitiveNode))
+			return false;
+
+		return fText.equals(((JSPrimitiveNode) obj).fText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * super.hashCode() + fText.hashCode();
+	}
 }
