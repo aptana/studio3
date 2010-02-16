@@ -17,4 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.editor.html
+Export-Package: com.aptana.editor.html,
+ com.aptana.editor.html.outline,
+ com.aptana.editor.html.parsing
