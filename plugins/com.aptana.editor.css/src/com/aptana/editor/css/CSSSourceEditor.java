@@ -46,9 +46,9 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 {
 
 	@Override
-	protected CommonOutlinePage getOutlinePage()
+	protected CommonOutlinePage createOutlinePage()
 	{
-		CommonOutlinePage outline = super.getOutlinePage();
+		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new CSSOutlineContentProvider());
 		outline.setLabelProvider(new CSSOutlineLabelProvider());
 

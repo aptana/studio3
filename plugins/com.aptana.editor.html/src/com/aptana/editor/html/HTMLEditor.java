@@ -75,9 +75,9 @@ public class HTMLEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected CommonOutlinePage getOutlinePage()
+	protected CommonOutlinePage createOutlinePage()
 	{
-		CommonOutlinePage outline = super.getOutlinePage();
+		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new HTMLOutlineContentProvider());
 		outline.setLabelProvider(new HTMLOutlineLabelProvider());
 

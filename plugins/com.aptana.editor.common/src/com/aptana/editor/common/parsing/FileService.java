@@ -1,9 +1,13 @@
 package com.aptana.editor.common.parsing;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.Messages;
+import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
@@ -15,6 +19,7 @@ public class FileService
 	private IDocument fDocument;
 	private IParser fParser;
 	private IParseState fParseState;
+	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 
 	public FileService()
 	{
@@ -33,6 +38,8 @@ public class FileService
 		try
 		{
 			fParser.parse(fParseState);
+			for (IParseListener listener : listeners)
+				listener.parseFinished();
 		}
 		catch (Exception e)
 		{
@@ -65,5 +72,15 @@ public class FileService
 	public void setDocument(IDocument document)
 	{
 		fDocument = document;
+	}
+
+	public void addListener(IParseListener listener)
+	{
+		listeners.add(listener);		
+	}
+
+	public void removeListener(IParseListener fListener)
+	{
+		listeners.remove(fListener);
 	}
 }

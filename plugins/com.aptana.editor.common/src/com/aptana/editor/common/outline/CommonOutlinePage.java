@@ -19,8 +19,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -96,15 +94,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
 		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
-
-		// TODO: needs to be improved
-		editor.getSourceViewerNonFinal().getTextWidget().addFocusListener(new FocusAdapter()
-		{
-			public void focusGained(FocusEvent e)
-			{
-				refresh();
-			}
-		});
 	}
 
 	@Override
@@ -113,6 +102,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		super.createControl(parent);
 
 		TreeViewer viewer = getTreeViewer();
+		viewer.setAutoExpandLevel(2);
+		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
@@ -257,7 +248,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			fontListener = null;
 		}
 	}
-	
+
 	private void removeThemeListener()
 	{
 		if (fThemeChangeListener != null)
@@ -267,7 +258,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			fThemeChangeListener = null;
 		}
 	}
-	
+
 	@Override
 	public void selectionChanged(SelectionChangedEvent event)
 	{

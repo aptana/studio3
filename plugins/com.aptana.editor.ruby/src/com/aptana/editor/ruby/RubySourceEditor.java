@@ -73,9 +73,9 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected CommonOutlinePage getOutlinePage()
-	{
-		CommonOutlinePage outline = super.getOutlinePage();
+	protected CommonOutlinePage createOutlinePage()
+	{		
+		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new RubyOutlineContentProvider());
 		outline.setLabelProvider(new RubyOutlineLabelProvider());
 

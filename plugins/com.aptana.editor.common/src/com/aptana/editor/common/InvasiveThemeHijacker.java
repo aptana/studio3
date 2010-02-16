@@ -49,6 +49,7 @@ import com.aptana.editor.common.theme.Theme;
  * 
  * @author cwilliams
  */
+@SuppressWarnings({ "restriction", "deprecation" })
 class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
 {
 
@@ -96,7 +97,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
-	@SuppressWarnings({ "deprecation", "restriction", "nls" })
+	@SuppressWarnings({ "nls" })
 	protected void hijackView(IViewPart view, boolean revertToDefaults)
 	{
 		if (view == null)
