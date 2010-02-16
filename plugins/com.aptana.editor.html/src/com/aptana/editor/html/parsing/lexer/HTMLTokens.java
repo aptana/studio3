@@ -16,12 +16,14 @@ public class HTMLTokens
 	public static final short STRING = 7;
 	public static final short COMMENT = 8;
 	public static final short DOCTYPE = 9;
+	public static final short STYLE_END = 10;
+	public static final short SCRIPT_END = 11;
 
-	private static final short MAXIMUM = 9;
+	private static final short MAXIMUM = 11;
 
 	@SuppressWarnings("nls")
 	private static final String[] NAMES = { "EOF", "STYLE", "SCRIPT", "START_TAG", "TEXT", "END_TAG", "XML_DECL",
-			"STRING", "COMMENT", "DOCTYPE" };
+			"STRING", "COMMENT", "DOCTYPE", "STYLE_END", "SCRIPT_END" };
 	private static final String NAME_UNKNOWN = "UNKNOWN"; //$NON-NLS-1$
 
 	private static Map<String, Short> nameIndexMap;

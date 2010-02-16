@@ -522,7 +522,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		}
 		if (repo.switchBranch(branchName))
 		{
-			refreshViewer();
+			refreshViewer(); // might be new file structure
 			return true;
 		}
 		revertToCurrentBranch(repo);

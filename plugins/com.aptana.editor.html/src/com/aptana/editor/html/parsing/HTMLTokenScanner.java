@@ -34,8 +34,10 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new MultiLineRule("<!DOCTYPE ", ">", createToken(getTokenName(HTMLTokens.DOCTYPE)))); //$NON-NLS-1$ //$NON-NLS-2$
 		// script
 		rules.add(new TagRule("script", createToken(getTokenName(HTMLTokens.SCRIPT)))); //$NON-NLS-1$
+		rules.add(new TagRule("/script", createToken(getTokenName(HTMLTokens.SCRIPT_END)))); //$NON-NLS-1$
 		// style
 		rules.add(new TagRule("style", createToken(getTokenName(HTMLTokens.STYLE)))); //$NON-NLS-1$
+		rules.add(new TagRule("/style", createToken(getTokenName(HTMLTokens.STYLE_END)))); //$NON-NLS-1$
 		// xml declaration
 		rules.add(new TagRule("?xml", createToken(getTokenName(HTMLTokens.XML_DECL)))); //$NON-NLS-1$
 		// tags

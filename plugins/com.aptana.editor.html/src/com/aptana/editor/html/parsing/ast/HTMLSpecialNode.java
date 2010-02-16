@@ -5,33 +5,18 @@ import com.aptana.parsing.ast.IParseNode;
 public class HTMLSpecialNode extends HTMLNode
 {
 
-	public static final short CSS = 0;
-	public static final short JS = 1;
+	private String fTagName;
 
-	private short fNestedLanguage;
-
-	public HTMLSpecialNode(short language, IParseNode[] children, int start, int end)
+	public HTMLSpecialNode(String tagName, IParseNode[] children, int start, int end)
 	{
 		super(HTMLNodeTypes.SPECIAL, start, end);
-		fNestedLanguage = language;
+		fTagName = tagName;
 		setChildren(children);
 	}
 
 	public String getLanguageTag()
 	{
-		switch (getNestedLanguage())
-		{
-			case CSS:
-				return "style"; //$NON-NLS-1$
-			case JS:
-				return "script"; //$NON-NLS-1$
-		}
-		return ""; //$NON-NLS-1$
-	}
-
-	public short getNestedLanguage()
-	{
-		return fNestedLanguage;
+		return fTagName;
 	}
 
 	@Override
