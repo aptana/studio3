@@ -57,26 +57,30 @@ public class RubyElement extends ParseBaseNode implements IRubyElement
 	}
 
 	@Override
-	public boolean equals(Object obj)
-	{
-		// TODO Auto-generated method stub
-		return toString().equals(obj.toString());
-	}
-
-	@Override
 	public String toString()
 	{
 		Object parent = getParent();
 		if (parent != null)
 		{
-			return parent.toString() + "/" + getName();
+			return parent.toString() + "/" + getName(); //$NON-NLS-1$
 		}
 		return getName();
 	}
 	
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof RubyElement))
+			return false;
+
+		return getName().equals(((RubyElement) obj).getName());
+	}
+
+	@Override
 	public int hashCode()
 	{
-		return toString().hashCode();
+		return 31 * super.hashCode() + getName().hashCode();
 	}
 }

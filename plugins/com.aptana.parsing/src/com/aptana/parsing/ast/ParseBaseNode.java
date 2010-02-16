@@ -162,4 +162,43 @@ public class ParseBaseNode extends Node implements IParseNode
 			((ParseBaseNode) child).setParent(this);
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		// Must be a parse node
+		if (!(obj instanceof IParseNode))
+			return false;
+
+		IParseNode other = (IParseNode) obj;
+		// Must be same language
+		if (!getLanguage().equals(other.getLanguage()))
+			return false;
+
+		// Must have same parent
+		if (getParent() == null)
+		{
+			if (other.getParent() != null)
+				return false;
+		}
+		else if (!getParent().equals(other.getParent()))
+			return false;
+
+		// Same type
+		if (getType() != other.getType())
+			return false;
+
+		// That's about the best we can check from here, since offsets can change a lot. Should really also check
+		// identifier/name
+		return true;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 31 + getLanguage().hashCode();
+		hash = hash * 31 + getType();
+		hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
+		return hash;
+	}
 }

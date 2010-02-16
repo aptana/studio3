@@ -20,6 +20,23 @@ public class HTMLSpecialNode extends HTMLNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof HTMLSpecialNode))
+			return false;
+
+		return getLanguageTag().equals(((HTMLSpecialNode) obj).getLanguageTag());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * super.hashCode() + getLanguageTag().hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
