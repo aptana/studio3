@@ -94,15 +94,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
 		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
-
-		// TODO: needs to be improved
-		// editor.getSourceViewerNonFinal().getTextWidget().addFocusListener(new FocusAdapter()
-		// {
-		// public void focusGained(FocusEvent e)
-		// {
-		// refresh();
-		// }
-		// });
 	}
 
 	@Override
