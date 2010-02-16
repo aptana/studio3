@@ -29,6 +29,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
+import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -36,6 +37,8 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
 
@@ -47,11 +50,12 @@ import com.aptana.editor.common.theme.Theme;
  */
 class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
 {
-	private static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
+
+	private Listener listener;
 
 	public InvasiveThemeHijacker()
 	{
-		super("Installing invasive theme hijacker!");
+		super("Installing invasive theme hijacker!"); //$NON-NLS-1$
 
 		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		prefs.addPreferenceChangeListener(this);
@@ -59,7 +63,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected boolean invasiveThemesEnabled()
 	{
-		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID, INVASIVE_THEMES, false, null);
+		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+				IPreferenceConstants.INVASIVE_THEMES, false, null);
 	}
 
 	@Override
@@ -68,30 +73,30 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (invasiveThemesEnabled())
 		{
-			applyThemeToJDTEditor(getCurrentTheme());
+			applyThemeToJDTEditor(getCurrentTheme(), false);
 			window.getActivePage().addPartListener(this);
-			hijackCurrentViews(window);
+			hijackCurrentViews(window, false);
 		}
 		else
 		{
 			window.getActivePage().removePartListener(this);
-			// TODO Revert to JDT Editor defaults
-			// TODO Revert to system default color/font for views.
+			applyThemeToJDTEditor(getCurrentTheme(), true);
+			hijackCurrentViews(window, true);
 		}
 		return Status.OK_STATUS;
 	}
 
-	protected void hijackCurrentViews(IWorkbenchWindow window)
+	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
 	{
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
 		{
-			hijackView(ref.getView(false));
+			hijackView(ref.getView(false), revertToDefaults);
 		}
 	}
 
 	@SuppressWarnings({ "deprecation", "restriction", "nls" })
-	protected void hijackView(IViewPart view)
+	protected void hijackView(IViewPart view, boolean revertToDefaults)
 	{
 		if (view == null)
 			return;
@@ -99,7 +104,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (view instanceof IResourceNavigator)
 		{
 			IResourceNavigator navigator = (IResourceNavigator) view;
-			hookTheme(navigator.getViewer().getTree());
+			hookTheme(navigator.getViewer().getTree(), revertToDefaults);
 			return;
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
@@ -109,7 +114,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
 				m.setAccessible(true);
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree());
+				hookTheme(treeViewer.getTree(), revertToDefaults);
 			}
 			catch (Exception e)
 			{
@@ -120,13 +125,16 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		else if (view instanceof ProgressView)
 		{
 			ProgressView navigator = (ProgressView) view;
-			hookTheme(navigator.getViewer().getControl());
+			hookTheme(navigator.getViewer().getControl(), revertToDefaults);
 			return;
 		}
 		else if (view instanceof ContentOutline)
 		{
 			ContentOutline outline = (ContentOutline) view;
-			hookTheme(outline.getCurrentPage().getControl());
+			IPage page = outline.getCurrentPage();
+			if (page instanceof CommonOutlinePage)
+				return; // we already handle our own outlines
+			hookTheme(page.getControl(), revertToDefaults);
 			return;
 		}
 		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
@@ -135,7 +143,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			{
 				Method m = view.getClass().getMethod("getCommonViewer");
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree());
+				hookTheme(treeViewer.getTree(), revertToDefaults);
 			}
 			catch (Exception e)
 			{
@@ -149,26 +157,34 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			{
 				Method m = view.getClass().getMethod("getTreeViewer");
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree());
+				hookTheme(treeViewer.getTree(), revertToDefaults);
 			}
 			catch (Exception e)
 			{
 				// ignore
 			}
 		}
-
 	}
 
-	protected void hookTheme(Control tree)
+	protected void hookTheme(Control tree, boolean revert)
 	{
-		tree.setBackground(CommonEditorPlugin.getDefault().getColorManager()
-				.getColor(getCurrentTheme().getBackground()));
-		tree.setForeground(CommonEditorPlugin.getDefault().getColorManager()
-				.getColor(getCurrentTheme().getForeground()));
-		tree.setFont(JFaceResources.getTextFont());
+		if (revert)
+		{
+			tree.setBackground(null);
+			tree.setForeground(null);
+			tree.setFont(null);
+		}
+		else
+		{
+			tree.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+					getCurrentTheme().getBackground()));
+			tree.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+					getCurrentTheme().getForeground()));
+			tree.setFont(JFaceResources.getTextFont());
+		}
 		if (tree instanceof Tree)
 		{
-			overrideTreeDrawing((Tree) tree);
+			overrideTreeDrawing((Tree) tree, revert);
 		}
 	}
 
@@ -177,62 +193,71 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		return CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	private void overrideTreeDrawing(final Tree tree)
+	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
 	{
-		// TODO Hook up the font...
-		// Override selection color to match what is set in theme
-		tree.addListener(SWT.EraseItem, new Listener()
+		if (listener == null)
 		{
-			public void handleEvent(Event event)
+			listener = new Listener()
 			{
-				if ((event.detail & SWT.SELECTED) != 0)
+				public void handleEvent(Event event)
 				{
-					Tree tree = (Tree) event.widget;
-					int clientWidth = tree.getClientArea().width;
+					// Override selection color to match what is set in theme
+					if ((event.detail & SWT.SELECTED) != 0)
+					{
+						Tree tree = (Tree) event.widget;
+						int clientWidth = tree.getClientArea().width;
 
-					GC gc = event.gc;
-					Color oldBackground = gc.getBackground();
+						GC gc = event.gc;
+						Color oldBackground = gc.getBackground();
 
-					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							getCurrentTheme().getSelection()));
-					gc.fillRectangle(0, event.y, clientWidth, event.height);
-					gc.setBackground(oldBackground);
+						gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+								getCurrentTheme().getSelection()));
+						gc.fillRectangle(0, event.y, clientWidth, event.height);
+						gc.setBackground(oldBackground);
 
-					event.detail &= ~SWT.SELECTED;
-					event.detail &= ~SWT.BACKGROUND;
+						event.detail &= ~SWT.SELECTED;
+						event.detail &= ~SWT.BACKGROUND;
+					}
 				}
-			}
-		});
+			};
+		}
+		if (revertToDefaults)
+		{
+			tree.removeListener(SWT.EraseItem, listener);
+		}
+		else
+		{
+			tree.addListener(SWT.EraseItem, listener);
+		}
 	}
 
 	@SuppressWarnings("nls")
-	protected void applyThemeToJDTEditor(Theme theme)
+	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults)
 	{
 		// Set prefs for all editors
-		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"));
+		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
-		setGeneralEditorValues(theme, prefs);
+		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!
 		// prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
-		setToken(prefs, theme, "string.quoted.double.java", "java_string");
-		setToken(prefs, theme, "source", "java_default");
-		setToken(prefs, theme, "constant.language.java", "java_keyword");
-		setToken(prefs, theme, "keyword.operator", "java_operator");
-		setToken(prefs, theme, "keyword.control.java", "java_keyword_return"); // FIXME Should be a special keyword
-																				// subtoken...
-		setToken(prefs, theme, "comment", "java_single_line_comment");
-		setToken(prefs, theme, "comment.block", "java_multi_line_comment");
-		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket");
-		setSemanticToken(prefs, theme, "storage.type.java", "class");
-		setSemanticToken(prefs, theme, "storage.type.java", "enum");
-		setSemanticToken(prefs, theme, "storage.type.java", "interface");
-		setSemanticToken(prefs, theme, "constant.numeric.java", "number");
-		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable");
-		setSemanticToken(prefs, theme, "variable.other.java", "localVariable");
-		setSemanticToken(prefs, theme, "variable.other.java", "field");
+		setToken(prefs, theme, "string.quoted.double.java", "java_string", revertToDefaults);
+		setToken(prefs, theme, "source", "java_default", revertToDefaults);
+		setToken(prefs, theme, "constant.language.java", "java_keyword", revertToDefaults);
+		setToken(prefs, theme, "keyword.operator", "java_operator", revertToDefaults);
+		setToken(prefs, theme, "keyword.control.java", "java_keyword_return", revertToDefaults);
+		setToken(prefs, theme, "comment", "java_single_line_comment", revertToDefaults);
+		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults);
+		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket", revertToDefaults);
+		setSemanticToken(prefs, theme, "storage.type.java", "class", revertToDefaults);
+		setSemanticToken(prefs, theme, "storage.type.java", "enum", revertToDefaults);
+		setSemanticToken(prefs, theme, "storage.type.java", "interface", revertToDefaults);
+		setSemanticToken(prefs, theme, "constant.numeric.java", "number", revertToDefaults);
+		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);
+		setSemanticToken(prefs, theme, "variable.other.java", "localVariable", revertToDefaults);
+		setSemanticToken(prefs, theme, "variable.other.java", "field", revertToDefaults);
 		try
 		{
 			prefs.flush();
@@ -243,19 +268,27 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
-	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs)
+	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
+		if (revertToDefaults)
+		{
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND);
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);
+			prefs.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR);
+		}
+		else
+		{
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
+			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
+					.getLineHighlight()));
+		}
 
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
-
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
-		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
-
-		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
-				.getLineHighlight()));
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, revertToDefaults);
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
 
 		try
 		{
@@ -268,27 +301,51 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	}
 
 	@SuppressWarnings("nls")
-	protected void setToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken)
+	protected void setToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken,
+			boolean revertToDefaults)
 	{
-		TextAttribute attr = theme.getTextAttribute(ourTokenType);
-		prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
-		prefs.putBoolean(jdtToken + "_bold", (attr.getStyle() & SWT.BOLD) != 0);
-		prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0);
-		prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
-		prefs.putBoolean(jdtToken + "_strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+		if (revertToDefaults)
+		{
+			prefs.remove(jdtToken);
+			prefs.remove(jdtToken + "_bold");
+			prefs.remove(jdtToken + "_italic");
+			prefs.remove(jdtToken + "_underline");
+			prefs.remove(jdtToken + "_strikethrough");
+		}
+		else
+		{
+			TextAttribute attr = theme.getTextAttribute(ourTokenType);
+			prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
+			prefs.putBoolean(jdtToken + "_bold", (attr.getStyle() & SWT.BOLD) != 0);
+			prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0);
+			prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
+			prefs.putBoolean(jdtToken + "_strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+		}
 	}
 
 	@SuppressWarnings("nls")
-	protected void setSemanticToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken)
+	protected void setSemanticToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken,
+			boolean revertToDefaults)
 	{
 		String prefix = "SemanticHighlighting.";
 		jdtToken = prefix + jdtToken;
-		TextAttribute attr = theme.getTextAttribute(ourTokenType);
-		prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
-		prefs.putBoolean(jdtToken + ".bold", (attr.getStyle() & SWT.BOLD) != 0);
-		prefs.putBoolean(jdtToken + ".italic", (attr.getStyle() & SWT.ITALIC) != 0);
-		prefs.putBoolean(jdtToken + ".underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
-		prefs.putBoolean(jdtToken + ".strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+		if (revertToDefaults)
+		{
+			prefs.remove(jdtToken);
+			prefs.remove(jdtToken + ".bold");
+			prefs.remove(jdtToken + ".italic");
+			prefs.remove(jdtToken + ".underline");
+			prefs.remove(jdtToken + ".strikethrough");
+		}
+		else
+		{
+			TextAttribute attr = theme.getTextAttribute(ourTokenType);
+			prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
+			prefs.putBoolean(jdtToken + ".bold", (attr.getStyle() & SWT.BOLD) != 0);
+			prefs.putBoolean(jdtToken + ".italic", (attr.getStyle() & SWT.ITALIC) != 0);
+			prefs.putBoolean(jdtToken + ".underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
+			prefs.putBoolean(jdtToken + ".strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+		}
 	}
 
 	@SuppressWarnings("nls")
@@ -306,10 +363,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 		{
 			// Theme has changed, need to apply new theme to editor and views
-			applyThemeToJDTEditor(getCurrentTheme());
-			hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+			if (invasiveThemesEnabled())
+			{
+				applyThemeToJDTEditor(getCurrentTheme(), false);
+				hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), false);
+			}
 		}
-		else if (event.getKey().equals(INVASIVE_THEMES))
+		else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
 		{
 			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
 			schedule();
@@ -324,7 +384,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			return;
 
 		IViewPart view = (IViewPart) part;
-		hijackView(view);
+		hijackView(view, false);
 	}
 
 	@Override
