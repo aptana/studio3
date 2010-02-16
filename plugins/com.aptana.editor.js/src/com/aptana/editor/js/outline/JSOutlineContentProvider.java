@@ -374,7 +374,12 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			IParseNode parameters = node.getChild(0);
 			IParseNode body = node.getChild(1);
 
-			JSOutlineItem item = new JSOutlineItem(MessageFormat.format("{0}({1})", name, parameters), Type.FUNCTION, //$NON-NLS-1$
+			String pattern = "{0}({1})"; //$NON-NLS-1$
+			String parmsString = parameters.toString();
+			if (parmsString.startsWith("(")) //$NON-NLS-1$
+				pattern = "{0}{1}"; //$NON-NLS-1$
+			
+			JSOutlineItem item = new JSOutlineItem(MessageFormat.format(pattern, name, parmsString), Type.FUNCTION,
 					node, body, getChildrenCount(body));
 			fItemsByScope.put(fullpath, item);
 			elements.add(item);
