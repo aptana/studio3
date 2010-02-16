@@ -31,6 +31,18 @@ module Ruble
       end      
       IO.popen(cmd_line, 'r')
       nil
-    end    
+    end        
+    
+    # Open an internal browser pointed at URL
+    def open(url, options = {})
+      browser_id = options[:new_window] ? nil : "singleton"
+      title = options[:title]
+      support = org.eclipse.ui.PlatformUI.workbench.browser_support
+      wbs = org.eclipse.ui.browser.IWorkbenchBrowserSupport
+      style = wbs::NAVIGATION_BAR | wbs::LOCATION_BAR | wbs::AS_EDITOR | wbs::STATUS
+      if support.isInternalWebBrowserAvailable
+        support.createBrowser(style, browser_id, title, nil).openURL(java.net.URL.new(url.to_s))
+      end
+    end
   end  
 end
