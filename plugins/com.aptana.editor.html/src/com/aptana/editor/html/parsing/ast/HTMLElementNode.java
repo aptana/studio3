@@ -43,6 +43,23 @@ public class HTMLElementNode extends HTMLNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+			return false;
+		if (!(obj instanceof HTMLElementNode))
+			return false;
+
+		return getName().equals(((HTMLElementNode) obj).getName());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * super.hashCode() + getName().hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();

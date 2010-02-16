@@ -116,4 +116,18 @@ public class JSOutlineItem implements ILexeme, ILanguageNode
 	{
 		return fReferenceNode.getLanguage();
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof JSOutlineItem))
+			return false;
+		return fReferenceNode.equals(((JSOutlineItem) obj).fReferenceNode); 
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return 31 + fReferenceNode.hashCode();
+	}
 }

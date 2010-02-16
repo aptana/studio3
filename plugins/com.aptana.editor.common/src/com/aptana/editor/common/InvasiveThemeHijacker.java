@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -48,6 +49,7 @@ import com.aptana.editor.common.theme.Theme;
  * 
  * @author cwilliams
  */
+@SuppressWarnings({ "restriction", "deprecation" })
 class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
 {
 
@@ -95,7 +97,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
-	@SuppressWarnings({ "deprecation", "restriction", "nls" })
+	@SuppressWarnings({ "nls" })
 	protected void hijackView(IViewPart view, boolean revertToDefaults)
 	{
 		if (view == null)
@@ -124,8 +126,17 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ProgressView)
 		{
-			ProgressView navigator = (ProgressView) view;
-			hookTheme(navigator.getViewer().getControl(), revertToDefaults);
+			try
+			{
+				Method m = ProgressView.class.getDeclaredMethod("getViewer");
+				m.setAccessible(true);
+				Viewer treeViewer = (Viewer) m.invoke(view);
+				hookTheme(treeViewer.getControl(), revertToDefaults);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
 			return;
 		}
 		else if (view instanceof ContentOutline)
