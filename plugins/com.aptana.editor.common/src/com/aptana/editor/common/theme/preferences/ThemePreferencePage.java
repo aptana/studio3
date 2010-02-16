@@ -16,6 +16,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -72,8 +75,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
@@ -161,9 +166,39 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		createThemeListControls(composite);
 		createGlobalColorControls(composite);
 		createTokenEditTable(composite);
+		createInvasivePrefArea(composite);
 
 		setTheme(getThemeManager().getCurrentTheme().getName());
 		return composite;
+	}
+
+	private void createInvasivePrefArea(Composite composite)
+	{
+		Composite themesComp = new Composite(composite, SWT.NONE);
+		themesComp.setLayout(new GridLayout(1, false));
+
+		final Button checkbox = new Button(themesComp, SWT.CHECK);
+		checkbox.setText(Messages.ThemePreferencePage_InvasiveThemesLBL);
+		checkbox.setSelection(Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+				IPreferenceConstants.INVASIVE_THEMES, false, null));
+		checkbox.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+				prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, checkbox.getSelection());
+				try
+				{
+					prefs.flush();
+				}
+				catch (BackingStoreException e1)
+				{
+					CommonEditorPlugin.logError(e1);
+				}
+			}
+		});
 	}
 
 	protected IThemeManager getThemeManager()
