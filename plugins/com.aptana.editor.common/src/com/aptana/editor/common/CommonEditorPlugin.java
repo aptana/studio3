@@ -7,6 +7,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -45,6 +47,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private ColorManager fColorManager;
 	private Map<String, Image> fImages = new HashMap<String, Image>();
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
+	private InvasiveThemeHijacker themeHijacker;
 
 	/**
 	 * The constructor
@@ -63,7 +66,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		plugin = this;
 
 		new EditorFontOverride().schedule();
-		new InvasiveThemeHijacker().schedule();
+		themeHijacker = new InvasiveThemeHijacker();
+		themeHijacker.schedule();
 	}
 
 	/*
@@ -72,11 +76,21 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		if (fColorManager != null)
-			fColorManager.dispose();
-		fColorManager = null;
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			if (fColorManager != null)
+				fColorManager.dispose();
+
+			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			prefs.removePreferenceChangeListener(themeHijacker);
+		}
+		finally
+		{
+			themeHijacker = null;
+			fColorManager = null;
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

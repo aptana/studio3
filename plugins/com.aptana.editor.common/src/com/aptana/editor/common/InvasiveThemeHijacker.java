@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -44,69 +45,39 @@ import com.aptana.editor.common.theme.Theme;
  * 
  * @author cwilliams
  */
-class InvasiveThemeHijacker extends UIJob
+class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
 {
+	private static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
 
 	public InvasiveThemeHijacker()
 	{
 		super("Installing invasive theme hijacker!");
+
+		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		prefs.addPreferenceChangeListener(this);
+	}
+
+	protected boolean invasiveThemesEnabled()
+	{
+		return Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID, INVASIVE_THEMES, false, null);
 	}
 
 	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor)
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		prefs.addPreferenceChangeListener(new IPreferenceChangeListener()
-		{
-
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					applyThemeToJDTEditor(getCurrentTheme());
-					hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
-				}
-			}
-		});
-		applyThemeToJDTEditor(getCurrentTheme());
-
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		window.getActivePage().addPartListener(new IPartListener()
+		if (invasiveThemesEnabled())
 		{
-
-			@Override
-			public void partOpened(IWorkbenchPart part)
-			{
-				if (!(part instanceof IViewPart))
-					return;
-
-				IViewPart view = (IViewPart) part;
-				hijackView(view);
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part)
-			{
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPart part)
-			{
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part)
-			{
-			}
-
-			@Override
-			public void partActivated(IWorkbenchPart part)
-			{
-			}
-		});
-
-		hijackCurrentViews(window);
+			applyThemeToJDTEditor(getCurrentTheme());
+			window.getActivePage().addPartListener(this);
+			hijackCurrentViews(window);
+		}
+		else
+		{
+			window.getActivePage().removePartListener(this);
+			// TODO Revert to JDT Editor defaults
+			// TODO Revert to system default color/font for views.
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -119,6 +90,7 @@ class InvasiveThemeHijacker extends UIJob
 		}
 	}
 
+	@SuppressWarnings({ "deprecation", "restriction", "nls" })
 	protected void hijackView(IViewPart view)
 	{
 		if (view == null)
@@ -325,5 +297,53 @@ class InvasiveThemeHijacker extends UIJob
 		StringBuilder builder = new StringBuilder();
 		builder.append(selection.red).append(",").append(selection.green).append(",").append(selection.blue);
 		return builder.toString();
+	}
+
+	// IPreferenceChangeListener
+	@Override
+	public void preferenceChange(PreferenceChangeEvent event)
+	{
+		if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+		{
+			// Theme has changed, need to apply new theme to editor and views
+			applyThemeToJDTEditor(getCurrentTheme());
+			hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+		}
+		else if (event.getKey().equals(INVASIVE_THEMES))
+		{
+			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
+			schedule();
+		}
+	}
+
+	// IPartListener
+	@Override
+	public void partOpened(IWorkbenchPart part)
+	{
+		if (!(part instanceof IViewPart))
+			return;
+
+		IViewPart view = (IViewPart) part;
+		hijackView(view);
+	}
+
+	@Override
+	public void partDeactivated(IWorkbenchPart part)
+	{
+	}
+
+	@Override
+	public void partClosed(IWorkbenchPart part)
+	{
+	}
+
+	@Override
+	public void partBroughtToTop(IWorkbenchPart part)
+	{
+	}
+
+	@Override
+	public void partActivated(IWorkbenchPart part)
+	{
 	}
 }
