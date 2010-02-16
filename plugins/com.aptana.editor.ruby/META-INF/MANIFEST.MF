@@ -17,6 +17,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.ruby,
+ com.aptana.editor.ruby.core,
+ com.aptana.editor.ruby.outline,
+ com.aptana.editor.ruby.parsing,
  org.jrubyparser.parser;x-friends:="com.aptana.editor.ruby.tests"
 Bundle-ClassPath: lib/JRubyParser.jar,
  .

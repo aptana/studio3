@@ -35,13 +35,17 @@
 
 package com.aptana.editor.erb.html;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.erb.html.outline.RHTMLOutlineContentProvider;
+import com.aptana.editor.erb.html.outline.RHTMLOutlineLabelProvider;
+import com.aptana.editor.erb.html.parsing.RHTMLParser;
+import com.aptana.editor.html.HTMLEditor;
 
 /**
  * @author Max Stepanov
  *
  */
-public class RHTMLEditor extends AbstractThemeableEditor {
+public class RHTMLEditor extends HTMLEditor {
 
 	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -52,5 +56,17 @@ public class RHTMLEditor extends AbstractThemeableEditor {
 
         setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new RHTMLDocumentProvider());
+        
+        getFileService().setParser(new RHTMLParser());
     }
+
+	@Override
+	protected CommonOutlinePage getOutlinePage()
+	{
+		CommonOutlinePage outline = super.getOutlinePage();
+		outline.setContentProvider(new RHTMLOutlineContentProvider());
+		outline.setLabelProvider(new RHTMLOutlineLabelProvider());
+
+		return outline;
+	}
 }
