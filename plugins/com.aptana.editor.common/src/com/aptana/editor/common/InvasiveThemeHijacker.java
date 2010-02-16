@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -124,8 +125,17 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ProgressView)
 		{
-			ProgressView navigator = (ProgressView) view;
-			hookTheme(navigator.getViewer().getControl(), revertToDefaults);
+			try
+			{
+				Method m = ProgressView.class.getDeclaredMethod("getViewer");
+				m.setAccessible(true);
+				Viewer treeViewer = (Viewer) m.invoke(view);
+				hookTheme(treeViewer.getControl(), revertToDefaults);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
 			return;
 		}
 		else if (view instanceof ContentOutline)
