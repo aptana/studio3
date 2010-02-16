@@ -876,8 +876,8 @@ public class CommandExecutionUtils
 						support.createBrowser(
 								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
 										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS, "", //$NON-NLS-1$
-								"", //$NON-NLS-1$
-								command.getDisplayName()).openURL(url);
+										null, // Set the name to null. That way the browser tab will display the title of page loaded in the browser.
+										command.getDisplayName()).openURL(url);
 					}
 					else
 					{
