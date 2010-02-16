@@ -4,5 +4,5 @@ public interface IScannerSwitchStrategy
 {
 	public String[] getEnterTokens();
 
-	public String[] getExitSequences();
+	public String[] getExitTokens();
 }
