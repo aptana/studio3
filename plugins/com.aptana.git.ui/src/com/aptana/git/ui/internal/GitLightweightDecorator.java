@@ -13,6 +13,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -48,6 +51,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
 	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
 	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
+
+	/**
+	 * Default set to use when bg is very dark!
+	 */
+	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
+	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
+	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
+	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
 
 	/**
 	 * The token used from the theme for staged file decorations.
@@ -102,9 +113,24 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 				.getBundle().getEntry("icons/ovr/staged_removed.gif"))); //$NON-NLS-1$
 	}
 
+	private IPreferenceChangeListener fThemeChangeListener;
+
 	public GitLightweightDecorator()
 	{
 		GitRepository.addListener(this);
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					refresh();
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	public void decorate(Object element, IDecoration decoration)
@@ -246,6 +272,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getForeground(STAGED_TOKEN);
 		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
+		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
 	}
 
@@ -255,6 +285,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getBackground(STAGED_TOKEN);
 		}
+		if (currentThemeHasLightFG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
+		}
+		// TODO Test if current theme's bg is too close to color we return here?
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
@@ -263,6 +298,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
 			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
+		}
+		if (currentThemeHasDarkBG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
 		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
 	}
@@ -273,7 +312,26 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		{
 			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
 		}
+		if (currentThemeHasLightFG())
+		{
+			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
+		}
+		// TODO Test if current theme's bg is too close to color we return here?
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
+	}
+
+	private boolean currentThemeHasDarkBG()
+	{
+		RGB themeBG = getActiveTheme().getBackground();
+		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		return grey <= 128;
+	}
+	
+	private boolean currentThemeHasLightFG()
+	{
+		RGB themeBG = getActiveTheme().getForeground();
+		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		return grey >= 90;
 	}
 
 	protected Theme getActiveTheme()
@@ -289,8 +347,16 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	@Override
 	public void dispose()
 	{
-		GitRepository.removeListener(this);
-		super.dispose();
+		try
+		{
+			GitRepository.removeListener(this);
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fThemeChangeListener);
+		}
+		finally
+		{
+			super.dispose();
+		}
 	}
 
 	private static IResource getResource(Object element)
@@ -399,11 +465,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	}
 
 	/**
-	 * Perform a blanket refresh of all decorations
-	 * 
-	 * @deprecated this is very bad performance wise. Need to avoid using this and always just use deltas if possible!
+	 * Perform a blanket refresh of all decorations this is very bad performance wise. Need to avoid using this and
+	 * always just use deltas if possible!
 	 */
-	public static void refresh()
+	private static void refresh()
 	{
 		Display.getDefault().asyncExec(new Runnable()
 		{

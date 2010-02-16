@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -49,9 +50,12 @@ public class PortManager
 			// a abnormal exit the last time.
 			return -1;
 		}
+		catch (BindException e)
+		{
+			// Address in use. Assume that the port is in use by a running instance of the IDE.
+		}
 		catch (IOException e)
 		{
-			// Threw an exception. Assume that the port is in use by a running instance of the IDE.
 			CommandlineLauncherPlugin.logInfo(e.getLocalizedMessage(), e);
 		}
 		finally

@@ -1,16 +1,20 @@
 package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import beaver.Symbol;
 import beaver.Scanner.Exception;
 
 import com.aptana.editor.css.parsing.CSSParserFactory;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
+import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
@@ -29,10 +33,20 @@ public class HTMLParser implements IParser
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
 
+	private Map<String, IParser> fLanguageParsers;
+
 	public HTMLParser()
 	{
-		fScanner = new HTMLParserScanner();
+		this(new HTMLParserScanner());
+	}
+
+	protected HTMLParser(HTMLParserScanner scanner)
+	{
+		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
+		fLanguageParsers = new HashMap<String, IParser>();
+		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
+		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
 	}
 
 	@Override
@@ -51,6 +65,50 @@ public class HTMLParser implements IParser
 		return root;
 	}
 
+	protected void processSymbol(Symbol symbol) throws IOException, Exception
+	{
+		switch (symbol.getId())
+		{
+			case HTMLTokens.START_TAG:
+				processStartTag();
+				break;
+			case HTMLTokens.END_TAG:
+				processEndTag();
+				break;
+			case HTMLTokens.STYLE:
+				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END, "style"); //$NON-NLS-1$
+				break;
+			case HTMLTokens.SCRIPT:
+				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END, "script"); //$NON-NLS-1$
+				break;
+		}
+	}
+
+	protected void processLanguage(String language, short endToken, String tagName) throws IOException, Exception
+	{
+		Symbol startTag = fCurrentSymbol;
+		advance();
+
+		int start = fCurrentSymbol.getStart();
+		int end = start;
+		while (fCurrentSymbol.getId() != endToken)
+		{
+			end = fCurrentSymbol.getEnd();
+			advance();
+		}
+
+		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
+		if (fCurrentElement != null)
+		{
+			fCurrentElement.addChild(new HTMLSpecialNode(tagName, nested, startTag.getStart(), startTag.getEnd()));
+		}
+	}
+
+	protected void addLanguageParser(String language, IParser parser)
+	{
+		fLanguageParsers.put(language, parser);
+	}
+
 	private void parseAll(IParseNode root) throws IOException, Exception
 	{
 		fElementStack.clear();
@@ -59,23 +117,8 @@ public class HTMLParser implements IParser
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
-			switch (fCurrentSymbol.getId())
-			{
-				case HTMLTokens.START_TAG:
-					processStartTag();
-					break;
-				case HTMLTokens.END_TAG:
-					processEndTag();
-					break;
-				case HTMLTokens.STYLE:
-					processCSSStyle();
-					break;
-				case HTMLTokens.SCRIPT:
-					processJSScript();
-					break;
-				default:
-					advance();
-			}
+			processSymbol(fCurrentSymbol);
+			advance();
 		}
 	}
 
@@ -84,14 +127,29 @@ public class HTMLParser implements IParser
 		fCurrentSymbol = fScanner.nextToken();
 	}
 
+	private IParseNode[] getParseResult(IParser parser, int start, int end)
+	{
+		try
+		{
+			String text = fScanner.getSource().get(start, end - start + 1);
+			ParseState parseState = new ParseState();
+			parseState.setEditState(text, text, 0, 0);
+			IParseNode node = parser.parse(parseState);
+			addOffset(node, start);
+			return new IParseNode[] { node };
+		}
+		catch (java.lang.Exception e)
+		{
+		}
+		return new IParseNode[0];
+	}
+
 	private void processStartTag() throws IOException, Exception
 	{
 		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
 				fCurrentSymbol.getEnd());
 		// pushes the element onto the stack
 		openElement(element);
-
-		advance();
 	}
 
 	private void processEndTag() throws IOException, Exception
@@ -106,83 +164,6 @@ public class HTMLParser implements IParser
 				closeElement();
 			}
 		}
-		advance();
-	}
-
-	private void processCSSStyle() throws IOException, Exception
-	{
-		Symbol styleTag = fCurrentSymbol;
-		advance();
-
-		int start = fCurrentSymbol.getStart();
-		int end = start;
-		while (fCurrentSymbol.getId() == HTMLTokens.STYLE)
-		{
-			end = fCurrentSymbol.getEnd();
-			advance();
-		}
-
-		IParseNode[] nested = new IParseNode[0];
-		if (start != end)
-		{
-			// has CSS content
-			try
-			{
-				String text = fScanner.getSource().get(start, end - start + 1);
-				ParseState parseState = new ParseState();
-				parseState.setEditState(text, text, 0, 0);
-				IParseNode node = CSSParserFactory.getInstance().getParser().parse(parseState);
-				addOffset(node, start);
-				nested = new IParseNode[] { node };
-			}
-			catch (java.lang.Exception e)
-			{
-			}
-		}
-		if (fCurrentElement != null)
-		{
-			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.CSS, nested, styleTag.getStart(), styleTag
-					.getEnd()));
-		}
-		advance();
-	}
-
-	private void processJSScript() throws IOException, Exception
-	{
-		Symbol scriptTag = fCurrentSymbol;
-		advance();
-
-		int start = fCurrentSymbol.getStart();
-		int end = start;
-		while (fCurrentSymbol.getId() == HTMLTokens.SCRIPT)
-		{
-			end = fCurrentSymbol.getEnd();
-			advance();
-		}
-
-		IParseNode[] nested = new IParseNode[0];
-		if (start != end)
-		{
-			// has JS content
-			try
-			{
-				String text = fScanner.getSource().get(start, end - start + 1);
-				ParseState parseState = new ParseState();
-				parseState.setEditState(text, text, 0, 0);
-				IParseNode node = JSParserFactory.getInstance().getParser().parse(parseState);
-				addOffset(node, start);
-				nested = new IParseNode[] { node };
-			}
-			catch (java.lang.Exception e)
-			{
-			}
-		}
-		if (fCurrentElement != null)
-		{
-			fCurrentElement.addChild(new HTMLSpecialNode(HTMLSpecialNode.JS, nested, scriptTag.getStart(), scriptTag
-					.getEnd()));
-		}
-		advance();
 	}
 
 	/**

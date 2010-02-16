@@ -1,5 +1,8 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -12,7 +15,11 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -67,6 +74,8 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -437,6 +446,15 @@ public abstract class SingleProjectView extends CommonNavigator
 		super.createPartControl(viewer);
 	}
 
+	@Override
+	protected CommonViewer createCommonViewer(Composite aParent)
+	{
+		// Always expand to project's contents initially
+		CommonViewer viewer = super.createCommonViewer(aParent);
+		viewer.setAutoExpandLevel(2);
+		return viewer;
+	}
+
 	private Composite createFilterComposite(final Composite myComposite)
 	{
 		Composite filter = new Composite(myComposite, SWT.NONE);
@@ -578,7 +596,6 @@ public abstract class SingleProjectView extends CommonNavigator
 				IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
 				selectedProject = newSelectedProject;
 				projectChanged(oldActiveProject, newSelectedProject);
-				refreshViewer();
 			}
 		};
 		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
@@ -590,9 +607,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	private void hookToThemes()
 	{
-		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getBackground()));
+		themeChanged();
 		overrideTreeDrawing();
 		overrideLabelProvider();
 		listenForThemeChanges();
@@ -664,7 +679,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					public void run()
 					{
 						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
-						refreshViewer();
+						updateViewer(selectedProject); // no structural change
 						tree.redraw();
 						tree.update();
 					}
@@ -718,10 +733,7 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					getCommonViewer().refresh();
-					getCommonViewer().getTree().setBackground(
-							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									getThemeManager().getCurrentTheme().getBackground()));
+					themeChanged();
 				}
 			}
 		};
@@ -769,7 +781,6 @@ public abstract class SingleProjectView extends CommonNavigator
 			setActiveProject();
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
-		refreshViewer();
 	}
 
 	private void setActiveProject()
@@ -806,6 +817,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
+		// Set/unset file watcher
 		try
 		{
 			if (watcher != null)
@@ -822,25 +834,59 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			ExplorerPlugin.logError(e.getMessage(), e);
 		}
+		// Set project pulldown
 		String newProjectName = ""; //$NON-NLS-1$
 		if (newProject != null && newProject.exists())
 		{
 			newProjectName = newProject.getName();
 		}
-
 		projectToolItem.setText(newProjectName);
 		MenuItem[] menuItems = projectsMenu.getItems();
 		for (MenuItem menuItem : menuItems)
 		{
 			menuItem.setSelection(menuItem.getText().equals(newProjectName));
 		}
+		// Update the tree since filter changed
+		updateViewer(oldProject, newProject); // no structural change, just filter changed
+		// Expand the new project one level. Have to schedule after short delay or it seems the tree's model is not yet
+		// ready...
+		UIJob job = new UIJob("Expand selected project")
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				if (selectedProject != null && selectedProject.exists() && getCommonViewer() != null)
+				{
+					// Expand selected project
+					getCommonViewer().setExpandedState(selectedProject, true);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		job.schedule(250);
 	}
 
 	protected void refreshViewer()
 	{
 		if (getCommonViewer() == null)
 			return;
-		getCommonViewer().refresh();
+		getCommonViewer().refresh(selectedProject, true);
+	}
+
+	protected void updateViewer(Object... elements)
+	{
+		if (getCommonViewer() == null)
+			return;
+		List<Object> nonNulls = new ArrayList<Object>();
+		for (Object element : elements)
+		{
+			if (element == null)
+				continue;
+			nonNulls.add(element);
+		}
+		getCommonViewer().update(nonNulls.toArray(), null);
 	}
 
 	@Override
@@ -873,9 +919,10 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		if (fActiveProjectPrefChangeListener != null)
 		{
-			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
+			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fActiveProjectPrefChangeListener);
 		}
+		fActiveProjectPrefChangeListener = null;
 	}
 
 	private void removeSingleProjectFilter()
@@ -1055,6 +1102,13 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			ExplorerPlugin.logError(e);
 		}
+	}
+
+	protected void themeChanged()
+	{
+		getCommonViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput

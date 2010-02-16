@@ -48,7 +48,7 @@ import com.aptana.explorer.ExplorerPlugin;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
- *
+ * 
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
@@ -81,8 +81,6 @@ public class FilteringProjectView extends GitProjectView
 	protected int lastDrawnX;
 	protected Object[] fExpandedElements;
 	private Image eyeball;
-
-
 
 	private Composite customComposite;
 
@@ -347,7 +345,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Restores the state of the receiver to the state described in the specified memento.
-	 *
+	 * 
 	 * @param memento
 	 *            the memento
 	 * @since 2.0
@@ -437,13 +435,14 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Set the text in the filter control.
-	 *
+	 * 
 	 * @param string
 	 */
 	protected void setFilterText(String string)
 	{
 		currentFilterText = string;
-		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor, new Object[] {currentFilterText}));
+		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
+				new Object[] { currentFilterText }));
 		textChanged();
 	}
 
@@ -471,7 +470,7 @@ public class FilteringProjectView extends GitProjectView
 
 	/**
 	 * Return the time delay that should be used when scheduling the filter refresh job. Subclasses may override.
-	 *
+	 * 
 	 * @return a time delay in milliseconds before the job should run
 	 * @since 3.5
 	 */
@@ -574,7 +573,7 @@ public class FilteringProjectView extends GitProjectView
 
 			/**
 			 * Returns true if the job should be canceled (because of timeout or actual cancellation).
-			 *
+			 * 
 			 * @param items
 			 * @param monitor
 			 * @param cancelTime
@@ -696,6 +695,11 @@ public class FilteringProjectView extends GitProjectView
 	{
 		if (hoveredItem == null)
 			return;
+		if (hoveredItem.isDisposed())
+		{
+			hoveredItem = null;
+			return;
+		}
 		final Rectangle bounds = hoveredItem.getBounds();
 		hoveredItem.setBackground(null);
 		hoveredItem = null;
