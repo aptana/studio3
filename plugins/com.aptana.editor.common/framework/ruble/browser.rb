@@ -33,7 +33,8 @@ module Ruble
         if Ruble.platforms.include? :mac
           "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Test
+          # TODO Need to test common install paths! This is Windows 7...
+          "ruby -e \"`/Program Files (x86)/Mozilla Firefox/firefox.exe \"#{url.to_s}\"`\""
         else
           "/usr/bin/firefox \"#{url.to_s}\" &"
         end
@@ -42,7 +43,8 @@ module Ruble
           # FIXME Seems to open a new instance and it reports an error about loading profile data
           "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Test
+          # TODO Need to test common install paths! This is Windows 7...
+          "ruby -e \"`/Users/#{ENV['TM_FULLNAME']}/AppData/Local/Google/Chrome/Application/chrome.exe \"#{url.to_s}\"`\""
         else
           "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
@@ -53,7 +55,9 @@ module Ruble
           # FIXME Opens in new tab/window
           "osascript -e \"tell application \\\"Safari\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""          
         elsif Ruble.platforms.include? :windows
-          "cmd /C safari.exe \"#{url.to_s}\"" # TODO Launch Safari on Windows
+          # TODO Need to test common install paths! This is Windows 7...
+          # FIXME Doesn't seem to take URL...
+          "ruby -e \"`/Program Files (x86)/Safari/Safari.exe \"#{url.to_s}\"`\""
         end
       when :webkit
         # TODO What about WebKit on Windows?
@@ -63,7 +67,8 @@ module Ruble
         if Ruble.platforms.include? :mac
           "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C opera.exe \"#{url.to_s}\"" # TODO Test
+          # TODO Need to test common install paths! This is Windows 7...
+          "ruby -e \"`/Program Files (x86)/Opera/opera.exe \"#{url.to_s}\"`\""
         else
           "/usr/bin/opera \"#{url.to_s}\" &"
         end
