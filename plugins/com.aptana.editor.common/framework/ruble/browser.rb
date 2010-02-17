@@ -1,48 +1,85 @@
 module Ruble
-  class Browser
-    def self.open(symbol, url)
-      # TODO Allow users to launch an external browser
+  class Browser        
+    
+    # Open an internal browser pointed at URL
+    def open(url, options = {})
+      if options[:browser].nil?
+        browser_id = options[:new_window] ? nil : "singleton"
+        title = options[:title]
+        support = org.eclipse.ui.PlatformUI.workbench.browser_support
+        wbs = org.eclipse.ui.browser.IWorkbenchBrowserSupport
+        style = wbs::NAVIGATION_BAR | wbs::LOCATION_BAR | wbs::AS_EDITOR | wbs::STATUS
+        support.createBrowser(style, browser_id, title, nil).openURL(java.net.URL.new(url.to_s))
+      else
+        external_open(options[:browser], url)
+      end
+    end    
+    
+    private
+    def external_open(symbol, url)
+      # TODO Set to default for OS if not valid for the current OS
+      valid_browsers = [:safari, :firefox, :chrome, :opera]
+      if Ruble.platforms.include? :windows
+        valid_browsers << :ie
+      elsif Ruble.platforms.include? :mac
+        valid_browsers << :webkit
+      end
+
+      # Force default case if browser choice is invalid for OS
+      symbol = nil if !valid_browsers.include? symbol
+
       cmd_line = case symbol
       when :firefox
-        # TODO Launch Firefox on *nix/Windows
-        "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
+        if Ruble.platforms.include? :mac
+          "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
+        elsif Ruble.platforms.include? :windows
+          "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Launch Firefox on Windows
+        else
+          "firefox \"#{url.to_s}\" &" # TODO Launch Firefox on *nix
+        end
       when :chrome
-        # TODO Launch Chrome
+        # FIXME Seems to open a new instance and it reports an error about loading profile data
+        if Ruble.platforms.include? :mac
+          "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
+        elsif Ruble.platforms.include? :windows
+          "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Launch Chrome on Windows
+        else
+          "google-chrome \"#{url.to_s}\" &" # TODO Launch Chrome on *nix
+        end
       when :ie
         "cmd /C start \"#{url.to_s}\""
       when :safari
-        # TODO What about Safari on Windows?
-        "open \"#{url.to_s}\" &"
+        # TODO Safari assume arg is a file, may need to resort to AppleScript!
+        if Ruble.platforms.include? :mac
+          "/Applications/Safari.app/Contents/MacOS/Safari \"#{url.to_s}\" &"
+        elsif Ruble.platforms.include? :windows
+          "cmd /C safari.exe \"#{url.to_s}\"" # TODO Launch Safari on Windows
+        end
       when :webkit
         # TODO What about WebKit on Windows?
-        # TODO Need to generate a tmp file that causes redirect, webkit assumes a file...
+        # TODO Webkit assume arg is a file, may need to resort to AppleScript!
         "/Applications/WebKit.app/Contents/MacOS/WebKit \"#{url.to_s}\" &"
       when :opera
-        # TODO Launch opera
+        if Ruble.platforms.include? :mac
+          "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
+        elsif Ruble.platforms.include? :windows
+          "cmd /C opera.exe \"#{url.to_s}\"" # TODO Launch Opera on Windows
+        else
+          "opera \"#{url.to_s}\" &" # TODO Launch Opera on *nix
+        end
       else
         # Use some default for each OS
-        if Ruble.Platforms.include? :mac
-        "open \"#{url.to_s}\" &"
-        elsif Ruble.Platforms.include? :windows
-        "cmd /C start \"#{url.to_s}\""
+        if Ruble.platforms.include? :mac
+          "open \"#{url.to_s}\" &"
+        elsif Ruble.platforms.include? :windows
+          "cmd /C start \"#{url.to_s}\""
         else
           # TODO What is the default for Unix/Linux?
         end
       end      
       IO.popen(cmd_line, 'r')
       nil
-    end        
+    end    
     
-    # Open an internal browser pointed at URL
-    def open(url, options = {})
-      browser_id = options[:new_window] ? nil : "singleton"
-      title = options[:title]
-      support = org.eclipse.ui.PlatformUI.workbench.browser_support
-      wbs = org.eclipse.ui.browser.IWorkbenchBrowserSupport
-      style = wbs::NAVIGATION_BAR | wbs::LOCATION_BAR | wbs::AS_EDITOR | wbs::STATUS
-      if support.isInternalWebBrowserAvailable
-        support.createBrowser(style, browser_id, title, nil).openURL(java.net.URL.new(url.to_s))
-      end
-    end
   end  
 end
