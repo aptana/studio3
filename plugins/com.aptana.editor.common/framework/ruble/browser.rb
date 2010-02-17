@@ -35,16 +35,16 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Test
         else
-          "/usr/bin/firefox \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/firefox \"#{url.to_s}\" &"
         end
       when :chrome
-        # FIXME Seems to open a new instance and it reports an error about loading profile data
         if Ruble.platforms.include? :mac
+          # FIXME Seems to open a new instance and it reports an error about loading profile data
           "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Test
         else
-          "/usr/bin/google-chrome \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
       when :ie
         "cmd /C start \"#{url.to_s}\""
@@ -65,7 +65,7 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C opera.exe \"#{url.to_s}\"" # TODO Test
         else
-          "/usr/bin/opera \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/opera \"#{url.to_s}\" &"
         end
       else
         # Use some default for each OS
@@ -74,7 +74,8 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C start \"#{url.to_s}\""
         else
-          # TODO What is the default for Unix/Linux?
+          # TODO Test
+          "xdg-open \"#{url.to_s}\" &"
         end
       end      
       IO.popen(cmd_line, 'r')
