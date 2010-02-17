@@ -19,17 +19,24 @@ class Reference
 	private String fScope;
 	private String fName;
 	private String fType;
+	private IParseNode fNameNode;
 
-	public Reference(IParseNode node, String name, String type)
+	public Reference(IParseNode scopeNode, IParseNode nameNode, String name, String type)
 	{
-		this(createScopeString(node), name, type);
+		this(createScopeString(scopeNode), nameNode, name, type);
 	}
 
-	public Reference(String scope, String name, String type)
+	public Reference(String scope, IParseNode nameNode, String name, String type)
 	{
 		fScope = scope;
+		fNameNode = nameNode;
 		fName = name;
 		fType = type;
+	}
+
+	public IParseNode getNameNode()
+	{
+		return fNameNode;
 	}
 
 	public String getName()
