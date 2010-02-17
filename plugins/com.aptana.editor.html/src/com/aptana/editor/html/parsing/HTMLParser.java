@@ -91,10 +91,12 @@ public class HTMLParser implements IParser
 
 		int start = fCurrentSymbol.getStart();
 		int end = start;
-		while (fCurrentSymbol.getId() != endToken)
+		short id = fCurrentSymbol.getId();
+		while (id != endToken && id != HTMLTokens.EOF)
 		{
 			end = fCurrentSymbol.getEnd();
 			advance();
+			id = fCurrentSymbol.getId();
 		}
 
 		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
