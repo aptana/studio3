@@ -93,6 +93,29 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			TemplateBuffer templateBuffer;
 			{
 				int oldReplaceOffset = getReplaceOffset();
+
+				if (fTemplate instanceof SnippetTemplate)
+				{
+					// Reset indented pattern
+					((SnippetTemplate)fTemplate).setIndentedPattern(null);
+
+					IRegion lineInformationOfStart = document.getLineInformationOfOffset(oldReplaceOffset);
+					int lineInformationOfStartOffset = lineInformationOfStart.getOffset();
+					if (oldReplaceOffset > lineInformationOfStartOffset)
+					{
+						// Get the text from beginning of line to the replacement start offset
+						String prefix = document.get(lineInformationOfStartOffset, oldReplaceOffset - lineInformationOfStartOffset);
+
+						// Is there any leading white space?
+						if (prefix.matches("\\s+.*")) //$NON-NLS-1$
+						{
+							// Yes. Prefix each line in the template's pattern with the same white space
+							((SnippetTemplate)fTemplate).setIndentedPattern(fTemplate.getPattern().replaceAll("(\r\n|\r|\n)", //$NON-NLS-1$
+									"$1" + prefix.replaceFirst("(\\s+).*", "$1")));   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						}
+					}
+				}
+
 				try
 				{
 					// this may already modify the document
