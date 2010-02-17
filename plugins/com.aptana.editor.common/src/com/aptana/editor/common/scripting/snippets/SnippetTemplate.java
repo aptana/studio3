@@ -5,6 +5,7 @@ import com.aptana.scripting.model.SnippetElement;
 
 public class SnippetTemplate extends CommandTemplate
 {
+	private String indentedPattern;
 
 	public SnippetTemplate(CommandElement commandElement, String pattern)
 	{
@@ -14,5 +15,29 @@ public class SnippetTemplate extends CommandTemplate
 	public SnippetTemplate(SnippetElement snippet, String trigger, String contextTypeId)
 	{
 		super(snippet, trigger, snippet.getDisplayName(), contextTypeId, snippet.getExpansion(), true);
+	}
+
+	/**
+	 * Set the indented pattern.
+	 *
+	 * @param indentedPattern
+	 */
+	void setIndentedPattern(String indentedPattern)
+	{
+		this.indentedPattern = indentedPattern;
+	}
+
+	/**
+	 * Return the indented pattern if not null.
+	 *
+	 * @return pattern
+	 */
+	public String getPattern()
+	{
+		if (indentedPattern != null)
+		{
+			return indentedPattern;
+		}
+		return super.getPattern();
 	}
 }

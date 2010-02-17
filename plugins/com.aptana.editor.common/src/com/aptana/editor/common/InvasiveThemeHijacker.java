@@ -255,20 +255,48 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!
 		// prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
 		setToken(prefs, theme, "string.quoted.double.java", "java_string", revertToDefaults);
-		setToken(prefs, theme, "source", "java_default", revertToDefaults);
-		setToken(prefs, theme, "constant.language.java", "java_keyword", revertToDefaults);
+		setToken(prefs, theme, "source.java", "java_default", revertToDefaults);
+		setToken(prefs, theme, "keyword", "java_keyword", revertToDefaults);
 		setToken(prefs, theme, "keyword.operator", "java_operator", revertToDefaults);
 		setToken(prefs, theme, "keyword.control.java", "java_keyword_return", revertToDefaults);
-		setToken(prefs, theme, "comment", "java_single_line_comment", revertToDefaults);
+		setToken(prefs, theme, "comment.line.double-slash.java", "java_single_line_comment", revertToDefaults);
 		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults);
 		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket", revertToDefaults);
-		setSemanticToken(prefs, theme, "storage.type.java", "class", revertToDefaults);
-		setSemanticToken(prefs, theme, "storage.type.java", "enum", revertToDefaults);
-		setSemanticToken(prefs, theme, "storage.type.java", "interface", revertToDefaults);
+		//Javadoc
+		//String TASK_TAG= "java_comment_task_tag"; //$NON-NLS-1$
+		setToken(prefs, theme, "keyword.other.documentation.java", "java_doc_keyword", revertToDefaults);
+		setToken(prefs, theme, "entity.name.tag.inline.any.html", "java_doc_tag", revertToDefaults);
+		setToken(prefs, theme, "markup.underline.link.javadoc", "java_doc_link", revertToDefaults);
+		setToken(prefs, theme, "comment.block.documentation.javadoc", "java_doc_default", revertToDefaults);
+
+		// deprecated
+		setToken(prefs, theme, "entity.name.function.java", "java_method_name", revertToDefaults);
+		setToken(prefs, theme, "entity.name.type.class.java", "java_type", revertToDefaults);
+		setToken(prefs, theme, "storage.type.annotation.java", "java_annotation", revertToDefaults);
+		
+		// Semantic
+		setSemanticToken(prefs, theme, "entity.name.type.class.java", "class", revertToDefaults);
+		setSemanticToken(prefs, theme, "entity.name.type.enum.java", "enum", revertToDefaults);
+		setSemanticToken(prefs, theme, "entity.name.type.interface.java", "interface", revertToDefaults);
 		setSemanticToken(prefs, theme, "constant.numeric.java", "number", revertToDefaults);
-		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);
-		setSemanticToken(prefs, theme, "variable.other.java", "localVariable", revertToDefaults);
-		setSemanticToken(prefs, theme, "variable.other.java", "field", revertToDefaults);
+		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);		
+		setSemanticToken(prefs, theme, "constant.other.java", "staticField", revertToDefaults);
+		setSemanticToken(prefs, theme, "constant.other.java", "staticFinalField", revertToDefaults);
+		setSemanticToken(prefs, theme, "entity.name.function.java", "methodDeclarationName", revertToDefaults);
+		setSemanticToken(prefs, theme, "invalid.deprecated.java", "deprecatedMember", revertToDefaults);
+		setSemanticToken(prefs, theme, "storage.type.annotation.java", "annotation", revertToDefaults);
+		setSemanticToken(prefs, theme, "constant.other.key.java", "annotationElementReference", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "localVariable", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "field", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "staticMethodInvocation", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "inheritedMethodInvocation", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "abstractMethodInvocation", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "localVariableDeclaration", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "method", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "typeParameter", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
+		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
+		
 		try
 		{
 			prefs.flush();

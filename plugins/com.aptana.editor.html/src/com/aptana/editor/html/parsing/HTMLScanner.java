@@ -19,7 +19,12 @@ public class HTMLScanner extends CompositeTokenScanner
 
 	public HTMLScanner()
 	{
-		super(new HTMLTokenScanner(), new IScannerSwitchStrategy[] { CSS_STRATEGY, JS_STRATEGY });
+		this(new HTMLTokenScanner(), new IScannerSwitchStrategy[] { CSS_STRATEGY, JS_STRATEGY });
+	}
+
+	protected HTMLScanner(HTMLTokenScanner tokenScanner, IScannerSwitchStrategy[] switchStrategies)
+	{
+		super(tokenScanner, switchStrategies);
 	}
 
 	public short getTokenType(Object data)
