@@ -34,7 +34,7 @@ module Ruble
           "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           path = path_that_exists("/Program Files/Mozilla Firefox/firefox.exe", "/Program Files (x86)/Mozilla Firefox/firefox.exe")
-          "ruby -e \"`#{path} \"#{url.to_s}\"`\""
+          "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/firefox \"#{url.to_s}\" &"
         end
@@ -44,7 +44,7 @@ module Ruble
           "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           path = path_that_exists("/Documents and Settings/#{ENV['TM_FULLNAME']}/Local Settings/Application Data/Google/Chrome/Application/chrome.exe", "/Users/#{ENV['TM_FULLNAME']}/AppData/Local/Google/Chrome/Application/chrome.exe")
-          "ruby -e \"`#{path} \"#{url.to_s}\"`\""
+          "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
@@ -57,7 +57,7 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           # FIXME Doesn't seem to take URL...
           path = path_that_exists("/Program Files/Safari/Safari.exe", "/Program Files (x86)/Safari/Safari.exe")
-          "ruby -e \"`#{path} \"#{url.to_s}\"`\""
+          "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         end
       when :webkit
         # TODO What about WebKit on Windows?
@@ -68,7 +68,7 @@ module Ruble
           "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
           path = path_that_exists("/Program Files/Opera/opera.exe", "/Program Files (x86)/Opera/opera.exe")
-          "ruby -e \"`#{path} \"#{url.to_s}\"`\""
+          "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         else
           "/usr/bin/opera \"#{url.to_s}\" &"
         end
@@ -87,9 +87,9 @@ module Ruble
       nil
     end        
         
-    def path_that_exists(array)
+    def path_that_exists(*array)
       array.each do |filepath|
-        return filepath if File.exist? filepath
+        return filepath if File.exist?("C:" + filepath)
       end
       array.first # Just return the first one, though none exist...
     end    
