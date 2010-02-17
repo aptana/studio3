@@ -45,26 +45,28 @@ class FileTypeAssociationListener implements BundleChangeListener
 		// parent content type!
 		// i.e. 'source.ruby.rspec' => '*.spec' should get associated to same content type that
 		// 'source.ruby' did (the ruby content type).
+		if (type != null)
+			return;
+		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		if (type == null)
 		{
-			type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
+			Activator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null);
+		}
+		try
+		{
+			int assocType = IContentType.FILE_NAME_SPEC;
 
-			try
+			if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
 			{
-				int assocType = IContentType.FILE_NAME_SPEC;
-
-				if (fileType.contains("*") && fileType.indexOf('.') != -1) //$NON-NLS-1$
-				{
-					assocType = IContentType.FILE_EXTENSION_SPEC;
-					fileType = fileType.substring(fileType.indexOf('.') + 1);
-				}
-
-				type.addFileSpec(fileType, assocType);
+				assocType = IContentType.FILE_EXTENSION_SPEC;
+				fileType = fileType.substring(fileType.indexOf('.') + 1);
 			}
-			catch (CoreException e)
-			{
-				Activator.logError(e.getMessage(), e);
-			}
+
+			type.addFileSpec(fileType, assocType);
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e.getMessage(), e);
 		}
 	}
 
