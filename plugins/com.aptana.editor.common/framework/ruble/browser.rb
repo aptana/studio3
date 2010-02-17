@@ -88,9 +88,10 @@ module Ruble
     end        
         
     def path_that_exists(*array)
-      drives = ["C", "D", "E"] # For some reason JRuby needs the drive prefix for File.exist?
+      # For some reason JRuby needs the drive prefix for File.exist?
+      drives = java.io.File.listRoots.map {|r| r.toString()[0..-2] } 
       array.each do |filepath|
-        drives.each {|d| return filepath if File.exist?(d + ":" + filepath) }
+        drives.each {|d| return filepath if File.exist?(d + filepath) }
       end
       array.first # Just return the first one, though none exist...
     end    
