@@ -35,7 +35,7 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Test
         else
-          "firefox \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/firefox \"#{url.to_s}\" &" # TODO Test
         end
       when :chrome
         # FIXME Seems to open a new instance and it reports an error about loading profile data
@@ -44,7 +44,7 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Test
         else
-          "google-chrome \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/google-chrome \"#{url.to_s}\" &" # TODO Test
         end
       when :ie
         "cmd /C start \"#{url.to_s}\""
@@ -65,7 +65,7 @@ module Ruble
         elsif Ruble.platforms.include? :windows
           "cmd /C opera.exe \"#{url.to_s}\"" # TODO Test
         else
-          "opera \"#{url.to_s}\" &" # TODO Test
+          "/usr/bin/opera \"#{url.to_s}\" &" # TODO Test
         end
       else
         # Use some default for each OS
