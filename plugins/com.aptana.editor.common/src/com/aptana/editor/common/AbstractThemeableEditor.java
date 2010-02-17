@@ -352,6 +352,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		getSourceViewer().getTextWidget().setSelectionBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(
 						getThemeManager().getCurrentTheme().getSelection()));
+		if (!Platform.getOS().equals(Platform.OS_WIN32) && !Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			// Linux needs selection fg set or we just see a block of color.
+			getSourceViewer().getTextWidget().setSelectionForeground(
+					CommonEditorPlugin.getDefault().getColorManager().getColor(
+							getThemeManager().getCurrentTheme().getForeground()));
+		}
 
 		if (selectionListener != null)
 			return;
