@@ -33,39 +33,39 @@ module Ruble
         if Ruble.platforms.include? :mac
           "/Applications/Firefox.app/Contents/MacOS/firefox-bin \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Launch Firefox on Windows
+          "cmd /C firefox.exe \"#{url.to_s}\"" # TODO Test
         else
-          "firefox \"#{url.to_s}\" &" # TODO Launch Firefox on *nix
+          "firefox \"#{url.to_s}\" &" # TODO Test
         end
       when :chrome
         # FIXME Seems to open a new instance and it reports an error about loading profile data
         if Ruble.platforms.include? :mac
           "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Launch Chrome on Windows
+          "cmd /C chrome.exe \"#{url.to_s}\"" # TODO Test
         else
-          "google-chrome \"#{url.to_s}\" &" # TODO Launch Chrome on *nix
+          "google-chrome \"#{url.to_s}\" &" # TODO Test
         end
       when :ie
         "cmd /C start \"#{url.to_s}\""
       when :safari
-        # TODO Safari assume arg is a file, may need to resort to AppleScript!
         if Ruble.platforms.include? :mac
-          "/Applications/Safari.app/Contents/MacOS/Safari \"#{url.to_s}\" &"
+          # FIXME Opens in new tab/window
+          "osascript -e \"tell application \\\"Safari\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""          
         elsif Ruble.platforms.include? :windows
           "cmd /C safari.exe \"#{url.to_s}\"" # TODO Launch Safari on Windows
         end
       when :webkit
         # TODO What about WebKit on Windows?
-        # TODO Webkit assume arg is a file, may need to resort to AppleScript!
-        "/Applications/WebKit.app/Contents/MacOS/WebKit \"#{url.to_s}\" &"
+        # FIXME Opens in new tab/window
+        "osascript -e \"tell application \\\"WebKit\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""
       when :opera
         if Ruble.platforms.include? :mac
           "/Applications/Opera.app/Contents/MacOS/Opera \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C opera.exe \"#{url.to_s}\"" # TODO Launch Opera on Windows
+          "cmd /C opera.exe \"#{url.to_s}\"" # TODO Test
         else
-          "opera \"#{url.to_s}\" &" # TODO Launch Opera on *nix
+          "opera \"#{url.to_s}\" &" # TODO Test
         end
       else
         # Use some default for each OS
