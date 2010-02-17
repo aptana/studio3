@@ -76,4 +76,18 @@
          <enablement></enablement>
       </consolePageParticipant>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="com.aptana"
+            name="Aptana">
+      </category>
+      <view
+            category="com.aptana"
+            class="com.aptana.scripting.ui.views.BundleView"
+            id="com.aptana.scripting.views.BundleView"
+            name="Bundles"
+            restorable="true">
+      </view>
+   </extension>
 </plugin>
