@@ -13,7 +13,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ContextContributor;
 import com.aptana.scripting.model.EnvironmentContributor;
-import com.aptana.util.ProcessUtil;
+import com.aptana.util.IOUtil;
 
 public class FullnameEnvContextContributor implements ContextContributor, EnvironmentContributor
 {
@@ -77,11 +77,17 @@ public class FullnameEnvContextContributor implements ContextContributor, Enviro
 		{
 			if (username.trim().length() > 0)
 			{
-				String cmdLine = "getent passwd \"" + username + "\" | cut -d ':' -f 5 | cut -d ',' -f 1"; //$NON-NLS-1$ //$NON-NLS-2$
-				Map<Integer, String> result = ProcessUtil.runInBackground(cmdLine, null, new String[0]);
-				if (result != null && result.keySet().iterator().next() == 0)
+				try 
 				{
-					map.put(TM_FULLNAME, result.values().iterator().next());
+					Process p = Runtime.getRuntime().exec("/usr/bin/getent passwd " + username);
+					String read = IOUtil.read(p.getInputStream(), "UTF-8");
+					String raw = read.split(":")[4];
+					String fullname = raw.split(",")[0];
+					map.put(TM_FULLNAME, fullname);
+				} 
+				catch (Throwable e) 
+				{
+					// ignore
 				}
 			}
 		}

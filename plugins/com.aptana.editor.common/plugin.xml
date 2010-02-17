@@ -166,11 +166,17 @@
       <file
             name="ruble/theme.rb">
       </file>
+      <file
+            name="ruble/browser.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
             class="com.aptana.editor.common.internal.scripting.EditorContextContributor">
+      </contributor>
+      <contributor
+            class="com.aptana.editor.common.internal.scripting.BrowserContextContributor">
       </contributor>
    </extension>
 </plugin>

@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -262,7 +264,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setToken(prefs, theme, "comment.line.double-slash.java", "java_single_line_comment", revertToDefaults);
 		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults);
 		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket", revertToDefaults);
-		//Javadoc
+		// Javadoc
 		//String TASK_TAG= "java_comment_task_tag"; //$NON-NLS-1$
 		setToken(prefs, theme, "keyword.other.documentation.java", "java_doc_keyword", revertToDefaults);
 		setToken(prefs, theme, "entity.name.tag.inline.any.html", "java_doc_tag", revertToDefaults);
@@ -273,13 +275,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setToken(prefs, theme, "entity.name.function.java", "java_method_name", revertToDefaults);
 		setToken(prefs, theme, "entity.name.type.class.java", "java_type", revertToDefaults);
 		setToken(prefs, theme, "storage.type.annotation.java", "java_annotation", revertToDefaults);
-		
+
 		// Semantic
 		setSemanticToken(prefs, theme, "entity.name.type.class.java", "class", revertToDefaults);
 		setSemanticToken(prefs, theme, "entity.name.type.enum.java", "enum", revertToDefaults);
 		setSemanticToken(prefs, theme, "entity.name.type.interface.java", "interface", revertToDefaults);
 		setSemanticToken(prefs, theme, "constant.numeric.java", "number", revertToDefaults);
-		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);		
+		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);
 		setSemanticToken(prefs, theme, "constant.other.java", "staticField", revertToDefaults);
 		setSemanticToken(prefs, theme, "constant.other.java", "staticFinalField", revertToDefaults);
 		setSemanticToken(prefs, theme, "entity.name.function.java", "methodDeclarationName", revertToDefaults);
@@ -296,7 +298,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setSemanticToken(prefs, theme, "source.java", "typeParameter", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
-		
+
 		try
 		{
 			prefs.flush();
@@ -439,10 +441,24 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partBroughtToTop(IWorkbenchPart part)
 	{
+		partActivated(part);
 	}
 
 	@Override
 	public void partActivated(IWorkbenchPart part)
 	{
+		if (!(part instanceof IEditorPart))
+			return;
+
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IViewReference[] refs = window.getActivePage().getViewReferences();
+		for (IViewReference ref : refs)
+		{
+			if (ref.getId().equals(IPageLayout.ID_OUTLINE))
+			{
+				hijackView(ref.getView(false), false);
+				return;
+			}
+		}
 	}
 }

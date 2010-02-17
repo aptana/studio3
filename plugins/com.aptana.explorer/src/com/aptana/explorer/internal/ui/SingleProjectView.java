@@ -927,7 +927,10 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private void removeSingleProjectFilter()
 	{
-		getCommonViewer().removeFilter(activeProjectFilter);
+		if (getCommonViewer() != null && activeProjectFilter != null)
+		{
+			getCommonViewer().removeFilter(activeProjectFilter);
+		}
 		activeProjectFilter = null;
 	}
 

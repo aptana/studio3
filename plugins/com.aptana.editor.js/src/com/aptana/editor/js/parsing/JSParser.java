@@ -220,7 +220,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol _symbol_b = _symbols[offset + 4];
 					final JSNode b = (JSNode) _symbol_b.value;
-					return new JSFunctionNode(i, new JSNode[] { p, b }, f.getStart(), b.getEnd());
+					return new JSFunctionNode(new JSNode[] { new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b }, f.getStart(), b.getEnd());
 				}
 			},
 			new Action() {	// [6] FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
@@ -230,7 +230,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode p = (JSNode) _symbol_p.value;
 					final Symbol _symbol_b = _symbols[offset + 3];
 					final JSNode b = (JSNode) _symbol_b.value;
-					return new JSFunctionNode(new JSNode[] { p, b }, f.getStart(), b.getEnd());
+					return new JSFunctionNode(new JSNode[] { new JSNode(), p, b }, f.getStart(), b.getEnd());
 				}
 			},
 			Action.RETURN,	// [7] FunctionExpression = FunctionDeclaration
