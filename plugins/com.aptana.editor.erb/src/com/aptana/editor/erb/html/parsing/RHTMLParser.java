@@ -52,10 +52,12 @@ public class RHTMLParser extends CompositeParser
 		// finds the entire ruby block
 		int start = getCurrentSymbol().getStart();
 		int end = start;
-		while (getCurrentSymbol().getId() != ERBTokens.RUBY_END)
+		short id = getCurrentSymbol().getId();
+		while (id != ERBTokens.RUBY_END && id != ERBTokens.EOF)
 		{
 			end = getCurrentSymbol().getEnd();
 			advance();
+			id = getCurrentSymbol().getId();
 		}
 
 		IParseNode result = getParseResult(new RubyParser(), start, end);
