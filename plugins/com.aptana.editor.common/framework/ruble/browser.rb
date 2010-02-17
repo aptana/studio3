@@ -55,7 +55,7 @@ module Ruble
           # FIXME Opens in new tab/window
           "osascript -e \"tell application \\\"Safari\\\"\nopen location \\\"#{url.to_s}\\\"\nend tell\""          
         elsif Ruble.platforms.include? :windows
-          # FIXME Doesn't seem to take URL...
+          # FIXME Doesn't seem to take URL on Windows XP...
           path = path_that_exists("/Program Files/Safari/Safari.exe", "/Program Files (x86)/Safari/Safari.exe")
           "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
         end
@@ -88,8 +88,9 @@ module Ruble
     end        
         
     def path_that_exists(*array)
+      drives = ["C", "D", "E"] # For some reason JRuby needs the drive prefix for File.exist?
       array.each do |filepath|
-        return filepath if File.exist?("C:" + filepath)
+        drives.each {|d| return filepath if File.exist?(d + ":" + filepath) }
       end
       array.first # Just return the first one, though none exist...
     end    
