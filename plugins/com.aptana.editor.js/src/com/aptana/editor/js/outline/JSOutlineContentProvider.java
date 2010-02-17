@@ -85,9 +85,17 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	protected Object[] filter(IParseNode[] nodes)
 	{
 		List<JSOutlineItem> elements = new ArrayList<JSOutlineItem>();
-		for (IParseNode node : nodes)
+		if (nodes.length > 0 && nodes[0].getParent() instanceof ParseRootNode)
 		{
-			processNode(elements, node);
+			// treating the root node as type STATEMENTS and process its children directly
+			processStatements(elements, nodes[0].getParent());
+		}
+		else
+		{
+			for (IParseNode node : nodes)
+			{
+				processNode(elements, node);
+			}
 		}
 		return elements.toArray(new JSOutlineItem[elements.size()]);
 	}
@@ -209,58 +217,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				}
 				break;
 			case JSNodeTypes.STATEMENTS:
-				// processes named functions first
-				IParseNode child;
-				size = node.getChildrenCount();
-				for (int i = 0; i < size; ++i)
-				{
-					child = node.getChild(i);
-					if (child.getType() == JSNodeTypes.FUNCTION && child.getText().length() > 0)
-					{
-						processNode(elements, child);
-					}
-				}
-				// processes var declarations
-				for (int i = 0; i < size; ++i)
-				{
-					child = node.getChild(i);
-					if (child.getType() == JSNodeTypes.VAR)
-					{
-						processNode(elements, child);
-					}
-				}
-				// processes var assignments, identifiers, and name/value pairs
-				short childType;
-				for (int i = 0; i < size; ++i)
-				{
-					child = node.getChild(i);
-					childType = child.getType();
-					if (childType == JSNodeTypes.ASSIGN || childType == JSNodeTypes.IDENTIFIER
-							|| childType == JSNodeTypes.NAME_VALUE_PAIR || childType == JSNodeTypes.INVOKE
-							|| childType == JSNodeTypes.RETURN)
-					{
-						processNode(elements, child);
-					}
-				}
-				// processes if statements
-				for (int i = 0; i < size; ++i)
-				{
-					child = node.getChild(i);
-					if (child.getType() == JSNodeTypes.IF)
-					{
-						processNode(elements, child);
-					}
-				}
-				// process try/catch statements
-				for (int i = 0; i < size; ++i)
-				{
-					child = node.getChild(i);
-					childType = child.getType();
-					if (childType == JSNodeTypes.TRY || childType == JSNodeTypes.CATCH)
-					{
-						processNode(elements, child);
-					}
-				}
+				processStatements(elements, node);
 				break;
 			case JSNodeTypes.IF:
 			case JSNodeTypes.TRY:
@@ -529,6 +486,62 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			default:
 				elements.add(new JSOutlineItem(name, type, property, value));
 				break;
+		}
+	}
+
+	private void processStatements(List<JSOutlineItem> elements, IParseNode node)
+	{
+		// processes named functions first
+		IParseNode child;
+		int size = node.getChildrenCount();
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getType() == JSNodeTypes.FUNCTION && child.getText().length() > 0)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes var declarations
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getType() == JSNodeTypes.VAR)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes var assignments, identifiers, and name/value pairs
+		short childType;
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			childType = child.getType();
+			if (childType == JSNodeTypes.ASSIGN || childType == JSNodeTypes.IDENTIFIER
+					|| childType == JSNodeTypes.NAME_VALUE_PAIR || childType == JSNodeTypes.INVOKE
+					|| childType == JSNodeTypes.RETURN)
+			{
+				processNode(elements, child);
+			}
+		}
+		// processes if statements
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			if (child.getType() == JSNodeTypes.IF)
+			{
+				processNode(elements, child);
+			}
+		}
+		// process try/catch statements
+		for (int i = 0; i < size; ++i)
+		{
+			child = node.getChild(i);
+			childType = child.getType();
+			if (childType == JSNodeTypes.TRY || childType == JSNodeTypes.CATCH)
+			{
+				processNode(elements, child);
+			}
 		}
 	}
 
