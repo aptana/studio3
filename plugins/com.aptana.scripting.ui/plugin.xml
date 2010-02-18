@@ -76,6 +76,8 @@
          <enablement></enablement>
       </consolePageParticipant>
    </extension>
+   <!-- uncomment to activate the bundles view -->
+   <!--
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -90,4 +92,5 @@
             restorable="true">
       </view>
    </extension>
+   -->
 </plugin>
