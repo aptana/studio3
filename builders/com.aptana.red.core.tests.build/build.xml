@@ -83,6 +83,7 @@
 			<arg value="${git.executable} clean -f -d -x" />
 		</exec>
 		<delete file="build.properties" failonerror="false" />
+		<delete dir="${buildDirectory}/eclipse" failonerror="false" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
