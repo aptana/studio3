@@ -76,6 +76,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -345,6 +346,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+
+		// Register with focus service so that Cut/Copy/Paste/SelecAll handlers will work.
+		IFocusService focusService = (IFocusService) getViewSite().getService(IFocusService.class);
+		focusService.addFocusTracker(searchText, ID + ".searchText"); //$NON-NLS-1$
+
 		searchText.addFocusListener(new FocusListener()
 		{
 			@Override
