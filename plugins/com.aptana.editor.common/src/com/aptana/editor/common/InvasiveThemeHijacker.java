@@ -11,13 +11,13 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -272,7 +272,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setToken(prefs, theme, "comment.block.documentation.javadoc", "java_doc_default", revertToDefaults);
 
 		// deprecated
-		setToken(prefs, theme, "entity.name.function.java", "java_method_name", revertToDefaults);
+		// setToken(prefs, theme, "entity.name.function.java", "java_method_name", revertToDefaults);
 		setToken(prefs, theme, "entity.name.type.class.java", "java_type", revertToDefaults);
 		setToken(prefs, theme, "storage.type.annotation.java", "java_annotation", revertToDefaults);
 
@@ -320,11 +320,12 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else
 		{
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, toString(theme.getBackground()));
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, toString(theme.getForeground()));
-			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, toString(theme
-					.getLineHighlight()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme
+					.getSelection()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
+			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, StringConverter
+					.asString(theme.getLineHighlight()));
 		}
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
@@ -356,7 +357,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		else
 		{
 			TextAttribute attr = theme.getTextAttribute(ourTokenType);
-			prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
+			prefs.put(jdtToken, StringConverter.asString(attr.getForeground().getRGB()));
 			prefs.putBoolean(jdtToken + "_bold", (attr.getStyle() & SWT.BOLD) != 0);
 			prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0);
 			prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
@@ -368,33 +369,27 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	protected void setSemanticToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken,
 			boolean revertToDefaults)
 	{
-		String prefix = "SemanticHighlighting.";
+		String prefix = "semanticHighlighting.";
 		jdtToken = prefix + jdtToken;
 		if (revertToDefaults)
 		{
-			prefs.remove(jdtToken);
+			prefs.remove(jdtToken + ".color");
 			prefs.remove(jdtToken + ".bold");
 			prefs.remove(jdtToken + ".italic");
 			prefs.remove(jdtToken + ".underline");
 			prefs.remove(jdtToken + ".strikethrough");
+			prefs.remove(jdtToken + ".enabled");
 		}
 		else
 		{
 			TextAttribute attr = theme.getTextAttribute(ourTokenType);
-			prefs.put(jdtToken, toString(attr.getForeground().getRGB()));
+			prefs.put(jdtToken + ".color", StringConverter.asString(attr.getForeground().getRGB()));
 			prefs.putBoolean(jdtToken + ".bold", (attr.getStyle() & SWT.BOLD) != 0);
 			prefs.putBoolean(jdtToken + ".italic", (attr.getStyle() & SWT.ITALIC) != 0);
 			prefs.putBoolean(jdtToken + ".underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
 			prefs.putBoolean(jdtToken + ".strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+			prefs.putBoolean(jdtToken + ".enabled", true);
 		}
-	}
-
-	@SuppressWarnings("nls")
-	private static String toString(RGB selection)
-	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(",").append(selection.green).append(",").append(selection.blue);
-		return builder.toString();
 	}
 
 	// IPreferenceChangeListener

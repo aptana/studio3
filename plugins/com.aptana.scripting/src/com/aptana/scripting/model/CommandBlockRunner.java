@@ -218,34 +218,45 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		}
 		catch (RaiseException e)
 		{
-			if ((e.getException() instanceof RubySystemExit) && context.isForcedExit())
+			if (e.getException() instanceof RubySystemExit)
 			{
-				// should be from the exit call in exit_with_message
-				resultText = context.get(OUTPUT_PROPERTY).toString();
+				RubySystemExit exit = (RubySystemExit) e.getException();
+				if (context.isForcedExit())
+				{
+					// should be from the exit call in exit_with_message
+					resultText = context.get(OUTPUT_PROPERTY).toString();
+				}
+				else if (exit.success_p().isTrue()) // command did an exit with exitcode of zero
+				{
+					// exited OK, just assume we're fine!
+				}
+				else
+				{
+					executionFailed(command, e);
+				}				
 			}
 			else
 			{
-				String message = MessageFormat.format( //
-						Messages.CommandElement_Error_Processing_Command_Block, //
-						new Object[] { command.getDisplayName(), command.getPath(), e.getMessage() } //
-						); //
-
-				ScriptUtils.logErrorWithStackTrace(message, e);
-				this.setExecutedSuccessfully(false);
+				executionFailed(command, e);
 			}
 		}
 		catch (Exception e)
 		{
-			String message = MessageFormat.format( //
-					Messages.CommandElement_Error_Processing_Command_Block, //
-					new Object[] { command.getDisplayName(), command.getPath(), e.getMessage() } //
-					); //
-
-			ScriptUtils.logErrorWithStackTrace(message, e);
-			this.setExecutedSuccessfully(false);
+			executionFailed(command, e);
 		}
 
 		return resultText;
+	}
+
+	private void executionFailed(CommandElement command, Exception e)
+	{
+		String message = MessageFormat.format( //
+				Messages.CommandElement_Error_Processing_Command_Block, //
+				new Object[] { command.getDisplayName(), command.getPath(), e.getMessage() } //
+				); //
+
+		ScriptUtils.logErrorWithStackTrace(message, e);
+		this.setExecutedSuccessfully(false);
 	}
 
 	/**

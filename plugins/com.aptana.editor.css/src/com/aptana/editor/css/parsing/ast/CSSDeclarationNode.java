@@ -72,4 +72,41 @@ public class CSSDeclarationNode extends CSSNode
 		}
 		return text.toString();
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+		{
+			return false;
+		}
+		if (!(obj instanceof CSSDeclarationNode))
+		{
+			return false;
+		}
+		CSSDeclarationNode otherDecl = (CSSDeclarationNode) obj;
+		if (fIdentifier == null)
+		{
+			// if there is no identifier, it's an empty declaration, and other fields are not set either, so no need to
+			// check them
+			return otherDecl.fIdentifier == null;
+		}
+		return fIdentifier.equals(otherDecl.fIdentifier)
+				&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus
+						.equals(otherDecl.fStatus))) && fHasSemicolon == otherDecl.fHasSemicolon;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		if (fIdentifier == null)
+		{
+			return super.hashCode();
+		}
+		int hash = super.hashCode();
+		hash = hash * 31 + fIdentifier.hashCode();
+		hash = hash * 31 + (fStatus == null ? 0 : fStatus.hashCode());
+		hash = hash * 31 + Boolean.valueOf(fHasSemicolon).hashCode();
+		return hash;
+	}
 }
