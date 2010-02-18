@@ -118,9 +118,10 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 							if (defaultValues != null)
 							{
 								buffer.append("("); //$NON-NLS-1$
-								StringTokenizer tokenizer = new StringTokenizer(defaultValues, "/"); //$NON-NLS-1$
 								boolean first = true;
-								while (tokenizer.hasMoreTokens())
+								// We want to split on non-escaped '/'
+								String[] values = defaultValues.split("[^\\\\]/");
+								for (String value : values)
 								{
 									if (first)
 									{
@@ -130,7 +131,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 									{
 										buffer.append(","); //$NON-NLS-1$
 									}
-									buffer.append(SINGLE_QUOTE + tokenizer.nextToken() + SINGLE_QUOTE);
+									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/") + SINGLE_QUOTE);
 								}
 								buffer.append(")"); //$NON-NLS-1$
 							}
