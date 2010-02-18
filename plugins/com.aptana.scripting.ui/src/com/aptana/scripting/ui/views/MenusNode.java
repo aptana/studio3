@@ -1,9 +1,11 @@
 package com.aptana.scripting.ui.views;
 
+import org.eclipse.swt.graphics.Image;
+
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.MenuElement;
 
-class MenusNode implements CollectionNode
+class MenusNode extends BaseNode
 {
 	private MenuElement[] _menus;
 	
@@ -17,14 +19,22 @@ class MenusNode implements CollectionNode
 		this._menus = bundle.getMenus();
 	}
 	
-	/**
-	 * getChildren
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
 		return this._menus;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
+	 */
+	public Image getImage()
+	{
+		return null;
 	}
 	
 	/*
@@ -35,7 +45,7 @@ class MenusNode implements CollectionNode
 	{
 		return Messages.MenusNode_Menus_Node;
 	}
-	
+
 	/**
 	 * hasChildren
 	 * 

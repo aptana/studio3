@@ -3,14 +3,16 @@ package com.aptana.scripting.ui.views;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.swt.graphics.Image;
+
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 
-class SnippetsNode implements CollectionNode
+class SnippetsNode extends BaseNode
 {
-	private SnippetElement[] _snippets;
-	
+	private SnippetNode[] _snippets;
+
 	/**
 	 * CommandsNode
 	 * 
@@ -18,29 +20,38 @@ class SnippetsNode implements CollectionNode
 	 */
 	public SnippetsNode(BundleElement bundle)
 	{
-		List<CommandElement> snippets = new LinkedList<CommandElement>();
-		
+		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
+
 		for (CommandElement command : bundle.getCommands())
 		{
 			if (command instanceof SnippetElement)
 			{
-				snippets.add(command);
+				snippets.add(new SnippetNode((SnippetElement) command));
 			}
 		}
-		
-		this._snippets = snippets.toArray(new SnippetElement[snippets.size()]);
+
+		this._snippets = snippets.toArray(new SnippetNode[snippets.size()]);
 	}
-	
-	/**
-	 * getChildren
-	 * 
-	 * @return
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
 		return this._snippets;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
+	 */
+	public Image getImage()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
@@ -49,7 +60,7 @@ class SnippetsNode implements CollectionNode
 	{
 		return Messages.SnippetsNode_Snippets_Node;
 	}
-	
+
 	/**
 	 * hasChildren
 	 * 

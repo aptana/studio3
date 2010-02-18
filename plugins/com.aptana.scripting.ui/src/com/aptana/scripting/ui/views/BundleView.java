@@ -59,7 +59,11 @@ public class BundleView extends ViewPart
 		this._treeViewer.setLabelProvider(_labelProvider);
 		this._treeViewer.setInput(BundleManager.getInstance());
 
+		// add load cycle listener
 		BundleManager.getInstance().addLoadCycleListener(this._loadCycleListener);
+		
+		// add selection provider
+		this.getSite().setSelectionProvider(this._treeViewer);
 	}
 
 	/*
@@ -68,6 +72,10 @@ public class BundleView extends ViewPart
 	 */
 	public void dispose()
 	{
+		// remove selection provider
+		this.getSite().setSelectionProvider(null);
+		
+		// remove load cycle listener
 		BundleManager.getInstance().removeLoadCycleListener(this._loadCycleListener);
 
 		super.dispose();

@@ -3,13 +3,15 @@ package com.aptana.scripting.ui.views;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.swt.graphics.Image;
+
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 
-class CommandsNode implements CollectionNode
+class CommandsNode extends BaseNode
 {
-	private CommandElement[] _commands;
+	private CommandNode[] _commands;
 	
 	/**
 	 * CommandsNode
@@ -18,17 +20,17 @@ class CommandsNode implements CollectionNode
 	 */
 	public CommandsNode(BundleElement bundle)
 	{
-		List<CommandElement> commands = new LinkedList<CommandElement>();
+		List<CommandNode> commands = new LinkedList<CommandNode>();
 		
 		for (CommandElement command : bundle.getCommands())
 		{
 			if ((command instanceof SnippetElement) == false)
 			{
-				commands.add(command);
+				commands.add(new CommandNode(command));
 			}
 		}
 		
-		this._commands = commands.toArray(new CommandElement[commands.size()]);
+		this._commands = commands.toArray(new CommandNode[commands.size()]);
 	}
 	
 	/*
@@ -39,7 +41,17 @@ class CommandsNode implements CollectionNode
 	{
 		return this._commands;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 */
+	public Image getImage()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()

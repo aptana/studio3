@@ -1,7 +1,16 @@
 package com.aptana.scripting.ui.views;
 
+import org.eclipse.swt.graphics.Image;
+
 interface CollectionNode
 {
+	/**
+	 * getImage
+	 * 
+	 * @return
+	 */
+	Image getImage();
+	
 	/**
 	 * getLabel
 	 * 
