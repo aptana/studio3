@@ -44,7 +44,7 @@ public class HAMLDocumentProvider extends CompositeDocumentProvider
 	protected HAMLDocumentProvider()
 	{
 		super(IHAMLConstants.CONTENT_TYPE_HAML, HAMLSourceConfiguration.getDefault(), RubySourceConfiguration
-				.getDefault(), new NullPartitionerSwitchStrategy());
+				.getDefault(), HAMLPartitionerSwitchStrategy.getDefault());
 	}
 
 }

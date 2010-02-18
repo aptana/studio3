@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,57 +35,53 @@
 
 package com.aptana.editor.haml;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.CompositeSourceViewerConfiguration;
-import com.aptana.editor.common.IPartitionerSwitchStrategy;
-import com.aptana.editor.common.scripting.IContentTypeTranslator;
-import com.aptana.editor.common.scripting.QualifiedContentType;
-import com.aptana.editor.ruby.RubySourceConfiguration;
+import com.aptana.editor.common.PartitionerSwitchStrategy;
 
 /**
  * @author Max Stepanov
- * @author cwilliams
+ *
  */
-public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration implements IHAMLConstants
-{
+public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 
-	static
-	{
-		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(
-				"text.haml"));
-	}
-
-	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
-	{
-		super(HAMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(), preferences, editor);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()
+	private static HAMLPartitionerSwitchStrategy instance;
+	
+	private static final String[][] ERB_PAIRS = new String[][] {
+		{ "{", "}" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "[", "]" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "=", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "~", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+	};
+	
+	private static final String[][] ESCAPE_PAIRS = new String[][] {
+		{ "#" , null }, //$NON-NLS-1$
+		{ "=begin", "=end" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "#{" , "}" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "'" , "'" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "\"" , "\"" }, //$NON-NLS-1$ //$NON-NLS-2$
+	};
+	
+	/**
+	 * 
 	 */
-	@Override
-	protected String getTopContentType()
-	{
-		return IHAMLConstants.CONTENT_TYPE_HAML;
+	private HAMLPartitionerSwitchStrategy() {
+		super(ERB_PAIRS, ESCAPE_PAIRS);
+	}
+	
+	public static HAMLPartitionerSwitchStrategy getDefault() {
+		if (instance == null) {
+			instance = new HAMLPartitionerSwitchStrategy();
+		}
+		return instance;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getLanguageSpecification()
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
 	 */
-	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy()
-	{
-		return HAMLPartitionerSwitchStrategy.getDefault();
+	public String[][] getSwitchTagPairs() {
+		return ERB_PAIRS;
 	}
 
-	protected String getStartEndTokenType()
-	{
-		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
-	}
 }

@@ -119,15 +119,16 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				new EndOfLineRule("-#", new Token(HAML_COMMENT)), //$NON-NLS-1$
 				new EndOfLineRule("!!!", new Token(DOCTYPE)), //$NON-NLS-1$
 				// String Interpolation
-				new SingleLineRule("#{", "}", ruby, '\\'), //$NON-NLS-1$ //$NON-NLS-2$				
+				//new SingleLineRule("#{", "}", ruby, '\\'), //$NON-NLS-1$ //$NON-NLS-2$				
 				// FIXME Not sure I'm setting up the language transition properly here
 				// Ruby Single-liners
-				new SingleCharacterRule('=', ruby), new SingleCharacterRule('-', ruby),
-				new SingleCharacterRule('~', ruby),
+				//new SingleCharacterRule('=', ruby), new SingleCharacterRule('-', ruby),
+				//new SingleCharacterRule('~', ruby),
 				// Object
-				new SingleCharacterRule('[', new Token(OBJECT)),
+				//new SingleCharacterRule('[', new Token(OBJECT)),
 				// Attributes
-				new SingleCharacterRule('{', new Token(ATTRIBUTE)) };
+				//new SingleCharacterRule('{', new Token(ATTRIBUTE)) 
+				};
 	}
 
 	/*
