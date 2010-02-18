@@ -51,7 +51,46 @@
    <extension
          point="org.eclipse.ui.startup">
       <startup
-            class="com.aptana.scripting.ui.EarlyStartup">
+            class="com.aptana.scripting.ui.ScriptingConsole">
       </startup>
    </extension>
+   <extension
+         point="com.aptana.scripting.contextContributors">
+      <contributor
+            class="com.aptana.scripting.ui.StreamContextContributor"
+            name="RadRails Stream Contributor">
+      </contributor>
+   </extension>
+   <extension
+         point="com.aptana.scripting.loadPaths">
+      <loadPath
+            name="RadRails Framework Directory"
+            path="framework/">
+      </loadPath>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="com.aptana.scripting.ui.ScriptingConsole"
+            id="com.aptana.scripting.ui.consolePageParticipant">
+         <enablement></enablement>
+      </consolePageParticipant>
+   </extension>
+   <!-- uncomment to activate the bundles view -->
+   <!--
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="com.aptana"
+            name="%category.name">
+      </category>
+      <view
+            category="com.aptana"
+            class="com.aptana.scripting.ui.views.BundleView"
+            id="com.aptana.scripting.views.BundleView"
+            name="%view.name"
+            restorable="true">
+      </view>
+   </extension>
+   -->
 </plugin>

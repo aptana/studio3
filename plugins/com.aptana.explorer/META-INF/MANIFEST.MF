@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.navigator;bundle-version="3.3.0",
  org.eclipse.core.resources;bundle-version="3.4.0",
+ org.eclipse.core.expressions,
  org.eclipse.search,
  com.aptana.git.core;bundle-version="1.0.0",
  com.aptana.git.ui;bundle-version="1.0.0",
@@ -17,7 +18,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.filewatcher;bundle-version="1.0.0",
  com.aptana.scripting,
  com.aptana.editor.common;bundle-version="1.0.0",
- com.aptana.terminal;bundle-version="1.0.0"
+ com.aptana.terminal;bundle-version="1.0.0",
+ org.jruby;bundle-version="1.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

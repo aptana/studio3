@@ -42,16 +42,6 @@
       </viewerActionBinding>
 	</extension>
    <extension
-         point="org.eclipse.ui.themes">
-      <fontDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            defaultsTo="org.eclipse.jface.textfont"
-            id="com.aptana.explorer.font"
-            isEditable="true"
-            label="%appExplorerFont.label">
-      </fontDefinition>
-   </extension>
-   <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
             class="com.aptana.explorer.ExplorerContextContributor"
@@ -68,7 +58,46 @@
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/project.rb">
+            name="ruble/project.rb">
       </file>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.cut"
+         commandId="org.eclipse.ui.edit.cut">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.copy"
+         commandId="org.eclipse.ui.edit.copy">
+        <activeWhen>
+           <with variable="com.aptana.explorer.view.searchText">
+             <equals value="com.aptana.explorer.view.SearchInProject"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.paste"
+         commandId="org.eclipse.ui.edit.paste">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
+      <handler
+         class="com.aptana.explorer.internal.ui.SearchTextHandler:org.eclipse.ui.edit.selectAll"
+         commandId="org.eclipse.ui.edit.selectAll">
+        <activeWhen>
+           <with variable="activeFocusControlId">
+             <equals value="com.aptana.explorer.view.searchText"/>
+           </with>
+        </activeWhen>
+      </handler>
    </extension>
 </plugin>

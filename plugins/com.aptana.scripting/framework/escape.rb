@@ -5,7 +5,7 @@ end
 
 # escape text for use in a TextMate snippet
 def e_sn(str)
-  str.to_s.gsub(/(?=[$`\\])/, '\\')
+  str.to_s.gsub(/(?=[$`\\\/])/, '\\')
 end
 
 # escape text for use in a TextMate snippet placeholder

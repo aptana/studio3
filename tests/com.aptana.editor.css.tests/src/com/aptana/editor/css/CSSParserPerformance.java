@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import com.aptana.editor.css.parsing.CSSParser;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseState;
 
 public class CSSParserPerformance {
 
@@ -18,11 +20,13 @@ public class CSSParserPerformance {
         String src = new String(out.toByteArray());
 
         CSSParser parser = new CSSParser();
+        IParseState parseState = new ParseState();
         int numRuns = 100;
         long start = System.currentTimeMillis();
         for (int i = 0; i < numRuns; i++) {
+            parseState.setEditState(src, src, 0, 0);
             try {
-                parser.parse(src);
+                parser.parse(parseState);
             } catch (Exception e) {
             }
         }

@@ -51,6 +51,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
@@ -83,7 +85,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/**", "*/", new Token(JS_DOC), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("/*", "*/", new Token(JS_MULTILINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
-			new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\)/[igm]*", new Token(JS_REGEXP), true) }; //$NON-NLS-1$
+			new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\|\\\\/)/[igm]*", new Token(JS_REGEXP), true) }; //$NON-NLS-1$
 
 	private JSCodeScanner codeScanner;
 	private JSDocScanner docScanner;
@@ -94,6 +96,19 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	private RuleBasedScanner singleLineCommentScanner;
 
 	private static JSSourceConfiguration instance;
+
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(IJSConstants.CONTENT_TYPE_JS), new QualifiedContentType("source.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_REGEXP), new QualifiedContentType("string.regexp.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_SINGLELINE_COMMENT), new QualifiedContentType(
+				"comment.line.double-slash.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
+	}
 
 	public static JSSourceConfiguration getDefault()
 	{

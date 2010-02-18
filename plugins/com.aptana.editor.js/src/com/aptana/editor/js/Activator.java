@@ -1,5 +1,8 @@
 package com.aptana.editor.js;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -13,7 +16,9 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
-	
+
+	private static ImageRegistry fImages = new ImageRegistry();
+
 	/**
 	 * The constructor
 	 */
@@ -47,4 +52,24 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
+	public static Image getImage(String path)
+	{
+		Image image = fImages.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+			if (id == null)
+			{
+				return null;
+			}
+			fImages.put(path, id);
+			image = fImages.get(path);
+		}
+		return image;
+	}
+
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 }

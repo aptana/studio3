@@ -20,6 +20,10 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -27,12 +31,17 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
@@ -42,6 +51,7 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -54,8 +64,6 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.model.InvocationType;
-import com.aptana.scripting.model.OutputType;
-//import com.aptana.scripting.ui.ScriptingConsole;
 
 @SuppressWarnings("deprecation")
 public class CommandExecutionUtils
@@ -77,6 +85,9 @@ public class CommandExecutionUtils
 	private static final String HTML_FILE_EXTENSION = ".html"; //$NON-NLS-1$
 
 	public static final FilterInputProvider EOF = new StringInputProvider();
+
+	// Delay after which the tooltip is hidden.
+	private static final long DELAY = 10000;
 
 	static final String DEFAULT_CONSOLE_NAME = Messages.CommandExecutionUtils_DefaultConsoleName;
 
@@ -109,18 +120,16 @@ public class CommandExecutionUtils
 			}
 			catch (FileNotFoundException e)
 			{
-				String message = MessageFormat.format(
-					Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
-					new Object[] { path }
-				);
-				
+				String message = MessageFormat.format(Messages.CommandExecutionUtils_Input_File_Does_Not_Exist,
+						new Object[] { path });
+
 				ScriptUtils.logErrorWithStackTrace(message, e);
 			}
 
 			return result;
 		}
 	}
-	
+
 	public static class StringInputProvider implements FilterInputProvider
 	{
 		private final String string;
@@ -367,7 +376,7 @@ public class CommandExecutionUtils
 
 		// Set input stream
 		commandContext.setInputStream(filterInputProvider.getInputStream());
-		commandContext.put(CommandContext.INPUT_TYPE, selected.toString());
+		commandContext.put(CommandContext.INPUT_TYPE, selected.getName());
 
 		// Set invocation type
 		commandContext.put(CommandContext.INVOKED_VIA, invocationType.getName());
@@ -375,11 +384,16 @@ public class CommandExecutionUtils
 		return command.execute(commandContext);
 	}
 
-	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command, InputType inputType)
+	protected static FilterInputProvider getInputProvider(StyledText textWidget, CommandElement command,
+			InputType inputType)
 	{
 		Point selectionRange = textWidget.getSelection();
 		switch (inputType)
 		{
+			// TODO Move this logic into the enum itself
+			case UNDEFINED:
+			case NONE:
+				return CommandExecutionUtils.EOF;
 			case SELECTION:
 				if (selectionRange.x == selectionRange.y)
 					return null;
@@ -397,6 +411,16 @@ public class CommandExecutionUtils
 						selectionStartOffsetLineStartOffset, selectionEndOffsetLineEndOffset));
 			case DOCUMENT:
 				return new CommandExecutionUtils.StringInputProvider(textWidget.getText());
+			case LEFT_CHAR:
+				if (textWidget.getCaretOffset() < 1)
+					return null;
+				return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
+						.getCaretOffset() - 1, 1));
+			case RIGHT_CHAR:
+				if (textWidget.getCaretOffset() < textWidget.getCharCount())
+					return new CommandExecutionUtils.StringInputProvider(textWidget.getTextRange(textWidget
+							.getCaretOffset(), 1));
+				return null;
 			case CLIPBOARD:
 				String contents = getClipboardContents();
 				if (contents == null || contents.trim().length() == 0)
@@ -436,10 +460,11 @@ public class CommandExecutionUtils
 
 		StyledText textWidget = textViewer.getTextWidget();
 		final int caretOffset = textWidget.getCaretOffset();
-		OutputType ouputType = commandResult.getOutputType(); //OutputType.get(command.getOutputType());
-		switch (ouputType)
+		switch (commandResult.getOutputType())
 		{
+			// TODO Move this logic into the enum itself!
 			case DISCARD:
+			case UNDEFINED:
 				break;
 			case REPLACE_SELECTION:
 				if (commandResult.getInputType() == InputType.DOCUMENT)
@@ -450,9 +475,25 @@ public class CommandExecutionUtils
 				{
 					replaceLine(textWidget, commandResult);
 				}
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					replaceWord(textWidget, commandResult);
+				}
 				else
 				{
 					IRegion region = getSelectedRegion(textWidget);
+					if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+					{
+						region = new Region(textWidget.getCaretOffset(), 1);
+					}
+					else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+					{
+						region = new Region(textWidget.getCaretOffset() - 1, 1);
+					}
+					else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+					{
+						region = getSelectedLinesRegion(textWidget);
+					}
 					textWidget
 							.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
 				}
@@ -465,6 +506,9 @@ public class CommandExecutionUtils
 			case REPLACE_LINE:
 				replaceLine(textWidget, commandResult);
 				break;
+			case REPLACE_WORD:
+				replaceWord(textWidget, commandResult);
+				break;
 			case REPLACE_DOCUMENT:
 				replaceDocument(textWidget, commandResult);
 				break;
@@ -475,12 +519,33 @@ public class CommandExecutionUtils
 					IRegion region = getSelectedRegion(textWidget);
 					offsetToInsert = region.getOffset() + region.getLength();
 				}
+				else if (commandResult.getInputType() == InputType.SELECTED_LINES)
+				{
+					IRegion region = getSelectedLinesRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
 				else if (commandResult.getInputType() == InputType.LINE)
 				{
 					IRegion region = getCurrentLineRegion(textWidget);
 					offsetToInsert = region.getOffset() + region.getLength();
 				}
-				textWidget.replaceTextRange(offsetToInsert, 0, commandResult.getOutputString());
+				else if (commandResult.getInputType() == InputType.WORD)
+				{
+					IRegion region = findWordRegion(textWidget);
+					offsetToInsert = region.getOffset() + region.getLength();
+				}
+				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+				{
+					offsetToInsert = textWidget.getCaretOffset() + 1;
+				}
+				else if (commandResult.getInputType() == InputType.DOCUMENT)
+				{
+					offsetToInsert = textWidget.getCharCount();
+				}
+				String outputString = commandResult.getOutputString();
+				textWidget.replaceTextRange(offsetToInsert, 0, outputString);
+				// Need to place cursor at end of inserted text!
+				textWidget.setCaretOffset(caretOffset + outputString.length());
 				break;
 			case INSERT_AS_SNIPPET:
 				IRegion region = new Region(caretOffset, 0);
@@ -504,7 +569,15 @@ public class CommandExecutionUtils
 				{
 					region = findWordRegion(textWidget);
 				}
-				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString());
+				else if (commandResult.getInputType() == InputType.RIGHT_CHAR)
+				{
+					region = new Region(textWidget.getCaretOffset(), 1);
+				}
+				else if (commandResult.getInputType() == InputType.LEFT_CHAR)
+				{
+					region = new Region(textWidget.getCaretOffset() - 1, 1);
+				}
+				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString(), commandResult.getCommand());
 				break;
 			case SHOW_AS_HTML:
 				showAsHTML(command, commandResult);
@@ -525,6 +598,12 @@ public class CommandExecutionUtils
 				outputToFile(commandResult);
 				break;
 		}
+	}
+
+	protected static void replaceWord(StyledText textWidget, CommandResult commandResult)
+	{
+		IRegion wordRegion = findWordRegion(textWidget);
+		textWidget.replaceTextRange(wordRegion.getOffset(), wordRegion.getLength(), commandResult.getOutputString());
 	}
 
 	private static IRegion getSelectedLinesRegion(StyledText textWidget)
@@ -564,7 +643,9 @@ public class CommandExecutionUtils
 	protected static void replaceLine(StyledText textWidget, CommandResult commandResult)
 	{
 		IRegion region = getCurrentLineRegion(textWidget);
-		textWidget.replaceTextRange(region.getOffset(), region.getLength(), commandResult.getOutputString());
+		String output = commandResult.getOutputString();
+		textWidget.replaceTextRange(region.getOffset(), region.getLength(), output);
+		textWidget.setCaretOffset(region.getOffset() + output.length());
 	}
 
 	private static void outputToConsole(CommandResult commandResult)
@@ -581,7 +662,7 @@ public class CommandExecutionUtils
 	{
 		FileWriter writer = null;
 		String path = commandResult.getCommand().getOutputPath();
-		
+
 		try
 		{
 			writer = new FileWriter(path);
@@ -589,11 +670,9 @@ public class CommandExecutionUtils
 		}
 		catch (IOException e)
 		{
-			String message = MessageFormat.format(
-				Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
-				new Object[] { path }
-			);
-			
+			String message = MessageFormat.format(Messages.CommandExecutionUtils_Unable_To_Write_To_Output_File,
+					new Object[] { path });
+
 			ScriptUtils.logErrorWithStackTrace(message, e);
 		}
 		finally
@@ -675,17 +754,86 @@ public class CommandExecutionUtils
 		if (output == null || output.trim().length() == 0)
 			return;
 		DefaultInformationControl tooltip = new DefaultInformationControl(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell(), Messages.CommandExecutionUtils_TypeEscapeToDismiss, null);
+				.getActiveWorkbenchWindow().getShell(), NLS.bind(
+				Messages.CommandExecutionUtils_ClickToFocusTypeEscapeToDismissWhenFocused, DELAY / 1000), null)
+		{
+			@Override
+			public void setVisible(boolean visible)
+			{
+				super.setVisible(visible);
+
+				if (visible)
+				{
+					final Shell shell = getShell();
+					final UIJob hideJob = new UIJob("Hide tooltip") //$NON-NLS-1$
+					{
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor)
+						{
+							if (isVisible())
+							{
+								setVisible(false);
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					hideJob.setPriority(Job.INTERACTIVE);
+					hideJob.setSystem(true);
+					hideJob.schedule(DELAY);
+
+					shell.addShellListener(new ShellAdapter()
+					{
+						@Override
+						public void shellDeactivated(ShellEvent e)
+						{
+							// Hide
+							setVisible(false);
+						}
+
+						@Override
+						public void shellActivated(ShellEvent e)
+						{
+							// Cancel the job
+							hideJob.cancel();
+						}
+					});
+				}
+			}
+		};
 		tooltip.setInformation(output);
 		Point p = tooltip.computeSizeHint();
 		tooltip.setSize(p.x, p.y);
 
 		Point locationAtOffset = textWidget.getLocationAtOffset(caretOffset);
-		locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
-				+ textWidget.getLineHeight(caretOffset) + 2);
+		Rectangle bounds = textWidget.getClientArea();
+		// Is caret visible in the client area
+		if (bounds.contains(locationAtOffset))
+		{
+			// Show the tooltip near it
+			locationAtOffset = textWidget.toDisplay(locationAtOffset.x, locationAtOffset.y
+					+ textWidget.getLineHeight(caretOffset) + 2);
+		}
+		else
+		{
+			// Is y offset in the client area
+			if (locationAtOffset.y > bounds.y && locationAtOffset.y < bounds.y + bounds.height)
+			{
+				// Show the tooltip near left margin below the current line
+				locationAtOffset = textWidget.toDisplay(bounds.x + 2, locationAtOffset.y
+						+ textWidget.getLineHeight(caretOffset) + 2);
+			}
+			else
+			{
+				int topIndex = textWidget.getTopIndex();
+				int offsetAtLine = textWidget.getOffsetAtLine(topIndex);
+				locationAtOffset = textWidget.getLocationAtOffset(offsetAtLine);
+				// Show the tool tip below first visible line
+				locationAtOffset = textWidget.toDisplay(locationAtOffset.x + 2, locationAtOffset.y
+						+ textWidget.getLineHeight(caretOffset) + 2);
+			}
+		}
 		tooltip.setLocation(locationAtOffset);
 		tooltip.setVisible(true);
-		tooltip.setFocus();
 	}
 
 	private static void showAsHTML(CommandElement command, CommandResult commandResult)
@@ -728,8 +876,8 @@ public class CommandExecutionUtils
 						support.createBrowser(
 								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
 										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS, "", //$NON-NLS-1$
-								"", //$NON-NLS-1$
-								command.getDisplayName()).openURL(url);
+										null, // Set the name to null. That way the browser tab will display the title of page loaded in the browser.
+										command.getDisplayName()).openURL(url);
 					}
 					else
 					{

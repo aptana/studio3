@@ -126,7 +126,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				if (selectedProject != null)
+				if (selectedProject != null && selectedProject.exists())
 				{
 					GitRepository repository = GitRepository.getAttached(selectedProject);
 					new MenuItem(menu, SWT.SEPARATOR);
@@ -522,7 +522,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		}
 		if (repo.switchBranch(branchName))
 		{
-			refreshViewer();
+			refreshViewer(); // might be new file structure
 			return true;
 		}
 		revertToCurrentBranch(repo);

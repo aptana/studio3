@@ -53,6 +53,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -138,6 +140,15 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	private RuleBasedScanner stringScanner;
 
 	private static CSSSourceConfiguration instance;
+
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
+				"source.css")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType("comment.block.css")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType("string.quoted.single.css")); //$NON-NLS-1$
+	}
 
 	public static CSSSourceConfiguration getDefault()
 	{

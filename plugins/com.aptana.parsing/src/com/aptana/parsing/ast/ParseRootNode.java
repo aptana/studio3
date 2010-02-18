@@ -8,8 +8,9 @@ import beaver.Symbol;
 public class ParseRootNode extends ParseBaseNode
 {
 
-	public ParseRootNode(Symbol[] children, int start, int end)
+	public ParseRootNode(String language, Symbol[] children, int start, int end)
 	{
+		super(language);
 		this.start = start;
 		this.end = end;
 

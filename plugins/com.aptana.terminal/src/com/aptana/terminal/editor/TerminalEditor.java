@@ -12,6 +12,7 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
+import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalEditor extends EditorPart implements IPersistableEditor
 {
@@ -26,6 +27,11 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	@Override
 	public void createPartControl(Composite parent)
 	{
+		// NOTE: This forces the terminal server to startup before we try to
+		// open the terminal editor. Apparently, on Windows, the editor will
+		// open the URL before the server has started resulting in a "page not found"
+		TerminalServer.getInstance();
+		
 		this._browser = new TerminalBrowser(this);
 		this._browser.createControl(parent);
 

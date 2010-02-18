@@ -10,6 +10,8 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xml.sax.InputSource;
 
@@ -29,6 +31,37 @@ import plistreader.PlistProperties;
 @SuppressWarnings("nls")
 public class BundleConverter
 {
+
+	/**
+	 * Characters that naturally occur only with hitting shift, so if keybinding contains shift plus these characters,
+	 * replace with their base character.
+	 */
+	private static Map<Character, Character> shiftChars = new HashMap<Character, Character>();
+	static
+	{
+		shiftChars.put('_', '-');
+		shiftChars.put('!', '1');
+		shiftChars.put('@', '2');
+		shiftChars.put('#', '3');
+		shiftChars.put('$', '4');
+		shiftChars.put('%', '5');
+		shiftChars.put('^', '6');
+		shiftChars.put('&', '7');
+		shiftChars.put('*', '8');
+		shiftChars.put('(', '9');
+		shiftChars.put(')', '0');
+		shiftChars.put('+', '=');
+		shiftChars.put('{', '[');
+		shiftChars.put('}', ']');
+		shiftChars.put('|', '\\');
+		shiftChars.put(':', ';');
+		shiftChars.put('"', '\'');
+		shiftChars.put('<', ',');
+		shiftChars.put('>', '.');
+		shiftChars.put('?', '/');
+		shiftChars.put('~', '`');
+	}
+
 	/**
 	 * @param args
 	 * @throws Exception
@@ -51,7 +84,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		// String[] bundleFilter = new String[] { "TODO" };
+		String[] bundleFilter = new String[] { "json" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -62,14 +95,14 @@ public class BundleConverter
 		{
 			String nameWithoutExtension = textmateBundleDir.getName().substring(0,
 					textmateBundleDir.getName().length() - 9);
-			// for (String bundleToConvert : bundleFilter)
-			// {
-			// if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
-			// {
-			convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension);
-			// continue;
-			// }
-			// }
+			for (String bundleToConvert : bundleFilter)
+			{
+				if (bundleToConvert.equalsIgnoreCase(nameWithoutExtension))
+				{
+					convertBundle(textmateBundleDir, outputDir + File.separator + nameWithoutExtension + ".ruble");
+					continue;
+				}
+			}
 		}
 	}
 
@@ -117,10 +150,10 @@ public class BundleConverter
 		copyDir(bundleDir + "/Templates/", outputBundlePath + "/unsupported/templates");
 	}
 
-	private static void copyDir(String srcPath, String destPath)
+	private static boolean copyDir(String srcPath, String destPath)
 	{
 		if (!new File(srcPath).exists())
-			return;
+			return true;
 		try
 		{
 			File dest = new File(destPath);
@@ -129,6 +162,7 @@ public class BundleConverter
 			ProcessBuilder builder = new ProcessBuilder("cp", "-R", srcPath, destPath);
 			Process p = builder.start();
 			p.waitFor();
+			return true;
 		}
 		catch (IOException e)
 		{
@@ -140,6 +174,7 @@ public class BundleConverter
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -148,8 +183,7 @@ public class BundleConverter
 		PlistProperties properties = parse(plistFile);
 
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("require 'java'\n");
-		buffer.append("require 'radrails'\n\n");
+		buffer.append("require 'ruble'\n\n");
 		String name = sanitize(properties, "name");
 		buffer.append("bundle '").append(name).append("' do |bundle|\n");
 		// Author
@@ -161,16 +195,165 @@ public class BundleConverter
 		buffer.append("  bundle.description =  <<END\n").append((String) properties.getProperty("description")).append(
 				"\nEND\n");
 
+		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
+
+		File syntaxesDir = new File(plistFile.getParentFile(), "Syntaxes");
+		buffer.append(addFolding(syntaxesDir));
+		buffer.append(addFileTypes(syntaxesDir));
+
 		// Menu
 		PlistProperties mainMenu = (PlistProperties) properties.getProperty("mainMenu");
-		PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
-		buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
-		buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"), uuidToName));
-		buffer.append("  end\n");
+		if (mainMenu != null)
+		{
+			PlistProperties submenus = (PlistProperties) mainMenu.getProperty("submenus");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", submenus, (List<String>) mainMenu.getProperty("items"),
+					uuidToName));
+			buffer.append("  end\n");
+		}
+		else
+		{
+			List<String> items = (List<String>) properties.getProperty("ordering");
+			buffer.append("\n  bundle.menu '").append(name).append("' do |main_menu|\n");
+			buffer.append(handleMenu("    main_menu", new PlistProperties(), items, uuidToName));
+			buffer.append("  end\n");
+		}
 		// end menu
 
 		buffer.append("end\n");
 		return buffer.toString();
+	}
+
+	private static String addIndents(File prefsDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (prefsDir == null || !prefsDir.isDirectory())
+			return builder.toString();
+		File[] files = prefsDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File prefsFile : files)
+		{
+			PlistProperties properties = parse(prefsFile);
+			if (properties == null || !properties.hasKey("settings"))
+				continue;
+			PlistProperties settings = (PlistProperties) properties.getProperty("settings");
+			if (!settings.hasKey("increaseIndentPattern"))
+				continue;
+
+			String scope = (String) properties.getProperty("scope");
+			String increase = (String) settings.getProperty("increaseIndentPattern");
+			increase = sanitizeRegexp(increase);
+			builder.append("  increase_indent = /").append(increase).append("/\n");
+			if (settings.hasKey("decreaseIndentPattern"))
+			{
+				String decrease = (String) settings.getProperty("decreaseIndentPattern");
+				decrease = sanitizeRegexp(decrease);
+				builder.append("  decrease_indent = /").append(decrease).append("/\n");
+				builder.append("  bundle.indent['").append(scope).append("'] = increase_indent, decrease_indent\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	protected static String sanitizeRegexp(String regexp)
+	{
+		return regexp.replace("''", "'").replace("/", "\\/");
+	}
+
+	@SuppressWarnings("unchecked")
+	private static String addFileTypes(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			List<String> fileTypes = (List<String>) properties.getProperty("fileTypes");
+			if (fileTypes != null && !fileTypes.isEmpty())
+			{
+				builder.append("  bundle.file_types['").append(scope).append("'] = ");
+				for (String fileType : fileTypes)
+				{
+					String pattern = "*." + fileType;
+					// If fileType has a period or begins with a capital letter we should assume exact filename match
+					if (fileType.contains(".") || Character.isUpperCase(fileType.charAt(0)))
+					{
+						pattern = fileType;
+					}
+					builder.append("'").append(pattern).append("', ");
+				}
+				builder.delete(builder.length() - 2, builder.length());
+				builder.append("\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	private static String addFolding(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			@Override
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			PlistProperties properties = parse(syntaxFile);
+			String scope = (String) properties.getProperty("scopeName");
+			boolean hasStart = properties.hasKey("foldingStartMarker");
+			if (hasStart)
+			{
+				String folding = (String) properties.getProperty("foldingStartMarker");
+				folding = sanitizeRegexp(folding);
+				builder.append("  start_folding = /").append(folding).append("/\n");
+			}
+			boolean hasStop = properties.hasKey("foldingStopMarker");
+			if (hasStop)
+			{
+				String folding = (String) properties.getProperty("foldingStopMarker");
+				folding = sanitizeRegexp(folding);
+				builder.append("  end_folding = /").append(folding).append("/\n");
+			}
+			if (hasStart && hasStop)
+			{
+				builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+			}
+		}
+		return builder.toString();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -208,8 +391,13 @@ public class BundleConverter
 				// Not a sub-menu, must be an item
 				String commandName = uuidToName.get(uuid);
 				if (commandName == null)
-					commandName = uuid;
-				buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				{
+					buffer.append("#").append(menuPrefix).append(".command '").append(uuid).append("'\n");
+				}
+				else
+				{
+					buffer.append(menuPrefix).append(".command '").append(commandName).append("'\n");
+				}
 			}
 		}
 		return buffer.toString();
@@ -219,8 +407,8 @@ public class BundleConverter
 	{
 		try
 		{
-			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", "\""
-					+ plistFile.getAbsolutePath() + "\"");
+			ProcessBuilder builder = new ProcessBuilder("/usr/bin/plutil", "-convert", "xml1", plistFile.getName());
+			builder.directory(plistFile.getParentFile());
 			Process p = builder.start();
 			int exitCode = p.waitFor();
 			if (exitCode != 0)
@@ -248,7 +436,7 @@ public class BundleConverter
 		String content = (String) properties.getProperty(key);
 		if (content == null)
 			return null;
-		return content.replace("'", "\\'").replace("É", "...").replace("Ñ", "-"); //$NON-NLS-1$ //$NON-NLS-2$
+		return content.replace("'", "\\'").replace("â€¦", "...").replace("â€”", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	static void writeToFile(String output, String outFilePath) throws IOException
@@ -284,13 +472,16 @@ public class BundleConverter
 			char c = keyBinding.charAt(i);
 			switch (c)
 			{
+				case 'ïœˆ':
+					builder.append("F5+"); //$NON-NLS-1$
+					break;
 				case '@':
 					builder.append("M1+M2+"); //$NON-NLS-1$
 					break;
 				case '^':
 					if ((keyBinding.length() > (i + 1)) && (keyBinding.charAt(i + 1) == '@'))
 					{
-						builder.append("CONTROL+SHIFT+COMMAND+"); //$NON-NLS-1$
+						builder.append("CONTROL+COMMAND+SHIFT+"); //$NON-NLS-1$
 						i++;
 					}
 					else
@@ -316,6 +507,25 @@ public class BundleConverter
 		}
 		if (keyBinding.length() > 0)
 			builder.deleteCharAt(builder.length() - 1);
-		return builder.toString();
+
+		// Turn Shift+lowercase_letter into uppercase_letter
+		String result = builder.toString();
+		Pattern p = Pattern.compile("(SHIFT|M2)\\+([a-z])");
+		Matcher m = p.matcher(result);
+		StringBuffer sb = new StringBuffer();
+		while (m.find())
+		{
+			m.appendReplacement(sb, m.group(2).toUpperCase());
+		}
+		m.appendTail(sb);
+		result = sb.toString();
+
+		// We really need to convert any characters that only occur with a shift into their "unshifted chars + shift"
+		for (Map.Entry<Character, Character> entry : shiftChars.entrySet())
+		{
+			result = result.replace("SHIFT+" + entry.getKey(), "SHIFT+" + entry.getValue());
+			result = result.replace("M2+" + entry.getKey(), "M2+" + entry.getValue());
+		}
+		return result;
 	}
 }

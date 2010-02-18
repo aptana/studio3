@@ -1,5 +1,5 @@
-require 'radrails'
+require 'ruble'
 
-bundle "bundleWithSnippet" do
+bundle do
   snippet "MySnippet"
 end

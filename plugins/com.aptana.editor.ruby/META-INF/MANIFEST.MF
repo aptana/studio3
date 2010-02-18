@@ -9,11 +9,17 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.ui,
  org.eclipse.ui.editors,
- com.aptana.editor.common
+ org.eclipse.ui.views,
+ com.aptana.editor.common,
+ com.aptana.parsing,
+ org.jruby
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.ruby,
+ com.aptana.editor.ruby.core,
+ com.aptana.editor.ruby.outline,
+ com.aptana.editor.ruby.parsing,
  org.jrubyparser.parser;x-friends:="com.aptana.editor.ruby.tests"
 Bundle-ClassPath: lib/JRubyParser.jar,
  .

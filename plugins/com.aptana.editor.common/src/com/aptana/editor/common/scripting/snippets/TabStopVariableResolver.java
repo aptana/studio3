@@ -7,9 +7,11 @@ import org.eclipse.jface.text.templates.TemplateVariable;
 class TabStopVariableResolver extends SimpleTemplateVariableResolver
 {
 
-	TabStopVariableResolver(String type, String description)
+	static final String VARIABLE_TYPE = "tabstop"; //$NON-NLS-1$
+
+	TabStopVariableResolver()
 	{
-		super(type, description);
+		super(VARIABLE_TYPE, VARIABLE_TYPE);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -26,18 +28,10 @@ class TabStopVariableResolver extends SimpleTemplateVariableResolver
 		else
 		{
 			super.resolve(variable, context);
-			if (variable.getType().equals(variable.getName()))
-			{
-				variable.setValues(new String[] { "" }); //$NON-NLS-1$
-				setEvaluationString(""); //$NON-NLS-1$
-			}
-			else
-			{
-				setEvaluationString(variable.getName());
-			}
+			setEvaluationString(variable.getName());
 		}
 	}
-	
+
 	protected boolean isUnambiguous(TemplateContext context)
 	{
 		return false;

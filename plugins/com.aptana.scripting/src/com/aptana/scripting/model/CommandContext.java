@@ -1,6 +1,7 @@
 package com.aptana.scripting.model;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,15 +14,12 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.Activator;
-import com.aptana.scripting.ScriptingEngine;
 
 public class CommandContext
 {
 	// Key names for well known keys in the map
-	public static final String WORKING_DIRECTORY = "working_directory"; //$NON-NLS-1$
 	public static final String INPUT_TYPE = "input_type"; //$NON-NLS-1$
 	public static final String INVOKED_VIA = "invoked_via"; //$NON-NLS-1$
 
@@ -33,6 +31,9 @@ public class CommandContext
 	
 	private Map<String,Object> _map;
 	private InputStream _inputStream;
+	private OutputStream _outputStream;
+	private OutputStream _errorStream;
+	private OutputStream _consoleStream;
 	private OutputType _outputType;
 	private boolean _forcedExit;
 
@@ -116,6 +117,26 @@ public class CommandContext
 	}
 	
 	/**
+	 * getConsoleStream
+	 * 
+	 * @return
+	 */
+	public OutputStream getConsoleStream()
+	{
+		return this._consoleStream;
+	}
+	
+	/**
+	 * getErrorStream
+	 * 
+	 * @return
+	 */
+	public OutputStream getErrorStream()
+	{
+		return this._errorStream;
+	}
+	
+	/**
 	 * getInputStream
 	 * 
 	 * @return
@@ -123,6 +144,16 @@ public class CommandContext
 	public InputStream getInputStream()
 	{
 		return this._inputStream;
+	}
+	
+	/**
+	 * getOutputStream
+	 * 
+	 * @return
+	 */
+	public OutputStream getOutputStream()
+	{
+		return this._outputStream;
 	}
 
 	/**
@@ -143,16 +174,6 @@ public class CommandContext
 	public OutputType getOutputType()
 	{
 		return this._outputType;
-	}
-	
-	/**
-	 * in
-	 * 
-	 * @return
-	 */
-	public IRubyObject in()
-	{
-		return ScriptingEngine.getInstance().getScriptingContainer().getRuntime().getObject().getConstant("STDIN"); //$NON-NLS-1$
 	}
 	
 	/**
@@ -187,6 +208,26 @@ public class CommandContext
 	}
 
 	/**
+	 * setConsoleStream
+	 * 
+	 * @param stream
+	 */
+	public void setConsoleStream(OutputStream stream)
+	{
+		this._consoleStream = stream;
+	}
+	
+	/**
+	 * setErrorStream
+	 * 
+	 * @param stream
+	 */
+	public void setErrorStream(OutputStream stream)
+	{
+		this._errorStream = stream;
+	}
+	
+	/**
 	 * setForceExit
 	 * 
 	 * @param value
@@ -202,6 +243,16 @@ public class CommandContext
 	public void setInputStream(InputStream inputStream)
 	{
 		this._inputStream = inputStream;
+	}
+	
+	/**
+	 * setOutputStream
+	 * 
+	 * @param stream
+	 */
+	public void setOutputStream(OutputStream stream)
+	{
+		this._outputStream = stream;
 	}
 	
 	/**

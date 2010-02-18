@@ -2,6 +2,7 @@ package com.aptana.editor.common.outline;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.parsing.ast.IParseNode;
@@ -10,6 +11,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 {
 
 	private static final Object[] EMPTY = new Object[0];
+	private IParseListener fListener;
 
 	@Override
 	public Object[] getChildren(Object parentElement)
@@ -21,6 +23,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 			{
 				return filter(root.getChildren());
 			}
+		}
+		else if (parentElement instanceof IParseNode)
+		{
+			return filter(((IParseNode) parentElement).getChildren());
 		}
 		return EMPTY;
 	}
@@ -55,16 +61,51 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
 	{
+		boolean isCU = (newInput instanceof AbstractThemeableEditor);
+
+		if (isCU && fListener == null)
+		{
+			final AbstractThemeableEditor editor = (AbstractThemeableEditor) newInput;
+			fListener = new IParseListener()
+			{
+				@Override
+				public void parseFinished()
+				{
+					Display.getDefault().asyncExec(new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							CommonOutlinePage page = editor.getOutlinePage();
+							// FIXME What if the parse failed! We don't really want to wipe the existing results! This is just a hack!
+							IParseNode node = editor.getFileService().getParseResult();
+							if (node.getChildrenCount() > 0)
+							{
+								page.refresh();
+							}
+						}
+					});
+				}
+			};
+			editor.getFileService().addListener(fListener);
+		}
+		else if (!isCU && fListener != null)
+		{
+			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
+			editor.getFileService().removeListener(fListener);
+			fListener = null;
+		}
 	}
 
 	/**
-	 * Subclass could override to filter out specific nodes.
+	 * Subclass could override to return a specific list from the result.
 	 * 
 	 * @param nodes
 	 *            the array containing the parse result
-	 * @return the nodes that should be displayed
+	 * @return the specific top level objects to display
 	 */
-	protected IParseNode[] filter(IParseNode[] nodes)
+	protected Object[] filter(IParseNode[] nodes)
 	{
 		return nodes;
 	}

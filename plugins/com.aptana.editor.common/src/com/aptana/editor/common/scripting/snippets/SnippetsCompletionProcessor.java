@@ -7,9 +7,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
@@ -25,18 +22,17 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.DocumentContentTypeManager;
-import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.HasTriggerFilter;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
-import com.aptana.scripting.model.HasTriggerFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
@@ -52,7 +48,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		IDocument document = viewer.getDocument();
 		try
 		{
-			contentTypeString = getContentTypeAtOffset(document, region.getOffset() + region.getLength());
+			contentTypeString = getDocumentScopeManager().getScopeAtOffset(document, region.getOffset() + region.getLength());
 		}
 		catch (BadLocationException e)
 		{
@@ -61,14 +57,9 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		return new SnippetTemplateContextType(contentTypeString);
 	}
 
-	private String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
+	protected IDocumentScopeManager getDocumentScopeManager()
 	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	@Override
@@ -108,70 +99,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			}
 		});
 		return templatesList.toArray(new Template[0]);
-	}
-
-	private static final String SPACES = "\\s*+"; //$NON-NLS-1$
-
-	// Transform Textmate variable syntax into Eclipse variable syntax
-	static String processExpansion(String expansion)
-	{
-		// cursor $ or ${0} to ${cursor}
-		expansion = expansion.replaceAll(Pattern.quote("$0"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
-		expansion = expansion.replaceAll(Pattern.quote("${0}"), Matcher.quoteReplacement("${cursor}")); //$NON-NLS-1$  //$NON-NLS-2$
-		// Turn \$ into $$
-		expansion = expansion.replaceAll(Pattern.quote("\\$"), Matcher.quoteReplacement("$$")); //$NON-NLS-1$  //$NON-NLS-2$
-		// turn empty tab stops into something eclipse can handle
-		expansion = expansion.replaceAll("\\$(\\d)", "\\${value$1:$1('')}"); //$NON-NLS-1$  //$NON-NLS-2$
-		// transform ${n:value1/value2/value3} to ${choices:n('value1',value2','value3)} where n is a digit
-		Pattern p = Pattern.compile("\\$\\{" //$NON-NLS-1$
-				+ SPACES + "(\\d)" //$NON-NLS-1$
-				+ SPACES + ":" //$NON-NLS-1$
-				+ SPACES + "(([^\\}/]+/)+([^\\}/]+))" //$NON-NLS-1$
-				+ "\\}" //$NON-NLS-1$
-		);
-		Matcher m = p.matcher(expansion);
-		while (m.find())
-		{
-			String values = m.group(2);
-			StringBuilder replacement = new StringBuilder("${choices"); //$NON-NLS-1$
-			replacement.append(m.group(1));
-			replacement.append(':');
-			replacement.append(m.group(1));
-			replacement.append("("); //$NON-NLS-1$
-			StringTokenizer tokenizer = new StringTokenizer(values, "/"); //$NON-NLS-1$
-			while (tokenizer.hasMoreTokens())
-			{
-				replacement.append("'"); //$NON-NLS-1$
-				replacement.append(tokenizer.nextToken());
-				replacement.append("',"); //$NON-NLS-1$
-			}
-			replacement.deleteCharAt(replacement.length() - 1);
-			replacement.append(")}"); //$NON-NLS-1$
-			expansion = expansion.substring(0, m.start()) + replacement.toString() + expansion.substring(m.end());
-			m = p.matcher(expansion);
-		}
-		// Wrap values as an arg so we handle the invalid characters properly and give them identifiers based on tab stop so that equal values with different tab stops produce unique ids.
-		p = Pattern.compile("\\$\\{" //$NON-NLS-1$
-				+ SPACES + "(\\d)" //$NON-NLS-1$
-				+ SPACES + ":" //$NON-NLS-1$
-				+ SPACES + "([^\\}]+)" //$NON-NLS-1$
-				+ "\\}" //$NON-NLS-1$
-		);
-		m = p.matcher(expansion);
-		while (m.find())
-		{
-			String value = m.group(2);
-			StringBuilder replacement = new StringBuilder("${value"); //$NON-NLS-1$
-			replacement.append(m.group(1));
-			replacement.append(':');
-			replacement.append(m.group(1));
-			replacement.append("('"); //$NON-NLS-1$
-			replacement.append(value);
-			replacement.append("')}"); //$NON-NLS-1$
-			expansion = expansion.substring(0, m.start()) + replacement.toString() + expansion.substring(m.end());
-			m = p.matcher(expansion);
-		}
-		return expansion;
 	}
 
 	@Override
@@ -244,11 +171,11 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	protected ICompletionProposal createProposal(Template template, TemplateContext context, IRegion region,
 			int relevance)
 	{
-		if (template instanceof CommandTemplate)
+		if (template instanceof SnippetTemplate)
 		{
-			return new CommandProposal(template, context, region, getImage(template), relevance);
+			return new SnippetTemplateProposal(template, context, region, getImage(template), relevance);
 		}
-		return new SnippetTemplateProposal(template, context, region, getImage(template), relevance);
+		return new CommandProposal(template, context, region, getImage(template), relevance);
 	}
 
 	@Override
@@ -291,35 +218,21 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 	}
 
-	public static void insertAsTemplate(ITextViewer textViewer, final int caretOffset, String templateText)
-	{
-		IRegion region = new IRegion()
-		{
-			public int getOffset()
-			{
-				return caretOffset;
-			}
-
-			public int getLength()
-			{
-				return 0;
-			}
-		};
-		insertAsTemplate(textViewer, region, templateText);
-	}
-	
-	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText)
+	public static void insertAsTemplate(ITextViewer textViewer, final IRegion region, String templateText, CommandElement commandElement)
 	{
 		SnippetsCompletionProcessor snippetsCompletionProcessor = new SnippetsCompletionProcessor();
-		Template template = new SnippetTemplate("", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				"", //$NON-NLS-1$
-				SnippetsCompletionProcessor.processExpansion(templateText));
+		Template template = new SnippetTemplate(commandElement, templateText);
 		TemplateContext context = snippetsCompletionProcessor.createContext(textViewer, region);
 		SnippetTemplateProposal completionProposal = (SnippetTemplateProposal) snippetsCompletionProcessor
 				.createProposal(template, context, region, 0);
 		completionProposal.setTemplateProposals(new ICompletionProposal[] { completionProposal });
 		completionProposal.apply(textViewer, '0', SWT.NONE, region.getOffset());
+		
+		Point selection= completionProposal.getSelection(textViewer.getDocument());
+		if (selection != null) {
+			textViewer.setSelectedRange(selection.x, selection.y);
+			textViewer.revealRange(selection.x, selection.y);
+		}
 	}
 
 	private static class CustomStyler extends Styler
@@ -343,7 +256,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
 			}
 
-			textStyle.font = JFaceResources.getFontRegistry().get("org.eclipse.jface.textfont"); //$NON-NLS-1$
+			textStyle.font = JFaceResources.getTextFont();
 		}
 	}
 

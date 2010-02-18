@@ -11,12 +11,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.textEditor"
-            description="%command.scope.description"
-            id="com.aptana.editor.common.showscopes"
-            name="%command.scope.name">
-      </command>
        <command
        		categoryId="org.eclipse.ui.category.edit"
             description="%command.filter.description"
@@ -26,12 +20,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
-      <key
-            commandId="com.aptana.editor.common.showscopes"
-            contextId="org.eclipse.ui.textEditorScope"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="Ctrl+Shift+P">
-      </key>
       <key
             commandId="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             contextId="org.eclipse.ui.textEditorScope"
@@ -135,6 +123,13 @@
                value="Inconsolata-regular-14">
          </fontOverride>
       </theme>
+      <fontDefinition
+            categoryId="org.eclipse.ui.workbenchMisc"
+            defaultsTo="org.eclipse.jface.textfont"
+            id="com.aptana.explorer.font"
+            isEditable="true"
+            label="%appExplorerFont.label">
+      </fontDefinition>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
@@ -166,16 +161,22 @@
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file
-            name="radrails/editor.rb">
+            name="ruble/editor.rb">
       </file>
       <file
-            name="radrails/theme.rb">
+            name="ruble/theme.rb">
+      </file>
+      <file
+            name="ruble/browser.rb">
       </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
       <contributor
-            class="com.aptana.editor.common.EditorContextContributor">
+            class="com.aptana.editor.common.internal.scripting.EditorContextContributor">
+      </contributor>
+      <contributor
+            class="com.aptana.editor.common.internal.scripting.BrowserContextContributor">
       </contributor>
    </extension>
 </plugin>

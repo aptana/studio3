@@ -64,7 +64,7 @@ public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		super(ERB_PAIRS, ESCAPE_PAIRS);
 	}
 	
-	public static ERBPartitionerSwitchStrategy getDafault() {
+	public static ERBPartitionerSwitchStrategy getDefault() {
 		if (instance == null) {
 			instance = new ERBPartitionerSwitchStrategy();
 		}

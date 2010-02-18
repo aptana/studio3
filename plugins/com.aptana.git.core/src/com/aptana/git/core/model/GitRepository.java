@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -99,7 +102,7 @@ public class GitRepository
 	 */
 	public static synchronized GitRepository getUnattachedExisting(URI path)
 	{
-		if (GitExecutable.instance().path() == null)
+		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
 			return null;
 
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
@@ -142,7 +145,14 @@ public class GitRepository
 			return repositoryURL;
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		String newPath = GitExecutable.instance().outputForCommand(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance()
+				.runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null || result.isEmpty())
+			return null;
+		Integer exitCode = result.keySet().iterator().next();
+		if (exitCode != 0)
+			return null;
+		String newPath = result.values().iterator().next();
 		if (newPath == null)
 			return null;
 		if (newPath.equals(GIT_DIR))
@@ -184,7 +194,21 @@ public class GitRepository
 
 	public Set<String> allBranches()
 	{
-		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
+		// Return local branches first!
+		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
+		{
+			@Override
+			public int compare(String o1, String o2)
+			{
+				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+					return 1;
+				if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+					return -1;
+				return o1.compareTo(o2);
+			}
+		});
+		localFirst.addAll(branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE));
+		return localFirst;
 	}
 
 	private Set<String> branches(GitRef.TYPE... types)
@@ -623,7 +647,12 @@ public class GitRepository
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (output == null || output.trim().length() == 0)
+		{
+			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there...
+			// See http://kernel.org/pub/software/scm/git/docs/git-pull.html#REMOTES
+			// Git will look in a few places and assume use of remote defined
 			return null;
+		}
 		String remoteSubname = output.substring(14 + branchName.length()).trim();
 		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
 	}
@@ -678,9 +707,21 @@ public class GitRepository
 
 	public IStatus deleteBranch(String branchName)
 	{
+		return deleteBranch(branchName, false);
+	}
+
+	public IStatus deleteBranch(String branchName, boolean force)
+	{
 		List<String> args = new ArrayList<String>();
 		args.add("branch"); //$NON-NLS-1$
-		args.add("-d"); //$NON-NLS-1$
+		if (!force)
+		{
+			args.add("-d"); //$NON-NLS-1$
+		}
+		else
+		{
+			args.add("-D"); //$NON-NLS-1$
+		}
 		args.add(branchName);
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
@@ -719,13 +760,17 @@ public class GitRepository
 		return true;
 	}
 
-	public boolean moveFile(String source, String dest)
+	public IStatus moveFile(String source, String dest)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "mv", source, dest); //$NON-NLS-1$
-		if (result.keySet().iterator().next() != 0)
-			return false;
+		int exitCode = result.keySet().iterator().next();
+		if (exitCode != 0)
+		{
+			String message = result.values().iterator().next();
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, message, null);
+		}
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	public String relativePath(IResource theResource)

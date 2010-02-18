@@ -6,7 +6,6 @@ public class CSSSimpleSelectorNode extends CSSNode
 {
 
 	private String fTypeSelector;
-	private CSSAttributeSelectorNode[] fAttributeSelectors;
 
 	public CSSSimpleSelectorNode(Symbol typeSelector)
 	{
@@ -21,28 +20,33 @@ public class CSSSimpleSelectorNode extends CSSNode
 	public CSSSimpleSelectorNode(Symbol typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
 		fTypeSelector = (typeSelector == null) ? null : typeSelector.value.toString();
-		fAttributeSelectors = attributeSelectors;
+		setChildren(attributeSelectors);
 
 		if (typeSelector == null)
 		{
-			if (fAttributeSelectors.length > 0)
+			if (attributeSelectors.length > 0)
 			{
-				this.start = fAttributeSelectors[0].getStart();
-				this.end = fAttributeSelectors[fAttributeSelectors.length - 1].getEnd();
+				this.start = attributeSelectors[0].getStart();
+				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
 			}
 		}
 		else
 		{
 			this.start = typeSelector.getStart();
-			if (fAttributeSelectors.length == 0)
+			if (attributeSelectors.length == 0)
 			{
 				this.end = typeSelector.getEnd();
 			}
 			else
 			{
-				this.end = fAttributeSelectors[fAttributeSelectors.length - 1].getEnd();
+				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
 			}
 		}
+	}
+
+	public CSSAttributeSelectorNode[] getAttributeSelectors()
+	{
+		return (CSSAttributeSelectorNode[]) getChildren();
 	}
 
 	@Override
@@ -53,10 +57,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 		{
 			text.append(fTypeSelector);
 		}
-		for (CSSAttributeSelectorNode attribute : fAttributeSelectors)
-		{
-			text.append(attribute);
-		}
+		text.append(super.toString());
 		return text.toString();
 	}
 }

@@ -1,6 +1,7 @@
 package com.aptana.editor.common;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Platform;
@@ -13,11 +14,13 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension2;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.source.CompositeRuler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
+import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -35,9 +38,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
@@ -46,10 +49,12 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
-import com.aptana.editor.common.actions.ShowScopesAction;
+import com.aptana.editor.common.internal.AbstractFoldingEditor;
 import com.aptana.editor.common.internal.peer.CharacterPairMatcher;
 import com.aptana.editor.common.internal.peer.PeerCharacterCloser;
+import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -57,6 +62,7 @@ import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
 /**
@@ -67,7 +73,7 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
  * @author schitale
  */
 @SuppressWarnings("restriction")
-public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEditor
+public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 {
 	private static final int RULER_EDITOR_GAP = 5;
 
@@ -121,6 +127,9 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		overrideThemeColors();
 		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
 		fCursorChangeListened = true;
+
+		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
+		contextService.activateContext(Activator.CONTEXT_ID);
 	}
 
 	/*
@@ -139,13 +148,18 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		return super.getAdapter(adapter);
 	}
 
-	protected CommonOutlinePage getOutlinePage()
+	public CommonOutlinePage getOutlinePage()
 	{
 		if (fOutlinePage == null)
 		{
-			fOutlinePage = new CommonOutlinePage(this, getOutlinePreferenceStore());
+			fOutlinePage = createOutlinePage();
 		}
 		return fOutlinePage;
+	}
+
+	protected CommonOutlinePage createOutlinePage()
+	{
+		return new CommonOutlinePage(this, getOutlinePreferenceStore());
 	}
 
 	private void overrideThemeColors()
@@ -155,12 +169,20 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		overrideRulerColors();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void overrideRulerColors()
 	{
 		// Use normal parent gray bg
 		if (parent == null || fLineColumn == null)
 			return;
 		fLineColumn.setBackground(parent.getBackground());
+		// force the colors for all the ruler columns (specifically so we force the folding bg to match).
+		Iterator<IVerticalRulerColumn> iter = ((CompositeRuler) getVerticalRuler()).getDecoratorIterator();
+		while (iter.hasNext())
+		{
+			IVerticalRulerColumn column = iter.next();
+			column.getControl().setBackground(parent.getBackground());
+		}
 	}
 
 	@Override
@@ -175,8 +197,8 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
-
-		ISourceViewer viewer = new SourceViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
+		// Need to make it a projection viewer now that we have folding...
+		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
 			protected Layout createLayout()
 			{
@@ -330,6 +352,13 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 		getSourceViewer().getTextWidget().setSelectionBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(
 						getThemeManager().getCurrentTheme().getSelection()));
+		if (!Platform.getOS().equals(Platform.OS_WIN32) && !Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			// Linux needs selection fg set or we just see a block of color.
+			getSourceViewer().getTextWidget().setSelectionForeground(
+					CommonEditorPlugin.getDefault().getColorManager().getColor(
+							getThemeManager().getCurrentTheme().getForeground()));
+		}
 
 		if (selectionListener != null)
 			return;
@@ -584,7 +613,6 @@ public abstract class AbstractThemeableEditor extends AbstractDecoratedTextEdito
 	protected void createActions()
 	{
 		super.createActions();
-		setAction(ShowScopesAction.COMMAND_ID, ShowScopesAction.create(this, getSourceViewer()));
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
 		ISourceViewer sourceViewer = getSourceViewer();
 		if (sourceViewer instanceof ITextViewerExtension)

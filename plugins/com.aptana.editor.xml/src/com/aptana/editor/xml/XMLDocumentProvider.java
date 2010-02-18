@@ -38,25 +38,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
-import com.aptana.editor.common.DocumentContentTypeManager;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class XMLDocumentProvider extends TextFileDocumentProvider {
+public class XMLDocumentProvider extends CommonDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
+	@Override
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
 		IDocument document = getDocument(element);
-		if (document != null) {
-			IDocumentPartitioner partitioner = new FastPartitioner(
-					new XMLPartitionScanner(),
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new XMLPartitionScanner(),
 					XMLSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IXMLConstants.CONTENT_TYPE_XML);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, XMLSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					XMLSourceConfiguration.getDefault());
 		}
+	}
+
+	protected String getDefaultContentType()
+	{
+		return IXMLConstants.CONTENT_TYPE_XML;
 	}
 }

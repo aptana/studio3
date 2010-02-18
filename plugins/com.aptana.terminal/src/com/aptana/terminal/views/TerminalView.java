@@ -1,5 +1,8 @@
 package com.aptana.terminal.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -22,20 +25,89 @@ import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
-import com.aptana.terminal.server.HttpServer;
+import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalView extends ViewPart
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
+	private static List<String> startDirectories = new ArrayList<String>(2);
 
+	/**
+	 * pullStartDirectory
+	 * 
+	 * @return
+	 */
+	private static String pullStartingDirectory()
+	{
+		String result = null;
+		
+		synchronized (startDirectories)
+		{
+			if (startDirectories.isEmpty() == false)
+			{
+				result = startDirectories.remove(0);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * pushStartingDirectory
+	 * 
+	 * @param startingDirectory
+	 */
+	public static void pushStartingDirectory(String startingDirectory)
+	{
+		synchronized (startDirectories)
+		{
+			startDirectories.add(startingDirectory);
+		}
+	}
+	
+	/**
+	 * @param id
+	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
+	 * @param title
+	 *            the title used in the UI tab for the instance of the view.
+	 * @param workingDirectory
+	 *            The directory in which to set the view initially.
+	 * @return
+	 */
+	public static TerminalView open(String id, String title, String workingDirectory)
+	{
+		TerminalView term = null;
+		
+		try
+		{
+			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			
+			if (workingDirectory != null)
+			{
+				pushStartingDirectory(workingDirectory);
+			}
+			
+			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
+		}
+		catch (IllegalStateException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		catch (PartInitException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		
+		if (term != null)
+		{
+			term.setPartName(title);
+		}
+		
+		return term;
+	}
+	
 	private TerminalBrowser browser;
 	private Action openEditor;
-
-	@Override
-	public void setPartName(String partName)
-	{
-		super.setPartName(partName);
-	}
 
 	/**
 	 * contributeToActionBars
@@ -53,7 +125,7 @@ public class TerminalView extends ViewPart
 	 */
 	public void createPartControl(Composite parent)
 	{
-		this.browser = new TerminalBrowser(this);
+		this.browser = new TerminalBrowser(this, pullStartingDirectory());
 		this.browser.createControl(parent);
 
 		// Create the help context id for the viewer's control
@@ -115,6 +187,16 @@ public class TerminalView extends ViewPart
 	}
 
 	/**
+	 * getId
+	 * 
+	 * @return
+	 */
+	public String getId()
+	{
+		return browser.getId();
+	}
+
+	/**
 	 * hookContextMenu
 	 */
 	private void hookContextMenu()
@@ -144,7 +226,7 @@ public class TerminalView extends ViewPart
 	{
 		super.init(site);
 
-		HttpServer server = HttpServer.getInstance();
+		TerminalServer server = TerminalServer.getInstance();
 
 		if (server == null)
 		{
@@ -179,40 +261,9 @@ public class TerminalView extends ViewPart
 		browser.setFocus();
 	}
 
-	public String getId()
+	@Override
+	public void setPartName(String partName)
 	{
-		return browser.getId();
-	}
-
-	/**
-	 * @param id
-	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
-	 * @param title
-	 *            the title used in the UI tab for the instance of the view.
-	 * @param workingDirectory
-	 *            The directory in which to set the view initially.
-	 * @return
-	 */
-	public static TerminalView open(String id, String title, String workingDirectory)
-	{
-		try
-		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			if (workingDirectory != null)
-			{
-				TerminalBrowser.setStartingDirectory(workingDirectory);
-			}
-			TerminalView term = (TerminalView) page.showView(TerminalView.ID, id,
-					org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
-			if (term == null)
-				return null;
-			term.setPartName(title);
-			return term;
-		}
-		catch (PartInitException e1)
-		{
-			Activator.logError(e1.getMessage(), e1);
-		}
-		return null;
+		super.setPartName(partName);
 	}
 }

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -29,16 +30,16 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.DocumentContentTypeManager;
 import com.aptana.editor.common.ITopContentTypesProvider;
-import com.aptana.editor.common.QualifiedContentType;
-import com.aptana.editor.common.tmp.ContentTypeTranslation;
-import com.aptana.scope.ScopeSelector;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.model.NotFilter;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
 import com.aptana.util.CollectionsUtil;
@@ -134,13 +135,15 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			String contentTypeAtOffset = null;
 			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
 			MenuElement[] menusFromScope;
+			MenuElement[] menusFromOtherScopes = null;
 			try
 			{
 				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(
 						abstractThemeableEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = getContentTypeAtOffset(document, caretOffset);
+				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
+						document, caretOffset);
 			}
 			catch (BadLocationException e)
 			{
@@ -150,16 +153,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			// First pull all possible menus from the current caret position's scopes
 			if (contentTypeAtOffset != null)
 			{
-				String[] splitContentTypesAtOffset = ScopeSelector.splitScope(contentTypeAtOffset);
-				for (int i = 0; i < splitContentTypesAtOffset.length; i++)
+				ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+				menusFromScope = BundleManager.getInstance().getMenus(filter);
+				if (menusFromScope.length > 0)
 				{
-					ScopeFilter filter = new ScopeFilter(splitContentTypesAtOffset[i]);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
-					if (menusFromScope.length > 0)
-					{
-						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
-						break;
-					}
+					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 				}
 			}
 
@@ -170,18 +168,32 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			{
 				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration)
 						.getTopContentTypes();
+				List<String> topLevelContentTypesList = new LinkedList<String>();
 				for (String[] topContentType : topContentTypes)
 				{
 					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-					String contentType = ContentTypeTranslation.getDefault().translate(qualifiedContentType).toString();
+					String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
+					topLevelContentTypesList.add(contentType);
+				}
+				if (topLevelContentTypesList.size() > 0)
+				{
+					String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
+					topLevelContentTypesList.toArray(topLevelContentTypes);
+
 					// Get menus
-					ScopeFilter filter = new ScopeFilter(contentType);
-					menusFromScope = BundleManager.getInstance().getMenus(filter);
+					ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
+					menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
 					if (menusFromScope.length > 0)
 					{
 						// Collect
 						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 					}
+
+					// Next we use a negative filter to get menus that belong to scopes
+					// that do not match the top level scopes. We will use this
+					// later to build the "Other" menu.
+					NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
+					menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
 				}
 			}
 
@@ -205,15 +217,25 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
 			}
 
-			new MenuItem(menu, SWT.SEPARATOR);
+			// Are there any menus that belong to scopes other than top level scopes
+			if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0)
+			{
+				// Build the "Other" menu
+				new MenuItem(menu, SWT.SEPARATOR);
 
-			MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
-			menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
+				MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+				menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
 
-			Menu menuForOtherScopes = new Menu(menu);
-			menuItemForOtherScopes.setMenu(menuForOtherScopes);
-			// TODO Need API in Bundle Manager to implement this.
+				Menu menuForOtherScopes = new Menu(menu);
+				menuItemForOtherScopes.setMenu(menuForOtherScopes);
+				buildMenu(menuForOtherScopes, menusFromOtherScopes, abstractThemeableEditor, contentTypeAtOffset);
+			}
 		}
+	}
+
+	protected static IContentTypeTranslator getContentTypeTranslator()
+	{
+		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
 	}
 
 	/**
@@ -322,6 +344,37 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						|| command.getScopeSelector().matches(contentTypeAtOffset));
 			}
 		}
+		if (menusFromScope.length > 0)
+		{
+			MenuElement menuForScope = menusFromScope[0];
+			// if we're inside a bundle's main menu
+			if (menuForScope.getParent() != null && menuForScope.getParent().getParent() == null)
+			{
+				new MenuItem(menu, SWT.SEPARATOR);
+				final MenuItem editBundleItem = new MenuItem(menu, SWT.PUSH);
+				editBundleItem.setText("Edit this bundle");
+				final BundleElement bundleElement = menuForScope.getOwningBundle();
+				editBundleItem.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetSelected(SelectionEvent e)
+					{
+						editBundle(bundleElement);
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e)
+					{
+					}
+				});
+			}
+		}
+	}
+
+	protected static void editBundle(final BundleElement owningBundle)
+	{
+		Job job = new EditBundleJob(owningBundle);
+		job.schedule();
 	}
 
 	/*
@@ -332,15 +385,5 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	public boolean isDynamic()
 	{
 		return true;
-	}
-
-	private static String getContentTypeAtOffset(IDocument document, int offset) throws BadLocationException
-	{
-		QualifiedContentType contentType = DocumentContentTypeManager.getInstance().getContentType(document, offset);
-		if (contentType != null)
-		{
-			return ContentTypeTranslation.getDefault().translate(contentType).toString();
-		}
-		return document.getContentType(offset);
 	}
 }

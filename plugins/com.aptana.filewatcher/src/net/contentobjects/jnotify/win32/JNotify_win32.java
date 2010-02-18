@@ -40,7 +40,11 @@ public class JNotify_win32
 {
 	static
 	{
-		System.loadLibrary("jnotify");
+		if (System.getProperty("os.arch").equals("amd64")) {
+			System.loadLibrary("64-jnotify");
+		} else {
+			System.loadLibrary("jnotify");
+		}
 		int res = nativeInit();
 		if (res != 0)
 		{

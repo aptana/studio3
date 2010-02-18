@@ -45,6 +45,39 @@ public class CSSCodeScannerTest extends TestCase
 		}
 	}
 	
+	public void testBrowserSpecificPropertyNames()
+	{
+		String src = "-moz-border-radius: 4px\n" +
+				"-webkit-border-radius: 4px";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 18);
+		assertToken(getToken("punctuation.separator.key-value.css"), 18, 1);
+		assertToken(Token.WHITESPACE, 19, 1);
+		assertToken(getToken("constant.numeric.css"), 20, 1);
+		assertToken(getToken("keyword.other.unit.css"), 21, 2);
+		assertToken(Token.WHITESPACE, 23, 1);
+		assertToken(getToken("support.type.property-name.css"), 24, 21);
+		assertToken(getToken("punctuation.separator.key-value.css"), 45, 1);
+		assertToken(Token.WHITESPACE, 46, 1);
+		assertToken(getToken("constant.numeric.css"), 47, 1);
+		assertToken(getToken("keyword.other.unit.css"), 48, 2);
+	}
+	
+	public void testURLFunctionArgWithNoString()
+	{
+		String src = "background: url(/images/blah_header.jpg)";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("support.type.property-name.css"), 0, 10);
+		assertToken(getToken("punctuation.separator.key-value.css"), 10, 1);
+		assertToken(Token.WHITESPACE, 11, 1);
+		assertToken(getToken("support.function.misc.css"), 12, 3);		
+		assertToken(getToken("punctuation.section.function.css"), 15, 25);
+	}
+	
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -112,8 +145,8 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
 		assertToken(Token.WHITESPACE, 26, 1);
 		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 1);
-		assertToken(getToken("punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("punctuation.section.function.css"), 30, 2);
+//		assertToken(getToken("punctuation.section.function.css"), 31, 1);
 		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
 		assertToken(Token.WHITESPACE, 33, 3);
 		// line 3

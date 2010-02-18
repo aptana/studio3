@@ -5,7 +5,10 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
 import com.aptana.editor.common.internal.peer.PeerTests;
+import com.aptana.editor.common.scripting.ScriptingInputOutputTest;
 import com.aptana.editor.common.scripting.snippets.SnippetsTests;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategyTest;
+import com.aptana.editor.common.text.reconciler.RubyRegexpFolderTest;
 import com.aptana.editor.common.text.rules.RulesTests;
 import com.aptana.editor.common.theme.ThemeTests;
 
@@ -21,6 +24,9 @@ public class AllTests
 		suite.addTest(RulesTests.suite());
 		suite.addTest(ThemeTests.suite());
 		suite.addTest(SnippetsTests.suite());
+		suite.addTestSuite(ScriptingInputOutputTest.class);
+		suite.addTestSuite(RubyRegexpFolderTest.class);
+		suite.addTestSuite(RubyRegexpAutoIndentStrategyTest.class);
 		// $JUnit-END$
 		return suite;
 	}

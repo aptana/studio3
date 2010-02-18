@@ -1,4 +1,4 @@
-require 'radrails'
+require 'ruble'
 require 'context_contributor'
 
 bundle "contexts" do

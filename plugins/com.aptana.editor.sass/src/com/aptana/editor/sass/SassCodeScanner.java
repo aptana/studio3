@@ -1,6 +1,8 @@
 package com.aptana.editor.sass;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +71,16 @@ public class SassCodeScanner extends CSSCodeScanner
 				namespaced.add(tokenizer.nextToken());
 			namespaced.add(name);
 		}
-		return namespaced.toArray(new String[namespaced.size()]);
+		List<String> list = new ArrayList<String>(namespaced);
+		Collections.sort(list, new Comparator<String>()
+		{
+			@Override
+			public int compare(String o1, String o2)
+			{
+				return o2.length() - o1.length();
+			}
+		});
+		return list.toArray(new String[list.size()]);
 	}
 
 	private static class VariableWordDetector implements IWordDetector

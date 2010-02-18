@@ -51,7 +51,7 @@ public class RHTMLDocumentProvider extends CompositeDocumentProvider {
 		super(IERBConstants.CONTENT_TYPE_HTML_ERB,
 				HTMLSourceConfiguration.getDefault(),
 				RubySourceConfiguration.getDefault(),
-				ERBPartitionerSwitchStrategy.getDafault());
+				ERBPartitionerSwitchStrategy.getDefault());
 	}
 
 }

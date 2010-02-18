@@ -64,25 +64,27 @@ public class JSCodeScanner extends RuleBasedScanner
 	// regexp + special char + word: 160-190ms avg (biggest gain was converting operators from regexp to words)
 
 	@SuppressWarnings("nls")
-	private static final String[] KEYWORD_OPERATORS = new String[] { "delete", "in", "instanceof", "new", "typeof",
+	protected static final String[] KEYWORD_OPERATORS = new String[] { "delete", "instanceof", "in", "new", "typeof",
 			"with" };
 
 	@SuppressWarnings("nls")
-	private static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", "continue", "default",
-			"do", "else", "finally", "for", "goto", "if", "import", "package", "return", "switch", "throw", "try",
-			"while" };
+	protected static final String[] KEYWORD_CONTROL = new String[] { "break", "case", "catch", "continue", "default",
+			"do", "else", "finally", "for", "if", "return", "switch", "throw", "try", "while" };
 
 	@SuppressWarnings("nls")
-	private static final String[] STORAGE_TYPES = new String[] { "boolean", "byte", "char", "class", "double", "enum",
-			"float", "function", "int", "interface", "long", "short", "var", "void" };
+	protected static final String[] KEYWORD_CONTROL_FUTURE = new String[] { "goto", "import", "package" };
 
 	@SuppressWarnings("nls")
-	private static final String[] STORAGE_MODIFIERS = new String[] { "const", "export", "extends", "final",
+	protected static final String[] STORAGE_TYPES = new String[] { "boolean", "byte", "char", "class", "double",
+			"enum", "float", "function", "int", "interface", "long", "short", "var", "void" };
+
+	@SuppressWarnings("nls")
+	protected static final String[] STORAGE_MODIFIERS = new String[] { "const", "export", "extends", "final",
 			"implements", "native", "private", "protected", "public", "static", "synchronized", "throws", "transient",
 			"volatile" };
 
 	@SuppressWarnings("nls")
-	private static final String[] SUPPORT_CLASSES = new String[] { "Anchor", "Applet", "Area", "Array", "Boolean",
+	protected static final String[] SUPPORT_CLASSES = new String[] { "Anchor", "Applet", "Area", "Array", "Boolean",
 			"Button", "Checkbox", "Date", "document", "event", "FileUpload", "Form", "Frame", "Function", "Hidden",
 			"History", "Image", "JavaArray", "JavaClass", "JavaObject", "JavaPackage", "java", "Layer", "Link",
 			"Location", "Math", "MimeType", "Number", "navigator", "netscape", "Object", "Option", "Packages",
@@ -90,15 +92,15 @@ public class JSCodeScanner extends RuleBasedScanner
 			"Text", "Textarea", "window", "XMLHttpRequest" };
 
 	@SuppressWarnings("nls")
-	private static final String[] SUPPORT_DOM_CONSTANTS = new String[] { "ELEMENT_NODE", "ATTRIBUTE_NODE", "TEXT_NODE",
-			"CDATA_SECTION_NODE", "ENTITY_REFERENCE_NODE", "ENTITY_NODE", "PROCESSING_INSTRUCTION_NODE",
+	protected static final String[] SUPPORT_DOM_CONSTANTS = new String[] { "ELEMENT_NODE", "ATTRIBUTE_NODE",
+			"TEXT_NODE", "CDATA_SECTION_NODE", "ENTITY_REFERENCE_NODE", "ENTITY_NODE", "PROCESSING_INSTRUCTION_NODE",
 			"COMMENT_NODE", "DOCUMENT_NODE", "DOCUMENT_TYPE_NODE", "DOCUMENT_FRAGMENT_NODE", "NOTATION_NODE",
 			"INDEX_SIZE_ERR", "DOMSTRING_SIZE_ERR", "HIERARCHY_REQUEST_ERR", "WRONG_DOCUMENT_ERR",
 			"INVALID_CHARACTER_ERR", "NO_DATA_ALLOWED_ERR", "NO_MODIFICATION_ALLOWED_ERR", "NOT_FOUND_ERR",
 			"NOT_SUPPORTED_ERR", "INUSE_ATTRIBUTE_ERR" };
 
 	@SuppressWarnings("nls")
-	private static final String[] SUPPORT_FUNCTIONS = new String[] { "small", "savePreferences", "slice", "sqrt",
+	protected static final String[] SUPPORT_FUNCTIONS = new String[] { "small", "savePreferences", "slice", "sqrt",
 			"shift", "showModelessDialog", "showModalDialog", "showHelp", "scrollX", "scrollByPages", "scrollByLines",
 			"scrollBy", "scrollY", "scrollTo", "scroll", "stop", "strike", "sin", "sidebar", "signText",
 			"sizeToContent", "sort", "sup", "substring", "substr", "sub", "splice", "split", "send", "search",
@@ -127,7 +129,7 @@ public class JSCodeScanner extends RuleBasedScanner
 			"back" };
 
 	@SuppressWarnings("nls")
-	private static final String[] EVENT_HANDLER_FUNCTIONS = new String[] { "onRowsinserted", "onRowsdelete",
+	protected static final String[] EVENT_HANDLER_FUNCTIONS = new String[] { "onRowsinserted", "onRowsdelete",
 			"onRowenter", "onRowexit", "onResizestart", "onResizeend", "onResize", "onReset", "onReadystatechange",
 			"onMouseout", "onMouseover", "onMousedown", "onMouseup", "onMousemove", "onBeforecut",
 			"onBeforedeactivate", "onBeforeunload", "onBeforeupdate", "onBeforepaste", "onBeforeprint",
@@ -140,7 +142,7 @@ public class JSCodeScanner extends RuleBasedScanner
 			"onAbort", "onAfterupdate", "onAfterprint" };
 
 	@SuppressWarnings("nls")
-	private static final String[] DOM_FUNCTIONS = new String[] { "substringData", "submit", "splitText",
+	protected static final String[] DOM_FUNCTIONS = new String[] { "substringData", "submit", "splitText",
 			"setNamedItem", "setAttributeNode", "setAttribute", "select", "hasChildNodes", "hasFeature", "namedItem",
 			"click", "close", "cloneNode", "createComment", "createCDATASection", "createCaption", "createTHead",
 			"createTextNode", "createTFoot", "createDocumentFragment", "createProcessingInstruction",
@@ -152,25 +154,27 @@ public class JSCodeScanner extends RuleBasedScanner
 			"getAttributeNode", "getAttribute", "blur" };
 
 	@SuppressWarnings("nls")
-	private static final String[] FIREBUG_FUNCTIONS = new String[] { ".warn", ".info", ".log", ".error", ".time",
+	protected static final String[] FIREBUG_FUNCTIONS = new String[] { ".warn", ".info", ".log", ".error", ".time",
 			".timeEnd", ".assert" };
 
 	@SuppressWarnings("nls")
-	private static final String[] KEYWORD_OPERATOR_WORDS = new String[] { "in", "instanceof", "new", "delete",
-			"typeof", "void" };
+	protected static final String[] OPERATORS = { ">>>=", ">>>", "<<=", ">>=", "===", "!==", ">>", "<<", "!=", "<=",
+			">=", "==", "--", "++", "&&", "||", "*=", "/=", "%=", "+=", "-=", "&=", "|=", "^=" };
 
-	@SuppressWarnings("nls")
-	private static final String[] OPERATORS = { ">>>=", "<<=", ">>=", "===", "!==", "!!!", "!=", "<>", "<=", ">=",
-			"==", "--", "++", "&&", "||", "?:", "*=", "/=", "%=", "+=", "-=", "&=", "^=", "!!", "!", "$", "%", "&",
-			"*", "-", "+", "~", "=", "<", ">", "!", "/" };
+	protected static final char[] SINGLE_CHARACTER_OPERATORS = { '?', '!', '%', '&', '*', '-', '+', '~', '=', '<', '>',
+			'^', '|', '/' };
 
 	private static final boolean OPTIMIZE_REGEXP_RULES = true;
-	private static final boolean USE_WORD_RULES = true;
 
 	/**
 	 * CodeScanner
 	 */
 	public JSCodeScanner()
+	{
+		initRules();
+	}
+
+	protected void initRules()
 	{
 		// Please note that ordering of rules is important! the last word rule will end up assigning a token type to any
 		// words that don't match the list. So we'll only have non-word source left to match against (like braces or
@@ -181,47 +185,27 @@ public class JSCodeScanner extends RuleBasedScanner
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		if (USE_WORD_RULES)
-		{
-			// Converted word rules
-			WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
-			addWordRules(wordRule, createToken("keyword.operator.js"), KEYWORD_OPERATOR_WORDS); //$NON-NLS-1$
-			addWordRules(wordRule, createToken("support.function.js"), SUPPORT_FUNCTIONS); //$NON-NLS-1$
-			addWordRules(wordRule, createToken("support.function.event-handler.js"), EVENT_HANDLER_FUNCTIONS); //$NON-NLS-1$
-			addWordRules(wordRule, createToken("support.function.dom.js"), DOM_FUNCTIONS); //$NON-NLS-1$
-			rules.add(wordRule);
+		// Converted word rules
+		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
+		addWordRules(wordRule, createToken("keyword.operator.js"), KEYWORD_OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken("support.function.js"), SUPPORT_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken("support.function.event-handler.js"), EVENT_HANDLER_FUNCTIONS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken("support.function.dom.js"), DOM_FUNCTIONS); //$NON-NLS-1$
+		rules.add(wordRule);
 
-			// Functions where we need period to begin it
-			wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
-			addWordRules(wordRule, createToken("support.function.js.firebug"), FIREBUG_FUNCTIONS); //$NON-NLS-1$
-			rules.add(wordRule);
+		// Functions where we need period to begin it
+		wordRule = new WordRule(new FunctionCallDetector(), Token.UNDEFINED);
+		addWordRules(wordRule, createToken("support.function.js.firebug"), FIREBUG_FUNCTIONS); //$NON-NLS-1$
+		rules.add(wordRule);
 
-			// Operators
-			wordRule = new WordRule(new OperatorDetector(), Token.UNDEFINED);
-			addWordRules(wordRule, createToken("keyword.operator.js"), OPERATORS); //$NON-NLS-1$
-			rules.add(wordRule);
-		}
-		else
+		// Operators
+		wordRule = new WordRule(new OperatorDetector(), Token.UNDEFINED);
+		addWordRules(wordRule, createToken("keyword.operator.js"), OPERATORS); //$NON-NLS-1$
+		rules.add(wordRule);
+
+		for (char operator : SINGLE_CHARACTER_OPERATORS)
 		{
-			// Original regexp rules
-			rules
-					.add(new RegexpRule(
-							"!|\\$|%|&|\\*|\\-\\-|\\-|\\+\\+|\\+|~|===|==|=|!=|!==|<=|>=|<<=|>>=|>>>=|<>|<|>|!|&&|\\|\\||\\?\\:|\\*=|(?<!\\()/=|%=|\\+=|\\-=|&=|\\^=|\\b(in|instanceof|new|delete|typeof|void)\\b", //$NON-NLS-1$
-							createToken("keyword.operator.js"))); //$NON-NLS-1$
-			rules.add(new RegexpRule("\\.(warn|info|log|error|time|timeEnd|assert)\\b", //$NON-NLS-1$
-					createToken("support.function.js.firebug"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
-			rules
-					.add(new RegexpRule(
-							"\\b(s(ub(stringData|mit)|plitText|e(t(NamedItem|Attribute(Node)?)|lect))|has(ChildNodes|Feature)|namedItem|c(l(ick|o(se|neNode))|reate(C(omment|DATASection|aption)|T(Head|extNode|Foot)|DocumentFragment|ProcessingInstruction|E(ntityReference|lement)|Attribute))|tabIndex|i(nsert(Row|Before|Cell|Data)|tem)|open|delete(Row|C(ell|aption)|T(Head|Foot)|Data)|focus|write(ln)?|a(dd|ppend(Child|Data))|re(set|place(Child|Data)|move(NamedItem|Child|Attribute(Node)?)?)|get(NamedItem|Element(sBy(Name|TagName)|ById)|Attribute(Node)?)|blur)\\b(?=\\()", //$NON-NLS-1$
-							createToken("support.function.dom.js"))); //$NON-NLS-1$
-			rules
-					.add(new RegexpRule(
-							"\\b(s(h(ift|ow(Mod(elessDialog|alDialog)|Help))|croll(X|By(Pages|Lines)?|Y|To)?|t(op|rike)|i(n|zeToContent|debar|gnText)|ort|u(p|b(str(ing)?)?)|pli(ce|t)|e(nd|t(Re(sizable|questHeader)|M(i(nutes|lliseconds)|onth)|Seconds|Ho(tKeys|urs)|Year|Cursor|Time(out)?|Interval|ZOptions|Date|UTC(M(i(nutes|lliseconds)|onth)|Seconds|Hours|Date|FullYear)|FullYear|Active)|arch)|qrt|lice|avePreferences|mall)|h(ome|andleEvent)|navigate|c(har(CodeAt|At)|o(s|n(cat|textual|firm)|mpile)|eil|lear(Timeout|Interval)?|a(ptureEvents|ll)|reate(StyleSheet|Popup|EventObject))|t(o(GMTString|S(tring|ource)|U(TCString|pperCase)|Lo(caleString|werCase))|est|a(n|int(Enabled)?))|i(s(NaN|Finite)|ndexOf|talics)|d(isableExternalCapture|ump|etachEvent)|u(n(shift|taint|escape|watch)|pdateCommands)|j(oin|avaEnabled)|p(o(p|w)|ush|lugins.refresh|a(ddings|rse(Int|Float)?)|r(int|ompt|eference))|e(scape|nableExternalCapture|val|lementFromPoint|x(p|ec(Script|Command)?))|valueOf|UTC|queryCommand(State|Indeterm|Enabled|Value)|f(i(nd|le(ModifiedDate|Size|CreatedDate|UpdatedDate)|xed)|o(nt(size|color)|rward)|loor|romCharCode)|watch|l(ink|o(ad|g)|astIndexOf)|a(sin|nchor|cos|t(tachEvent|ob|an(2)?)|pply|lert|b(s|ort))|r(ou(nd|teEvents)|e(size(By|To)|calc|turnValue|place|verse|l(oad|ease(Capture|Events)))|andom)|g(o|et(ResponseHeader|M(i(nutes|lliseconds)|onth)|Se(conds|lection)|Hours|Year|Time(zoneOffset)?|Da(y|te)|UTC(M(i(nutes|lliseconds)|onth)|Seconds|Hours|Da(y|te)|FullYear)|FullYear|A(ttention|llResponseHeaders)))|m(in|ove(B(y|elow)|To(Absolute)?|Above)|ergeAttributes|a(tch|rgins|x))|b(toa|ig|o(ld|rderWidths)|link|ack))\\b(?=\\()", //$NON-NLS-1$
-							createToken("support.function.js"))); //$NON-NLS-1$
-			rules
-					.add(new RegexpRule(
-							"\\bon(R(ow(s(inserted|delete)|e(nter|xit))|e(s(ize(start|end)?|et)|adystatechange))|Mouse(o(ut|ver)|down|up|move)|B(efore(cut|deactivate|u(nload|pdate)|p(aste|rint)|editfocus|activate)|lur)|S(croll|top|ubmit|elect(start|ionchange)?)|H(over|elp)|C(hange|ont(extmenu|rolselect)|ut|ellchange|l(ick|ose))|D(eactivate|ata(setc(hanged|omplete)|available)|r(op|ag(start|over|drop|en(ter|d)|leave)?)|blclick)|Unload|P(aste|ropertychange)|Error(update)?|Key(down|up|press)|Focus|Load|A(ctivate|fter(update|print)|bort))\\b", //$NON-NLS-1$
-							createToken("support.function.event-handler.js"))); //$NON-NLS-1$
+			rules.add(new SingleCharacterRule(operator, createToken("keyword.operator.js"))); //$NON-NLS-1$
 		}
 
 		// TODO Turn these next two rules into word rules using the FunctionCallDetector word rule list
@@ -239,9 +223,9 @@ public class JSCodeScanner extends RuleBasedScanner
 						createToken("support.constant.dom.js"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 
 		// Add word rule for keywords, types, and constants.
-		WordRule wordRule = new WordRule(new WordDetector(), createToken("source.js")); //$NON-NLS-1$
+		wordRule = new WordRule(new WordDetector(), createToken("source.js")); //$NON-NLS-1$
 		addWordRules(wordRule, createToken("keyword.control.js"), KEYWORD_CONTROL); //$NON-NLS-1$
-		addWordRules(wordRule, createToken("keyword.operator.js"), KEYWORD_OPERATORS); //$NON-NLS-1$
+		addWordRules(wordRule, createToken("keyword.control.js"), KEYWORD_CONTROL_FUTURE); //$NON-NLS-1$
 		addWordRules(wordRule, createToken("storage.type.js"), STORAGE_TYPES); //$NON-NLS-1$
 		addWordRules(wordRule, createToken("storage.modifier.js"), STORAGE_MODIFIERS); //$NON-NLS-1$
 		addWordRules(wordRule, createToken("support.class.js"), SUPPORT_CLASSES); //$NON-NLS-1$
@@ -284,7 +268,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
-	private void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)
+	protected void addWordRules(WordRule wordRule, IToken keywordOperators, String... words)
 	{
 		for (String word : words)
 		{
@@ -297,33 +281,61 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class OperatorDetector implements IWordDetector
+	protected static final class OperatorDetector implements IWordDetector
 	{
+
+		private int fPosition;
+
+		public OperatorDetector()
+		{
+		}
 
 		@Override
 		public boolean isWordPart(char c)
 		{
-			return isWordStart(c) || c == ':';
+			fPosition++;
+			if (fPosition > 1)
+			{
+				switch (c)
+				{
+					case '=':
+					case '>':
+						return true;
+					default:
+						return false;
+				}
+			}
+			switch (c)
+			{
+				case '&':
+				case '-':
+				case '+':
+				case '=':
+				case '<':
+				case '>':
+				case '|':
+					return true;
+				default:
+					return false;
+			}
 		}
 
 		@Override
 		public boolean isWordStart(char c)
 		{
+			fPosition = 0;
 			switch (c)
 			{
 				case '!':
-				case '$':
 				case '%':
 				case '&':
 				case '*':
 				case '-':
 				case '+':
-				case '~':
 				case '=':
 				case '<':
 				case '>':
 				case '|':
-				case '?':
 				case '/':
 				case '^':
 					return true;
@@ -338,8 +350,13 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class LettersAndDigitsWordDetector implements IWordDetector
+	protected static final class LettersAndDigitsWordDetector implements IWordDetector
 	{
+
+		public LettersAndDigitsWordDetector()
+		{
+		}
+
 		@Override
 		public boolean isWordPart(char c)
 		{
@@ -358,8 +375,12 @@ public class JSCodeScanner extends RuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class FunctionCallDetector implements IWordDetector
+	protected static final class FunctionCallDetector implements IWordDetector
 	{
+
+		public FunctionCallDetector()
+		{
+		}
 
 		@Override
 		public boolean isWordPart(char c)

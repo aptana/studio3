@@ -4,13 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link href="Term.css.template" rel="stylesheet" type="text/css" id="ss" />
         <title>Aptana Web Terminal</title>
-		<!--script src="webterm_compressed.js"></script-->
-		<script src="webterm_debug_compressed.js"></script>
+		<script src="webterm_compressed.js"></script>
         <script>
             var terminal;
-			var terminalID = "terminal";
-			var xtermHandler;
-			var debugHandler;
+			var terminalElementID = "terminal";
 			var characterWidth = null, characterHeight = null;
 			var RESIZE_INTERVAL = 250;
 			var resizeID = null;
@@ -21,35 +18,26 @@
             function init()
             {
 				var query = getQuery();
-				// create a list of handlers so we can capture debug info while
-				// allowing regular processing to occur
-				xtermHandler = new XTermHandler();
-				debugHandler = new DebugHandler();
-				
-				var handlerList = new BroadcastHandler();
-				handlerList.addHandler(debugHandler);
-				handlerList.addHandler(xtermHandler);
 				
 				var config = {
-					handler: handlerList,
 					id: (query !== null && query.hasOwnProperty("id")) ? query.id : null,
 					autoStart: false,
 					showTitle: false
 				};
 				
 				// create terminal
-                terminal = new Term(terminalID, 80,20, config);
+                terminal = new Term(terminalElementID, 80,20, config);
 				
 				// resize to fit
 				resizeHelper();
-				
-				// HACK due to architecture flaw, but for debugging purposes only!
-				xtermHandler._term = terminal;
 				
 				// start processing
 				terminal.toggleRunState();
             }
 			
+			/**
+			 * getQuery
+			 */
 			function getQuery()
 			{
 				var query = window.location.search.substring(1);
@@ -69,120 +57,6 @@
 			}
             
 			/**
-			 * showActionSequence
-			 */
-			function showActionSequence()
-			{
-				var header = ["Action sequence", ""];
-				var entries = debugHandler.getActions();
-				
-				if (entries.length > 0)
-				{
-					entries = header.concat(entries);
-				}
-				else
-				{
-					entries = ["No actions have been seen"];
-				}
-				
-				document.getElementById("stdout").innerHTML = entries.join("<br />");
-			}
-			
-			/**
-			 * showProcessedActions
-			 */
-            function showProcessedActions()
-			{
-				var commands = debugHandler.getCommands();
-				var entries = getEntries(commands);
-				
-				if (entries.length > 0)
-				{
-					entries.unshift("");
-                    entries.unshift("Processed commands with frequency counts:");
-				}
-				else
-				{
-					entries.push("No commands have been processed");
-				}
-				
-				document.getElementById("stdout").innerHTML = entries.join("<br />");
-			}
-			
-			/**
-			 * showUnsupportedActions
-			 */
-            function showUnsupportedActions()
-			{
-				var missingCommands = xtermHandler.getMissingCommands();
-				var entries = getEntries(missingCommands);
-				
-				if (entries.length > 0)
-				{
-					entries.unshift("");
-                    entries.unshift("Unsupported sequences with frequency counts:");
-				}
-				else
-				{
-					entries.push("No unsupported actions");
-				}
-				
-				document.getElementById("stdout").innerHTML = entries.join("<br />");
-			}
-			
-			/**
-			 * getEntries
-			 * 
-			 * @param {Object} obj
-			 */
-			function getEntries(obj)
-			{
-                var names = [];
-                var result = [];
-                var message = "";
-                
-                for (var p in obj) 
-                {
-                    names.push(p);
-                }
-                
-                if (names.length > 0) 
-                {
-                    names.sort();
-                    
-                    for (var i = 0; i < names.length; i++) 
-                    {
-                        var name = names[i];
-                        
-                        result.push(name + ": " + obj[name]);
-                    }
-                }
-				
-				return result;
-            }
-			
-			/**
-			 * resetDebugInfo
-			 */
-			function resetDebugInfo()
-			{
-				debugHandler.clear();
-				document.getElementById("stdout").innerHTML = "Debug info cleared";
-			}
-			
-			/**
-			 * toggleRunState
-			 */
-			function toggleRunState()
-			{
-				var comm = terminal.getCommunicationHandler();
-				
-				comm.toggleRunState();
-				
-				document.getElementById("toggle").innerText = (comm.isRunning()) ? "Stop" : "Start";
-			}
-			
-			/**
 			 * autoSize
 			 */
 			function autoSize()
@@ -194,7 +68,10 @@
 				
 				resizeID = window.setTimeout(resizeHelper, RESIZE_INTERVAL);
 			}
-				
+			
+			/**
+			 * resizeHelper
+			 */
 			function resizeHelper()
 			{
 				// clear timeout id
@@ -202,7 +79,7 @@
 				
 				if (characterWidth === null || characterHeight === null)
 				{
-					var div = document.getElementById(terminalID);
+					var div = document.getElementById(terminalElementID);
 					var divWidth = div.offsetWidth;
 					var divHeight = div.offsetHeight;
 					
@@ -210,24 +87,60 @@
 					characterHeight = divHeight / terminal.getHeight();
 				}
 				
-				var viewWidth = window.innerWidth;
-				var viewHeight = window.innerHeight;
-				var width = Math.floor(viewWidth / characterWidth);
-				var height = Math.floor(viewHeight / characterHeight);
+				var width = Math.floor(getWindowWidth() / characterWidth);
+				var height = Math.floor(getWindowHeight() / characterHeight);
 				
 				terminal.setSize(width,height);
+			}
+			
+			/**
+			 * getWindowWidth
+			 */
+			function getWindowWidth()
+			{
+				var result = 0;
+				
+				if (window.innerWidth)
+				{
+					result = window.innerWidth;
+				}
+				else if (document.documentElement && document.documentElement.clientWidth)
+				{
+					result = document.documentElement.clientWidth;
+				}
+				else if (document.body && document.body.clientWidth)
+				{
+					result = document.body.clientWidth;
+				}
+				
+				return result;
+			}
+			
+			/**
+			 * getWindowHeight
+			 */
+			function getWindowHeight()
+			{
+				var result = 0;
+				
+				if (window.innerHeight)
+				{
+					result = window.innerHeight;
+				}
+				else if (document.documentElement && document.documentElement.clientHeight)
+				{
+					result = document.documentElement.clientHeight;
+				}
+				else if (document.body && document.body.clientHeight)
+				{
+					result = document.body.clientHeight;
+				}
+				
+				return result;
 			}
         </script>
     </head>
     <body onload="init();" onresize="autoSize();">
 		<div id="terminal"></div>
-		<!--div style="clear: both; padding: 15px; color: white">
-	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
-	    	<button onclick="showActionSequence()">Actions</button>
-	    	<button onclick="showProcessedActions()">Seen</button>
-	    	<button onclick="showUnsupportedActions()">Unsupported</button>
-	    	<button onclick="resetDebugInfo()">Reset</button>
-	        <pre id="stdout">result:</pre>
-		</div-->
     </body>
 </html>

@@ -1,6 +1,6 @@
-require 'radrails'
+require 'ruble'
 
-bundle "bundleWithCommand" do
+bundle do
   command "MyCommand" do |cmd|
     cmd.invoke = "cd .."
   end

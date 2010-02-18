@@ -34,20 +34,35 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
+import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
 
 	private AbstractThemeableEditor fEditor;
+
+	/**
+	 * Code Folding.
+	 */
+	private List<Position> fPositions = new ArrayList<Position>();
+
+	private IProgressMonitor fMonitor;
+
+	private RubyRegexpFolder folder;
 
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
@@ -62,18 +77,21 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void reconcile(IRegion partition)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
+		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
 	@Override
 	public void setDocument(IDocument document)
 	{
+		folder = new RubyRegexpFolder(document);
 		fEditor.getFileService().setDocument(document);
 	}
 
@@ -86,6 +104,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	@Override
 	public void setProgressMonitor(IProgressMonitor monitor)
 	{
+		fMonitor = monitor;
 	}
 
 	public void aboutToBeReconciled()
@@ -104,10 +123,29 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+		// Folding...
+		fPositions.clear();
+		try
+		{
+			fPositions = folder.emitFoldingRegions(fPositions, monitor);
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		Display.getDefault().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				fEditor.updateFoldingStructure(fPositions);
+			}
+		});
+
 	}
 
 	private void reconcile(boolean initialReconcile)
 	{
-		calculatePositions(new NullProgressMonitor());
+		calculatePositions(fMonitor);
 	}
 }

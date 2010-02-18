@@ -10,7 +10,7 @@ public class FilterTests extends BundleTestBase
 	{
 		super.setUp();
 		
-		this.loadBundleEntry("modelFilters", BundleScope.PROJECT);
+		this.loadBundleEntry("modelFilters", BundlePrecedence.PROJECT);
 	}
 
 	/**
@@ -35,11 +35,12 @@ public class FilterTests extends BundleTestBase
 		CommandElement[] commands = BundleManager.getInstance().getCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
+		assertEquals(3, commands.length);
 		assertEquals("HTML", commands[0].getDisplayName());
 		assertEquals("JS", commands[1].getDisplayName());
+		assertEquals("CSS String", commands[2].getDisplayName());
 	}
-	
+
 	/**
 	 * testAndFilter
 	 */

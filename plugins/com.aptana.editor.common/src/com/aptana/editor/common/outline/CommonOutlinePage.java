@@ -1,9 +1,13 @@
 package com.aptana.editor.common.outline;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -14,9 +18,17 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
@@ -24,6 +36,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.parsing.lexer.ILexeme;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
@@ -71,21 +84,16 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private IPreferenceStore fPrefs;
 
+	private IPropertyChangeListener fontListener;
+
+	private IPreferenceChangeListener fThemeChangeListener;
+
 	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
 		fEditor = editor;
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
-		fLabelProvider = new LabelProvider();
-
-		// TODO: needs to be improved
-		editor.getSourceViewerNonFinal().getTextWidget().addFocusListener(new FocusAdapter()
-		{
-			public void focusGained(FocusEvent e)
-			{
-				refresh();
-			}
-		});
+		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
 	}
 
 	@Override
@@ -94,10 +102,14 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		super.createControl(parent);
 
 		TreeViewer viewer = getTreeViewer();
+		viewer.setAutoExpandLevel(2);
+		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
+
+		hookToThemes();
 
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
@@ -106,11 +118,145 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fPrefs.addPropertyChangeListener(this);
 	}
 
+	private void hookToThemes()
+	{
+		// Set the background of tree to theme background.
+		getTreeViewer().getTree().setBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getThemeManager().getCurrentTheme().getBackground()));
+		overrideTreeDrawing();
+		listenForThemeChanges();
+	}
+
+	private void overrideTreeDrawing()
+	{
+		final Tree tree = getTreeViewer().getTree();
+		// Override selection color to match what is set in theme
+		tree.addListener(SWT.EraseItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				if ((event.detail & SWT.SELECTED) != 0)
+				{
+					Tree tree = (Tree) event.widget;
+					int clientWidth = tree.getClientArea().width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+							getThemeManager().getCurrentTheme().getSelection()));
+					gc.fillRectangle(0, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
+					event.detail &= ~SWT.SELECTED;
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			}
+		});
+
+		// Hack to force a specific row height and width based on font
+		tree.addListener(SWT.MeasureItem, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+				if (font == null)
+				{
+					font = JFaceResources.getTextFont();
+				}
+				if (font != null)
+				{
+					event.gc.setFont(font);
+					FontMetrics metrics = event.gc.getFontMetrics();
+					int height = metrics.getHeight() + 2;
+					TreeItem item = (TreeItem) event.item;
+					int width = event.gc.stringExtent(item.getText()).x + 24;
+					event.height = height;
+					if (width > event.width)
+						event.width = width;
+				}
+			}
+		});
+
+		fontListener = new IPropertyChangeListener()
+		{
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
+					return;
+				Display.getCurrent().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
+						if (getTreeViewer() != null)
+							getTreeViewer().refresh();
+						tree.redraw();
+						tree.update();
+					}
+				});
+
+			}
+		};
+		JFaceResources.getFontRegistry().addListener(fontListener);
+	}
+
+	private void listenForThemeChanges()
+	{
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					getTreeViewer().refresh();
+					getTreeViewer().getTree().setBackground(
+							CommonEditorPlugin.getDefault().getColorManager().getColor(
+									getThemeManager().getCurrentTheme().getBackground()));
+				}
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	protected IThemeManager getThemeManager()
+	{
+		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
 	@Override
 	public void dispose()
 	{
+		removeFontListener();
+		removeThemeListener();
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
+	}
+
+	private void removeFontListener()
+	{
+		if (fontListener != null)
+		{
+			JFaceResources.getFontRegistry().removeListener(fontListener);
+			fontListener = null;
+		}
+	}
+
+	private void removeThemeListener()
+	{
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
 	}
 
 	@Override
@@ -164,7 +310,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	public void setLabelProvider(ILabelProvider provider)
 	{
-		fLabelProvider = provider;
+		fLabelProvider = new ThemedDelegatingLabelProvider(provider);
 		if (!isDisposed())
 		{
 			getTreeViewer().setLabelProvider(fLabelProvider);

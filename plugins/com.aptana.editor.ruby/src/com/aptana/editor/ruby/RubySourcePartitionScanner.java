@@ -55,6 +55,7 @@ import org.jrubyparser.lexer.Lexer;
 import org.jrubyparser.lexer.LexerSource;
 import org.jrubyparser.lexer.SyntaxException;
 import org.jrubyparser.lexer.Lexer.LexState;
+import org.jrubyparser.lexer.SyntaxException.PID;
 import org.jrubyparser.parser.ParserConfiguration;
 import org.jrubyparser.parser.ParserResult;
 import org.jrubyparser.parser.ParserSupport;
@@ -192,7 +193,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			if (se.getMessage().equals("embedded document meets end of file")) { //$NON-NLS-1$
 				return handleUnterminedMultilineComment(se);
 			}
-			else if (se.getMessage().equals("unterminated string meets end of file")) { //$NON-NLS-1$
+			else if (se.getPid().equals(PID.STRING_MARKER_MISSING) || se.getPid().equals(PID.STRING_HITS_EOF)) {
 				return handleUnterminatedString(se);
 			}
 
@@ -212,7 +213,9 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		{
 			setLength(getAdjustedOffset() - fOffset);
 			// HACK End of heredocs are returning a zero length token for end of string that hoses us
-			if (fLength == 0 && returnValue.getData().equals(RubySourceConfiguration.STRING))
+			if (fLength == 0
+					&& (returnValue.getData().equals(RubySourceConfiguration.STRING_DOUBLE) || returnValue.getData()
+							.equals(RubySourceConfiguration.STRING_SINGLE)))
 				return nextToken();
 		}
 		return returnValue;
@@ -398,7 +401,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			String marker = new String(opening.substring(0, index).trim());
 			fOpeningString = generateOpeningStringForHeredocMarker(marker);
 		}
-		fContentType = RubySourceConfiguration.STRING;
+		fContentType = RubySourceConfiguration.STRING_DOUBLE;
 	}
 
 	private void addCommaToken(int index)
@@ -408,7 +411,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	private void addHereDocStartToken(int index)
 	{
-		push(new QueuedToken(new Token(RubySourceConfiguration.STRING), fOffset, index));
+		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), fOffset, index));
 	}
 
 	private void setOffset(int offset)
@@ -529,9 +532,9 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		generateHackedSource(heredocMarker);
 
 		// Add a token for the heredoc string we just ate up!
-		fContentType = RubySourceConfiguration.STRING;
+		fContentType = RubySourceConfiguration.STRING_DOUBLE;
 		int afterHeredoc = fOffset + heredocMarker.length();
-		push(new QueuedToken(new Token(RubySourceConfiguration.STRING), afterHeredoc, getAdjustedOffset()
+		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), afterHeredoc, getAdjustedOffset()
 				- afterHeredoc));
 	}
 
@@ -586,13 +589,13 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	private IToken getToken(int i)
 	{
 		// We have an unresolved heredoc
-		if (fContentType.equals(RubySourceConfiguration.STRING) && insideHeredoc())
+		if (fContentType.equals(RubySourceConfiguration.STRING_DOUBLE) && insideHeredoc())
 		{
 			if (reachedEndOfHeredoc())
 			{
 				fContentType = RubySourceConfiguration.DEFAULT;
 				inSingleQuote = false;
-				return new Token(RubySourceConfiguration.STRING);
+				return new Token(RubySourceConfiguration.STRING_DOUBLE);
 			}
 		}
 		if (fContentType.equals(RubySourceConfiguration.MULTI_LINE_COMMENT) && i != Tokens.tWHITESPACE)
@@ -613,15 +616,21 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 				return new Token(fContentType);
 			case Tokens.tSTRING_BEG:
 				fOpeningString = getOpeningString();
+				fContentType = RubySourceConfiguration.STRING_DOUBLE;
 				if (fOpeningString.equals("'") || fOpeningString.startsWith("%q")) { //$NON-NLS-1$//$NON-NLS-2$
 					inSingleQuote = true;
+					fContentType = RubySourceConfiguration.STRING_SINGLE;
 				}
 				else if (fOpeningString.startsWith(HEREDOC_MARKER_PREFIX))
 				{ // here-doc
 					fOpeningString = generateOpeningStringForHeredocMarker(fOpeningString);
+					if (fOpeningString.startsWith("'")) //$NON-NLS-1$
+					{
+						inSingleQuote = true;
+						fContentType = RubySourceConfiguration.STRING_SINGLE;
+					}
 				}
-				fContentType = RubySourceConfiguration.STRING;
-				return new Token(RubySourceConfiguration.STRING);
+				return new Token(fContentType);
 			case Tokens.tXSTRING_BEG:
 				fOpeningString = getOpeningString();
 				fContentType = RubySourceConfiguration.COMMAND;
@@ -629,12 +638,22 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tQWORDS_BEG:
 			case Tokens.tWORDS_BEG:
 				fOpeningString = getOpeningString();
-				fContentType = RubySourceConfiguration.STRING;
-				return new Token(RubySourceConfiguration.STRING);
+				fContentType = RubySourceConfiguration.STRING_SINGLE;
+				if (fOpeningString.startsWith("%") && fOpeningString.length() > 1 //$NON-NLS-1$
+						&& Character.isUpperCase(fOpeningString.charAt(1)))
+				{
+					fContentType = RubySourceConfiguration.STRING_DOUBLE;
+				}
+				return new Token(fContentType);
 			case Tokens.tSTRING_END:
 				// If we're ending a heredoc, make sure we're not nested and ending one of the earlier ones!
 				if (insideHeredoc() && !reachedEndOfHeredoc())
-					return new Token(RubySourceConfiguration.STRING);
+				{
+					String contentTypeToReturn = RubySourceConfiguration.STRING_DOUBLE;
+					if (fOpeningString.startsWith("'")) //$NON-NLS-1$
+						contentTypeToReturn = RubySourceConfiguration.STRING_SINGLE;
+					return new Token(contentTypeToReturn);
+				}
 
 				String oldContentType = fContentType;
 				fContentType = RubySourceConfiguration.DEFAULT;
@@ -650,28 +669,38 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 			case Tokens.tSYMBEG:
 				// Sometimes we need to add 1, sometimes two. Depends on if there's
 				// a space preceding the ':'
+				int charAt = fOffset - origOffset;
+				char c = fContents.charAt(charAt);
 				int nextCharOffset = (fOffset + 1);
-				int charAt = nextCharOffset - origOffset;
-				if (fContents.length() <= charAt)
+				while (c == ' ') // skip past space if it's there
+				{
+					nextCharOffset++;
+					c = fContents.charAt(++charAt);
+				}				
+				if (fContents.length() <= charAt + 1)
 				{
 					return new Token(RubySourceConfiguration.DEFAULT);
 				}
-				char c = fContents.charAt(charAt);
-				if (c == ':')
+				if (c == '%') // %s syntax
+				{
+					fOpeningString = getOpeningString();
+					fContentType = RubySourceConfiguration.STRING_SINGLE;
+				}
+				else if (c == ':') // normal syntax (i.e. ":symbol")
 				{
 					if (fContents.length() <= charAt + 1)
 					{
 						return new Token(RubySourceConfiguration.DEFAULT);
 					}
 					nextCharOffset++;
-					c = fContents.charAt(charAt + 1);
-				}
-				if (c == '"')
-				{
-					fOpeningString = "\""; //$NON-NLS-1$
-					push(new QueuedToken(new Token(RubySourceConfiguration.STRING), nextCharOffset, 1));
-					fContentType = RubySourceConfiguration.STRING;
-				}
+					c = fContents.charAt(++charAt);
+					if (c == '"') // Check for :"symbol" syntax
+					{
+						fOpeningString = "\""; //$NON-NLS-1$
+						push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), nextCharOffset - 1, 1));
+						fContentType = RubySourceConfiguration.STRING_DOUBLE;
+					}
+				}				
 				return new Token(RubySourceConfiguration.DEFAULT);
 			default:
 				return new Token(fContentType);

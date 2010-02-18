@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -104,10 +105,9 @@ public abstract class CompositeSourceViewerConfiguration extends CommonSourceVie
 	@Override
 	public final String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return TextUtils
-				.combine(new String[][] { CompositePartitionScanner.SWITCHING_CONTENT_TYPES,
-						primarySourceViewerConfiguration.getContentTypes(),
-						defaultSourceViewerConfiguration.getContentTypes() });
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				CompositePartitionScanner.SWITCHING_CONTENT_TYPES, primarySourceViewerConfiguration.getContentTypes(),
+				defaultSourceViewerConfiguration.getContentTypes() });
 	}
 
 	/*
