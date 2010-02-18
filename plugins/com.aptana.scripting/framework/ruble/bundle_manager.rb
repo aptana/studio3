@@ -24,6 +24,21 @@ module Ruble
           bundle = @@bundles_by_path[test_path]
         end
         
+        # else try BundleManager (can happen when reloading existing
+        # commands/snippets if we're in a different runtime
+        if bundle.nil?
+          test_path = (File.directory? path) ? path : File.dirname(path)
+          bundle = manager.get_bundle_from_path(test_path)
+          
+          # else try parent
+          if bundle.nil?
+            test_path = File.dirname test_path
+            bundle = manager.get_bundle_from_path(test_path)
+          end
+          
+          bundle = Bundle.new(bundle) unless bundle.nil?
+        end
+        
         return bundle
       end
       
