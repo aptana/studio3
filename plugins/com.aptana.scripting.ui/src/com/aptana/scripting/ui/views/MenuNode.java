@@ -5,9 +5,12 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 public class MenuNode extends BaseNode
 {
+	private static final Image MENU_ICON = ScriptingUIPlugin.getImage("icons/menu.png"); //$NON-NLS-1$
+	
 	private static final String BUNDLE_MENU_NAME = "bundle.menu.name";
 	private static final String BUNDLE_MENU_PATH = "bundle.menu.path";
 	
@@ -46,7 +49,7 @@ public class MenuNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		return null;
+		return MENU_ICON;
 	}
 
 	/*

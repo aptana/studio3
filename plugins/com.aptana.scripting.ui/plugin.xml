@@ -77,7 +77,6 @@
       </consolePageParticipant>
    </extension>
    <!-- uncomment to activate the bundles view -->
-   <!--
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -87,10 +86,10 @@
       <view
             category="com.aptana"
             class="com.aptana.scripting.ui.views.BundleView"
+            icon="icons/bundle_entry.png"
             id="com.aptana.scripting.views.BundleView"
             name="%view.name"
             restorable="true">
       </view>
    </extension>
-   -->
 </plugin>

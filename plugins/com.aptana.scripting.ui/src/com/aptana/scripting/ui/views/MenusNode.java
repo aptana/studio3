@@ -4,9 +4,12 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class MenusNode extends BaseNode
 {
+	private static final Image MENUS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	
 	private MenuNode[] _menus;
 	
 	/**
@@ -41,7 +44,7 @@ class MenusNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		return null;
+		return MENUS_ICON;
 	}
 	
 	/*
