@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.SnippetElement;
 
 public class BundleViewLabelProvider implements ILabelProvider
 {
@@ -42,6 +43,20 @@ public class BundleViewLabelProvider implements ILabelProvider
 		else if (element instanceof CollectionNode)
 		{
 			result = ((CollectionNode) element).getLabel();
+		}
+		else if (element instanceof SnippetElement)
+		{
+			SnippetElement snippet = (SnippetElement) element;
+			String[] triggers = snippet.getTriggers();
+			
+			if (triggers != null && triggers.length > 0)
+			{
+				result = triggers[0] + ": " + snippet.getDisplayName();
+			}
+			else
+			{
+				result = snippet.getDisplayName();
+			}
 		}
 		else if (element instanceof AbstractElement)
 		{
