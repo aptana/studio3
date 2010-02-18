@@ -8,9 +8,12 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class SnippetsNode extends BaseNode
 {
+	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	
 	private SnippetNode[] _snippets;
 
 	/**
@@ -48,8 +51,7 @@ class SnippetsNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return SNIPPETS_ICON;
 	}
 
 	/*

@@ -6,9 +6,12 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 public class CommandNode extends BaseNode
 {
+	private static final Image COMMAND_ICON = ScriptingUIPlugin.getImage("icons/command.png"); //$NON-NLS-1$
+	
 	private static final String BUNDLE_COMMAND_NAME = "bundle.command.name";
 	private static final String BUNDLE_COMMAND_PATH = "bundle.command.path";
 	private static final String BUNDLE_COMMAND_INPUTS = "bundle.command.inputs";
@@ -33,7 +36,7 @@ public class CommandNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		return null;
+		return COMMAND_ICON;
 	}
 
 	/*

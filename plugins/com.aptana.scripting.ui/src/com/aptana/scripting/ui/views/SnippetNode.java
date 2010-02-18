@@ -5,9 +5,12 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 public class SnippetNode extends BaseNode
 {
+	private static final Image SNIPPET_ICON = ScriptingUIPlugin.getImage("icons/snippet.png"); //$NON-NLS-1$
+	
 	private static final String BUNDLE_SNIPPET_NAME = "bundle.snippet.name";
 	private static final String BUNDLE_SNIPPET_PATH = "bundle.snippet.path";
 	private static final String BUNDLE_SNIPPET_TRIGGERS = "bundle.snippet.triggers";
@@ -31,7 +34,7 @@ public class SnippetNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		return null;
+		return SNIPPET_ICON;
 	}
 
 	/*
@@ -40,7 +43,16 @@ public class SnippetNode extends BaseNode
 	 */
 	public String getLabel()
 	{
-		return this._snippet.getDisplayName();
+		String[] triggers = this._snippet.getTriggers();
+
+		if (triggers != null && triggers.length > 0)
+		{
+			return triggers[0] + ": " + this._snippet.getDisplayName(); //$NON-NLS-1$
+		}
+		else
+		{
+			return this._snippet.getDisplayName();
+		}
 	}
 
 	/*

@@ -6,9 +6,12 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 public class BundleEntryNode extends BaseNode
 {
+	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
+	
 	private static final String BUNDLE_ENTRY_NAME = "bundle.entry.name";
 
 	private BundleEntry _entry;
@@ -46,7 +49,7 @@ public class BundleEntryNode extends BaseNode
 	 */
 	public Image getImage()
 	{
-		return null;
+		return BUNDLE_ENTRY_ICON;
 	}
 
 	/*

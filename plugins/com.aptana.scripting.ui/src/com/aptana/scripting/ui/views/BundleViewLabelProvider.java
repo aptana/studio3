@@ -4,9 +4,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.SnippetElement;
-
 class BundleViewLabelProvider implements ILabelProvider
 {
 	/*
@@ -31,7 +28,14 @@ class BundleViewLabelProvider implements ILabelProvider
 	 */
 	public Image getImage(Object element)
 	{
-		return null;
+		Image result = null;
+		
+		if (element instanceof CollectionNode)
+		{
+			result = ((CollectionNode) element).getImage();
+		}
+		
+		return result;
 	}
 
 	/*
@@ -45,24 +49,6 @@ class BundleViewLabelProvider implements ILabelProvider
 		if (element instanceof CollectionNode)
 		{
 			result = ((CollectionNode) element).getLabel();
-		}
-		else if (element instanceof SnippetElement)
-		{
-			SnippetElement snippet = (SnippetElement) element;
-			String[] triggers = snippet.getTriggers();
-
-			if (triggers != null && triggers.length > 0)
-			{
-				result = triggers[0] + ": " + snippet.getDisplayName(); //$NON-NLS-1$
-			}
-			else
-			{
-				result = snippet.getDisplayName();
-			}
-		}
-		else if (element instanceof AbstractElement)
-		{
-			result = ((AbstractElement) element).getDisplayName();
 		}
 
 		return result;
