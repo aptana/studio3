@@ -2,7 +2,6 @@ package com.aptana.editor.common.scripting.snippets;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,7 +119,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 								buffer.append("("); //$NON-NLS-1$
 								boolean first = true;
 								// We want to split on non-escaped '/'
-								String[] values = defaultValues.split("[^\\\\]/");
+								String[] values = defaultValues.split("(?<!\\\\)/");
 								for (String value : values)
 								{
 									if (first)
