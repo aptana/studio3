@@ -192,12 +192,14 @@ module Ruble
           end
         end
         tooltip = org.eclipse.swt.widgets.ToolTip.new(shell, style)
-        tooltip.text = content
+        tooltip.text = content.to_s
         tooltip.message = message
         tooltip.visible = true
         nil      
       end
-      
+
+      alias :tooltip :tool_tip
+
       # pop up a menu on screen
       # +options+ may be an Array of Strings, or an Array of Hashes
       # If it's an Array of Hashes, it's expected that each Hash willl contain:
