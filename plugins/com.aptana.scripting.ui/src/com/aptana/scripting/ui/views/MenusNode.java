@@ -7,7 +7,7 @@ import com.aptana.scripting.model.MenuElement;
 
 class MenusNode extends BaseNode
 {
-	private MenuElement[] _menus;
+	private MenuNode[] _menus;
 	
 	/**
 	 * CommandsNode
@@ -16,7 +16,14 @@ class MenusNode extends BaseNode
 	 */
 	public MenusNode(BundleElement bundle)
 	{
-		this._menus = bundle.getMenus();
+		MenuElement[] menus = bundle.getMenus();
+		
+		this._menus = new MenuNode[menus.length];
+		
+		for (int i = 0; i < menus.length; i++)
+		{
+			this._menus[i] = new MenuNode(menus[i]);
+		}
 	}
 	
 	/*
