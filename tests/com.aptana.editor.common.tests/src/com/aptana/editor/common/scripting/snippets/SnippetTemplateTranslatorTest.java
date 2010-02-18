@@ -18,7 +18,10 @@ public class SnippetTemplateTranslatorTest extends TestCase
 		expectations.put("font-size: ${1:100%};$0", "font-size: ${1:tabstop('100%')};${cursor}");
 		expectations.put("${1:sans-}serif", "${1:tabstop('sans-')}serif");
 		expectations.put("${2:!important}", "${2:tabstop('!important')}");
+		// Interprets '/' as list delimeter
 		expectations.put("${3:fixed/scroll}", "${3:tabstop('fixed','scroll')}");
+		// Doesn't interpret escaped '/' as list
+		expectations.put("${3:fixed\\/scroll}", "${3:tabstop('fixed/scroll')}");
 		expectations.put("margin: ${1:20px} ${2:0px} ${3:40px} ${4:0px};$0",
 				"margin: ${1:tabstop('20px')} ${2:tabstop('0px')} ${3:tabstop('40px')} ${4:tabstop('0px')};${cursor}");
 		expectations.put("background-attachment: ${1:scroll/fixed};$0",
