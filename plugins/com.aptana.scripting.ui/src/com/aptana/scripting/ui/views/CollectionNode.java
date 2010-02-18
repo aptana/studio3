@@ -1,10 +1,25 @@
 package com.aptana.scripting.ui.views;
 
-public interface CollectionNode
+interface CollectionNode
 {
+	/**
+	 * getLabel
+	 * 
+	 * @return
+	 */
 	String getLabel();
 	
+	/**
+	 * getChildren
+	 * 
+	 * @return
+	 */
 	Object[] getChildren();
 	
+	/**
+	 * hasChildren
+	 * 
+	 * @return
+	 */
 	boolean hasChildren();
 }

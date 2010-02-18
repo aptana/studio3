@@ -10,7 +10,7 @@ import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.SnippetElement;
 
-public class BundleViewLabelProvider implements ILabelProvider
+class BundleViewLabelProvider implements ILabelProvider
 {
 	/*
 	 * (non-Javadoc)
@@ -51,7 +51,7 @@ public class BundleViewLabelProvider implements ILabelProvider
 			
 			if (triggers != null && triggers.length > 0)
 			{
-				result = triggers[0] + ": " + snippet.getDisplayName();
+				result = triggers[0] + ": " + snippet.getDisplayName(); //$NON-NLS-1$
 			}
 			else
 			{

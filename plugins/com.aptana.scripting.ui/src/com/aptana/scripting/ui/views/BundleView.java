@@ -20,7 +20,8 @@ public class BundleView extends ViewPart
 	TreeViewer _treeViewer;
 	BundleViewContentProvider _contentProvider;
 	BundleViewLabelProvider _labelProvider;
-	
+	LoadCycleListener _loadCycleListener;
+
 	/**
 	 * BundleView
 	 */
@@ -28,20 +29,7 @@ public class BundleView extends ViewPart
 	{
 		this._contentProvider = new BundleViewContentProvider();
 		this._labelProvider = new BundleViewLabelProvider();
-	}
-
-	/**
-	 * createPartControl
-	 */
-	public void createPartControl(Composite parent)
-	{
-		this._treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		
-		this._treeViewer.setContentProvider(this._contentProvider);
-		this._treeViewer.setLabelProvider(_labelProvider);
-		this._treeViewer.setInput(BundleManager.getInstance());
-		
-		BundleManager.getInstance().addLoadCycleListener(new LoadCycleListener()
+		this._loadCycleListener = new LoadCycleListener()
 		{
 			public void scriptLoaded(File script)
 			{
@@ -57,17 +45,45 @@ public class BundleView extends ViewPart
 			{
 				refresh();
 			}
-		});
+		};
 	}
-	
+
+	/**
+	 * createPartControl
+	 */
+	public void createPartControl(Composite parent)
+	{
+		this._treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+
+		this._treeViewer.setContentProvider(this._contentProvider);
+		this._treeViewer.setLabelProvider(_labelProvider);
+		this._treeViewer.setInput(BundleManager.getInstance());
+
+		BundleManager.getInstance().addLoadCycleListener(this._loadCycleListener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	public void dispose()
+	{
+		BundleManager.getInstance().removeLoadCycleListener(this._loadCycleListener);
+
+		super.dispose();
+	}
+
+	/**
+	 * refresh
+	 */
 	public void refresh()
 	{
-		UIJob job = new UIJob("Refresh Bundles View")
+		UIJob job = new UIJob("Refresh Bundles View") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				_treeViewer.refresh();
-				
+
 				return Status.OK_STATUS;
 			}
 		};

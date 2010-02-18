@@ -3,7 +3,7 @@ package com.aptana.scripting.ui.views;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.MenuElement;
 
-public class MenusNode implements CollectionNode
+class MenusNode implements CollectionNode
 {
 	private MenuElement[] _menus;
 	
@@ -33,7 +33,7 @@ public class MenusNode implements CollectionNode
 	 */
 	public String getLabel()
 	{
-		return "Menus";
+		return Messages.MenusNode_Menus_Node;
 	}
 	
 	/**

@@ -11,7 +11,7 @@ import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.MenuElement;
 
-public class BundleViewContentProvider implements ITreeContentProvider
+class BundleViewContentProvider implements ITreeContentProvider
 {
 	private static final Object[] NO_ELEMENTS = new Object[0];
 	

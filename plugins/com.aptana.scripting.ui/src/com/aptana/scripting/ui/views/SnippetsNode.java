@@ -7,7 +7,7 @@ import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 
-public class SnippetsNode implements CollectionNode
+class SnippetsNode implements CollectionNode
 {
 	private SnippetElement[] _snippets;
 	
@@ -47,7 +47,7 @@ public class SnippetsNode implements CollectionNode
 	 */
 	public String getLabel()
 	{
-		return "Snippets";
+		return Messages.SnippetsNode_Snippets_Node;
 	}
 	
 	/**

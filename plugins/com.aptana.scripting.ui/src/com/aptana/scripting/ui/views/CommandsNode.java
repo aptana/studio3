@@ -7,7 +7,7 @@ import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
 
-public class CommandsNode implements CollectionNode
+class CommandsNode implements CollectionNode
 {
 	private CommandElement[] _commands;
 	
@@ -46,7 +46,7 @@ public class CommandsNode implements CollectionNode
 	 */
 	public String getLabel()
 	{
-		return "Commands";
+		return Messages.CommandsNode_Commands_Node;
 	}
 
 	/**
