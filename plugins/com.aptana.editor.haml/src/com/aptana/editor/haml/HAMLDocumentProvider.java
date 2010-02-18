@@ -34,37 +34,17 @@
  */
 package com.aptana.editor.haml;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
-
-import com.aptana.editor.common.DocumentContentTypeManager;
-import com.aptana.editor.common.ExtendedFastPartitioner;
-import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.CompositeDocumentProvider;
 import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.ruby.RubySourceConfiguration;
 
-public class HAMLDocumentProvider extends TextFileDocumentProvider {
+public class HAMLDocumentProvider extends CompositeDocumentProvider
+{
 
-    @Override
-	public void connect(Object element) throws CoreException {
-	    super.connect(element);
-
-		IDocument document = getDocument(element);
-		if (document != null) {
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-					HAMLSourceConfiguration.getDefault().createSubPartitionScanner(),
-					new NullSubPartitionScanner(),
-					new NullPartitionerSwitchStrategy());
-			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner,
-						HAMLSourceConfiguration.getDefault().getContentTypes());
-			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			DocumentContentTypeManager.getInstance().setDocumentContentType(document, IHAMLConstants.CONTENT_TYPE_HAML);
-			DocumentContentTypeManager.getInstance().registerConfiguration(document, HAMLSourceConfiguration.getDefault());
-		}
+	protected HAMLDocumentProvider()
+	{
+		super(IHAMLConstants.CONTENT_TYPE_HAML, HAMLSourceConfiguration.getDefault(), RubySourceConfiguration
+				.getDefault(), new NullPartitionerSwitchStrategy());
 	}
+
 }

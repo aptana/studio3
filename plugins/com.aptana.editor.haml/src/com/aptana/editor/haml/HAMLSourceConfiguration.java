@@ -51,6 +51,8 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -87,6 +89,16 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	private RuleBasedScanner fDocTypeScanner;
 
 	private static HAMLSourceConfiguration instance;
+
+	static
+	{
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(
+				"text.haml")); //$NON-NLS-1$
+		c
+		.addTranslation(new QualifiedContentType(HAML_COMMENT), new QualifiedContentType(
+				"comment.line.number-sign.ruby")); //$NON-NLS-1$
+	}
 
 	public static HAMLSourceConfiguration getDefault()
 	{
