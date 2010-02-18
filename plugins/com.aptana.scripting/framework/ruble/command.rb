@@ -149,7 +149,12 @@ module Ruble
 
         # add command to bundle
         bundle = BundleManager.bundle_from_path(command.path)
-        bundle.add_command(command) unless bundle.nil?
+        
+        if !bundle.nil?
+          bundle.add_command(command)
+        else
+          log_warning("No bundle found for command #{name}: #{command.path}")
+        end
       end
     end
 
