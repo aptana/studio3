@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.MenuElement;
 
 class BundleViewContentProvider implements ITreeContentProvider
 {
@@ -29,10 +28,6 @@ class BundleViewContentProvider implements ITreeContentProvider
 		if (parentElement instanceof CollectionNode)
 		{
 			children = ((CollectionNode) parentElement).getChildren();
-		}
-		else if (parentElement instanceof MenuElement)
-		{
-			children = ((MenuElement) parentElement).getChildren();
 		}
 
 		return children;
@@ -82,10 +77,6 @@ class BundleViewContentProvider implements ITreeContentProvider
 		if (element instanceof CollectionNode)
 		{
 			result = ((CollectionNode) element).hasChildren();
-		}
-		else if (element instanceof MenuElement)
-		{
-			result = ((MenuElement) element).hasChildren();
 		}
 
 		return result;
