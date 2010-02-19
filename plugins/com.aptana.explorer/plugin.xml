@@ -29,9 +29,14 @@
             </contentExtension>
             <contentExtension pattern="org.eclipse.jdt.java.ui.javaContent" />
 			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />
-			<contentExtension pattern="com.aptana.explorer.linkHelper">
+			<contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper">
    </contentExtension>	
          </includes>
+         <excludes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+         </excludes>
       </viewerContentBinding>
       <viewerActionBinding
             viewerId="com.aptana.explorer.view">
@@ -40,6 +45,11 @@
                   pattern="org.eclipse.ui.navigator.resources.*">
             </actionExtension>
          </includes>
+         <excludes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.WorkingSetActions">
+            </actionExtension>
+         </excludes>
       </viewerActionBinding>
 	</extension>
    <extension
@@ -100,22 +110,5 @@
            </with>
         </activeWhen>
       </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.linkHelper">
-      <linkHelper
-            class="com.aptana.explorer.internal.ui.AppExplorerLinkHelper"
-            id="com.aptana.explorer.linkHelper">
-         <editorInputEnablement>
-            <instanceof
-                  value="org.eclipse.ui.IFileEditorInput">
-            </instanceof>
-         </editorInputEnablement>
-         <selectionEnablement>
-            <instanceof
-                  value="org.eclipse.core.resources.IResource">
-            </instanceof>
-         </selectionEnablement>
-      </linkHelper>
    </extension>
 </plugin>
