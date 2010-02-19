@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.aptana.util.StringUtil;
 
-public abstract class AbstractElement
+public abstract class AbstractElement implements Comparable<AbstractElement>
 {
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
@@ -24,37 +24,6 @@ public abstract class AbstractElement
 	static
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
-	}
-	
-	/**
-	 * unregisterElement
-	 * 
-	 * @param element
-	 */
-	public static void unregisterElement(AbstractElement element)
-	{
-		if (element != null)
-		{
-			String path = element.getPath();
-			
-			if (path != null && path.length() > 0)
-			{
-				synchronized (ELEMENTS_BY_PATH)
-				{
-					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-					
-					if (elements != null)
-					{
-						elements.remove(element);
-						
-						if (elements.size() == 0)
-						{
-							ELEMENTS_BY_PATH.remove(path);
-						}
-					}
-				}
-			}
-		}
 	}
 	
 	/**
@@ -110,6 +79,37 @@ public abstract class AbstractElement
 	}
 	
 	/**
+	 * unregisterElement
+	 * 
+	 * @param element
+	 */
+	public static void unregisterElement(AbstractElement element)
+	{
+		if (element != null)
+		{
+			String path = element.getPath();
+			
+			if (path != null && path.length() > 0)
+			{
+				synchronized (ELEMENTS_BY_PATH)
+				{
+					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
+					
+					if (elements != null)
+					{
+						elements.remove(element);
+						
+						if (elements.size() == 0)
+						{
+							ELEMENTS_BY_PATH.remove(path);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
 	 * ModelBase
 	 * 
 	 * @param path
@@ -119,6 +119,15 @@ public abstract class AbstractElement
 		this._path = path;
 		
 		registerElement(this);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(AbstractElement o)
+	{
+		return this._displayName.compareToIgnoreCase(o._displayName);
 	}
 	
 	/**
@@ -138,7 +147,7 @@ public abstract class AbstractElement
 		
 		return result;
 	}
-	
+
 	/**
 	 * getDisplayName
 	 * 
@@ -148,14 +157,14 @@ public abstract class AbstractElement
 	{
 		return this._displayName;
 	}
-
+	
 	/**
 	 * getElementName
 	 * 
 	 * @return
 	 */
 	protected abstract String getElementName();
-	
+
 	/**
 	 * getPath
 	 * 
@@ -165,6 +174,13 @@ public abstract class AbstractElement
 	{
 		return this._path;
 	}
+	
+	/**
+	 * printBody
+	 * 
+	 * @param printer
+	 */
+	abstract protected void printBody(SourcePrinter printer);
 
 	/**
 	 * put
@@ -187,7 +203,7 @@ public abstract class AbstractElement
 			}
 		}
 	}
-	
+
 	/**
 	 * setDisplayName
 	 * 
@@ -214,7 +230,7 @@ public abstract class AbstractElement
 			registerElement(this);
 		}
 	}
-
+	
 	/**
 	 * toSource
 	 * 
@@ -255,11 +271,4 @@ public abstract class AbstractElement
 		// close element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
-	
-	/**
-	 * printBody
-	 * 
-	 * @param printer
-	 */
-	abstract protected void printBody(SourcePrinter printer);
 }

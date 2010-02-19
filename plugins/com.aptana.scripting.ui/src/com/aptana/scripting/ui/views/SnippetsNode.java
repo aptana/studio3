@@ -1,5 +1,6 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,11 +36,16 @@ class SnippetsNode extends BaseNode
 	{
 		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
 
-		for (CommandElement command : elements)
+		if (elements != null)
 		{
-			if (command instanceof SnippetElement)
+			Arrays.sort(elements);
+			
+			for (CommandElement command : elements)
 			{
-				snippets.add(new SnippetNode((SnippetElement) command));
+				if (command instanceof SnippetElement)
+				{
+					snippets.add(new SnippetNode((SnippetElement) command));
+				}
 			}
 		}
 

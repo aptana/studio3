@@ -1,5 +1,6 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,12 +35,17 @@ class CommandsNode extends BaseNode
 	public CommandsNode(CommandElement[] elements)
 	{
 		List<CommandNode> commands = new LinkedList<CommandNode>();
-		
-		for (CommandElement command : elements)
+
+		if (elements != null)
 		{
-			if ((command instanceof SnippetElement) == false)
+			Arrays.sort(elements);
+			
+			for (CommandElement command : elements)
 			{
-				commands.add(new CommandNode(command));
+				if ((command instanceof SnippetElement) == false)
+				{
+					commands.add(new CommandNode(command));
+				}
 			}
 		}
 		
