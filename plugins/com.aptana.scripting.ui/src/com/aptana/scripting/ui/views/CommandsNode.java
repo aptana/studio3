@@ -1,5 +1,6 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,9 +14,9 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class CommandsNode extends BaseNode
 {
 	private static final Image COMMANDS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	
+
 	private CommandNode[] _commands;
-	
+
 	/**
 	 * CommandsNode
 	 * 
@@ -23,19 +24,34 @@ class CommandsNode extends BaseNode
 	 */
 	public CommandsNode(BundleElement bundle)
 	{
+		this(bundle.getCommands());
+	}
+
+	/**
+	 * CommandsNode
+	 * 
+	 * @param elements
+	 */
+	public CommandsNode(CommandElement[] elements)
+	{
 		List<CommandNode> commands = new LinkedList<CommandNode>();
-		
-		for (CommandElement command : bundle.getCommands())
+
+		if (elements != null)
 		{
-			if ((command instanceof SnippetElement) == false)
+			Arrays.sort(elements);
+
+			for (CommandElement command : elements)
 			{
-				commands.add(new CommandNode(command));
+				if ((command instanceof SnippetElement) == false)
+				{
+					commands.add(new CommandNode(command));
+				}
 			}
 		}
-		
+
 		this._commands = commands.toArray(new CommandNode[commands.size()]);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()

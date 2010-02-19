@@ -1,17 +1,23 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
+import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.MenuElement;
+import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class BundleEntryNode extends BaseNode
 {
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
-	
+
 	private static final String BUNDLE_ENTRY_NAME = "bundle.entry.name";
 
 	private BundleEntry _entry;
@@ -32,15 +38,51 @@ class BundleEntryNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		BundleElement[] bundles = this._entry.getBundles();
-		Object[] result = new Object[bundles.length];
+		List<Object> result = new LinkedList<Object>();
 
-		for (int i = 0; i < bundles.length; i++)
+		// add bundle element that contribute to this bundle
+		for (BundleElement bundle : this._entry.getBundles())
 		{
-			result[i] = new BundleNode(bundles[i]);
+			result.add(new BundleNode(bundle));
 		}
 
-		return result;
+		// divide commands into commands and snippets
+		List<CommandElement> commands = new LinkedList<CommandElement>();
+		List<SnippetElement> snippets = new LinkedList<SnippetElement>();
+
+		for (CommandElement element : this._entry.getCommands())
+		{
+			if (element instanceof SnippetElement)
+			{
+				snippets.add((SnippetElement) element);
+			}
+			else
+			{
+				commands.add(element);
+			}
+		}
+
+		// add visible commands
+		if (commands.size() > 0)
+		{
+			result.add(new CommandsNode(commands.toArray(new CommandElement[commands.size()])));
+		}
+
+		// add visible snippets
+		if (snippets.size() > 0)
+		{
+			result.add(new SnippetsNode(snippets.toArray(new CommandElement[snippets.size()])));
+		}
+
+		// add visible menus
+		MenuElement[] menus = this._entry.getMenus();
+
+		if (menus != null && menus.length > 0)
+		{
+			result.add(new MenusNode(menus));
+		}
+
+		return result.toArray();
 	}
 
 	/*
@@ -94,6 +136,17 @@ class BundleEntryNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._entry.size() > 0;
+		boolean result = false;
+
+		for (BundleElement bundle : this._entry.getBundles())
+		{
+			if (bundle.hasCommands() || bundle.hasMenus())
+			{
+				result = true;
+				break;
+			}
+		}
+
+		return result;
 	}
 }

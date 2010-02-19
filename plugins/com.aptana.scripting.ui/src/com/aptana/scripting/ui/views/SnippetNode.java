@@ -43,16 +43,7 @@ class SnippetNode extends BaseNode
 	 */
 	public String getLabel()
 	{
-		String[] triggers = this._snippet.getTriggers();
-
-		if (triggers != null && triggers.length > 0)
-		{
-			return triggers[0] + ": " + this._snippet.getDisplayName(); //$NON-NLS-1$
-		}
-		else
-		{
-			return this._snippet.getDisplayName();
-		}
+		return this._snippet.getDisplayName();
 	}
 
 	/*

@@ -1,5 +1,6 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class SnippetsNode extends BaseNode
 {
 	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	
+
 	private SnippetNode[] _snippets;
 
 	/**
@@ -23,13 +24,28 @@ class SnippetsNode extends BaseNode
 	 */
 	public SnippetsNode(BundleElement bundle)
 	{
+		this(bundle.getCommands());
+	}
+
+	/**
+	 * SnippetNode
+	 * 
+	 * @param elements
+	 */
+	public SnippetsNode(CommandElement[] elements)
+	{
 		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
 
-		for (CommandElement command : bundle.getCommands())
+		if (elements != null)
 		{
-			if (command instanceof SnippetElement)
+			Arrays.sort(elements);
+
+			for (CommandElement command : elements)
 			{
-				snippets.add(new SnippetNode((SnippetElement) command));
+				if (command instanceof SnippetElement)
+				{
+					snippets.add(new SnippetNode((SnippetElement) command));
+				}
 			}
 		}
 
