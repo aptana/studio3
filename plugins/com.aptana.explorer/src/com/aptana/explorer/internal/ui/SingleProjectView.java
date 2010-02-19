@@ -11,11 +11,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -65,9 +61,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
-import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -228,28 +222,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
-	}
-
-	@Override
-	protected CommonNavigatorManager createCommonManager()
-	{
-		CommonNavigatorManager manager = super.createCommonManager();
-		// Need to hack and schedule a job that sets the initial input properly again because WorkingSetActionProvider
-		// messes everything up!
-		UIJob job = new UIJob("HACK!") //$NON-NLS-1$
-		{
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
-			{
-				getCommonViewer().setInput(getInitialInput());
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.setPriority(Job.SHORT);
-		job.schedule(300);
-		return manager;
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);

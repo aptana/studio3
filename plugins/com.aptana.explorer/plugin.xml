@@ -42,14 +42,9 @@
             viewerId="com.aptana.explorer.view">
          <includes>
             <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
+                  pattern="org\.eclipse\.ui\.navigator\.resources\.(?!WorkingSetActions).*">
             </actionExtension>
          </includes>
-         <excludes>
-            <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.WorkingSetActions">
-            </actionExtension>
-         </excludes>
       </viewerActionBinding>
 	</extension>
    <extension
