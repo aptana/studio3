@@ -43,7 +43,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 /**
  * Adds Git UI elements to the Single Project View.
- *
+ * 
  * @author cwilliams
  */
 public class GitProjectView extends SingleProjectView implements IGitRepositoryListener
@@ -106,8 +106,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				Point toolbarLocation = branchesToolbar.getLocation();
 				toolbarLocation = branchesToolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = branchesToolbar.getSize();
-				branchesMenu.setLocation(toolbarLocation.x, toolbarLocation.y
-						+ toolbarSize.y + 2);
+				branchesMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				branchesMenu.setVisible(true);
 			}
 		});
@@ -258,7 +257,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					fChangedFilesFilter = new GitChangedFilesFilter();
 					getCommonViewer().addFilter(fChangedFilesFilter);
 					getCommonViewer().expandAll();
-					showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH), Messages.GitProjectView_ChangedFilesFilterTooltip);
+					showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH),
+							Messages.GitProjectView_ChangedFilesFilterTooltip);
 				}
 				else
 				{
@@ -274,6 +274,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		if (fChangedFilesFilter != null)
 		{
 			getCommonViewer().removeFilter(fChangedFilesFilter);
+			expandProject();
 			fChangedFilesFilter = null;
 		}
 		super.removeFilter();
@@ -652,6 +653,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					rightLabel.setVisible(true);
 				}
 				branchesToolbar.getParent().getParent().layout(true, true);
+				refreshViewer();
 				return Status.OK_STATUS;
 			}
 		};
