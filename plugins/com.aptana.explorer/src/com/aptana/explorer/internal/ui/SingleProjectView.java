@@ -11,12 +11,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -28,13 +23,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
@@ -71,8 +61,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonViewer;
-import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -94,31 +82,35 @@ public abstract class SingleProjectView extends CommonNavigator
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	private ToolItem projectToolItem;
+	private Menu projectsMenu;
 
 	protected IProject selectedProject;
-	private ResourceListener fResourceListener;
-	private ViewerFilter activeProjectFilter;
+	/**
+	 * Listens for the addition/removal of projects.
+	 */
+	private ResourceListener fProjectsListener;
 
 	/**
 	 * The text to initially show in the filter text control.
 	 */
-	protected String initialText = Messages.GitProjectView_InitialFileFilterText;
+	protected String initialText = Messages.SingleProjectView_InitialFileFilterText;
 	private Text searchText;
+	private CLabel filterLabel;
+	private GridData filterLayoutData;
 	protected boolean caseSensitiveSearch;
 	protected boolean regularExpressionSearch;
 
+	/**
+	 * Used as a handle for the filesystem watcher on the selected project.
+	 */
 	private Integer watcher;
 
+	// Theming
 	private IPreferenceChangeListener fThemeChangeListener;
-
-	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
-
 	private IPropertyChangeListener fontListener;
 
-	private Menu projectsMenu;
-
-	private CLabel filterLabel;
-	private GridData filterLayoutData;
+	// listen for external changes to active project
+	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -221,8 +213,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		createFilterComposite(parent);
 
 		addProjectResourceListener();
-		detectSelectedProject();
-		addSingleProjectFilter();
+		IProject project = detectSelectedProject();
+		if (project != null)
+		{
+			setActiveProject(project.getName());
+		}
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
@@ -257,7 +252,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					new MenuItem(menu, SWT.SEPARATOR);
 
 					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
-					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication); // TODO
+					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication);
 
 					Menu projectsMenu = new Menu(menu);
 					for (IProject iProject : projects)
@@ -450,12 +445,9 @@ public abstract class SingleProjectView extends CommonNavigator
 	}
 
 	@Override
-	protected CommonViewer createCommonViewer(Composite aParent)
+	protected Object getInitialInput()
 	{
-		// Always expand to project's contents initially
-		CommonViewer viewer = super.createCommonViewer(aParent);
-		viewer.setAutoExpandLevel(2);
-		return viewer;
+		return detectSelectedProject();
 	}
 
 	private Composite createFilterComposite(final Composite myComposite)
@@ -520,64 +512,10 @@ public abstract class SingleProjectView extends CommonNavigator
 		hideFilterLable();
 	}
 
-	private void addSingleProjectFilter()
-	{
-		activeProjectFilter = new ViewerFilter()
-		{
-
-			@Override
-			public boolean select(Viewer viewer, Object parentElement, Object element)
-			{
-				if (selectedProject == null)
-					return false;
-				IResource resource = null;
-				if (element instanceof IResource)
-				{
-					resource = (IResource) element;
-				}
-				if (resource == null)
-				{
-					if (element instanceof IAdaptable)
-					{
-						IAdaptable adapt = (IAdaptable) element;
-						resource = (IResource) adapt.getAdapter(IResource.class);
-					}
-				}
-
-				if (resource == null)
-					return false;
-
-				IProject project = resource.getProject();
-				return selectedProject.equals(project);
-			}
-		};
-		getCommonViewer().addFilter(activeProjectFilter);
-		// When user manually edits filters, they get blown away and then re-added. We need to listen to this indirectly
-		// and re-add our filter!
-		getCommonViewer().addSelectionChangedListener(new ISelectionChangedListener()
-		{
-
-			public void selectionChanged(SelectionChangedEvent event)
-			{
-				ISelection selection = event.getSelection();
-				if (selection == null || !selection.isEmpty())
-					return;
-				// check to see if our filter got wiped out!
-				ViewerFilter[] filters = getCommonViewer().getFilters();
-				for (ViewerFilter viewerFilter : filters)
-				{
-					if (viewerFilter.equals(activeProjectFilter))
-						return;
-				}
-				getCommonViewer().addFilter(activeProjectFilter);
-			}
-		});
-	}
-
 	private void addProjectResourceListener()
 	{
-		fResourceListener = new ResourceListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
+		fProjectsListener = new ResourceListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
 	}
 
 	private void listenToActiveProjectPrefChanges()
@@ -743,7 +681,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
-	private void detectSelectedProject()
+	private IProject detectSelectedProject()
 	{
 		String value = Platform.getPreferencesService().getString(ExplorerPlugin.PLUGIN_ID,
 				IPreferenceConstants.ACTIVE_PROJECT, null, null);
@@ -756,13 +694,10 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			if (projects == null || projects.length == 0)
-				return;
+				return null;
 			project = projects[0];
 		}
-		if (project != null)
-		{
-			setActiveProject(project.getName());
-		}
+		return project;
 	}
 
 	protected void setActiveProject(String projectName)
@@ -821,12 +756,9 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
 		// Set/unset file watcher
+		removeFileWatcher();
 		try
 		{
-			if (watcher != null)
-			{
-				FileWatcher.removeWatch(watcher);
-			}
 			if (newProject != null && newProject.exists() && newProject.getLocation() != null)
 			{
 				watcher = FileWatcher.addWatch(newProject.getLocation().toOSString(), IJNotify.FILE_ANY, true,
@@ -849,31 +781,24 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			menuItem.setSelection(menuItem.getText().equals(newProjectName));
 		}
+		getCommonViewer().setInput(newProject);
 		// Update the tree since project changed
-		updateViewer(oldProject, newProject); // no structural change, just project changed
-		expandProject();
+		// updateViewer(oldProject, newProject); // no structural change, just project changed
 	}
 
-	protected void expandProject()
+	private void removeFileWatcher()
 	{
-		// Expand the new project one level. Have to schedule after short delay or it seems the tree's model is not yet
-		// ready...
-		UIJob job = new UIJob("Expand selected project") //$NON-NLS-1$
+		try
 		{
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor)
+			if (watcher != null)
 			{
-				if (selectedProject != null && selectedProject.exists() && getCommonViewer() != null)
-				{
-					// Expand selected project
-					getCommonViewer().setExpandedState(selectedProject, true);
-				}
-				return Status.OK_STATUS;
+				FileWatcher.removeWatch(watcher);
 			}
-		};
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule(250);
+		}
+		catch (JNotifyException e)
+		{
+			ExplorerPlugin.logError(e.getMessage(), e);
+		}
 	}
 
 	protected void refreshViewer()
@@ -888,24 +813,24 @@ public abstract class SingleProjectView extends CommonNavigator
 		if (getCommonViewer() == null)
 			return;
 		// FIXME Need to update the element plus all it's children recursively if we want to call "update"
-//		List<Object> nonNulls = new ArrayList<Object>();
+		// List<Object> nonNulls = new ArrayList<Object>();
 		for (Object element : elements)
 		{
 			if (element == null)
 				continue;
-//			nonNulls.add(element);
+			// nonNulls.add(element);
 			getCommonViewer().refresh(element);
 		}
-//		getCommonViewer().update(nonNulls.toArray(), null);
+		// getCommonViewer().update(nonNulls.toArray(), null);
 	}
 
 	@Override
 	public void dispose()
 	{
+		removeFileWatcher();
 		removeFontListener();
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
-		removeSingleProjectFilter();
 		removeThemeListener();
 		super.dispose();
 	}
@@ -921,8 +846,8 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private void removeProjectResourceListener()
 	{
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
-		fResourceListener = null;
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectsListener);
+		fProjectsListener = null;
 	}
 
 	private void removeActiveProjectPrefListener()
@@ -933,15 +858,6 @@ public abstract class SingleProjectView extends CommonNavigator
 					fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;
-	}
-
-	private void removeSingleProjectFilter()
-	{
-		if (getCommonViewer() != null && activeProjectFilter != null)
-		{
-			getCommonViewer().removeFilter(activeProjectFilter);
-		}
-		activeProjectFilter = null;
 	}
 
 	private void removeThemeListener()

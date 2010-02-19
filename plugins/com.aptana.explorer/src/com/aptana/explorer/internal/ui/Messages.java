@@ -18,7 +18,7 @@ public class Messages extends NLS
 	public static String GitProjectView_CreateBranchDialog_Title;
 	public static String GitProjectView_createNewBranchOption;
 	public static String GitProjectView_Expand_tooltip;
-	public static String GitProjectView_InitialFileFilterText;
+	public static String SingleProjectView_InitialFileFilterText;
 	public static String GitProjectView_InvalidBranchNameMessage;
 	public static String GitProjectView_LBL_ShowGitHubNetwork;
 	public static String GitProjectView_NonEmptyBranchNameMessage;

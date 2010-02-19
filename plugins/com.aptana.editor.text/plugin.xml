@@ -25,6 +25,7 @@
             file-names="README,TODO,README_FOR_APP,CHANGELOG,LICENSE,ABOUT">
       </file-association>
       <content-type
+            base-type="org.eclipse.core.runtime.text"
             id="com.aptana.editor.text.content-type.generic"
             name="Generic Content Type"
             priority="normal">
