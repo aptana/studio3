@@ -1,8 +1,5 @@
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -856,7 +853,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		updateViewer(oldProject, newProject); // no structural change, just filter changed
 		// Expand the new project one level. Have to schedule after short delay or it seems the tree's model is not yet
 		// ready...
-		UIJob job = new UIJob("Expand selected project")
+		UIJob job = new UIJob("Expand selected project") //$NON-NLS-1$
 		{
 
 			@Override
@@ -885,14 +882,16 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		if (getCommonViewer() == null)
 			return;
-		List<Object> nonNulls = new ArrayList<Object>();
+		// FIXME Need to update the element plus all it's children recursively if we want to call "update"
+//		List<Object> nonNulls = new ArrayList<Object>();
 		for (Object element : elements)
 		{
 			if (element == null)
 				continue;
-			nonNulls.add(element);
+//			nonNulls.add(element);
+			getCommonViewer().refresh(element);
 		}
-		getCommonViewer().update(nonNulls.toArray(), null);
+//		getCommonViewer().update(nonNulls.toArray(), null);
 	}
 
 	@Override
