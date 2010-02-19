@@ -16,10 +16,12 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class BundleEntryNode extends BaseNode
 {
+	private enum Property
+	{
+		NAME
+	}
+
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
-
-	private static final String BUNDLE_ENTRY_NAME = "bundle.entry.name";
-
 	private BundleEntry _entry;
 
 	/**
@@ -109,7 +111,7 @@ class BundleEntryNode extends BaseNode
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(BUNDLE_ENTRY_NAME, "Name");
+		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
 
 		return new IPropertyDescriptor[] { nameProperty };
 	}
@@ -122,9 +124,12 @@ class BundleEntryNode extends BaseNode
 	{
 		Object result = null;
 
-		if (id.equals(BUNDLE_ENTRY_NAME))
+		if (id instanceof Property)
 		{
-			result = this._entry.getName();
+			if (((Property) id) == Property.NAME)
+			{
+				result = this._entry.getName();
+			}
 		}
 
 		return result;

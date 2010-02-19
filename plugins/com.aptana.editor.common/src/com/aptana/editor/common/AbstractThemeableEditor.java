@@ -596,7 +596,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	{
 		int offset = element.getStartingOffset();
 		int length = element.getLength();
-		setHighlightRange(offset, length, true);
+		setHighlightRange(offset, length, false);
 		selectAndReveal(offset, length);
 	}
 

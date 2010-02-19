@@ -13,11 +13,12 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class BundleNode extends BaseNode
 {
+	private enum Property
+	{
+		NAME, PATH
+	}
+
 	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/bundle_directory.png"); //$NON-NLS-1$
-
-	private static final String BUNDLE_NAME = "bundle.name";
-	private static final String BUNDLE_PATH = "bundle.path";
-
 	private BundleElement _bundle;
 
 	/**
@@ -83,8 +84,8 @@ class BundleNode extends BaseNode
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(BUNDLE_NAME, "Name");
-		PropertyDescriptor pathProperty = new PropertyDescriptor(BUNDLE_PATH, "Path");
+		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
+		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
 
 		return new IPropertyDescriptor[] { nameProperty, pathProperty };
 	}
@@ -97,13 +98,21 @@ class BundleNode extends BaseNode
 	{
 		Object result = null;
 
-		if (id.equals(BUNDLE_NAME))
+		if (id instanceof Property)
 		{
-			result = this._bundle.getDisplayName();
-		}
-		else if (id.equals(BUNDLE_PATH))
-		{
-			result = this._bundle.getPath();
+			switch ((Property) id)
+			{
+				case NAME:
+					result = this._bundle.getDisplayName();
+					break;
+
+				case PATH:
+					result = this._bundle.getPath();
+					break;
+
+				default:
+					break;
+			}
 		}
 
 		return result;
