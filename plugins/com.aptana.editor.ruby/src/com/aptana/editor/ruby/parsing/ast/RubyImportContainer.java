@@ -21,6 +21,27 @@ public class RubyImportContainer extends RubyElement implements IImportContainer
 	}
 
 	@Override
+	public int getStart()
+	{
+		if (getChildrenCount() == 0)
+		{
+			return super.getStart();
+		}
+		return getChild(0).getStartingOffset();
+	}
+
+	@Override
+	public int getEnd()
+	{
+		int size = getChildrenCount();
+		if (size == 0)
+		{
+			return super.getEnd();
+		}
+		return getChild(size - 1).getEndingOffset();
+	}
+
+	@Override
 	public String toString()
 	{
 		return getName();

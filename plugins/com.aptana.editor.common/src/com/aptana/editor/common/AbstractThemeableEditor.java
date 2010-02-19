@@ -588,8 +588,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			// disables listening to cursor change so we don't get into the loop of setting selections between editor
 			// and outline
 			fCursorChangeListened = false;
-			selectAndReveal(element.getStartingOffset(), element.getLength());
+			setSelectedElement(element);
 		}
+	}
+
+	protected void setSelectedElement(ILexeme element)
+	{
+		int offset = element.getStartingOffset();
+		int length = element.getLength();
+		setHighlightRange(offset, length, true);
+		selectAndReveal(offset, length);
 	}
 
 	protected void handleCursorPositionChanged()
