@@ -61,7 +61,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -443,15 +442,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		viewer.setLayoutData(gridData);
 
 		super.createPartControl(viewer);
-	}
-
-	@Override
-	protected CommonViewer createCommonViewer(Composite aParent)
-	{
-		// Always expand to project's contents initially
-		CommonViewer viewer = super.createCommonViewer(aParent);
-		viewer.setAutoExpandLevel(2);
-		return viewer;
 	}
 
 	@Override
