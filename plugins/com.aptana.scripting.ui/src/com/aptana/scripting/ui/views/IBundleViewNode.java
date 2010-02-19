@@ -2,7 +2,7 @@ package com.aptana.scripting.ui.views;
 
 import org.eclipse.swt.graphics.Image;
 
-interface CollectionNode
+interface IBundleViewNode
 {
 	/**
 	 * getImage

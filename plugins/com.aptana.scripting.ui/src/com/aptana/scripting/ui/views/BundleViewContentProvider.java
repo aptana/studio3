@@ -25,9 +25,9 @@ class BundleViewContentProvider implements ITreeContentProvider
 	{
 		Object[] children = NO_ELEMENTS;
 
-		if (parentElement instanceof CollectionNode)
+		if (parentElement instanceof IBundleViewNode)
 		{
-			children = ((CollectionNode) parentElement).getChildren();
+			children = ((IBundleViewNode) parentElement).getChildren();
 		}
 
 		return children;
@@ -74,9 +74,9 @@ class BundleViewContentProvider implements ITreeContentProvider
 	{
 		boolean result = false;
 
-		if (element instanceof CollectionNode)
+		if (element instanceof IBundleViewNode)
 		{
-			result = ((CollectionNode) element).hasChildren();
+			result = ((IBundleViewNode) element).hasChildren();
 		}
 
 		return result;

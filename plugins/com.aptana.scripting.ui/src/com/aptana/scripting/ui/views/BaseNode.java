@@ -4,7 +4,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-public class BaseNode implements CollectionNode, IPropertySource
+public class BaseNode implements IBundleViewNode, IPropertySource
 {
 	protected IPropertyDescriptor[] NO_DESCRIPTORS = new IPropertyDescriptor[0];
 	

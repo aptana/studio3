@@ -30,9 +30,9 @@ class BundleViewLabelProvider implements ILabelProvider
 	{
 		Image result = null;
 		
-		if (element instanceof CollectionNode)
+		if (element instanceof IBundleViewNode)
 		{
-			result = ((CollectionNode) element).getImage();
+			result = ((IBundleViewNode) element).getImage();
 		}
 		
 		return result;
@@ -46,9 +46,9 @@ class BundleViewLabelProvider implements ILabelProvider
 	{
 		String result = null;
 
-		if (element instanceof CollectionNode)
+		if (element instanceof IBundleViewNode)
 		{
-			result = ((CollectionNode) element).getLabel();
+			result = ((IBundleViewNode) element).getLabel();
 		}
 
 		return result;
