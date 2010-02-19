@@ -15,7 +15,7 @@ class BundleNode extends BaseNode
 {
 	private enum Property
 	{
-		NAME, PATH
+		NAME, PATH, VISIBLE, REFERENCE, PRECEDENCE, AUTHOR, COPYRIGHT, DESCRIPTION, LICENSE, LICENSE_URL, REPOSITORY
 	}
 
 	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/bundle_directory.png"); //$NON-NLS-1$
@@ -86,8 +86,19 @@ class BundleNode extends BaseNode
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
 		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor visibleProperty = new PropertyDescriptor(Property.VISIBLE, "Visible");
+		PropertyDescriptor referenceProperty = new PropertyDescriptor(Property.REFERENCE, "Reference");
+		PropertyDescriptor precedenceProperty = new PropertyDescriptor(Property.PRECEDENCE, "Precedence");
+		PropertyDescriptor authorProperty = new PropertyDescriptor(Property.AUTHOR, "Author");
+		PropertyDescriptor copyrightProperty = new PropertyDescriptor(Property.COPYRIGHT, "Copyright");
+		PropertyDescriptor descriptionProperty = new PropertyDescriptor(Property.DESCRIPTION, "Description");
+		PropertyDescriptor licenseProperty = new PropertyDescriptor(Property.LICENSE, "License");
+		PropertyDescriptor licenseUrlProperty = new PropertyDescriptor(Property.LICENSE_URL, "License URL");
+		PropertyDescriptor repositoryProperty = new PropertyDescriptor(Property.REPOSITORY, "Repository");
 
-		return new IPropertyDescriptor[] { nameProperty, pathProperty };
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, visibleProperty, referenceProperty,
+				precedenceProperty, authorProperty, copyrightProperty, descriptionProperty, licenseProperty,
+				licenseUrlProperty, repositoryProperty };
 	}
 
 	/*
@@ -108,6 +119,42 @@ class BundleNode extends BaseNode
 
 				case PATH:
 					result = this._bundle.getPath();
+					break;
+
+				case VISIBLE:
+					result = this._bundle.isVisible();
+					break;
+
+				case REFERENCE:
+					result = this._bundle.isReference();
+					break;
+					
+				case PRECEDENCE:
+					result = this._bundle.getBundlePrecedence();
+					break;
+
+				case AUTHOR:
+					result = this._bundle.getAuthor();
+					break;
+
+				case COPYRIGHT:
+					result = this._bundle.getCopyright();
+					break;
+
+				case DESCRIPTION:
+					result = this._bundle.getDescription();
+					break;
+
+				case LICENSE:
+					result = this._bundle.getLicense();
+					break;
+
+				case LICENSE_URL:
+					result = this._bundle.getLicenseUrl();
+					break;
+
+				case REPOSITORY:
+					result = this._bundle.getRepository();
 					break;
 
 				default:
