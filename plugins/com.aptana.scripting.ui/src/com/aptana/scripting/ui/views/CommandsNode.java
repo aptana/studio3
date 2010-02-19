@@ -14,9 +14,9 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class CommandsNode extends BaseNode
 {
 	private static final Image COMMANDS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	
+
 	private CommandNode[] _commands;
-	
+
 	/**
 	 * CommandsNode
 	 * 
@@ -26,7 +26,7 @@ class CommandsNode extends BaseNode
 	{
 		this(bundle.getCommands());
 	}
-	
+
 	/**
 	 * CommandsNode
 	 * 
@@ -39,7 +39,7 @@ class CommandsNode extends BaseNode
 		if (elements != null)
 		{
 			Arrays.sort(elements);
-			
+
 			for (CommandElement command : elements)
 			{
 				if ((command instanceof SnippetElement) == false)
@@ -48,10 +48,10 @@ class CommandsNode extends BaseNode
 				}
 			}
 		}
-		
+
 		this._commands = commands.toArray(new CommandNode[commands.size()]);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()

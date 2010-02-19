@@ -14,7 +14,7 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class SnippetsNode extends BaseNode
 {
 	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-	
+
 	private SnippetNode[] _snippets;
 
 	/**
@@ -26,7 +26,7 @@ class SnippetsNode extends BaseNode
 	{
 		this(bundle.getCommands());
 	}
-	
+
 	/**
 	 * SnippetNode
 	 * 
@@ -39,7 +39,7 @@ class SnippetsNode extends BaseNode
 		if (elements != null)
 		{
 			Arrays.sort(elements);
-			
+
 			for (CommandElement command : elements)
 			{
 				if (command instanceof SnippetElement)

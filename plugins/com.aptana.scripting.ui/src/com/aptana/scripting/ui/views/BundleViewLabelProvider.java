@@ -49,12 +49,12 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	public Font getFont(Object element)
 	{
 		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-		
+
 		if (font == null)
 		{
 			font = JFaceResources.getTextFont();
 		}
-		
+
 		return font;
 	}
 
@@ -68,7 +68,7 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 		ColorManager colorManager = plugin.getColorManager();
 		IThemeManager themeManager = plugin.getThemeManager();
 		Theme currentTheme = themeManager.getCurrentTheme();
-		
+
 		return colorManager.getColor(currentTheme.getForeground());
 	}
 
@@ -79,12 +79,12 @@ class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontPr
 	public Image getImage(Object element)
 	{
 		Image result = null;
-		
+
 		if (element instanceof IBundleViewNode)
 		{
 			result = ((IBundleViewNode) element).getImage();
 		}
-		
+
 		return result;
 	}
 

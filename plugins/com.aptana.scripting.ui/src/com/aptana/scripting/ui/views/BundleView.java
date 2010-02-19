@@ -83,7 +83,7 @@ public class BundleView extends ViewPart
 		this._treeViewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		this._contentProvider = new BundleViewContentProvider();
 		this._labelProvider = new BundleViewLabelProvider();
-		
+
 		this._treeViewer.setContentProvider(this._contentProvider);
 		this._treeViewer.setLabelProvider(_labelProvider);
 		this._treeViewer.setInput(BundleManager.getInstance());
@@ -118,7 +118,8 @@ public class BundleView extends ViewPart
 		// remove theme change listener
 		if (this._themeChangeListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this._themeChangeListener);
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					this._themeChangeListener);
 		}
 
 		super.dispose();
@@ -155,19 +156,19 @@ public class BundleView extends ViewPart
 								if (_treeViewer != null)
 								{
 									Tree tree = _treeViewer.getTree();
-									
+
 									_treeViewer.refresh();
 									tree.redraw();
 									tree.update();
 								}
-								
+
 							}
 						});
 					}
 				}
 			}
 		};
-		
+
 		JFaceResources.getFontRegistry().addListener(this._fontChangeListener);
 	}
 
@@ -193,10 +194,10 @@ public class BundleView extends ViewPart
 				refresh();
 			}
 		};
-		
+
 		BundleManager.getInstance().addLoadCycleListener(this._loadCycleListener);
 	}
-	
+
 	/**
 	 * listenForThemeChanges
 	 */
@@ -212,8 +213,9 @@ public class BundleView extends ViewPart
 				}
 			}
 		};
-		
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this._themeChangeListener);
+
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+				.addPreferenceChangeListener(this._themeChangeListener);
 	}
 
 	/**

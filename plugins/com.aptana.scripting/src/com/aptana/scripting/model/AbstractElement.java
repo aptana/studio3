@@ -11,13 +11,13 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 {
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
-	
+
 	private String _path;
 	private String _displayName;
-	private Map<String,Object> _customProperties;
-	
+	private Map<String, Object> _customProperties;
+
 	private Object propertyLock = new Object();
-	
+
 	/**
 	 * static constructor
 	 */
@@ -25,7 +25,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
 	}
-	
+
 	/**
 	 * getRegisteredElements
 	 * 
@@ -35,20 +35,20 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public static AbstractElement[] getRegisteredElements(String path)
 	{
 		AbstractElement[] result = NO_ELEMENTS;
-		
+
 		synchronized (ELEMENTS_BY_PATH)
 		{
 			List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-			
+
 			if (elements != null)
 			{
 				result = elements.toArray(new AbstractElement[elements.size()]);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * registerElement
 	 * 
@@ -59,25 +59,25 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		if (element != null)
 		{
 			String path = element.getPath();
-			
+
 			if (path != null && path.length() > 0)
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-					
+
 					if (elements == null)
 					{
 						elements = new ArrayList<AbstractElement>();
 						ELEMENTS_BY_PATH.put(path, elements);
 					}
-					
+
 					elements.add(element);
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * unregisterElement
 	 * 
@@ -88,17 +88,17 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		if (element != null)
 		{
 			String path = element.getPath();
-			
+
 			if (path != null && path.length() > 0)
 			{
 				synchronized (ELEMENTS_BY_PATH)
 				{
 					List<AbstractElement> elements = ELEMENTS_BY_PATH.get(path);
-					
+
 					if (elements != null)
 					{
 						elements.remove(element);
-						
+
 						if (elements.size() == 0)
 						{
 							ELEMENTS_BY_PATH.remove(path);
@@ -108,7 +108,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-	
+
 	/**
 	 * ModelBase
 	 * 
@@ -117,10 +117,10 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public AbstractElement(String path)
 	{
 		this._path = path;
-		
+
 		registerElement(this);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
@@ -129,7 +129,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		return this._displayName.compareToIgnoreCase(o._displayName);
 	}
-	
+
 	/**
 	 * get
 	 * 
@@ -139,12 +139,12 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public synchronized Object get(String property)
 	{
 		Object result = null;
-		
+
 		if (this._customProperties != null)
 		{
 			result = this._customProperties.get(property);
 		}
-		
+
 		return result;
 	}
 
@@ -157,7 +157,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		return this._displayName;
 	}
-	
+
 	/**
 	 * getElementName
 	 * 
@@ -174,7 +174,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		return this._path;
 	}
-	
+
 	/**
 	 * printBody
 	 * 
@@ -198,7 +198,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 				{
 					this._customProperties = new HashMap<String, Object>();
 				}
-				
+
 				this._customProperties.put(property, value);
 			}
 		}
@@ -224,13 +224,13 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		if (StringUtil.areNotEqual(this._path, path))
 		{
 			unregisterElement(this);
-			
+
 			this._path = path;
-			
+
 			registerElement(this);
 		}
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -255,10 +255,10 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		// open element
 		printer.printWithIndent(this.getElementName());
 		printer.print(" \"").print(this.getDisplayName()).println("\" {").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		// emit body
 		this.printBody(printer);
-		
+
 		// emit custom properties
 		if (this._customProperties != null)
 		{

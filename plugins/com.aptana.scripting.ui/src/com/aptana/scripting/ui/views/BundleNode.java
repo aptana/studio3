@@ -14,10 +14,10 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class BundleNode extends BaseNode
 {
 	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/bundle_directory.png"); //$NON-NLS-1$
-	
+
 	private static final String BUNDLE_NAME = "bundle.name";
 	private static final String BUNDLE_PATH = "bundle.path";
-	
+
 	private BundleElement _bundle;
 
 	/**
@@ -85,7 +85,7 @@ class BundleNode extends BaseNode
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(BUNDLE_NAME, "Name");
 		PropertyDescriptor pathProperty = new PropertyDescriptor(BUNDLE_PATH, "Path");
-		
+
 		return new IPropertyDescriptor[] { nameProperty, pathProperty };
 	}
 
@@ -96,7 +96,7 @@ class BundleNode extends BaseNode
 	public Object getPropertyValue(Object id)
 	{
 		Object result = null;
-		
+
 		if (id.equals(BUNDLE_NAME))
 		{
 			result = this._bundle.getDisplayName();
@@ -105,7 +105,7 @@ class BundleNode extends BaseNode
 		{
 			result = this._bundle.getPath();
 		}
-		
+
 		return result;
 	}
 
