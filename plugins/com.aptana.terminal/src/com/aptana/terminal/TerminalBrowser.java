@@ -75,10 +75,7 @@ public class TerminalBrowser
 				@Override
 				public void run()
 				{
-					final String reloadCSSScript = "s = document.getElementById('ss');\n" //$NON-NLS-1$
-							+ "var h=s.href.replace(/(&|\\?)forceReload=d /,'');\n" //$NON-NLS-1$
-							+ "s.href=h+(h.indexOf('?')>=0?'&':'?')+'forceReload='+(new Date().valueOf());"; //$NON-NLS-1$
-					_browser.execute(reloadCSSScript);
+					_browser.execute("onThemeChange()"); //$NON-NLS-1$
 				}
 			});
 		}

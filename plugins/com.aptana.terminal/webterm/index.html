@@ -138,6 +138,29 @@
 				
 				return result;
 			}
+			
+			/**
+			 * onThemeChange
+			 */
+			function onThemeChange()
+			{
+				// reload CSS
+				var s = document.getElementById('ss');
+				var h = s.href.replace(/(&|\\?)forceReload=d /,'');
+				
+				s.href = h + (h.indexOf('?') >= 0 ? '&' : '?') + 'forceReload=' + (new Date().valueOf());
+				
+				window.setTimeout(
+					function()
+					{
+						// clear character size cache and force resize
+						characterWidth = null;
+						characterHeight = null;
+						resizeHelper();
+					},
+					1000
+				);
+			}
         </script>
     </head>
     <body onload="init();" onresize="autoSize();">
