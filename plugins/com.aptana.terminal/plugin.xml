@@ -6,11 +6,11 @@
          point="org.eclipse.ui.views">
       <category
             name="%category.name"
-            id="com.aptana.terminal">
+            id="com.aptana">
       </category>
       <view
             allowMultiple="true"
-            category="com.aptana.terminal"
+            category="com.aptana"
             class="com.aptana.terminal.views.TerminalView"
             icon="icons/terminal.png"
             id="com.aptana.terminal.views.TerminalView"

@@ -52,7 +52,12 @@ module Ruble
         
         # add snippet to bundle
         bundle = BundleManager.bundle_from_path(snippet.path)
-        bundle.add_command(snippet) unless bundle.nil?
+        
+        if !bundle.nil?
+          bundle.add_command(snippet)
+        else
+          log_warning("No bundle found for snippet #{name}: #{snippet.path}")
+        end
       end
     end
     
