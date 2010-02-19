@@ -19,13 +19,21 @@ class MenusNode extends BaseNode
 	 */
 	public MenusNode(BundleElement bundle)
 	{
-		MenuElement[] menus = bundle.getMenus();
+		this(bundle.getMenus());
+	}
+	
+	/**
+	 * MenusNode
+	 * 
+	 * @param elements
+	 */
+	public MenusNode(MenuElement[] elements)
+	{
+		this._menus = new MenuNode[elements.length];
 		
-		this._menus = new MenuNode[menus.length];
-		
-		for (int i = 0; i < menus.length; i++)
+		for (int i = 0; i < elements.length; i++)
 		{
-			this._menus[i] = new MenuNode(menus[i]);
+			this._menus[i] = new MenuNode(elements[i]);
 		}
 	}
 	

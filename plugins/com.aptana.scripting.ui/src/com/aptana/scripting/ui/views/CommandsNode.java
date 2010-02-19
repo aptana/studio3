@@ -23,9 +23,19 @@ class CommandsNode extends BaseNode
 	 */
 	public CommandsNode(BundleElement bundle)
 	{
+		this(bundle.getCommands());
+	}
+	
+	/**
+	 * CommandsNode
+	 * 
+	 * @param elements
+	 */
+	public CommandsNode(CommandElement[] elements)
+	{
 		List<CommandNode> commands = new LinkedList<CommandNode>();
 		
-		for (CommandElement command : bundle.getCommands())
+		for (CommandElement command : elements)
 		{
 			if ((command instanceof SnippetElement) == false)
 			{

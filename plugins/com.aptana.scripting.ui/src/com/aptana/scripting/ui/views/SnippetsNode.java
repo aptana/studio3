@@ -23,9 +23,19 @@ class SnippetsNode extends BaseNode
 	 */
 	public SnippetsNode(BundleElement bundle)
 	{
+		this(bundle.getCommands());
+	}
+	
+	/**
+	 * SnippetNode
+	 * 
+	 * @param elements
+	 */
+	public SnippetsNode(CommandElement[] elements)
+	{
 		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
 
-		for (CommandElement command : bundle.getCommands())
+		for (CommandElement command : elements)
 		{
 			if (command instanceof SnippetElement)
 			{
