@@ -43,7 +43,6 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -54,7 +53,6 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
@@ -111,7 +109,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private HAMLSourceConfiguration()
 	{
-		IToken ruby = new Token(HAML_RUBY);
+//		IToken ruby = new Token(HAML_RUBY);
 		partitioningRules = new IPredicateRule[] {
 				// FIXME What about indented text getting wrapped too?
 				// FIXME These have to occur at beginning of line (only can be preceded by spaces!)

@@ -35,7 +35,6 @@
 package com.aptana.editor.haml;
 
 import com.aptana.editor.common.CompositeDocumentProvider;
-import com.aptana.editor.common.NullPartitionerSwitchStrategy;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
 public class HAMLDocumentProvider extends CompositeDocumentProvider
