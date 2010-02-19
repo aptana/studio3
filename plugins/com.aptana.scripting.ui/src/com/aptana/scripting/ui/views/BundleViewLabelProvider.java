@@ -1,10 +1,20 @@
 package com.aptana.scripting.ui.views;
 
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-class BundleViewLabelProvider implements ILabelProvider
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ColorManager;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
+
+class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
 	/*
 	 * (non-Javadoc)
@@ -20,6 +30,46 @@ class BundleViewLabelProvider implements ILabelProvider
 	 */
 	public void dispose()
 	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
+	public Color getBackground(Object element)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
+	public Font getFont(Object element)
+	{
+		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+		
+		if (font == null)
+		{
+			font = JFaceResources.getTextFont();
+		}
+		
+		return font;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	public Color getForeground(Object element)
+	{
+		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ColorManager colorManager = plugin.getColorManager();
+		IThemeManager themeManager = plugin.getThemeManager();
+		Theme currentTheme = themeManager.getCurrentTheme();
+		
+		return colorManager.getColor(currentTheme.getForeground());
 	}
 
 	/*
