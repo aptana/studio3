@@ -10,21 +10,21 @@ interface IBundleViewNode
 	 * @return
 	 */
 	Image getImage();
-	
+
 	/**
 	 * getLabel
 	 * 
 	 * @return
 	 */
 	String getLabel();
-	
+
 	/**
 	 * getChildren
 	 * 
 	 * @return
 	 */
 	Object[] getChildren();
-	
+
 	/**
 	 * hasChildren
 	 * 

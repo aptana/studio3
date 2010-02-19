@@ -7,14 +7,15 @@ import org.eclipse.ui.views.properties.IPropertySource;
 class BaseNode implements IBundleViewNode, IPropertySource
 {
 	protected IPropertyDescriptor[] NO_DESCRIPTORS = new IPropertyDescriptor[0];
-	
+	protected Object[] NO_OBJECTS = new Object[0];
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.IBundleViewNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
-		return null;
+		return NO_OBJECTS;
 	}
 
 	/*

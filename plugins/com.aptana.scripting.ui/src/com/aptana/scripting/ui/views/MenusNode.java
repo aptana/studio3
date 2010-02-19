@@ -11,7 +11,6 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class MenusNode extends BaseNode
 {
 	private static final Image MENUS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-
 	private MenuNode[] _menus;
 
 	/**

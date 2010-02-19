@@ -14,7 +14,6 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 class CommandsNode extends BaseNode
 {
 	private static final Image COMMANDS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
-
 	private CommandNode[] _commands;
 
 	/**
