@@ -33,11 +33,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.PageBookView;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
+import org.eclipse.ui.views.properties.PropertySheet;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -150,6 +152,20 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			hookTheme(page.getControl(), revertToDefaults);
 			return;
 		}
+		else if (view instanceof PropertySheet)
+		{
+			PropertySheet outline = (PropertySheet) view;
+			IPage page = outline.getCurrentPage();
+			hookTheme(page.getControl(), revertToDefaults);
+			return;
+		}
+//		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
+//		{
+//			PageBookView outline = (PageBookView) view;
+//			IPage page = outline.getCurrentPage();
+//			hookTheme(page.getControl(), revertToDefaults);
+//			return;
+//		}
 		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
 		{
 			try
