@@ -18,7 +18,7 @@ class BundleEntryNode extends BaseNode
 {
 	private enum Property
 	{
-		NAME
+		NAME, CONTRIBUTOR_COUNT
 	}
 
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
@@ -112,8 +112,9 @@ class BundleEntryNode extends BaseNode
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
+		PropertyDescriptor contributorCountProperty = new PropertyDescriptor(Property.CONTRIBUTOR_COUNT, "Contributors");
 
-		return new IPropertyDescriptor[] { nameProperty };
+		return new IPropertyDescriptor[] { nameProperty, contributorCountProperty };
 	}
 
 	/*
@@ -126,9 +127,17 @@ class BundleEntryNode extends BaseNode
 
 		if (id instanceof Property)
 		{
-			if (((Property) id) == Property.NAME)
+			switch ((Property) id)
 			{
-				result = this._entry.getName();
+				case NAME:
+					result = this._entry.getName();
+					break;
+					
+				case CONTRIBUTOR_COUNT:
+					BundleElement[] bundles = this._entry.getBundles();
+					
+					result = (bundles != null) ? bundles.length : 0;
+					break;
 			}
 		}
 

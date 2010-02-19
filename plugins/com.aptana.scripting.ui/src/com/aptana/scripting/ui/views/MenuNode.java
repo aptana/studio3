@@ -11,7 +11,7 @@ class MenuNode extends BaseNode
 {
 	private enum Property
 	{
-		NAME, PATH
+		NAME, PATH, SCOPE, SEPARATOR
 	}
 
 	private static final Image MENU_ICON = ScriptingUIPlugin.getImage("icons/menu.png"); //$NON-NLS-1$
@@ -70,8 +70,10 @@ class MenuNode extends BaseNode
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
 		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope");
+		PropertyDescriptor separatorProperty = new PropertyDescriptor(Property.SEPARATOR, "Separator");
 
-		return new IPropertyDescriptor[] { nameProperty, pathProperty };
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, separatorProperty };
 	}
 
 	/*
@@ -89,8 +91,19 @@ class MenuNode extends BaseNode
 				case NAME:
 					result = this._menu.getDisplayName();
 					break;
+
 				case PATH:
 					result = this._menu.getPath();
+					break;
+
+				case SCOPE:
+					String scope = this._menu.getScope();
+
+					result = (scope != null && scope.length() > 0) ? scope : "all";
+					break;
+
+				case SEPARATOR:
+					result = this._menu.isSeparator();
 					break;
 			}
 		}

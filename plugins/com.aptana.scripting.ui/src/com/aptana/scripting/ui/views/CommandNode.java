@@ -12,7 +12,7 @@ class CommandNode extends BaseNode
 {
 	private enum Property
 	{
-		NAME, PATH, INPUTS, OUTPUT, TRIGGERS
+		NAME, PATH, SCOPE, EXECUTABLE, TYPE, INPUTS, OUTPUT, TRIGGERS
 	}
 
 	private static final Image COMMAND_ICON = ScriptingUIPlugin.getImage("icons/command.png"); //$NON-NLS-1$
@@ -54,11 +54,15 @@ class CommandNode extends BaseNode
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
 		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope");
+		PropertyDescriptor executableProperty = new PropertyDescriptor(Property.EXECUTABLE, "Executable");
+		PropertyDescriptor executionTypeProperty = new PropertyDescriptor(Property.TYPE, "Execution Type");
 		PropertyDescriptor inputsProperty = new PropertyDescriptor(Property.INPUTS, "Inputs");
 		PropertyDescriptor outputProperty = new PropertyDescriptor(Property.OUTPUT, "Output");
 		PropertyDescriptor triggersProperty = new PropertyDescriptor(Property.TRIGGERS, "Triggers");
 
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, inputsProperty, outputProperty, triggersProperty };
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, executableProperty,
+				executionTypeProperty, inputsProperty, outputProperty, triggersProperty };
 	}
 
 	/*
@@ -81,6 +85,21 @@ class CommandNode extends BaseNode
 
 				case PATH:
 					result = this._command.getPath();
+					break;
+
+				case SCOPE:
+					String scope = this._command.getScope();
+					
+					result = (scope != null && scope.length() > 0) ? scope : "all";
+					break;
+
+				case EXECUTABLE:
+					result = this._command.isExecutable();
+					break;
+
+				case TYPE:
+					result = this._command.isBlockCommand() ? "Ruby block" : this._command.isShellCommand() ? "Shell script"
+							: "unknown";
 					break;
 
 				case INPUTS:
@@ -108,7 +127,7 @@ class CommandNode extends BaseNode
 				case TRIGGERS:
 					String[] triggers = this._command.getTriggers();
 
-					if (triggers != null)
+					if (triggers != null && triggers.length > 0)
 					{
 						buffer = new StringBuilder();
 
@@ -123,6 +142,10 @@ class CommandNode extends BaseNode
 						}
 
 						result = buffer.toString();
+					}
+					else
+					{
+						result = "none";
 					}
 					break;
 

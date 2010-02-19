@@ -11,7 +11,7 @@ class SnippetNode extends BaseNode
 {
 	private enum Property
 	{
-		NAME, PATH, TRIGGERS, EXPANSION
+		NAME, PATH, SCOPE, TRIGGERS, EXPANSION
 	}
 
 	private static final Image SNIPPET_ICON = ScriptingUIPlugin.getImage("icons/snippet.png"); //$NON-NLS-1$
@@ -53,10 +53,12 @@ class SnippetNode extends BaseNode
 	{
 		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
 		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope");
 		PropertyDescriptor triggersProperty = new PropertyDescriptor(Property.TRIGGERS, "Triggers");
 		PropertyDescriptor expansionProperty = new PropertyDescriptor(Property.EXPANSION, "Expansion");
 
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, triggersProperty, expansionProperty };
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, triggersProperty,
+				expansionProperty };
 	}
 
 	/*
@@ -74,9 +76,17 @@ class SnippetNode extends BaseNode
 				case NAME:
 					result = this._snippet.getDisplayName();
 					break;
+
 				case PATH:
 					result = this._snippet.getPath();
 					break;
+
+				case SCOPE:
+					String scope = this._snippet.getScope();
+
+					result = (scope != null && scope.length() > 0) ? scope : "all";
+					break;
+
 				case TRIGGERS:
 					String[] triggers = this._snippet.getTriggers();
 
@@ -87,7 +97,9 @@ class SnippetNode extends BaseNode
 						for (int i = 0; i < triggers.length; i++)
 						{
 							if (i > 0)
+							{
 								buffer.append(", ");
+							}
 
 							buffer.append(triggers[i]);
 						}
@@ -95,6 +107,7 @@ class SnippetNode extends BaseNode
 						result = buffer.toString();
 					}
 					break;
+
 				case EXPANSION:
 					result = this._snippet.getExpansion();
 					break;
