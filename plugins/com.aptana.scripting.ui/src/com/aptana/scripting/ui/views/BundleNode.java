@@ -13,7 +13,7 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class BundleNode extends BaseNode
 {
-	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private static final Image BUNDLE_ICON = ScriptingUIPlugin.getImage("icons/bundle_directory.png"); //$NON-NLS-1$
 	
 	private static final String BUNDLE_NAME = "bundle.name";
 	private static final String BUNDLE_PATH = "bundle.path";
