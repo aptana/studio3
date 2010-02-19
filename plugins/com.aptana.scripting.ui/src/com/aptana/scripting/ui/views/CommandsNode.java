@@ -38,7 +38,7 @@ class CommandsNode extends BaseNode
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getChildren()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
@@ -47,7 +47,7 @@ class CommandsNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
 	 */
 	public Image getImage()
 	{
@@ -56,7 +56,7 @@ class CommandsNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{

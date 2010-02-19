@@ -7,7 +7,7 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-public class MenuNode extends BaseNode
+class MenuNode extends BaseNode
 {
 	private static final Image MENU_ICON = ScriptingUIPlugin.getImage("icons/menu.png"); //$NON-NLS-1$
 	
@@ -45,7 +45,7 @@ public class MenuNode extends BaseNode
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
 	 */
 	public Image getImage()
 	{

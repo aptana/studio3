@@ -8,7 +8,7 @@ import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-public class BundleEntryNode extends BaseNode
+class BundleEntryNode extends BaseNode
 {
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
 	
@@ -28,7 +28,7 @@ public class BundleEntryNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getChildren()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
@@ -45,7 +45,7 @@ public class BundleEntryNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
 	 */
 	public Image getImage()
 	{
@@ -54,7 +54,7 @@ public class BundleEntryNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{
@@ -63,7 +63,7 @@ public class BundleEntryNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
@@ -74,7 +74,7 @@ public class BundleEntryNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
 	 */
 	public Object getPropertyValue(Object id)
 	{

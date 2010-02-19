@@ -4,13 +4,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 
-public class BaseNode implements IBundleViewNode, IPropertySource
+class BaseNode implements IBundleViewNode, IPropertySource
 {
 	protected IPropertyDescriptor[] NO_DESCRIPTORS = new IPropertyDescriptor[0];
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getChildren()
+	 * @see com.aptana.scripting.ui.views.IBundleViewNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
@@ -28,7 +28,7 @@ public class BaseNode implements IBundleViewNode, IPropertySource
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 * @see com.aptana.scripting.ui.views.IBundleViewNode#getImage()
 	 */
 	public Image getImage()
 	{
@@ -37,7 +37,7 @@ public class BaseNode implements IBundleViewNode, IPropertySource
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
+	 * @see com.aptana.scripting.ui.views.IBundleViewNode#getLabel()
 	 */
 	public String getLabel()
 	{
@@ -64,7 +64,7 @@ public class BaseNode implements IBundleViewNode, IPropertySource
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#hasChildren()
+	 * @see com.aptana.scripting.ui.views.IBundleViewNode#hasChildren()
 	 */
 	public boolean hasChildren()
 	{

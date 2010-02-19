@@ -49,7 +49,7 @@ class MenusNode extends BaseNode
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{

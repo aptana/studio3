@@ -8,7 +8,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.InputType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-public class CommandNode extends BaseNode
+class CommandNode extends BaseNode
 {
 	private static final Image COMMAND_ICON = ScriptingUIPlugin.getImage("icons/command.png"); //$NON-NLS-1$
 	
@@ -32,7 +32,7 @@ public class CommandNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getImage()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
 	 */
 	public Image getImage()
 	{
@@ -50,7 +50,7 @@ public class CommandNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyDescriptors()
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
@@ -65,7 +65,7 @@ public class CommandNode extends BaseNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.lang.Object)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getPropertyValue(java.lang.Object)
 	 */
 	public Object getPropertyValue(Object id)
 	{
