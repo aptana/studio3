@@ -849,8 +849,13 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			menuItem.setSelection(menuItem.getText().equals(newProjectName));
 		}
-		// Update the tree since filter changed
-		updateViewer(oldProject, newProject); // no structural change, just filter changed
+		// Update the tree since project changed
+		updateViewer(oldProject, newProject); // no structural change, just project changed
+		expandProject();
+	}
+
+	protected void expandProject()
+	{
 		// Expand the new project one level. Have to schedule after short delay or it seems the tree's model is not yet
 		// ready...
 		UIJob job = new UIJob("Expand selected project") //$NON-NLS-1$
