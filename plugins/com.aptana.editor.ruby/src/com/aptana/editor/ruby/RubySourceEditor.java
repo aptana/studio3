@@ -41,9 +41,11 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.RubyParser;
+import com.aptana.parsing.lexer.ILexeme;
 
 @SuppressWarnings("restriction")
 public class RubySourceEditor extends AbstractThemeableEditor
@@ -63,7 +65,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new RubyDocumentProvider());
-		
+
 		getFileService().setParser(new RubyParser());
 	}
 
@@ -74,11 +76,25 @@ public class RubySourceEditor extends AbstractThemeableEditor
 
 	@Override
 	protected CommonOutlinePage createOutlinePage()
-	{		
+	{
 		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new RubyOutlineContentProvider());
 		outline.setLabelProvider(new RubyOutlineLabelProvider());
 
 		return outline;
+	}
+
+	@Override
+	protected void setSelectedElement(ILexeme element)
+	{
+		if (element instanceof IImportContainer)
+		{
+			// just sets the highlight range and moves the cursor
+			setHighlightRange(element.getStartingOffset(), element.getLength(), true);
+		}
+		else
+		{
+			super.setSelectedElement(element);
+		}
 	}
 }
