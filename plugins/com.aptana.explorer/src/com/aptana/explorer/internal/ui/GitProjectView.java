@@ -274,7 +274,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		if (fChangedFilesFilter != null)
 		{
 			getCommonViewer().removeFilter(fChangedFilesFilter);
-			expandProject();
 			fChangedFilesFilter = null;
 		}
 		super.removeFilter();
