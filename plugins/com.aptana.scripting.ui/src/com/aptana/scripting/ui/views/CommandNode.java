@@ -10,14 +10,12 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class CommandNode extends BaseNode
 {
-	private static final Image COMMAND_ICON = ScriptingUIPlugin.getImage("icons/command.png"); //$NON-NLS-1$
-	
-	private static final String BUNDLE_COMMAND_NAME = "bundle.command.name";
-	private static final String BUNDLE_COMMAND_PATH = "bundle.command.path";
-	private static final String BUNDLE_COMMAND_INPUTS = "bundle.command.inputs";
-	private static final String BUNDLE_COMMAND_OUTPUT = "bundle.command.output";
-	private static final String BUNDLE_COMMAND_TRIGGERS = "bundle.command.triggers";
+	private enum Property
+	{
+		NAME, PATH, SCOPE, EXECUTABLE, TYPE, INPUTS, OUTPUT, TRIGGERS
+	}
 
+	private static final Image COMMAND_ICON = ScriptingUIPlugin.getImage("icons/command.png"); //$NON-NLS-1$
 	private CommandElement _command;
 
 	/**
@@ -54,13 +52,17 @@ class CommandNode extends BaseNode
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(BUNDLE_COMMAND_NAME, "Name");
-		PropertyDescriptor pathProperty = new PropertyDescriptor(BUNDLE_COMMAND_PATH, "Path");
-		PropertyDescriptor inputsProperty = new PropertyDescriptor(BUNDLE_COMMAND_INPUTS, "Inputs");
-		PropertyDescriptor outputProperty = new PropertyDescriptor(BUNDLE_COMMAND_OUTPUT, "Output");
-		PropertyDescriptor triggersProperty = new PropertyDescriptor(BUNDLE_COMMAND_TRIGGERS, "Triggers");
+		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
+		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope");
+		PropertyDescriptor executableProperty = new PropertyDescriptor(Property.EXECUTABLE, "Executable");
+		PropertyDescriptor executionTypeProperty = new PropertyDescriptor(Property.TYPE, "Execution Type");
+		PropertyDescriptor inputsProperty = new PropertyDescriptor(Property.INPUTS, "Inputs");
+		PropertyDescriptor outputProperty = new PropertyDescriptor(Property.OUTPUT, "Output");
+		PropertyDescriptor triggersProperty = new PropertyDescriptor(Property.TRIGGERS, "Triggers");
 
-		return new IPropertyDescriptor[] { nameProperty, pathProperty, inputsProperty, outputProperty, triggersProperty };
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, executableProperty,
+				executionTypeProperty, inputsProperty, outputProperty, triggersProperty };
 	}
 
 	/*
@@ -71,50 +73,84 @@ class CommandNode extends BaseNode
 	{
 		Object result = null;
 
-		if (id.equals(BUNDLE_COMMAND_NAME))
+		if (id instanceof Property)
 		{
-			result = this._command.getDisplayName();
-		}
-		else if (id.equals(BUNDLE_COMMAND_PATH))
-		{
-			result = this._command.getPath();
-		}
-		else if (id.equals(BUNDLE_COMMAND_INPUTS))
-		{
-			InputType[] inputs = this._command.getInputTypes();
-			StringBuilder buffer = new StringBuilder();
+			StringBuilder buffer;
 
-			for (int i = 0; i < inputs.length; i++)
+			switch ((Property) id)
 			{
-				if (i > 0)
-					buffer.append(", ");
+				case NAME:
+					result = this._command.getDisplayName();
+					break;
 
-				buffer.append(inputs[i].getName());
-			}
+				case PATH:
+					result = this._command.getPath();
+					break;
 
-			result = buffer.toString();
-		}
-		else if (id.equals(BUNDLE_COMMAND_OUTPUT))
-		{
-			result = this._command.getOutputType();
-		}
-		else if (id.equals(BUNDLE_COMMAND_TRIGGERS))
-		{
-			String[] triggers = this._command.getTriggers();
+				case SCOPE:
+					String scope = this._command.getScope();
+					
+					result = (scope != null && scope.length() > 0) ? scope : "all";
+					break;
 
-			if (triggers != null)
-			{
-				StringBuilder buffer = new StringBuilder();
+				case EXECUTABLE:
+					result = this._command.isExecutable();
+					break;
 
-				for (int i = 0; i < triggers.length; i++)
-				{
-					if (i > 0)
-						buffer.append(", ");
+				case TYPE:
+					result = this._command.isBlockCommand() ? "Ruby block" : this._command.isShellCommand() ? "Shell script"
+							: "unknown";
+					break;
 
-					buffer.append(triggers[i]);
-				}
+				case INPUTS:
+					InputType[] inputs = this._command.getInputTypes();
 
-				result = buffer.toString();
+					buffer = new StringBuilder();
+
+					for (int i = 0; i < inputs.length; i++)
+					{
+						if (i > 0)
+						{
+							buffer.append(", ");
+						}
+
+						buffer.append(inputs[i].getName());
+					}
+
+					result = buffer.toString();
+					break;
+
+				case OUTPUT:
+					result = this._command.getOutputType();
+					break;
+
+				case TRIGGERS:
+					String[] triggers = this._command.getTriggers();
+
+					if (triggers != null && triggers.length > 0)
+					{
+						buffer = new StringBuilder();
+
+						for (int i = 0; i < triggers.length; i++)
+						{
+							if (i > 0)
+							{
+								buffer.append(", ");
+							}
+
+							buffer.append(triggers[i]);
+						}
+
+						result = buffer.toString();
+					}
+					else
+					{
+						result = "none";
+					}
+					break;
+
+				default:
+					break;
 			}
 		}
 

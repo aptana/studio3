@@ -9,13 +9,14 @@ import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class MenuNode extends BaseNode
 {
+	private enum Property
+	{
+		NAME, PATH, SCOPE, SEPARATOR
+	}
+
 	private static final Image MENU_ICON = ScriptingUIPlugin.getImage("icons/menu.png"); //$NON-NLS-1$
-	
-	private static final String BUNDLE_MENU_NAME = "bundle.menu.name";
-	private static final String BUNDLE_MENU_PATH = "bundle.menu.path";
-	
 	private MenuElement _menu;
-	
+
 	/**
 	 * MenuNode
 	 * 
@@ -25,7 +26,7 @@ class MenuNode extends BaseNode
 	{
 		this._menu = menu;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
@@ -34,15 +35,15 @@ class MenuNode extends BaseNode
 	{
 		MenuElement[] children = this._menu.getChildren();
 		Object[] result = new Object[children.length];
-		
+
 		for (int i = 0; i < result.length; i++)
 		{
 			result[i] = new MenuNode(children[i]);
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
@@ -67,10 +68,12 @@ class MenuNode extends BaseNode
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(BUNDLE_MENU_NAME, "Name");
-		PropertyDescriptor pathProperty = new PropertyDescriptor(BUNDLE_MENU_PATH, "Path");
-		
-		return new IPropertyDescriptor[] { nameProperty, pathProperty };
+		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
+		PropertyDescriptor pathProperty = new PropertyDescriptor(Property.PATH, "Path");
+		PropertyDescriptor scopeProperty = new PropertyDescriptor(Property.SCOPE, "Scope");
+		PropertyDescriptor separatorProperty = new PropertyDescriptor(Property.SEPARATOR, "Separator");
+
+		return new IPropertyDescriptor[] { nameProperty, pathProperty, scopeProperty, separatorProperty };
 	}
 
 	/*
@@ -81,15 +84,30 @@ class MenuNode extends BaseNode
 	{
 		Object result = null;
 
-		if (id.equals(BUNDLE_MENU_NAME))
+		if (id instanceof Property)
 		{
-			result = this._menu.getDisplayName();
+			switch ((Property) id)
+			{
+				case NAME:
+					result = this._menu.getDisplayName();
+					break;
+
+				case PATH:
+					result = this._menu.getPath();
+					break;
+
+				case SCOPE:
+					String scope = this._menu.getScope();
+
+					result = (scope != null && scope.length() > 0) ? scope : "all";
+					break;
+
+				case SEPARATOR:
+					result = this._menu.isSeparator();
+					break;
+			}
 		}
-		else if (id.equals(BUNDLE_MENU_PATH))
-		{
-			result = this._menu.getPath();
-		}
-		
+
 		return result;
 	}
 

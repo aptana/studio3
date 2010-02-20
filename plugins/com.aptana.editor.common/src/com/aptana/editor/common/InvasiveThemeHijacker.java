@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -38,6 +39,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
+import org.eclipse.ui.views.properties.PropertySheet;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -78,6 +80,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (invasiveThemesEnabled())
 		{
 			applyThemeToJDTEditor(getCurrentTheme(), false);
+			applyThemeToConsole(getCurrentTheme(), false);
 			window.getActivePage().addPartListener(this);
 			hijackCurrentViews(window, false);
 		}
@@ -85,9 +88,51 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			window.getActivePage().removePartListener(this);
 			applyThemeToJDTEditor(getCurrentTheme(), true);
+			applyThemeToConsole(getCurrentTheme(), true);
 			hijackCurrentViews(window, true);
 		}
 		return Status.OK_STATUS;
+	}
+
+	@SuppressWarnings("nls")
+	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults)
+	{
+
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui");
+		if (revertToDefaults)
+		{
+			prefs.remove("org.eclipse.debug.ui.errorColor");
+			prefs.remove("org.eclipse.debug.ui.outColor");
+			prefs.remove("org.eclipse.debug.ui.inColor");
+			prefs.remove("org.eclipse.debug.ui.consoleBackground");
+		}
+		else
+		{
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, "console.error", new RGB(0x80, 0, 0));
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, "console.output", currentTheme
+					.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, "console.input", currentTheme.getForeground());
+			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
+		}
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setColor(IEclipsePreferences prefs, String prefKey, Theme currentTheme, String tokenName,
+			RGB defaultColor)
+	{
+		RGB rgb = defaultColor;
+		if (currentTheme.hasEntry(tokenName))
+		{
+			rgb = currentTheme.getForegroundAsRGB(tokenName);
+		}
+		prefs.put(prefKey, StringConverter.asString(rgb));
 	}
 
 	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
@@ -150,6 +195,20 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			hookTheme(page.getControl(), revertToDefaults);
 			return;
 		}
+		else if (view instanceof PropertySheet)
+		{
+			PropertySheet outline = (PropertySheet) view;
+			IPage page = outline.getCurrentPage();
+			hookTheme(page.getControl(), revertToDefaults);
+			return;
+		}
+		// else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
+		// {
+		// PageBookView outline = (PageBookView) view;
+		// IPage page = outline.getCurrentPage();
+		// hookTheme(page.getControl(), revertToDefaults);
+		// return;
+		// }
 		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
 		{
 			try
@@ -402,6 +461,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			if (invasiveThemesEnabled())
 			{
 				applyThemeToJDTEditor(getCurrentTheme(), false);
+				applyThemeToConsole(getCurrentTheme(), false);
 				hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), false);
 			}
 		}
