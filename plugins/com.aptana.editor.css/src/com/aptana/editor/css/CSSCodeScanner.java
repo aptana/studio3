@@ -146,6 +146,8 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// normal words
 		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
+		rules.add(wordRule);
+		wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, HTML_TAGS, "entity.name.tag.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule, MEDIA, "support.constant.media.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule, FUNCTIONS, "support.function.misc.css"); //$NON-NLS-1$
