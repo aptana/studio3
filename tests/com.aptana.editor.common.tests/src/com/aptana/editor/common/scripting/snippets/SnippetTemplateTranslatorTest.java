@@ -38,6 +38,12 @@ public class SnippetTemplateTranslatorTest extends TestCase
 		expectations.put("${TM_SELECTED_TEXT}", "${TM_SELECTED_TEXT:environment('')}");
 		expectations.put("${TM_SELECTED_TEXT:in case there is no slection}", "${TM_SELECTED_TEXT:environment('in case there is no slection')}");
 		expectations.put("${TM_SELECTED_TEXT:alt selection1/alt selection2}", "${TM_SELECTED_TEXT:environment('alt selection1','alt selection2')}");
+		// escapes!
+		expectations.put("# vars = \\`find cookbooks\\`${0}", "# vars = `find cookbooks`${cursor}");
+		expectations.put("# vars = \\/\\/attributes\\/", "# vars = //attributes/");
+		expectations.put("# vars = {}", "# vars = {}");
+		expectations.put("# vars = \\\\;", "# vars = \\;");
+		expectations.put("    # vars = \\`find cookbooks\\/\\/attributes\\/ -exec grep set_unless {} \\\\;\\`.split(\"\\n\")${0}", "    # vars = `find cookbooks//attributes/ -exec grep set_unless {} \\;`.split(\"\\n\")${cursor}");
 		for (Map.Entry<String, String> pair : expectations.entrySet())
 		{
 			assertEquals(pair.getValue(), SnippetTemplateTranslator.processExpansion(pair.getKey()));
