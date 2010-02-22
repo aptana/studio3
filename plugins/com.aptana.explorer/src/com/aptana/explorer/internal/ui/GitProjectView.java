@@ -24,6 +24,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
@@ -48,6 +51,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  */
 public class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 {
+	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
 	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
 	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
@@ -68,6 +72,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private Menu branchesMenu;
 
 	private GitChangedFilesFilter fChangedFilesFilter;
+	private boolean filterOnInitially;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -75,6 +80,23 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		super.createPartControl(aParent);
 
 		GitRepository.addListener(this);
+
+		if (filterOnInitially)
+		{
+			UIJob job = new UIJob("Turn on git filter initially") //$NON-NLS-1$
+			{
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					addGitChangedFilesFilter();
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.setPriority(Job.SHORT);
+			job.schedule(300);
+		}
 	}
 
 	protected void doCreateToolbar(Composite toolbarComposite)
@@ -254,11 +276,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			{
 				if (fChangedFilesFilter == null)
 				{
-					fChangedFilesFilter = new GitChangedFilesFilter();
-					getCommonViewer().addFilter(fChangedFilesFilter);
-					getCommonViewer().expandAll();
-					showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH),
-							Messages.GitProjectView_ChangedFilesFilterTooltip);
+					addGitChangedFilesFilter();
 				}
 				else
 				{
@@ -560,6 +578,11 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
 		super.projectChanged(oldProject, newProject);
+		if (fChangedFilesFilter != null)
+		{
+			removeFilter();
+			addGitChangedFilesFilter();
+		}
 		refreshUI(GitRepository.getAttached(newProject));
 	}
 
@@ -681,5 +704,42 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		IProject changed = e.getProject();
 		if (changed != null && changed.equals(selectedProject))
 			refreshUI(null);
+	}
+
+	protected void addGitChangedFilesFilter()
+	{
+		fChangedFilesFilter = new GitChangedFilesFilter();
+		getCommonViewer().addFilter(fChangedFilesFilter);
+		getCommonViewer().expandAll();
+		showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH),
+				Messages.GitProjectView_ChangedFilesFilterTooltip);
+	}
+
+	@Override
+	public void saveState(IMemento aMemento)
+	{
+		aMemento.putInteger(GIT_CHANGED_FILES_FILTER, (fChangedFilesFilter == null) ? 0 : 1);
+		super.saveState(aMemento);
+	}
+
+	/**
+	 * <p>
+	 * Note: This method is for internal use only. Clients should not call this method.
+	 * </p>
+	 * 
+	 * @see org.eclipse.ui.part.ViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
+	 */
+	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
+	{
+		super.init(aSite, aMemento);
+		memento = aMemento;
+		if (memento != null)
+		{
+			Integer gitFilterEnabled = memento.getInteger(GIT_CHANGED_FILES_FILTER);
+			if (gitFilterEnabled != null && gitFilterEnabled.intValue() == 1)
+			{
+				filterOnInitially = true;
+			}
+		}
 	}
 }
