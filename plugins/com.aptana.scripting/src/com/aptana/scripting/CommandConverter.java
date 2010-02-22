@@ -24,13 +24,13 @@ public class CommandConverter
 		String userHome = System.getProperty("user.home");
 		if (args == null || args.length == 0)
 		{
-			args = new String[] { userHome + "/Documents/RadRails Bundles/sass/commands" };
+			args = new String[] { userHome + "/Documents/Aptana Rubles/sass/commands" };
 		}
 
 		String outputFilePath;
 		if (args.length < 2)
 		{
-			outputFilePath = userHome + "/Documents/RadRails Bundles/sass/commands";
+			outputFilePath = userHome + "/Documents/Aptana Rubles/sass/commands";
 		}
 		else
 		{
