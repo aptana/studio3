@@ -360,7 +360,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		@Override
 		public boolean isWordPart(char c)
 		{
-			return isWordStart(c) || Character.isDigit(c);
+			return isWordStart(c) || Character.isDigit(c) || c == '_';
 		}
 
 		@Override
