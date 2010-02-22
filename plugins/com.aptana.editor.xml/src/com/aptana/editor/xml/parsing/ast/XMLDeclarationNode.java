@@ -41,6 +41,44 @@ public class XMLDeclarationNode extends XMLNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj))
+		{
+			return false;
+		}
+		if (!(obj instanceof XMLDeclarationNode))
+		{
+			return false;
+		}
+		XMLDeclarationNode other = (XMLDeclarationNode) obj;
+		if (fVersion == null && other.fVersion != null)
+		{
+			return false;
+		}
+		if (fEncoding == null && other.fEncoding != null)
+		{
+			return false;
+		}
+		if (fStandalone == null && other.fStandalone != null)
+		{
+			return false;
+		}
+		return fVersion.equals(other.fVersion) && fEncoding.equals(other.fEncoding)
+				&& fStandalone.equals(other.fStandalone);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = super.hashCode();
+		hash = 31 * hash + fVersion == null ? 0 : fVersion.hashCode();
+		hash = 31 * hash + fEncoding == null ? 0 : fEncoding.hashCode();
+		hash = 31 * hash + fStandalone == null ? 0 : fStandalone.hashCode();
+		return hash;
+	}
+
+	@Override
 	public String toString()
 	{
 		if (fText == null)

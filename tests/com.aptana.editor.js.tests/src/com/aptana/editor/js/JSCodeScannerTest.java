@@ -215,6 +215,15 @@ public class JSCodeScannerTest extends TestCase
 		// TODO Test all the rest of the lines! (Or at least the "interesting" parts with new token types
 	}
 
+	public void testUnderscoreInIdentifierWithKeyword()
+	{
+		String src = "add_child";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("source.js"), 0, 9);
+	}
+
 	private IToken getToken(String string)
 	{
 		return new Token(string);

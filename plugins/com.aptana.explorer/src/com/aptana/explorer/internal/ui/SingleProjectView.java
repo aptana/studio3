@@ -1,5 +1,8 @@
 package com.aptana.explorer.internal.ui;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -50,6 +53,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -114,6 +118,9 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
+
+	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
+	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -219,7 +226,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.forward"); //$NON-NLS-1$
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.up"); //$NON-NLS-1$
-		
+
 		addProjectResourceListener();
 		IProject project = detectSelectedProject();
 		if (project != null)
@@ -630,6 +637,29 @@ public abstract class SingleProjectView extends CommonNavigator
 					event.height = height;
 					if (width > event.width)
 						event.width = width;
+					// HACK! This is a major hack to force down the height of the row when we resize our font to a
+					// smaller height!
+					if (isMacOSX && isCocoa)
+					{
+						try
+						{
+							Field f = Control.class.getField("view"); //$NON-NLS-1$
+							if (f != null)
+							{
+								Object widget = f.get(tree);
+								if (widget != null)
+								{
+									Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
+									if (m != null)
+										m.invoke(widget, height);
+								}
+							}
+						}
+						catch (Exception e)
+						{
+							CommonEditorPlugin.logError(e);
+						}
+					}
 				}
 			}
 		});
