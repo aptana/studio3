@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -215,6 +216,11 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		createFilterComposite(parent);
 
+		// Remove the navigation actions
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.forward"); //$NON-NLS-1$
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.up"); //$NON-NLS-1$
+		
 		addProjectResourceListener();
 		IProject project = detectSelectedProject();
 		if (project != null)
