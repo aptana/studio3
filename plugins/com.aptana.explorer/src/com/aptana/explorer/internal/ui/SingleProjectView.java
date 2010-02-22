@@ -119,6 +119,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
+	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 
@@ -680,6 +681,35 @@ public abstract class SingleProjectView extends CommonNavigator
 					{
 						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
 						updateViewer(selectedProject); // no structural change
+						if (isWindows)
+						{
+							try
+							{
+								Method m = Tree.class.getDeclaredMethod("setItemHeight", Integer.TYPE); //$NON-NLS-1$
+								if (m != null)
+								{
+									m.setAccessible(true);
+									Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+									if (font == null)
+									{
+										font = JFaceResources.getTextFont();
+									}
+									if (font != null)
+									{
+										GC gc = new GC(Display.getDefault());
+										gc.setFont(font);
+										FontMetrics metrics = gc.getFontMetrics();
+										int height = metrics.getHeight() + 2;
+										m.invoke(tree, height);
+										gc.dispose();
+									}
+								}
+							}
+							catch (Exception e)
+							{
+								CommonEditorPlugin.logError(e);
+							}
+						}
 						tree.redraw();
 						tree.update();
 					}
