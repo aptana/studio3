@@ -80,9 +80,19 @@
 				if (characterWidth === null || characterHeight === null)
 				{
 					var div = document.getElementById(terminalElementID);
+					
+					// save current font-weight and then set to bold
+					var oldWeight = div.style.fontWeight;
+					div.style.fontWeight = "bold";
+					
+					// get div's width and height
 					var divWidth = div.offsetWidth;
 					var divHeight = div.offsetHeight;
 					
+					// restore original font-weight
+					div.style.fontWeight = oldWeight;
+					
+					// calculate average width/height of a character
 					characterWidth = divWidth / terminal.getWidth();
 					characterHeight = divHeight / terminal.getHeight();
 				}
