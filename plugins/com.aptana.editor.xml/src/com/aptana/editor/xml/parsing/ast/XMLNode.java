@@ -22,6 +22,7 @@ public class XMLNode extends ParseBaseNode
 		setChildren(children);
 	}
 
+	@Override
 	public short getType()
 	{
 		return fType;
