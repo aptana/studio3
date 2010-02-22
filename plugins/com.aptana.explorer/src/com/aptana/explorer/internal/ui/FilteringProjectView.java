@@ -100,7 +100,6 @@ public class FilteringProjectView extends GitProjectView
 		super.createPartControl(customComposite);
 
 		patternFilter = new PathFilter();
-		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
 
 		// Add eyeball hover
@@ -545,10 +544,13 @@ public class FilteringProjectView extends GitProjectView
 				if (initial)
 				{
 					patternFilter.setPattern(null);
+					getCommonViewer().removeFilter(patternFilter);
 				}
 				else
 				{
+					getCommonViewer().removeFilter(patternFilter);
 					patternFilter.setPattern(text);
+					getCommonViewer().addFilter(patternFilter);
 				}
 
 				Control redrawFalseControl = getCommonViewer().getControl();
