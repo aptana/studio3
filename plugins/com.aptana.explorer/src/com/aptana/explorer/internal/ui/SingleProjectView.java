@@ -23,6 +23,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.search.ui.NewSearchUI;
@@ -61,6 +63,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -442,6 +445,27 @@ public abstract class SingleProjectView extends CommonNavigator
 		viewer.setLayoutData(gridData);
 
 		super.createPartControl(viewer);
+	}
+
+	/**
+	 * Force us to return the active project as the implicit selection if there' an empty selection. This fixes the
+	 * issue where new file/Flder won't show in right click menu with no selection 9like in a barnd new generic
+	 * project).
+	 */
+	@Override
+	protected CommonViewer createCommonViewerObject(Composite aParent)
+	{
+		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
+		{
+			@Override
+			public ISelection getSelection()
+			{
+				ISelection sel = super.getSelection();
+				if (sel.isEmpty() && selectedProject != null)
+					return new StructuredSelection(selectedProject);
+				return sel;
+			}
+		};
 	}
 
 	@Override
