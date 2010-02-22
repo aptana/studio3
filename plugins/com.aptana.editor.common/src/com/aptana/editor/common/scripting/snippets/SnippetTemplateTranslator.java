@@ -36,7 +36,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 	private static final String REVERSE_TICK_PATTERN_STRING = "`[^`]*`"; //$NON-NLS-1$
 
 	private static final Pattern SNIPPET_VARIABLE_COMMANDS_AND_ESCAPES = Pattern.compile(
-			  "\\`" //$NON-NLS-1$
+			  "\\\\`" //$NON-NLS-1$
 			+ OR
 			+ "\\\\$" //$NON-NLS-1$
 			+ OR
@@ -119,7 +119,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 								buffer.append("("); //$NON-NLS-1$
 								boolean first = true;
 								// We want to split on non-escaped '/'
-								String[] values = defaultValues.split("(?<!\\\\)/");
+								String[] values = defaultValues.split("(?<!\\\\)/"); //$NON-NLS-1$
 								for (String value : values)
 								{
 									if (first)
@@ -130,7 +130,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 									{
 										buffer.append(","); //$NON-NLS-1$
 									}
-									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/") + SINGLE_QUOTE);
+									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/") + SINGLE_QUOTE); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 								buffer.append(")"); //$NON-NLS-1$
 							}
@@ -152,7 +152,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 					Matcher m = NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN.matcher(matched);
 					m.find();
 					String name = m.group(1);
-					// the end caret position avriable
+					// the end caret position variable
 					if (ZERO.equals(name))
 					{
 						buffer.append(CURSOR);
@@ -189,8 +189,11 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 		}
 		// append remaining verbatim text
 		buffer.append(string.substring(complete));
-
-		return buffer.toString();
+		// handle escaped '/' or '\'
+		String result = buffer.toString();
+		result = result.replaceAll("\\\\/", "/"); //$NON-NLS-1$ //$NON-NLS-2$
+		result = result.replaceAll(Pattern.quote("\\\\"), Matcher.quoteReplacement("\\")); //$NON-NLS-1$ //$NON-NLS-2$
+		return result;
 	}
 
 }
