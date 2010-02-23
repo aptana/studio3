@@ -9,27 +9,16 @@ public class AllTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
-		//$JUnit-BEGIN$
-		// Core
-		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.util.tests.AllTests.suite());
-		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		// UI
-		suite.addTest(com.aptana.git.ui.AllTests.suite());
-		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
-//		suite.addTest(com.aptana.editor.text.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.ruby.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
-		//$JUnit-END$
+		// $JUnit-BEGIN$
+		suite.addTest(CoreTests.suite());
+		suite.addTest(UITests.suite());
+		// $JUnit-END$
 		return suite;
 	}
 
-	// Approach using reflection. Necessary if the host plugin (i.e. real plugin, not tests) doesn't have an "Eclipse-ExtensibleAPI: true" entry in MANIFEST.MF
-// public static Test suite() throws ClassNotFoundException {
+	// Approach using reflection. Necessary if the host plugin (i.e. real plugin, not tests) doesn't have an
+	// "Eclipse-ExtensibleAPI: true" entry in MANIFEST.MF
+	// public static Test suite() throws ClassNotFoundException {
 	// TestSuite suite = new TestSuite(
 	// "Master test suite.");
 	//
