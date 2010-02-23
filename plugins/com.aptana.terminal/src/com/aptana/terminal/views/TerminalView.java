@@ -9,11 +9,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -108,6 +110,8 @@ public class TerminalView extends ViewPart
 	
 	private TerminalBrowser browser;
 	private Action openEditor;
+	private Action copy;
+	private Action paste;
 
 	/**
 	 * contributeToActionBars
@@ -160,9 +164,10 @@ public class TerminalView extends ViewPart
 	private void fillContextMenu(IMenuManager manager)
 	{
 		manager.add(openEditor);
-
-		// Other plug-ins can contribute there actions here
-
+		manager.add(new Separator());
+		manager.add(copy);
+		manager.add(paste);
+		
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -251,6 +256,34 @@ public class TerminalView extends ViewPart
 		openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
 		openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
 		openEditor.setImageDescriptor(icon);
+		
+		copy = new Action()
+		{
+			public void run()
+			{
+				// NOTE: TerminalBrowser is doing the equivalent of:
+				// browser.copy();
+				// via a KeyListener
+			}
+		};
+		copy.setText("Copy");
+		copy.setToolTipText("Copy the selected text to the clipboard");
+		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
+		
+		paste = new Action()
+		{
+			public void run()
+			{
+				// NOTE: TerminalBrowser is doing the equivalent of:
+				// browser.paste();
+				// via a KeyListener
+			}
+		};
+		paste.setText("Paste");
+		paste.setToolTipText("Paste clipboard text into the terminal");
+		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
+		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
 	}
 
 	/**
