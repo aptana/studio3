@@ -16,3 +16,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
  com.aptana.terminal.server,
  com.aptana.terminal.views
+Eclipse-ExtensibleAPI: true

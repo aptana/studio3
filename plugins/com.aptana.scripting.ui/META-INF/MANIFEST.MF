@@ -16,3 +16,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.scripting.ui
+Eclipse-ExtensibleAPI: true
