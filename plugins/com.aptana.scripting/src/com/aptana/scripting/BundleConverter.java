@@ -77,7 +77,7 @@ public class BundleConverter
 			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
-		String outputDir = userHome + "/Documents/RadRails Bundles";
+		String outputDir = userHome + "/Documents/Aptana Rubles";
 		if (args.length > 1)
 		{
 			outputDir = args[1];
