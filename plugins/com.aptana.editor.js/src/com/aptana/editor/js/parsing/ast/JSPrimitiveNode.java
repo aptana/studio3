@@ -11,6 +11,11 @@ public class JSPrimitiveNode extends JSNode
 	}
 
 	@Override
+	public String getText() {
+		return fText;
+	}
+
+	@Override
 	public String toString()
 	{
 		return appendSemicolon(fText);
