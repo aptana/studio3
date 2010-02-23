@@ -314,6 +314,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	{
 		// Set prefs for all editors
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
+		
+		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
 
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
@@ -363,6 +365,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setSemanticToken(prefs, theme, "source.java", "typeParameter", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
+		
+		// Java *.properties files
+		setToken(prefs, theme, "keyword.other.java-props", "pf_coloring_key", revertToDefaults);
+		setToken(prefs, theme, "comment.line.number-sign.java-props", "pf_coloring_comment", revertToDefaults);
+		setToken(prefs, theme, "string.java-props", "pf_coloring_value", revertToDefaults);
+		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults);
+		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults);
 
 		try
 		{
@@ -396,6 +405,29 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+	
+	protected void setEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+		}
 
 		try
 		{
