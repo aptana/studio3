@@ -7,8 +7,9 @@
             class="com.aptana.editor.text.TextEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            icon="icons/text.png"
             id="com.aptana.editor.text"
-            name="Text Editor">
+            name="%editor.text.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.text">
          </contentTypeBinding>
