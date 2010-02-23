@@ -154,7 +154,7 @@ public class TerminalBrowser
 				{
 					if (COPY_STROKE.equals(key))
 					{
-						_browser.execute("copy()");
+						copy();
 					}
 					else if (PASTE_STROKE.equals(key))
 					{
@@ -227,6 +227,14 @@ public class TerminalBrowser
 		}
 	}
 
+	/**
+	 * copy
+	 */
+	public void copy()
+	{
+		this._browser.execute("copy()");
+	}
+	
 	/**
 	 * createControl
 	 * 
