@@ -171,6 +171,15 @@
 					1000
 				);
 			}
+			
+			function copy()
+			{
+				var pre = document.getElementById(terminalElementID).getFirstChild();
+				var range = pre.createRange();
+
+				range.execCommand("RemoveFormat");
+				range.execCommand("Copy");
+			}
         </script>
     </head>
     <body onload="init();" onresize="autoSize();">
