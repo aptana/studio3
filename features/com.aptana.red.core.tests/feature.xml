@@ -84,7 +84,7 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-         
+
    <plugin
          id="com.aptana.editor.sass.tests"
          download-size="0"
@@ -97,8 +97,8 @@
          id="com.aptana.scripting.tests"
          download-size="0"
          install-size="0"
-         fragment="true"
-         version="0.0.0"/>
+         version="0.0.0"
+         fragment="true"/>
 
    <plugin
          id="com.aptana.editor.xml.tests"
@@ -107,7 +107,7 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-         
+
    <plugin
          id="com.aptana.git.core.tests"
          download-size="0"
@@ -122,4 +122,12 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
+
+   <plugin
+         id="com.aptana.red.core.tests.all"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

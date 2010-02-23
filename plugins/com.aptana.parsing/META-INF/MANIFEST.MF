@@ -21,3 +21,4 @@ Export-Package: beaver,
  com.aptana.parsing.lexer
 Bundle-ClassPath: libs/beaver.jar,
  .
+Eclipse-ExtensibleAPI: true

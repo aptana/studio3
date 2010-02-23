@@ -197,49 +197,9 @@
 
 		<property name="library-file" value="${baseLocation}/test-framework/eclipse/plugins/org.eclipse.test_3.2.0/library.xml" />
 		<!-- Run the tests. -->
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.util.tests" />
-			<param name="test.classname" value="com.aptana.util.tests.AllTests" />
-		</antcall>
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.scripting.tests" />
-			<param name="test.classname" value="com.aptana.scripting.tests.AllTests" />
-		</antcall>
-		<antcall target="run-core-test">
-			<param name="test.plugin" value="com.aptana.git.core.tests" />
-			<param name="test.classname" value="com.aptana.git.core.tests.AllTests" />
-		</antcall>
 		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.common.tests" />
-			<param name="test.classname" value="com.aptana.editor.common.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.ruby.tests" />
-			<param name="test.classname" value="com.aptana.editor.ruby.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.js.tests" />
-			<param name="test.classname" value="com.aptana.editor.js.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.css.tests" />
-			<param name="test.classname" value="com.aptana.editor.css.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.html.tests" />
-			<param name="test.classname" value="com.aptana.editor.html.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.xml.tests" />
-			<param name="test.classname" value="com.aptana.editor.xml.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.editor.sass.tests" />
-			<param name="test.classname" value="com.aptana.editor.sass.tests.AllTests" />
-		</antcall>
-		<antcall target="run-ui-test">
-			<param name="test.plugin" value="com.aptana.git.ui.tests" />
-			<param name="test.classname" value="com.aptana.git.ui.AllTests" />
+			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
+			<param name="test.classname" value="com.aptana.red.core.tests.all.AllTests" />
 		</antcall>
 
 		<!-- Collect all test results into single file and move to results directory. -->
