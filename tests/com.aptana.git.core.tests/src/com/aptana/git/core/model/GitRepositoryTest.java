@@ -346,9 +346,10 @@ public class GitRepositoryTest extends TestCase
 		IStatus status = fRepo.deleteBranch("my_new_branch");
 		assertFalse(status.isOK());
 		assertEquals(1, status.getCode());
-		assertEquals(
-				"error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
-				status.getMessage());
+		// Can't rely on the unmerged failure message from git to remain the same across versions.
+//		assertEquals(
+//				"error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
+//				status.getMessage());
 	}
 
 	protected IPath repoToGenerate()
