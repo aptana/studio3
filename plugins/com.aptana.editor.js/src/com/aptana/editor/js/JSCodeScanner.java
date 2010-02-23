@@ -255,6 +255,9 @@ public class JSCodeScanner extends RuleBasedScanner
 		rules.add(new RegexpRule("\\b((0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?))\\b", //$NON-NLS-1$
 				createToken("constant.numeric.js"))); //$NON-NLS-1$
 
+		// identifiers
+		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken("source.js"), true)); //$NON-NLS-1$ //$NON-NLS-2$
+
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
@@ -360,7 +363,7 @@ public class JSCodeScanner extends RuleBasedScanner
 		@Override
 		public boolean isWordPart(char c)
 		{
-			return isWordStart(c) || Character.isDigit(c) || c == '_';
+			return isWordStart(c) || Character.isDigit(c) || c == '_' || c == '$';
 		}
 
 		@Override
