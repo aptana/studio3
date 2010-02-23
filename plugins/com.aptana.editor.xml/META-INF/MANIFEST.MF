@@ -16,3 +16,4 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.editor.xml
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy
+Eclipse-ExtensibleAPI: true
