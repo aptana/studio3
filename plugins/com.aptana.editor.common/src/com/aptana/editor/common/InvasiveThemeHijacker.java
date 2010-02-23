@@ -316,6 +316,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+		
+		// Ant
+		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
+		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
+		setAntEditorValues(theme, antPrefs, revertToDefaults);
 
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
@@ -427,6 +432,37 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+		}
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+	
+	protected void setAntEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("org.eclipse.ant.ui.commentsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.processingInstructionsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.constantStringsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.textColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.tagsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.dtdColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			setToken(prefs, theme, "comment.block.xml.ant", "org.eclipse.ant.ui.commentsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.processingInstructionsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "string.quoted.double.xml.ant", "org.eclipse.ant.ui.constantStringsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "text.xml.ant", "org.eclipse.ant.ui.textColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "entity.name.tag.target.xml.ant", "org.eclipse.ant.ui.tagsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.dtdColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		try
