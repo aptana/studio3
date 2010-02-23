@@ -44,7 +44,16 @@ public class CSSCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
-	
+
+	public void testIdentifierWithKeyword()
+	{
+		String src = "table-row-group";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("source.css"), 0, 15);
+	}
+
 	public void testBrowserSpecificPropertyNames()
 	{
 		String src = "-moz-border-radius: 4px\n" +

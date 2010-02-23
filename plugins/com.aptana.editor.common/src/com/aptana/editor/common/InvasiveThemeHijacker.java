@@ -40,6 +40,8 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
 import org.eclipse.ui.views.properties.PropertySheet;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -158,16 +160,20 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			try
+			Bundle b = Platform.getBundle("org.eclipse.ui.ide");
+			if (b.getVersion().compareTo(Version.parseVersion("3.6.0")) >= 0)
 			{
-				Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
-				m.setAccessible(true);
-				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree(), revertToDefaults);
-			}
-			catch (Exception e)
-			{
-				// ignore
+				try
+				{
+					Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
+					m.setAccessible(true);
+					TreeViewer treeViewer = (TreeViewer) m.invoke(view);
+					hookTheme(treeViewer.getTree(), revertToDefaults);
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
 			}
 			return;
 		}

@@ -1,5 +1,8 @@
 package com.aptana.explorer.internal.ui;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -23,6 +26,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.search.ui.NewSearchUI;
@@ -48,6 +53,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -61,6 +67,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -111,6 +118,10 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
+
+	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
+	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
+	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -211,6 +222,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		createNavigator(parent);
 
 		createFilterComposite(parent);
+
+		// Remove the navigation actions
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.forward"); //$NON-NLS-1$
+		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.up"); //$NON-NLS-1$
 
 		addProjectResourceListener();
 		IProject project = detectSelectedProject();
@@ -444,6 +460,27 @@ public abstract class SingleProjectView extends CommonNavigator
 		super.createPartControl(viewer);
 	}
 
+	/**
+	 * Force us to return the active project as the implicit selection if there' an empty selection. This fixes the
+	 * issue where new file/Flder won't show in right click menu with no selection 9like in a barnd new generic
+	 * project).
+	 */
+	@Override
+	protected CommonViewer createCommonViewerObject(Composite aParent)
+	{
+		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
+		{
+			@Override
+			public ISelection getSelection()
+			{
+				ISelection sel = super.getSelection();
+				if (sel.isEmpty() && selectedProject != null)
+					return new StructuredSelection(selectedProject);
+				return sel;
+			}
+		};
+	}
+
 	@Override
 	protected Object getInitialInput()
 	{
@@ -601,6 +638,29 @@ public abstract class SingleProjectView extends CommonNavigator
 					event.height = height;
 					if (width > event.width)
 						event.width = width;
+					// HACK! This is a major hack to force down the height of the row when we resize our font to a
+					// smaller height!
+					if (isMacOSX && isCocoa)
+					{
+						try
+						{
+							Field f = Control.class.getField("view"); //$NON-NLS-1$
+							if (f != null)
+							{
+								Object widget = f.get(tree);
+								if (widget != null)
+								{
+									Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
+									if (m != null)
+										m.invoke(widget, height);
+								}
+							}
+						}
+						catch (Exception e)
+						{
+							CommonEditorPlugin.logError(e);
+						}
+					}
 				}
 			}
 		});
@@ -621,6 +681,35 @@ public abstract class SingleProjectView extends CommonNavigator
 					{
 						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
 						updateViewer(selectedProject); // no structural change
+						if (isWindows)
+						{
+							try
+							{
+								Method m = Tree.class.getDeclaredMethod("setItemHeight", Integer.TYPE); //$NON-NLS-1$
+								if (m != null)
+								{
+									m.setAccessible(true);
+									Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+									if (font == null)
+									{
+										font = JFaceResources.getTextFont();
+									}
+									if (font != null)
+									{
+										GC gc = new GC(Display.getDefault());
+										gc.setFont(font);
+										FontMetrics metrics = gc.getFontMetrics();
+										int height = metrics.getHeight() + 2;
+										m.invoke(tree, height);
+										gc.dispose();
+									}
+								}
+							}
+							catch (Exception e)
+							{
+								CommonEditorPlugin.logError(e);
+							}
+						}
 						tree.redraw();
 						tree.update();
 					}
