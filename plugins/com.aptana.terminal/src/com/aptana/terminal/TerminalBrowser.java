@@ -43,8 +43,8 @@ public class TerminalBrowser
 	private static final String TERMINAL_URL = "http://{0}:{1}/webterm/"; //$NON-NLS-1$
 	private static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont"; //$NON-NLS-1$
 
-	private static KeyStroke COPY_STROKE;
-	private static KeyStroke PASTE_STROKE;
+	public static KeyStroke COPY_STROKE;
+	public static KeyStroke PASTE_STROKE;
 
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
