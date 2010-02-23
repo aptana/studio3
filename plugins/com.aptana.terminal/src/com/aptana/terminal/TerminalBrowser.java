@@ -219,6 +219,7 @@ public class TerminalBrowser
 		if (this._browser != null)
 		{
 			this._browser.setFocus();
+			this._browser.execute("window.focus();");
 		}
 	}
 

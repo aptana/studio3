@@ -16,3 +16,4 @@ Bundle-ClassPath: lib/cglib-nodep-2.1_3.jar,
  lib/jmock-legacy-2.5.1.jar,
  lib/objenesis-1.0.jar,
  .
+Export-Package: com.aptana.util.tests

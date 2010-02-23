@@ -68,5 +68,39 @@
             class="com.aptana.terminal.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.terminal.actionSet"
+            label="%showTerminalEditorActionSet.label"
+            visible="false">
+         <action
+               class="com.aptana.terminal.editor.ShowTerminalEditorAction"
+               icon="icons/terminal.png"
+               id="com.aptana.terminal.ShowTerminalEditorAction"
+               label="%showTerminalEditorAction.label"
+               menubarPath="window/showView/additions"
+               style="push">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.radrails.rails.ui.PerspectiveRails">
+         <actionSet
+               id="com.aptana.terminal.actionSet">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.debug.ui.DebugPerspective">
+         <actionSet
+               id="com.aptana.terminal.actionSet">
+         </actionSet>
+      </perspectiveExtension>
+   </extension>
 
 </plugin>
