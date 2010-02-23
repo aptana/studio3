@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.aptana.red.core"
-      label="RED Core"
+      label="%featureName"
       version="1.0.0.qualifier"
-      provider-name="Aptana, Inc.">
+      provider-name="%providerName">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]

@@ -14,7 +14,11 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -67,7 +71,9 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -479,6 +485,30 @@ public abstract class SingleProjectView extends CommonNavigator
 				return sel;
 			}
 		};
+	}
+
+	@Override
+	protected CommonNavigatorManager createCommonManager()
+	{
+		// HACK! This is to fix behavior that Eclipse bakes into CommonNavigatorManager.UpdateActionBarsJob where it
+		// forces the selection context for actions tied to the view to the view's input *even if it already has a
+		// perfectly fine and valid selection!* This forces the selection again in a delayed job which hopefully runs
+		// right after their %^$&^$!! job.
+		final CommonNavigatorManager navManager = super.createCommonManager();
+		UIJob job = new UIJob(getTitle())
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				getCommonViewer().setSelection(getCommonViewer().getSelection());
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.setPriority(Job.BUILD);
+		job.schedule(250);
+		return navManager;
 	}
 
 	@Override
