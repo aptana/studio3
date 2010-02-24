@@ -48,7 +48,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs;
-	
+
 	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
@@ -197,19 +197,29 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
+
 				char c = before.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel--;
+					}
 				}
 			}
 
@@ -219,26 +229,34 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				char c = after.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
-					if (stackLevel < 0)
-						return true;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel--;
+						if (stackLevel < 0)
+							return true;
+					}
 				}
 			}
 			return stackLevel != 0;
 		}
 		catch (BadLocationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// ignore
 		}
 		return false;
 	}
@@ -272,6 +290,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
+			if (fgCommentSelector.matches(getScopeAtOffset(document, beginning + index)))
+				continue;
 			open = !open;
 			if (open)
 			{
