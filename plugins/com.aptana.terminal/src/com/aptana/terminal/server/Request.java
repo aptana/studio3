@@ -103,6 +103,8 @@ public class Request
 		catch (IOException e)
 		{
 			Activator.logError(Messages.Request_Request_Processing_Error, e);
+			
+			result = null;
 		}
 		
 		return result;
