@@ -46,45 +46,21 @@ public class PeerCharacterCloserTest extends TestCase
 		super.tearDown();
 	}
 
-	protected IDocument setDocument(String src)
-	{
-		document = new Document(src);
-		viewer.setDocument(document);
-		return document;
-	}
-
 	public void testDoesntDoubleEndingUnclosedPair()
 	{
 		setDocument("\" ");
-		Event e = new Event();
-		e.character = '"';
-		e.start = 0;
-		e.end = 0;
-		e.keyCode = 39;
-		e.doit = true;
-		e.stateMask = 131072;
-		e.widget = viewer.getTextWidget();
-		VerifyEvent event = new VerifyEvent(e);
-		closer.verifyKey(event);
+		VerifyEvent event = sendEvent('"');
 
 		// This looks kind of wrong here because the doc should really be '"" ', but since we're hacking the event
 		// mechanism we're not really sending a keystroke here.
+		assertTrue(event.doit); // don't interfere
 		assertEquals("\" ", document.get());
 	}
 
 	public void testAutoClosePair()
 	{
 		setDocument(" ");
-		Event e = new Event();
-		e.character = '"';
-		e.start = 0;
-		e.end = 0;
-		e.keyCode = 39;
-		e.doit = true;
-		e.stateMask = 131072;
-		e.widget = viewer.getTextWidget();
-		VerifyEvent event = new VerifyEvent(e);
-		closer.verifyKey(event);
+		VerifyEvent event = sendEvent('"');
 
 		assertFalse(event.doit);
 		assertEquals("\"\" ", document.get());
@@ -93,16 +69,7 @@ public class PeerCharacterCloserTest extends TestCase
 	public void testDontCloseWhenSimpleUnopenedPairCloseCharFollows()
 	{
 		setDocument(" ) ");
-		Event e = new Event();
-		e.character = '(';
-		e.start = 0;
-		e.end = 0;
-		e.keyCode = 39;
-		e.doit = true;
-		e.stateMask = 131072;
-		e.widget = viewer.getTextWidget();
-		VerifyEvent event = new VerifyEvent(e);
-		closer.verifyKey(event);
+		VerifyEvent event = sendEvent('(');
 
 		assertTrue(event.doit); // don't interfere
 	}
@@ -110,16 +77,7 @@ public class PeerCharacterCloserTest extends TestCase
 	public void testDontCloseWhenUnOpenedPairFollows()
 	{
 		setDocument(" ()) ");
-		Event e = new Event();
-		e.character = '(';
-		e.start = 0;
-		e.end = 0;
-		e.keyCode = 39;
-		e.doit = true;
-		e.stateMask = 131072;
-		e.widget = viewer.getTextWidget();
-		VerifyEvent event = new VerifyEvent(e);
-		closer.verifyKey(event);
+		VerifyEvent event = sendEvent('(');
 
 		assertTrue(event.doit); // don't interfere
 	}
@@ -128,16 +86,7 @@ public class PeerCharacterCloserTest extends TestCase
 	{
 		setDocument("selected ");
 		viewer.setSelectedRange(0, 8);
-		Event e = new Event();
-		e.character = '"';
-		e.start = 0;
-		e.end = 0;
-		e.keyCode = 39;
-		e.doit = true;
-		e.stateMask = 131072;
-		e.widget = viewer.getTextWidget();
-		VerifyEvent event = new VerifyEvent(e);
-		closer.verifyKey(event);
+		VerifyEvent event = sendEvent('"');
 
 		assertFalse(event.doit);
 		assertEquals("\"selected\" ", document.get());
@@ -173,17 +122,70 @@ public class PeerCharacterCloserTest extends TestCase
 				return "source.js comment.block";
 			}
 		};
+		VerifyEvent event = sendEvent('(');
+
+		assertTrue(event.doit); // don't interfere
+	}
+
+	public void testDontCountCharsInTrailingCommentsForDeterminingPairBalance()
+	{
+		setDocument("\n // )");
+		viewer.setSelectedRange(0, 0);
+		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		{
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if (offset >= 2)
+					return "source.js comment.block";
+				return "source.js";
+			}
+		};
+		VerifyEvent event = sendEvent('(');
+
+		assertFalse(event.doit);
+		assertEquals("()\n // )", document.get());
+	}
+
+	public void testDontCountCharsInPrecedingCommentsForDeterminingPairBalance()
+	{
+		setDocument("// '\n ");
+		viewer.setSelectedRange(5, 0);
+		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		{
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if (offset <= 4)
+					return "source.js comment.block";
+				return "source.js";
+			}
+		};
+		VerifyEvent event = sendEvent('\'');
+
+		assertFalse(event.doit);
+		assertEquals("// '\n'' ", document.get());
+	}
+
+	protected IDocument setDocument(String src)
+	{
+		document = new Document(src);
+		viewer.setDocument(document);
+		return document;
+	}
+
+	protected VerifyEvent sendEvent(char c)
+	{
 		Event e = new Event();
-		e.character = '(';
+		e.character = c;
 		e.start = 0;
 		e.end = 0;
-		e.keyCode = 39;
+		e.keyCode = c;
 		e.doit = true;
 		e.stateMask = 131072;
 		e.widget = viewer.getTextWidget();
 		VerifyEvent event = new VerifyEvent(e);
 		closer.verifyKey(event);
-
-		assertTrue(event.doit); // don't interfere
+		return event;
 	}
 }
