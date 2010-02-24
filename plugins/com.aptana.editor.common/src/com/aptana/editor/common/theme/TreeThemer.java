@@ -149,29 +149,6 @@ public class TreeThemer
 					event.height = height;
 					if (width > event.width)
 						event.width = width;
-					// HACK! This is a major hack to force down the height of the row when we resize our font to a
-					// smaller height!
-					if (isMacOSX && isCocoa)
-					{
-						try
-						{
-							Field f = Control.class.getField("view"); //$NON-NLS-1$
-							if (f != null)
-							{
-								Object widget = f.get(tree);
-								if (widget != null)
-								{
-									Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
-									if (m != null)
-										m.invoke(widget, height);
-								}
-							}
-						}
-						catch (Exception e)
-						{
-							CommonEditorPlugin.logError(e);
-						}
-					}
 				}
 			}
 		};
@@ -203,6 +180,13 @@ public class TreeThemer
 						if (font != null)
 						{
 							tree.setFont(font);
+
+							GC gc = new GC(Display.getDefault());
+							gc.setFont(font);
+							FontMetrics metrics = gc.getFontMetrics();
+							int height = metrics.getHeight() + 2;
+							gc.dispose();
+
 							if (isWindows)
 							{
 								try
@@ -211,13 +195,31 @@ public class TreeThemer
 									if (m != null)
 									{
 										m.setAccessible(true);
-
-										GC gc = new GC(Display.getDefault());
-										gc.setFont(font);
-										FontMetrics metrics = gc.getFontMetrics();
-										int height = metrics.getHeight() + 2;
 										m.invoke(tree, height);
-										gc.dispose();
+									}
+								}
+								catch (Exception e)
+								{
+									CommonEditorPlugin.logError(e);
+								}
+							}
+							// HACK! This is a major hack to force down the height of the row when we resize our font to
+							// a
+							// smaller height!
+							else if (isMacOSX && isCocoa)
+							{
+								try
+								{
+									Field f = Control.class.getField("view"); //$NON-NLS-1$
+									if (f != null)
+									{
+										Object widget = f.get(tree);
+										if (widget != null)
+										{
+											Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
+											if (m != null)
+												m.invoke(widget, height);
+										}
 									}
 								}
 								catch (Exception e)
