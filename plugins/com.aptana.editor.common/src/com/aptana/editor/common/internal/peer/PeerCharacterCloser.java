@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.ScopeSelector;
 
 /**
  * A class that can be installed on a ITextViewer and will auto-insert the closing peer character for typical paired
@@ -47,6 +48,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs;
+	
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
 	{
@@ -79,6 +82,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 		try
 		{
+
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+			if (fgCommentSelector.matches(scope))
+			{
+				return;
+			}
+
 			if (length > 0)
 			{
 				wrapSelection(event, document, offset, length);
