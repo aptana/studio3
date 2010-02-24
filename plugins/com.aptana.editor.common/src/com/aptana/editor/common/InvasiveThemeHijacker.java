@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -24,6 +25,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
@@ -144,6 +146,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			hijackView(ref.getView(false), revertToDefaults);
 		}
+		IEditorReference[] editorRefs = window.getActivePage().getEditorReferences();
+		for (IEditorReference ref : editorRefs)
+		{
+			hijackEditor(ref.getEditor(false), revertToDefaults);
+		}
 	}
 
 	@SuppressWarnings({ "nls" })
@@ -246,6 +253,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void hookTheme(Control tree, boolean revert)
 	{
+		// TODO Use TreeThemer?
 		if (revert)
 		{
 			tree.setBackground(null);
@@ -315,6 +323,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		// Set prefs for all editors
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 
+		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+
+		// Ant
+		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
+		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
+		setAntEditorValues(theme, antPrefs, revertToDefaults);
+
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
@@ -364,6 +379,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
 
+		// Java *.properties files
+		setToken(prefs, theme, "keyword.other.java-props", "pf_coloring_key", revertToDefaults);
+		setToken(prefs, theme, "comment.line.number-sign.java-props", "pf_coloring_comment", revertToDefaults);
+		setToken(prefs, theme, "string.java-props", "pf_coloring_value", revertToDefaults);
+		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults);
+		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults);
+
 		try
 		{
 			prefs.flush();
@@ -396,6 +418,62 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+		}
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setAntEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("org.eclipse.ant.ui.commentsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.processingInstructionsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.constantStringsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.textColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.tagsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.dtdColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			setToken(prefs, theme, "comment.block.xml.ant", "org.eclipse.ant.ui.commentsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme,
+					"meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.processingInstructionsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme,
+					"string.quoted.double.xml.ant", "org.eclipse.ant.ui.constantStringsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "text.xml.ant", "org.eclipse.ant.ui.textColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "entity.name.tag.target.xml.ant", "org.eclipse.ant.ui.tagsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.dtdColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		try
 		{
@@ -478,10 +556,54 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
+	protected void overrideSelectionColor(AbstractTextEditor editor)
+	{
+		if (editor instanceof AbstractThemeableEditor) // we already handle our own editors
+			return;
+
+		ISourceViewer sourceViewer = null;
+		try
+		{
+			Method m = AbstractTextEditor.class.getDeclaredMethod("getSourceViewer"); //$NON-NLS-1$
+			m.setAccessible(true);
+			sourceViewer = (ISourceViewer) m.invoke(editor);
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		if (sourceViewer == null || sourceViewer.getTextWidget() == null)
+			return;
+
+		// Force selection color
+		sourceViewer.getTextWidget().setSelectionBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
+		if (!Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			// Linux and windows need selection fg set or we just see a block of color.
+			sourceViewer.getTextWidget().setSelectionForeground(
+					CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getForeground()));
+		}
+	}
+
+	protected void hijackEditor(IEditorPart part, boolean revertToDefaults)
+	{
+		if (part instanceof AbstractTextEditor)
+		{
+			overrideSelectionColor((AbstractTextEditor) part);
+		}
+	}
+
 	// IPartListener
 	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
+		if (part instanceof IEditorPart)
+		{
+			hijackEditor((IEditorPart) part, false);
+			return;
+		}
+
 		if (!(part instanceof IViewPart))
 			return;
 

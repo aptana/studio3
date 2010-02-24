@@ -1908,6 +1908,7 @@ var ESC=String.fromCharCode(27);
 var CSI=ESC+"[";
 this._keyHandler.addKeys(CSI+[8,this._height,this._width].join(";")+"t");
 }
+this.refresh();
 }
 };
 Term.prototype.setTitle=function(_13b){

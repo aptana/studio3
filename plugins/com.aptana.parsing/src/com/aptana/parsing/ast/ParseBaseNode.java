@@ -124,7 +124,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	@Override
 	public String getText()
 	{
-		return toString();
+		return ""; //$NON-NLS-1$
 	}
 
 	@Override

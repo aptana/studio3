@@ -288,7 +288,7 @@ public class TerminalServerWorker implements Runnable
 				try
 				{
 					Request request = Request.fromInputStream(this._clientSocket.getInputStream());
-					String method = request.getMethod();
+					String method = (request != null) ? request.getMethod() : null;
 
 					if ("GET".equals(method)) //$NON-NLS-1$
 					{
