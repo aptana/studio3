@@ -1,11 +1,21 @@
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableEditor;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
@@ -19,6 +29,8 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalBrowser _browser;
+	private Action copy;
+	private Action paste;
 
 	/*
 	 * (non-Javadoc)
@@ -37,6 +49,9 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
+		
+		makeActions();
+		hookContextMenu();
 	}
 
 	/*
@@ -73,6 +88,41 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	{
 	}
 
+	/**
+	 * fillContextMenu
+	 * 
+	 * @param manager
+	 */
+	private void fillContextMenu(IMenuManager manager)
+	{
+		manager.add(copy);
+		manager.add(paste);
+		
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+	
+	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu()
+	{
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener()
+		{
+			public void menuAboutToShow(IMenuManager manager)
+			{
+				fillContextMenu(manager);
+			}
+		});
+
+		Control browserControl = _browser.getControl();
+		Menu menu = menuMgr.createContextMenu(browserControl);
+		browserControl.setMenu(menu);
+		// getSite().registerContextMenu(menuMgr, viewer);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
@@ -107,6 +157,38 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 		return false;
 	}
 
+	/**
+	 * makeActions
+	 */
+	private void makeActions()
+	{
+		// copy action
+		copy = new Action()
+		{
+			public void run()
+			{
+				_browser.copy();
+			}
+		};
+		copy.setText("Copy");
+		copy.setToolTipText("Copy the selected text to the clipboard");
+		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
+		
+		// paste action
+		paste = new Action()
+		{
+			public void run()
+			{
+				_browser.paste();
+			}
+		};
+		paste.setText("Paste");
+		paste.setToolTipText("Paste clipboard text into the terminal");
+		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
+		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
