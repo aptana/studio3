@@ -10,9 +10,12 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
@@ -42,7 +45,7 @@ public class TerminalView extends ViewPart
 	private static String pullStartingDirectory()
 	{
 		String result = null;
-		
+
 		synchronized (startDirectories)
 		{
 			if (startDirectories.isEmpty() == false)
@@ -66,7 +69,7 @@ public class TerminalView extends ViewPart
 			startDirectories.add(startingDirectory);
 		}
 	}
-	
+
 	/**
 	 * @param id
 	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
@@ -79,16 +82,16 @@ public class TerminalView extends ViewPart
 	public static TerminalView open(String id, String title, String workingDirectory)
 	{
 		TerminalView term = null;
-		
+
 		try
 		{
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			
+
 			if (workingDirectory != null)
 			{
 				pushStartingDirectory(workingDirectory);
 			}
-			
+
 			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
 		}
 		catch (IllegalStateException e)
@@ -99,15 +102,15 @@ public class TerminalView extends ViewPart
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
 		if (term != null)
 		{
 			term.setPartName(title);
 		}
-		
+
 		return term;
 	}
-	
+
 	private TerminalBrowser browser;
 	private Action openEditor;
 	private Action copy;
@@ -163,11 +166,32 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
+		// set copy enabled state
+		copy.setEnabled(this.browser.hasSelection());
+
+		// set paste enabled state
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		Clipboard clipboard = new Clipboard(display);
+		TransferData[] available = clipboard.getAvailableTypes();
+		boolean enabled = false;
+		
+		for (int i = 0; i < available.length; i++)
+		{
+			if (TextTransfer.getInstance().isSupportedType(available[i]))
+			{
+				enabled = true;
+				break;
+			}
+		}
+		
+		paste.setEnabled(enabled);
+
+		// add menus
 		manager.add(openEditor);
 		manager.add(new Separator());
 		manager.add(copy);
 		manager.add(paste);
-		
+
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -244,8 +268,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void makeActions()
 	{
-		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png"); //$NON-NLS-1$
-
+		// open editor action
 		openEditor = new Action()
 		{
 			public void run()
@@ -255,34 +278,34 @@ public class TerminalView extends ViewPart
 		};
 		openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
 		openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
-		openEditor.setImageDescriptor(icon);
-		
+		openEditor.setImageDescriptor(Activator.getImageDescriptor("/icons/terminal.png")); //$NON-NLS-1$
+
+		// copy action
 		copy = new Action()
 		{
 			public void run()
 			{
-				// NOTE: TerminalBrowser is doing the equivalent of:
-				// browser.copy();
-				// via a KeyListener
+				browser.copy();
 			}
 		};
 		copy.setText("Copy");
 		copy.setToolTipText("Copy the selected text to the clipboard");
-		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+				ISharedImages.IMG_TOOL_COPY));
 		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
-		
+
+		// paste action
 		paste = new Action()
 		{
 			public void run()
 			{
-				// NOTE: TerminalBrowser is doing the equivalent of:
-				// browser.paste();
-				// via a KeyListener
+				browser.paste();
 			}
 		};
 		paste.setText("Paste");
 		paste.setToolTipText("Paste clipboard text into the terminal");
-		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
+		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+				ISharedImages.IMG_TOOL_PASTE));
 		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
 	}
 
