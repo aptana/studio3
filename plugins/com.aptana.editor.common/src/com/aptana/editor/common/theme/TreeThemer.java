@@ -45,6 +45,8 @@ public class TreeThemer
 	private TreeViewer treeViewer;
 	private IPropertyChangeListener fontListener;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private Listener measureItemListener;
+	private Listener selectionOverride;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -60,7 +62,7 @@ public class TreeThemer
 		addSelectionColorOverride();
 		addMeasureItemListener();
 		addFontListener();
-		listenForThemeChanges();
+		addThemeChangeListener();
 		overrideLabelProvider();
 	}
 
@@ -95,11 +97,11 @@ public class TreeThemer
 		});
 	}
 
-	protected void addSelectionColorOverride()
+	private void addSelectionColorOverride()
 	{
 		final Tree tree = treeViewer.getTree();
 		// Override selection color to match what is set in theme
-		tree.addListener(SWT.EraseItem, new Listener()
+		selectionOverride = new Listener()
 		{
 			public void handleEvent(Event event)
 			{
@@ -120,14 +122,15 @@ public class TreeThemer
 					event.detail &= ~SWT.BACKGROUND;
 				}
 			}
-		});
+		};
+		tree.addListener(SWT.EraseItem, selectionOverride);
 	}
 
-	protected void addMeasureItemListener()
+	private void addMeasureItemListener()
 	{
 		final Tree tree = treeViewer.getTree();
 		// Hack to force a specific row height and width based on font
-		tree.addListener(SWT.MeasureItem, new Listener()
+		measureItemListener = new Listener()
 		{
 			public void handleEvent(Event event)
 			{
@@ -171,10 +174,11 @@ public class TreeThemer
 					}
 				}
 			}
-		});
+		};
+		tree.addListener(SWT.MeasureItem, measureItemListener);
 	}
 
-	protected void addFontListener()
+	private void addFontListener()
 	{
 		final Tree tree = treeViewer.getTree();
 		fontListener = new IPropertyChangeListener()
@@ -191,23 +195,23 @@ public class TreeThemer
 					@Override
 					public void run()
 					{
-						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
-						treeViewer.refresh();
-						if (isWindows)
+						Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+						if (font == null)
 						{
-							try
+							font = JFaceResources.getTextFont();
+						}
+						if (font != null)
+						{
+							tree.setFont(font);
+							if (isWindows)
 							{
-								Method m = Tree.class.getDeclaredMethod("setItemHeight", Integer.TYPE); //$NON-NLS-1$
-								if (m != null)
+								try
 								{
-									m.setAccessible(true);
-									Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-									if (font == null)
+									Method m = Tree.class.getDeclaredMethod("setItemHeight", Integer.TYPE); //$NON-NLS-1$
+									if (m != null)
 									{
-										font = JFaceResources.getTextFont();
-									}
-									if (font != null)
-									{
+										m.setAccessible(true);
+
 										GC gc = new GC(Display.getDefault());
 										gc.setFont(font);
 										FontMetrics metrics = gc.getFontMetrics();
@@ -216,12 +220,14 @@ public class TreeThemer
 										gc.dispose();
 									}
 								}
-							}
-							catch (Exception e)
-							{
-								CommonEditorPlugin.logError(e);
+								catch (Exception e)
+								{
+									CommonEditorPlugin.logError(e);
+								}
 							}
 						}
+						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree
+						treeViewer.refresh();
 						tree.redraw();
 						tree.update();
 					}
@@ -232,7 +238,7 @@ public class TreeThemer
 		JFaceResources.getFontRegistry().addListener(fontListener);
 	}
 
-	private void listenForThemeChanges()
+	private void addThemeChangeListener()
 	{
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
@@ -242,10 +248,10 @@ public class TreeThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					treeViewer.refresh();
 					treeViewer.getTree().setBackground(
 							CommonEditorPlugin.getDefault().getColorManager().getColor(
 									getThemeManager().getCurrentTheme().getBackground()));
+					treeViewer.refresh();
 				}
 			}
 		};
@@ -254,11 +260,36 @@ public class TreeThemer
 
 	public void dispose()
 	{
+		removeSelectionOverride();
+		removeMeasureItemListener();
 		removeFontListener();
 		removeThemeListener();
 	}
 
-	protected void removeFontListener()
+	private void removeSelectionOverride()
+	{
+		if (selectionOverride != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.EraseItem, selectionOverride);
+		}
+		selectionOverride = null;
+	}
+
+	private void removeMeasureItemListener()
+	{
+		if (measureItemListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.MeasureItem, measureItemListener);
+		}
+		measureItemListener = null;
+	}
+
+	private Tree getTree()
+	{
+		return treeViewer.getTree();
+	}
+
+	private void removeFontListener()
 	{
 		if (fontListener != null)
 			JFaceResources.getFontRegistry().removeListener(fontListener);
@@ -275,7 +306,7 @@ public class TreeThemer
 		}
 	}
 
-	protected static IThemeManager getThemeManager()
+	protected IThemeManager getThemeManager()
 	{
 		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
