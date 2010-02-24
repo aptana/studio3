@@ -52,6 +52,9 @@ div.webterm pre span.b5 {  background-color: rgb({ansi.magenta}); }
 div.webterm pre span.b6 {  background-color: rgb({ansi.cyan}); }
 div.webterm pre span.b7 {  background-color: rgb({ansi.white}); }
 
+/* selection color */
+div.webterm pre span.bs { background-color: rgb({selection}); }
+
 /* text styles */
 div.webterm pre span.b  { font-weight: bolder           }
 div.webterm pre span.i  { font-style: italic            }
