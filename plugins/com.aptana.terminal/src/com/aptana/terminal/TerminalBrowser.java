@@ -20,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -232,7 +233,27 @@ public class TerminalBrowser
 	 */
 	public void copy()
 	{
-		this._browser.execute("copy()");
+		final Object result = this._browser.evaluate("return copy();");
+		
+		// only copy when we have text
+		if (result != null && result instanceof String && ((String) result).length() > 0)
+		{
+			UIJob job = new UIJob("Copy from Terminal")
+			{
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					Display display = PlatformUI.getWorkbench().getDisplay();
+					Clipboard clipboard = new Clipboard(display);
+					
+					clipboard.setContents(new Object[] { result }, new Transfer[] { TextTransfer.getInstance() });
+	
+					return Status.OK_STATUS;
+				}
+			};
+			job.setSystem(true);
+			job.setPriority(Job.INTERACTIVE);
+			job.schedule();
+		}
 	}
 	
 	/**
@@ -316,6 +337,24 @@ public class TerminalBrowser
 	}
 
 	/**
+	 * hasSelection
+	 * 
+	 * @return
+	 */
+	public boolean hasSelection()
+	{
+		Object jsResult = this._browser.evaluate("return hasSelection();");
+		boolean result = false;
+		
+		if (jsResult instanceof Boolean)
+		{
+			result = ((Boolean) jsResult).booleanValue();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * paste
 	 */
 	public void paste()
@@ -334,7 +373,11 @@ public class TerminalBrowser
 
 					if (process != null)
 					{
+						// send text
 						process.sendText(text);
+						
+						// force update now
+						update();
 					}
 				}
 
@@ -369,5 +412,13 @@ public class TerminalBrowser
 		{
 			this._browser.setUrl(string);
 		}
+	}
+	
+	/**
+	 * update
+	 */
+	protected void update()
+	{
+		this._browser.execute("getInput();");
 	}
 }
