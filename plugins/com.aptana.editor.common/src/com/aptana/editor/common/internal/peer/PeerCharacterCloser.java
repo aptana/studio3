@@ -83,7 +83,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		try
 		{
 
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+			String scope = getScopeAtOffset(document, offset);
 			if (fgCommentSelector.matches(scope))
 			{
 				return;
@@ -181,6 +181,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
 	}
 
 	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
