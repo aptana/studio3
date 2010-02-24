@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -455,7 +456,15 @@ public class FilteringProjectView extends GitProjectView
 						continue;
 					if (resource.getProject().equals(selectedProject))
 					{
-						getCommonViewer().refresh();
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() 
+						{
+							
+							@Override
+							public void run() 
+							{
+								getCommonViewer().refresh();
+							}
+						});						
 						return;
 					}
 				}
