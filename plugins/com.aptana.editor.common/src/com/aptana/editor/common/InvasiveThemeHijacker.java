@@ -253,6 +253,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void hookTheme(Control tree, boolean revert)
 	{
+		// TODO Use TreeThemer?
 		if (revert)
 		{
 			tree.setBackground(null);

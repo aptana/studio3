@@ -1,8 +1,5 @@
 package com.aptana.explorer.internal.ui;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -25,15 +22,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
@@ -47,27 +37,18 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontMetrics;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -79,6 +60,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
@@ -118,16 +100,14 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	private Integer watcher;
 
-	// Theming
-	private IPreferenceChangeListener fThemeChangeListener;
-	private IPropertyChangeListener fontListener;
-
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
 	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+
+	private TreeThemer treeThemer;
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -615,189 +595,13 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	private void hookToThemes()
 	{
-		themeChanged();
-		overrideTreeDrawing();
-		overrideLabelProvider();
-		listenForThemeChanges();
-	}
-
-	private void overrideTreeDrawing()
-	{
-		final Tree tree = getCommonViewer().getTree();
-		// Override selection color to match what is set in theme
-		tree.addListener(SWT.EraseItem, new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				if ((event.detail & SWT.SELECTED) != 0)
-				{
-					Tree tree = (Tree) event.widget;
-					int clientWidth = tree.getClientArea().width;
-
-					GC gc = event.gc;
-					Color oldBackground = gc.getBackground();
-
-					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							getThemeManager().getCurrentTheme().getSelection()));
-					gc.fillRectangle(0, event.y, clientWidth, event.height);
-					gc.setBackground(oldBackground);
-
-					event.detail &= ~SWT.SELECTED;
-					event.detail &= ~SWT.BACKGROUND;
-				}
-			}
-		});
-
-		// Hack to force a specific row height and width based on font
-		tree.addListener(SWT.MeasureItem, new Listener()
-		{
-			public void handleEvent(Event event)
-			{
-				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-				if (font == null)
-				{
-					font = JFaceResources.getTextFont();
-				}
-				if (font != null)
-				{
-					event.gc.setFont(font);
-					FontMetrics metrics = event.gc.getFontMetrics();
-					int height = metrics.getHeight() + 2;
-					TreeItem item = (TreeItem) event.item;
-					int width = event.gc.stringExtent(item.getText()).x + 24;
-					event.height = height;
-					if (width > event.width)
-						event.width = width;
-					// HACK! This is a major hack to force down the height of the row when we resize our font to a
-					// smaller height!
-					if (isMacOSX && isCocoa)
-					{
-						try
-						{
-							Field f = Control.class.getField("view"); //$NON-NLS-1$
-							if (f != null)
-							{
-								Object widget = f.get(tree);
-								if (widget != null)
-								{
-									Method m = widget.getClass().getMethod("setRowHeight", Double.TYPE); //$NON-NLS-1$
-									if (m != null)
-										m.invoke(widget, height);
-								}
-							}
-						}
-						catch (Exception e)
-						{
-							CommonEditorPlugin.logError(e);
-						}
-					}
-				}
-			}
-		});
-
-		fontListener = new IPropertyChangeListener()
-		{
-
-			@Override
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				if (!event.getProperty().equals(IThemeManager.VIEW_FONT_NAME))
-					return;
-				Display.getCurrent().asyncExec(new Runnable()
-				{
-
-					@Override
-					public void run()
-					{
-						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree!
-						updateViewer(selectedProject); // no structural change
-						if (isWindows)
-						{
-							try
-							{
-								Method m = Tree.class.getDeclaredMethod("setItemHeight", Integer.TYPE); //$NON-NLS-1$
-								if (m != null)
-								{
-									m.setAccessible(true);
-									Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-									if (font == null)
-									{
-										font = JFaceResources.getTextFont();
-									}
-									if (font != null)
-									{
-										GC gc = new GC(Display.getDefault());
-										gc.setFont(font);
-										FontMetrics metrics = gc.getFontMetrics();
-										int height = metrics.getHeight() + 2;
-										m.invoke(tree, height);
-										gc.dispose();
-									}
-								}
-							}
-							catch (Exception e)
-							{
-								CommonEditorPlugin.logError(e);
-							}
-						}
-						tree.redraw();
-						tree.update();
-					}
-				});
-
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(fontListener);
-	}
-
-	private void overrideLabelProvider()
-	{
-		ViewerColumn viewer = (ViewerColumn) getCommonViewer().getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
-		ColumnViewer colViewer = viewer.getViewer();
-		final CellLabelProvider provider = (CellLabelProvider) colViewer.getLabelProvider();
-		viewer.setLabelProvider(new CellLabelProvider()
-		{
-
-			@Override
-			public void update(ViewerCell cell)
-			{
-				provider.update(cell);
-				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-				if (font == null)
-				{
-					font = JFaceResources.getTextFont();
-				}
-				if (font != null)
-				{
-					cell.setFont(font);
-				}
-
-				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getForeground()));
-			}
-		});
+		treeThemer = new TreeThemer(getCommonViewer());
+		treeThemer.apply();
 	}
 
 	protected IThemeManager getThemeManager()
 	{
 		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
-
-	private void listenForThemeChanges()
-	{
-		fThemeChangeListener = new IPreferenceChangeListener()
-		{
-
-			@Override
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-				{
-					themeChanged();
-				}
-			}
-		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	private IProject detectSelectedProject()
@@ -947,20 +751,11 @@ public abstract class SingleProjectView extends CommonNavigator
 	public void dispose()
 	{
 		removeFileWatcher();
-		removeFontListener();
+		treeThemer.dispose();
+		treeThemer = null;
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
-		removeThemeListener();
 		super.dispose();
-	}
-
-	private void removeFontListener()
-	{
-		if (fontListener != null)
-		{
-			JFaceResources.getFontRegistry().removeListener(fontListener);
-			fontListener = null;
-		}
 	}
 
 	private void removeProjectResourceListener()
@@ -977,16 +772,6 @@ public abstract class SingleProjectView extends CommonNavigator
 					fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;
-	}
-
-	private void removeThemeListener()
-	{
-		if (fThemeChangeListener != null)
-		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fThemeChangeListener);
-			fThemeChangeListener = null;
-		}
 	}
 
 	/**
