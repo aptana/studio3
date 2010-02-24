@@ -2,6 +2,7 @@ package com.aptana.editor.common.internal.peer;
 
 import junit.framework.TestCase;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -9,13 +10,19 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 public class CharacterPairMatcherTest extends TestCase
 {
+	private static final char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"' };
 	private ICharacterPairMatcher matcher;
 
 	@Override
 	protected void setUp() throws Exception
 	{
-		char[] pairs = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"' };
-		matcher = new CharacterPairMatcher(pairs);
+		matcher = new CharacterPairMatcher(pairs)
+		{
+			protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
+			{
+				return "source.ruby";
+			};
+		};
 		super.setUp();
 	}
 
@@ -67,6 +74,47 @@ public class CharacterPairMatcherTest extends TestCase
 		assertRawMatch(document, 6, 19, 6, 14); // ``
 		assertRawMatch(document, 22, 43, 22, 22); // ''
 		assertRawMatch(document, 46, 67, 46, 22); // ""
+	}
+
+	public void testDoesntPairMatchInComments()
+	{
+		String source = "# ( { [ `ruby command`, 'single quoted string', \"double quoted string\" ] } )";
+		IDocument document = new Document(source);
+		matcher = new CharacterPairMatcher(pairs)
+		{
+			protected String getScopeAtOffset(IDocument doc, int charOffset)
+					throws org.eclipse.jface.text.BadLocationException
+			{
+				return "source.ruby comment.line.hash";
+			};
+		};
+		assertNull(matcher.match(document, 2));
+		assertNull(matcher.match(document, 4));
+		assertNull(matcher.match(document, 6));
+		assertNull(matcher.match(document, 8));
+		assertNull(matcher.match(document, 24));
+		assertNull(matcher.match(document, 48));
+	}
+
+	public void testSkipsPairsInComments()
+	{
+		String source = "(\n# )\n)";
+		IDocument document = new Document(source);
+		matcher = new CharacterPairMatcher(pairs)
+		{
+			protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
+			{
+				if (charOffset >= 2 && charOffset <= 5)
+					return "source.ruby comment.line.hash";
+				return "source.ruby";
+			};
+		};
+		IRegion region = matcher.match(document, 0);
+		assertNotNull(region);
+		assertEquals("offset", 0, region.getOffset());
+		assertEquals("length", 7, region.getLength());
+		assertEquals(ICharacterPairMatcher.LEFT, matcher.getAnchor());
+		assertNull(matcher.match(document, 4));
 	}
 
 	private void assertRawMatch(IDocument document, int leftOffsetToMatch, int rightOffsetToMatch, int offset,
