@@ -23,6 +23,7 @@ import org.eclipse.ui.part.EditorPart;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.server.TerminalServer;
+import com.aptana.util.ClipboardUtil;
 
 public class TerminalEditor extends EditorPart implements IPersistableEditor
 {
@@ -95,6 +96,11 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
+		// set copy/paste enabled states
+		copy.setEnabled(this._browser.hasSelection());
+		paste.setEnabled(ClipboardUtil.hasTextContent());
+
+		// add menus
 		manager.add(copy);
 		manager.add(paste);
 		

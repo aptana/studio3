@@ -10,12 +10,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
@@ -31,6 +27,7 @@ import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.TerminalServer;
+import com.aptana.util.ClipboardUtil;
 
 public class TerminalView extends ViewPart
 {
@@ -166,25 +163,9 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		// set copy enabled state
+		// set copy/paste enabled states
 		copy.setEnabled(this.browser.hasSelection());
-
-		// set paste enabled state
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		Clipboard clipboard = new Clipboard(display);
-		TransferData[] available = clipboard.getAvailableTypes();
-		boolean enabled = false;
-		
-		for (int i = 0; i < available.length; i++)
-		{
-			if (TextTransfer.getInstance().isSupportedType(available[i]))
-			{
-				enabled = true;
-				break;
-			}
-		}
-		
-		paste.setEnabled(enabled);
+		paste.setEnabled(ClipboardUtil.hasTextContent());
 
 		// add menus
 		manager.add(openEditor);
