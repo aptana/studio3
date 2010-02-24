@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
@@ -144,6 +145,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		for (IViewReference ref : refs)
 		{
 			hijackView(ref.getView(false), revertToDefaults);
+		}
+		IEditorReference[] editorRefs = window.getActivePage().getEditorReferences();
+		for (IEditorReference ref : editorRefs)
+		{
+			hijackEditor(ref.getEditor(false), revertToDefaults);
 		}
 	}
 
@@ -553,7 +559,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	{
 		if (editor instanceof AbstractThemeableEditor) // we already handle our own editors
 			return;
-		
+
 		ISourceViewer sourceViewer = null;
 		try
 		{
@@ -579,13 +585,21 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
-	// IPartListener
-	@Override
-	public void partOpened(IWorkbenchPart part)
+	protected void hijackEditor(IEditorPart part, boolean revertToDefaults)
 	{
 		if (part instanceof AbstractTextEditor)
 		{
 			overrideSelectionColor((AbstractTextEditor) part);
+		}
+	}
+
+	// IPartListener
+	@Override
+	public void partOpened(IWorkbenchPart part)
+	{
+		if (part instanceof IEditorPart)
+		{
+			hijackEditor((IEditorPart) part, false);
 			return;
 		}
 
