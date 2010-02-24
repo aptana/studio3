@@ -71,17 +71,29 @@ public class GitExecutable
 											"You entered a custom git path in the Preferences pane, but this path is not a valid git v{0} or higher binary. We're going to use the default search paths instead", //$NON-NLS-1$
 											MIN_GIT_VERSION), null);
 		}
-
-		// Try to find the path of the Git binary
-		String gitPath = System.getenv(GitEnv.GIT_PATH);
-		if (gitPath != null && acceptBinary(gitPath))
-			return new GitExecutable(gitPath);
-
-		// No explicit path. Try it with "which"
-		String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, "git"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (acceptBinary(whichPath))
-			return new GitExecutable(whichPath);
-
+		
+		if (Platform.getOS().equals(Platform.OS_WIN32))
+		{
+			// Grab PATH and search it!
+			String path = System.getenv("PATH"); //$NON-NLS-1$
+			String[] paths = path.split(File.pathSeparator);
+			for (String pathString : paths)
+			{
+				String possiblePath = pathString + File.separator + "git.exe"; //$NON-NLS-1$
+				if (acceptBinary(possiblePath))
+				{
+					return new GitExecutable(possiblePath);
+				}
+			}
+		}
+		else
+		{
+			// No explicit path. Try it with "which"
+			String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, "git"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (acceptBinary(whichPath))
+				return new GitExecutable(whichPath);
+		}
+		
 		// Still no path. Let's try some default locations.
 		for (String location : searchLocations())
 		{
@@ -103,12 +115,20 @@ public class GitExecutable
 		if (fgLocations == null)
 		{
 			fgLocations = new ArrayList<String>();
-			fgLocations.add("/opt/local/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/sw/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/opt/git/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/usr/local/bin/git"); //$NON-NLS-1$
-			fgLocations.add("/usr/local/git/bin/git"); //$NON-NLS-1$
-			fgLocations.add(stringByExpandingTildeInPath("~/bin/git")); //$NON-NLS-1$
+			if (Platform.getOS().equals(Platform.OS_WIN32))
+			{
+				fgLocations.add("C:\\Program Files (x86)\\Git\\bin\\git.exe"); //$NON-NLS-1$
+				fgLocations.add("C:\\Program Files\\Git\\bin\\git.exe"); //$NON-NLS-1$
+			}
+			else
+			{
+				fgLocations.add("/opt/local/bin/git"); //$NON-NLS-1$
+				fgLocations.add("/sw/bin/git"); //$NON-NLS-1$
+				fgLocations.add("/opt/git/bin/git"); //$NON-NLS-1$
+				fgLocations.add("/usr/local/bin/git"); //$NON-NLS-1$
+				fgLocations.add("/usr/local/git/bin/git"); //$NON-NLS-1$
+				fgLocations.add(stringByExpandingTildeInPath("~/bin/git")); //$NON-NLS-1$
+			}
 		}
 		return fgLocations;
 	}
