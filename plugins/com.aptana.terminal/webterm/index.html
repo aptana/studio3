@@ -27,6 +27,12 @@
 				
 				// create terminal
                 terminal = new Term(terminalElementID, 80,20, config);
+                
+                // TEMP: disable selection
+                var div = document.getElementById(terminalElementID);
+				div.onselectstart = function () { return false; } // ie
+				div.onmousedown = function () { return false; } // mozilla
+				terminal.select(10, 30);
 				
 				// resize to fit
 				resizeHelper();
@@ -172,13 +178,19 @@
 				);
 			}
 			
+			function hasSelection()
+			{
+				return terminal.hasSelection();
+			}
+			
 			function copy()
 			{
-				var pre = document.getElementById(terminalElementID).getFirstChild();
-				var range = pre.createRange();
-
-				range.execCommand("RemoveFormat");
-				range.execCommand("Copy");
+				return terminal.getSelectedText();
+			}
+			
+			function getInput()
+			{
+				terminal.getCommunicationHandler().update();
 			}
         </script>
     </head>
