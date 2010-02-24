@@ -1,6 +1,7 @@
 package com.aptana.git.core;
 
 import java.io.File;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -14,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 
 class GitMoveDeleteHook implements IMoveDeleteHook
@@ -32,7 +34,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		final GitRepository repo = GitRepository.getAttached(file.getProject());
 		if (repo == null)
 			return false;
-		
+
 		// If this file is new and unstaged, we don't need to handle it!
 		ChangedFile changed = repo.getChangedFileForResource(file);
 		if (changed == null || changed.getStatus() == ChangedFile.Status.NEW)
@@ -82,7 +84,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (dstm == null || !dstm.equals(repo))
 			return false;
 		// TODO If they're in separate repos, we need to delete and add!
-		
+
 		// If this file is new and unstaged, we don't need to handle it!
 		ChangedFile changed = repo.getChangedFileForResource(srcf);
 		if (changed == null || changed.getStatus() == ChangedFile.Status.NEW)
@@ -92,7 +94,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 			tree.addToLocalHistory(srcf);
 
-		String source = getRepoRelativePath(srcf, repo);		
+		String source = getRepoRelativePath(srcf, repo);
 		String dest = getRepoRelativePath(dstf, repo);
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFile if success
@@ -114,14 +116,18 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return false;
 		// TODO If they're in separate repos, we need to delete and add!
 
+		String source = getRepoRelativePath(srcf, repo);
+		// If source folder contains no already committed files, we need to punt!
+		if (hasNoCommittedFiles(source, repo))
+			return false;
+		
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 		{
 			// TODO Add all files that will be affected to local history!
-//			tree.addToLocalHistory(srcf);
+			// tree.addToLocalHistory(srcf);
 		}
-		
-		String source = getRepoRelativePath(srcf, repo);
+
 		String dest = getRepoRelativePath(dstf, repo);
 		IStatus status = repo.moveFile(source, dest);
 		// Call tree.failed if failed, call tree.movedFolder if success
@@ -130,6 +136,17 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		else
 			tree.failed(status);
 		return true;
+	}
+
+	private boolean hasNoCommittedFiles(String source, GitRepository repo)
+	{
+		int exitCode = 1;
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
+				"-r", "HEAD:" + source); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result != null && !result.isEmpty())
+			exitCode = result.keySet().iterator().next();
+
+		return exitCode != 0;
 	}
 
 	public boolean moveProject(final IResourceTree tree, final IProject source, final IProjectDescription description,
