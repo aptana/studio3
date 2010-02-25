@@ -117,10 +117,18 @@
          <fontOverride
                id="org.eclipse.jface.textfont"
                value="Inconsolata-regular-14">
+            <fontValue
+                  os="win32"
+                  value="Inconsolata-regular-12">
+            </fontValue>
          </fontOverride>
          <fontOverride
                id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
                value="Inconsolata-regular-14">
+            <fontValue
+                  os="win32"
+                  value="Inconsolata-regular-12">
+            </fontValue>
          </fontOverride>
       </theme>
       <fontDefinition
