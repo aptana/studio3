@@ -47,6 +47,11 @@ public class FileService
 		}
 	}
 
+	public IParseState getParseState()
+	{
+		return fParseState;
+	}
+
 	public IParseNode getParseResult()
 	{
 		return fParseState.getParseResult();
