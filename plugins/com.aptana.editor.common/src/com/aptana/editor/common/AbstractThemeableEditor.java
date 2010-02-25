@@ -67,7 +67,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
-import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
@@ -656,7 +656,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return getOutlineElementAt(caret);
 	}
 
-	public void select(ILexeme element, boolean checkIfOutlineActive)
+	public void select(IRange element, boolean checkIfOutlineActive)
 	{
 		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
 		{
@@ -667,7 +667,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		}
 	}
 
-	protected void setSelectedElement(ILexeme element)
+	protected void setSelectedElement(IRange element)
 	{
 		int offset = element.getStartingOffset();
 		int length = element.getLength();

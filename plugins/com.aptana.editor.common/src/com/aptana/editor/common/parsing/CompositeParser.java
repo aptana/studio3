@@ -1,9 +1,9 @@
 package com.aptana.editor.common.parsing;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import beaver.Symbol;
 import beaver.Scanner.Exception;
@@ -44,17 +44,45 @@ public class CompositeParser implements IParser
 		if (fEmbeddedlanguageRoot != null)
 		{
 			// merges the tree for the embedded language into the result
-			SortedMap<Integer, IParseNode> list = new TreeMap<Integer, IParseNode>();
+			List<IParseNode> list = new LinkedList<IParseNode>();
 			getAllNodes(result, list);
 
 			IParseNode[] embeddedNodes = fEmbeddedlanguageRoot.getChildren();
 			IParseNode parent;
 			for (IParseNode node : embeddedNodes)
 			{
-				parent = findNode(list, node.getEndingOffset());
-				if (parent != null)
+				parent = findNode(node, list);
+				if (parent == null)
 				{
-					parent.addChild(node);
+					// the node is at the end of the source
+					result.addChild(node);
+					// adjusts the offsets to include the new node
+					((ParseBaseNode) result).setLocation(result.getStartingOffset(), node.getEndingOffset());
+				}
+				else
+				{
+					// inserts the node into the right position
+					List<IParseNode> newList = new ArrayList<IParseNode>();
+					IParseNode[] children = parent.getChildren();
+					boolean found = false;
+					for (IParseNode child : children)
+					{
+						if (!found && child.getStartingOffset() > node.getStartingOffset())
+						{
+							found = true;
+							newList.add(node);
+						}
+						newList.add(child);
+					}
+					if (!found)
+					{
+						// the node locates at the end of the parent node
+						newList.add(node);
+					}
+					((ParseBaseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
+					// adjusts the offsets to include the new node
+					((ParseBaseNode) parent).setLocation(newList.get(0).getStartingOffset(), newList.get(
+							newList.size() - 1).getEndingOffset());
 				}
 			}
 		}
@@ -98,22 +126,27 @@ public class CompositeParser implements IParser
 		return null;
 	}
 
-	private static void getAllNodes(IParseNode node, Map<Integer, IParseNode> list)
+	private static void getAllNodes(IParseNode node, List<IParseNode> list)
 	{
 		IParseNode[] children = node.getChildren();
 		for (IParseNode child : children)
 		{
 			getAllNodes(child, list);
 		}
-		list.put(node.getStartingOffset(), node);
+		list.add(node);
 	}
 
-	private static IParseNode findNode(SortedMap<Integer, IParseNode> list, int endOffset)
+	private static IParseNode findNode(IParseNode node, List<IParseNode> list)
 	{
-		// the map is sorted by starting offset, and we want to find the node closest to the desired ending offset
-		// without exceeding it as that will be the one which includes the embedded text
-		list = list.headMap(endOffset);
-		return list.get(list.lastKey());
+		for (IParseNode element : list)
+		{
+			if (element.getStartingOffset() <= node.getStartingOffset()
+					&& element.getEndingOffset() >= node.getEndingOffset())
+			{
+				return element;
+			}
+		}
+		return null;
 	}
 
 	private static void addOffset(IParseNode node, int offset)

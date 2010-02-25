@@ -14,12 +14,12 @@ public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 	}
 
 	@Override
-	public String getText(Object element)
+	protected String getDefaultText(Object element)
 	{
 		if (element instanceof IRubyScript)
 		{
 			return "erb"; //$NON-NLS-1$
 		}
-		return super.getText(element);
+		return super.getDefaultText(element);
 	}
 }

@@ -45,7 +45,7 @@ import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.RubyParser;
-import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.IRange;
 
 @SuppressWarnings("restriction")
 public class RubySourceEditor extends AbstractThemeableEditor
@@ -85,7 +85,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected void setSelectedElement(ILexeme element)
+	protected void setSelectedElement(IRange element)
 	{
 		if (element instanceof IImportContainer)
 		{

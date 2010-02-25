@@ -2,21 +2,52 @@ package com.aptana.editor.html.parsing.ast;
 
 import java.util.StringTokenizer;
 
+import beaver.Symbol;
+
+import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 
 public class HTMLElementNode extends HTMLNode
 {
-	private String fName;
 
-	public HTMLElementNode(String tag, int start, int end)
+	private static final class NameNode implements INameNode
 	{
-		this(tag, new HTMLNode[0], start, end);
+
+		private final String fName;
+		private final IRange fRange;
+
+		public NameNode(String name, int start, int end)
+		{
+			fName = name;
+			fRange = new Range(start, end);
+		}
+
+		@Override
+		public String getName()
+		{
+			return fName;
+		}
+
+		@Override
+		public IRange getNameRange()
+		{
+			return fRange;
+		}
 	}
 
-	public HTMLElementNode(String tag, HTMLNode[] children, int start, int end)
+	private INameNode fNameNode;
+
+	public HTMLElementNode(Symbol tagSymbol, int start, int end)
+	{
+		this(tagSymbol, new HTMLNode[0], start, end);
+	}
+
+	public HTMLElementNode(Symbol tagSymbol, HTMLNode[] children, int start, int end)
 	{
 		super(HTMLNodeTypes.ELEMENT, children, start, end);
-		fName = tag;
+		String tag = tagSymbol.value.toString();
 		if (tag.length() > 0)
 		{
 			try
@@ -24,22 +55,29 @@ public class HTMLElementNode extends HTMLNode
 				if (tag.endsWith("/>")) //$NON-NLS-1$
 				{
 					// self-closing
-					fName = getTagName(tag.substring(1, tag.length() - 2));
+					tag = getTagName(tag.substring(1, tag.length() - 2));
 				}
 				else
 				{
-					fName = getTagName(tag.substring(1, tag.length() - 1));
+					tag = getTagName(tag.substring(1, tag.length() - 1));
 				}
 			}
 			catch (IndexOutOfBoundsException e)
 			{
 			}
 		}
+		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 	}
 
 	public String getName()
 	{
-		return fName;
+		return fNameNode.getName();
+	}
+
+	@Override
+	public INameNode getNameNode()
+	{
+		return fNameNode;
 	}
 
 	@Override
@@ -63,16 +101,17 @@ public class HTMLElementNode extends HTMLNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		if (fName.length() > 0)
+		String name = getName();
+		if (name.length() > 0)
 		{
-			text.append("<").append(fName); //$NON-NLS-1$
+			text.append("<").append(name); //$NON-NLS-1$
 			text.append(">"); //$NON-NLS-1$
 			IParseNode[] children = getChildren();
 			for (IParseNode child : children)
 			{
 				text.append(child);
 			}
-			text.append("</").append(fName).append(">"); //$NON-NLS-1$//$NON-NLS-2$
+			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return text.toString();
 	}
