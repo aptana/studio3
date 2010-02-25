@@ -34,10 +34,14 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -49,6 +53,8 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.LoadCycleListener;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
@@ -67,6 +73,54 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
+
+		BundleManager.getInstance().addLoadCycleListener(new LoadCycleListener()
+		{
+
+			private Job job;
+
+			@Override
+			public void scriptUnloaded(File script)
+			{
+				bundleFileChanged(script);
+			}
+
+			private void bundleFileChanged(File script)
+			{
+				if (script == null || !script.getName().equals("bundle.rb")) //$NON-NLS-1$
+					return;
+				// Run in a job on a delay and cancel/reschedule if it already exists and is scheduled... This should
+				// basically only make us run once if we get hit multiple times in a row. We'll still probably run a few
+				// times, but this should cut it down a lot.
+				if (job != null)
+				{
+					job.cancel();
+				}
+				job = new Job("Force reconcile on bundle change") //$NON-NLS-1$
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						calculatePositions(monitor);
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.schedule(750);
+			}
+
+			@Override
+			public void scriptReloaded(File script)
+			{
+				bundleFileChanged(script);
+			}
+
+			@Override
+			public void scriptLoaded(File script)
+			{
+				bundleFileChanged(script);
+			}
+		});
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -121,8 +175,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	protected void calculatePositions(IProgressMonitor monitor)
 	{
+		if (monitor != null && monitor.isCanceled())
+			return;
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+		if (monitor != null && monitor.isCanceled())
+			return;
 		// Folding...
 		fPositions.clear();
 		try
