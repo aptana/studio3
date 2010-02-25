@@ -9,8 +9,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
 
 public class PeerCharacterCloserTest extends TestCase
 {
@@ -26,7 +26,7 @@ public class PeerCharacterCloserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		viewer = new TextViewer(Display.getDefault().getActiveShell(), SWT.NONE);
+		viewer = new TextViewer(new Shell(), SWT.NONE);
 		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
 		{
 			@Override
@@ -165,6 +165,28 @@ public class PeerCharacterCloserTest extends TestCase
 
 		assertFalse(event.doit);
 		assertEquals("// '\n'' ", document.get());
+	}
+
+	public void testRR3_115()
+	{
+		setDocument("function x()\n" + "{\n" + "    if (false)\n" + "    \n" + "\n" + "    if (false)\n" + "    {\n"
+				+ "        // scroll sub-regions\n" + "    }\n" + "};");
+		viewer.setSelectedRange(34, 0);
+		closer = new PeerCharacterCloser(viewer, DEFAULT_PAIRS)
+		{
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if (offset >= 65 && offset <= 85)
+					return "source.js comment.block";
+				return "source.js";
+			}
+		};
+		VerifyEvent event = sendEvent('{');
+
+		assertFalse(event.doit);
+		assertEquals("function x()\n" + "{\n" + "    if (false)\n" + "    {}\n" + "\n" + "    if (false)\n" + "    {\n"
+				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
 	}
 
 	protected IDocument setDocument(String src)
