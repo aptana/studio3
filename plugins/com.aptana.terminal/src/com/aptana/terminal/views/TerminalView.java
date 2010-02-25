@@ -112,6 +112,7 @@ public class TerminalView extends ViewPart
 	private Action openEditor;
 	private Action copy;
 	private Action paste;
+	private Action selectAll;
 
 	/**
 	 * contributeToActionBars
@@ -172,6 +173,8 @@ public class TerminalView extends ViewPart
 		manager.add(new Separator());
 		manager.add(copy);
 		manager.add(paste);
+		manager.add(new Separator());
+		manager.add(selectAll);
 
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -288,6 +291,18 @@ public class TerminalView extends ViewPart
 		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
 				ISharedImages.IMG_TOOL_PASTE));
 		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
+		
+		// select-all action
+		selectAll = new Action()
+		{
+			public void run()
+			{
+				browser.selectAll();
+			}
+		};
+		selectAll.setText("Select All");
+		selectAll.setToolTipText("Select all text in the terminal");
+		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
 	}
 
 	/**

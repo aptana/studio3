@@ -32,6 +32,7 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	private TerminalBrowser _browser;
 	private Action copy;
 	private Action paste;
+	private Action selectAll;
 
 	/*
 	 * (non-Javadoc)
@@ -103,6 +104,8 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 		// add menus
 		manager.add(copy);
 		manager.add(paste);
+		manager.add(new Separator());
+		manager.add(selectAll);
 		
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -193,6 +196,18 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 		paste.setToolTipText("Paste clipboard text into the terminal");
 		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
 		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
+		
+		// select-all action
+		selectAll = new Action()
+		{
+			public void run()
+			{
+				_browser.selectAll();
+			}
+		};
+		selectAll.setText("Select All");
+		selectAll.setToolTipText("Select all text in the terminal");
+		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
 	}
 	
 	/*

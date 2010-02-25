@@ -46,6 +46,7 @@ public class TerminalBrowser
 
 	public static KeyStroke COPY_STROKE;
 	public static KeyStroke PASTE_STROKE;
+	public static KeyStroke SELECT_ALL_STROKE;
 
 	private Browser _browser;
 	private WorkbenchPart _owningPart;
@@ -62,6 +63,7 @@ public class TerminalBrowser
 
 		COPY_STROKE = KeyStroke.getInstance(modifiers, 'C');
 		PASTE_STROKE = KeyStroke.getInstance(modifiers, 'V');
+		SELECT_ALL_STROKE = KeyStroke.getInstance(modifiers, 'A');
 	}
 
 	/**
@@ -161,6 +163,10 @@ public class TerminalBrowser
 					{
 						paste();
 					}
+					else if (SELECT_ALL_STROKE.equals(key))
+					{
+						selectAll();
+					}
 				}
 			}
 
@@ -233,26 +239,29 @@ public class TerminalBrowser
 	 */
 	public void copy()
 	{
-		final Object result = this._browser.evaluate("return copy();");
-		
-		// only copy when we have text
-		if (result != null && result instanceof String && ((String) result).length() > 0)
+		if (this._browser != null)
 		{
-			UIJob job = new UIJob("Copy from Terminal")
+			final Object result = this._browser.evaluate("return copy();");
+			
+			// only copy when we have text
+			if (result != null && result instanceof String && ((String) result).length() > 0)
 			{
-				public IStatus runInUIThread(IProgressMonitor monitor)
+				UIJob job = new UIJob("Copy from Terminal")
 				{
-					Display display = PlatformUI.getWorkbench().getDisplay();
-					Clipboard clipboard = new Clipboard(display);
-					
-					clipboard.setContents(new Object[] { result }, new Transfer[] { TextTransfer.getInstance() });
-	
-					return Status.OK_STATUS;
-				}
-			};
-			job.setSystem(true);
-			job.setPriority(Job.INTERACTIVE);
-			job.schedule();
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						Display display = PlatformUI.getWorkbench().getDisplay();
+						Clipboard clipboard = new Clipboard(display);
+						
+						clipboard.setContents(new Object[] { result }, new Transfer[] { TextTransfer.getInstance() });
+		
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.setPriority(Job.INTERACTIVE);
+				job.schedule();
+			}
 		}
 	}
 	
@@ -359,36 +368,50 @@ public class TerminalBrowser
 	 */
 	public void paste()
 	{
-		UIJob job = new UIJob("Paste into Terminal")
+		if (this._browser != null)
 		{
-			public IStatus runInUIThread(IProgressMonitor monitor)
+			UIJob job = new UIJob("Paste into Terminal")
 			{
-				Display display = PlatformUI.getWorkbench().getDisplay();
-				Clipboard clipboard = new Clipboard(display);
-				String text = (String) clipboard.getContents(TextTransfer.getInstance());
-
-				if (text != null && text.length() > 0)
+				public IStatus runInUIThread(IProgressMonitor monitor)
 				{
-					ProcessWrapper process = TerminalServer.getInstance().getProcess(_id);
-
-					if (process != null)
+					Display display = PlatformUI.getWorkbench().getDisplay();
+					Clipboard clipboard = new Clipboard(display);
+					String text = (String) clipboard.getContents(TextTransfer.getInstance());
+	
+					if (text != null && text.length() > 0)
 					{
-						// send text
-						process.sendText(text);
-						
-						// force update now
-						update();
+						ProcessWrapper process = TerminalServer.getInstance().getProcess(_id);
+	
+						if (process != null)
+						{
+							// send text
+							process.sendText(text);
+							
+							// force update now
+							update();
+						}
 					}
+	
+					return Status.OK_STATUS;
 				}
-
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
+			};
+			job.setSystem(true);
+			job.setPriority(Job.INTERACTIVE);
+			job.schedule();
+		}
 	}
 
+	/**
+	 * selectAll
+	 */
+	public void selectAll()
+	{
+		if (this._browser != null)
+		{
+			this._browser.execute("selectAll();");
+		}
+	}
+	
 	/**
 	 * setFocus
 	 */

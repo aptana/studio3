@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link href="Term.css.template" rel="stylesheet" type="text/css" id="ss" />
         <title>Aptana Web Terminal</title>
-		<script src="webterm_compressed.js"></script>
+		<script src="webterm.js"></script>
         <script>
             var terminal;
 			var terminalElementID = "terminal";
@@ -182,6 +182,11 @@
 				return terminal.getSelectedText();
 			}
 			
+			function selectAll()
+			{
+				terminal.selectAll();
+			}
+			
 			function getInput()
 			{
 				terminal.getCommunicationHandler().update();
@@ -190,5 +195,6 @@
     </head>
     <body onload="init();" onresize="autoSize();">
 		<div id="terminal"></div>
+		<div id="fontInfo" style="color: rgb(128,64,64)"></div>
     </body>
 </html>
