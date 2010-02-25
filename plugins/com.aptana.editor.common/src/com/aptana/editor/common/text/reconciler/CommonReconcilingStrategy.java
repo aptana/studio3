@@ -34,14 +34,10 @@
  */
 package com.aptana.editor.common.text.reconciler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -53,8 +49,6 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.LoadCycleListener;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
@@ -74,7 +68,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	{
 		fEditor = editor;
 
-		
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -145,6 +138,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		{
 			CommonEditorPlugin.logError(e);
 		}
+		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
+		// early because of cancel...
+		if (monitor != null && monitor.isCanceled())
+			return;
 
 		Display.getDefault().asyncExec(new Runnable()
 		{
