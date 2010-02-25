@@ -2,8 +2,6 @@ package com.aptana.editor.common.internal.scripting;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
@@ -22,27 +20,37 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	{
 		super(pageName, selection);
 	}
-	
+
 	@Override
 	protected InputStream getInitialContents()
 	{
-		// TODO Generate contents from scripting bundles!
-		TemplateElement[] templates = (TemplateElement[]) BundleManager.getInstance().getCommands(new IModelFilter()
+		CommandElement[] commands = BundleManager.getInstance().getCommands(new IModelFilter()
 		{
-			
+
 			@Override
 			public boolean include(AbstractElement element)
 			{
-				// TODO Filter by matching filetype pattern!
+				// TODO Filter here by matching the filetype?
 				return element instanceof TemplateElement;
 			}
 		});
-		if (templates != null && templates.length > 0)
+		if (commands != null && commands.length > 0)
 		{
-			for (TemplateElement template : templates)
+			for (CommandElement command : commands)
 			{
+				if (!(command instanceof TemplateElement))
+					continue;
+				TemplateElement template = (TemplateElement) command;
 				String pattern = template.getFiletype();
-				pattern = pattern.replace(Pattern.quote("."), Matcher.quoteReplacement("\\.")).replace(Pattern.quote("*"), Matcher.quoteReplacement(".+"));
+				if (pattern.isEmpty())
+					continue;
+
+				// TODO This code was copy-pasted from BundleManager.getTopLevelScope
+				// Escape periods in pattern (for regexp)
+				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+
+				// Replace * wildcard pattern with .+? regexp
+				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (getFileName().matches(pattern))
 				{
 					CommandResult result = template.execute();

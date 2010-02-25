@@ -179,4 +179,20 @@
             class="com.aptana.editor.common.internal.scripting.BrowserContextContributor">
       </contributor>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            name="%NewWizards.file"
+            icon="$nl$/icons/full/etool16/newfile_wiz.gif"
+            category="org.eclipse.ui.Basic"
+            class="com.aptana.editor.common.internal.scripting.NewFileWizard"
+            id="com.aptana.ui.wizards.new.file">
+         <description>
+            %NewWizards.file.description
+         </description>
+         <selection
+               class="org.eclipse.core.resources.IResource">
+         </selection>
+      </wizard>
+   </extension>
 </plugin>
