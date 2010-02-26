@@ -172,31 +172,32 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		// Run Last launched
-		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
-				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
-				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
-
-		// Debug last launched
-		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
-				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
-				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
+//		Do not show these commands until we implement the Eclipse launch configuration based Run and Debug
+//		// Run Last launched
+//		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
+//				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
+//				SWT.PUSH);
+//		commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
+//		{
+//			@Override
+//			public boolean isEnabled()
+//			{
+//				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+//			}
+//		});
+//
+//		// Debug last launched
+//		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
+//				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
+//				SWT.PUSH);
+//		commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
+//		{
+//			@Override
+//			public boolean isEnabled()
+//			{
+//				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+//			}
+//		});
 
 		new MenuItem(commandsMenu, SWT.SEPARATOR);
 
