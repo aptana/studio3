@@ -261,10 +261,10 @@ module Ruble
         # Get reference to active editor
         active_editor_reference = active_page.active_editor_reference if active_page
         # Get array of editor references
-        editor_references = active_page.editor_references if active_page
+        editor_references = active_page.editor_references.to_a if active_page
         if active_editor_reference && editor_references && editor_references.length >= 2
           # Find index of active editor reference
-          active_editor_reference_index = editor_references.to_a.index(active_editor_reference)
+          active_editor_reference_index = editor_references.index(active_editor_reference)
           if active_editor_reference_index
             # Add offset
             active_editor_reference_index = (active_editor_reference_index + offset)
