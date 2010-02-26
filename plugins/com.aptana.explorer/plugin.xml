@@ -106,4 +106,20 @@
         </activeWhen>
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonWizard
+            associatedExtensionId="org.eclipse.ui.navigator.resourceContent"
+            type="new"
+            wizardId="com.aptana.ui.wizards.new.file">
+         <enablement>
+			<or>
+				<adapt type="org.eclipse.core.resources.IFile" />
+				<adapt type="org.eclipse.core.resources.IFolder" />
+	         	<adapt type="org.eclipse.core.resources.IProject" />
+	            <adapt type="org.eclipse.core.resources.IWorkspaceRoot" />
+			</or>
+	     </enablement>
+      </commonWizard>
+   </extension>
 </plugin>
