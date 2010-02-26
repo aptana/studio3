@@ -56,8 +56,6 @@ public class CompositeParser implements IParser
 				{
 					// the node is at the end of the source
 					result.addChild(node);
-					// adjusts the offsets to include the new node
-					((ParseBaseNode) result).setLocation(result.getStartingOffset(), node.getEndingOffset());
 				}
 				else
 				{
