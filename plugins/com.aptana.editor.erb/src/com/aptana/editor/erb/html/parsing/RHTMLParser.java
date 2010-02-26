@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.erb.parsing.lexer.ERBTokens;
 import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.parsing.IParseState;
@@ -47,6 +48,7 @@ public class RHTMLParser extends CompositeParser
 
 	private void processRubyBlock(IParseNode root) throws IOException, Exception
 	{
+		String startTag = getCurrentSymbol().value.toString();
 		advance();
 
 		// finds the entire ruby block
@@ -63,7 +65,8 @@ public class RHTMLParser extends CompositeParser
 		IParseNode result = getParseResult(new RubyParser(), start, end);
 		if (result != null)
 		{
-			root.addChild(result);
+			ERBScript erb = new ERBScript((IRubyScript) result, startTag, getCurrentSymbol().value.toString());
+			root.addChild(erb);
 		}
 	}
 }

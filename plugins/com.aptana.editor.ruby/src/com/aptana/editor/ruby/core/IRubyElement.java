@@ -1,6 +1,8 @@
 package com.aptana.editor.ruby.core;
 
-public interface IRubyElement
+import com.aptana.parsing.ast.IParseNode;
+
+public interface IRubyElement extends IParseNode
 {
 
 	public static final short SCRIPT = 1;

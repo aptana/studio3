@@ -24,7 +24,7 @@ import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
-import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.IRange;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
@@ -214,10 +214,10 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		if (selection.size() == 1)
 		{
 			Object element = selection.getFirstElement();
-			if (element instanceof ILexeme)
+			if (element instanceof IRange)
 			{
 				// selects the range in the editor
-				fEditor.select((ILexeme) element, checkIfActive);
+				fEditor.select((IRange) element, checkIfActive);
 			}
 		}
 	}

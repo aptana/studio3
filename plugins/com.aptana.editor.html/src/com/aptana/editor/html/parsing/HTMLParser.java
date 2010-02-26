@@ -76,15 +76,15 @@ public class HTMLParser implements IParser
 				processEndTag();
 				break;
 			case HTMLTokens.STYLE:
-				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END, "style"); //$NON-NLS-1$
+				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END);
 				break;
 			case HTMLTokens.SCRIPT:
-				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END, "script"); //$NON-NLS-1$
+				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END);
 				break;
 		}
 	}
 
-	protected void processLanguage(String language, short endToken, String tagName) throws IOException, Exception
+	protected void processLanguage(String language, short endToken) throws IOException, Exception
 	{
 		Symbol startTag = fCurrentSymbol;
 		advance();
@@ -102,7 +102,7 @@ public class HTMLParser implements IParser
 		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(tagName, nested, startTag.getStart(), startTag.getEnd()));
+			fCurrentElement.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
 		}
 	}
 
@@ -148,8 +148,8 @@ public class HTMLParser implements IParser
 
 	private void processStartTag() throws IOException, Exception
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
-				fCurrentSymbol.getEnd());
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
+				.getEnd());
 		// pushes the element onto the stack
 		openElement(element);
 	}
@@ -163,6 +163,8 @@ public class HTMLParser implements IParser
 			if ((fCurrentElement instanceof HTMLElementNode)
 					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 			{
+				// adjusts the ending offset of current element to include the entire block
+				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getEnd());
 				closeElement();
 			}
 		}
