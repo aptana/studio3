@@ -49,7 +49,7 @@ module Ruble
           "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
       when :ie
-        "cmd /C start \"#{url.to_s}\""
+        "cmd /C start #{url.to_s}"
       when :safari
         if Ruble.platforms.include? :mac
           # FIXME Opens in new tab/window
@@ -77,7 +77,7 @@ module Ruble
         if Ruble.platforms.include? :mac
           "open \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C start \"#{url.to_s}\""
+          "cmd /C start #{url.to_s}"
         else
           # TODO Test
           "xdg-open \"#{url.to_s}\" &"
