@@ -52,13 +52,10 @@ public class HTMLParseState extends ParseState
 	 */
 	public int getCloseTagType(String tagName)
 	{
-		if (fDocumentType.compareTo(Type.XHTML_1_0_STRICT) < 0)
+		String key = tagName.toLowerCase();
+		if (fEndTagInfo.containsKey(key))
 		{
-			String key = tagName.toLowerCase();
-			if (fEndTagInfo.containsKey(key))
-			{
-				return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
-			}
+			return fEndTagInfo.get(key) & HTMLTagInfo.END_MASK;
 		}
 		return HTMLTagInfo.END_REQUIRED;
 	}
