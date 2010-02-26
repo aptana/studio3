@@ -12,4 +12,14 @@ public class HTMLSpecialNode extends HTMLElementNode
 		super(tag, start, end);
 		setChildren(children);
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof HTMLSpecialNode))
+		{
+			return false;
+		}
+		return super.equals(obj);
+	}
 }

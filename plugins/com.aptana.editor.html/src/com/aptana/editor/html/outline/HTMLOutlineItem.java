@@ -37,4 +37,20 @@ class HTMLOutlineItem implements IRange
 	{
 		return fSourceRange.getStartingOffset();
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof HTMLOutlineItem))
+		{
+			return false;
+		}
+		return fReferenceNode.equals(((HTMLOutlineItem) obj).fReferenceNode);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return fReferenceNode.hashCode();
+	}
 }
