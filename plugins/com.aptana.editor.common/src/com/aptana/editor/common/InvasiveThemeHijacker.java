@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
@@ -36,6 +38,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -62,6 +66,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 {
 
 	private Listener listener;
+	private IPageChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
 	{
@@ -205,7 +210,21 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			IPage page = outline.getCurrentPage();
 			if (page instanceof CommonOutlinePage)
 				return; // we already handle our own outlines
-			hookTheme(page.getControl(), revertToDefaults);
+			Control control = page.getControl();
+			if (control instanceof PageBook)
+			{
+				PageBook book = (PageBook) control;
+				Control[] children = book.getChildren();
+				if (children != null && children.length > 0)
+				{
+					for (Control child : children)
+					{
+						hookTheme(child, revertToDefaults);
+					}
+				}
+				return;
+			}
+			hookTheme(control, revertToDefaults);
 			return;
 		}
 		else if (view instanceof PropertySheet)
@@ -655,6 +674,23 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (part instanceof IEditorPart)
 		{
 			hijackEditor((IEditorPart) part, false);
+			if (part instanceof MultiPageEditorPart)
+			{
+				MultiPageEditorPart multi = (MultiPageEditorPart) part;
+				if (pageListener == null)
+				{
+					pageListener = new IPageChangedListener()
+					{
+
+						@Override
+						public void pageChanged(PageChangedEvent event)
+						{
+							hijackOutline();
+						}
+					};
+				}
+				multi.addPageChangedListener(pageListener);
+			}
 			return;
 		}
 
@@ -673,6 +709,14 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
+		if (part instanceof MultiPageEditorPart)
+		{
+			MultiPageEditorPart multi = (MultiPageEditorPart) part;
+			if (pageListener != null)
+			{
+				multi.removePageChangedListener(pageListener);
+			}
+		}
 	}
 
 	@Override
@@ -687,6 +731,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (!(part instanceof IEditorPart))
 			return;
 
+		hijackOutline();
+	}
+
+	protected void hijackOutline()
+	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
