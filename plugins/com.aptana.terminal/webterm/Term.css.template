@@ -14,7 +14,6 @@ div.webterm {
 /* top-level pre element */
 div.webterm pre {
 	margin: 0px 0px 0px;
-	/*font-family: Monaco, Courier, monospace;*/
 	font-family: {font-name}, Monaco, monospace;
 	font-size: {font-size};
 	line-height: {line-height};
@@ -64,3 +63,18 @@ div.webterm pre span.bl { text-decoration: blink        }
 
 /* cursor style */
 div.webterm pre span span.cursor {	background-color: rgb({caret}); }
+
+/* div used for gathering font info */
+div.fontInfo {
+	clear: both;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	border: 1px solid black;
+	color: rgb(192,128,128);
+}
+
+div.fontInfo pre {
+	font-family: {font-name}, Monaco, monospace;
+	font-size: {font-size};
+}
