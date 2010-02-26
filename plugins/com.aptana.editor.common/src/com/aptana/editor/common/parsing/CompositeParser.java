@@ -80,9 +80,6 @@ public class CompositeParser implements IParser
 						newList.add(node);
 					}
 					((ParseBaseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
-					// adjusts the offsets to include the new node
-					((ParseBaseNode) parent).setLocation(newList.get(0).getStartingOffset(), newList.get(
-							newList.size() - 1).getEndingOffset());
 				}
 			}
 		}
