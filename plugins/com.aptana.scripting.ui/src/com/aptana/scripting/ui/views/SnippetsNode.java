@@ -1,16 +1,21 @@
 package com.aptana.scripting.ui.views;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.ui.ScriptingUIPlugin;
 
-class SnippetsNode implements CollectionNode
+class SnippetsNode extends BaseNode
 {
-	private SnippetElement[] _snippets;
-	
+	private static final Image SNIPPETS_ICON = ScriptingUIPlugin.getImage("icons/folder.png"); //$NON-NLS-1$
+	private SnippetNode[] _snippets;
+
 	/**
 	 * CommandsNode
 	 * 
@@ -18,38 +23,61 @@ class SnippetsNode implements CollectionNode
 	 */
 	public SnippetsNode(BundleElement bundle)
 	{
-		List<CommandElement> snippets = new LinkedList<CommandElement>();
-		
-		for (CommandElement command : bundle.getCommands())
+		this(bundle.getCommands());
+	}
+
+	/**
+	 * SnippetNode
+	 * 
+	 * @param elements
+	 */
+	public SnippetsNode(CommandElement[] elements)
+	{
+		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
+
+		if (elements != null)
 		{
-			if (command instanceof SnippetElement)
+			Arrays.sort(elements);
+
+			for (CommandElement command : elements)
 			{
-				snippets.add(command);
+				if (command instanceof SnippetElement)
+				{
+					snippets.add(new SnippetNode((SnippetElement) command));
+				}
 			}
 		}
-		
-		this._snippets = snippets.toArray(new SnippetElement[snippets.size()]);
+
+		this._snippets = snippets.toArray(new SnippetNode[snippets.size()]);
 	}
-	
-	/**
-	 * getChildren
-	 * 
-	 * @return
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getChildren()
 	 */
 	public Object[] getChildren()
 	{
 		return this._snippets;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.ui.views.CollectionNode#getLabel()
+	 * @see com.aptana.scripting.ui.views.BaseNode#getImage()
+	 */
+	public Image getImage()
+	{
+		return SNIPPETS_ICON;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.ui.views.BaseNode#getLabel()
 	 */
 	public String getLabel()
 	{
 		return Messages.SnippetsNode_Snippets_Node;
 	}
-	
+
 	/**
 	 * hasChildren
 	 * 

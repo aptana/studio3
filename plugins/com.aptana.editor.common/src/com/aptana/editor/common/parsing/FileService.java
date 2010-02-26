@@ -47,16 +47,14 @@ public class FileService
 		}
 	}
 
+	public IParseState getParseState()
+	{
+		return fParseState;
+	}
+
 	public IParseNode getParseResult()
 	{
-		IParseNode result = fParseState.getParseResult();
-		if (result == null)
-		{
-			// performs an initial parse
-			parse();
-			result = fParseState.getParseResult();
-		}
-		return result;
+		return fParseState.getParseResult();
 	}
 
 	public void setParser(IParser parser)

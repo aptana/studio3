@@ -28,15 +28,21 @@
                   pattern="org.eclipse.ui.navigator.resources.filters.*">
             </contentExtension>
             <contentExtension pattern="org.eclipse.jdt.java.ui.javaContent" />
-			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />	
-			<contentExtension pattern="org.eclipse.jdt.java.ui.javaLinkHelper" />	
+			<contentExtension pattern="org.eclipse.jdt.java.ui.filters.*" />
+			<contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper">
+   </contentExtension>	
          </includes>
+         <excludes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+         </excludes>
       </viewerContentBinding>
       <viewerActionBinding
             viewerId="com.aptana.explorer.view">
          <includes>
             <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
+                  pattern="org\.eclipse\.ui\.navigator\.resources\.(?!WorkingSetActions).*">
             </actionExtension>
          </includes>
       </viewerActionBinding>

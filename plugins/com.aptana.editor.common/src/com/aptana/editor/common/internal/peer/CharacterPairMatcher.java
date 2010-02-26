@@ -14,6 +14,9 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.ScopeSelector;
+
 /**
  * This is a modified version of DefaultCharacterPairMatcher from Eclipse. This version adds some heuristics to try and
  * properly handle character pairs where the start and end chars are the same (like '', "", ``) by looking at the
@@ -25,6 +28,7 @@ import org.eclipse.jface.text.source.ICharacterPairMatcher;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment");
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
@@ -121,6 +125,12 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 
+		// Drop out if the char is inside a comment
+		if (fgCommentSelector.matches(getScopeAtOffset(doc, charOffset)))
+		{
+			return null;
+		}
+
 		boolean isForward = fPairs.isStartCharacter(prevChar);
 		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
 		if (fPairs.isAmbiguous(prevChar))
@@ -151,6 +161,11 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		if (adjustedEndOffset == adjustedOffset)
 			return null;
 		return new Region(Math.min(adjustedOffset, adjustedEndOffset), Math.abs(adjustedEndOffset - adjustedOffset));
+	}
+
+	protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(doc, charOffset);
 	}
 
 	private boolean isUnclosedPair(char c, IDocument document, int offset) throws BadLocationException
@@ -209,7 +224,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		while (pos != boundary)
 		{
 			final char c = doc.getChar(pos);
-			if (doc.isMatch(pos, end))
+			if (doc.isMatch(pos, end) && !fgCommentSelector.matches(getScopeAtOffset(doc.fDocument, pos)))
 			{
 				return pos;
 			}

@@ -17,7 +17,6 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.common.theme.IThemeManager;
 
 /**
@@ -137,15 +136,15 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
-		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
-		WordRule wordRule2 = new WordRule(lettersAndHyphens, Token.UNDEFINED);
-		addWordsToRule(wordRule2, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
-		addWordsToRule(wordRule2, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
-		rules.add(wordRule2);
+		IWordDetector identifierDetector = new KeywordIdentifierDetector();
+		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
+		addWordsToRule(wordRule, getPropertyNames(), "support.type.property-name.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule, PROPERTY_VALUES, "support.constant.property-value.css"); //$NON-NLS-1$
+		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
+		rules.add(wordRule);
 
 		// normal words
-		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
-		addWordsToRule(wordRule, MEASUREMENTS, "keyword.other.unit.css"); //$NON-NLS-1$
+		wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
 		addWordsToRule(wordRule, HTML_TAGS, "entity.name.tag.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule, MEDIA, "support.constant.media.css"); //$NON-NLS-1$
 		addWordsToRule(wordRule, FUNCTIONS, "support.function.misc.css"); //$NON-NLS-1$
@@ -153,13 +152,13 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		addWordsToRule(wordRule, DEPRECATED_COLORS, "invalid.deprecated.color.w3c-non-standard-color-name.css"); //$NON-NLS-1$
 		rules.add(wordRule);
 
-		// letters and hyphens, ignore case
-		WordRule wordRule3 = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
-		addWordsToRule(wordRule3, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
-		rules.add(wordRule3);
+		// ignore case
+		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
+		addWordsToRule(wordRule, FONT_NAMES, "support.constant.font-name.css"); //$NON-NLS-1$
+		rules.add(wordRule);
 
 		// Browser-specific property names
-		IWordDetector browserSpecificProperties = new LettersAndHyphensWordDetector()
+		IWordDetector browserSpecificProperties = new KeywordIdentifierDetector()
 		{
 			@Override
 			public boolean isWordStart(char c)
@@ -229,6 +228,9 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		rules.add(new RegexpRule(
 				"@[_a-zA-Z0-9-]+", createToken("keyword.control.at-rule.media.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 
+		// identifiers
+		rules.add(new RegexpRule("[_a-zA-Z0-9-]+", createToken("source.css"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
+
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
@@ -257,16 +259,16 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	}
 
 	/**
-	 * Detects words consisting only of letters and '-'. Must start with letter
+	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
 	 * 
 	 * @author cwilliams
 	 */
-	protected static class LettersAndHyphensWordDetector implements IWordDetector
+	protected static class KeywordIdentifierDetector implements IWordDetector
 	{
 		@Override
 		public boolean isWordPart(char c)
 		{
-			return Character.isLetter(c) || c == '-';
+			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
 		}
 
 		@Override

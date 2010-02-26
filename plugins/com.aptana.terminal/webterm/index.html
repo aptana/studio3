@@ -80,9 +80,19 @@
 				if (characterWidth === null || characterHeight === null)
 				{
 					var div = document.getElementById(terminalElementID);
+					
+					// save current font-weight and then set to bold
+					var oldWeight = div.style.fontWeight;
+					div.style.fontWeight = "bold";
+					
+					// get div's width and height
 					var divWidth = div.offsetWidth;
 					var divHeight = div.offsetHeight;
 					
+					// restore original font-weight
+					div.style.fontWeight = oldWeight;
+					
+					// calculate average width/height of a character
 					characterWidth = divWidth / terminal.getWidth();
 					characterHeight = divHeight / terminal.getHeight();
 				}
@@ -137,6 +147,29 @@
 				}
 				
 				return result;
+			}
+			
+			/**
+			 * onThemeChange
+			 */
+			function onThemeChange()
+			{
+				// reload CSS
+				var s = document.getElementById('ss');
+				var h = s.href.replace(/(&|\\?)forceReload=d /,'');
+				
+				s.href = h + (h.indexOf('?') >= 0 ? '&' : '?') + 'forceReload=' + (new Date().valueOf());
+				
+				window.setTimeout(
+					function()
+					{
+						// clear character size cache and force resize
+						characterWidth = null;
+						characterHeight = null;
+						resizeHelper();
+					},
+					1000
+				);
 			}
         </script>
     </head>

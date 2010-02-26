@@ -13,16 +13,19 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IViewPart;
@@ -38,6 +41,9 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
+import org.eclipse.ui.views.properties.PropertySheet;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -78,6 +84,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (invasiveThemesEnabled())
 		{
 			applyThemeToJDTEditor(getCurrentTheme(), false);
+			applyThemeToConsole(getCurrentTheme(), false);
 			window.getActivePage().addPartListener(this);
 			hijackCurrentViews(window, false);
 		}
@@ -85,9 +92,51 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		{
 			window.getActivePage().removePartListener(this);
 			applyThemeToJDTEditor(getCurrentTheme(), true);
+			applyThemeToConsole(getCurrentTheme(), true);
 			hijackCurrentViews(window, true);
 		}
 		return Status.OK_STATUS;
+	}
+
+	@SuppressWarnings("nls")
+	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults)
+	{
+
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui");
+		if (revertToDefaults)
+		{
+			prefs.remove("org.eclipse.debug.ui.errorColor");
+			prefs.remove("org.eclipse.debug.ui.outColor");
+			prefs.remove("org.eclipse.debug.ui.inColor");
+			prefs.remove("org.eclipse.debug.ui.consoleBackground");
+		}
+		else
+		{
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, "console.error", new RGB(0x80, 0, 0));
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, "console.output", currentTheme
+					.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, "console.input", currentTheme.getForeground());
+			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
+		}
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setColor(IEclipsePreferences prefs, String prefKey, Theme currentTheme, String tokenName,
+			RGB defaultColor)
+	{
+		RGB rgb = defaultColor;
+		if (currentTheme.hasEntry(tokenName))
+		{
+			rgb = currentTheme.getForegroundAsRGB(tokenName);
+		}
+		prefs.put(prefKey, StringConverter.asString(rgb));
 	}
 
 	protected void hijackCurrentViews(IWorkbenchWindow window, boolean revertToDefaults)
@@ -96,6 +145,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		for (IViewReference ref : refs)
 		{
 			hijackView(ref.getView(false), revertToDefaults);
+		}
+		IEditorReference[] editorRefs = window.getActivePage().getEditorReferences();
+		for (IEditorReference ref : editorRefs)
+		{
+			hijackEditor(ref.getEditor(false), revertToDefaults);
 		}
 	}
 
@@ -113,16 +167,20 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			try
+			Bundle b = Platform.getBundle("org.eclipse.ui.ide");
+			if (b.getVersion().compareTo(Version.parseVersion("3.6.0")) >= 0)
 			{
-				Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
-				m.setAccessible(true);
-				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
-				hookTheme(treeViewer.getTree(), revertToDefaults);
-			}
-			catch (Exception e)
-			{
-				// ignore
+				try
+				{
+					Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
+					m.setAccessible(true);
+					TreeViewer treeViewer = (TreeViewer) m.invoke(view);
+					hookTheme(treeViewer.getTree(), revertToDefaults);
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
 			}
 			return;
 		}
@@ -150,6 +208,20 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			hookTheme(page.getControl(), revertToDefaults);
 			return;
 		}
+		else if (view instanceof PropertySheet)
+		{
+			PropertySheet outline = (PropertySheet) view;
+			IPage page = outline.getCurrentPage();
+			hookTheme(page.getControl(), revertToDefaults);
+			return;
+		}
+		// else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
+		// {
+		// PageBookView outline = (PageBookView) view;
+		// IPage page = outline.getCurrentPage();
+		// hookTheme(page.getControl(), revertToDefaults);
+		// return;
+		// }
 		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
 		{
 			try
@@ -181,6 +253,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void hookTheme(Control tree, boolean revert)
 	{
+		// TODO Use TreeThemer?
 		if (revert)
 		{
 			tree.setBackground(null);
@@ -250,6 +323,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		// Set prefs for all editors
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 
+		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+
+		// Ant
+		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
+		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
+		setAntEditorValues(theme, antPrefs, revertToDefaults);
+
 		// Now set for JDT...
 		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
@@ -299,6 +379,13 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
 		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
 
+		// Java *.properties files
+		setToken(prefs, theme, "keyword.other.java-props", "pf_coloring_key", revertToDefaults);
+		setToken(prefs, theme, "comment.line.number-sign.java-props", "pf_coloring_comment", revertToDefaults);
+		setToken(prefs, theme, "string.java-props", "pf_coloring_value", revertToDefaults);
+		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults);
+		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults);
+
 		try
 		{
 			prefs.flush();
@@ -331,6 +418,62 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, revertToDefaults);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
+			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelection())); //$NON-NLS-1$
+		}
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
+	protected void setAntEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (revertToDefaults)
+		{
+			prefs.remove("org.eclipse.ant.ui.commentsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.processingInstructionsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.constantStringsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.textColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.tagsColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.ant.ui.dtdColor"); //$NON-NLS-1$
+		}
+		else
+		{
+			setToken(prefs, theme, "comment.block.xml.ant", "org.eclipse.ant.ui.commentsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme,
+					"meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.processingInstructionsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme,
+					"string.quoted.double.xml.ant", "org.eclipse.ant.ui.constantStringsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "text.xml.ant", "org.eclipse.ant.ui.textColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "entity.name.tag.target.xml.ant", "org.eclipse.ant.ui.tagsColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(prefs, theme, "meta.tag.preprocessor.xml.ant", "org.eclipse.ant.ui.dtdColor", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		try
 		{
@@ -402,6 +545,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			if (invasiveThemesEnabled())
 			{
 				applyThemeToJDTEditor(getCurrentTheme(), false);
+				applyThemeToConsole(getCurrentTheme(), false);
 				hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), false);
 			}
 		}
@@ -412,10 +556,54 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
+	protected void overrideSelectionColor(AbstractTextEditor editor)
+	{
+		if (editor instanceof AbstractThemeableEditor) // we already handle our own editors
+			return;
+
+		ISourceViewer sourceViewer = null;
+		try
+		{
+			Method m = AbstractTextEditor.class.getDeclaredMethod("getSourceViewer"); //$NON-NLS-1$
+			m.setAccessible(true);
+			sourceViewer = (ISourceViewer) m.invoke(editor);
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		if (sourceViewer == null || sourceViewer.getTextWidget() == null)
+			return;
+
+		// Force selection color
+		sourceViewer.getTextWidget().setSelectionBackground(
+				CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelection()));
+		if (!Platform.getOS().equals(Platform.OS_MACOSX))
+		{
+			// Linux and windows need selection fg set or we just see a block of color.
+			sourceViewer.getTextWidget().setSelectionForeground(
+					CommonEditorPlugin.getDefault().getColorManager().getColor(getCurrentTheme().getForeground()));
+		}
+	}
+
+	protected void hijackEditor(IEditorPart part, boolean revertToDefaults)
+	{
+		if (part instanceof AbstractTextEditor)
+		{
+			overrideSelectionColor((AbstractTextEditor) part);
+		}
+	}
+
 	// IPartListener
 	@Override
 	public void partOpened(IWorkbenchPart part)
 	{
+		if (part instanceof IEditorPart)
+		{
+			hijackEditor((IEditorPart) part, false);
+			return;
+		}
+
 		if (!(part instanceof IViewPart))
 			return;
 

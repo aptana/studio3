@@ -34,7 +34,13 @@
  */
 package com.aptana.editor.xml;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
+import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
+import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
+import com.aptana.editor.xml.parsing.XMLParser;
 
 public class XMLEditor extends AbstractThemeableEditor {
 
@@ -44,5 +50,23 @@ public class XMLEditor extends AbstractThemeableEditor {
 
         setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
         setDocumentProvider(new XMLDocumentProvider());
+
+		getFileService().setParser(new XMLParser());
     }
+
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		CommonOutlinePage outline = super.createOutlinePage();
+		outline.setContentProvider(new XMLOutlineContentProvider());
+		outline.setLabelProvider(new XMLOutlineLabelProvider());
+
+		return outline;
+	}
+
+	@Override
+	protected IPreferenceStore getOutlinePreferenceStore()
+	{
+		return XMLPlugin.getDefault().getPreferenceStore();
+	}
 }

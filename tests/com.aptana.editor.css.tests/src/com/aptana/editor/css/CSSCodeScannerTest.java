@@ -44,7 +44,16 @@ public class CSSCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
-	
+
+	public void testIdentifierWithKeyword()
+	{
+		String src = "table-row-group";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("source.css"), 0, 15);
+	}
+
 	public void testBrowserSpecificPropertyNames()
 	{
 		String src = "-moz-border-radius: 4px\n" +
@@ -95,6 +104,29 @@ public class CSSCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.terminator.rule.css"), 24, 1);
 		assertToken(Token.WHITESPACE, 25, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
+	}
+
+	public void testCSSEmTag()
+	{
+		// the preceding elements are to make sure "em" does not corrupt the rest of tokenizing
+		String src = "textarea.JScript, textarea.HTML {height:10em;}";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("entity.name.tag.css"), 0, 8);
+		assertToken(getToken("entity.other.attribute-name.class.css"), 8, 8);
+		assertToken(Token.WHITESPACE, 16, 1);
+		assertToken(Token.WHITESPACE, 17, 1);
+		assertToken(getToken("entity.name.tag.css"), 18, 8);
+		assertToken(getToken("entity.other.attribute-name.class.css"), 26, 5);
+		assertToken(Token.WHITESPACE, 31, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 32, 1);
+		assertToken(getToken("support.type.property-name.css"), 33, 6);
+		assertToken(getToken("punctuation.separator.key-value.css"), 39, 1);
+		assertToken(getToken("constant.numeric.css"), 40, 2);
+		assertToken(getToken("keyword.other.unit.css"), 42, 2); // "em"
+		assertToken(getToken("punctuation.terminator.rule.css"), 44, 1);
+		assertToken(getToken("punctuation.section.property-list.css"), 45, 1);
 	}
 
 	public void testBasicTokenizing()

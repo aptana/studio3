@@ -1,5 +1,7 @@
 package com.aptana.parsing.ast;
 
+import com.aptana.parsing.lexer.IRange;
+
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
@@ -110,6 +112,26 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	@Override
+	public INameNode getNameNode()
+	{
+		return new INameNode()
+		{
+
+			@Override
+			public String getName()
+			{
+				return getText();
+			}
+
+			@Override
+			public IRange getNameRange()
+			{
+				return ParseBaseNode.this;
+			}
+		};
+	}
+
+	@Override
 	public IParseNode getParent()
 	{
 		return fParent;
@@ -124,7 +146,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	@Override
 	public String getText()
 	{
-		return toString();
+		return ""; //$NON-NLS-1$
 	}
 
 	@Override
@@ -153,7 +175,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		fParent = parent;
 	}
 
-	protected void setChildren(IParseNode[] children)
+	public void setChildren(IParseNode[] children)
 	{
 		fChildren = children;
 		fChildrenCount = children.length;

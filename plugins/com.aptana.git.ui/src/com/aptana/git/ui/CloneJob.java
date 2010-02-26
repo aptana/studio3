@@ -67,7 +67,7 @@ public class CloneJob extends Job
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
 		try
 		{
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", sourceURI, dest); //$NON-NLS-1$
+			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			while (!launch.isTerminated())
 			{
 				if (subMonitor.isCanceled())

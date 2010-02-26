@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.junit;bundle-version="3.0.0",
  org.eclipse.jface.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.aptana.editor.ruby.tests

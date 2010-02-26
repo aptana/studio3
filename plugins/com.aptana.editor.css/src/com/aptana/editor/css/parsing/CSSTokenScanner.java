@@ -16,7 +16,6 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.css.parsing.lexer.CSSTokens;
 
 /**
@@ -122,7 +121,8 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// normal words
-		WordRule wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
+		IWordDetector identifierDetector = new KeywordIdentifierDetector();
+		WordRule wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
 		String identifier = getTokenName(CSSTokens.IDENTIFIER);
 		addWordsToRule(wordRule, HTML_TAGS, identifier);
 		addWordsToRule(wordRule, MEDIAS, identifier);
@@ -137,21 +137,16 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 		wordRule.addWord(KEYWORD_PAGE, createToken(getTokenName(CSSTokens.PAGE)));
 		rules.add(wordRule);
 
-		// property words
-		IWordDetector lettersAndHyphens = new LettersAndHyphensWordDetector();
-		wordRule = new WordRule(lettersAndHyphens, Token.UNDEFINED);
+		// property words and colors
+		wordRule = new WordRule(identifierDetector, Token.UNDEFINED);
 		addWordsToRule(wordRule, PROPERTY_NAMES, identifier);
-		rules.add(wordRule);
-
-		// letters and hyphens, ignore case
-		wordRule = new WordRule(lettersAndHyphens, Token.UNDEFINED, true);
-		addWordsToRule(wordRule, FONT_NAMES, identifier);
-		rules.add(wordRule);
-
-		// colors
-		wordRule = new WordRule(new WordDetector(), Token.UNDEFINED);
 		addWordsToRule(wordRule, STANDARD_COLORS, getTokenName(CSSTokens.COLOR));
 		addWordsToRule(wordRule, DEPRECATED_COLORS, getTokenName(CSSTokens.COLOR));
+		rules.add(wordRule);
+
+		// ignore case
+		wordRule = new WordRule(identifierDetector, Token.UNDEFINED, true);
+		addWordsToRule(wordRule, FONT_NAMES, identifier);
 		rules.add(wordRule);
 
 		// special character keywords
@@ -267,16 +262,16 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 	}
 
 	/**
-	 * Detects words consisting only of letters and '-'. Must start with letter
+	 * Detects words consisting only of letters, digits, '-', and '_'. Must start with letter
 	 * 
 	 * @author cwilliams
 	 */
-	private static final class LettersAndHyphensWordDetector implements IWordDetector
+	protected static class KeywordIdentifierDetector implements IWordDetector
 	{
 		@Override
 		public boolean isWordPart(char c)
 		{
-			return Character.isLetter(c) || c == '-';
+			return Character.isLetterOrDigit(c) || c == '-' || c == '_';
 		}
 
 		@Override

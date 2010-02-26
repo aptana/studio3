@@ -34,26 +34,10 @@
  */
 package com.aptana.parsing.lexer;
 
-public interface ILexeme {
+public interface ILexeme extends IRange {
 
     /**
      * @return the text of this lexeme
      */
     public String getText();
-
-    /**
-     * @return the length of this lexeme; should equal to getText().length(),
-     *         but implementation could optimize
-     */
-    public int getLength();
-
-    /**
-     * @return the starting offset of this lexeme
-     */
-    public int getStartingOffset();
-
-    /**
-     * @return the ending offset of this lexeme
-     */
-    public int getEndingOffset();
 }

@@ -1,6 +1,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
 import net.contentobjects.jnotify.IJNotify;
@@ -53,6 +54,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	private BundleMonitor()
 	{
+		this._watchId = -1;
 	}
 
 	/**
@@ -64,8 +66,43 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (this._registered == false)
 		{
+			// begin monitoring resource changes
 			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-			this._watchId = FileWatcher.addWatch(BundleManager.getInstance().getUserBundlesPath(), IJNotify.FILE_ANY, true, this);
+			
+			// Make sure the user bundles directory exists
+			String userBundlePath = BundleManager.getInstance().getUserBundlesPath();
+			File bundleDirectory = new File(userBundlePath);
+			boolean directoryExists = true;
+			
+			if (bundleDirectory.exists() == false)
+			{
+				directoryExists = bundleDirectory.mkdirs();
+			}
+			else
+			{
+				directoryExists = bundleDirectory.isDirectory();
+			}
+			
+			if (directoryExists)
+			{
+				try
+				{
+					this._watchId = FileWatcher.addWatch(BundleManager.getInstance().getUserBundlesPath(), IJNotify.FILE_ANY, true, this);
+				}
+				catch (JNotifyException e)
+				{
+					Activator.logError("An error occurred while registering a file watcher", e);
+				}
+			}
+			else
+			{
+				String message = MessageFormat.format(
+					"Unable to register file watcher for {0}. The path is not a directory or does not exist",
+					userBundlePath
+				);
+				
+				Activator.logError(message, null);
+			}
 
 			this._registered = true;
 		}
@@ -81,7 +118,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		if (this._registered)
 		{
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
-			FileWatcher.removeWatch(this._watchId);
+			
+			if (this._watchId != -1)
+			{
+				FileWatcher.removeWatch(this._watchId);
+				this._watchId = -1;
+			}
 			
 			this._registered = false;
 		}

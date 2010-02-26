@@ -29,6 +29,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.ScopeSelector;
 
 /**
  * A class that can be installed on a ITextViewer and will auto-insert the closing peer character for typical paired
@@ -47,6 +48,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs;
+
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
 	{
@@ -79,6 +82,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 		try
 		{
+
+			String scope = getScopeAtOffset(document, offset);
+			if (fgCommentSelector.matches(scope))
+			{
+				return;
+			}
+
 			if (length > 0)
 			{
 				wrapSelection(event, document, offset, length);
@@ -173,57 +183,80 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 	}
 
+	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+	}
+
 	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
 	{
 		try
 		{
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset).trim();
+			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for comment scope matching
 			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
+
 				char c = before.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					{
+						stackLevel--;
+					}
 				}
 			}
 
-			String after = document.get(offset, document.getLength() - offset).trim();
+			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need offsets to match for comment scope matching
 			for (int i = 0; i < after.length(); i++)
 			{
 				char c = after.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					stackLevel++;
-					stackLevel = stackLevel % 2;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+						stackLevel = stackLevel % 2;
+					}
 				}
 				else if (c == openingChar)
 				{
-					stackLevel++;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel++;
+					}
 				}
 				else if (c == closingCharacter)
 				{
-					stackLevel--;
-					if (stackLevel < 0)
-						return true;
+					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					{
+						stackLevel--;
+						if (stackLevel < 0)
+							return true;
+					}
 				}
 			}
 			return stackLevel != 0;
 		}
 		catch (BadLocationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// ignore
 		}
 		return false;
 	}
@@ -257,6 +290,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
+			if (fgCommentSelector.matches(getScopeAtOffset(document, beginning + index)))
+				continue;
 			open = !open;
 			if (open)
 			{

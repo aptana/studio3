@@ -50,7 +50,8 @@ class FileTypeAssociationListener implements BundleChangeListener
 		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		if (type == null)
 		{
-			Activator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null);
+			Activator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
+			return;
 		}
 		try
 		{

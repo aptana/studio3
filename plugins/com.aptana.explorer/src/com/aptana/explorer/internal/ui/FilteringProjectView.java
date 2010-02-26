@@ -6,6 +6,9 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -38,6 +41,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -83,6 +87,7 @@ public class FilteringProjectView extends GitProjectView
 	private Image eyeball;
 
 	private Composite customComposite;
+	private IResourceChangeListener fResourceListener;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -96,7 +101,6 @@ public class FilteringProjectView extends GitProjectView
 		super.createPartControl(customComposite);
 
 		patternFilter = new PathFilter();
-		getCommonViewer().addFilter(patternFilter);
 		createRefreshJob();
 
 		// Add eyeball hover
@@ -106,6 +110,7 @@ public class FilteringProjectView extends GitProjectView
 			restoreState(memento);
 		}
 		memento = null;
+		addResourceListener();
 	}
 
 	@Override
@@ -424,6 +429,55 @@ public class FilteringProjectView extends GitProjectView
 		clearText();
 	}
 
+	@Override
+	public void dispose()
+	{
+		removeResourceListener();
+		super.dispose();
+	}
+
+	private void addResourceListener()
+	{
+		// Add a listener for add/remove/edits of files in this project!
+		fResourceListener = new IResourceChangeListener()
+		{
+
+			@Override
+			public void resourceChanged(IResourceChangeEvent event)
+			{
+				if (selectedProject == null || !selectedProject.exists())
+					return;
+				IResourceDelta delta = event.getDelta();
+				IResourceDelta[] children = delta.getAffectedChildren();
+				for (IResourceDelta iResourceDelta : children)
+				{
+					IResource resource = iResourceDelta.getResource();
+					if (resource == null)
+						continue;
+					if (resource.getProject().equals(selectedProject))
+					{
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() 
+						{
+							
+							@Override
+							public void run() 
+							{
+								getCommonViewer().refresh();
+							}
+						});						
+						return;
+					}
+				}
+			}
+		};
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fResourceListener, IResourceChangeEvent.POST_CHANGE);
+	}
+
+	private void removeResourceListener()
+	{
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fResourceListener);
+	}
+
 	/**
 	 * Clears the text in the filter text widget.
 	 */
@@ -499,10 +553,13 @@ public class FilteringProjectView extends GitProjectView
 				if (initial)
 				{
 					patternFilter.setPattern(null);
+					getCommonViewer().removeFilter(patternFilter);
 				}
 				else
 				{
+					getCommonViewer().removeFilter(patternFilter);
 					patternFilter.setPattern(text);
+					getCommonViewer().addFilter(patternFilter);
 				}
 
 				Control redrawFalseControl = getCommonViewer().getControl();

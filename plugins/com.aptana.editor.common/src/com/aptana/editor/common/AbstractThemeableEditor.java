@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
@@ -21,6 +22,7 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -29,13 +31,17 @@ import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Caret;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
@@ -61,7 +67,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
-import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 
@@ -105,6 +111,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 
 	private boolean fCursorChangeListened;
 
+	private IPropertyChangeListener blockSelectionModeFontAdjuster;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -130,6 +138,47 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
 		contextService.activateContext(Activator.CONTEXT_ID);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#setFocus()
+	 *
+	 * This is to workaround the Eclipse SWT bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=303677f
+	 */
+	@Override
+	public void setFocus()
+	{
+		super.setFocus();
+
+		// The above Eclipse SWT bug only occurs on Mac OS Cocoa builds
+		// "cocoa" is hardcoded because Platform.WS_COCOA was added
+		// in Eclipse 3.5
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && Platform.getWS().equals("cocoa")) //$NON-NLS-1$
+		{
+			final Shell shell = getSite().getShell();
+			Display display = shell.getDisplay();
+			if (display.getFocusControl() != getSourceViewer().getTextWidget())
+			{
+				// Focus did not stick due to the bug above. This is most likely
+				// because of the containing shell is not the active shell.
+				if (shell != display.getActiveShell())
+				{
+					// Queue up a setFocus() when the containing shell activates.
+					shell.addShellListener(new ShellAdapter()
+					{
+						@Override
+						public void shellActivated(ShellEvent e)
+						{
+							// Cleanup
+							shell.removeShellListener(this);
+
+							// Set the focus
+							AbstractThemeableEditor.this.setFocus();
+						}
+					});
+				}
+			}
+		}
 	}
 
 	/*
@@ -352,9 +401,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		getSourceViewer().getTextWidget().setSelectionBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(
 						getThemeManager().getCurrentTheme().getSelection()));
-		if (!Platform.getOS().equals(Platform.OS_WIN32) && !Platform.getOS().equals(Platform.OS_MACOSX))
+		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
-			// Linux needs selection fg set or we just see a block of color.
+			// Linux and windows need selection fg set or we just see a block of color.
 			getSourceViewer().getTextWidget().setSelectionForeground(
 					CommonEditorPlugin.getDefault().getColorManager().getColor(
 							getThemeManager().getCurrentTheme().getForeground()));
@@ -491,6 +540,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			fCaretImage = null;
 		}
 		removeLineHighlightListener();
+		if (blockSelectionModeFontAdjuster != null)
+		{
+			JFaceResources.getFontRegistry().removeListener(blockSelectionModeFontAdjuster);
+		}
 		super.dispose();
 	}
 
@@ -509,6 +562,28 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 		fFileService = new FileService();
+
+		/**
+		 * This listener is used to track changes to the font settings.
+		 */
+		blockSelectionModeFontAdjuster = new IPropertyChangeListener()
+		{
+			@Override
+			public void propertyChange(PropertyChangeEvent event)
+			{
+				String property = event.getProperty();
+				if (JFaceResources.TEXT_FONT.equals(property));
+				{
+					if (isBlockSelectionModeEnabled())
+					{
+						// Force the editor to refresh the font.
+						setBlockSelectionMode(false);
+						setBlockSelectionMode(true);
+					}
+				}
+			}
+		};
+		JFaceResources.getFontRegistry().addListener(blockSelectionModeFontAdjuster);
 	}
 
 	@Override
@@ -581,15 +656,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return getOutlineElementAt(caret);
 	}
 
-	public void select(ILexeme element, boolean checkIfOutlineActive)
+	public void select(IRange element, boolean checkIfOutlineActive)
 	{
 		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
 		{
 			// disables listening to cursor change so we don't get into the loop of setting selections between editor
 			// and outline
 			fCursorChangeListened = false;
-			selectAndReveal(element.getStartingOffset(), element.getLength());
+			setSelectedElement(element);
 		}
+	}
+
+	protected void setSelectedElement(IRange element)
+	{
+		int offset = element.getStartingOffset();
+		int length = element.getLength();
+		setHighlightRange(offset, length, false);
+		selectAndReveal(offset, length);
 	}
 
 	protected void handleCursorPositionChanged()

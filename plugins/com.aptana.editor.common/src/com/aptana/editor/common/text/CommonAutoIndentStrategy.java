@@ -198,8 +198,7 @@ public class CommonAutoIndentStrategy implements IAutoEditStrategy
 		try
 		{
 			// finds the start of line
-			int p = (c.offset == d.getLength() ? c.offset - 1 : c.offset);
-			IRegion info = d.getLineInformationOfOffset(p);
+			IRegion info = d.getLineInformationOfOffset(c.offset);
 			int start = info.getOffset();
 			// finds the white spaces
 			int end = findEndOfWhiteSpace(d, start, c.offset);

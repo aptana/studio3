@@ -20,3 +20,4 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.editor.html,
  com.aptana.editor.html.outline,
  com.aptana.editor.html.parsing
+Eclipse-ExtensibleAPI: true

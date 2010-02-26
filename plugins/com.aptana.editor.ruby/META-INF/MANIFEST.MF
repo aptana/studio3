@@ -23,3 +23,4 @@ Export-Package: com.aptana.editor.ruby,
  org.jrubyparser.parser;x-friends:="com.aptana.editor.ruby.tests"
 Bundle-ClassPath: lib/JRubyParser.jar,
  .
+Eclipse-ExtensibleAPI: true

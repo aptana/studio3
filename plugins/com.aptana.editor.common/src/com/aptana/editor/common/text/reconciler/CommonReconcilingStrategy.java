@@ -67,6 +67,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
+
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -121,8 +122,12 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	protected void calculatePositions(IProgressMonitor monitor)
 	{
+		if (monitor != null && monitor.isCanceled())
+			return;
 		// doing a full parse at the moment
 		fEditor.getFileService().parse();
+		if (monitor != null && monitor.isCanceled())
+			return;
 		// Folding...
 		fPositions.clear();
 		try
@@ -133,6 +138,10 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		{
 			CommonEditorPlugin.logError(e);
 		}
+		// If we had all positions we shouldn't probably listen to cancel, but we may have exited emitFoldingRegions
+		// early because of cancel...
+		if (monitor != null && monitor.isCanceled())
+			return;
 
 		Display.getDefault().asyncExec(new Runnable()
 		{

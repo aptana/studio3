@@ -1,71 +1,21 @@
 package com.aptana.scripting.ui.views;
 
-import java.io.File;
-
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.SnippetElement;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.ColorManager;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
 
-class BundleViewLabelProvider implements ILabelProvider
+class BundleViewLabelProvider implements ILabelProvider, IColorProvider, IFontProvider
 {
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
-	public Image getImage(Object element)
-	{
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
-	public String getText(Object element)
-	{
-		String result = null;
-		
-		if (element instanceof String)
-		{
-			result = (String) element;
-		}
-		else if (element instanceof BundleElement)
-		{
-			BundleElement bundle = (BundleElement) element;
-			File file = new File(bundle.getPath());
-			
-			result = file.getAbsolutePath();
-		}
-		else if (element instanceof CollectionNode)
-		{
-			result = ((CollectionNode) element).getLabel();
-		}
-		else if (element instanceof SnippetElement)
-		{
-			SnippetElement snippet = (SnippetElement) element;
-			String[] triggers = snippet.getTriggers();
-			
-			if (triggers != null && triggers.length > 0)
-			{
-				result = triggers[0] + ": " + snippet.getDisplayName(); //$NON-NLS-1$
-			}
-			else
-			{
-				result = snippet.getDisplayName();
-			}
-		}
-		else if (element instanceof AbstractElement)
-		{
-			result = ((AbstractElement) element).getDisplayName();
-		}
-		
-		return result;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
@@ -84,6 +34,78 @@ class BundleViewLabelProvider implements ILabelProvider
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
+	public Color getBackground(Object element)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
+	public Font getFont(Object element)
+	{
+		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+
+		if (font == null)
+		{
+			font = JFaceResources.getTextFont();
+		}
+
+		return font;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	public Color getForeground(Object element)
+	{
+		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ColorManager colorManager = plugin.getColorManager();
+		IThemeManager themeManager = plugin.getThemeManager();
+		Theme currentTheme = themeManager.getCurrentTheme();
+
+		return colorManager.getColor(currentTheme.getForeground());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
+	 */
+	public Image getImage(Object element)
+	{
+		Image result = null;
+
+		if (element instanceof IBundleViewNode)
+		{
+			result = ((IBundleViewNode) element).getImage();
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+	 */
+	public String getText(Object element)
+	{
+		String result = null;
+
+		if (element instanceof IBundleViewNode)
+		{
+			result = ((IBundleViewNode) element).getLabel();
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
 	 */
 	public boolean isLabelProperty(Object element, String property)
@@ -93,7 +115,8 @@ class BundleViewLabelProvider implements ILabelProvider
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 * @see
+	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
 	public void removeListener(ILabelProviderListener listener)
 	{

@@ -7,8 +7,9 @@
             class="com.aptana.editor.text.TextEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            icon="icons/text.png"
             id="com.aptana.editor.text"
-            name="Text Editor">
+            name="%editor.text.name">
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.text">
          </contentTypeBinding>
@@ -25,6 +26,7 @@
             file-names="README,TODO,README_FOR_APP,CHANGELOG,LICENSE,ABOUT">
       </file-association>
       <content-type
+            base-type="org.eclipse.core.runtime.text"
             id="com.aptana.editor.text.content-type.generic"
             name="Generic Content Type"
             priority="normal">
