@@ -586,7 +586,6 @@ public class BundleElement extends AbstractElement
 		{
 			if (this._commands != null && (removed = this._commands.remove(command)))
 			{
-				// TODO Unregister the template with the registry
 				AbstractElement.unregisterElement(command);
 			}
 		}
