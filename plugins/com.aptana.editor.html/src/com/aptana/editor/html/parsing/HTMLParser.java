@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.rules.IToken;
+
 import beaver.Symbol;
 import beaver.Scanner.Exception;
 
 import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -29,6 +33,7 @@ public class HTMLParser implements IParser
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
+	private HTMLTagScanner fTagScanner;
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
@@ -44,6 +49,7 @@ public class HTMLParser implements IParser
 	{
 		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
+		fTagScanner = new HTMLTagScanner();
 		fLanguageParsers = new HashMap<String, IParser>();
 		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
 		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
@@ -102,7 +108,8 @@ public class HTMLParser implements IParser
 		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
+			fCurrentElement
+					.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
 		}
 	}
 
@@ -152,6 +159,8 @@ public class HTMLParser implements IParser
 				.getEnd());
 		// pushes the element onto the stack
 		openElement(element);
+
+		parseAttribute(element, fCurrentSymbol.value.toString());
 	}
 
 	private void processEndTag() throws IOException, Exception
@@ -164,8 +173,38 @@ public class HTMLParser implements IParser
 					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 			{
 				// adjusts the ending offset of current element to include the entire block
-				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getEnd());
+				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol
+						.getEnd());
 				closeElement();
+			}
+		}
+	}
+
+	private void parseAttribute(HTMLElementNode element, String tag)
+	{
+		fTagScanner.setRange(new Document(tag), 0, tag.length());
+		IToken token;
+		Object data;
+		String name = null, value = null;
+		while (!(token = fTagScanner.nextToken()).isEOF())
+		{
+			data = token.getData();
+			if (data == null)
+			{
+				continue;
+			}
+
+			if (data == TokenType.ATTR_NAME)
+			{
+				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+			}
+			else if (data == TokenType.ATTR_VALUE)
+			{
+				// found a pair
+				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+				element.setAttribute(name, value);
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package com.aptana.editor.html.parsing.ast;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import beaver.Symbol;
@@ -11,6 +13,9 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLElementNode extends HTMLNode
 {
+
+	private static final String ID = "id"; //$NON-NLS-1$
+	private static final String CLASS = "class"; //$NON-NLS-1$
 
 	private static final class NameNode implements INameNode
 	{
@@ -38,6 +43,7 @@ public class HTMLElementNode extends HTMLNode
 	}
 
 	private INameNode fNameNode;
+	private Map<String, String> fAttributes;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
@@ -67,6 +73,7 @@ public class HTMLElementNode extends HTMLNode
 			}
 		}
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
+		fAttributes = new HashMap<String, String>();
 	}
 
 	public String getName()
@@ -78,6 +85,37 @@ public class HTMLElementNode extends HTMLNode
 	public INameNode getNameNode()
 	{
 		return fNameNode;
+	}
+
+	@Override
+	public String getText()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append(getName());
+		if (getID() != null)
+		{
+			text.append(" ").append(ID).append("=").append(getID()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (getCSSClass() != null)
+		{
+			text.append(" ").append(CLASS).append("=").append(getCSSClass()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return text.toString();
+	}
+
+	public String getID()
+	{
+		return fAttributes.get(ID);
+	}
+
+	public String getCSSClass()
+	{
+		return fAttributes.get(CLASS);
+	}
+
+	public void setAttribute(String name, String value)
+	{
+		fAttributes.put(name, value);
 	}
 
 	@Override
