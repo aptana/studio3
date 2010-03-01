@@ -1,6 +1,5 @@
 var terminal;
 var terminalElementID = "terminal";
-var fontInfo;
 var RESIZE_INTERVAL = 250;
 var resizeID = null;
 
@@ -47,7 +46,16 @@ function getInput()
  */
 function hasSelection()
 {
-	return terminal.hasSelection();
+	if (terminal._useNativeCopy)
+	{
+		var text = terminal.getSelectedText();
+		
+		return (isString(text) && text.length > 0);
+	}
+	else
+	{
+		return terminal.hasSelection();
+	}
 }
 
 /**
@@ -65,25 +73,6 @@ function init()
 	
 	// create terminal
 	terminal = new Term(terminalElementID, 80,20, config);
-	
-	// save reference to fontInfo
-	fontInfo = terminal.getFontInfo();
-	
-	// turn on tracking for mono-spaced fonts
-	if (fontInfo.isMonospaced())
-	{
-		// get rule for div.webterm pre span.b
-		var rule = getCSSRule("div.webterm pre span.b");
-		
-		if (rule)
-		{
-			// apply tracking
-			rule.style.letterSpacing = fontInfo.getTracking();
-			
-			// and let know font info know we've done that
-			fontInfo.useTracking(true);
-		}
-	}
 	
 	// resize to fit
 	resizeHelper();
@@ -109,7 +98,7 @@ function onThemeChange()
 		function()
 		{
 			// reset font info cache
-			fontInfo.reset();
+			terminal.getFontInfo().reset();
 
 			// force resize						
 			resizeHelper();
@@ -127,8 +116,31 @@ function resizeHelper()
 	// clear timeout id
 	resizeID = null;
 	
+	// A little hacky: we know when we reset fontInfo in nativeCopy mode, it
+	// reports as non-monospaced before calling sizeToWindow but it will be
+	// mono-spaced after the call. This allows us to apply letter spacing only
+	// once
+	fontInfo = terminal.getFontInfo();
+	var beforeMono = fontInfo.isMonospaced();
+	
 	// resize terminal to fill the window
 	terminal.sizeToWindow();
+	
+	// turn on tracking for mono-spaced fonts
+	if (beforeMono === false && fontInfo.isMonospaced())
+	{
+		// get rule for div.webterm pre span.b
+		var rule = getCSSRule("div.webterm pre span.b");
+		
+		if (rule)
+		{
+			// apply tracking
+			rule.style.letterSpacing = fontInfo.getTracking();
+			
+			// and let know font info know we've done that
+			fontInfo.useTracking(true);
+		}
+	}
 }
 
 /**
