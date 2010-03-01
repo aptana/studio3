@@ -1,7 +1,14 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.eclipse.compare.CompareUI;
+import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -10,6 +17,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -24,13 +32,21 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.history.IFileHistoryProvider;
+import org.eclipse.team.core.history.IFileRevision;
+import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
@@ -43,6 +59,7 @@ import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
+import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 
 /**
  * Adds Git UI elements to the Single Project View.
@@ -157,6 +174,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					}
 					else
 					{
+						createDiffMenuItem(menu);
 						createCommitMenuItem(menu);
 						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 						if (commitsAhead != null && commitsAhead.length > 0)
@@ -340,6 +358,57 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				job.setUser(true);
 				job.setPriority(Job.LONG);
 				job.schedule();
+			}
+		});
+	}
+
+	private void createDiffMenuItem(Menu menu)
+	{
+		MenuItem commit = new MenuItem(menu, SWT.PUSH);
+		// commit.setImage(ExplorerPlugin.getImage(COMMIT_ICON_PATH));
+		commit.setText(Messages.GitProjectView_DiffTooltip);
+		commit.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				GitRepository repo = GitRepository.getAttached(selectedProject);
+				if (repo == null)
+					return;
+				ISelection sel = getCommonViewer().getSelection();
+				RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject, GitRepositoryProvider.ID);
+				IFileHistoryProvider prov = provider.getFileHistoryProvider();
+				Set<IResource> resources = new HashSet<IResource>();
+				IStructuredSelection structured = (IStructuredSelection) sel;
+				for (Object element : structured.toList())
+				{
+					if (element == null)
+						continue;
+
+					if (element instanceof IResource)
+						resources.add((IResource) element);
+
+					if (element instanceof IAdaptable)
+					{
+						IAdaptable adapt = (IAdaptable) element;
+						IResource resource = (IResource) adapt.getAdapter(IResource.class);
+						if (resource != null)
+							resources.add(resource);
+					}
+				}
+				for (IResource resource : resources)
+				{
+					ChangedFile changedFile = repo.getChangedFileForResource(resource);
+					if (changedFile == null)
+						continue;
+					String name = changedFile.getPath();
+					final IFileRevision baseFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name);
+					final IFileRevision nextFile = prov.getWorkspaceFileRevision(resource);
+					final ITypedElement base = new FileRevisionTypedElement(baseFile);
+					final ITypedElement next = new FileRevisionTypedElement(nextFile);
+					final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
+					CompareUI.openCompareEditor(in);
+				}
 			}
 		});
 	}
