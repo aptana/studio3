@@ -18,7 +18,6 @@ public class Messages extends NLS
 	public static String GitProjectView_CreateBranchDialog_Title;
 	public static String GitProjectView_createNewBranchOption;
 	public static String GitProjectView_Expand_tooltip;
-	public static String SingleProjectView_InitialFileFilterText;
 	public static String GitProjectView_InvalidBranchNameMessage;
 	public static String GitProjectView_LBL_ShowGitHubNetwork;
 	public static String GitProjectView_NonEmptyBranchNameMessage;
@@ -39,6 +38,7 @@ public class Messages extends NLS
 	public static String GitProjectView_StageJobTitle;
 	public static String GitProjectView_UnstageTooltip;
 	public static String GitProjectView_UnstageJobTitle;
+	public static String GitProjectView_StatusTooltip;
 	
 	public static String SingleProjectView_CaseSensitive;
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
@@ -49,6 +49,7 @@ public class Messages extends NLS
 	public static String SingleProjectView_RunMenuTitle;
 	public static String SingleProjectView_SwitchToApplication;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;
+	public static String SingleProjectView_InitialFileFilterText;
 	
 	static
 	{

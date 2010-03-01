@@ -44,7 +44,7 @@
                tooltip="%PullAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.StatusAction"
+               class="com.aptana.git.ui.actions.StatusAction"
                definitionId="com.aptana.git.ui.command.status"
                id="com.aptana.git.ui.actions.StatusAction"
                label="%StatusAction_label"

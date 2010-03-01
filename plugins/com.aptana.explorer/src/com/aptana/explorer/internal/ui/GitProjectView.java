@@ -16,10 +16,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,6 +60,7 @@ import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.StageAction;
 import com.aptana.git.ui.actions.StashAction;
+import com.aptana.git.ui.actions.StatusAction;
 import com.aptana.git.ui.actions.UnstageAction;
 import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
@@ -79,6 +82,9 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private static final String CHAGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
 
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
+	private static final String GROUP_GIT_SINGLE_FILES = "group.git.files"; //$NON-NLS-1$
+	private static final String GROUP_GIT_PROJECTS = "group.git.project"; //$NON-NLS-1$
+	private static final String GROUP_GIT_BRANCHING = "group.git.branching"; //$NON-NLS-1$
 
 	private Label leftLabel;
 	private GridData leftLabelGridData;
@@ -161,111 +167,25 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	@Override
 	protected void fillCommandsMenu(MenuManager menuManager)
 	{
-		menuManager.add(new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				if (selectedProject != null && selectedProject.exists())
-				{
-					GitRepository repository = GitRepository.getAttached(selectedProject);
-					new MenuItem(menu, SWT.SEPARATOR);
-					if (repository == null)
-					{
-						createRepoMenuItem(menu);
-					}
-					else
-					{
-						createDiffMenuItem(menu);
-						createCommitMenuItem(menu);
-						createStageMenuItem(menu);
-						createUnstageMenuItem(menu);
-						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
-						if (commitsAhead != null && commitsAhead.length > 0)
-						{
-							createPushMenuItem(menu);
-						}
-						if (repository.trackingRemote(repository.currentBranch()))
-						{
-							createPullMenuItem(menu);
-						}
-						createStashMenuItem(menu);
-						createUnstashMenuItem(menu);
-					}
-				}
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
 		super.fillCommandsMenu(menuManager);
 
-		menuManager.add(new ContributionItem()
+		// Set up Git groups
+		menuManager.insertBefore(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_SINGLE_FILES));
+		menuManager.insertAfter(GROUP_GIT_SINGLE_FILES, new Separator(GROUP_GIT_PROJECTS));
+		menuManager.insertAfter(GROUP_GIT_PROJECTS, new Separator(GROUP_GIT_BRANCHING));
+
+		// Add git filter to filtering group
+		menuManager.appendToGroup(IContextMenuConstants.GROUP_FILTERING, new ContributionItem()
 		{
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				if (selectedProject != null)
+				if (selectedProject == null || !selectedProject.exists())
+					return;
+				GitRepository repository = GitRepository.getAttached(selectedProject);
+				if (repository != null)
 				{
-					GitRepository repository = GitRepository.getAttached(selectedProject);
-					if (repository != null)
-					{
-						// Switch to branch
-						MenuItem branchesMenuItem = new MenuItem(menu, SWT.CASCADE);
-						branchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
-
-						Menu branchesMenu = new Menu(menu);
-						String currentBranchName = repository.currentBranch();
-						for (String branchName : repository.localBranches())
-						{
-							// Construct the menu item to for this branch
-							final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.RADIO);
-							if (branchName.equals(currentBranchName) && repository.isDirty())
-							{
-								branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
-							}
-							else
-							{
-								branchNameMenuItem.setText(branchName);
-							}
-							branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
-
-							branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-							{
-								public void widgetSelected(SelectionEvent e)
-								{
-									setNewBranch(branchNameMenuItem.getText());
-								}
-							});
-
-						}
-						branchesMenuItem.setMenu(branchesMenu);
-
-						// Create branch
-						final MenuItem branchNameMenuItem = new MenuItem(menu, SWT.PUSH);
-						branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
-						branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-						{
-							public void widgetSelected(SelectionEvent e)
-							{
-								setNewBranch(branchNameMenuItem.getText());
-							}
-						});
-
-						// TODO Merge Branch
-
-						new MenuItem(menu, SWT.SEPARATOR);
-
-						createFilterMenuItem(menu);
-
-						// TODO Show History
-
-						createShowGithubNetworkMenuItem(menu);
-					}
+					createFilterMenuItem(menu);
 				}
 			}
 
@@ -276,6 +196,109 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 
+		// Add the git file actions
+		menuManager.appendToGroup(GROUP_GIT_SINGLE_FILES, new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				if (selectedProject == null || !selectedProject.exists())
+					return;
+				GitRepository repository = GitRepository.getAttached(selectedProject);
+				if (repository == null)
+				{
+					return;
+				}
+				createStageMenuItem(menu);
+				createUnstageMenuItem(menu);
+				createDiffMenuItem(menu);
+				// TODO Conflicts
+				// TODO Revert
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
+		// add the git project actions
+		menuManager.appendToGroup(GROUP_GIT_PROJECTS, new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				if (selectedProject == null || !selectedProject.exists())
+					return;
+				GitRepository repository = GitRepository.getAttached(selectedProject);
+				if (repository == null)
+				{
+					createRepoMenuItem(menu);
+				}
+				else
+				{
+					createCommitMenuItem(menu);
+
+					String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
+					if (commitsAhead != null && commitsAhead.length > 0)
+					{
+						createPushMenuItem(menu);
+					}
+					if (repository.trackingRemote(repository.currentBranch()))
+					{
+						createPullMenuItem(menu);
+					}
+					createGitStatusMenuItem(menu);
+				}
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
+		// Add the git branching/misc items
+		menuManager.appendToGroup(GROUP_GIT_BRANCHING, new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				if (selectedProject == null || !selectedProject.exists())
+					return;
+				GitRepository repository = GitRepository.getAttached(selectedProject);
+				if (repository == null)
+					return;
+
+				
+				// Branch submenu, which contains...
+				MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
+				branchMenuItem.setText("Branch");
+				Menu branchSubMenu = new Menu(menu);
+				addSwitchBranchSubMenu(repository, branchSubMenu);
+				// TODO Merge Branch submenu
+				addCreateBranchMenuItem(branchSubMenu);
+				// TODO Delete branch submenu
+				branchMenuItem.setMenu(branchSubMenu);
+				
+				// More submenu, which contains...
+				MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
+				moreMenuItem.setText("More");
+				Menu moreSubMenu = new Menu(menu);
+				createStashMenuItem(moreSubMenu);
+				createUnstashMenuItem(moreSubMenu);
+				// .. TODO Show in Resource History
+				createShowGithubNetworkMenuItem(moreSubMenu);
+				// TODO Disconnect
+				moreMenuItem.setMenu(moreSubMenu);
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+		});
 	}
 
 	@Override
@@ -525,8 +548,23 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			public void widgetSelected(SelectionEvent e)
 			{
 				CommitAction action = new CommitAction();
-				ISelection selection = new StructuredSelection(selectedProject);
-				action.selectionChanged(null, selection);
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				action.run();
+			}
+		});
+	}
+	
+	private void createGitStatusMenuItem(Menu menu)
+	{
+		MenuItem commit = new MenuItem(menu, SWT.PUSH);
+		commit.setText(Messages.GitProjectView_StatusTooltip);
+		commit.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				StatusAction action = new StatusAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
 				action.run();
 			}
 		});
@@ -911,5 +949,52 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				filterOnInitially = true;
 			}
 		}
+	}
+
+	protected void addCreateBranchMenuItem(Menu menu)
+	{
+		// Create branch
+		final MenuItem branchNameMenuItem = new MenuItem(menu, SWT.PUSH);
+		branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
+		branchNameMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				setNewBranch(branchNameMenuItem.getText());
+			}
+		});
+	}
+
+	protected void addSwitchBranchSubMenu(GitRepository repository, Menu menu)
+	{
+		// Switch to branch
+		MenuItem switchBranchesMenuItem = new MenuItem(menu, SWT.CASCADE);
+		switchBranchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
+		Menu switchBranchesSubMenu = new Menu(menu);
+		String currentBranchName = repository.currentBranch();
+		for (String branchName : repository.localBranches())
+		{
+			// Construct the menu item to for this branch
+			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
+			if (branchName.equals(currentBranchName) && repository.isDirty())
+			{
+				branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
+			}
+			else
+			{
+				branchNameMenuItem.setText(branchName);
+			}
+			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
+			branchNameMenuItem.addSelectionListener(new SelectionAdapter()
+			{
+				public void widgetSelected(SelectionEvent e)
+				{
+					setNewBranch(branchNameMenuItem.getText());
+				}
+			});
+		}
+		// only 1 branch, no need to switch
+		switchBranchesMenuItem.setEnabled(repository.localBranches().size() > 1);
+		switchBranchesMenuItem.setMenu(switchBranchesSubMenu);
 	}
 }
