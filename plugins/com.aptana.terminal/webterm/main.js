@@ -120,7 +120,7 @@ function resizeHelper()
 	// reports as non-monospaced before calling sizeToWindow but it will be
 	// mono-spaced after the call. This allows us to apply letter spacing only
 	// once
-	fontInfo = terminal.getFontInfo();
+	var fontInfo = terminal.getFontInfo();
 	var beforeMono = fontInfo.isMonospaced();
 	
 	// resize terminal to fill the window
