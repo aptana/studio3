@@ -63,7 +63,7 @@ public class HTMLParserTest extends TestCase
 		IParseNode result = fParser.parse(fParseState);
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
-		assertEquals("html id=\"aptana\" class=\"cool\"", children[0].getText());
+		assertEquals("html#aptana.cool", children[0].getText());
 	}
 
 	public void testStyle() throws Exception

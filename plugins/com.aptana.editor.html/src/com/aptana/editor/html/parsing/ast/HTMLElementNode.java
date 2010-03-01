@@ -94,11 +94,11 @@ public class HTMLElementNode extends HTMLNode
 		text.append(getName());
 		if (getID() != null)
 		{
-			text.append(" ").append(ID).append("=").append(getID()); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append("#").append(getID()); //$NON-NLS-1$
 		}
 		if (getCSSClass() != null)
 		{
-			text.append(" ").append(CLASS).append("=").append(getCSSClass()); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append(".").append(getCSSClass()); //$NON-NLS-1$
 		}
 		return text.toString();
 	}

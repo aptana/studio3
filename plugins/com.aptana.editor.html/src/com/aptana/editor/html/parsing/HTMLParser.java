@@ -204,7 +204,8 @@ public class HTMLParser implements IParser
 				// found a pair
 				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
 						+ fTagScanner.getTokenLength());
-				element.setAttribute(name, value);
+				// strips the quotation marks and any surrounding whitespaces
+				element.setAttribute(name, value.substring(1, value.length() - 1).trim());
 			}
 		}
 	}
