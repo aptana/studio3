@@ -61,6 +61,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.git.ui.actions.RevertAction;
 import com.aptana.git.ui.internal.DiffFormatter;
 
 public class CommitDialog extends StatusDialog

@@ -110,7 +110,7 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
-               class="com.aptana.git.ui.internal.actions.RevertAction"
+               class="com.aptana.git.ui.actions.RevertAction"
                definitionId="com.aptana.git.ui.command.revert"
                id="com.aptana.git.ui.actions.RevertAction"
                label="%RevertAction_label"
@@ -118,7 +118,7 @@
                tooltip="%RevertAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.UnstageAction"
+               class="com.aptana.git.ui.actions.UnstageAction"
                definitionId="com.aptana.git.ui.command.unstage"
                id="com.aptana.git.ui.actions.UnstageAction"
                label="%UnstageAction_label"
@@ -126,7 +126,7 @@
                tooltip="%UnstageAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.StageAction"
+               class="com.aptana.git.ui.actions.StageAction"
                definitionId="com.aptana.git.ui.command.stage"
                id="com.aptana.git.ui.actions.StageAction"
                label="%StageAction_label"

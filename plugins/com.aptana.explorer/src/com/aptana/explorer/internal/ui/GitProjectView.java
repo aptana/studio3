@@ -56,7 +56,9 @@ import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.GithubNetworkAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
+import com.aptana.git.ui.actions.StageAction;
 import com.aptana.git.ui.actions.StashAction;
+import com.aptana.git.ui.actions.UnstageAction;
 import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
 import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
@@ -176,6 +178,8 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					{
 						createDiffMenuItem(menu);
 						createCommitMenuItem(menu);
+						createStageMenuItem(menu);
+						createUnstageMenuItem(menu);
 						String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 						if (commitsAhead != null && commitsAhead.length > 0)
 						{
@@ -365,7 +369,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private void createDiffMenuItem(Menu menu)
 	{
 		MenuItem commit = new MenuItem(menu, SWT.PUSH);
-		// commit.setImage(ExplorerPlugin.getImage(COMMIT_ICON_PATH));
 		commit.setText(Messages.GitProjectView_DiffTooltip);
 		commit.addSelectionListener(new SelectionAdapter()
 		{
@@ -375,34 +378,15 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				GitRepository repo = GitRepository.getAttached(selectedProject);
 				if (repo == null)
 					return;
-				ISelection sel = getCommonViewer().getSelection();
 				RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject, GitRepositoryProvider.ID);
 				IFileHistoryProvider prov = provider.getFileHistoryProvider();
-				Set<IResource> resources = new HashSet<IResource>();
-				IStructuredSelection structured = (IStructuredSelection) sel;
-				for (Object element : structured.toList())
-				{
-					if (element == null)
-						continue;
-
-					if (element instanceof IResource)
-						resources.add((IResource) element);
-
-					if (element instanceof IAdaptable)
-					{
-						IAdaptable adapt = (IAdaptable) element;
-						IResource resource = (IResource) adapt.getAdapter(IResource.class);
-						if (resource != null)
-							resources.add(resource);
-					}
-				}
-				for (IResource resource : resources)
+				for (IResource resource : getSelectedFiles())
 				{
 					ChangedFile changedFile = repo.getChangedFileForResource(resource);
 					if (changedFile == null)
 						continue;
 					String name = changedFile.getPath();
-					final IFileRevision baseFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name);
+					final IFileRevision baseFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name); //$NON-NLS-1$
 					final IFileRevision nextFile = prov.getWorkspaceFileRevision(resource);
 					final ITypedElement base = new FileRevisionTypedElement(baseFile);
 					final ITypedElement next = new FileRevisionTypedElement(nextFile);
@@ -411,6 +395,123 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				}
 			}
 		});
+	}
+
+	private void createStageMenuItem(Menu menu)
+	{
+		// Limit to only those changed files which have unstaged changes
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		final Set<IResource> selected = new HashSet<IResource>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				ChangedFile changedFile = repo.getChangedFileForResource(resource);
+				if (changedFile == null)
+					continue;
+				if (changedFile.hasUnstagedChanges())
+					selected.add(resource);
+			}
+		}
+		MenuItem stage = new MenuItem(menu, SWT.PUSH);
+		stage.setText(Messages.GitProjectView_StageTooltip);
+		stage.setEnabled(!selected.isEmpty());
+		stage.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final StageAction action = new StageAction();
+				action.selectionChanged(null, new StructuredSelection(selected.toArray()));
+				Job job = new Job(Messages.GitProjectView_StageJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createUnstageMenuItem(Menu menu)
+	{
+		// Limit to only those changed files which have staged changes
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		final Set<IResource> selected = new HashSet<IResource>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				ChangedFile changedFile = repo.getChangedFileForResource(resource);
+				if (changedFile == null)
+					continue;
+				if (changedFile.hasStagedChanges())
+					selected.add(resource);
+			}
+		}
+
+		MenuItem unstage = new MenuItem(menu, SWT.PUSH);
+		unstage.setText(Messages.GitProjectView_UnstageTooltip);
+		unstage.setEnabled(!selected.isEmpty());
+		unstage.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final UnstageAction action = new UnstageAction();
+				action.selectionChanged(null, new StructuredSelection(selected.toArray()));
+				Job job = new Job(Messages.GitProjectView_UnstageJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private Set<IResource> getSelectedFiles()
+	{
+		ISelection sel = getCommonViewer().getSelection();
+		Set<IResource> resources = new HashSet<IResource>();
+		if (sel == null || sel.isEmpty())
+			return resources;
+		if (!(sel instanceof IStructuredSelection))
+			return resources;
+		IStructuredSelection structured = (IStructuredSelection) sel;
+		for (Object element : structured.toList())
+		{
+			if (element == null)
+				continue;
+
+			if (element instanceof IResource)
+				resources.add((IResource) element);
+
+			if (element instanceof IAdaptable)
+			{
+				IAdaptable adapt = (IAdaptable) element;
+				IResource resource = (IResource) adapt.getAdapter(IResource.class);
+				if (resource != null)
+					resources.add(resource);
+			}
+		}
+		return resources;
 	}
 
 	private void createCommitMenuItem(Menu menu)

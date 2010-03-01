@@ -35,7 +35,11 @@ public class Messages extends NLS
 	public static String GitProjectView_UnstashJobTitle;
 	public static String GitProjectView_UnstashTooltip;
 	public static String GitProjectView_DiffTooltip;
-
+	public static String GitProjectView_StageTooltip;
+	public static String GitProjectView_StageJobTitle;
+	public static String GitProjectView_UnstageTooltip;
+	public static String GitProjectView_UnstageJobTitle;
+	
 	public static String SingleProjectView_CaseSensitive;
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;
 	public static String SingleProjectView_RefreshJob_title;
