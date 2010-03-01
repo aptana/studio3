@@ -55,6 +55,17 @@ public class HTMLParserTest extends TestCase
 		parseTest(source, "<body><p></p><h3></h3></body>\n");
 	}
 
+	public void testOutlineAttributes() throws Exception
+	{
+		String source = "<html id=\"aptana\" class=\"cool\" height=\"100\">";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length);
+		assertEquals("html#aptana.cool", children[0].getText());
+	}
+
 	public void testStyle() throws Exception
 	{
 		String source = "<html><head><style>html {color: red;}</style></head></html>\n";
