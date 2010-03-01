@@ -68,6 +68,75 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertTrue(command.doit);
 	}
 
+	private static class AlwaysMatchRubyRegexpAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
+	{
+		AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			super("", null, null);
+		}
+
+		@Override
+		protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
+				throws BadLocationException
+		{
+			return "";
+		}
+
+		@Override
+		protected RubyRegexp getIncreaseIndentRegexp(String scope)
+		{
+			return null;
+		}
+
+		@Override
+		protected RubyRegexp getDecreaseIndentRegexp(String scope)
+		{
+			return null;
+		}
+
+		@Override
+		protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
+		{
+			return "";
+		}
+
+		@Override
+		protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+		{
+			return true;
+		}
+	}
+
+	public void testIndentAndPushTrailingContentAfterNewlineAndCursorForTagPair()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("\t<div></div>");
+		DocumentCommand command = createNewlineCommand(6);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n\t\t\n\t", command.text);
+		assertTrue(command.doit);
+		document = new Document("    <div></div>");
+		command = createNewlineCommand(9);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n    \t\n    ", command.text);
+		assertTrue(command.doit);
+	}
+
+	public void testDoesNotIndentAndPushTrailingContentAfterNewlineAndCursorForTagTag()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
+		IDocument document = new Document("\t<div><div>");
+		DocumentCommand command = createNewlineCommand(6);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n\t\t", command.text);
+		assertTrue(command.doit);
+		document = new Document("    <div><div>");
+		command = createNewlineCommand(9);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n    \t", command.text);
+		assertTrue(command.doit);
+	}
+
 	protected DocumentCommand createNewlineCommand(int offset)
 	{
 		DocumentCommand command = new DocumentCommand()

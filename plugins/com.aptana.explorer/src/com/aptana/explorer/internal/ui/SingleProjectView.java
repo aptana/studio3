@@ -49,6 +49,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -172,35 +175,39 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		// Run Last launched
-		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
-				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
-				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
+		// Do not show these commands until we implement the Eclipse launch configuration based Run and Debug
+		// // Run Last launched
+		//		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
+		//				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
+		// SWT.PUSH);
+		// commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
+		// {
+		// @Override
+		// public boolean isEnabled()
+		// {
+		// return super.isEnabled() && selectedProject != null && selectedProject.exists();
+		// }
+		// });
+		//
+		// // Debug last launched
+		//		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
+		//				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
+		// SWT.PUSH);
+		// commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
+		// {
+		// @Override
+		// public boolean isEnabled()
+		// {
+		// return super.isEnabled() && selectedProject != null && selectedProject.exists();
+		// }
+		// });
 
-		// Debug last launched
-		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
-				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
-				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
-
+		// Not really sure why but this separator isn't actually showing...
 		new MenuItem(commandsMenu, SWT.SEPARATOR);
 
 		fillCommandsMenu(commandsMenuManager);
+
+		addDeleteProjectAction(commandsMenuManager);
 
 		// Create search
 		createSearchComposite(parent);
@@ -223,6 +230,42 @@ public abstract class SingleProjectView extends CommonNavigator
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
+	}
+
+	protected void addDeleteProjectAction(final MenuManager commandsMenuManager)
+	{
+		commandsMenuManager.add(new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				new MenuItem(menu, SWT.SEPARATOR);
+
+				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
+				terminalMenuItem.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
+				terminalMenuItem.addSelectionListener(new SelectionAdapter()
+				{
+					public void widgetSelected(SelectionEvent e)
+					{
+						DeleteResourceAction action = new DeleteResourceAction(getSite());
+						action.selectionChanged(new StructuredSelection(selectedProject));
+						action.run();
+					}
+				});
+				boolean enabled = (selectedProject != null && selectedProject.exists());
+				ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
+				terminalMenuItem.setImage(enabled ? images.getImage(ISharedImages.IMG_TOOL_DELETE) : images
+						.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
+				terminalMenuItem.setEnabled(enabled);
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+
+		});
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);

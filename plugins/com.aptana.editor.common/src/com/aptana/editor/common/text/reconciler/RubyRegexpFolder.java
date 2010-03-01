@@ -38,6 +38,10 @@ class RubyRegexpFolder
 		}
 		for (int currentLine = 0; currentLine < lineCount; currentLine++)
 		{
+			// Check for cancellation
+			if (monitor != null && monitor.isCanceled())
+				return positions;
+			
 			IRegion lineRegion = fDocument.getLineInformation(currentLine);
 			int offset = lineRegion.getOffset();
 			String line = fDocument.get(offset, lineRegion.getLength());

@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.lexer.ILexeme;
+import com.aptana.parsing.lexer.IRange;
 
-public class JSOutlineItem implements ILexeme, ILanguageNode
+public class JSOutlineItem implements IRange, ILanguageNode
 {
 
 	public static enum Type
@@ -17,18 +17,18 @@ public class JSOutlineItem implements ILexeme, ILanguageNode
 
 	private String fLabel;
 	private Type fType;
-	private ILexeme fSourceRange;
+	private IRange fSourceRange;
 	private IParseNode fReferenceNode;
 	private int fChildrenCount;
 
 	private List<IParseNode> fVirtualChildren;
 
-	public JSOutlineItem(String label, Type type, ILexeme sourceRange, IParseNode referenceNode)
+	public JSOutlineItem(String label, Type type, IRange sourceRange, IParseNode referenceNode)
 	{
 		this(label, type, sourceRange, referenceNode, 0);
 	}
 
-	public JSOutlineItem(String label, Type type, ILexeme sourceRange, IParseNode referenceNode, int childrenCount)
+	public JSOutlineItem(String label, Type type, IRange sourceRange, IParseNode referenceNode, int childrenCount)
 	{
 		fLabel = label;
 		fType = type;
@@ -103,12 +103,6 @@ public class JSOutlineItem implements ILexeme, ILanguageNode
 	public int getStartingOffset()
 	{
 		return fSourceRange.getStartingOffset();
-	}
-
-	@Override
-	public String getText()
-	{
-		return fSourceRange.getText();
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class RHTMLEditor extends HTMLEditor {
 	{
 		CommonOutlinePage outline = super.createOutlinePage();
 		outline.setContentProvider(new RHTMLOutlineContentProvider());
-		outline.setLabelProvider(new RHTMLOutlineLabelProvider());
+		outline.setLabelProvider(new RHTMLOutlineLabelProvider(getFileService().getParseState()));
 
 		return outline;
 	}

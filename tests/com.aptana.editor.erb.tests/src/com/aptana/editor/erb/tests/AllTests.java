@@ -1,5 +1,6 @@
 package com.aptana.editor.erb.tests;
 
+import com.aptana.editor.erb.RHTMLParserTest;
 import com.aptana.editor.erb.RHTMLSourcePartitionScannerTest;
 
 import junit.framework.Test;
@@ -13,6 +14,7 @@ public class AllTests
 		TestSuite suite = new TestSuite("Tests for com.aptana.editor.erb"); //$NON-NLS-1$
 		// $JUnit-BEGIN$
 		suite.addTestSuite(RHTMLSourcePartitionScannerTest.class);
+		suite.addTestSuite(RHTMLParserTest.class);
 		// $JUnit-END$
 		return suite;
 	}

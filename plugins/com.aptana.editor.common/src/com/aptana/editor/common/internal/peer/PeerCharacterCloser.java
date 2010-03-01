@@ -193,7 +193,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		try
 		{
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset).trim();
+			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for comment scope matching
 			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
@@ -223,7 +223,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				}
 			}
 
-			String after = document.get(offset, document.getLength() - offset).trim();
+			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need offsets to match for comment scope matching
 			for (int i = 0; i < after.length(); i++)
 			{
 				char c = after.charAt(i);

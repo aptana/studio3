@@ -311,6 +311,11 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			return true;
 		if (before == '(' && after == ')')
 			return true;
+		if (contentAfterNewline.length() >= 2) {
+			char afterAfter = contentAfterNewline.charAt(1);
+			if (before == '>' && after == '<' && afterAfter == '/')
+				return true;
+		}
 		return false;
 	}
 }

@@ -56,9 +56,8 @@ public class TreeThemer
 	public void apply()
 	{
 		// Set the background of tree to theme background.
-		treeViewer.getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getBackground()));
+		treeViewer.getTree().setBackground(getBackground());
+		treeViewer.getTree().setForeground(getForeground());
 		addSelectionColorOverride();
 		addMeasureItemListener();
 		addFontListener();
@@ -91,8 +90,7 @@ public class TreeThemer
 					cell.setFont(font);
 				}
 
-				cell.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getForeground()));
+				cell.setForeground(getForeground());
 			}
 		});
 	}
@@ -113,8 +111,7 @@ public class TreeThemer
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
-					gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-							getThemeManager().getCurrentTheme().getSelection()));
+					gc.setBackground(getSelection());
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 
@@ -250,9 +247,8 @@ public class TreeThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					treeViewer.getTree().setBackground(
-							CommonEditorPlugin.getDefault().getColorManager().getColor(
-									getThemeManager().getCurrentTheme().getBackground()));
+					treeViewer.getTree().setBackground(getBackground());
+					treeViewer.getTree().setForeground(getForeground());
 					treeViewer.refresh();
 				}
 			}
@@ -311,5 +307,34 @@ public class TreeThemer
 	protected IThemeManager getThemeManager()
 	{
 		return CommonEditorPlugin.getDefault().getThemeManager();
+	}
+
+	protected Color getForeground() 
+	{
+		return getColorManager().getColor(
+				getThemeManager().getCurrentTheme().getForeground());
+	}
+	
+	/**
+	 * @return
+	 */
+	protected Color getBackground() 
+	{
+		return getColorManager().getColor(
+				getThemeManager().getCurrentTheme().getBackground());
+	}
+	
+	protected Color getSelection() 
+	{
+		return getColorManager().getColor(
+				getThemeManager().getCurrentTheme().getSelection());
+	}
+	
+	/**
+	 * @return
+	 */
+	protected ColorManager getColorManager() 
+	{
+		return CommonEditorPlugin.getDefault().getColorManager();
 	}
 }

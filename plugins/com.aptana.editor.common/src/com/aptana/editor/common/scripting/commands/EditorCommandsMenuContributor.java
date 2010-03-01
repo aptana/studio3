@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
@@ -78,12 +79,17 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			Object activePart = currentState.getVariable(ISources.ACTIVE_PART_NAME);
 			if (activePart instanceof ITextEditor)
 			{
-				fill(menu, (ITextEditor) activePart);
+				fill(menu, (ITextEditor) activePart, this);
 			}
 		}
 	}
 
-	public static void fill(final Menu menu, ITextEditor textEditor)
+	public static void fill(Menu menu, ITextEditor textEditor)
+	{
+		fill(menu, textEditor, null);
+	}
+
+	public static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem)
 	{
 		// Add the listener to clean up the menu on hide
 		// so that the accelerators do not interfere with
@@ -127,6 +133,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				});
 			}
 		});
+
 
 		// Is this an Aptana Editor
 		if (textEditor instanceof AbstractThemeableEditor)
@@ -214,21 +221,23 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				menusFromScopeList.toArray(menusFromScope);
 
 				// Now build the menu
-				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset);
+				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset, contributionItem);
 			}
 
 			// Are there any menus that belong to scopes other than top level scopes
 			if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0)
 			{
 				// Build the "Other" menu
-				new MenuItem(menu, SWT.SEPARATOR);
+				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+				separatorMenuItem.setData(contributionItem);
 
 				MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+				menuItemForOtherScopes.setData(contributionItem);
 				menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
 
 				Menu menuForOtherScopes = new Menu(menu);
 				menuItemForOtherScopes.setMenu(menuForOtherScopes);
-				buildMenu(menuForOtherScopes, menusFromOtherScopes, abstractThemeableEditor, contentTypeAtOffset);
+				buildMenu(menuForOtherScopes, menusFromOtherScopes, abstractThemeableEditor, contentTypeAtOffset, contributionItem);
 			}
 		}
 	}
@@ -247,7 +256,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	 * @param contentTypeAtOffset
 	 */
 	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor,
-			String contentTypeAtOffset)
+			String contentTypeAtOffset, IContributionItem contributionItem)
 	{
 		for (MenuElement menuForScope : menusFromScope)
 		{
@@ -255,6 +264,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			if (menuForScope.isHierarchicalMenu())
 			{
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
+				menuItemForMenuForScope.setData(contributionItem);
 				menuItemForMenuForScope.setText(displayName);
 				// We mark the cascade menu items for disposal when the menu is hidden
 				// so that accelerators on descendant menu items do not hinder the handling of
@@ -265,16 +275,18 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				menuItemForMenuForScope.setMenu(menuForMenuForScope);
 
 				// Recursive
-				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset);
+				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset, contributionItem);
 			}
 			else if (menuForScope.isSeparator())
 			{
-				new MenuItem(menu, SWT.SEPARATOR);
+				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+				separatorMenuItem.setData(contributionItem);
 			}
 			else
 			{
 				final CommandElement command = menuForScope.getCommand();
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
+				menuItem.setData(contributionItem);
 
 				if (command != null)
 				{
@@ -350,8 +362,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			// if we're inside a bundle's main menu
 			if (menuForScope.getParent() != null && menuForScope.getParent().getParent() == null)
 			{
-				new MenuItem(menu, SWT.SEPARATOR);
+				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+				separatorMenuItem.setData(contributionItem);
+
 				final MenuItem editBundleItem = new MenuItem(menu, SWT.PUSH);
+				editBundleItem.setData(contributionItem);
 				editBundleItem.setText("Edit this bundle");
 				final BundleElement bundleElement = menuForScope.getOwningBundle();
 				editBundleItem.addSelectionListener(new SelectionListener()

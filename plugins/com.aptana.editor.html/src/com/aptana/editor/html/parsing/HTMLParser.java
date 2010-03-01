@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.rules.IToken;
+
 import beaver.Symbol;
 import beaver.Scanner.Exception;
 
 import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -29,6 +33,7 @@ public class HTMLParser implements IParser
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
+	private HTMLTagScanner fTagScanner;
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
@@ -44,6 +49,7 @@ public class HTMLParser implements IParser
 	{
 		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
+		fTagScanner = new HTMLTagScanner();
 		fLanguageParsers = new HashMap<String, IParser>();
 		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
 		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
@@ -76,15 +82,15 @@ public class HTMLParser implements IParser
 				processEndTag();
 				break;
 			case HTMLTokens.STYLE:
-				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END, "style"); //$NON-NLS-1$
+				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END);
 				break;
 			case HTMLTokens.SCRIPT:
-				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END, "script"); //$NON-NLS-1$
+				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END);
 				break;
 		}
 	}
 
-	protected void processLanguage(String language, short endToken, String tagName) throws IOException, Exception
+	protected void processLanguage(String language, short endToken) throws IOException, Exception
 	{
 		Symbol startTag = fCurrentSymbol;
 		advance();
@@ -102,7 +108,8 @@ public class HTMLParser implements IParser
 		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(tagName, nested, startTag.getStart(), startTag.getEnd()));
+			fCurrentElement
+					.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
 		}
 	}
 
@@ -148,10 +155,12 @@ public class HTMLParser implements IParser
 
 	private void processStartTag() throws IOException, Exception
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
-				fCurrentSymbol.getEnd());
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
+				.getEnd());
 		// pushes the element onto the stack
 		openElement(element);
+
+		parseAttribute(element, fCurrentSymbol.value.toString());
 	}
 
 	private void processEndTag() throws IOException, Exception
@@ -163,7 +172,40 @@ public class HTMLParser implements IParser
 			if ((fCurrentElement instanceof HTMLElementNode)
 					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 			{
+				// adjusts the ending offset of current element to include the entire block
+				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol
+						.getEnd());
 				closeElement();
+			}
+		}
+	}
+
+	private void parseAttribute(HTMLElementNode element, String tag)
+	{
+		fTagScanner.setRange(new Document(tag), 0, tag.length());
+		IToken token;
+		Object data;
+		String name = null, value = null;
+		while (!(token = fTagScanner.nextToken()).isEOF())
+		{
+			data = token.getData();
+			if (data == null)
+			{
+				continue;
+			}
+
+			if (data == TokenType.ATTR_NAME)
+			{
+				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+			}
+			else if (data == TokenType.ATTR_VALUE)
+			{
+				// found a pair
+				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+				// strips the quotation marks and any surrounding whitespaces
+				element.setAttribute(name, value.substring(1, value.length() - 1).trim());
 			}
 		}
 	}

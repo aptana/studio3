@@ -59,14 +59,9 @@ public class RubyElement extends ParseBaseNode implements IRubyElement
 	@Override
 	public String toString()
 	{
-		Object parent = getParent();
-		if (parent != null)
-		{
-			return parent.toString() + "/" + getName(); //$NON-NLS-1$
-		}
 		return getName();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
