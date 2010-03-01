@@ -23,7 +23,7 @@
          <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
-                class="com.aptana.git.ui.internal.actions.DisconnectAction"
+                class="com.aptana.git.ui.actions.DisconnectAction"
                id="com.aptana.git.ui.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
          </action>

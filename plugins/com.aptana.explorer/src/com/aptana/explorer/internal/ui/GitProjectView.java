@@ -55,6 +55,7 @@ import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.actions.CommitAction;
+import com.aptana.git.ui.actions.DisconnectAction;
 import com.aptana.git.ui.actions.GithubNetworkAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
@@ -270,7 +271,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				if (repository == null)
 					return;
 
-				
 				// Branch submenu, which contains...
 				MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
 				branchMenuItem.setText("Branch");
@@ -280,7 +280,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				addCreateBranchMenuItem(branchSubMenu);
 				// TODO Delete branch submenu
 				branchMenuItem.setMenu(branchSubMenu);
-				
+
 				// More submenu, which contains...
 				MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
 				moreMenuItem.setText("More");
@@ -289,7 +289,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				createUnstashMenuItem(moreSubMenu);
 				// .. TODO Show in Resource History
 				createShowGithubNetworkMenuItem(moreSubMenu);
-				// TODO Disconnect
+				createDisconnectMenuItem(moreSubMenu);
 				moreMenuItem.setMenu(moreSubMenu);
 			}
 
@@ -553,7 +553,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	private void createGitStatusMenuItem(Menu menu)
 	{
 		MenuItem commit = new MenuItem(menu, SWT.PUSH);
@@ -679,6 +679,35 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					{
 						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
+						return Status.OK_STATUS;
+					}
+				};
+				job.setUser(true);
+				job.setPriority(Job.LONG);
+				job.schedule();
+			}
+		});
+	}
+
+	private void createDisconnectMenuItem(Menu menu)
+	{
+		MenuItem disconnect = new MenuItem(menu, SWT.PUSH);
+		disconnect.setText(Messages.GitProjectView_DisconnectTooltip);
+		disconnect.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final DisconnectAction action = new DisconnectAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				Job job = new Job(Messages.GitProjectView_DisconnectJobTitle)
+				{
+
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						action.run();
+						refreshUI(null);
 						return Status.OK_STATUS;
 					}
 				};
