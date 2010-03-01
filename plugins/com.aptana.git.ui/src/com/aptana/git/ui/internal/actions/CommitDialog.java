@@ -179,7 +179,7 @@ public class CommitDialog extends StatusDialog
 	{
 		// TODO Make list entries be able to be truncated when too long to fit, like GitX does
 		// TODO Sort list entries
-		Table table = new Table(composite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		Table table = new Table(composite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
