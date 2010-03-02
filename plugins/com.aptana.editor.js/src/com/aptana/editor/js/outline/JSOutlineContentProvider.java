@@ -2,6 +2,7 @@ package com.aptana.editor.js.outline;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,6 +98,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processNode(elements, node);
 			}
 		}
+		Collections.sort(elements);
 		return elements.toArray(new JSOutlineItem[elements.size()]);
 	}
 
@@ -235,10 +237,16 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private void processAssignment(List<JSOutlineItem> elements, IParseNode lhs, IParseNode rhs)
+	private IParseNode processAssignment(List<JSOutlineItem> elements, IParseNode lhs, IParseNode rhs)
 	{
 		short lhsType = lhs.getType();
 		short rhsType = rhs.getType();
+		if (rhsType == JSNodeTypes.ASSIGN)
+		{
+			// processes the right-hand assignment recursively
+			rhs = processAssignment(elements, rhs.getChild(0), rhs.getChild(1));
+			rhsType = rhs.getType();
+		}
 
 		switch (lhsType)
 		{
@@ -294,6 +302,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				}
 				break;
 		}
+		return rhs;
 	}
 
 	private void processFunction(List<JSOutlineItem> elements, IParseNode node, Reference reference)
@@ -378,6 +387,10 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 							break;
 						case JSNodeTypes.ASSIGN:
 							reference = new Reference(parent, rhs, rhs.getText(), PROPERTY_TYPE);
+							while (target.getType() == JSNodeTypes.ASSIGN) {
+								// finds the right-most element
+								target = target.getChild(1);
+							}
 							addValue(elements, reference, target);
 							break;
 						case JSNodeTypes.GET_PROPERTY:
