@@ -50,7 +50,7 @@ public abstract class DiffFormatter
 		html.append("<div class=\"file\">"); //$NON-NLS-1$
 		html.append("<div class=\"fileHeader\">").append(title).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		html.append("<div class=\"diffContent\">"); //$NON-NLS-1$
-		String[] lines = diff.split("\r|\n|\r\n"); //$NON-NLS-1$
+		String[] lines = diff.split("\r\n|\r|\n"); //$NON-NLS-1$
 		StringBuilder diffContent = new StringBuilder();
 		StringBuilder line1 = new StringBuilder();
 		StringBuilder line2 = new StringBuilder();
