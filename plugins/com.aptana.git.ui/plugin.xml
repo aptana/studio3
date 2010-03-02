@@ -302,6 +302,12 @@
             sequence="CTRL+M2+G">
       </key>
       <key
+            commandId="com.aptana.git.ui.command.add_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M2+G">
+      </key>
+      <key
             commandId="com.aptana.git.ui.command.github.network"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
