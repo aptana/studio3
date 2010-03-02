@@ -23,15 +23,18 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.WorkbenchPart;
@@ -64,7 +67,8 @@ public class TerminalBrowser
 	private IPreferenceChangeListener _themeChangeListener;
 	private IPropertyChangeListener _fontChangeListener;
 	private KeyListener _keyListener;
-	private FocusListener _focusListener;
+	private IPartListener _partListener;
+	private IWindowListener _windowListener;
 
 	static
 	{
@@ -73,6 +77,33 @@ public class TerminalBrowser
 		COPY_STROKE = KeyStroke.getInstance(modifiers, 'C');
 		PASTE_STROKE = KeyStroke.getInstance(modifiers, 'V');
 		SELECT_ALL_STROKE = KeyStroke.getInstance(modifiers, 'A');
+
+		// Add window listener to track deactivation of window
+		PlatformUI.getWorkbench().addWindowListener(new IWindowListener()
+		{
+			@Override
+			public void windowOpened(IWorkbenchWindow window)
+			{
+			}
+
+			@Override
+			public void windowDeactivated(IWorkbenchWindow window)
+			{
+				// We make sure that the key filtering is enabled
+				// when a workbench window is deactivated
+				setKeyFilterEnabled(true);
+			}
+
+			@Override
+			public void windowClosed(IWorkbenchWindow window)
+			{
+			}
+
+			@Override
+			public void windowActivated(IWorkbenchWindow window)
+			{
+			}
+		});
 	}
 
 	/**
@@ -96,30 +127,6 @@ public class TerminalBrowser
 		this._owningPart = owningPart;
 		this._startingDirectory = startingDirectory;
 		this._id = UUID.randomUUID().toString();
-	}
-
-	/**
-	 * addFocusListener
-	 */
-	private void addFocusListener()
-	{
-		// create focus listener so we can enable/disable key bindings
-		final IBindingService bindingService = (IBindingService) this._owningPart.getSite().getService(
-				IBindingService.class);
-
-		this._focusListener = new FocusListener()
-		{
-			public void focusGained(FocusEvent e)
-			{
-				bindingService.setKeyFilterEnabled(false);
-			}
-
-			public void focusLost(FocusEvent e)
-			{
-				bindingService.setKeyFilterEnabled(true);
-			}
-		};
-		this._browser.addFocusListener(this._focusListener);
 	}
 
 	/**
@@ -189,11 +196,105 @@ public class TerminalBrowser
 	}
 
 	/**
+	 * addPartListener
+	 */
+	private void addPartListener()
+	{
+		_partListener = new IPartListener()
+		{
+
+			@Override
+			public void partOpened(IWorkbenchPart part)
+			{
+			}
+
+			@Override
+			public void partDeactivated(IWorkbenchPart part)
+			{
+				if (part == _owningPart)
+				{
+					// Enable key filter
+					setKeyFilterEnabled(true);
+				}
+			}
+
+			@Override
+			public void partClosed(IWorkbenchPart part)
+			{
+			}
+
+			@Override
+			public void partBroughtToTop(IWorkbenchPart part)
+			{
+			}
+
+			@Override
+			public void partActivated(IWorkbenchPart part)
+			{
+				if (part == _owningPart)
+				{
+					// Disable key filter
+					setKeyFilterEnabled(false);
+				}
+			}
+		};
+
+		// Add part listener to track Part activation and deactivation
+		this._owningPart.getSite().getWorkbenchWindow().getPartService().addPartListener(_partListener);
+	}
+
+	private void addWindowListener()
+	{
+		_windowListener = new IWindowListener()
+		{
+
+			@Override
+			public void windowOpened(IWorkbenchWindow window)
+			{
+			}
+
+			@Override
+			public void windowDeactivated(IWorkbenchWindow window)
+			{
+			}
+
+			@Override
+			public void windowClosed(IWorkbenchWindow window)
+			{
+			}
+
+			@Override
+			public void windowActivated(IWorkbenchWindow window)
+			{
+				IWorkbenchPage activePage = window.getActivePage();
+				if (activePage == null)
+				{
+					return;
+				}
+
+				IWorkbenchPart activePart = activePage.getActivePart();
+				if (activePart == _owningPart)
+				{
+					// We make sure that the key filtering is disabled
+					// when a workbench window is activated and the active part
+					// is this terminal browser's owner
+					setKeyFilterEnabled(false);
+				}
+
+			}
+		};
+
+		// Add window listener to track activation of window
+		PlatformUI.getWorkbench().addWindowListener(_windowListener);
+	}
+
+	/**
 	 * addListeners
 	 */
 	private void addListeners()
 	{
-		this.addFocusListener();
+		this.addPartListener();
+		this.addWindowListener();
 		this.addThemeListener();
 		this.addFontChangeListener();
 		this.addKeyListener();
@@ -242,6 +343,18 @@ public class TerminalBrowser
 		{
 			// do nothing
 		}
+	}
+
+	/**
+	 * setKeyFilterEnabled
+	 *
+	 * @param enabled
+	 */
+	private static void setKeyFilterEnabled(boolean enable)
+	{
+		IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getService(
+				IBindingService.class);
+		bindingService.setKeyFilterEnabled(enable);
 	}
 
 	/**
@@ -294,12 +407,18 @@ public class TerminalBrowser
 	 */
 	public void dispose()
 	{
-		if (this._focusListener != null)
+		if (this._windowListener != null)
 		{
-			this._browser.removeFocusListener(this._focusListener);
-			this._focusListener = null;
+			PlatformUI.getWorkbench().removeWindowListener(this._windowListener);
+			this._windowListener = null;
 		}
-		
+
+		if (this._partListener != null)
+		{
+			this._owningPart.getSite().getWorkbenchWindow().getPartService().removePartListener(this._partListener);
+			this._partListener = null;
+		}
+
 		if (this._themeChangeListener != null)
 		{
 			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
