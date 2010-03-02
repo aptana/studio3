@@ -11,9 +11,6 @@
 			var xtermHandler;
 			var debugHandler;
 			var keyHandler;
-			var characterWidth = null, characterHeight = null;
-			var RESIZE_INTERVAL = 250;
-			var resizeID = null;
             
 			/**
 			 * init
@@ -39,10 +36,7 @@
 				
 				// create terminal
                 terminal = new Term(terminalID, 80,20, config);
-				
-				// resize to fit
-				resizeHelper();
-				
+
 				// save reference to key handler (used during debugging)
 				keyHandler = terminal.getKeyHandler();
 				
@@ -186,86 +180,6 @@
 				document.getElementById("toggle").innerText = (comm.isRunning()) ? "Stop" : "Start";
 			}
 			
-			/**
-			 * autoSize
-			 */
-			function autoSize()
-			{
-				if (resizeID !== null)
-				{
-					window.clearTimeout(resizeID);
-				}
-				
-				resizeID = window.setTimeout(resizeHelper, RESIZE_INTERVAL);
-			}
-				
-			function resizeHelper()
-			{
-				// clear timeout id
-				resizeID = null;
-				
-				if (characterWidth === null || characterHeight === null)
-				{
-					var div = document.getElementById(terminalID);
-					var divWidth = div.offsetWidth;
-					var divHeight = div.offsetHeight;
-					
-					characterWidth = divWidth / terminal.getWidth();
-					characterHeight = divHeight / terminal.getHeight();
-				}
-				
-				var width = Math.floor(getWindowWidth() / characterWidth);
-				var height = Math.floor(getWindowHeight() / characterHeight);
-				
-				terminal.setSize(width,height);
-			}
-			
-			/**
-			 * getWindowWidth
-			 */
-			function getWindowWidth()
-			{
-				var result = 0;
-				
-				if (window.innerWidth)
-				{
-					result = window.innerWidth;
-				}
-				else if (document.documentElement && document.documentElement.clientWidth)
-				{
-					result = document.documentElement.clientWidth;
-				}
-				else if (document.body && document.body.clientWidth)
-				{
-					result = document.body.clientWidth;
-				}
-				
-				return result;
-			}
-			
-			/**
-			 * getWindowHeight
-			 */
-			function getWindowHeight()
-			{
-				var result = 0;
-				
-				if (window.innerHeight)
-				{
-					result = window.innerHeight;
-				}
-				else if (document.documentElement && document.documentElement.clientHeight)
-				{
-					result = document.documentElement.clientHeight;
-				}
-				else if (document.body && document.body.clientHeight)
-				{
-					result = document.body.clientHeight;
-				}
-				
-				return result;
-			}
-			
 			function print(msg)
 			{
 				document.getElementById("stdout").innerHTML += msg + "<br />";
@@ -290,7 +204,7 @@
 			}
         </script>
     </head>
-    <body onload="init();" onresize="autoSize();">
+    <body onload="init();">
 		<div id="terminal"></div>
 		<div style="clear: both; padding: 15px; color: white">
 	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
@@ -300,6 +214,7 @@
 	    	<button onclick="record()">Record</button>
 	    	<button onclick="stop()">Stop</button>
 	    	<button onclick="play()">Play</button>
+	    	<button onclick="terminal.select(new Range(10,3*80+10));">Select</button>
 	    	<button onclick="resetDebugInfo()">Reset</button>
 	        <pre style="color: white" id="stdout">result:</pre>
 		</div>

@@ -9,7 +9,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -40,7 +39,7 @@ public class TerminalView extends ViewPart
 	private static String pullStartingDirectory()
 	{
 		String result = null;
-		
+
 		synchronized (startDirectories)
 		{
 			if (startDirectories.isEmpty() == false)
@@ -64,7 +63,7 @@ public class TerminalView extends ViewPart
 			startDirectories.add(startingDirectory);
 		}
 	}
-	
+
 	/**
 	 * @param id
 	 *            The secondary id of the view. Used to uniquely identify and address a specific instance of this view.
@@ -77,16 +76,16 @@ public class TerminalView extends ViewPart
 	public static TerminalView open(String id, String title, String workingDirectory)
 	{
 		TerminalView term = null;
-		
+
 		try
 		{
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			
+
 			if (workingDirectory != null)
 			{
 				pushStartingDirectory(workingDirectory);
 			}
-			
+
 			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
 		}
 		catch (IllegalStateException e)
@@ -97,15 +96,15 @@ public class TerminalView extends ViewPart
 		{
 			Activator.logError(e.getMessage(), e);
 		}
-		
+
 		if (term != null)
 		{
 			term.setPartName(title);
 		}
-		
+
 		return term;
 	}
-	
+
 	private TerminalBrowser browser;
 	private Action openEditor;
 
@@ -159,9 +158,12 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		manager.add(openEditor);
-
-		// Other plug-ins can contribute there actions here
+		// add menus
+		manager.add(this.openEditor);
+		manager.add(new Separator());
+		
+		// add browser's menus
+		this.browser.fillContextMenu(manager);
 
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -173,7 +175,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalPullDown(IMenuManager manager)
 	{
-		manager.add(openEditor);
+		manager.add(this.openEditor);
 	}
 
 	/**
@@ -183,7 +185,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalToolBar(IToolBarManager manager)
 	{
-		manager.add(openEditor);
+		manager.add(this.openEditor);
 	}
 
 	/**
@@ -208,7 +210,7 @@ public class TerminalView extends ViewPart
 		{
 			public void menuAboutToShow(IMenuManager manager)
 			{
-				TerminalView.this.fillContextMenu(manager);
+				fillContextMenu(manager);
 			}
 		});
 
@@ -239,18 +241,17 @@ public class TerminalView extends ViewPart
 	 */
 	private void makeActions()
 	{
-		ImageDescriptor icon = Activator.getImageDescriptor("/icons/terminal.png"); //$NON-NLS-1$
-
-		openEditor = new Action()
+		// open editor action
+		this.openEditor = new Action()
 		{
 			public void run()
 			{
 				Utils.openEditor(TerminalEditor.ID, true);
 			}
 		};
-		openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
-		openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
-		openEditor.setImageDescriptor(icon);
+		this.openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
+		this.openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
+		this.openEditor.setImageDescriptor(Activator.getImageDescriptor("/icons/terminal.png")); //$NON-NLS-1$
 	}
 
 	/**
@@ -258,9 +259,13 @@ public class TerminalView extends ViewPart
 	 */
 	public void setFocus()
 	{
-		browser.setFocus();
+		this.browser.setFocus();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.ViewPart#setPartName(java.lang.String)
+	 */
 	@Override
 	public void setPartName(String partName)
 	{

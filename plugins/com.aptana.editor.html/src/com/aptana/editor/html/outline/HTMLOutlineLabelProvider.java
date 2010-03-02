@@ -45,7 +45,7 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 		}
 		if (element instanceof HTMLElementNode)
 		{
-			return ((HTMLElementNode) element).getName();
+			return ((HTMLElementNode) element).getText();
 		}
 		return super.getDefaultText(element);
 	}

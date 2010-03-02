@@ -48,8 +48,9 @@ module Ruble
         else
           "/usr/bin/google-chrome \"#{url.to_s}\" &"
         end
-      when :ie
-        "cmd /C start \"#{url.to_s}\""
+      when :ie        
+        path = path_that_exists("/Program Files (x86)/Internet Explorer/iexplore.exe", "/Program Files/Internet Explorer/iexplore.exe")
+        "ruby -e \"IO.popen('#{path} \"#{url.to_s}\"')\""
       when :safari
         if Ruble.platforms.include? :mac
           # FIXME Opens in new tab/window
@@ -77,7 +78,7 @@ module Ruble
         if Ruble.platforms.include? :mac
           "open \"#{url.to_s}\" &"
         elsif Ruble.platforms.include? :windows
-          "cmd /C start \"#{url.to_s}\""
+          "ruby -e \"IO.popen('#{default_browser} \"#{url.to_s}\"')\""
         else
           # TODO Test
           "xdg-open \"#{url.to_s}\" &"
@@ -96,5 +97,16 @@ module Ruble
       array.first # Just return the first one, though none exist...
     end    
     
+    def default_browser
+      if Ruble.platforms.include? :windows
+        result = IO.popen("reg query HKEY_CLASSES_ROOT\\http\\shell\\open\\command") {|io| io.read }
+        result = result.strip
+        result = result[(result.index('REG_SZ') + 6)..-8].strip
+        result = result.sub(/"/, '').sub(/"/, '')
+        result
+      else
+        nil
+      end
+    end
   end  
 end

@@ -56,8 +56,6 @@ public class CompositeParser implements IParser
 				{
 					// the node is at the end of the source
 					result.addChild(node);
-					// adjusts the offsets to include the new node
-					((ParseBaseNode) result).setLocation(result.getStartingOffset(), node.getEndingOffset());
 				}
 				else
 				{
@@ -80,9 +78,6 @@ public class CompositeParser implements IParser
 						newList.add(node);
 					}
 					((ParseBaseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
-					// adjusts the offsets to include the new node
-					((ParseBaseNode) parent).setLocation(newList.get(0).getStartingOffset(), newList.get(
-							newList.size() - 1).getEndingOffset());
 				}
 			}
 		}

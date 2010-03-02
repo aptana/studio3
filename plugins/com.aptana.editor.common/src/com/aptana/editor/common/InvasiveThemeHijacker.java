@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
@@ -36,6 +38,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.MultiPageEditorPart;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -62,6 +66,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 {
 
 	private Listener listener;
+	private IPageChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
 	{
@@ -205,7 +210,21 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			IPage page = outline.getCurrentPage();
 			if (page instanceof CommonOutlinePage)
 				return; // we already handle our own outlines
-			hookTheme(page.getControl(), revertToDefaults);
+			Control control = page.getControl();
+			if (control instanceof PageBook)
+			{
+				PageBook book = (PageBook) control;
+				Control[] children = book.getChildren();
+				if (children != null && children.length > 0)
+				{
+					for (Control child : children)
+					{
+						hookTheme(child, revertToDefaults);
+					}
+				}
+				return;
+			}
+			hookTheme(control, revertToDefaults);
 			return;
 		}
 		else if (view instanceof PropertySheet)
@@ -322,8 +341,12 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	{
 		// Set prefs for all editors
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
-
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+
+		// PDE
+		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui");
+		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
+		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 
 		// Ant
 		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
@@ -396,8 +419,56 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
+	@SuppressWarnings("nls")
+	protected void setPDEEditorValues(Theme theme, IEclipsePreferences pdePrefs, boolean revertToDefaults)
+	{
+		if (pdePrefs == null)
+			return;
+		if (revertToDefaults)
+		{
+			pdePrefs.remove("editor.color.xml_comment");
+			pdePrefs.remove("editor.color.instr");
+			pdePrefs.remove("editor.color.string");
+			pdePrefs.remove("editor.color.externalized_string");
+			pdePrefs.remove("editor.color.default");
+			pdePrefs.remove("editor.color.tag");
+			pdePrefs.remove("editor.color.header_key");
+			pdePrefs.remove("editor.color.header_value");
+			pdePrefs.remove("editor.color.header_assignment");
+			pdePrefs.remove("editor.color.header_osgi");
+			pdePrefs.remove("editor.color.header_attributes");
+		}
+		else
+		{
+			// plugin.xml
+			setToken(pdePrefs, theme, "comment.block.xml", "editor.color.xml_comment", revertToDefaults);
+			setToken(pdePrefs, theme, "meta.tag.preprocessor.xml", "editor.color.instr", revertToDefaults);
+			setToken(pdePrefs, theme, "string.quoted.double.xml", "editor.color.string", revertToDefaults);
+			setToken(pdePrefs, theme, "string.interpolated.xml", "editor.color.externalized_string", revertToDefaults);
+			setToken(pdePrefs, theme, "text.xml", "editor.color.default", revertToDefaults);
+			setToken(pdePrefs, theme, "entity.name.tag.xml", "editor.color.tag", revertToDefaults);
+			// manifest.mf
+			setToken(pdePrefs, theme, "keyword.other.manifest", "editor.color.header_key", revertToDefaults);
+			setToken(pdePrefs, theme, "source.manifest", "editor.color.header_value", revertToDefaults);
+			setToken(pdePrefs, theme, "punctuation.separator.key-value.manifest", "editor.color.header_assignment",
+					revertToDefaults);
+			setToken(pdePrefs, theme, "keyword.other.manifest.osgi", "editor.color.header_osgi", revertToDefaults);
+			setToken(pdePrefs, theme, "string.manifest", "editor.color.header_attributes", revertToDefaults);
+		}
+		try
+		{
+			pdePrefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
 	protected void setGeneralEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
+		if (prefs == null)
+			return;
 		if (revertToDefaults)
 		{
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
@@ -454,6 +525,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void setAntEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
+		if (prefs == null)
+			return;
 		if (revertToDefaults)
 		{
 			prefs.remove("org.eclipse.ant.ui.commentsColor"); //$NON-NLS-1$
@@ -601,6 +674,23 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (part instanceof IEditorPart)
 		{
 			hijackEditor((IEditorPart) part, false);
+			if (part instanceof MultiPageEditorPart)
+			{
+				MultiPageEditorPart multi = (MultiPageEditorPart) part;
+				if (pageListener == null)
+				{
+					pageListener = new IPageChangedListener()
+					{
+
+						@Override
+						public void pageChanged(PageChangedEvent event)
+						{
+							hijackOutline();
+						}
+					};
+				}
+				multi.addPageChangedListener(pageListener);
+			}
 			return;
 		}
 
@@ -619,6 +709,14 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void partClosed(IWorkbenchPart part)
 	{
+		if (part instanceof MultiPageEditorPart)
+		{
+			MultiPageEditorPart multi = (MultiPageEditorPart) part;
+			if (pageListener != null)
+			{
+				multi.removePageChangedListener(pageListener);
+			}
+		}
 	}
 
 	@Override
@@ -633,6 +731,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		if (!(part instanceof IEditorPart))
 			return;
 
+		hijackOutline();
+	}
+
+	protected void hijackOutline()
+	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IViewReference[] refs = window.getActivePage().getViewReferences();
 		for (IViewReference ref : refs)
