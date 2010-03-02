@@ -330,6 +330,9 @@ public class TerminalBrowser
 		catch (Exception e)
 		{
 		}
+
+		// Make sure to stop the redtty
+		TerminalServer.getInstance().removeProcess(_id);
 	}
 
 	/**
