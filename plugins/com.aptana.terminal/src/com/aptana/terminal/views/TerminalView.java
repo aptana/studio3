@@ -9,12 +9,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -27,7 +25,6 @@ import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.TerminalServer;
-import com.aptana.util.ClipboardUtil;
 
 public class TerminalView extends ViewPart
 {
@@ -110,9 +107,6 @@ public class TerminalView extends ViewPart
 
 	private TerminalBrowser browser;
 	private Action openEditor;
-	private Action copy;
-	private Action paste;
-	private Action selectAll;
 
 	/**
 	 * contributeToActionBars
@@ -164,17 +158,12 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		// set copy/paste enabled states
-		copy.setEnabled(this.browser.hasSelection());
-		paste.setEnabled(ClipboardUtil.hasTextContent());
-
 		// add menus
-		manager.add(openEditor);
+		manager.add(this.openEditor);
 		manager.add(new Separator());
-		manager.add(copy);
-		manager.add(paste);
-		manager.add(new Separator());
-		manager.add(selectAll);
+		
+		// add browser's menus
+		this.browser.fillContextMenu(manager);
 
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -186,7 +175,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalPullDown(IMenuManager manager)
 	{
-		manager.add(openEditor);
+		manager.add(this.openEditor);
 	}
 
 	/**
@@ -196,7 +185,7 @@ public class TerminalView extends ViewPart
 	 */
 	private void fillLocalToolBar(IToolBarManager manager)
 	{
-		manager.add(openEditor);
+		manager.add(this.openEditor);
 	}
 
 	/**
@@ -221,7 +210,7 @@ public class TerminalView extends ViewPart
 		{
 			public void menuAboutToShow(IMenuManager manager)
 			{
-				TerminalView.this.fillContextMenu(manager);
+				fillContextMenu(manager);
 			}
 		});
 
@@ -253,56 +242,16 @@ public class TerminalView extends ViewPart
 	private void makeActions()
 	{
 		// open editor action
-		openEditor = new Action()
+		this.openEditor = new Action()
 		{
 			public void run()
 			{
 				Utils.openEditor(TerminalEditor.ID, true);
 			}
 		};
-		openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
-		openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
-		openEditor.setImageDescriptor(Activator.getImageDescriptor("/icons/terminal.png")); //$NON-NLS-1$
-
-		// copy action
-		copy = new Action()
-		{
-			public void run()
-			{
-				browser.copy();
-			}
-		};
-		copy.setText("Copy");
-		copy.setToolTipText("Copy the selected text to the clipboard");
-		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-				ISharedImages.IMG_TOOL_COPY));
-		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
-
-		// paste action
-		paste = new Action()
-		{
-			public void run()
-			{
-				browser.paste();
-			}
-		};
-		paste.setText("Paste");
-		paste.setToolTipText("Paste clipboard text into the terminal");
-		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
-				ISharedImages.IMG_TOOL_PASTE));
-		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
-		
-		// select-all action
-		selectAll = new Action()
-		{
-			public void run()
-			{
-				browser.selectAll();
-			}
-		};
-		selectAll.setText("Select All");
-		selectAll.setToolTipText("Select all text in the terminal");
-		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
+		this.openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
+		this.openEditor.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
+		this.openEditor.setImageDescriptor(Activator.getImageDescriptor("/icons/terminal.png")); //$NON-NLS-1$
 	}
 
 	/**
@@ -310,9 +259,13 @@ public class TerminalView extends ViewPart
 	 */
 	public void setFocus()
 	{
-		browser.setFocus();
+		this.browser.setFocus();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.ViewPart#setPartName(java.lang.String)
+	 */
 	@Override
 	public void setPartName(String partName)
 	{

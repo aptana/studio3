@@ -1,12 +1,10 @@
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -14,7 +12,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableEditor;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -23,16 +20,12 @@ import org.eclipse.ui.part.EditorPart;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.server.TerminalServer;
-import com.aptana.util.ClipboardUtil;
 
 public class TerminalEditor extends EditorPart implements IPersistableEditor
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalBrowser _browser;
-	private Action copy;
-	private Action paste;
-	private Action selectAll;
 
 	/*
 	 * (non-Javadoc)
@@ -52,7 +45,6 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
 		
-		makeActions();
 		hookContextMenu();
 	}
 
@@ -97,15 +89,8 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	 */
 	private void fillContextMenu(IMenuManager manager)
 	{
-		// set copy/paste enabled states
-		copy.setEnabled(this._browser.hasSelection());
-		paste.setEnabled(ClipboardUtil.hasTextContent());
-
-		// add menus
-		manager.add(copy);
-		manager.add(paste);
-		manager.add(new Separator());
-		manager.add(selectAll);
+		// add browser's menus
+		this._browser.fillContextMenu(manager);
 		
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -126,7 +111,7 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 			}
 		});
 
-		Control browserControl = _browser.getControl();
+		Control browserControl = this._browser.getControl();
 		Menu menu = menuMgr.createContextMenu(browserControl);
 		browserControl.setMenu(menu);
 		// getSite().registerContextMenu(menuMgr, viewer);
@@ -164,50 +149,6 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	public boolean isSaveAsAllowed()
 	{
 		return false;
-	}
-
-	/**
-	 * makeActions
-	 */
-	private void makeActions()
-	{
-		// copy action
-		copy = new Action()
-		{
-			public void run()
-			{
-				_browser.copy();
-			}
-		};
-		copy.setText("Copy");
-		copy.setToolTipText("Copy the selected text to the clipboard");
-		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
-		
-		// paste action
-		paste = new Action()
-		{
-			public void run()
-			{
-				_browser.paste();
-			}
-		};
-		paste.setText("Paste");
-		paste.setToolTipText("Paste clipboard text into the terminal");
-		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE));
-		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
-		
-		// select-all action
-		selectAll = new Action()
-		{
-			public void run()
-			{
-				_browser.selectAll();
-			}
-		};
-		selectAll.setText("Select All");
-		selectAll.setToolTipText("Select all text in the terminal");
-		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
 	}
 	
 	/*

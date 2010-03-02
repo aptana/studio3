@@ -4,12 +4,14 @@ import java.util.UUID;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.resource.JFaceResources;
@@ -28,6 +30,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.keys.IBindingService;
@@ -38,6 +41,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.server.TerminalServer;
+import com.aptana.util.ClipboardUtil;
 
 public class TerminalBrowser
 {
@@ -52,14 +56,19 @@ public class TerminalBrowser
 	private WorkbenchPart _owningPart;
 	private String _id;
 	private String _startingDirectory;
+	
+	private Action copy;
+	private Action paste;
+	private Action selectAll;
+	
 	private IPreferenceChangeListener _themeChangeListener;
 	private IPropertyChangeListener _fontChangeListener;
 	private KeyListener _keyListener;
+	private FocusListener _focusListener;
 
 	static
 	{
-		boolean isMac = Platform.getOS().equals(Platform.OS_MACOSX);
-		int modifiers = SWT.SHIFT | ((isMac) ? SWT.COMMAND : SWT.CONTROL);
+		int modifiers = SWT.SHIFT | SWT.MOD1;
 
 		COPY_STROKE = KeyStroke.getInstance(modifiers, 'C');
 		PASTE_STROKE = KeyStroke.getInstance(modifiers, 'V');
@@ -98,7 +107,7 @@ public class TerminalBrowser
 		final IBindingService bindingService = (IBindingService) this._owningPart.getSite().getService(
 				IBindingService.class);
 
-		this._browser.addFocusListener(new FocusListener()
+		this._focusListener = new FocusListener()
 		{
 			public void focusGained(FocusEvent e)
 			{
@@ -109,7 +118,8 @@ public class TerminalBrowser
 			{
 				bindingService.setKeyFilterEnabled(true);
 			}
-		});
+		};
+		this._browser.addFocusListener(this._focusListener);
 	}
 
 	/**
@@ -275,6 +285,7 @@ public class TerminalBrowser
 		// create browser control
 		this._browser = new Browser(parent, SWT.NONE);
 
+		this.makeActions();
 		this.addListeners();
 	}
 
@@ -283,6 +294,12 @@ public class TerminalBrowser
 	 */
 	public void dispose()
 	{
+		if (this._focusListener != null)
+		{
+			this._browser.removeFocusListener(this._focusListener);
+			this._focusListener = null;
+		}
+		
 		if (this._themeChangeListener != null)
 		{
 			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
@@ -315,6 +332,23 @@ public class TerminalBrowser
 		}
 	}
 
+	/**
+	 * fillContextMenu
+	 * 
+	 * @param manager
+	 */
+	public void fillContextMenu(IMenuManager manager)
+	{
+		// set copy/paste enabled states
+		copy.setEnabled(this.hasSelection());
+		paste.setEnabled(ClipboardUtil.hasTextContent());
+		
+		manager.add(copy);
+		manager.add(paste);
+		manager.add(new Separator());
+		manager.add(selectAll);
+	}
+	
 	/**
 	 * getControl
 	 * 
@@ -361,6 +395,49 @@ public class TerminalBrowser
 		}
 		
 		return result;
+	}
+	
+	private void makeActions()
+	{
+		// copy action
+		copy = new Action()
+		{
+			public void run()
+			{
+				copy();
+			}
+		};
+		copy.setText("Copy");
+		copy.setToolTipText("Copy the selected text to the clipboard");
+		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+				ISharedImages.IMG_TOOL_COPY));
+		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
+
+		// paste action
+		paste = new Action()
+		{
+			public void run()
+			{
+				paste();
+			}
+		};
+		paste.setText("Paste");
+		paste.setToolTipText("Paste clipboard text into the terminal");
+		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+				ISharedImages.IMG_TOOL_PASTE));
+		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
+		
+		// select-all action
+		selectAll = new Action()
+		{
+			public void run()
+			{
+				selectAll();
+			}
+		};
+		selectAll.setText("Select All");
+		selectAll.setToolTipText("Select all text in the terminal");
+		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
 	}
 	
 	/**
