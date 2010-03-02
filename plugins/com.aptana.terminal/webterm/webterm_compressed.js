@@ -2047,10 +2047,16 @@ _15c.push(_15f);
 }
 }else{
 if(window.getSelection){
-_15c=[window.getSelection().toString()];
+_15c=window.getSelection().toString();
 }else{
 if(document.selection){
-_15c=[document.selection.createRange().text];
+_15c=document.selection.createRange().text;
+}
+}
+if(_15c!==null){
+_15c=_15c.split(/\r\n|\r|\n/);
+for(var i=0;i<_15c.length;i++){
+_15c[i]=_15c[i].replace(/\s+$/,"");
 }
 }
 }
@@ -2304,6 +2310,7 @@ var ESC=String.fromCharCode(27);
 var CSI=ESC+"[";
 this._keyHandler.addKeys(CSI+[8,this._height,this._width].join(";")+"t");
 }
+this.refresh();
 }
 };
 Term.prototype.setTitle=function(_18d){
