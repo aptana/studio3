@@ -1,10 +1,10 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.compare.CompareUI;
-import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -18,43 +18,42 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.team.core.RepositoryProvider;
-import org.eclipse.team.core.history.IFileHistoryProvider;
-import org.eclipse.team.core.history.IFileRevision;
-import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
+import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.DeleteBranchAction;
 import com.aptana.git.ui.actions.DisconnectAction;
@@ -71,7 +70,6 @@ import com.aptana.git.ui.actions.StatusAction;
 import com.aptana.git.ui.actions.UnstageAction;
 import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
-import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 
 /**
  * Adds Git UI elements to the Single Project View.
@@ -379,6 +377,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	{
 		MenuItem commit = new MenuItem(menu, SWT.PUSH);
 		commit.setText(Messages.GitProjectView_DiffTooltip);
+		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedFiles().isEmpty());
 		commit.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -387,21 +386,52 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				GitRepository repo = GitRepository.getAttached(selectedProject);
 				if (repo == null)
 					return;
-				RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject, GitRepositoryProvider.ID);
-				IFileHistoryProvider prov = provider.getFileHistoryProvider();
-				for (IResource resource : getSelectedFiles())
+
+				Map<String, String> diffs = new HashMap<String, String>();
+				Set<IResource> resources = getSelectedFiles();
+				for (IResource resource : resources)
 				{
-					ChangedFile changedFile = repo.getChangedFileForResource(resource);
-					if (changedFile == null)
+					ChangedFile file = repo.getChangedFileForResource(resource);
+					if (file == null)
 						continue;
-					String name = changedFile.getPath();
-					final IFileRevision baseFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), name); //$NON-NLS-1$
-					final IFileRevision nextFile = prov.getWorkspaceFileRevision(resource);
-					final ITypedElement base = new FileRevisionTypedElement(baseFile);
-					final ITypedElement next = new FileRevisionTypedElement(nextFile);
-					final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
-					CompareUI.openCompareEditor(in);
+
+					String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
+					diffs.put(file.getPath(), diff);
 				}
+				if (diffs.isEmpty())
+					return;
+				String diff = ""; //$NON-NLS-1$
+				try
+				{
+					diff = DiffFormatter.toHTML(diffs);
+				}
+				catch (Throwable t)
+				{
+					ExplorerPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+				}
+				final String finalDiff = diff;
+				MessageDialog dialog = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+						.getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
+						"", 0, new String[] { IDialogConstants.OK_LABEL }, 0) //$NON-NLS-1$
+				{
+					@Override
+					protected Control createCustomArea(Composite parent)
+					{
+						Browser diffArea = new Browser(parent, SWT.BORDER);
+						GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+						data.heightHint = 300;
+						diffArea.setLayoutData(data);
+						diffArea.setText(finalDiff);
+						return diffArea;
+					}
+
+					@Override
+					protected boolean isResizable()
+					{
+						return true;
+					}
+				};
+				dialog.open();
 			}
 		});
 	}
@@ -692,6 +722,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowInHistory);
 		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
 		{
+			@SuppressWarnings("restriction")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{

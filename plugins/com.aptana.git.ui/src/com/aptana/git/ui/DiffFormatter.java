@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal;
+package com.aptana.git.ui;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.util.IOUtil;
 import com.aptana.util.StringUtil;
 
@@ -30,17 +29,23 @@ public abstract class DiffFormatter
 	 * @param diff
 	 * @return
 	 */
-	public static String toHTML(String diff)
+	public static String toHTML(String title, String diff)
 	{
 		if (diff == null)
 		{
 			return ""; //$NON-NLS-1$
 		}
+		return injectIntoTemplate(convertDiff(title, diff));
+	}
+
+	protected static String convertDiff(String title, String diff)
+	{
 		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
 			return "<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		String title = ""; // FIXME Grab the filename! //$NON-NLS-1$
+		if (title == null)
+			title = ""; //$NON-NLS-1$
 		StringBuilder html = new StringBuilder();
 		html.append("<div class=\"file\">"); //$NON-NLS-1$
 		html.append("<div class=\"fileHeader\">").append(title).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -112,7 +117,11 @@ public abstract class DiffFormatter
 		html.append("<div class=\"lineno\">").append(line2).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		html.append("<div class=\"lines\">").append(diffContent).append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 		html.append("</div>").append("</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+		return html.toString();
+	}
 
+	protected static String injectIntoTemplate(String html)
+	{
 		InputStream stream = null;
 		try
 		{
@@ -120,7 +129,7 @@ public abstract class DiffFormatter
 					.append("diff.html"), false); //$NON-NLS-1$
 			String template = IOUtil.read(stream);
 			Map<String, String> variables = new HashMap<String, String>();
-			variables.put("\\{diff\\}", html.toString()); //$NON-NLS-1$
+			variables.put("\\{diff\\}", html); //$NON-NLS-1$
 			return StringUtil.replaceAll(template, variables);
 		}
 		catch (Exception e)
@@ -128,6 +137,26 @@ public abstract class DiffFormatter
 			GitUIPlugin.logError(e.getMessage(), e);
 			return html.toString();
 		}
+	}
+
+	/**
+	 * Pass in a Map of filename/path to diff.
+	 * 
+	 * @param diffs
+	 * @return
+	 */
+	public static String toHTML(Map<String, String> diffs)
+	{
+		if (diffs == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
+		StringBuilder combined = new StringBuilder();
+		for (Map.Entry<String, String> diffMap : diffs.entrySet())
+		{
+			combined.append(convertDiff(diffMap.getKey(), diffMap.getValue())).append("\n"); //$NON-NLS-1$
+		}
+		return injectIntoTemplate(combined.toString());
 	}
 
 }
