@@ -23,9 +23,17 @@
          <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
-                class="com.aptana.git.ui.actions.DisconnectAction"
+               class="com.aptana.git.ui.actions.DisconnectAction"
                id="com.aptana.git.ui.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
+         </action>
+         <action
+               class="com.aptana.git.ui.internal.actions.AddRemoteAction"
+               definitionId="com.aptana.git.ui.command.add_remote"
+               id="com.aptana.git.ui.actions.AddRemoteAction"
+               label="%AddRemoteAction_label"
+               menubarPath="team.main/projectGroup"
+               tooltip="%AddRemoteAction_tooltip">
          </action>
          <action
                class="com.aptana.git.ui.actions.PushAction"
@@ -214,6 +222,11 @@
             id="com.aptana.git.ui.category"
             name="%Git_command_category">
       </category>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            id="com.aptana.git.ui.command.add_remote"
+            name="%AddRemoteAction_tooltip">
+      </command>
       <command
             categoryId="com.aptana.git.ui.category"
             id="com.aptana.git.ui.command.push"
