@@ -11,15 +11,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
@@ -53,10 +49,7 @@ import com.aptana.util.CollectionsUtil;
 public class EditorCommandsMenuContributor extends ContributionItem
 {
 
-	private static final String DISPOSE_ON_HIDE = "DOH"; //$NON-NLS-1$
-
-	// FIXME Char for tab. Figure out how to use an image instead.
-	private static final String TAB = "\u21E5"; //$NON-NLS-1$
+	private static final String TAB = "\u00bb"; //$NON-NLS-1$
 
 	public EditorCommandsMenuContributor()
 	{
@@ -91,50 +84,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 
 	public static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem)
 	{
-		// Add the listener to clean up the menu on hide
-		// so that the accelerators do not interfere with
-		// key binding
-		menu.addMenuListener(new MenuListener()
-		{
-			@Override
-			public void menuShown(MenuEvent e)
-			{
-			}
-
-			@Override
-			public void menuHidden(MenuEvent e)
-			{
-				menu.removeMenuListener(this);
-				// Have to use the delay to allow the dispatching
-				// of any menu item selection events
-				menu.getDisplay().timerExec(200, new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						if (menu.isDisposed())
-						{
-							return;
-						}
-						MenuItem[] menuItems = menu.getItems();
-						for (MenuItem menuItem : menuItems)
-						{
-							if (!menuItem.isDisposed())
-							{
-								// Is this a menu item that we had added
-								Object data = menuItem.getData(DISPOSE_ON_HIDE);
-								if (data != null)
-								{
-									menuItem.dispose();
-								}
-							}
-						}
-					}
-				});
-			}
-		});
-
-
 		// Is this an Aptana Editor
 		if (textEditor instanceof AbstractThemeableEditor)
 		{
@@ -266,10 +215,6 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
 				menuItemForMenuForScope.setData(contributionItem);
 				menuItemForMenuForScope.setText(displayName);
-				// We mark the cascade menu items for disposal when the menu is hidden
-				// so that accelerators on descendant menu items do not hinder the handling of
-				// key bindings
-				menuItemForMenuForScope.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
 
 				Menu menuForMenuForScope = new Menu(menu);
 				menuItemForMenuForScope.setMenu(menuForMenuForScope);
@@ -288,27 +233,14 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 				menuItem.setData(contributionItem);
 
+				String acceleratorText = ""; //$NON-NLS-1$
 				if (command != null)
 				{
 					KeySequence[] keySequences = command.getKeySequences();
 					if (keySequences != null && keySequences.length > 0)
 					{
 						KeySequence keySequence = keySequences[0];
-						KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
-						// Eclipse can show only single key stroke key sequences
-						if (keyStrokes.length == 1)
-						{
-							int accelerator = SWTKeySupport.convertKeyStrokeToAccelerator(keyStrokes[0]);
-							menuItem.setAccelerator(accelerator);
-							// We mark the first level menu item with accelerators
-							// for disposal when the menu is hidden so that it does
-							// the accelerator does not interfere with the handling
-							// of key bindings
-							if (menu.getParentMenu() == null)
-							{
-								menuItem.setData(DISPOSE_ON_HIDE, Boolean.TRUE);
-							}
-						}
+						acceleratorText = "\t" + keySequence.format(); //$NON-NLS-1$
 					}
 					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0)
 					{
@@ -316,11 +248,11 @@ public class EditorCommandsMenuContributor extends ContributionItem
 						if (triggers != null && triggers.length > 0)
 						{
 							// Use first trigger
-							displayName += " (" + triggers[0] + TAB + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+							displayName += " " + triggers[0] + TAB; //$NON-NLS-1$
 						}
 					}
 				}
-				menuItem.setText(displayName);
+				menuItem.setText(displayName + acceleratorText);
 				menuItem.addSelectionListener(new SelectionListener()
 				{
 					@Override

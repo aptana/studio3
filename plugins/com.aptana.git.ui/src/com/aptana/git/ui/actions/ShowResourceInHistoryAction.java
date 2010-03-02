@@ -9,7 +9,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.team.internal.ui.actions.TeamAction;

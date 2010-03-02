@@ -22,8 +22,10 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
@@ -115,6 +117,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 
+	protected static final String GROUP_RUN = "group.run";
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -147,9 +151,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
 		commandsToolBar.setLayoutData(branchComboData);
-
-		final MenuManager commandsMenuManager = new MenuManager();
-		final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
+			
 		commandsToolItem.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent selectionEvent)
@@ -157,57 +159,14 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
+				final MenuManager commandsMenuManager = new MenuManager();	
+				fillCommandsMenu(commandsMenuManager);
+				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
 			}
 		});
-
-		// Run script/server
-		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
-				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
-				SWT.PUSH);
-		commandsMenuManager.add(new CommandContributionItem(runScriptServer)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
-
-		// Do not show these commands until we implement the Eclipse launch configuration based Run and Debug
-		// // Run Last launched
-		//		CommandContributionItemParameter runLastCCIP = new CommandContributionItemParameter(getSite(), "RunLast", //$NON-NLS-1$
-		//				"org.eclipse.debug.ui.commands.RunLast", //$NON-NLS-1$
-		// SWT.PUSH);
-		// commandsMenuManager.add(new CommandContributionItem(runLastCCIP)
-		// {
-		// @Override
-		// public boolean isEnabled()
-		// {
-		// return super.isEnabled() && selectedProject != null && selectedProject.exists();
-		// }
-		// });
-		//
-		// // Debug last launched
-		//		CommandContributionItemParameter debugLastCCIP = new CommandContributionItemParameter(getSite(), "DebugLast", //$NON-NLS-1$
-		//				"org.eclipse.debug.ui.commands.DebugLast", //$NON-NLS-1$
-		// SWT.PUSH);
-		// commandsMenuManager.add(new CommandContributionItem(debugLastCCIP)
-		// {
-		// @Override
-		// public boolean isEnabled()
-		// {
-		// return super.isEnabled() && selectedProject != null && selectedProject.exists();
-		// }
-		// });
-
-		// Not really sure why but this separator isn't actually showing...
-		new MenuItem(commandsMenu, SWT.SEPARATOR);
-
-		fillCommandsMenu(commandsMenuManager);
-
-		addDeleteProjectAction(commandsMenuManager);
+		
 
 		// Create search
 		createSearchComposite(parent);
@@ -232,52 +191,41 @@ public abstract class SingleProjectView extends CommonNavigator
 		hookToThemes();
 	}
 
-	protected void addDeleteProjectAction(final MenuManager commandsMenuManager)
-	{
-		commandsMenuManager.add(new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				new MenuItem(menu, SWT.SEPARATOR);
-
-				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
-				terminalMenuItem.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
-				terminalMenuItem.addSelectionListener(new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						DeleteResourceAction action = new DeleteResourceAction(getSite());
-						action.selectionChanged(new StructuredSelection(selectedProject));
-						action.run();
-					}
-				});
-				boolean enabled = (selectedProject != null && selectedProject.exists());
-				ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
-				terminalMenuItem.setImage(enabled ? images.getImage(ISharedImages.IMG_TOOL_DELETE) : images
-						.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
-				terminalMenuItem.setEnabled(enabled);
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-
-		});
-	}
-
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
 
 	protected void fillCommandsMenu(MenuManager menuManager)
 	{
-		menuManager.add(new ContributionItem()
+		// Filtering
+		// Run
+		// Git single files
+		// Git project level
+		// Git branching
+		// Git misc
+		// Misc project/properties
+		menuManager.add(new Separator(IContextMenuConstants.GROUP_FILTERING));
+		menuManager.add(new Separator(GROUP_RUN));
+		menuManager.add(new Separator(IContextMenuConstants.GROUP_ADDITIONS));
+		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
+
+		// Add run related items
+		// Run script/server
+		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
+				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
+				SWT.PUSH);
+		menuManager.appendToGroup(GROUP_RUN, new CommandContributionItem(runScriptServer)
+		{
+			@Override
+			public boolean isEnabled()
+			{
+				return super.isEnabled() && selectedProject != null && selectedProject.exists();
+			}
+		});
+		// Open Terminal
+		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
 		{
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				new MenuItem(menu, SWT.SEPARATOR);
 				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
 				terminalMenuItem.setText(Messages.SingleProjectView_OpenTerminalMenuItem_LBL);
 				terminalMenuItem.addSelectionListener(new SelectionAdapter()
@@ -326,6 +274,38 @@ public abstract class SingleProjectView extends CommonNavigator
 			{
 				return true;
 			}
+		});
+
+		// Stick Delete in Properties area
+		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
+		{
+			@Override
+			public void fill(Menu menu, int index)
+			{
+				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
+				terminalMenuItem.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
+				terminalMenuItem.addSelectionListener(new SelectionAdapter()
+				{
+					public void widgetSelected(SelectionEvent e)
+					{
+						DeleteResourceAction action = new DeleteResourceAction(getSite());
+						action.selectionChanged(new StructuredSelection(selectedProject));
+						action.run();
+					}
+				});
+				boolean enabled = (selectedProject != null && selectedProject.exists());
+				ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
+				terminalMenuItem.setImage(enabled ? images.getImage(ISharedImages.IMG_TOOL_DELETE) : images
+						.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
+				terminalMenuItem.setEnabled(enabled);
+			}
+
+			@Override
+			public boolean isDynamic()
+			{
+				return true;
+			}
+
 		});
 	}
 
