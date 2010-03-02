@@ -54,6 +54,7 @@ import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.DiffFormatter;
+import com.aptana.git.ui.actions.AddRemoteAction;
 import com.aptana.git.ui.actions.CommitAction;
 import com.aptana.git.ui.actions.DeleteBranchAction;
 import com.aptana.git.ui.actions.DisconnectAction;
@@ -235,14 +236,15 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				else
 				{
 					createCommitMenuItem(menu);
-
 					String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
 					if (commitsAhead != null && commitsAhead.length > 0)
 					{
+						// FIXME Always add, just don't make enabled unless we've got commits?
 						createPushMenuItem(menu);
 					}
 					if (repository.trackingRemote(repository.currentBranch()))
 					{
+						// FIXME Always add, just don't make enabled unless we're tracking remote?
 						createPullMenuItem(menu);
 					}
 					createGitStatusMenuItem(menu);
@@ -277,6 +279,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				Menu moreSubMenu = new Menu(menu);
 				createStashMenuItem(moreSubMenu);
 				createUnstashMenuItem(moreSubMenu);
+				createAddRemoteMenuItem(moreSubMenu);
 				createShowInHistoryMenuItem(moreSubMenu);
 				createShowGithubNetworkMenuItem(moreSubMenu);
 				createDisconnectMenuItem(moreSubMenu);
@@ -576,6 +579,22 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			public void widgetSelected(SelectionEvent e)
 			{
 				StatusAction action = new StatusAction();
+				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				action.run();
+			}
+		});
+	}
+	
+	private void createAddRemoteMenuItem(Menu menu)
+	{
+		MenuItem commit = new MenuItem(menu, SWT.PUSH);
+		commit.setText(Messages.GitProjectView_AddRemoteTooltip);
+		commit.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				AddRemoteAction action = new AddRemoteAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
 				action.run();
 			}
