@@ -28,7 +28,7 @@
                menubarPath="team.main/projectGroup">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.AddRemoteAction"
+               class="com.aptana.git.ui.actions.AddRemoteAction"
                definitionId="com.aptana.git.ui.command.add_remote"
                id="com.aptana.git.ui.actions.AddRemoteAction"
                label="%AddRemoteAction_label"

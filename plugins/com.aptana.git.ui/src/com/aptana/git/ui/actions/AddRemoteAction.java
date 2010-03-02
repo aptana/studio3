@@ -1,11 +1,10 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 
-import com.aptana.git.ui.actions.SimpleGitCommandAction;
 import com.aptana.git.ui.dialogs.AddRemoteDialog;
 
 public class AddRemoteAction extends SimpleGitCommandAction
@@ -33,12 +32,9 @@ public class AddRemoteAction extends SimpleGitCommandAction
 		{
 			name = dialog.getValue().trim();
 			url = dialog.getRemoteURL();
+			return new String[] { "remote", "add", name, url };
 		}
-		else
-		{
-			// FIXME Bail out!
-		}
-		return new String[] { "remote", "add", name, url };
+		return null; // don't let this action run...
 	}
 
 	@Override
