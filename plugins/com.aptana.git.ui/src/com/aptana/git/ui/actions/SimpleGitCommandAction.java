@@ -41,6 +41,8 @@ public abstract class SimpleGitCommandAction extends GitAction
 		}
 		final String finWorking = workingDir.toString();
 		final String[] command = getCommand();
+		if (command == null || command.length == 0)
+			return;
 		StringBuilder jobName = new StringBuilder("git"); //$NON-NLS-1$
 		for (String string : command)
 		{

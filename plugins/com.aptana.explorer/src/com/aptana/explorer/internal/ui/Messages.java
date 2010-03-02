@@ -48,7 +48,7 @@ public class Messages extends NLS
 	public static String GitProjectView_MergeBranch;
 	public static String GitProjectView_MoreSubmenuLabel;
 	public static String GitProjectView_DeleteBranch;
-
+	public static String GitProjectView_AddRemoteTooltip;
 	public static String GitProjectView_GitDiffDialogTitle;
 	public static String GitProjectView_LBL_ShowInHistory;
 	
