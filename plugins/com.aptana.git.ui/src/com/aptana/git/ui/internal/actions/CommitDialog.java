@@ -60,8 +60,9 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.git.ui.internal.DiffFormatter;
+import com.aptana.git.ui.actions.RevertAction;
 
 public class CommitDialog extends StatusDialog
 {
@@ -323,7 +324,7 @@ public class CommitDialog extends StatusDialog
 				String diff = gitRepository.index().diffForFile(file, staged, 3);
 				try
 				{
-					diff = DiffFormatter.toHTML(diff);
+					diff = DiffFormatter.toHTML(file.getPath(), diff);
 				}
 				catch (Throwable t)
 				{

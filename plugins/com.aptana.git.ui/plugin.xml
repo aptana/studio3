@@ -23,7 +23,7 @@
          <action
                label="%DisconnectAction_label"
                tooltip="%DisconnectAction_tooltip"
-                class="com.aptana.git.ui.internal.actions.DisconnectAction"
+                class="com.aptana.git.ui.actions.DisconnectAction"
                id="com.aptana.git.ui.actions.DisconnectAction"
                menubarPath="team.main/projectGroup">
          </action>
@@ -44,7 +44,7 @@
                tooltip="%PullAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.StatusAction"
+               class="com.aptana.git.ui.actions.StatusAction"
                definitionId="com.aptana.git.ui.command.status"
                id="com.aptana.git.ui.actions.StatusAction"
                label="%StatusAction_label"
@@ -52,7 +52,7 @@
                tooltip="%StatusAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               class="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                label="%ShowResourceInHistoryAction_label"
                menubarPath="team.main/group1"
@@ -67,7 +67,7 @@
                tooltip="%CommitAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.DeleteBranchAction"
+               class="com.aptana.git.ui.actions.DeleteBranchAction"
                id="com.aptana.git.ui.actions.DeleteBranchAction"
                definitionId="com.aptana.git.ui.command.delete_branch"
                label="%DeleteBranchAction_label"
@@ -75,7 +75,7 @@
                tooltip="%DeleteBranchAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.MergeBranchAction"
+               class="com.aptana.git.ui.actions.MergeBranchAction"
                id="com.aptana.git.ui.actions.MergeBranchAction"
                definitionId="com.aptana.git.ui.command.merge_branch"
                label="%MergeBranchAction_label"
@@ -110,7 +110,7 @@
                value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
          </filter>
          <action
-               class="com.aptana.git.ui.internal.actions.RevertAction"
+               class="com.aptana.git.ui.actions.RevertAction"
                definitionId="com.aptana.git.ui.command.revert"
                id="com.aptana.git.ui.actions.RevertAction"
                label="%RevertAction_label"
@@ -118,7 +118,7 @@
                tooltip="%RevertAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.UnstageAction"
+               class="com.aptana.git.ui.actions.UnstageAction"
                definitionId="com.aptana.git.ui.command.unstage"
                id="com.aptana.git.ui.actions.UnstageAction"
                label="%UnstageAction_label"
@@ -126,7 +126,7 @@
                tooltip="%UnstageAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.StageAction"
+               class="com.aptana.git.ui.actions.StageAction"
                definitionId="com.aptana.git.ui.command.stage"
                id="com.aptana.git.ui.actions.StageAction"
                label="%StageAction_label"

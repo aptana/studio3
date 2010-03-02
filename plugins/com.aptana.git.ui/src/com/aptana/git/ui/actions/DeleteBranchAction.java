@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.text.MessageFormat;
 import java.util.SortedSet;
@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.actions.MenuAction;
+import com.aptana.git.ui.internal.actions.Messages;
 import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
 public class DeleteBranchAction extends MenuAction
@@ -38,7 +38,7 @@ public class DeleteBranchAction extends MenuAction
 	/**
 	 * Fills the fly-out menu
 	 */
-	protected void fillMenu(Menu menu)
+	public void fillMenu(Menu menu)
 	{
 		IResource resource = getSelectedResource();
 		if (resource == null)
