@@ -46,9 +46,9 @@ public class Messages extends NLS
 	public static String GitProjectView_RevertTooltip;
 	public static String GitProjectView_RevertJobTitle;
 	public static String GitProjectView_MergeBranch;
-
 	public static String GitProjectView_MoreSubmenuLabel;
 	public static String GitProjectView_DeleteBranch;
+	public static String GitProjectView_LBL_ShowInHistory;
 	
 	public static String SingleProjectView_CaseSensitive;
 	public static String SingleProjectView_OpenTerminalMenuItem_LBL;

@@ -52,7 +52,7 @@
                tooltip="%StatusAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.ShowResourceInHistoryAction"
+               class="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
                label="%ShowResourceInHistoryAction_label"
                menubarPath="team.main/group1"

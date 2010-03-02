@@ -64,6 +64,7 @@ import com.aptana.git.ui.actions.MergeBranchAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
 import com.aptana.git.ui.actions.RevertAction;
+import com.aptana.git.ui.actions.ShowResourceInHistoryAction;
 import com.aptana.git.ui.actions.StageAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.git.ui.actions.StatusAction;
@@ -198,12 +199,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					createFilterMenuItem(menu);
 				}
 			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
 		});
 
 		// Add the git file actions
@@ -224,12 +219,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				createDiffMenuItem(menu);
 				// TODO Conflicts
 				createRevertMenuItem(menu);
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
 			}
 		});
 		// add the git project actions
@@ -261,12 +250,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					createGitStatusMenuItem(menu);
 				}
 			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
 		});
 		// Add the git branching/misc items
 		menuManager.appendToGroup(GROUP_GIT_BRANCHING, new ContributionItem()
@@ -296,16 +279,10 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				Menu moreSubMenu = new Menu(menu);
 				createStashMenuItem(moreSubMenu);
 				createUnstashMenuItem(moreSubMenu);
-				// .. TODO Show in Resource History
+				createShowInHistoryMenuItem(moreSubMenu);
 				createShowGithubNetworkMenuItem(moreSubMenu);
 				createDisconnectMenuItem(moreSubMenu);
 				moreMenuItem.setMenu(moreSubMenu);
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
 			}
 		});
 	}
@@ -705,6 +682,21 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				job.setUser(true);
 				job.setPriority(Job.LONG);
 				job.schedule();
+			}
+		});
+	}
+
+	private void createShowInHistoryMenuItem(Menu menu)
+	{
+		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
+		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowInHistory);
+		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final ShowResourceInHistoryAction action = new ShowResourceInHistoryAction();
+				action.selectionChanged(null, new StructuredSelection(getSelectedFiles().toArray()));
 			}
 		});
 	}
