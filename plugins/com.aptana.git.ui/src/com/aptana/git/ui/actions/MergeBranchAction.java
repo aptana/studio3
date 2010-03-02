@@ -1,4 +1,4 @@
-package com.aptana.git.ui.internal.actions;
+package com.aptana.git.ui.actions;
 
 import java.util.Set;
 
@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.actions.MenuAction;
 import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
@@ -30,7 +29,7 @@ public class MergeBranchAction extends MenuAction
 	/*
 	 * Fills the fly-out menu
 	 */
-	protected void fillMenu(Menu menu)
+	public void fillMenu(Menu menu)
 	{
 		IResource resource = getSelectedResource();
 		if (resource == null)

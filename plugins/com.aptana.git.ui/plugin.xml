@@ -67,7 +67,7 @@
                tooltip="%CommitAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.DeleteBranchAction"
+               class="com.aptana.git.ui.actions.DeleteBranchAction"
                id="com.aptana.git.ui.actions.DeleteBranchAction"
                definitionId="com.aptana.git.ui.command.delete_branch"
                label="%DeleteBranchAction_label"
@@ -75,7 +75,7 @@
                tooltip="%DeleteBranchAction_tooltip">
          </action>
          <action
-               class="com.aptana.git.ui.internal.actions.MergeBranchAction"
+               class="com.aptana.git.ui.actions.MergeBranchAction"
                id="com.aptana.git.ui.actions.MergeBranchAction"
                definitionId="com.aptana.git.ui.command.merge_branch"
                label="%MergeBranchAction_label"

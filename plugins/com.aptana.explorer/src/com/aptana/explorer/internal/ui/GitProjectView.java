@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -55,10 +56,14 @@ import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.actions.CommitAction;
+import com.aptana.git.ui.actions.DeleteBranchAction;
 import com.aptana.git.ui.actions.DisconnectAction;
+import com.aptana.git.ui.actions.GitAction;
 import com.aptana.git.ui.actions.GithubNetworkAction;
+import com.aptana.git.ui.actions.MergeBranchAction;
 import com.aptana.git.ui.actions.PullAction;
 import com.aptana.git.ui.actions.PushAction;
+import com.aptana.git.ui.actions.RevertAction;
 import com.aptana.git.ui.actions.StageAction;
 import com.aptana.git.ui.actions.StashAction;
 import com.aptana.git.ui.actions.StatusAction;
@@ -83,6 +88,10 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 	private static final String CHAGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
 
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
+
+	/**
+	 * Group names for git sections of gear menu
+	 */
 	private static final String GROUP_GIT_SINGLE_FILES = "group.git.files"; //$NON-NLS-1$
 	private static final String GROUP_GIT_PROJECTS = "group.git.project"; //$NON-NLS-1$
 	private static final String GROUP_GIT_BRANCHING = "group.git.branching"; //$NON-NLS-1$
@@ -214,7 +223,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				createUnstageMenuItem(menu);
 				createDiffMenuItem(menu);
 				// TODO Conflicts
-				// TODO Revert
+				createRevertMenuItem(menu);
 			}
 
 			@Override
@@ -234,7 +243,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				GitRepository repository = GitRepository.getAttached(selectedProject);
 				if (repository == null)
 				{
-					createRepoMenuItem(menu);
+					createAttachRepoMenuItem(menu);
 				}
 				else
 				{
@@ -273,17 +282,17 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 				// Branch submenu, which contains...
 				MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
-				branchMenuItem.setText("Branch");
+				branchMenuItem.setText(Messages.GitProjectView_BranchSubmenuLabel);
 				Menu branchSubMenu = new Menu(menu);
 				addSwitchBranchSubMenu(repository, branchSubMenu);
-				// TODO Merge Branch submenu
+				addMergeBranchSubMenu(repository, branchSubMenu);
 				addCreateBranchMenuItem(branchSubMenu);
-				// TODO Delete branch submenu
+				addDeleteBranchSubMenu(repository, branchSubMenu);
 				branchMenuItem.setMenu(branchSubMenu);
 
 				// More submenu, which contains...
 				MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
-				moreMenuItem.setText("More");
+				moreMenuItem.setText(Messages.GitProjectView_MoreSubmenuLabel);
 				Menu moreSubMenu = new Menu(menu);
 				createStashMenuItem(moreSubMenu);
 				createUnstashMenuItem(moreSubMenu);
@@ -342,7 +351,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		super.removeFilter();
 	}
 
-	private void createRepoMenuItem(Menu menu)
+	private void createAttachRepoMenuItem(Menu menu)
 	{
 		MenuItem createRepo = new MenuItem(menu, SWT.PUSH);
 		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
@@ -420,51 +429,25 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		});
 	}
 
+	private void createRevertMenuItem(Menu menu)
+	{
+		createSimpleGitAction(menu, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
+				Messages.GitProjectView_RevertJobTitle, new RevertAction());
+	}
+
 	private void createStageMenuItem(Menu menu)
 	{
-		// Limit to only those changed files which have unstaged changes
-		GitRepository repo = GitRepository.getAttached(selectedProject);
-		final Set<IResource> selected = new HashSet<IResource>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasUnstagedChanges())
-					selected.add(resource);
-			}
-		}
-		MenuItem stage = new MenuItem(menu, SWT.PUSH);
-		stage.setText(Messages.GitProjectView_StageTooltip);
-		stage.setEnabled(!selected.isEmpty());
-		stage.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final StageAction action = new StageAction();
-				action.selectionChanged(null, new StructuredSelection(selected.toArray()));
-				Job job = new Job(Messages.GitProjectView_StageJobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
+		createSimpleGitAction(menu, getSelectedUnstagedFiles(), Messages.GitProjectView_StageTooltip,
+				Messages.GitProjectView_StageJobTitle, new StageAction());
 	}
 
 	private void createUnstageMenuItem(Menu menu)
+	{
+		createSimpleGitAction(menu, getSelectedStagedFiles(), Messages.GitProjectView_UnstageTooltip,
+				Messages.GitProjectView_UnstageJobTitle, new UnstageAction());
+	}
+
+	protected Set<IResource> getSelectedStagedFiles()
 	{
 		// Limit to only those changed files which have staged changes
 		GitRepository repo = GitRepository.getAttached(selectedProject);
@@ -480,18 +463,40 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					selected.add(resource);
 			}
 		}
+		return selected;
+	}
 
-		MenuItem unstage = new MenuItem(menu, SWT.PUSH);
-		unstage.setText(Messages.GitProjectView_UnstageTooltip);
-		unstage.setEnabled(!selected.isEmpty());
-		unstage.addSelectionListener(new SelectionAdapter()
+	protected Set<IResource> getSelectedUnstagedFiles()
+	{
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		final Set<IResource> selected = new HashSet<IResource>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				ChangedFile changedFile = repo.getChangedFileForResource(resource);
+				if (changedFile == null)
+					continue;
+				if (changedFile.hasUnstagedChanges())
+					selected.add(resource);
+			}
+		}
+		return selected;
+	}
+
+	private void createSimpleGitAction(Menu menu, final Set<IResource> selected, String tooltip, final String jobTitle,
+			final GitAction action)
+	{
+		MenuItem stage = new MenuItem(menu, SWT.PUSH);
+		stage.setText(tooltip);
+		stage.setEnabled(!selected.isEmpty());
+		stage.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				final UnstageAction action = new UnstageAction();
 				action.selectionChanged(null, new StructuredSelection(selected.toArray()));
-				Job job = new Job(Messages.GitProjectView_UnstageJobTitle)
+				Job job = new Job(jobTitle)
 				{
 
 					@Override
@@ -572,17 +577,32 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	private void createPushMenuItem(Menu menu)
 	{
-		MenuItem push = new MenuItem(menu, SWT.PUSH);
-		push.setImage(ExplorerPlugin.getImage(PUSH_ICON_PATH));
-		push.setText(Messages.GitProjectView_PushTooltip);
-		push.addSelectionListener(new SelectionAdapter()
+		createProjectLevelMenuItem(menu, PUSH_ICON_PATH, Messages.GitProjectView_PushTooltip,
+				Messages.GitProjectView_PushJobTitle, new PushAction());
+	}
+
+	private void createPullMenuItem(Menu menu)
+	{
+		createProjectLevelMenuItem(menu, PULL_ICON_PATH, Messages.GitProjectView_PullTooltip,
+				Messages.GitProjectView_PullJobTitle, new PullAction());
+	}
+
+	private void createProjectLevelMenuItem(Menu menu, String imagePath, String tooltip, final String jobTitle,
+			final GitAction action)
+	{
+		MenuItem item = new MenuItem(menu, SWT.PUSH);
+		if (imagePath != null)
+		{
+			item.setImage(ExplorerPlugin.getImage(imagePath));
+		}
+		item.setText(tooltip);
+		item.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				final PushAction action = new PushAction();
 				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_PushJobTitle)
+				Job job = new Job(jobTitle)
 				{
 
 					@Override
@@ -590,35 +610,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					{
 						action.run();
 						refreshUI(GitRepository.getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createPullMenuItem(Menu menu)
-	{
-		MenuItem pull = new MenuItem(menu, SWT.PUSH);
-		pull.setImage(ExplorerPlugin.getImage(PULL_ICON_PATH));
-		pull.setText(Messages.GitProjectView_PullTooltip);
-		pull.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final PullAction action = new PullAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_PullJobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
 						return Status.OK_STATUS;
 					}
 				};
@@ -999,7 +990,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		// Switch to branch
 		MenuItem switchBranchesMenuItem = new MenuItem(menu, SWT.CASCADE);
 		switchBranchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
-		Menu switchBranchesSubMenu = new Menu(menu);
+		Menu switchBranchesSubMenu = new Menu(switchBranchesMenuItem);
 		String currentBranchName = repository.currentBranch();
 		for (String branchName : repository.localBranches())
 		{
@@ -1025,5 +1016,36 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		// only 1 branch, no need to switch
 		switchBranchesMenuItem.setEnabled(repository.localBranches().size() > 1);
 		switchBranchesMenuItem.setMenu(switchBranchesSubMenu);
+	}
+
+	protected void addMergeBranchSubMenu(final GitRepository repository, Menu menu)
+	{
+		// Merge branch
+		MenuItem mergeBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
+		mergeBranchMenuItem.setText(Messages.GitProjectView_MergeBranch);
+		Menu mergeBranchSubmenu = new Menu(mergeBranchMenuItem);
+
+		MergeBranchAction action = new MergeBranchAction();
+		action.selectionChanged(new Action()
+		{
+		}, new StructuredSelection(selectedProject));
+		action.fillMenu(mergeBranchSubmenu);
+		mergeBranchMenuItem.setEnabled(repository.allBranches().size() > 1);
+		mergeBranchMenuItem.setMenu(mergeBranchSubmenu);
+	}
+
+	protected void addDeleteBranchSubMenu(final GitRepository repository, Menu menu)
+	{
+		// Delete branch
+		MenuItem deleteBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
+		deleteBranchMenuItem.setText(Messages.GitProjectView_DeleteBranch);
+		Menu deleteBranchSubmenu = new Menu(deleteBranchMenuItem);
+		DeleteBranchAction action = new DeleteBranchAction();
+		action.selectionChanged(new Action()
+		{
+		}, new StructuredSelection(selectedProject));
+		action.fillMenu(deleteBranchSubmenu);
+		deleteBranchMenuItem.setEnabled(repository.localBranches().size() > 1);
+		deleteBranchMenuItem.setMenu(deleteBranchSubmenu);
 	}
 }
