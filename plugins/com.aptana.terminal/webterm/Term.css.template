@@ -70,8 +70,10 @@ div.fontInfo {
 	position: absolute;
 	left: 0px;
 	top: 0px;
+	/*
 	border: 1px solid black;
 	color: rgb(192,128,128);
+	*/
 }
 
 div.fontInfo pre {
