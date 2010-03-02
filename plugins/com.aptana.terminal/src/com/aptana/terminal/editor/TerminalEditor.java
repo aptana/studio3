@@ -1,11 +1,18 @@
 package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableEditor;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
@@ -37,6 +44,8 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
+		
+		hookContextMenu();
 	}
 
 	/*
@@ -73,6 +82,41 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	{
 	}
 
+	/**
+	 * fillContextMenu
+	 * 
+	 * @param manager
+	 */
+	private void fillContextMenu(IMenuManager manager)
+	{
+		// add browser's menus
+		this._browser.fillContextMenu(manager);
+		
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+	
+	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu()
+	{
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener()
+		{
+			public void menuAboutToShow(IMenuManager manager)
+			{
+				fillContextMenu(manager);
+			}
+		});
+
+		Control browserControl = this._browser.getControl();
+		Menu menu = menuMgr.createContextMenu(browserControl);
+		browserControl.setMenu(menu);
+		// getSite().registerContextMenu(menuMgr, viewer);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
@@ -106,7 +150,7 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor
 	{
 		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
