@@ -1,20 +1,43 @@
-package com.aptana.editor.html;
+package com.aptana.editor.js;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+
+import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-public class HTMLTagScannerPerformance
+public class JSCodeScannerPerformanceTest extends TestCase
 {
 
-	public static void main(String[] args) throws Exception
+	private JSCodeScanner fScanner;
+
+	@Override
+	protected void setUp() throws Exception
+	{
+		fScanner = new JSCodeScanner()
+		{
+			@Override
+			protected IToken createToken(String string)
+			{
+				return new Token(string);
+			}
+		};
+	}
+
+	@Override
+	protected void tearDown() throws Exception
+	{
+		fScanner = null;
+	}
+
+	public void testTime() throws Exception
 	{
 		// read in the file
-		InputStream stream = HTMLTagScannerPerformance.class.getResourceAsStream("amazon.html");
+		InputStream stream = getClass().getResourceAsStream("dojo.js.uncompressed.js");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)
@@ -23,25 +46,17 @@ public class HTMLTagScannerPerformance
 		}
 		stream.close();
 		String src = new String(out.toByteArray());
-		HTMLTagScanner scanner = new HTMLTagScanner()
-		{
-			@Override
-			protected IToken createToken(String string)
-			{
-				return new Token(string);
-			}
-		};
 		IDocument document = new Document(src);
 		// Ok now actually scan the thing, the real work
-		int numRuns = 100;
+		int numRuns = 10;
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < numRuns; i++)
 		{
-			scanner.setRange(document, 0, src.length());
-			while (scanner.nextToken() != Token.EOF)
+			fScanner.setRange(document, 0, src.length());
+			while (fScanner.nextToken() != Token.EOF)
 			{
-				scanner.getTokenOffset();
-				scanner.getTokenLength();
+				fScanner.getTokenOffset();
+				fScanner.getTokenLength();
 			}
 		}
 		long diff = System.currentTimeMillis() - start;

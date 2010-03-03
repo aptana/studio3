@@ -35,6 +35,7 @@
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.js" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.xml" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.aptana.editor.erb"/>
    </requires>
 
    <plugin
@@ -128,6 +129,14 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.erb.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>
