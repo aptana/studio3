@@ -781,6 +781,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected boolean setNewBranch(String branchName)
 	{
+		// Strip off the indicators...
+		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
+			branchName = branchName.substring(0, branchName.length() - 2);
+		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
+			branchName = branchName.substring(0, branchName.length() - 2);		
 		if (branchName.endsWith("*")) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 1);
 
