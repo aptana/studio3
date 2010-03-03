@@ -41,11 +41,11 @@ SourceElement
 	;
 
 FunctionDeclaration
-	=	FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(i, new JSNode[] { p, b }, f.getStart(), b.getEnd());:}
+	=	FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b }, f.getStart(), b.getEnd());:}
 	;
 
 FunctionExpression
-	=	FUNCTION.f FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { p, b }, f.getStart(), b.getEnd());:}
+	=	FUNCTION.f FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { new JSNode(), p, b }, f.getStart(), b.getEnd());:}
 	|	FunctionDeclaration
 	;
 
