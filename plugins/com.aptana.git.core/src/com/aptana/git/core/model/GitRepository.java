@@ -560,6 +560,7 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
+		// TODO Take in a boolean to allow forcing a fetch or something to actually determine this more accurately!
 		GitRef remote = remoteTrackingBranch(branchName);
 		if (remote == null)
 			return null;

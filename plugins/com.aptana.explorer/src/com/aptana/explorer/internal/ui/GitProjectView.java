@@ -48,8 +48,6 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitExecutable;
-import com.aptana.git.core.model.GitRef;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
@@ -79,7 +77,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  * 
  * @author cwilliams
  */
-public class GitProjectView extends SingleProjectView implements IGitRepositoryListener
+class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 {
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
@@ -586,7 +584,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			}
 		});
 	}
-	
+
 	private void createAddRemoteMenuItem(Menu menu)
 	{
 		MenuItem commit = new MenuItem(menu, SWT.PUSH);
@@ -939,18 +937,12 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				else
 				{
 					String rightLabelText = "]"; //$NON-NLS-1$
+					String[] behind = repository.commitsBehind(repository.currentBranch());
+					if (behind != null && behind.length > 0)
+						rightLabelText += " \u2190"; // left arrow //$NON-NLS-1$
 					String[] ahead = repository.commitsAhead(repository.currentBranch());
 					if (ahead != null && ahead.length > 0)
-						rightLabelText += " ->"; //$NON-NLS-1$
-					GitRef ref = repository.remoteTrackingBranch(repository.currentBranch());
-					if (ref != null)
-					{
-						// TODO Need to determine if there's some way we can tell if we need to pull. We'll always have to hit the remote(s) to check, which seems bad!
-						String output = GitExecutable.instance().outputForCommand(repository.workingDirectory(),
-								"diff", ref.shortName(), "HEAD");
-						output = GitExecutable.instance().outputForCommand(repository.workingDirectory(), "fetch",
-								"--dry-run", "-k", ref.shortName(), "HEAD");
-					}
+						rightLabelText += " \u2192"; // right arrow //$NON-NLS-1$
 					rightLabel.setText(rightLabelText);
 					leftLabelGridData.exclude = false;
 					leftLabel.setVisible(true);
