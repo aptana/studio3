@@ -33,7 +33,7 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 	protected void createFieldEditors()
 	{
 		// Git Executable location
-		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH, "Git Executable", true,
+		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH, Messages.GitExecutableLocationPage_LocationLabel, true,
 				FileFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent())
 		{
 			@Override
@@ -49,7 +49,7 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 				{
 					if (!GitExecutable.acceptBinary(text))
 					{
-						showErrorMessage(NLS.bind("This path is not a valid git v{0} or higher binary.",
+						showErrorMessage(NLS.bind(Messages.GitExecutableLocationPage_InvalidLocationErrorMessage,
 								GitExecutable.MIN_GIT_VERSION));
 						return false;
 					}
@@ -61,7 +61,7 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 		};
 		// Git pull indicator
 		pullIndicatorEditor = new BooleanFieldEditor(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR,
-				"Calculate pull indicator (performs background fetches)", getFieldEditorParent()); //$NON-NLS-1$
+				Messages.GitExecutableLocationPage_CalculatePullIndicatorLabel, getFieldEditorParent());
 		addField(fileEditor);
 		addField(pullIndicatorEditor);
 	}
