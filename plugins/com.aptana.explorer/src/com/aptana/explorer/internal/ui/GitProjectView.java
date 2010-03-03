@@ -179,56 +179,81 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		super.fillCommandsMenu(menuManager);
 
-		// Set up Git groups
-		menuManager.insertBefore(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_SINGLE_FILES));
-		menuManager.insertAfter(GROUP_GIT_SINGLE_FILES, new Separator(GROUP_GIT_PROJECTS));
-		menuManager.insertAfter(GROUP_GIT_PROJECTS, new Separator(GROUP_GIT_BRANCHING));
-
-		// Add git filter to filtering group
-		menuManager.appendToGroup(IContextMenuConstants.GROUP_FILTERING, new ContributionItem()
+		if (selectedProject == null || !selectedProject.exists())
+			return;
+		final GitRepository repository = GitRepository.getAttached(selectedProject);
+		if (repository != null)
 		{
-			@Override
-			public void fill(Menu menu, int index)
+			// Set up Git groups
+			menuManager.insertBefore(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_SINGLE_FILES));
+			menuManager.insertAfter(GROUP_GIT_SINGLE_FILES, new Separator(GROUP_GIT_PROJECTS));
+			menuManager.insertAfter(GROUP_GIT_PROJECTS, new Separator(GROUP_GIT_BRANCHING));
+
+			// Add git filter to filtering group
+			menuManager.appendToGroup(IContextMenuConstants.GROUP_FILTERING, new ContributionItem()
 			{
-				if (selectedProject == null || !selectedProject.exists())
-					return;
-				GitRepository repository = GitRepository.getAttached(selectedProject);
-				if (repository != null)
+				@Override
+				public void fill(Menu menu, int index)
 				{
 					createFilterMenuItem(menu);
 				}
-			}
-		});
+			});
 
-		// Add the git file actions
-		menuManager.appendToGroup(GROUP_GIT_SINGLE_FILES, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
+			// Add the git file actions
+			menuManager.appendToGroup(GROUP_GIT_SINGLE_FILES, new ContributionItem()
 			{
-				if (selectedProject == null || !selectedProject.exists())
-					return;
-				GitRepository repository = GitRepository.getAttached(selectedProject);
-				if (repository == null)
+				@Override
+				public void fill(Menu menu, int index)
 				{
-					return;
+					createStageMenuItem(menu);
+					createUnstageMenuItem(menu);
+					createDiffMenuItem(menu);
+					// TODO Conflicts
+					createRevertMenuItem(menu);
 				}
-				createStageMenuItem(menu);
-				createUnstageMenuItem(menu);
-				createDiffMenuItem(menu);
-				// TODO Conflicts
-				createRevertMenuItem(menu);
-			}
-		});
+			});
+			// Add the git branching/misc items
+			menuManager.appendToGroup(GROUP_GIT_BRANCHING, new ContributionItem()
+			{
+				@Override
+				public void fill(Menu menu, int index)
+				{
+					// Branch submenu, which contains...
+					MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
+					branchMenuItem.setText(Messages.GitProjectView_BranchSubmenuLabel);
+					Menu branchSubMenu = new Menu(menu);
+					addSwitchBranchSubMenu(repository, branchSubMenu);
+					addMergeBranchSubMenu(repository, branchSubMenu);
+					addCreateBranchMenuItem(branchSubMenu);
+					addDeleteBranchSubMenu(repository, branchSubMenu);
+					branchMenuItem.setMenu(branchSubMenu);
+
+					// More submenu, which contains...
+					MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
+					moreMenuItem.setText(Messages.GitProjectView_MoreSubmenuLabel);
+					Menu moreSubMenu = new Menu(menu);
+					createStashMenuItem(moreSubMenu);
+					createUnstashMenuItem(moreSubMenu);
+					createAddRemoteMenuItem(moreSubMenu);
+					createShowInHistoryMenuItem(moreSubMenu);
+					createShowGithubNetworkMenuItem(moreSubMenu);
+					createDisconnectMenuItem(moreSubMenu);
+					moreMenuItem.setMenu(moreSubMenu);
+				}
+			});
+		}
+		else
+		{
+			// Set up Git groups
+			menuManager.insertAfter(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_PROJECTS));
+		}
+
 		// add the git project actions
 		menuManager.appendToGroup(GROUP_GIT_PROJECTS, new ContributionItem()
 		{
 			@Override
 			public void fill(Menu menu, int index)
 			{
-				if (selectedProject == null || !selectedProject.exists())
-					return;
-				GitRepository repository = GitRepository.getAttached(selectedProject);
 				if (repository == null)
 				{
 					createAttachRepoMenuItem(menu);
@@ -249,41 +274,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					}
 					createGitStatusMenuItem(menu);
 				}
-			}
-		});
-		// Add the git branching/misc items
-		menuManager.appendToGroup(GROUP_GIT_BRANCHING, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				if (selectedProject == null || !selectedProject.exists())
-					return;
-				GitRepository repository = GitRepository.getAttached(selectedProject);
-				if (repository == null)
-					return;
-
-				// Branch submenu, which contains...
-				MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
-				branchMenuItem.setText(Messages.GitProjectView_BranchSubmenuLabel);
-				Menu branchSubMenu = new Menu(menu);
-				addSwitchBranchSubMenu(repository, branchSubMenu);
-				addMergeBranchSubMenu(repository, branchSubMenu);
-				addCreateBranchMenuItem(branchSubMenu);
-				addDeleteBranchSubMenu(repository, branchSubMenu);
-				branchMenuItem.setMenu(branchSubMenu);
-
-				// More submenu, which contains...
-				MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
-				moreMenuItem.setText(Messages.GitProjectView_MoreSubmenuLabel);
-				Menu moreSubMenu = new Menu(menu);
-				createStashMenuItem(moreSubMenu);
-				createUnstashMenuItem(moreSubMenu);
-				createAddRemoteMenuItem(moreSubMenu);
-				createShowInHistoryMenuItem(moreSubMenu);
-				createShowGithubNetworkMenuItem(moreSubMenu);
-				createDisconnectMenuItem(moreSubMenu);
-				moreMenuItem.setMenu(moreSubMenu);
 			}
 		});
 	}
@@ -785,7 +775,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
 		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
-			branchName = branchName.substring(0, branchName.length() - 2);		
+			branchName = branchName.substring(0, branchName.length() - 2);
 		if (branchName.endsWith("*")) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 1);
 
