@@ -111,6 +111,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private boolean filterOnInitially;
 	private Job pullCalc;
 	private HashMap<String, Boolean> branchToPullIndicator;
+	private UIJob refreshUIJob;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -337,13 +338,19 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	public void dispose()
 	{
+		GitRepository.removeListener(this);
+		
 		branchToPullIndicator = null;
 		if (pullCalc != null)
 		{
 			pullCalc.cancel();
 			pullCalc = null;
 		}
-		GitRepository.removeListener(this);
+		if (refreshUIJob != null)
+		{
+			refreshUIJob.cancel();
+			refreshUIJob = null;
+		}		
 		super.dispose();
 	}
 
@@ -919,8 +926,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		refreshUI(GitRepository.getAttached(newProject));
 	}
 
-	private void populateBranches(GitRepository repo)
+	private void populateBranches(GitRepository repo, IProgressMonitor monitor) throws CoreException
 	{
+		if (monitor != null && monitor.isCanceled())
+			throw new CoreException(Status.CANCEL_STATUS);
+
 		MenuItem[] menuItems = branchesMenu.getItems();
 		for (MenuItem menuItem : menuItems)
 		{
@@ -929,6 +939,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		branchesToolItem.setText(""); //$NON-NLS-1$
 		if (repo == null)
 			return;
+
+		if (monitor != null && monitor.isCanceled())
+			throw new CoreException(Status.CANCEL_STATUS);
 
 		String currentBranchName = repo.currentBranch();
 		for (String branchName : repo.localBranches())
@@ -965,6 +978,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				currentBranchName = modifiedBranchName;
 		}
 
+		if (monitor != null && monitor.isCanceled())
+			throw new CoreException(Status.CANCEL_STATUS);
+
 		new MenuItem(branchesMenu, SWT.SEPARATOR);
 
 		final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.PUSH);
@@ -994,41 +1010,56 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void refreshUI(final GitRepository repository)
 	{
-		// TODO If we get multiple requests queuing up, just cancel current and reschedule?
-		Job job = new UIJob("update UI for index changes") //$NON-NLS-1$
+		// If we get multiple requests queuing up, just cancel current and reschedule
+		if (refreshUIJob != null)
+			refreshUIJob.cancel();
+		refreshUIJob = new UIJob("update UI for index changes") //$NON-NLS-1$
 		{
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				// Update the branch list so we can reset the dirty status on the branch
-				populateBranches(repository);
-				if (repository == null)
+				if (monitor != null && monitor.isCanceled())
+					return Status.CANCEL_STATUS;
+				try
 				{
-					leftLabelGridData.exclude = true;
-					leftLabel.setVisible(false);
-					branchesToolbarGridData.exclude = true;
-					branchesToolbar.setVisible(false);
-					rightLabelGridData.exclude = true;
-					rightLabel.setVisible(false);
+					// Update the branch list so we can reset the dirty status on the branch
+					populateBranches(repository, monitor);
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					if (repository == null)
+					{
+						leftLabelGridData.exclude = true;
+						leftLabel.setVisible(false);
+						branchesToolbarGridData.exclude = true;
+						branchesToolbar.setVisible(false);
+						rightLabelGridData.exclude = true;
+						rightLabel.setVisible(false);
+					}
+					else
+					{
+						leftLabelGridData.exclude = false;
+						leftLabel.setVisible(true);
+						branchesToolbarGridData.exclude = false;
+						branchesToolbar.setVisible(true);
+						rightLabelGridData.exclude = false;
+						rightLabel.setVisible(true);
+					}
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					branchesToolbar.getParent().getParent().layout(true, true);
+					refreshViewer();
+					return Status.OK_STATUS;
 				}
-				else
+				catch (CoreException e)
 				{
-					leftLabelGridData.exclude = false;
-					leftLabel.setVisible(true);
-					branchesToolbarGridData.exclude = false;
-					branchesToolbar.setVisible(true);
-					rightLabelGridData.exclude = false;
-					rightLabel.setVisible(true);
+					return e.getStatus();
 				}
-				branchesToolbar.getParent().getParent().layout(true, true);
-				refreshViewer();
-				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
+		refreshUIJob.setSystem(true);
+		refreshUIJob.setPriority(Job.INTERACTIVE);
+		refreshUIJob.schedule(100);
 	}
 
 	public void repositoryAdded(RepositoryAddedEvent e)
