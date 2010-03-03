@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTestSuite(JSCodeScannerPerformanceTest.class);
 		suite.addTestSuite(JSParserTest.class);
 		suite.addTestSuite(JSParserPerformanceTest.class);
+		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
