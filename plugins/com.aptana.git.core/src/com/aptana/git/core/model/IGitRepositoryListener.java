@@ -30,4 +30,6 @@ public interface IGitRepositoryListener
 	 * @param e
 	 */
 	public void repositoryRemoved(RepositoryRemovedEvent e);
+
+	public void pulled(PullEvent e);
 }

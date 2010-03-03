@@ -51,6 +51,7 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.DiffFormatter;
@@ -108,6 +109,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	private GitChangedFilesFilter fChangedFilesFilter;
 	private boolean filterOnInitially;
+	private Job pullCalc;
+	private HashMap<String, Boolean> branchToPullIndicator;
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -132,6 +135,49 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			job.setPriority(Job.SHORT);
 			job.schedule(300);
 		}
+
+		// Calculate the pull indicators in a recurring background job!
+		branchToPullIndicator = new HashMap<String, Boolean>();
+		pullCalc = new Job("Calculating git pull indicators") //$NON-NLS-1$
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				if (monitor != null && monitor.isCanceled())
+					return Status.CANCEL_STATUS;
+
+				GitRepository repo = GitRepository.getAttached(selectedProject);
+				if (repo == null)
+				{
+					schedule(5 * 60 * 1000); // reschedule for 5 minutes after we return!
+					return Status.OK_STATUS;
+				}
+
+				if (monitor != null && monitor.isCanceled())
+					return Status.CANCEL_STATUS;
+
+				synchronized (branchToPullIndicator)
+				{
+					branchToPullIndicator.clear();
+					for (String branch : repo.localBranches())
+					{
+						branchToPullIndicator.put(branch, repo.shouldPull(branch));
+					}
+				}
+
+				refreshUI(repo);
+
+				if (monitor != null && monitor.isCanceled())
+					return Status.CANCEL_STATUS;
+
+				schedule(5 * 60 * 1000); // reschedule for 5 minutes after we return!
+				return Status.OK_STATUS;
+			}
+		};
+		pullCalc.setSystem(true);
+		pullCalc.setPriority(Job.LONG);
+		pullCalc.schedule();
 	}
 
 	protected void doCreateToolbar(Composite toolbarComposite)
@@ -291,6 +337,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	public void dispose()
 	{
+		branchToPullIndicator = null;
+		if (pullCalc != null)
+		{
+			pullCalc.cancel();
+			pullCalc = null;
+		}
 		GitRepository.removeListener(this);
 		super.dispose();
 	}
@@ -782,12 +834,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	protected boolean setNewBranch(String branchName)
 	{
 		// Strip off the indicators...
-		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
-			branchName = branchName.substring(0, branchName.length() - 2);
-		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
-			branchName = branchName.substring(0, branchName.length() - 2);		
-		if (branchName.endsWith("*")) //$NON-NLS-1$
-			branchName = branchName.substring(0, branchName.length() - 1);
+		branchName = stripIndicators(branchName);
 
 		final GitRepository repo = GitRepository.getAttached(selectedProject);
 		if (repo == null)
@@ -820,6 +867,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		revertToCurrentBranch(repo);
 		return false;
+	}
+
+	protected String stripIndicators(String branchName)
+	{
+		if (branchName.endsWith(" \u2192")) //$NON-NLS-1$
+			branchName = branchName.substring(0, branchName.length() - 2);
+		if (branchName.endsWith(" \u2190")) //$NON-NLS-1$
+			branchName = branchName.substring(0, branchName.length() - 2);
+		if (branchName.endsWith("*")) //$NON-NLS-1$
+			branchName = branchName.substring(0, branchName.length() - 1);
+		return branchName;
 	}
 
 	private void revertToCurrentBranch(final GitRepository repo)
@@ -882,8 +940,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				modifiedBranchName += "*"; //$NON-NLS-1$
 			}
-			if (repo.shouldPull(branchName))
-				modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+
+			synchronized (branchToPullIndicator)
+			{
+				if (branchToPullIndicator.get(branchName))
+				{
+					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+				}
+			}
 			String[] ahead = repo.commitsAhead(branchName);
 			if (ahead != null && ahead.length > 0)
 				modifiedBranchName += " \u2192"; // right arrow //$NON-NLS-1$
@@ -921,8 +985,16 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		refreshUI(e.getRepository());
 	}
 
+	public void pulled(final PullEvent e)
+	{
+		// When user has done a pull we need to force a recalc of the pull indicators right away!
+		pullCalc.cancel();
+		pullCalc.schedule();
+	}
+
 	protected void refreshUI(final GitRepository repository)
 	{
+		// TODO If we get multiple requests queuing up, just cancel current and reschedule?
 		Job job = new UIJob("update UI for index changes") //$NON-NLS-1$
 		{
 

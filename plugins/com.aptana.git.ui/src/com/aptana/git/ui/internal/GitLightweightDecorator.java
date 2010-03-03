@@ -37,6 +37,7 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
@@ -404,6 +405,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
+		// FIXME Force a total refresh if the number of changed files is over some maximum!
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
@@ -481,5 +483,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
+	}
+	
+	@Override
+	public void pulled(PullEvent e)
+	{	
 	}
 }

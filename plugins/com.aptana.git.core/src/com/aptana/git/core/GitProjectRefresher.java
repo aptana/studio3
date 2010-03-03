@@ -20,10 +20,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
@@ -33,7 +33,7 @@ import com.aptana.git.core.model.RepositoryRemovedEvent;
  * 
  * @author cwilliams
  */
-class GitProjectRefresher implements IGitRepositoryListener
+class GitProjectRefresher extends AbstractGitRepositoryListener
 {
 
 	public void branchChanged(BranchChangedEvent e)

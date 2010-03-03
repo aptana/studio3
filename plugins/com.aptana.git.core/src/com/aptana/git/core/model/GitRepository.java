@@ -36,7 +36,6 @@ import org.eclipse.team.core.TeamException;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
-import com.aptana.util.IOUtil;
 import com.aptana.util.ProcessUtil;
 import com.aptana.util.StringUtil;
 
@@ -583,34 +582,15 @@ public class GitRepository
 				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
 		if (!performFetches)
 			return false;
-		String refspec = branchName;
-		if (!currentBranch().equals(branchName))
-		{
-			refspec = remote.getRemoteBranchName() + ":" + branchName;
-		}
-		ProcessBuilder builder = new ProcessBuilder(GitExecutable.instance().path(), "fetch", "--dry-run", "-k", remote
-				.getRemoteName(), refspec);
-		builder.directory(new File(workingDirectory()));
-		builder.redirectErrorStream(true);
-		try
-		{
-			Process p = builder.start();
-			int exitValue = p.waitFor();
-			String output = IOUtil.read(p.getInputStream(), "UTF-8");
-			if (exitValue != 0)
-				return false;
-			// If it's current branch we need to test if output has more than two lines...
-			if (currentBranch().equals(branchName))
-			{
-				return output.split("\r\n|\r|\n").length > 2;
-			}
-			return output.trim().length() > 0;
-		}
-		catch (Exception e)
-		{
-			GitPlugin.logError(e.getMessage(), e);
-		}
-		return false;
+
+		// Use git ls-remote remotename remote-branchname
+		// Parse out the sha and compare vs the branch's local sha!
+		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote",
+				remote.getRemoteName(), remote.getRemoteBranchName());
+		String remoteSHA = output.substring(0, 40);
+		output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote", ".", "heads/" + branchName);
+		String localSHA = output.substring(0, 40);
+		return !localSHA.equals(remoteSHA);
 	}
 
 	/**
@@ -928,6 +908,13 @@ public class GitRepository
 	File gitFile(String string)
 	{
 		return new File(fileURL.getPath(), string);
+	}
+
+	public void firePullEvent()
+	{
+		PullEvent e = new PullEvent(this);
+		for (IGitRepositoryListener listener : listeners)
+			listener.pulled(e);
 	}
 
 }

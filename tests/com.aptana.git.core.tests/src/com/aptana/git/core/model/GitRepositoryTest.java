@@ -225,6 +225,12 @@ public class GitRepositoryTest extends TestCase
 			{
 				eventsReceived.add(e);
 			}
+			
+			@Override
+			public void pulled(PullEvent e)
+			{
+				eventsReceived.add(e);
+			}
 		};
 		GitRepository.addListener(listener);
 		// TODO Attach and unattach repo with the RepositoryProvider and check those events
