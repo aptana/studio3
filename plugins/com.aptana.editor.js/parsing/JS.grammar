@@ -36,8 +36,7 @@ SourceElements
 	;
 
 SourceElement
-	=	FunctionDeclaration
-	|	Statement
+	=	Statement
 	;
 
 FunctionDeclaration
@@ -66,6 +65,7 @@ FunctionBody
 
 Statement
 	=	Block
+	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e {:JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;:}
 	|	Expression_NoLBF.e SEMICOLON {:e.setSemicolonIncluded(true); return e;:}
 	|	IfStatement
@@ -84,6 +84,7 @@ Statement
 
 Statement_NoIf
 	=	Block
+	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e {:JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;:}
 	|	Expression_NoLBF.e SEMICOLON {:e.setSemicolonIncluded(true); return e;:}
 	|	IfStatement_NoIf

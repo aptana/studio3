@@ -67,118 +67,115 @@ public class JSParser extends Parser implements IParser {
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pjNGTu55NNFdTsDmtIAmaX2IMK4B4hpK89Yj95194cLP0c8jX0a6815G7fLNhlsB1tHR2" +
-		"2s3is$51H4VVyxypSxCwIpMPdPvBuF#xcEVkUszvpphrpMpOiH3Npn9Lq8mqN$Uaw5Ubi6a" +
-		"ANKo$gGTVI9U8#MagNqbcqaEQ9nVG0FKWFqInwMBmgNX6zHK$HNLmjkeY6efwuI9mhEefsu" +
-		"dBHLBn9hz2hug1uMxn3Rz9#yRxuG1mI7ufpnFMYdwXBXocIFX5lYGFYNV5UiNsnH2mLoyHo" +
-		"iKAi4JF5FU9UwL4$UDH1UhI5vj1SUiIo$IZnwUdspSLFdrco7oC#BoF#6Pxuesc8AD8z4fV" +
-		"H8bfCIs3$HqlsKyHF8SH$Ezr1Tz84j7wLZbkodon#BIF#Hn7$J8$5H4hozZwbOlmTbkpdY3" +
-		"yjn9y7#n6MxDSIVvSH$sgV#AjHfY7#Eh0$ofBzki9j8Vu2sB$Palr2HIaZ$iq#yU#WR4FyZ" +
-		"M1$d2NxrHHNCF7JkJxnRw9nj83cqnZOlyEI$HPAJ83u7op3buQmFz7Qyw$4beX$10sZqJIL" +
-		"cb4JkficKsDgIaEfFKsaksWIJQ4Bw49gJXVHnTGRzk#sP7#hacZH$ZHBzZihAHRjRxTalvE" +
-		"IQT7#BalsyvHiiyy$pQRxwJQwWNfIBkm$PctzK$8inl#a9VjzbDeMxJzhRVzNwbkq$v8b#t" +
-		"sLCqhOTvB$FU0vdpLGEtzH7BbAjqylgFRfDNgTtb3jqrjqW0xIEmRxCwaB$q5Tg2NLeRQ6S" +
-		"vNl7l0ozW3jl4FFAuqCViwWzPGW1f4YnjC6saZrmTH5n59RSJvjSn#aZcAeJNvs58tvXEJI" +
-		"FHbhy4FFqKlrzvkLHdGUdOypQoJT8dUBGLJLgXy6csNlKY$IIpIU77RP5CbKX9zkD13zNjS" +
-		"pGhEeWEgBU56LhgO1r9gk52cgJJ7Gait1vAOYqojIJNhVikLCn5XerhAuGgHRjfmZQehweW" +
-		"4pZH1EUlVq5K2qzhC2HD3RuWQAf#$e9$fSHDA7z2lzGKn$YmoHPOw76fN68ng9GgfYZer7b" +
-		"UgLEXTYGrdjy2GVicNscBCPu8PNRZQ$g0IR0MwIvMOpmEsnl6m6kZ6Mcyq0jyHowzlAc2kL" +
-		"O3FG3RZSR0QuzPQRpG0ttNAp6U1sMsus0zneoyrcW5jikTaCS7CjDvi1RglbPZF03RNSR0Q" +
-		"ubPQRpG0tqNAp6U3sMMus0zmuoytcbvPkR#PEhYDjE4yNWMT4gJpRHHgzPu9j5qxdHmAUfp" +
-		"y0srz1idqf3jEduZLnLFmilX2HueZA9dup7UDNyEfR6$hgA7X#je7d17XEMkSHX3kLomQUA" +
-		"F0asy1J1N6zQmDFTVYJOmDF3PlyoOK$jMpWgGsUV1juwjWJ5#N0dxDiyESyy3InWQSPU5hP" +
-		"45SUU5hQu4yRzBCTuzuM$hIt8QwwyAUE3VvS1NywsU1F0NXwsC1J29xhRE1f19u#DlJFa3B" +
-		"Mmo3tB$6GE2pc1DY$WkLv63oFMDy7nNp4jT1wN5I0VRd0XhWM8gxvDl3CAQD$pFJpAXjur7" +
-		"7VQ0FFHl1ii85d4tZsMUVXBuJwTnZMUJw7Fn$PmFEPECo1peV1ydm2dezjuFa8F4TiuFaGF" +
-		"8Tju3a4dWziu7aVFE$PmFCknlqp6tXU1CzNfVBu#oGam##dmjtfCbf7rIdTP9js8RSfeXNQ" +
-		"PrD5z3kreh#eI7mD6II#er4qdJwcR#W7MYuIHO9GQ9c84KaYXNuJtzEV8aNSX5PNcBIwkOA" +
-		"YMwEs4SF4hMAwc8I8KcXa49$xTRNDisBUC#XHaKSpQ0RwLF$SRxR8flgYcxYHgedxnKhn07" +
-		"rKKQCjXeijOhtOe$N7rwP#Zt2CTugrz7s5UVgKsZkyGwmJnyHeKv$h$yBRbLGnei8yVOEIn" +
-		"7vwII7CXdzC$0L8TwgXHEBf51NbgH9FHKgwMA$aOFoZJOt#BzgpcbfXdjOHl$DYSL99umT4" +
-		"DLEUdk9jl5LSK56UyXRUp9ju8s$0sUWICwClpk3rl4wChJ1Fr$8Q9PzNyMeYSPUf6NKRuIN" +
-		"khB0zoV0IKqnvkbLhixjIFDrXojF$QMqUhnHFdpRZgHAbjNcXKZpzs1#3qi1dprvFNKGS3H" +
-		"ONgt$7X5F9Do5PVHxcRgBhrPEG6ApPVbsqW5xYhwd4XU9Ib8uadvVuGKSbebBwYKsDQ8RMv" +
-		"bIbU7h2r6gkzwcZCZnLuaBmj4gbU9eKWgSrAiNJh10yhLafdjODmTE69gscXU1fLWXjseJG" +
-		"vfeGsjmQGfjxGsYpEeGsEqDeipk4DY#RRoCAGcXpPWXjpjRQc7kkrmO#qufhQPf9nli2COf" +
-		"Ug76FJJwUgVcelbRQvECv7iPLfXZziec#6jjLDZ0Dq9Z#PugfYnP7M$Bp4cDCCHNvDEveuB" +
-		"b5t6w1oUZH137P9gQfOfjDJ3l5NfkOdX37RM9wHX4sCRsecFiTGUbCdoW9DZ5zgvZxRK3fJ" +
-		"3ygkS7VraLpKrR3TSDrmtN3TV#BTODRKsi7Lqzq2E8pcs2OyeEf9JhxsIVKt$$CjSMBUcNN" +
-		"4LrBsQsMY7as#D2WJ8vhj7zvL$A5NB6WpDQBv2U9sguhdgSznMsfIFmX$b6SIbMbm92Bbv9" +
-		"CU#anUfoUe2VfATf7JzCpz2mzLqhk7erTOpHufp4grPLQ6jOppLZAIodqgFxR5iyBzQNE2$" +
-		"Lbd1VUyjv#oxsltjI9EkD4VfK7kzBLr0styEvQF$T4t$T2hJxK5trzDkuXvw8NXe9V7P4HD" +
-		"996mT9DD8Pkfh7QlveSZzluRPv$#wzRd0mlfi2VQJGTTwnxIS7Cc44pjNyxMcnN$tQ0sVBV" +
-		"OiwZ#R94#7Xq1ZN2xSgg$Ir#x5Ta$0uJyM$ryUXot9kkA9V#Bpl#yxNrjZ5QMxM$DgZu6tW" +
-		"ifbE6eVSBBDjlRYd#PfRjDpKP$r9QPeY$YMNxYop5ly2o$HKcux#IsXdYNsxP$jAGujzEEo" +
-		"YQOcYtPVjBoeY$B5$Au$aNcDSESfAB8YYIehH8gr1LYgKuYgS4xLjyaYc5KYcjNEB$Bzdtj" +
-		"$vMfFrc8Jt$$UXwway3Q62vh7yL6R#$$RyYxVlR$olI$bO$zhlYh5dsCs3F#Qi1edL0dDZB" +
-		"d8QLlUGUe9ztrjAZ1jyMegUsqMBQJEkqdbe99a6hmEIaGfoN2sc3JNuMuiSXkNHFCWn#w3b" +
-		"wgVvU5twguwUEPV5keS1FgtvuRPOzGkfPgHxyiClcOl3fFmjnRl2Eq0Bq#mP4N0S$zV7Jq0" +
-		"QRxJNlpQz8QonRLkskg1JB7QYZThuZKoj0EYohtokdVYgRJJKeXt8fZsfIBQfjacTvgJpgg" +
-		"QkkIRPwfRAfxUfMoceNjXcs6ROPjXcs6ROPjXcs6RRvtx1fryarU9wCW3mAoioSf#k1JPHn" +
-		"dWwUBHDi#JR4AC2JRXDFwT45pvDkepzsF0Cgps8RU1pWSTZ0CnGy7MpWsMYZFtQCkmAUeJR" +
-		"mrB4fhkOsFJzBmAFOvCyI6tYQsUIF6bTJc$onWsSHU9hyYtWMW6U13JmhmBF21fxb0NytP6" +
-		"uNisCzR6xZysFNk2$y5utxGl0iie6dgKtzqyoczR2vJUkFkb#ije6d03mDRE39jockV9lsq" +
-		"toRpeTXdlz$F9cbyfZvL7WG3QOXT4E5jSdm$2Xq7oG3KMTWhqd7cMwJzhcK#idKAkqpgbsG" +
-		"kjHGcolf6cQWpRyvkhgQZweq3ChJFUNWsIQS#XVYPx7dSx#Tj18$gxHFhDJFXogk3ttxmzp" +
-		"TNfqd5UVfQgrtycazlFntUrhSew7CXegTGRwUckjJTJGgSlG5Hh4UHZy$XD7Fhq1Fypq$Yc" +
-		"ch5Uzf0$MTsMoVCcjjAiXJDhp2dlx7FIsRGK4qTV7kr289RfylwUbQM5FFEEf9gBrcUniLG" +
-		"Y$vrrJrgJvAwp3xUYfnNNX4xVFKn5CGzZJiwN$6qt2RS9kGsvXwhdt#LjU$ZVhsCgA6hOpQ" +
-		"pAnane0Hrwaa9g75uMG$BvDC6Jvj2truB32Tvb6OASnaBvEPrTFKp0hN3TSDrmtN$G$M3NP" +
-		"DjQzUS4n1rVApJ#Y$$x77Yo3gbB9RgLxOuKFPDJ36Vkoh8$zG4AtbPubQcmPKu6cR8Jz9h6" +
-		"FCbVkm#iqpbz2br89QKYjgJKNKXYuh9RT0uzSO3TuL5E$eeJ6MVaRmQFxRodcXrS2yqD0uB" +
-		"ppbc1T#oWsMqeYKCoTgNoPITHXHn0kgNYnuNGZfe7vNYfwE#4x7o7X3dJ#9H5DT5#aIpo1o" +
-		"EBnrykxHqT5IHoK2#cJKQmvy7dWTaREb#drzG3L$AL3zRkLFOQi9qhM0Ov2k3zoCzZE1to4" +
-		"DZAhfjHFLKqVNIcCSmGZQD94SSw7$9VK3qj#daDUCA3e6UD8Grqca#oA6lTwyBDdMzRUEqQ" +
-		"raxFkyTHniiBiEiSh#JNyQwSQGKv0PaCsd#UWgwNVqdKJ9hMNx9sMz2HAlaVWSwktLTP4HV" +
-		"9zaTPLufs##2DY$YEVeQNwlCkWH9Uid5qaxQoGUyCyRmNXEUq8cbYohkaFsnt7eguXY6WOR" +
-		"Pqakrq4TOmQ6rhxgWnBtd9Q$7vpB46yRw9z03X35AdfPR3xI7mBJKGUOV1bqXonhIbGb1Nc" +
-		"NGsyhyp1tKdeGfNOdgbu3wU6oB$l8yijbkfzCNw5ZwcRPbtBUnsA#LMcFUksWpv9vlI2xfR" +
-		"u6vTDHZdKWzbNqpPzwVlfyoI$zIMxlZRCAdhUgc9knQZnkfF4yHmoJVAz37mLSgQVZahtju" +
-		"l3ino6ck6iX4xpvURDb$vqlVN#MA6CEwWm2VW$47AXsiRU#IyPSRJRyV5Dolo9n2$AF0jz5" +
-		"sJwYx5#0#$Mo#0GlHqtCzUhTlUduwaGri6x5oNaTduCqyk9RGGP3FnlpeZTa7dICdVgzKgu" +
-		"4wEXB5yRATJrqh66H1OZZ7UZt8kyAo5NGbnNRqRbhxFPD9qJ1Rar84VfvbPwNKYZ70N74tI" +
-		"37e3zynZeQDrDFLqV$n6sNPRk9qgv17doDUr#Mtm$zf2pVYpJMdFWQicmRz1RIdpSCOx4Tw" +
-		"IzacuFGiVudu9dDYGDYZSof3Sm2OjrEk0JO4Ns2TJnd83QShu2t8#RHa9j107$LxvLFm3n8" +
-		"U1E2iSYPHPI8VivPgzj8J8Q08#KYu6YPToFAz#bwsYRu2f$Y1qg$tuT#h#mZsA$#0TBocQ$" +
-		"#D$It9ST8SA3lidEHTqB6rWTvU9woMyENJDynICI#aFWaEBy5FWx4CvI8EPpu6L6I0d52C8" +
-		"UJwa7QGgw438V0JX9YIiApc8GnIFoS22Of#mROG4n9wFU4Va3CbOIfGEnhoGDG1tjpzWFGE" +
-		"yCMk99lGLv3vEr4lVN8GzqKn9w2vpaTzgjZZYLWVKbPZZc#5dLR81xiwGbO3rFlXc2U9u8p" +
-		"THhoqN#969$KPQZ$0pZpaCPpcegsUV0vSH9qz5kg2zpTK8xdBd4rqeTGFWBwQz0FGp3UsKE" +
-		"H$Xaw$CyR1$#Je1yXzMX1gOWl0sEG$I3opqVwTzHP35rTjqv0rB9TI6F#fY6sl2NGLq0lX3" +
-		"H037XUy#1Jqaj8Du8EMxdmBm$f98nJsfdUyN6Y7rnjZ6Ec2fuvh3UKgzTnoVNKTPUXtNglJ" +
-		"hEyUhKTNbsS8$FUzEQbxDJH8VSTroaTSy#LY3vMlvSwTojiO9t9FQwVRvJn#XgHZ7ECmDXd" +
-		"ZV1oPisJzewS7aTPedwJdOv9XmmnV6ieNuIouwVr3PuPvIDVdkH2ttIc26pNWVvroZt0sSw" +
-		"ytybjlBhuqhVCQJXhPMRfwBerUEuakKPadkUR7vW3vPDEIt$frIDw1uYbhxJN8LWVIt9a3f" +
-		"4uELGE0zVYqDgvdf2nVkCdHcqlnhEpHKz7ohaLsSDGvoq$xOxAUhEzUKxC$PJQ#jeUkJyut" +
-		"rB6#ybxMCUeA6zUL0j3#NwlxdnQndYJZaclwnWRQwWlxpakx6rHsAzIQtdBOgSW5kpbiODb" +
-		"shCc#FeK#wjNZwYbO#OURrwgN3SovLapymTlMLm3MQUvV#vikR$5OLzC7UU$3i7lkBc#UH6" +
-		"DVTEvbnbqGDnds0kTq75#IyR#d3mMQwq3ULYBux4#PsK3iHV4utoJfIBMutYiSrbF#$9cVL" +
-		"NIduZpq9UxLLuz7J$7MnRrYw5Vi5T6D$2ce$iRod16ICN#6xt4K6vOxz9mHef9ygPZhbGHp" +
-		"wfXBKz6lz0vthGYrtRNL5a#IVQ7l4lcuYwQe2BsxGJqHHvi962VJy0#du3pU49RtpX9Zgim" +
-		"s4YH#qx20M#UaFNIi8UcOM#FcMhm#nb3J0yXRLW7gvnhA7j3vicpVqeLv7qZyzOQ$TBpqXk" +
-		"VdXUAW2TFHVJhCHbp8sdp2qETfdxQZPNr3NjUEkvpwLW7qjz2OeitFoD6rZtcpHED3Bg18m" +
-		"DhY32q5OOs6JYJPs3FLGnj5MDRdASKGrj5nfGgxsKPE5DLYyO#PsZlCBIlXdE#mz3UOR1Th" +
-		"PUEJja$AMyZRvpCCt0eP#gXifjFyTzIFmdv5NASjV$rYt4svhVKqmo$vZx6dHXpt$sp6oSg" +
-		"DrgmW4H2OY4uCJDk9bmV0cR6oOkRC#uQt1Rjsl6Lt8QBk3MtufRSWY$bI$XYxifNSH$D3lh" +
-		"B$R7x90$GKiFS7#4TEWzbd5WPjqt6gOoxCV5mlf4ZU3fFqsh#HPuN$yw$yPzSbQVo5BwRjU" +
-		"#mPPmf6Ui9OrtXcxISqPp4wPp6gPpY$i3zllizzxlkTzpe8xuBCf5lut6SpJbSWsjpBQx9U" +
-		"PpB3RYG6t81dyNdyDby0JVXndmXO$zWdAqOvqY#WyVphNmBtovz6SDNSt$k2wsNdkF#pNtK" +
-		"$PtxM$Stxg$TNxc$T7$X$jpzcVjJzoUCiUPZg764V#QV#4V#WR$de$mTVylVyDVy5N#9Sjp" +
-		"T#6q#wFwG32z#sIVrWaTxtf2BLPKVXQo4u9JBEDdoCiXIJuqbZDs57pIqmQcD5q9mOkH7UA" +
-		"wMDviVrd2czZw3xyFxFNo$fyszxf#u0#DEx$xHZIV8BKV6VPoxS6VkgTN13PjxkB6$kPclr" +
-		"t9mB#H1V9qwsZoG#xbnRsSN3s7i1ro5SHlcHCP2o9cCsntNPQn$V0RZLCxdCjPsRihD6EiX" +
-		"NyO767TpdiLOkNW1PBx6$wpqxXdj$McFj$kqzwTawadj$GduTTZz0tS2Vk$6y#$#0$8FIh0" +
-		"2CsOZnqDmS#GwdC$LE8wZM76Vad7#uZuXsTxaL$7#Yamzhhq$9bDxjVSz$8PCxrAjQTfkzo" +
-		"5#oJ3hZccQzZHeck5fAEtbVG9AhJ6bh1gXlOhZWTR9e$sZ$KxsCHAqcTJlj1Fqg9IkvAJkv" +
-		"808seAoBT3tQY9eAz9ReG#3Fan3HUh1o$sQgD#Pg4WzU1bAwhSLEsWDS0tIsw1l0wu7gly#" +
-		"Owqc3kslzbS3RwD8Y8jc06$Nn0M9aBegKGPK9Tg0giHuocS2PwBzJBJNTLMY3AXAj05LYV6" +
-		"Ktm6Vxu1FTmBl14u0JW1E1ES3a4dWdOIwkaH9YQPLgBSAyIn6tSKOcmr8Ru1#5#H1o6J8tH" +
-		"vnqavmRKITQz16bKubn45TKDv5GrMS41VjGjakvEz2tYxaROA#2NdTWDsGjnlwRk1so0xen" +
-		"NArHvmGXoPZa1w3z1XDTr0Ff7k0PofmAl0wZpWX3hePkYvEY8EMG5y2tAE9e6kbt2IbboOA" +
-		"JGDE0ou5gj9J4uMc0wS3rMyeAKjwQ#AW6u4t0fS3YwMF9WuQ3XmEN05KfQyc3Xf1wl#Iuw0" +
-		"5m6Bffuc3HW970Xy2FWHS23nTLagvNXC7ZGAE0iu2pW8k0XgbF$Bw0yS2nm8V1ZuC700S0B" +
-		"m5U0jmDd0sS21G$OkHSS1nm3d0ES11m470yS3nmBd0kS0Xm270qS3Hm4U0Zm1lqCH5zm3l0" +
-		"Su7pWSE1Wv67VNRMTJlGPq7d0TS1ZGZzw6D#dUkjm9l1Qu3hWDsBaMc$1$AZQMa");
+		"U9pjNGTu5DKMFcTsDydk0f84I49DY87Gn5we5WIneY8gHP2YA5L0m8984K44fLWG4AL9xw1" +
+		"OiJuh5knYRrYneMBPy$wPkTcTJJQRpCwIyBqtkz#P$zRpdtFx9M52bB#S7#GJw78QoETIFx" +
+		"f03r5JEecwqNbqFXtFOsaUdK1Dw0wQpRVGQ1f3O#aQtiPR#Kpkp1tv53wHSzZFpJYFst8hF" +
+		"fOB#L5QGIjv1p$9Jz5QMiVFydFy7tw1SxaBdyDfz31LeIVuSNw2d#Pd8lmydM$b6JoJR#Ev" +
+		"V1sFvZ5XYwfG9zCYhGdvAU2OFyWxI$BRyP#UTCHVbLyhq$zhBVvdyL6cHNmCfLC6#5znn9$" +
+		"3kntwlyiHVnt#h4p$Py7$gJIDRg7fT2lDe7gHCFY$SCJVWBzswF$NZlZp#Tio$PzJpFy2g$" +
+		"zyYIF#nlo3C$#vhoF#TFwvJF$d6$uhHgq5rOpoVu0Z$bRyM$dyf#PH$jz6jzCipCPjVAKJV" +
+		"gqfxu$h$xYujZG2$n17$f$E$oJa$vrq5zrDdS5$bRFrHwCu$eylmv93mJ$AsVgZUUpxJpDf" +
+		"2brD$Qas#1Svwlz6cZznVZuU$8iTyJVGgZWO$nU3VxcZzk#XLI#r$oUKsGuDmR$I4NztBJF" +
+		"XzgzBzS2$pX7$I2qxKNvkWzrh6szsjlzezOhuAINCNn1p1rWVOmNmaRTqVkgjyzCgMarhT7" +
+		"vQJnje8sssy4#bCwWnfBKCfvCjwthq3h05Eu0nuhYhLjzYvytq8pr08qZZosWeNqHvq3INv" +
+		"a3JKgrPw3Kw3V5bj9pp7Tjv6hZCCM$upOt05RQ37w4hw38QJ3Tg3UWYke76KHhil906K4Uw" +
+		"bgwZwsayjQ33g9TZEr9ihz6U97AQBM3sXDv3asGOMhWFNShDwGUw2ZsXj$u#dPFFTyB95t1" +
+		"B6Lf#RuqPKHzjlyqfCtrCxUXHUypSddRGduwP$mRpCtPwc8azz2nVY1v#A3azp04E5erbzF" +
+		"1DnbX#dhiM6yk$q8lWZ7FpIUP8HWldSbskJQ#2y#cAukIJZR7y3ZZZtB2IF6EBLYzVl5kLB" +
+		"SwVkGz6rMdq0UtZcqkneD2mm1Vl9fLKFq$bo$bg7WQxVF5kJqdbd8QRnZLyEr#VlBaIdvDF" +
+		"urMyWE#YJ$dEYk7aC#XNNefMXQTOWttnReP9u6ncS5xCFVXX2j1NODGvuzm6dNFosGRdOzX" +
+		"lzb8x$fslfc$06US6c0JEympE4BNJQcWfwC$lDHyuuzpwR76sm$SSo73MSC9efrLJ$VSRXN" +
+		"32E9i6KLlgGCFeSN36kUdPubnWiBRJ#S2pXVvb8k6kt07X$z3Bz3dDf##uE$q4pZYtEzj#j" +
+		"iCvgHqpU$7qSGfjuLJUplLnYsv8Vt0lBk33k3yuuzpex7D6ljoOZ#33kGdby60UoVVp2bxB" +
+		"c$WLVXkSSMvnZZYFvkEe3hV6JU43$eg$vr$vRqtJWbe6EEFStEnoQldS3hU1aoYVEr41dqw" +
+		"D#IpkfcLfTRM6z1lVm3VoH9uCpZYtDLldX2aybVB1DXMXoORssJmFFFFuRhw7LyjdyYbLaK" +
+		"$aOt36kQ7PuPIFv4FPBH$8#$AUl2lloDlobhmfk$WbVbMUuLty9hyZc$azsGJEEBSoMtv#9" +
+		"1lv2rd0tyXCsI3hPPsibJMoMbRnF5afA#G1MIvBPPcM1yuuDp4xd5fD#LF#q0xL6kDst5nh" +
+		"IQL$VFo64quHdFM#nAo$aOwc8usptX5q56sd0Nna#ApNaWwdO#XOEeusWJ6LNg2Tz1JjeKV" +
+		"eJNgNFg7Tj9$#IPeU$TCpgTekIQgshKdLzc3osf$tb5SFFq$43$6x$26$JdluHLqFVvxaVd" +
+		"Jrk7fSFQuULu#hfqBthuDj7ppO$7Brk7fSFQuUctfY$TjOzHW$4UzAvzA9j8Hgq24swvoQS" +
+		"9stiVw#hsx4ROhTa2T6nTwYU#Yz4hVeK#onQeKLvDtzHXthvyfYbki$KrmAtAiLuBcCbjC#" +
+		"EYiHotW3LwKXMgwkb2yeqKBt5WMu6X$2rJcTCpYJQt1DhiLPd8sCnogijwsVvuf#LXKrlgD" +
+		"$LXNPfr#3$NVGIvLXAVUsOob$JAHvkMUbjEb7vVxj5rr3BQFEPvLYwRUsUlzreyxlbMBfNx" +
+		"Oi$T0OCOTMoZXjOQVtkOvHfr#bM3hKremQQDGPL2cMZh1bwKAZpf9AiVG#MvP#OjHve58iN" +
+		"MFBqZ#CEXihnTANOsdGSg9#xb$imsyvNd6isah#BbNiSkeCnVigfPr#jDEZMgfHvxjAiVHB" +
+		"MwkvMUUNIh7qtmGi$QioBDNOlgLQrKgnD920fUcLOcaj6tjvjgfJnoPhjGGipKoWJli4wdH" +
+		"9e4xV1EgCIg3Ev0Jgt6U$3bT9e4wz1Eeqi5z7Eoo1EeSRTUpDmCMbR8oHpmIR6cygK#EafD" +
+		"kuCEasBhA$afNoEJDfcjv8bYQ#D6cQhaYQfk59qtHlqZGjIvgcJvEcwQUaQVepQPeaMPgqj" +
+		"AHfihSIkcNTicvPj#p$IjbotswuwK5XhrlMBUkMTSl#FvRLVr9TyXCxDUv7gyrLOzKjdXhx" +
+		"9zMbf5QDnLGyrOv6EjVOZxfYXug4kg5rBgABgJlre9xKYowXtlh$dJNQvtZiMeFGcaDeA0s" +
+		"ZuSR$fHr9ex1$gVTUg3OTXvOUZpQVG1Df4at6BNyAtQpU3g8PRmUPQVp$t0ZhBEo4SsWkTa" +
+		"Jp$mFF2#Tf5ekoADin$ugO$1NdVpER$hUrMBI8xdFCtwQI$MzTJl#ROgOUYRbwDEPcAqlOA" +
+		"V#2IlR$dWJyNvn4$##lPFyNbTl$8iOpwQma#dzlWluVPkmJRGyGlzN$#BPKbl#TwNGw0wln" +
+		"WLb$8lwNPSc1MN$AzhylRdBzSMvmoh##aldPqVXVxvZV4xV$oxR3AVy6H#tVoZ5$eIF#1GT" +
+		"e$rbSxXN0ANzJZC3x8LwqXDUohfVS0SmHjv2MMcoRJyje4sscTRIIjj5gMW9DVWf0auPJzN" +
+		"O8Kogb8UxKpXRWCYqm$Mu1heWTAy2ZOInx3TGPDyBE85MXgbID3g7gb4u#Ie6TJksmlqOlJ" +
+		"IAdsGBcq#oXGdYidyEzrDZe2RtrcoU1ysoqSA7j6Q7H0uwPTM$ODdEZ937NjiLy3dM1hSwP" +
+		"8qpwdQ9eBEizh8$bBCowwB6y36KgSYJtDKvz5SsfZ#Mi2kKiMhsInzdO65Kjy6oE$endGKN" +
+		"wgTkKZDkx7KvzPEkZgE8ubwkrP5M5SPgzhNlQl88u6olEGZ1M56VHw35Rj#8upVxq9BK$iy" +
+		"FVDJXXP8VxRo5jmGcZ0Dyc#3O69fzJvri8VmPX7rc3q1A42nHd0TRurKddN67CUSPJ0uFEl" +
+		"14ZforkeONAqmFXPz5N0uy6jZRAoyZtm77U2xRM#BOwu9ojS1jOWFFyFJYzByQP#dwZJVNl" +
+		"GiFdracuhKGu5s3qw5pp4MfbQ2yqsbR3B6c6KtqZV3NZcJpEHgLysNZMDawYPYnvdAmq5fP" +
+		"WrQ9Y3oMHiobcXWVwDnZFGYdruvYJmcSz$NQYd$NqyqVqMI$3#DtNcbIBii2OWtQkexz5bk" +
+		"fJ0ygbF6f8#NHeilGONZLsjLLM#xjwN3sk7bUFgyVLu#fnzRXwN3sk7bUFZPz8NsRyVlCLT" +
+		"6M5rT5WjwPknDEBtP3NHiMoQAlkPR4oqmzcxw8jBMQvtgkQSO$Kdth$DgS74xAiAJNJ$vNH" +
+		"q7fsYHOAjoAre$Pq8fr49zCfr85EfOxKYKwho3OirdFsnxThQLcMsj9GiJF8MPkwbhgzxrh" +
+		"gMdgmpIWfzadCqk9QmjfA$2vLAUNKwO9MkZsQF4kTzAXhgMjfHUtb5MsfMyUjat0TMpEGia" +
+		"lR6SCpfOchiNmhMIcQ2bnDhYPNqy6joIthbdNBkcN$PyhQEJaU3FQwPTsoRbctxFzZMPI9S" +
+		"NwDcHh$e$#aEbRTugcnVr9TIcgpc4p5Kcrf9Es86uqty5JPJXJShuUjWi$na9DKk8l2suYo" +
+		"vqRAv1zjOlOt9kflaCzfXy0Tm3d0nudgwNyRI81xYRWsKNqVJFq4MCVuUnnK$mZK6mZiHEJ" +
+		"h3ko5#2l0aH6U#jDCzAqgRcTPWZgjb8v5HFx5AhnLsTiJ#MqGVmbvIonr5a8k9V9aHTBg$6" +
+		"cYVwdIyQdI4OgKyRItwBWVyVr4tkFCU9Lw2ZkOcE9JUlw8rF7sBcb$WwhWN6Q6CzzJDYnN7" +
+		"FrLlTaebs#6gK$vswPELuNZejDvQVnwdZtHyPGSYmyxIvRtxrOyokuwhyRMwyk2$09zkUNr" +
+		"8Rf#bK4APrjiwwrmCjhe1DYo4laV8ZwMg2gRULKB45y1UHzbpa4PFN#VcPTQ4sa3aFOHodL" +
+		"MQIXJusAYcXSHrQs7z25cUcPtbJzInNkg#3icrbohR1biOjegwBuEkZ#6ZbagxNU4rVZqWw" +
+		"F1BE2daDlHDceCPcvJUfzMTHwE#DlW0Q90BUZ0lAlwB#AFWM#bqlSdmhS0rwcuPUm6Ze8S3" +
+		"Sc071D9ppzFwTrbfoyYzLCrrFq6N5W36a02cKIvDIFvlYjCp6s6l2nbor25noBz923MeXIi" +
+		"7Rb34CvMUSCj71x83eilmr1s4l0g5H#1#3pWACWoXDSZyHECypu8FuivZ7N8LntX3u1vaBu" +
+		"8$moTuo5O7$EmhlbEXs0DoQiNxL$UKT7nm0wYQj1HxLJqow#gVtvJUV2Xcl8tzKsCdPCHdw" +
+		"7oC8wgRLJbwnFLkX3vboFjBPNV1U7zAZyNURSI7QBMbC2v2AkrEgzpn9PyhALvQlodOOpdN" +
+		"Oso6u3JWPk0MAC2Mu0F0hS1iUxgVu4cxtCWRCZ3#kL3sFULyNPiqd9GxZC8qW8OamqF0Vu1" +
+		"B51sV86z1FNIi1u5SrKQT3HiROPhhO7T6s7h09Lt7i9gRK$36bptRSJL70cSZ$3hAlmtTC3" +
+		"7G5UagNcPYVPhYFO9N41KFRp#c7b1NHZI2EFE1$IOwVws27iXJI4ORy7ca1QGmo0j8OT3i1" +
+		"y5ZuHWFWGn7uB7G7g0Qnouke5Brt4S4Fj34EEo#ar0z7MmDyfWpmkWtu8OAq7iAq6CeuPOR" +
+		"mAOSzM1GUoDmMbOEzOHPS6#kl2hEjeyYFKbY3vf#0JA0gjZx0NXM$0oedIiFy4ha8x#JiVw" +
+		"5RmIVhJ7Veena8x#3Gv2tWo49o0y67cOBrcminviIiTO3#fpPYR2Bo0y5FbZa0STwJyWZda" +
+		"Im9wUaOxmS0ZsRV#rsCzr$NgwxZlcJW1hJmRMek18vAz67iPC1jeZgCydh4yP64T1ZAtWFV" +
+		"3XBQGzWpJCg#1eZC4cIFiEQOXdO1q8Zb7zjnlXfv3#7F1foBEM$dlEsfygxNarflL#NGAqx" +
+		"CrUp6TVfv9rlFkAmZXpl159pzaK2TC9AktbI5gDpIhjRXCzwfpZLUZ3kahO3rBWbnTd70$M" +
+		"LKP$Q1ZhZB6ZeGqPxPLwNqHdsYCcylpYTfObgAFspuntB3vy5GbhTP7tixKE$FrNFzz4wyb" +
+		"i7XslNGQl1nF9Wx7YUL7vhUQHRq8nFRNZwydi60bxLqRd#OPQz1IrSzkosYHI9#CnLVViw7" +
+		"JlR$7hUViKY$UpX4lj8$ZIH$4DBA#DTWJjeSP9oeXI#EVeYFvThygjKMWP3vanpc2PUqnCp" +
+		"RNukHLZFH#2DIsrU$digp4sHjfifTjoDqZTQSb$nSffeh#NidkuYZUnbFzQjGNcLLeQpaqD" +
+		"8tb#$Jo4CuHVdKlypyUsqs$XJ#bdOks9vV4njhwQcvIE1GgtMRWMgJ9jOjVDJLNbTg7CcDX" +
+		"bIDzVgaIdUKP5nxsZ8k6KLYZV0O9rFXLxkryNx0Ufu0ZWVXVeZBR3dIg0CqRW58Gdc6K37H" +
+		"7U5wtNtxAaFIbO#zDGrz$NZ0VEYUIbNMzf5$H7cgKjqdwovBqCmTd1tzJ2rJyIheLpalzUI" +
+		"zwxEc9iRucafRw6nz6HkARM26sBQYE5lYdARknl0Qo$gTYF0zV37joV0ZT0nXT9iNPNzTd2" +
+		"aQOfdyT5qbYLgzKQCbe$9qVo0cTQVC9U6PXYoTjXoNj9fVsbUD0VjRuqmy4mVxHz$ccnqXC" +
+		"Hd0kCkO$stQjyRwcuBMjmLgiOzQvMvOTPqd0coi8v86id8kiZwTb#LNPl98rRMi8M7TbOUz" +
+		"XIborriY#1u8wcMUfgrhgR4RVKrPHFQT#gV9ohSh1sU2prFPRwEGqHjzJtMBXprDhaLUsZp" +
+		"wqSTMxnMdG4mcjkSK6RPfUUL$irXSfMxGW3I4BoZ$mYFnlXdo0xvKKyNmZzA5q4TyxG3w7V" +
+		"yFpB#0SLaXH85GXkR587KWZ1ALOmSwMDu0mgdL7lJ3b3Eigfqa5EaPFb93bHsaixwIhdIs#" +
+		"31#qSsXtQB$sDsA0Gxa1wMAuKd3e5Drp1YLQwXKI6o63noSqoHLcBqwl07laLiXTQtfVz4f" +
+		"IRPB9C4kDlH0lM7C6vK71Eb156obMIBhMafjIGpD3ReRT2RuPsXTu8lOuSD8MCbsjbZDIL#" +
+		"b9FygMXv4ckD90cqboQILCvN8wK8#HOEK6Eb#C4UvPWNWlMJRbUnierCbgkKvQDb1$b1$bU" +
+		"lfDlvHlP8r$BL$AbV26ujyWRaDS5gqeewgzMotDHiQV3eQSigKz2SFQKnH2SUUK#2Ew44lv" +
+		"Rph9G9kDvcwNEV0ZEnN8Nv4wvmqYR8xCDd64yRnNS3sIgJ0$NcHRwNiwMis3ZTw4zeQz3Nu" +
+		"M#37qH#ZpqMUZJq2UXZqCVXJuC$OBSFytoeP$bF3bNUXXrkqCk3k5M5Wf9NoC5DmcvJ7hg$" +
+		"Ie3vD8GJeRYbO62MxC4n8zdTS5DJd84zrDf98tnR26u4ybHWXkGj9BMWXr5EichCXSuIx36" +
+		"2UxJShUXVuUo#WdZ#NZOYyUCvwCgzeZnV1XslHlwLd2R3NqJmXWF$Gxv1paQ1FDLga6o88T" +
+		"AWMHBLKaL3lsj$DmRsgUqlIpFu$aV5TjkF1zIiGUDvpPvISMtw6n6Q6le7NasCiFa5NFauc" +
+		"cC5IDa6IkbVIAZezGIayigaTYdo2U4keH3$rhoVnUqaFmb5qW$wODGBpCzzAk#2jDsObf76" +
+		"eHfAUbl4VJInUI1CAr7#dg47pA4QGEPRtWPZB0fUbYpnCidjuP5VvUgPecNJmQH$XPV3pr0" +
+		"#jiJcJOYl97qjvRfRxfYuzsMAn1U3bmEl8vI8JwQ0RpU41yaHOLrIREWBduBwX88vyy4paJ" +
+		"zcQXlXdL9iw0kVWlg4WZdZuFDus3J3S0RWEE1uu4tGkTja8dGEn5bJKbJugTbAAU$mr1$#z" +
+		"L2zD5gn5SZF05oEsGIP79OlBG5kjQWp4Meeyjv9SH3#hlfkngeYnVYewt8suhqhKZRYhIr2" +
+		"Az5seN02v6s3U5jm4sGpGWNIRUmU24UGqOXFWhnKKROGzqHxmuzKu1JWBt2ueLuw6g4JV52" +
+		"FCQxh#u5FcW8Kmyb8vLSOeX6DmDl1Yu2wjBJ48sc0gS2zNSYbIMz3V7G4E0GeFw6roBfOuY" +
+		"7XWA70XS3TRdK40yD0mu3tWCiahw6U6WuS3Xm5d0MS3wmk2nHqiyG3rq5l0eu6pWRk01ebV" +
+		"v8wmyS3HmDd0ES0nm0700S0nm3d0kS2xmCgFy#mLZWME0Tm3k0bmCl1ru3l0Pu9$1Eqlz6h" +
+		"0V2D08u0dWNy2xWbORuQ1fm6d0US1vm870WokZlPjRVZtmty6wW$bvEEp8TTVJVLRyMU2rm" +
+		"9N0byFnIvAR$0g94H1W=");
 
 	private final Action[] actions;
 
@@ -209,9 +206,8 @@ public class JSParser extends Parser implements IParser {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [3] SourceElement = FunctionDeclaration
-			Action.RETURN,	// [4] SourceElement = Statement
-			new Action() {	// [5] FunctionDeclaration = FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b
+			Action.RETURN,	// [3] SourceElement = Statement
+			new Action() {	// [4] FunctionDeclaration = FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -223,7 +219,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSFunctionNode(new JSNode[] { new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b }, f.getStart(), b.getEnd());
 				}
 			},
-			new Action() {	// [6] FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
+			new Action() {	// [5] FunctionExpression = FUNCTION.f FunctionParameters.p FunctionBody.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -233,15 +229,15 @@ public class JSParser extends Parser implements IParser {
 					return new JSFunctionNode(new JSNode[] { new JSNode(), p, b }, f.getStart(), b.getEnd());
 				}
 			},
-			Action.RETURN,	// [7] FunctionExpression = FunctionDeclaration
-			new Action() {	// [8] FunctionParameters = LPAREN.l RPAREN.r
+			Action.RETURN,	// [6] FunctionExpression = FunctionDeclaration
+			new Action() {	// [7] FunctionParameters = LPAREN.l RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.PARAMETERS, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [9] FunctionParameters = LPAREN.l FormalParameterList.p RPAREN.r
+			new Action() {	// [8] FunctionParameters = LPAREN.l FormalParameterList.p RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -250,7 +246,7 @@ public class JSParser extends Parser implements IParser {
 					p.setLocation(l.getStart(), r.getEnd());return p;
 				}
 			},
-			new Action() {	// [10] FormalParameterList = FormalParameterList.p COMMA IDENTIFIER.i
+			new Action() {	// [9] FormalParameterList = FormalParameterList.p COMMA IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final JSNode p = (JSNode) _symbol_p.value;
@@ -259,21 +255,21 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());p.addChild(node);p.setLocation(p.getStart(), node.getEnd());return p;
 				}
 			},
-			new Action() {	// [11] FormalParameterList = IDENTIFIER.i
+			new Action() {	// [10] FormalParameterList = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					JSNode node = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNaryNode(JSNodeTypes.PARAMETERS, new JSNode[] { node }, node.getStart(), node.getEnd());
 				}
 			},
-			new Action() {	// [12] FunctionBody = LCURLY.l RCURLY.r
+			new Action() {	// [11] FunctionBody = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [13] FunctionBody = LCURLY.l SourceElements.s RCURLY.r
+			new Action() {	// [12] FunctionBody = LCURLY.l SourceElements.s RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -283,7 +279,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.STATEMENTS, s, l.getStart(), r.getEnd());
 				}
 			},
-			Action.RETURN,	// [14] Statement = Block
+			Action.RETURN,	// [13] Statement = Block
+			Action.RETURN,	// [14] Statement = FunctionDeclaration
 			new Action() {	// [15] Statement = VAR.s VariableDeclarationList.l SEMICOLON.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
@@ -324,7 +321,8 @@ public class JSParser extends Parser implements IParser {
 				}
 			},
 			Action.RETURN,	// [29] Statement_NoIf = Block
-			new Action() {	// [30] Statement_NoIf = VAR.s VariableDeclarationList.l SEMICOLON.e
+			Action.RETURN,	// [30] Statement_NoIf = FunctionDeclaration
+			new Action() {	// [31] Statement_NoIf = VAR.s VariableDeclarationList.l SEMICOLON.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
@@ -334,43 +332,43 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [31] Statement_NoIf = Expression_NoLBF.e SEMICOLON
+			new Action() {	// [32] Statement_NoIf = Expression_NoLBF.e SEMICOLON
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
 					e.setSemicolonIncluded(true); return e;
 				}
 			},
-			Action.RETURN,	// [32] Statement_NoIf = IfStatement_NoIf
-			Action.RETURN,	// [33] Statement_NoIf = IterationStatement_NoIf
-			Action.RETURN,	// [34] Statement_NoIf = ContinueStatement
-			Action.RETURN,	// [35] Statement_NoIf = BreakStatement
-			Action.RETURN,	// [36] Statement_NoIf = ReturnStatement
-			Action.RETURN,	// [37] Statement_NoIf = WithStatement_NoIf
-			Action.RETURN,	// [38] Statement_NoIf = LabelledStatement_NoIf
-			Action.RETURN,	// [39] Statement_NoIf = SwitchStatement
-			Action.RETURN,	// [40] Statement_NoIf = ThrowStatement
-			Action.RETURN,	// [41] Statement_NoIf = TryStatement
-			new Action() {	// [42] Statement_NoIf = SEMICOLON.s
+			Action.RETURN,	// [33] Statement_NoIf = IfStatement_NoIf
+			Action.RETURN,	// [34] Statement_NoIf = IterationStatement_NoIf
+			Action.RETURN,	// [35] Statement_NoIf = ContinueStatement
+			Action.RETURN,	// [36] Statement_NoIf = BreakStatement
+			Action.RETURN,	// [37] Statement_NoIf = ReturnStatement
+			Action.RETURN,	// [38] Statement_NoIf = WithStatement_NoIf
+			Action.RETURN,	// [39] Statement_NoIf = LabelledStatement_NoIf
+			Action.RETURN,	// [40] Statement_NoIf = SwitchStatement
+			Action.RETURN,	// [41] Statement_NoIf = ThrowStatement
+			Action.RETURN,	// [42] Statement_NoIf = TryStatement
+			new Action() {	// [43] Statement_NoIf = SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					return new JSNode(JSNodeTypes.EMPTY, s.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [43] Statement_NoIf = error.e
+			new Action() {	// [44] Statement_NoIf = error.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol e = _symbols[offset + 1];
 					return new JSNode(JSNodeTypes.ERROR, e.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [44] Block = LCURLY.l RCURLY.r
+			new Action() {	// [45] Block = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.STATEMENTS, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [45] Block = LCURLY.l StatementList.a RCURLY.r
+			new Action() {	// [46] Block = LCURLY.l StatementList.a RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_a = _symbols[offset + 2];
@@ -380,44 +378,44 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.STATEMENTS, a, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [46] StatementList = StatementList Statement
+			new Action() {	// [47] StatementList = StatementList Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [47] StatementList = Statement
+			new Action() {	// [48] StatementList = Statement
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [48] VariableDeclarationList = VariableDeclarationList COMMA VariableDeclaration
+			new Action() {	// [49] VariableDeclarationList = VariableDeclarationList COMMA VariableDeclaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [49] VariableDeclarationList = VariableDeclaration
+			new Action() {	// [50] VariableDeclarationList = VariableDeclaration
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [50] VariableDeclarationList_NoIn = VariableDeclarationList_NoIn COMMA VariableDeclaration_NoIn
+			new Action() {	// [51] VariableDeclarationList_NoIn = VariableDeclarationList_NoIn COMMA VariableDeclaration_NoIn
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [51] VariableDeclarationList_NoIn = VariableDeclaration_NoIn
+			new Action() {	// [52] VariableDeclarationList_NoIn = VariableDeclaration_NoIn
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [52] VariableDeclaration = IDENTIFIER.i
+			new Action() {	// [53] VariableDeclaration = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
-			new Action() {	// [53] VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.e
+			new Action() {	// [54] VariableDeclaration = IDENTIFIER.i EQUAL AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -426,14 +424,14 @@ public class JSParser extends Parser implements IParser {
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [54] VariableDeclaration_NoIn = IDENTIFIER.i
+			new Action() {	// [55] VariableDeclaration_NoIn = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, new JSNode() }, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
-			new Action() {	// [55] VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
+			new Action() {	// [56] VariableDeclaration_NoIn = IDENTIFIER.i EQUAL AssignmentExpression_NoIn.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -442,7 +440,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.DECLARATION, new JSNode[] { id, e }, _symbol_i.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [56] IfStatement = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
+			new Action() {	// [57] IfStatement = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -454,7 +452,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [57] IfStatement = IF.i LPAREN Expression.e RPAREN Statement.s
+			new Action() {	// [58] IfStatement = IF.i LPAREN Expression.e RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -464,7 +462,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, s, new JSNode() }, i.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [58] IfStatement_NoIf = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement_NoIf.s
+			new Action() {	// [59] IfStatement_NoIf = IF.i LPAREN Expression.e RPAREN Statement_NoIf.sn ELSE Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -476,7 +474,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.IF, new JSNode[] { e, sn, s }, i.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [59] IterationStatement = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
+			new Action() {	// [60] IterationStatement = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -487,7 +485,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [60] IterationStatement = WHILE.w LPAREN Expression.e RPAREN Statement.s
+			new Action() {	// [61] IterationStatement = WHILE.w LPAREN Expression.e RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol w = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -497,7 +495,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [61] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement.s
+			new Action() {	// [62] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 6];
@@ -505,7 +503,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [62] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [63] IterationStatement = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_a = _symbols[offset + 5];
@@ -515,7 +513,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [63] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
+			new Action() {	// [64] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_c = _symbols[offset + 4];
@@ -525,7 +523,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [64] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [65] IterationStatement = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_c = _symbols[offset + 4];
@@ -537,7 +535,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [65] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
+			new Action() {	// [66] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -547,7 +545,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [66] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [67] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -559,7 +557,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [67] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
+			new Action() {	// [68] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -571,7 +569,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [68] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [69] IterationStatement = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -585,7 +583,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [69] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
+			new Action() {	// [70] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -597,7 +595,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [70] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [71] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -611,7 +609,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [71] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
+			new Action() {	// [72] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -625,7 +623,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [72] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
+			new Action() {	// [73] IterationStatement = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -641,7 +639,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [73] IterationStatement = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement.s
+			new Action() {	// [74] IterationStatement = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -653,7 +651,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [74] IterationStatement = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement.s
+			new Action() {	// [75] IterationStatement = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -666,7 +664,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] { i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [75] IterationStatement_NoIf = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
+			new Action() {	// [76] IterationStatement_NoIf = DO.d Statement.s WHILE LPAREN Expression.e RPAREN SEMICOLON.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
@@ -677,7 +675,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSNode(JSNodeTypes.DO, new JSNode[] { s, e }, d.getStart(), r.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [76] IterationStatement_NoIf = WHILE.w LPAREN Expression.e RPAREN Statement_NoIf.s
+			new Action() {	// [77] IterationStatement_NoIf = WHILE.w LPAREN Expression.e RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol w = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -687,7 +685,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.WHILE, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [77] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [78] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 6];
@@ -695,7 +693,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [78] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [79] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_a = _symbols[offset + 5];
@@ -705,7 +703,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [79] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [80] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_c = _symbols[offset + 4];
@@ -715,7 +713,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [80] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [81] IterationStatement_NoIf = FOR.f LPAREN SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_c = _symbols[offset + 4];
@@ -727,7 +725,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNode(), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [81] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [82] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -737,7 +735,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [82] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [83] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -749,7 +747,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [83] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [84] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -761,7 +759,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [84] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [85] IterationStatement_NoIf = FOR.f LPAREN Expression_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -775,7 +773,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { i, c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [85] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [86] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -787,7 +785,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [86] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [87] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -801,7 +799,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), new JSNode(), a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [87] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
+			new Action() {	// [88] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -815,7 +813,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, new JSNode(), s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [88] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
+			new Action() {	// [89] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclarationList_NoIn.i SEMICOLON Expression.c SEMICOLON Expression.a RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -831,7 +829,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, i, v.getStart(), i[i.length - 1].getEnd()), c, a, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [89] IterationStatement_NoIf = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement_NoIf.s
+			new Action() {	// [90] IterationStatement_NoIf = FOR.f LPAREN LeftHandSideExpression.i IN Expression.o RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -843,7 +841,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { i, o, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [90] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement_NoIf.s
+			new Action() {	// [91] IterationStatement_NoIf = FOR.f LPAREN VAR.v VariableDeclaration_NoIn.i IN Expression.o RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol v = _symbols[offset + 3];
@@ -856,14 +854,14 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FOR_IN, new JSNode[] { new JSNaryNode(JSNodeTypes.VAR, new JSNode[] {i }, v.getStart(), i.getEnd()), o, s }, f.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [91] ContinueStatement = CONTINUE.c SEMICOLON.s
+			new Action() {	// [92] ContinueStatement = CONTINUE.c SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
 					JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [92] ContinueStatement = CONTINUE.c IDENTIFIER.i SEMICOLON.s
+			new Action() {	// [93] ContinueStatement = CONTINUE.c IDENTIFIER.i SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -872,14 +870,14 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSLabelStatementNode(JSNodeTypes.CONTINUE, i, c.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [93] BreakStatement = BREAK.b SEMICOLON.s
+			new Action() {	// [94] BreakStatement = BREAK.b SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol b = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
 					JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [94] BreakStatement = BREAK.b IDENTIFIER.i SEMICOLON.s
+			new Action() {	// [95] BreakStatement = BREAK.b IDENTIFIER.i SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol b = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 2];
@@ -888,14 +886,14 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSLabelStatementNode(JSNodeTypes.BREAK, i, b.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [95] ReturnStatement = RETURN.r SEMICOLON.s
+			new Action() {	// [96] ReturnStatement = RETURN.r SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol r = _symbols[offset + 1];
 					final Symbol s = _symbols[offset + 2];
 					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, new JSNode(), r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [96] ReturnStatement = RETURN.r Expression.e SEMICOLON.s
+			new Action() {	// [97] ReturnStatement = RETURN.r Expression.e SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol r = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -904,7 +902,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.RETURN, e, r.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [97] WithStatement = WITH.w LPAREN Expression.e RPAREN Statement.s
+			new Action() {	// [98] WithStatement = WITH.w LPAREN Expression.e RPAREN Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol w = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -914,7 +912,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [98] WithStatement_NoIf = WITH.w LPAREN Expression.e RPAREN Statement_NoIf.s
+			new Action() {	// [99] WithStatement_NoIf = WITH.w LPAREN Expression.e RPAREN Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol w = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -924,7 +922,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.WITH, new JSNode[] { e, s }, w.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [99] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY RCURLY.r
+			new Action() {	// [100] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -933,7 +931,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [100] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY.r
+			new Action() {	// [101] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -945,7 +943,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, c, s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [101] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY.r
+			new Action() {	// [102] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -956,7 +954,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, new JSNode[] { d }, s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [102] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY.r
+			new Action() {	// [103] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY DefaultClause.d CaseClauses.c RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -976,7 +974,7 @@ public class JSParser extends Parser implements IParser {
 			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [103] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY.r
+			new Action() {	// [104] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c DefaultClause.d RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -996,7 +994,7 @@ public class JSParser extends Parser implements IParser {
 			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [104] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.r
+			new Action() {	// [105] SwitchStatement = SWITCH.s LPAREN Expression.e RPAREN LCURLY CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol s = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 3];
@@ -1022,17 +1020,17 @@ public class JSParser extends Parser implements IParser {
 			return new JSNaryAndExpressionNode(JSNodeTypes.SWITCH, e, children.toArray(new JSNode[children.size()]), s.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [105] CaseClauses = CaseClauses CaseClause
+			new Action() {	// [106] CaseClauses = CaseClauses CaseClause
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [106] CaseClauses = CaseClause
+			new Action() {	// [107] CaseClauses = CaseClause
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [107] CaseClause = CASE.c Expression.e COLON.r
+			new Action() {	// [108] CaseClause = CASE.c Expression.e COLON.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1041,7 +1039,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, c.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [108] CaseClause = CASE.c Expression.e COLON StatementList.s
+			new Action() {	// [109] CaseClause = CASE.c Expression.e COLON StatementList.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1052,14 +1050,14 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryAndExpressionNode(JSNodeTypes.CASE, e, s, c.getStart(), s[s.length - 1].getEnd());
 				}
 			},
-			new Action() {	// [109] DefaultClause = DEFAULT.d COLON.c
+			new Action() {	// [110] DefaultClause = DEFAULT.d COLON.c
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
 					final Symbol c = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.DEFAULT, d.getStart(), c.getEnd());
 				}
 			},
-			new Action() {	// [110] DefaultClause = DEFAULT.d COLON StatementList.s
+			new Action() {	// [111] DefaultClause = DEFAULT.d COLON StatementList.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol d = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 3];
@@ -1068,7 +1066,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.DEFAULT, s, d.getStart(), s[s.length - 1].getEnd());
 				}
 			},
-			new Action() {	// [111] LabelledStatement = IDENTIFIER.i COLON Statement.s
+			new Action() {	// [112] LabelledStatement = IDENTIFIER.i COLON Statement.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -1077,7 +1075,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [112] LabelledStatement_NoIf = IDENTIFIER.i COLON Statement_NoIf.s
+			new Action() {	// [113] LabelledStatement_NoIf = IDENTIFIER.i COLON Statement_NoIf.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
@@ -1086,7 +1084,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.LABELLED, new JSNode[] { id, s }, _symbol_i.getStart(), s.getEnd());
 				}
 			},
-			new Action() {	// [113] ThrowStatement = THROW.t Expression.e SEMICOLON.s
+			new Action() {	// [114] ThrowStatement = THROW.t Expression.e SEMICOLON.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1095,7 +1093,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode node = new JSUnaryOperatorNode(JSNodeTypes.THROW, e, t.getStart(), s.getEnd());node.setSemicolonIncluded(true);return node;
 				}
 			},
-			new Action() {	// [114] TryStatement = TRY.t Block.b Catch.c
+			new Action() {	// [115] TryStatement = TRY.t Block.b Catch.c
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					final Symbol _symbol_b = _symbols[offset + 2];
@@ -1105,7 +1103,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, new JSNode() }, t.getStart(), c.getEnd());
 				}
 			},
-			new Action() {	// [115] TryStatement = TRY.t Block.b Finally.f
+			new Action() {	// [116] TryStatement = TRY.t Block.b Finally.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					final Symbol _symbol_b = _symbols[offset + 2];
@@ -1115,7 +1113,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, new JSNode(), f }, t.getStart(), f.getEnd());
 				}
 			},
-			new Action() {	// [116] TryStatement = TRY.t Block.b Catch.c Finally.f
+			new Action() {	// [117] TryStatement = TRY.t Block.b Catch.c Finally.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					final Symbol _symbol_b = _symbols[offset + 2];
@@ -1127,7 +1125,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.TRY, new JSNode[] { b, c, f }, t.getStart(), f.getEnd());
 				}
 			},
-			new Action() {	// [117] Catch = CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
+			new Action() {	// [118] Catch = CATCH.c LPAREN IDENTIFIER.i RPAREN Block.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol c = _symbols[offset + 1];
 					final Symbol _symbol_i = _symbols[offset + 3];
@@ -1137,7 +1135,7 @@ public class JSParser extends Parser implements IParser {
 					JSNode id = new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());return new JSNode(JSNodeTypes.CATCH, new JSNode[] { id, b }, c.getStart(), b.getEnd());
 				}
 			},
-			new Action() {	// [118] Finally = FINALLY.f Block.b
+			new Action() {	// [119] Finally = FINALLY.f Block.b
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					final Symbol _symbol_b = _symbols[offset + 2];
@@ -1145,24 +1143,24 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.FINALLY, new JSNode[] { b }, f.getStart(), b.getEnd());
 				}
 			},
-			Action.RETURN,	// [119] PrimaryExpression = PrimaryExpression_NoLBF
-			Action.RETURN,	// [120] PrimaryExpression = ObjectLiteral
-			new Action() {	// [121] PrimaryExpression_NoLBF = THIS.t
+			Action.RETURN,	// [120] PrimaryExpression = PrimaryExpression_NoLBF
+			Action.RETURN,	// [121] PrimaryExpression = ObjectLiteral
+			new Action() {	// [122] PrimaryExpression_NoLBF = THIS.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					return new JSPrimitiveNode(JSNodeTypes.THIS, t.value.toString(), t.getStart(), t.getEnd());
 				}
 			},
-			new Action() {	// [122] PrimaryExpression_NoLBF = IDENTIFIER.t
+			new Action() {	// [123] PrimaryExpression_NoLBF = IDENTIFIER.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_t = _symbols[offset + 1];
 					final String t = (String) _symbol_t.value;
 					return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, t, _symbol_t.getStart(), _symbol_t.getEnd());
 				}
 			},
-			Action.RETURN,	// [123] PrimaryExpression_NoLBF = Literal
-			Action.RETURN,	// [124] PrimaryExpression_NoLBF = ArrayLiteral
-			new Action() {	// [125] PrimaryExpression_NoLBF = LPAREN.l Expression.e RPAREN.r
+			Action.RETURN,	// [124] PrimaryExpression_NoLBF = Literal
+			Action.RETURN,	// [125] PrimaryExpression_NoLBF = ArrayLiteral
+			new Action() {	// [126] PrimaryExpression_NoLBF = LPAREN.l Expression.e RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1171,14 +1169,14 @@ public class JSParser extends Parser implements IParser {
 					return new JSUnaryOperatorNode(JSNodeTypes.GROUP, e, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [126] ArrayLiteral = LBRACKET.l RBRACKET.r
+			new Action() {	// [127] ArrayLiteral = LBRACKET.l RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [127] ArrayLiteral = LBRACKET.l Elision.e RBRACKET.r
+			new Action() {	// [128] ArrayLiteral = LBRACKET.l Elision.e RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1187,7 +1185,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [128] ArrayLiteral = LBRACKET.l ElementList.e RBRACKET.r
+			new Action() {	// [129] ArrayLiteral = LBRACKET.l ElementList.e RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1196,7 +1194,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e }, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [129] ArrayLiteral = LBRACKET.l ElementList.e COMMA RBRACKET.r
+			new Action() {	// [130] ArrayLiteral = LBRACKET.l ElementList.e COMMA RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1205,7 +1203,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [130] ArrayLiteral = LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
+			new Action() {	// [131] ArrayLiteral = LBRACKET.l ElementList.e COMMA Elision.n RBRACKET.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1216,14 +1214,14 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ARRAY_LITERAL, new JSNode[] { e, n }, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [131] ElementList = AssignmentExpression.e
+			new Action() {	// [132] ElementList = AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
 					return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { e }, e.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [132] ElementList = Elision.n AssignmentExpression.e
+			new Action() {	// [133] ElementList = Elision.n AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -1232,7 +1230,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ELEMENTS, new JSNode[] { n, e }, n.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [133] ElementList = ElementList.l COMMA AssignmentExpression.e
+			new Action() {	// [134] ElementList = ElementList.l COMMA AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1241,7 +1239,7 @@ public class JSParser extends Parser implements IParser {
 					l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;
 				}
 			},
-			new Action() {	// [134] ElementList = ElementList.l COMMA Elision.n AssignmentExpression.e
+			new Action() {	// [135] ElementList = ElementList.l COMMA Elision.n AssignmentExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1252,26 +1250,26 @@ public class JSParser extends Parser implements IParser {
 					l.addChild(n);l.addChild(e);l.setLocation(l.getStart(), e.getEnd());return l;
 				}
 			},
-			new Action() {	// [135] Elision = Elision.e COMMA
+			new Action() {	// [136] Elision = Elision.e COMMA
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
 					e.addChild(new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0));return e;
 				}
 			},
-			new Action() {	// [136] Elision = COMMA
+			new Action() {	// [137] Elision = COMMA
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					return new JSNaryNode(JSNodeTypes.ELISION, new JSNode[] { new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0), new JSPrimitiveNode(JSNodeTypes.NULL, "null", 0, 0) }, 0, 0);
 				}
 			},
-			new Action() {	// [137] ObjectLiteral = LCURLY.l RCURLY.r
+			new Action() {	// [138] ObjectLiteral = LCURLY.l RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [138] ObjectLiteral = LCURLY.l PropertyNameAndValueList.p RCURLY.r
+			new Action() {	// [139] ObjectLiteral = LCURLY.l PropertyNameAndValueList.p RCURLY.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_p = _symbols[offset + 2];
@@ -1281,17 +1279,17 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.OBJECT_LITERAL, p, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [139] PropertyNameAndValueList = PropertyNameAndValue
+			new Action() {	// [140] PropertyNameAndValueList = PropertyNameAndValue
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			new Action() {	// [140] PropertyNameAndValueList = PropertyNameAndValueList COMMA PropertyNameAndValue
+			new Action() {	// [141] PropertyNameAndValueList = PropertyNameAndValueList COMMA PropertyNameAndValue
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [141] PropertyNameAndValue = PropertyName.n COLON AssignmentExpression.v
+			new Action() {	// [142] PropertyNameAndValue = PropertyName.n COLON AssignmentExpression.v
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final JSNode n = (JSNode) _symbol_n.value;
@@ -1300,30 +1298,30 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.NAME_VALUE_PAIR, new JSNode[] { n, v }, n.getStart(), v.getEnd());
 				}
 			},
-			new Action() {	// [142] PropertyName = IDENTIFIER.i
+			new Action() {	// [143] PropertyName = IDENTIFIER.i
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_i = _symbols[offset + 1];
 					final String i = (String) _symbol_i.value;
 					return new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd());
 				}
 			},
-			new Action() {	// [143] PropertyName = STRING.s
+			new Action() {	// [144] PropertyName = STRING.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
 					return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
 				}
 			},
-			new Action() {	// [144] PropertyName = NUMBER.n
+			new Action() {	// [145] PropertyName = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final String n = (String) _symbol_n.value;
 					return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
 				}
 			},
-			Action.RETURN,	// [145] MemberExpression = PrimaryExpression
-			Action.RETURN,	// [146] MemberExpression = FunctionExpression
-			new Action() {	// [147] MemberExpression = MemberExpression.l LBRACKET Expression.r RBRACKET
+			Action.RETURN,	// [146] MemberExpression = PrimaryExpression
+			Action.RETURN,	// [147] MemberExpression = FunctionExpression
+			new Action() {	// [148] MemberExpression = MemberExpression.l LBRACKET Expression.r RBRACKET
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1332,7 +1330,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetElementOperatorNode(l, r);
 				}
 			},
-			new Action() {	// [148] MemberExpression = MemberExpression.l DOT IDENTIFIER.r
+			new Action() {	// [149] MemberExpression = MemberExpression.l DOT IDENTIFIER.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1341,7 +1339,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
-			new Action() {	// [149] MemberExpression = NEW.l MemberExpression.e Arguments.a
+			new Action() {	// [150] MemberExpression = NEW.l MemberExpression.e Arguments.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1351,8 +1349,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
 				}
 			},
-			Action.RETURN,	// [150] MemberExpression_NoLBF = PrimaryExpression_NoLBF
-			new Action() {	// [151] MemberExpression_NoLBF = MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+			Action.RETURN,	// [151] MemberExpression_NoLBF = PrimaryExpression_NoLBF
+			new Action() {	// [152] MemberExpression_NoLBF = MemberExpression_NoLBF.l LBRACKET Expression.r RBRACKET
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1361,7 +1359,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetElementOperatorNode(l, r);
 				}
 			},
-			new Action() {	// [152] MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT IDENTIFIER.r
+			new Action() {	// [153] MemberExpression_NoLBF = MemberExpression_NoLBF.l DOT IDENTIFIER.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1370,7 +1368,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
-			new Action() {	// [153] MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
+			new Action() {	// [154] MemberExpression_NoLBF = NEW.l MemberExpression.e Arguments.a
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1380,8 +1378,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, a }, l.getStart(), a.getEnd());
 				}
 			},
-			Action.RETURN,	// [154] NewExpression = MemberExpression
-			new Action() {	// [155] NewExpression = NEW.l NewExpression.e
+			Action.RETURN,	// [155] NewExpression = MemberExpression
+			new Action() {	// [156] NewExpression = NEW.l NewExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1389,8 +1387,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
 				}
 			},
-			Action.RETURN,	// [156] NewExpression_NoLBF = MemberExpression_NoLBF
-			new Action() {	// [157] NewExpression_NoLBF = NEW.l NewExpression.e
+			Action.RETURN,	// [157] NewExpression_NoLBF = MemberExpression_NoLBF
+			new Action() {	// [158] NewExpression_NoLBF = NEW.l NewExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_e = _symbols[offset + 2];
@@ -1398,7 +1396,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONSTRUCT, new JSNode[] { e, new JSNode() }, l.getStart(), e.getEnd());
 				}
 			},
-			new Action() {	// [158] CallExpression = MemberExpression.l Arguments.r
+			new Action() {	// [159] CallExpression = MemberExpression.l Arguments.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1407,7 +1405,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [159] CallExpression = CallExpression.l Arguments.r
+			new Action() {	// [160] CallExpression = CallExpression.l Arguments.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1416,7 +1414,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [160] CallExpression = CallExpression.l LBRACKET Expression.r RBRACKET
+			new Action() {	// [161] CallExpression = CallExpression.l LBRACKET Expression.r RBRACKET
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1425,7 +1423,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetElementOperatorNode(l, r);
 				}
 			},
-			new Action() {	// [161] CallExpression = CallExpression.l DOT IDENTIFIER.r
+			new Action() {	// [162] CallExpression = CallExpression.l DOT IDENTIFIER.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1434,7 +1432,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
-			new Action() {	// [162] CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
+			new Action() {	// [163] CallExpression_NoLBF = MemberExpression_NoLBF.l Arguments.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1443,7 +1441,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [163] CallExpression_NoLBF = CallExpression_NoLBF.l Arguments.r
+			new Action() {	// [164] CallExpression_NoLBF = CallExpression_NoLBF.l Arguments.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1452,7 +1450,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.INVOKE, new JSNode[] {l, r}, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [164] CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
+			new Action() {	// [165] CallExpression_NoLBF = CallExpression_NoLBF.l LBRACKET Expression.r RBRACKET
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1461,7 +1459,7 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetElementOperatorNode(l, r);
 				}
 			},
-			new Action() {	// [165] CallExpression_NoLBF = CallExpression_NoLBF.l DOT IDENTIFIER.r
+			new Action() {	// [166] CallExpression_NoLBF = CallExpression_NoLBF.l DOT IDENTIFIER.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1470,14 +1468,14 @@ public class JSParser extends Parser implements IParser {
 					return new JSGetPropertyOperatorNode(l, new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, r, _symbol_r.getStart(), _symbol_r.getEnd()));
 				}
 			},
-			new Action() {	// [166] Arguments = LPAREN.l RPAREN.r
+			new Action() {	// [167] Arguments = LPAREN.l RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol r = _symbols[offset + 2];
 					return new JSNaryNode(JSNodeTypes.ARGUMENTS, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [167] Arguments = LPAREN.l ArgumentList.a RPAREN.r
+			new Action() {	// [168] Arguments = LPAREN.l ArgumentList.a RPAREN.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol l = _symbols[offset + 1];
 					final Symbol _symbol_a = _symbols[offset + 2];
@@ -1487,22 +1485,22 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.ARGUMENTS, a, l.getStart(), r.getEnd());
 				}
 			},
-			new Action() {	// [168] ArgumentList = ArgumentList COMMA AssignmentExpression
+			new Action() {	// [169] ArgumentList = ArgumentList COMMA AssignmentExpression
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
 				}
 			},
-			new Action() {	// [169] ArgumentList = AssignmentExpression
+			new Action() {	// [170] ArgumentList = AssignmentExpression
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 				}
 			},
-			Action.RETURN,	// [170] LeftHandSideExpression = NewExpression
-			Action.RETURN,	// [171] LeftHandSideExpression = CallExpression
-			Action.RETURN,	// [172] LeftHandSideExpression_NoLBF = NewExpression_NoLBF
-			Action.RETURN,	// [173] LeftHandSideExpression_NoLBF = CallExpression_NoLBF
-			Action.RETURN,	// [174] PostfixExpression = LeftHandSideExpression
-			new Action() {	// [175] PostfixExpression = LeftHandSideExpression.e PostfixOperator.o
+			Action.RETURN,	// [171] LeftHandSideExpression = NewExpression
+			Action.RETURN,	// [172] LeftHandSideExpression = CallExpression
+			Action.RETURN,	// [173] LeftHandSideExpression_NoLBF = NewExpression_NoLBF
+			Action.RETURN,	// [174] LeftHandSideExpression_NoLBF = CallExpression_NoLBF
+			Action.RETURN,	// [175] PostfixExpression = LeftHandSideExpression
+			new Action() {	// [176] PostfixExpression = LeftHandSideExpression.e PostfixOperator.o
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1511,8 +1509,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSPostUnaryOperatorNode(e, o, e.getStart(), _symbol_o.getEnd());
 				}
 			},
-			Action.RETURN,	// [176] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF
-			new Action() {	// [177] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF.e PostfixOperator.o
+			Action.RETURN,	// [177] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF
+			new Action() {	// [178] PostfixExpression_NoLBF = LeftHandSideExpression_NoLBF.e PostfixOperator.o
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_e = _symbols[offset + 1];
 					final JSNode e = (JSNode) _symbol_e.value;
@@ -1521,10 +1519,10 @@ public class JSParser extends Parser implements IParser {
 					return new JSPostUnaryOperatorNode(e, o, e.getStart(),  _symbol_o.getEnd());
 				}
 			},
-			Action.RETURN,	// [178] PostfixOperator = PLUS_PLUS
-			Action.RETURN,	// [179] PostfixOperator = MINUS_MINUS
-			Action.RETURN,	// [180] UnaryExpression = PostfixExpression
-			new Action() {	// [181] UnaryExpression = UnaryOperator.o UnaryExpression.e
+			Action.RETURN,	// [179] PostfixOperator = PLUS_PLUS
+			Action.RETURN,	// [180] PostfixOperator = MINUS_MINUS
+			Action.RETURN,	// [181] UnaryExpression = PostfixExpression
+			new Action() {	// [182] UnaryExpression = UnaryOperator.o UnaryExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_o = _symbols[offset + 1];
 					final String o = (String) _symbol_o.value;
@@ -1533,8 +1531,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
 				}
 			},
-			Action.RETURN,	// [182] UnaryExpression_NoLBF = PostfixExpression_NoLBF
-			new Action() {	// [183] UnaryExpression_NoLBF = UnaryOperator.o UnaryExpression.e
+			Action.RETURN,	// [183] UnaryExpression_NoLBF = PostfixExpression_NoLBF
+			new Action() {	// [184] UnaryExpression_NoLBF = UnaryOperator.o UnaryExpression.e
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_o = _symbols[offset + 1];
 					final String o = (String) _symbol_o.value;
@@ -1543,17 +1541,17 @@ public class JSParser extends Parser implements IParser {
 					return new JSUnaryOperatorNode(o, e, _symbol_o.getStart(), e.getEnd());
 				}
 			},
-			Action.RETURN,	// [184] UnaryOperator = DELETE
-			Action.RETURN,	// [185] UnaryOperator = EXCLAMATION
-			Action.RETURN,	// [186] UnaryOperator = MINUS
-			Action.RETURN,	// [187] UnaryOperator = MINUS_MINUS
-			Action.RETURN,	// [188] UnaryOperator = PLUS
-			Action.RETURN,	// [189] UnaryOperator = PLUS_PLUS
-			Action.RETURN,	// [190] UnaryOperator = TILDE
-			Action.RETURN,	// [191] UnaryOperator = TYPEOF
-			Action.RETURN,	// [192] UnaryOperator = VOID
-			Action.RETURN,	// [193] MultiplicativeExpression = UnaryExpression
-			new Action() {	// [194] MultiplicativeExpression = MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
+			Action.RETURN,	// [185] UnaryOperator = DELETE
+			Action.RETURN,	// [186] UnaryOperator = EXCLAMATION
+			Action.RETURN,	// [187] UnaryOperator = MINUS
+			Action.RETURN,	// [188] UnaryOperator = MINUS_MINUS
+			Action.RETURN,	// [189] UnaryOperator = PLUS
+			Action.RETURN,	// [190] UnaryOperator = PLUS_PLUS
+			Action.RETURN,	// [191] UnaryOperator = TILDE
+			Action.RETURN,	// [192] UnaryOperator = TYPEOF
+			Action.RETURN,	// [193] UnaryOperator = VOID
+			Action.RETURN,	// [194] MultiplicativeExpression = UnaryExpression
+			new Action() {	// [195] MultiplicativeExpression = MultiplicativeExpression.l MultiplicativeOperator.o UnaryExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1564,8 +1562,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [195] MultiplicativeExpression_NoLBF = UnaryExpression_NoLBF
-			new Action() {	// [196] MultiplicativeExpression_NoLBF = MultiplicativeExpression_NoLBF.l MultiplicativeOperator.o UnaryExpression.r
+			Action.RETURN,	// [196] MultiplicativeExpression_NoLBF = UnaryExpression_NoLBF
+			new Action() {	// [197] MultiplicativeExpression_NoLBF = MultiplicativeExpression_NoLBF.l MultiplicativeOperator.o UnaryExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1576,11 +1574,11 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [197] MultiplicativeOperator = STAR
-			Action.RETURN,	// [198] MultiplicativeOperator = FORWARD_SLASH
-			Action.RETURN,	// [199] MultiplicativeOperator = PERCENT
-			Action.RETURN,	// [200] AdditiveExpression = MultiplicativeExpression
-			new Action() {	// [201] AdditiveExpression = AdditiveExpression.l AdditiveOperator.o MultiplicativeExpression.r
+			Action.RETURN,	// [198] MultiplicativeOperator = STAR
+			Action.RETURN,	// [199] MultiplicativeOperator = FORWARD_SLASH
+			Action.RETURN,	// [200] MultiplicativeOperator = PERCENT
+			Action.RETURN,	// [201] AdditiveExpression = MultiplicativeExpression
+			new Action() {	// [202] AdditiveExpression = AdditiveExpression.l AdditiveOperator.o MultiplicativeExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1591,8 +1589,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [202] AdditiveExpression_NoLBF = MultiplicativeExpression_NoLBF
-			new Action() {	// [203] AdditiveExpression_NoLBF = AdditiveExpression_NoLBF.l AdditiveOperator.o MultiplicativeExpression.r
+			Action.RETURN,	// [203] AdditiveExpression_NoLBF = MultiplicativeExpression_NoLBF
+			new Action() {	// [204] AdditiveExpression_NoLBF = AdditiveExpression_NoLBF.l AdditiveOperator.o MultiplicativeExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1603,10 +1601,10 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [204] AdditiveOperator = PLUS
-			Action.RETURN,	// [205] AdditiveOperator = MINUS
-			Action.RETURN,	// [206] ShiftExpression = AdditiveExpression
-			new Action() {	// [207] ShiftExpression = ShiftExpression.l ShiftOperator.o AdditiveExpression.r
+			Action.RETURN,	// [205] AdditiveOperator = PLUS
+			Action.RETURN,	// [206] AdditiveOperator = MINUS
+			Action.RETURN,	// [207] ShiftExpression = AdditiveExpression
+			new Action() {	// [208] ShiftExpression = ShiftExpression.l ShiftOperator.o AdditiveExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1617,8 +1615,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [208] ShiftExpression_NoLBF = AdditiveExpression_NoLBF
-			new Action() {	// [209] ShiftExpression_NoLBF = ShiftExpression_NoLBF.l ShiftOperator.o AdditiveExpression.r
+			Action.RETURN,	// [209] ShiftExpression_NoLBF = AdditiveExpression_NoLBF
+			new Action() {	// [210] ShiftExpression_NoLBF = ShiftExpression_NoLBF.l ShiftOperator.o AdditiveExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1629,11 +1627,11 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [210] ShiftOperator = LESS_LESS
-			Action.RETURN,	// [211] ShiftOperator = GREATER_GREATER
-			Action.RETURN,	// [212] ShiftOperator = GREATER_GREATER_GREATER
-			Action.RETURN,	// [213] RelationalExpression = ShiftExpression
-			new Action() {	// [214] RelationalExpression = RelationalExpression.l RelationalOperator.o ShiftExpression.r
+			Action.RETURN,	// [211] ShiftOperator = LESS_LESS
+			Action.RETURN,	// [212] ShiftOperator = GREATER_GREATER
+			Action.RETURN,	// [213] ShiftOperator = GREATER_GREATER_GREATER
+			Action.RETURN,	// [214] RelationalExpression = ShiftExpression
+			new Action() {	// [215] RelationalExpression = RelationalExpression.l RelationalOperator.o ShiftExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1644,8 +1642,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [215] RelationalExpression_NoLBF = ShiftExpression_NoLBF
-			new Action() {	// [216] RelationalExpression_NoLBF = RelationalExpression_NoLBF.l RelationalOperator.o ShiftExpression.r
+			Action.RETURN,	// [216] RelationalExpression_NoLBF = ShiftExpression_NoLBF
+			new Action() {	// [217] RelationalExpression_NoLBF = RelationalExpression_NoLBF.l RelationalOperator.o ShiftExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1656,8 +1654,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [217] RelationalExpression_NoIn = ShiftExpression
-			new Action() {	// [218] RelationalExpression_NoIn = RelationalExpression_NoIn.l RelationalOperator_NoIn.o ShiftExpression.r
+			Action.RETURN,	// [218] RelationalExpression_NoIn = ShiftExpression
+			new Action() {	// [219] RelationalExpression_NoIn = RelationalExpression_NoIn.l RelationalOperator_NoIn.o ShiftExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1668,15 +1666,15 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [219] RelationalOperator_NoIn = LESS
-			Action.RETURN,	// [220] RelationalOperator_NoIn = GREATER
-			Action.RETURN,	// [221] RelationalOperator_NoIn = LESS_EQUAL
-			Action.RETURN,	// [222] RelationalOperator_NoIn = GREATER_EQUAL
-			Action.RETURN,	// [223] RelationalOperator_NoIn = INSTANCEOF
-			Action.RETURN,	// [224] RelationalOperator = RelationalOperator_NoIn
-			Action.RETURN,	// [225] RelationalOperator = IN
-			Action.RETURN,	// [226] EqualityExpression = RelationalExpression
-			new Action() {	// [227] EqualityExpression = EqualityExpression.l EqualityOperator.o RelationalExpression.r
+			Action.RETURN,	// [220] RelationalOperator_NoIn = LESS
+			Action.RETURN,	// [221] RelationalOperator_NoIn = GREATER
+			Action.RETURN,	// [222] RelationalOperator_NoIn = LESS_EQUAL
+			Action.RETURN,	// [223] RelationalOperator_NoIn = GREATER_EQUAL
+			Action.RETURN,	// [224] RelationalOperator_NoIn = INSTANCEOF
+			Action.RETURN,	// [225] RelationalOperator = RelationalOperator_NoIn
+			Action.RETURN,	// [226] RelationalOperator = IN
+			Action.RETURN,	// [227] EqualityExpression = RelationalExpression
+			new Action() {	// [228] EqualityExpression = EqualityExpression.l EqualityOperator.o RelationalExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1687,8 +1685,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [228] EqualityExpression_NoLBF = RelationalExpression_NoLBF
-			new Action() {	// [229] EqualityExpression_NoLBF = EqualityExpression_NoLBF.l EqualityOperator.o RelationalExpression.r
+			Action.RETURN,	// [229] EqualityExpression_NoLBF = RelationalExpression_NoLBF
+			new Action() {	// [230] EqualityExpression_NoLBF = EqualityExpression_NoLBF.l EqualityOperator.o RelationalExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1699,8 +1697,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [230] EqualityExpression_NoIn = RelationalExpression_NoIn
-			new Action() {	// [231] EqualityExpression_NoIn = EqualityExpression_NoIn.l EqualityOperator.o RelationalExpression_NoIn.r
+			Action.RETURN,	// [231] EqualityExpression_NoIn = RelationalExpression_NoIn
+			new Action() {	// [232] EqualityExpression_NoIn = EqualityExpression_NoIn.l EqualityOperator.o RelationalExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1711,11 +1709,11 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [232] EqualityOperator = EQUAL_EQUAL
-			Action.RETURN,	// [233] EqualityOperator = EXCLAMATION_EQUAL
-			Action.RETURN,	// [234] EqualityOperator = EQUAL_EQUAL_EQUAL
-			Action.RETURN,	// [235] EqualityOperator = EXCLAMATION_EQUAL_EQUAL
-			new Action() {	// [236] BitwiseAndExpression = BitwiseAndExpression.l AMPERSAND.o EqualityExpression.r
+			Action.RETURN,	// [233] EqualityOperator = EQUAL_EQUAL
+			Action.RETURN,	// [234] EqualityOperator = EXCLAMATION_EQUAL
+			Action.RETURN,	// [235] EqualityOperator = EQUAL_EQUAL_EQUAL
+			Action.RETURN,	// [236] EqualityOperator = EXCLAMATION_EQUAL_EQUAL
+			new Action() {	// [237] BitwiseAndExpression = BitwiseAndExpression.l AMPERSAND.o EqualityExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1725,8 +1723,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [237] BitwiseAndExpression = EqualityExpression
-			new Action() {	// [238] BitwiseAndExpression_NoLBF = BitwiseAndExpression_NoLBF.l AMPERSAND.o EqualityExpression.r
+			Action.RETURN,	// [238] BitwiseAndExpression = EqualityExpression
+			new Action() {	// [239] BitwiseAndExpression_NoLBF = BitwiseAndExpression_NoLBF.l AMPERSAND.o EqualityExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1736,8 +1734,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [239] BitwiseAndExpression_NoLBF = EqualityExpression_NoLBF
-			new Action() {	// [240] BitwiseAndExpression_NoIn = BitwiseAndExpression_NoIn.l AMPERSAND.o EqualityExpression_NoIn.r
+			Action.RETURN,	// [240] BitwiseAndExpression_NoLBF = EqualityExpression_NoLBF
+			new Action() {	// [241] BitwiseAndExpression_NoIn = BitwiseAndExpression_NoIn.l AMPERSAND.o EqualityExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1747,8 +1745,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [241] BitwiseAndExpression_NoIn = EqualityExpression_NoIn
-			new Action() {	// [242] BitwiseXorExpression = BitwiseXorExpression.l CARET.o BitwiseAndExpression.r
+			Action.RETURN,	// [242] BitwiseAndExpression_NoIn = EqualityExpression_NoIn
+			new Action() {	// [243] BitwiseXorExpression = BitwiseXorExpression.l CARET.o BitwiseAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1758,8 +1756,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [243] BitwiseXorExpression = BitwiseAndExpression
-			new Action() {	// [244] BitwiseXorExpression_NoLBF = BitwiseXorExpression_NoLBF.l CARET.o BitwiseAndExpression.r
+			Action.RETURN,	// [244] BitwiseXorExpression = BitwiseAndExpression
+			new Action() {	// [245] BitwiseXorExpression_NoLBF = BitwiseXorExpression_NoLBF.l CARET.o BitwiseAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1769,8 +1767,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [245] BitwiseXorExpression_NoLBF = BitwiseAndExpression_NoLBF
-			new Action() {	// [246] BitwiseXorExpression_NoIn = BitwiseXorExpression_NoIn.l CARET.o BitwiseAndExpression_NoIn.r
+			Action.RETURN,	// [246] BitwiseXorExpression_NoLBF = BitwiseAndExpression_NoLBF
+			new Action() {	// [247] BitwiseXorExpression_NoIn = BitwiseXorExpression_NoIn.l CARET.o BitwiseAndExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1780,8 +1778,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [247] BitwiseXorExpression_NoIn = BitwiseAndExpression_NoIn
-			new Action() {	// [248] BitwiseOrExpression = BitwiseOrExpression.l PIPE.o BitwiseXorExpression.r
+			Action.RETURN,	// [248] BitwiseXorExpression_NoIn = BitwiseAndExpression_NoIn
+			new Action() {	// [249] BitwiseOrExpression = BitwiseOrExpression.l PIPE.o BitwiseXorExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1791,8 +1789,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [249] BitwiseOrExpression = BitwiseXorExpression
-			new Action() {	// [250] BitwiseOrExpression_NoLBF = BitwiseOrExpression_NoLBF.l PIPE.o BitwiseXorExpression.r
+			Action.RETURN,	// [250] BitwiseOrExpression = BitwiseXorExpression
+			new Action() {	// [251] BitwiseOrExpression_NoLBF = BitwiseOrExpression_NoLBF.l PIPE.o BitwiseXorExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1802,8 +1800,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [251] BitwiseOrExpression_NoLBF = BitwiseXorExpression_NoLBF
-			new Action() {	// [252] BitwiseOrExpression_NoIn = BitwiseOrExpression_NoIn.l PIPE.o BitwiseXorExpression_NoIn.r
+			Action.RETURN,	// [252] BitwiseOrExpression_NoLBF = BitwiseXorExpression_NoLBF
+			new Action() {	// [253] BitwiseOrExpression_NoIn = BitwiseOrExpression_NoIn.l PIPE.o BitwiseXorExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1813,8 +1811,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [253] BitwiseOrExpression_NoIn = BitwiseXorExpression_NoIn
-			new Action() {	// [254] LogicalAndExpression = LogicalAndExpression.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
+			Action.RETURN,	// [254] BitwiseOrExpression_NoIn = BitwiseXorExpression_NoIn
+			new Action() {	// [255] LogicalAndExpression = LogicalAndExpression.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1824,8 +1822,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [255] LogicalAndExpression = BitwiseOrExpression
-			new Action() {	// [256] LogicalAndExpression_NoLBF = LogicalAndExpression_NoLBF.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
+			Action.RETURN,	// [256] LogicalAndExpression = BitwiseOrExpression
+			new Action() {	// [257] LogicalAndExpression_NoLBF = LogicalAndExpression_NoLBF.l AMPERSAND_AMPERSAND.o BitwiseOrExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1835,8 +1833,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [257] LogicalAndExpression_NoLBF = BitwiseOrExpression_NoLBF
-			new Action() {	// [258] LogicalAndExpression_NoIn = LogicalAndExpression_NoIn.l AMPERSAND_AMPERSAND.o BitwiseOrExpression_NoIn.r
+			Action.RETURN,	// [258] LogicalAndExpression_NoLBF = BitwiseOrExpression_NoLBF
+			new Action() {	// [259] LogicalAndExpression_NoIn = LogicalAndExpression_NoIn.l AMPERSAND_AMPERSAND.o BitwiseOrExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1846,8 +1844,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [259] LogicalAndExpression_NoIn = BitwiseOrExpression_NoIn
-			new Action() {	// [260] LogicalOrExpression = LogicalOrExpression.l PIPE_PIPE.o LogicalAndExpression.r
+			Action.RETURN,	// [260] LogicalAndExpression_NoIn = BitwiseOrExpression_NoIn
+			new Action() {	// [261] LogicalOrExpression = LogicalOrExpression.l PIPE_PIPE.o LogicalAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1857,8 +1855,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [261] LogicalOrExpression = LogicalAndExpression
-			new Action() {	// [262] LogicalOrExpression_NoLBF = LogicalOrExpression_NoLBF.l PIPE_PIPE.o LogicalAndExpression.r
+			Action.RETURN,	// [262] LogicalOrExpression = LogicalAndExpression
+			new Action() {	// [263] LogicalOrExpression_NoLBF = LogicalOrExpression_NoLBF.l PIPE_PIPE.o LogicalAndExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1868,8 +1866,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [263] LogicalOrExpression_NoLBF = LogicalAndExpression_NoLBF
-			new Action() {	// [264] LogicalOrExpression_NoIn = LogicalOrExpression_NoIn.l PIPE_PIPE.o LogicalAndExpression_NoIn.r
+			Action.RETURN,	// [264] LogicalOrExpression_NoLBF = LogicalAndExpression_NoLBF
+			new Action() {	// [265] LogicalOrExpression_NoIn = LogicalOrExpression_NoIn.l PIPE_PIPE.o LogicalAndExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1879,9 +1877,9 @@ public class JSParser extends Parser implements IParser {
 					return new JSBinaryOperatorNode(l, o.value.toString(), r);
 				}
 			},
-			Action.RETURN,	// [265] LogicalOrExpression_NoIn = LogicalAndExpression_NoIn
-			Action.RETURN,	// [266] ConditionalExpression = LogicalOrExpression
-			new Action() {	// [267] ConditionalExpression = LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+			Action.RETURN,	// [266] LogicalOrExpression_NoIn = LogicalAndExpression_NoIn
+			Action.RETURN,	// [267] ConditionalExpression = LogicalOrExpression
+			new Action() {	// [268] ConditionalExpression = LogicalOrExpression.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1892,8 +1890,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
-			Action.RETURN,	// [268] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF
-			new Action() {	// [269] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
+			Action.RETURN,	// [269] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF
+			new Action() {	// [270] ConditionalExpression_NoLBF = LogicalOrExpression_NoLBF.l QUESTION AssignmentExpression.t COLON AssignmentExpression.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1904,8 +1902,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
-			Action.RETURN,	// [270] ConditionalExpression_NoIn = LogicalOrExpression_NoIn
-			new Action() {	// [271] ConditionalExpression_NoIn = LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
+			Action.RETURN,	// [271] ConditionalExpression_NoIn = LogicalOrExpression_NoIn
+			new Action() {	// [272] ConditionalExpression_NoIn = LogicalOrExpression_NoIn.l QUESTION AssignmentExpression_NoIn.t COLON AssignmentExpression_NoIn.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1916,8 +1914,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNode(JSNodeTypes.CONDITIONAL, new JSNode[] { l, t, f }, l.getStart(), f.getEnd());
 				}
 			},
-			Action.RETURN,	// [272] AssignmentExpression = ConditionalExpression
-			new Action() {	// [273] AssignmentExpression = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
+			Action.RETURN,	// [273] AssignmentExpression = ConditionalExpression
+			new Action() {	// [274] AssignmentExpression = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1928,8 +1926,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSAssignmentNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [274] AssignmentExpression_NoLBF = ConditionalExpression_NoLBF
-			new Action() {	// [275] AssignmentExpression_NoLBF = LeftHandSideExpression_NoLBF.l AssignmentOperator.o AssignmentExpression.r
+			Action.RETURN,	// [275] AssignmentExpression_NoLBF = ConditionalExpression_NoLBF
+			new Action() {	// [276] AssignmentExpression_NoLBF = LeftHandSideExpression_NoLBF.l AssignmentOperator.o AssignmentExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1940,8 +1938,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSAssignmentNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [276] AssignmentExpression_NoIn = ConditionalExpression_NoIn
-			new Action() {	// [277] AssignmentExpression_NoIn = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression_NoIn.r
+			Action.RETURN,	// [277] AssignmentExpression_NoIn = ConditionalExpression_NoIn
+			new Action() {	// [278] AssignmentExpression_NoIn = LeftHandSideExpression.l AssignmentOperator.o AssignmentExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1952,19 +1950,19 @@ public class JSParser extends Parser implements IParser {
 					return new JSAssignmentNode(l, o, r);
 				}
 			},
-			Action.RETURN,	// [278] AssignmentOperator = EQUAL
-			Action.RETURN,	// [279] AssignmentOperator = STAR_EQUAL
-			Action.RETURN,	// [280] AssignmentOperator = FORWARD_SLASH_EQUAL
-			Action.RETURN,	// [281] AssignmentOperator = PERCENT_EQUAL
-			Action.RETURN,	// [282] AssignmentOperator = PLUS_EQUAL
-			Action.RETURN,	// [283] AssignmentOperator = MINUS_EQUAL
-			Action.RETURN,	// [284] AssignmentOperator = LESS_LESS_EQUAL
-			Action.RETURN,	// [285] AssignmentOperator = GREATER_GREATER_EQUAL
-			Action.RETURN,	// [286] AssignmentOperator = GREATER_GREATER_GREATER_EQUAL
-			Action.RETURN,	// [287] AssignmentOperator = AMPERSAND_EQUAL
-			Action.RETURN,	// [288] AssignmentOperator = CARET_EQUAL
-			Action.RETURN,	// [289] AssignmentOperator = PIPE_EQUAL
-			new Action() {	// [290] Expression = Expression.l COMMA AssignmentExpression.r
+			Action.RETURN,	// [279] AssignmentOperator = EQUAL
+			Action.RETURN,	// [280] AssignmentOperator = STAR_EQUAL
+			Action.RETURN,	// [281] AssignmentOperator = FORWARD_SLASH_EQUAL
+			Action.RETURN,	// [282] AssignmentOperator = PERCENT_EQUAL
+			Action.RETURN,	// [283] AssignmentOperator = PLUS_EQUAL
+			Action.RETURN,	// [284] AssignmentOperator = MINUS_EQUAL
+			Action.RETURN,	// [285] AssignmentOperator = LESS_LESS_EQUAL
+			Action.RETURN,	// [286] AssignmentOperator = GREATER_GREATER_EQUAL
+			Action.RETURN,	// [287] AssignmentOperator = GREATER_GREATER_GREATER_EQUAL
+			Action.RETURN,	// [288] AssignmentOperator = AMPERSAND_EQUAL
+			Action.RETURN,	// [289] AssignmentOperator = CARET_EQUAL
+			Action.RETURN,	// [290] AssignmentOperator = PIPE_EQUAL
+			new Action() {	// [291] Expression = Expression.l COMMA AssignmentExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1973,8 +1971,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
-			Action.RETURN,	// [291] Expression = AssignmentExpression
-			new Action() {	// [292] Expression_NoLBF = Expression_NoLBF.l COMMA AssignmentExpression.r
+			Action.RETURN,	// [292] Expression = AssignmentExpression
+			new Action() {	// [293] Expression_NoLBF = Expression_NoLBF.l COMMA AssignmentExpression.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1983,8 +1981,8 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
-			Action.RETURN,	// [293] Expression_NoLBF = AssignmentExpression_NoLBF
-			new Action() {	// [294] Expression_NoIn = Expression_NoIn.l COMMA AssignmentExpression_NoIn.r
+			Action.RETURN,	// [294] Expression_NoLBF = AssignmentExpression_NoLBF
+			new Action() {	// [295] Expression_NoIn = Expression_NoIn.l COMMA AssignmentExpression_NoIn.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_l = _symbols[offset + 1];
 					final JSNode l = (JSNode) _symbol_l.value;
@@ -1993,40 +1991,40 @@ public class JSParser extends Parser implements IParser {
 					return new JSNaryNode(JSNodeTypes.COMMA, new JSNode[] { l, r }, l.getStart(), r.getEnd());
 				}
 			},
-			Action.RETURN,	// [295] Expression_NoIn = AssignmentExpression_NoIn
-			new Action() {	// [296] Literal = NULL.n
+			Action.RETURN,	// [296] Expression_NoIn = AssignmentExpression_NoIn
+			new Action() {	// [297] Literal = NULL.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol n = _symbols[offset + 1];
 					return new JSPrimitiveNode(JSNodeTypes.NULL, n.value.toString(), n.getStart(), n.getEnd());
 				}
 			},
-			new Action() {	// [297] Literal = TRUE.t
+			new Action() {	// [298] Literal = TRUE.t
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol t = _symbols[offset + 1];
 					return new JSPrimitiveNode(JSNodeTypes.TRUE, t.value.toString(), t.getStart(), t.getEnd());
 				}
 			},
-			new Action() {	// [298] Literal = FALSE.f
+			new Action() {	// [299] Literal = FALSE.f
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol f = _symbols[offset + 1];
 					return new JSPrimitiveNode(JSNodeTypes.FALSE, f.value.toString(), f.getStart(), f.getEnd());
 				}
 			},
-			new Action() {	// [299] Literal = NUMBER.n
+			new Action() {	// [300] Literal = NUMBER.n
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final String n = (String) _symbol_n.value;
 					return new JSPrimitiveNode(JSNodeTypes.NUMBER, n, _symbol_n.getStart(), _symbol_n.getEnd());
 				}
 			},
-			new Action() {	// [300] Literal = STRING.s
+			new Action() {	// [301] Literal = STRING.s
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
 					return new JSPrimitiveNode(JSNodeTypes.STRING, s, _symbol_s.getStart(), _symbol_s.getEnd());
 				}
 			},
-			new Action() {	// [301] Literal = REGEX.r
+			new Action() {	// [302] Literal = REGEX.r
 				public Symbol reduce(Symbol[] _symbols, int offset) {
 					final Symbol _symbol_r = _symbols[offset + 1];
 					final String r = (String) _symbol_r.value;
