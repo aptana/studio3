@@ -28,12 +28,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.TeamException;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
+import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.util.IOUtil;
 import com.aptana.util.ProcessUtil;
 import com.aptana.util.StringUtil;
@@ -576,6 +578,11 @@ public class GitRepository
 		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 		if (commits != null && commits.length > 0)
 			return true;
+		// Check to see if user has disabled performing remote fetches for pull indicator calculations.
+		boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
+		if (!performFetches)
+			return false;
 		String refspec = branchName;
 		if (!currentBranch().equals(branchName))
 		{
