@@ -866,22 +866,26 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		branchesToolItem.setText(""); //$NON-NLS-1$
 		if (repo == null)
 			return;
-		// FIXME This doesn't seem to indicate proper dirty status and changed files on initial load!
+		
 		String currentBranchName = repo.currentBranch();
 		for (String branchName : repo.localBranches())
 		{
 			// Construct the menu item to for this project
 			final MenuItem branchNameMenuItem = new MenuItem(branchesMenu, SWT.RADIO);
+			String modifiedBranchName = branchName;
 			if (branchName.equals(currentBranchName) && repo.isDirty())
 			{
-				branchNameMenuItem.setText(branchName + "*"); //$NON-NLS-1$
+				modifiedBranchName += "*"; //$NON-NLS-1$
 			}
-			else
-			{
-				branchNameMenuItem.setText(branchName);
-			}
-			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
+			String[] behind = repo.commitsBehind(branchName);
+			if (behind != null && behind.length > 0)
+				modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+			String[] ahead = repo.commitsAhead(branchName);
+			if (ahead != null && ahead.length > 0)
+				modifiedBranchName += " \u2192"; // right arrow //$NON-NLS-1$
 
+			branchNameMenuItem.setText(modifiedBranchName);
+			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
 			branchNameMenuItem.addSelectionListener(new SelectionAdapter()
 			{
 				public void widgetSelected(SelectionEvent e)
@@ -889,7 +893,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					setNewBranch(branchNameMenuItem.getText());
 				}
 			});
-
+			if (branchName.equals(currentBranchName))
+				currentBranchName = modifiedBranchName;
 		}
 
 		new MenuItem(branchesMenu, SWT.SEPARATOR);
@@ -903,9 +908,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				setNewBranch(branchNameMenuItem.getText());
 			}
 		});
-
-		if (repo.isDirty())
-			currentBranchName += "*"; //$NON-NLS-1$
 		branchesToolItem.setText(currentBranchName);
 		branchesToolbar.pack();
 	}
@@ -936,14 +938,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 				else
 				{
-					String rightLabelText = "]"; //$NON-NLS-1$
-					String[] behind = repository.commitsBehind(repository.currentBranch());
-					if (behind != null && behind.length > 0)
-						rightLabelText += " \u2190"; // left arrow //$NON-NLS-1$
-					String[] ahead = repository.commitsAhead(repository.currentBranch());
-					if (ahead != null && ahead.length > 0)
-						rightLabelText += " \u2192"; // right arrow //$NON-NLS-1$
-					rightLabel.setText(rightLabelText);
 					leftLabelGridData.exclude = false;
 					leftLabel.setVisible(true);
 					branchesToolbarGridData.exclude = false;
