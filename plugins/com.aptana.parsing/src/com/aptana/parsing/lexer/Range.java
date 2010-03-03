@@ -44,6 +44,6 @@ public class Range implements IRange
 	@Override
 	public int hashCode()
 	{
-		return 13 * Integer.valueOf(getStartingOffset()).hashCode() + Integer.valueOf(getLength()).hashCode();
+		return 31 * getStartingOffset() + getLength();
 	}
 }
