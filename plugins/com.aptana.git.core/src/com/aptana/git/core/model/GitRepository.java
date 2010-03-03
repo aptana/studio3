@@ -581,7 +581,6 @@ public class GitRepository
 		{
 			refspec = remote.getRemoteBranchName() + ":" + branchName;
 		}
-
 		ProcessBuilder builder = new ProcessBuilder(GitExecutable.instance().path(), "fetch", "--dry-run", "-k", remote
 				.getRemoteName(), refspec);
 		builder.directory(new File(workingDirectory()));
@@ -593,6 +592,11 @@ public class GitRepository
 			String output = IOUtil.read(p.getInputStream(), "UTF-8");
 			if (exitValue != 0)
 				return false;
+			// If it's current branch we need to test if output has more than two lines...
+			if (currentBranch().equals(branchName))
+			{
+				return output.split("\r\n|\r|\n").length > 2;
+			}
 			return output.trim().length() > 0;
 		}
 		catch (Exception e)
