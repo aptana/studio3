@@ -63,7 +63,7 @@ public abstract class BundleTestBase extends TestCase
 		this.loadBundleEntry(bundleName, precedence);
 		
 		// get bundle entry
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		BundleEntry entry =  getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 		
 		return entry;
@@ -94,7 +94,7 @@ public abstract class BundleTestBase extends TestCase
 	 */
 	protected void loadBundleEntry(String bundleName, BundlePrecedence precedence)
 	{
-		BundleManager manager = BundleManager.getInstance(APPLICATION_BUNDLES, USER_BUNDLES);
+		BundleManager manager = getBundleManagerInstance();
 		String baseDirectory = null;
 		
 		// make sure we have a test bundle
@@ -121,6 +121,11 @@ public abstract class BundleTestBase extends TestCase
 		
 		// load bundle
 		manager.loadBundle(bundleFile);
+	}
+
+	public static BundleManager getBundleManagerInstance()
+	{
+		return BundleManager.getInstance(APPLICATION_BUNDLES, USER_BUNDLES);
 	}
 
 	/*

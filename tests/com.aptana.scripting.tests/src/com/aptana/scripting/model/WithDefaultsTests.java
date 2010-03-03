@@ -30,7 +30,7 @@ public class WithDefaultsTests extends BundleTestBase
 	public void testWithDefaultInsideBundle()
 	{
 		this.loadBundleEntry("withDefaultsInsideBundle", BundlePrecedence.PROJECT);
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("Bundle Reference");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("Bundle Reference");
 		assertNotNull(entry);
 		
 		BundleElement[] bundles = entry.getBundles();

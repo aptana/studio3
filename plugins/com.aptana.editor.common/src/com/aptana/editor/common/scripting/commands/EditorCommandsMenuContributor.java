@@ -230,6 +230,13 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			else
 			{
 				final CommandElement command = menuForScope.getCommand();
+
+				// A command attached to the menu item may not be executable on
+				// the current platform in which case we skip the menu item
+				if (command != null && (!command.isExecutable()))
+				{
+					continue;
+				}
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 				menuItem.setData(contributionItem);
 

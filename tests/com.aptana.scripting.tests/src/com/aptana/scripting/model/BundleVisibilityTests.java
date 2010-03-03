@@ -50,7 +50,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	{
 		this._bundleListener = new BundleTestListener();
 		
-		BundleManager.getInstance().addBundleChangeListener(this._bundleListener);
+		BundleTestBase.getBundleManagerInstance().addBundleChangeListener(this._bundleListener);
 	}
 	
 	/**
@@ -146,7 +146,7 @@ public class BundleVisibilityTests extends BundleTestBase
 		
 		this._bundleListener.reset();
 		
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 		
 		BundleElement[] bundles = entry.getBundles();
@@ -187,7 +187,7 @@ public class BundleVisibilityTests extends BundleTestBase
 		this._bundleListener.reset();
 		
 		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
@@ -224,7 +224,7 @@ public class BundleVisibilityTests extends BundleTestBase
 		this._bundleListener.reset();
 		
 		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.APPLICATION);
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 		BundleElement[] bundles = entry.getBundles();
 		assertNotNull(bundles);
