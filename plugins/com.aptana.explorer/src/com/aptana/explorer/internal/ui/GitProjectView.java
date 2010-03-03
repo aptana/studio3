@@ -866,7 +866,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		branchesToolItem.setText(""); //$NON-NLS-1$
 		if (repo == null)
 			return;
-		
+
 		String currentBranchName = repo.currentBranch();
 		for (String branchName : repo.localBranches())
 		{
@@ -877,8 +877,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				modifiedBranchName += "*"; //$NON-NLS-1$
 			}
-			String[] behind = repo.commitsBehind(branchName);
-			if (behind != null && behind.length > 0)
+			if (repo.shouldPull(branchName))
 				modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
 			String[] ahead = repo.commitsAhead(branchName);
 			if (ahead != null && ahead.length > 0)

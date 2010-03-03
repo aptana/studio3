@@ -34,6 +34,7 @@ import org.eclipse.team.core.TeamException;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
+import com.aptana.util.IOUtil;
 import com.aptana.util.ProcessUtil;
 import com.aptana.util.StringUtil;
 
@@ -560,11 +561,45 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
-		// TODO Take in a boolean to allow forcing a fetch or something to actually determine this more accurately!
 		GitRef remote = remoteTrackingBranch(branchName);
 		if (remote == null)
 			return null;
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
+	}
+
+	@SuppressWarnings("nls")
+	public boolean shouldPull(String branchName)
+	{
+		GitRef remote = remoteTrackingBranch(branchName);
+		if (remote == null)
+			return false;
+		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
+		if (commits != null && commits.length > 0)
+			return true;
+		String refspec = branchName;
+		if (!currentBranch().equals(branchName))
+		{
+			refspec = remote.getRemoteBranchName() + ":" + branchName;
+		}
+
+		ProcessBuilder builder = new ProcessBuilder(GitExecutable.instance().path(), "fetch", "--dry-run", "-k", remote
+				.getRemoteName(), refspec);
+		builder.directory(new File(workingDirectory()));
+		builder.redirectErrorStream(true);
+		try
+		{
+			Process p = builder.start();
+			int exitValue = p.waitFor();
+			String output = IOUtil.read(p.getInputStream(), "UTF-8");
+			if (exitValue != 0)
+				return false;
+			return output.trim().length() > 0;
+		}
+		catch (Exception e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+		}
+		return false;
 	}
 
 	/**
