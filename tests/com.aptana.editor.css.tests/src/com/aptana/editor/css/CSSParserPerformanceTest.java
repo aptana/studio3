@@ -1,10 +1,11 @@
-package com.aptana.editor.css.parsing;
+package com.aptana.editor.css;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
 
+import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
@@ -27,7 +28,7 @@ public class CSSParserPerformanceTest extends TestCase
 
 	public void testTime() throws Exception
 	{
-		InputStream stream = CSSParserPerformanceTest.class.getResourceAsStream("../yui.css");
+		InputStream stream = getClass().getResourceAsStream("yui.css");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)
