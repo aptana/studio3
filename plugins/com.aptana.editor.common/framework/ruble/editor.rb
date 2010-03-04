@@ -59,7 +59,7 @@ module Ruble
         else
           editor = Ruble::Editor.active
         end
-        return nil unless editor        
+        return nil unless editor
         region = editor.document.getLineInformation(options[:line].to_i - 1)
         editor.selection = [region.offset + options[:column].to_i - 1, 0]
         editor
@@ -195,6 +195,16 @@ module Ruble
     
     def current_line
       styled_text.line(caret_line)
+    end    
+    
+    def insert_as_text(text)
+      self[caret_offset, 0] = snippet
+    end    
+
+    def insert_as_snippet(snippet)
+      region = org.eclipse.jface.text.Region.new(caret_offset, 0)
+      text_viewer = editor_part.source_viewer
+      com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor.insertAsTemplate(text_viewer, region, snippet, nil)
     end
     
     def to_env
