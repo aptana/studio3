@@ -22,6 +22,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.contentobjects.jnotify.IJNotify;
+import net.contentobjects.jnotify.JNotifyException;
+import net.contentobjects.jnotify.JNotifyListener;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.TeamException;
 
+import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
@@ -171,6 +176,50 @@ public class GitRepository
 		this.branches = new ArrayList<GitRevSpecifier>();
 		reloadRefs();
 		readCurrentBranch();
+		// TODO Add a listener on the .git dir to detect external changes to the repo!
+		try
+		{
+			FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_ANY, true, new JNotifyListener()
+			{
+
+				@Override
+				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+				{
+					// ignore
+				}
+
+				@Override
+				public void fileModified(int wd, String rootPath, String name)
+				{
+					// ignore
+				}
+
+				@Override
+				public void fileDeleted(int wd, String rootPath, String name)
+				{
+					// Remove branch in model!
+					branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+				}
+
+				@Override
+				public void fileCreated(int wd, String rootPath, String name)
+				{
+					// a branch has been added
+					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+					// Check if our HEAD changed
+					String oldBranchName = currentBranch.simpleRef().shortName();
+					if (oldBranchName.equals(name))
+						return;
+					_headRef = null;
+					readCurrentBranch();
+					fireBranchChangeEvent(oldBranchName, name);
+				}
+			});
+		}
+		catch (JNotifyException e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+		}
 	}
 
 	public String workingDirectory()
