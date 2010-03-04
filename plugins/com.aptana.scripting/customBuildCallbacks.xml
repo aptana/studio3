@@ -129,11 +129,11 @@
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="rspec.ruble" />
-		  	<param name="bundle.dir.name" value="json.ruble" />
+		  	<param name="bundle.dir.name" value="rspec.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="cucumber.ruble" />
-		  	<param name="bundle.dir.name" value="json.ruble" />
+		  	<param name="bundle.dir.name" value="cucumber.ruble" />
 		</antcall>
 	</target>
 
