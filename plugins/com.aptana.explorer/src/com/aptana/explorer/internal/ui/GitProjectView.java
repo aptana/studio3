@@ -110,12 +110,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private GitChangedFilesFilter fChangedFilesFilter;
 	private boolean filterOnInitially;
 	private Job pullCalc;
-	private HashMap<String, Boolean> branchToPullIndicator;
+	private HashMap<String, Boolean> branchToPullIndicator = new HashMap<String, Boolean>();
 	private UIJob refreshUIJob;
 
 	@Override
 	public void createPartControl(Composite aParent)
-	{
+	{		
 		super.createPartControl(aParent);
 
 		GitRepository.addListener(this);
@@ -138,7 +138,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 
 		// Calculate the pull indicators in a recurring background job!
-		branchToPullIndicator = new HashMap<String, Boolean>();
 		pullCalc = new Job("Calculating git pull indicators") //$NON-NLS-1$
 		{
 
@@ -946,7 +945,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 			synchronized (branchToPullIndicator)
 			{
-				if (branchToPullIndicator.get(branchName))
+				if (branchToPullIndicator.containsKey(branchName) && branchToPullIndicator.get(branchName))
 				{
 					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
 				}
