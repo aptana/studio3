@@ -188,7 +188,7 @@ module Ruble
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
 
-        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets)$/
+        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets|templates)$/
           log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{$fullpath}")
         else
           # create new bundle
