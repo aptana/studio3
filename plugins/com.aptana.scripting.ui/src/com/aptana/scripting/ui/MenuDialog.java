@@ -95,6 +95,7 @@ public class MenuDialog extends PopupDialog
 	 */
 	private final void createTableDialogArea(final Composite parent, final List<Map<String, Object>> partialMatches)
 	{
+		// TODO Need to add accelerator 0-9 keys like Textmate does and our own keybinding hook does!
 		// Layout the table.
 		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
 		final GridData gridData = new GridData(GridData.FILL_BOTH);
