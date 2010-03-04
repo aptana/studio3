@@ -19,7 +19,7 @@ public class UITests
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.ruby.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
-//		suite.addTest(com.aptana.editor.erb.tests.AllTests.suite()); // TODO Add Tests for editor.erb
+		suite.addTest(com.aptana.editor.erb.tests.AllTests.suite());
 //		suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 //		suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
 		//$JUnit-END$

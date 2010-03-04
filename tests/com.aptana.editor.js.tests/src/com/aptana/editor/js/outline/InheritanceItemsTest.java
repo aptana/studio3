@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,22 +32,57 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css;
+package com.aptana.editor.js.outline;
 
-import com.aptana.editor.common.ILanguageService;
-import com.aptana.parsing.lexer.ILexeme;
-import com.aptana.parsing.lexer.ILexemeModel;
+/**
+ * @author Kevin Lindsey
+ */
+public class InheritanceItemsTest extends BaseOutlineItemTest
+{
 
-public class CSSLanguageService implements ILanguageService {
+	private void testInheritance(String source)
+	{
+		testItem(source, "/outline/object-literal", "Subclass", 1);
+		testItem(source, "/outline/object-literal/boolean", "a");
+	}
 
-    @Override
-    public String getContentAssistText(ILexeme lexeme) {
-        // TODO: returns the real documentation for content assist
-        return lexeme.getText();
-    }
+	public void testDojoLangExtend()
+	{
+		testInheritance("dojo.lang.extend(Subclass, { a: true });");
+	}
 
-    @Override
-    public ILexemeModel getLexemeModel() {
-        return null;
-    }
+	public void testMochiKitBaseUpdate()
+	{
+		testInheritance("MochiKit.Base.update(Subclass, { a: true });");
+	}
+
+	public void testObjectExtend()
+	{
+		testInheritance("Object.extend(Subclass, { a: true });");
+	}
+
+	public void testExtExtend()
+	{
+		testInheritance("Ext.extend(Subclass, Superclass, { a: true });");
+	}
+
+	public void testQxClassDefine()
+	{
+		testInheritance("qx.Class.define(Subclass, { a: true });");
+	}
+
+	public void testQxInterfaceDefine()
+	{
+		testInheritance("qx.Interface.define(Subclass, { a: true });");
+	}
+
+	public void testQxThemeDefine()
+	{
+		testInheritance("qx.Theme.define(Subclass, { a: true });");
+	}
+
+	public void testQxMixinDefine()
+	{
+		testInheritance("qx.Mixin.define(Subclass, { a: true });");
+	}
 }
