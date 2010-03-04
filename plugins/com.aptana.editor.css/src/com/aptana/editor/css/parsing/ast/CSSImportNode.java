@@ -1,5 +1,7 @@
 package com.aptana.editor.css.parsing.ast;
 
+import java.util.Arrays;
+
 public class CSSImportNode extends CSSNode
 {
 
@@ -16,6 +18,23 @@ public class CSSImportNode extends CSSNode
 		super(start, end);
 		fUriStr = uri;
 		fMediaList = mediaList;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSImportNode))
+		{
+			return false;
+		}
+		CSSImportNode other = (CSSImportNode) obj;
+		return fUriStr.equals(other.fUriStr) && Arrays.equals(fMediaList, other.fMediaList);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * fUriStr.hashCode() + Arrays.hashCode(fMediaList);
 	}
 
 	@Override
