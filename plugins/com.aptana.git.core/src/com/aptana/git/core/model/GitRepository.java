@@ -176,45 +176,46 @@ public class GitRepository
 		this.branches = new ArrayList<GitRevSpecifier>();
 		reloadRefs();
 		readCurrentBranch();
-		// TODO Add a listener on the .git dir to detect external changes to the repo!
+		// Add a listener on the .git dir to detect external changes to the repo!
 		try
 		{
-			FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_ANY, true, new JNotifyListener()
-			{
+			FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_CREATED | IJNotify.FILE_DELETED,
+					true, new JNotifyListener()
+					{
 
-				@Override
-				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
-				{
-					// ignore
-				}
+						@Override
+						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						{
+							// ignorebranchToPullIndicator = new HashMap<String, Boolean>();
+						}
 
-				@Override
-				public void fileModified(int wd, String rootPath, String name)
-				{
-					// ignore
-				}
+						@Override
+						public void fileModified(int wd, String rootPath, String name)
+						{
+							// ignore, should never happen
+						}
 
-				@Override
-				public void fileDeleted(int wd, String rootPath, String name)
-				{
-					// Remove branch in model!
-					branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
-				}
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							// Remove branch in model!
+							branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+						}
 
-				@Override
-				public void fileCreated(int wd, String rootPath, String name)
-				{
-					// a branch has been added
-					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
-					// Check if our HEAD changed
-					String oldBranchName = currentBranch.simpleRef().shortName();
-					if (oldBranchName.equals(name))
-						return;
-					_headRef = null;
-					readCurrentBranch();
-					fireBranchChangeEvent(oldBranchName, name);
-				}
-			});
+						@Override
+						public void fileCreated(int wd, String rootPath, String name)
+						{
+							// a branch has been added
+							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+							// Check if our HEAD changed
+							String oldBranchName = currentBranch.simpleRef().shortName();
+							if (oldBranchName.equals(name))
+								return;
+							_headRef = null;
+							readCurrentBranch();
+							fireBranchChangeEvent(oldBranchName, name);
+						}
+					});
 		}
 		catch (JNotifyException e)
 		{
