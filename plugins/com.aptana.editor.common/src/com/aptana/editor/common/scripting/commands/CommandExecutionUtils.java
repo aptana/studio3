@@ -336,6 +336,7 @@ public class CommandExecutionUtils
 			ITextEditor textEditor)
 	{
 		ITextViewer textViewer = null;
+		// FIXME This is pretty bad here. What we want is the ISourceViewer of the editor (which is a subinterface of ITextViewer). It just happens that sourceViewer.getTextOperationTarget returns self in this case.
 		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
 		if (adapter instanceof ITextViewer)
 		{
