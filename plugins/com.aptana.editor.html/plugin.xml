@@ -19,7 +19,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="html,htm"
+            file-extensions="html,htm,xhtml,shtml"
             id="com.aptana.contenttype.html"
             name="%content-type.html.name"
             priority="normal">
