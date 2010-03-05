@@ -32,12 +32,15 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
+import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
+import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
@@ -487,6 +490,25 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	
 	@Override
 	public void pulled(PullEvent e)
-	{	
+	{
+		// FIXME do nothing? Call refresh?
+	}
+	
+	@Override
+	public void pushed(PushEvent e)
+	{
+		// FIXME do nothing? Call refresh?		
+	}
+	
+	@Override
+	public void branchAdded(BranchAddedEvent e)
+	{
+		// do nothing
+	}
+	
+	@Override
+	public void branchRemoved(BranchRemovedEvent e)
+	{
+		// do nothing
 	}
 }

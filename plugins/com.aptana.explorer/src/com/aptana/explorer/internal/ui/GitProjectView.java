@@ -46,13 +46,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
+import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.DiffFormatter;
@@ -87,7 +90,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
 	private static final String STASH_ICON_PATH = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 	private static final String UNSTASH_ICON_PATH = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
-	private static final String CHAGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
+	private static final String CHANGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
 
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
 
@@ -111,7 +114,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private GitChangedFilesFilter fChangedFilesFilter;
 	private boolean filterOnInitially;
 	private Job pullCalc;
-	private HashMap<String, Boolean> branchToPullIndicator;
+	private HashMap<String, Boolean> branchToPullIndicator = new HashMap<String, Boolean>();
 	private UIJob refreshUIJob;
 
 	@Override
@@ -139,7 +142,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 
 		// Calculate the pull indicators in a recurring background job!
-		branchToPullIndicator = new HashMap<String, Boolean>();
 		pullCalc = new Job("Calculating git pull indicators") //$NON-NLS-1$
 		{
 
@@ -348,7 +350,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private void createFilterMenuItem(Menu menu)
 	{
 		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
-		gitFilter.setImage(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH));
+		gitFilter.setImage(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH));
 		gitFilter.setSelection(fChangedFilesFilter != null);
 		gitFilter.setText(Messages.GitProjectView_ChangedFilesFilterTooltip);
 		gitFilter.addSelectionListener(new SelectionAdapter()
@@ -693,7 +695,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					protected IStatus run(IProgressMonitor monitor)
 					{
 						action.run();
-						refreshUI(GitRepository.getAttached(selectedProject));
 						return Status.OK_STATUS;
 					}
 				};
@@ -997,14 +998,24 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	public void indexChanged(final IndexChangedEvent e)
 	{
-		refreshUI(e.getRepository());
+		handleBranchEvent(e.getRepository());
 	}
 
 	public void pulled(final PullEvent e)
 	{
-		// When user has done a pull we need to force a recalc of the pull indicators right away!
-		pullCalc.cancel();
-		pullCalc.schedule();
+		if (isCurrentProjectsRepository(e.getRepository()))
+		{
+			// When user has done a pull we need to force a recalc of the pull indicators right away!
+			pullCalc.cancel();
+			pullCalc.schedule();
+		}
+	}
+	
+	@Override
+	public void pushed(PushEvent e)
+	{
+		// Need to recalc the push indicators on branch pulldown
+		handleBranchEvent(e.getRepository());
 	}
 
 	protected void refreshUI(final GitRepository repository)
@@ -1070,10 +1081,31 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	public void branchChanged(BranchChangedEvent e)
 	{
-		GitRepository repo = e.getRepository();
+		handleBranchEvent(e.getRepository());
+	}
+
+	@Override
+	public void branchAdded(BranchAddedEvent e)
+	{
+		handleBranchEvent(e.getRepository());
+	}
+
+	@Override
+	public void branchRemoved(BranchRemovedEvent e)
+	{
+		handleBranchEvent(e.getRepository());
+	}
+
+	private void handleBranchEvent(GitRepository repo)
+	{
+		if (isCurrentProjectsRepository(repo))
+			refreshUI(repo);
+	}
+
+	private boolean isCurrentProjectsRepository(GitRepository repo)
+	{
 		GitRepository selectedRepo = GitRepository.getAttached(selectedProject);
-		if (selectedRepo != null && selectedRepo.equals(repo))
-			refreshUI(e.getRepository());
+		return selectedRepo != null && selectedRepo.equals(repo);
 	}
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
@@ -1088,7 +1120,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		fChangedFilesFilter = new GitChangedFilesFilter();
 		getCommonViewer().addFilter(fChangedFilesFilter);
 		getCommonViewer().expandAll();
-		showFilterLabel(ExplorerPlugin.getImage(CHAGED_FILE_FILTER_ICON_PATH),
+		showFilterLabel(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH),
 				Messages.GitProjectView_ChangedFilesFilterTooltip);
 	}
 
