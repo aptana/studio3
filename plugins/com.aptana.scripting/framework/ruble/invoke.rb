@@ -12,7 +12,7 @@ module Ruble
       if block_given?
         @jobj.set_invoke_block(&block)
       else
-      log_error("Missing block in invoke.all of Command #{@command.display_name}")
+        log_error("Missing block in invoke.all of Command #{@command.display_name}")
       end
     end
 
