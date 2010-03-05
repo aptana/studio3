@@ -946,7 +946,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 			synchronized (branchToPullIndicator)
 			{
-				if (branchToPullIndicator.get(branchName))
+				if (branchToPullIndicator.containsKey(branchName) && branchToPullIndicator.get(branchName))
 				{
 					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
 				}
