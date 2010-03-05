@@ -225,9 +225,27 @@ public class GitRepositoryTest extends TestCase
 			{
 				eventsReceived.add(e);
 			}
-			
+
 			@Override
 			public void pulled(PullEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void branchAdded(BranchAddedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void branchRemoved(BranchRemovedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void pushed(PushEvent e)
 			{
 				eventsReceived.add(e);
 			}
@@ -255,7 +273,8 @@ public class GitRepositoryTest extends TestCase
 			if (event instanceof BranchChangedEvent)
 			{
 				BranchChangedEvent branchChangeEvent = (BranchChangedEvent) event;
-				if (branchChangeEvent.getOldBranchName().equals(oldName) && branchChangeEvent.getNewBranchName().equals(newName))
+				if (branchChangeEvent.getOldBranchName().equals(oldName)
+						&& branchChangeEvent.getNewBranchName().equals(newName))
 				{
 					return;
 				}
@@ -353,9 +372,9 @@ public class GitRepositoryTest extends TestCase
 		assertFalse(status.isOK());
 		assertEquals(1, status.getCode());
 		// Can't rely on the unmerged failure message from git to remain the same across versions.
-//		assertEquals(
-//				"error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
-//				status.getMessage());
+		// assertEquals(
+		// "error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
+		// status.getMessage());
 	}
 
 	protected IPath repoToGenerate()
