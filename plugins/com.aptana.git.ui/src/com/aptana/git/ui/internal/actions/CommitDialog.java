@@ -20,6 +20,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -89,6 +90,19 @@ public class CommitDialog extends StatusDialog
 		fLastDiffFile = null;
 	}
 
+	@Override
+	protected IDialogSettings getDialogBoundsSettings()
+	{
+		IDialogSettings compareSettings = GitUIPlugin.getDefault().getDialogSettings();
+		String sectionName = this.getClass().getName();
+		IDialogSettings dialogSettings = compareSettings.getSection(sectionName);
+		if (dialogSettings == null)
+		{
+			dialogSettings = compareSettings.addNewSection(sectionName);
+		}
+		return dialogSettings;
+	}
+	
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
