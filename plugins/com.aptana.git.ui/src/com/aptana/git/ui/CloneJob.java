@@ -66,14 +66,19 @@ public class CloneJob extends Job
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
 		try
 		{
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, subMonitor.newChild(100),
+					"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			if (launch == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+						"Was unable to launch git clone -- " + sourceURI + " " + dest));
+			}
 			while (!launch.isTerminated())
 			{
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
 				Thread.yield();
 			}
-			subMonitor.worked(100);
 			Collection<File> existingProjects = new ArrayList<File>();
 			if (!forceRootAsProject)
 			{
@@ -90,6 +95,8 @@ public class CloneJob extends Job
 				int step = 75 / existingProjects.size();
 				for (File file : existingProjects)
 				{
+					if (file == null)
+						continue;
 					createExistingProject(file, subMonitor.newChild(step));
 				}
 			}
@@ -155,11 +162,12 @@ public class CloneJob extends Job
 		}
 
 		// first look for project description files
-		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
 		for (int i = 0; i < contents.length; i++)
 		{
 			File file = contents[i];
-			if (file.isFile() && file.getName().equals(dotProject))
+			if (file == null)
+				continue;
+			if (file.isFile() && file.getName().equals(IProjectDescription.DESCRIPTION_FILE_NAME))
 			{
 				files.add(file);
 				// don't search sub-directories since we can't have nested
@@ -170,6 +178,8 @@ public class CloneJob extends Job
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++)
 		{
+			if (contents[i] == null)
+				continue;
 			if (contents[i].isDirectory())
 			{
 				if (!contents[i].getName().equals(METADATA_FOLDER))
@@ -241,9 +251,9 @@ public class CloneJob extends Job
 		}
 		finally
 		{
-			monitor.done();
+			if (monitor != null)
+				monitor.done();
 		}
-
 		return true;
 	}
 
