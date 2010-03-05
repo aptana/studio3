@@ -91,7 +91,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	private JSDocScanner docScanner;
 	private JSSingleQuotedStringScanner singleQuoteScanner;
 	private JSDoubleQuotedStringScanner doubleQuoteScanner;
-	private RuleBasedScanner regexpScanner;
+	private JSRegexpScanner regexpScanner;
 	private RuleBasedScanner multiLineCommentScanner;
 	private RuleBasedScanner singleLineCommentScanner;
 
@@ -231,8 +231,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 	{
 		if (regexpScanner == null)
 		{
-			regexpScanner = new RuleBasedScanner();
-			regexpScanner.setDefaultReturnToken(getToken("string.regexp.js")); //$NON-NLS-1$
+			regexpScanner = new JSRegexpScanner();
 		}
 		return regexpScanner;
 	}
