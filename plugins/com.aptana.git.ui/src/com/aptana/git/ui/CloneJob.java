@@ -2,6 +2,7 @@ package com.aptana.git.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,12 +67,17 @@ public class CloneJob extends Job
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
 		try
 		{
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+						Messages.CloneJob_UnableToFindGitExecutableError));
+			}
 			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, subMonitor.newChild(100),
 					"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			if (launch == null)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
-						"Was unable to launch git clone -- " + sourceURI + " " + dest));
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
+						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
 			}
 			while (!launch.isTerminated())
 			{
