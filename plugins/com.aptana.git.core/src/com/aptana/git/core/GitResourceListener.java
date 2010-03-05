@@ -37,6 +37,12 @@ class GitResourceListener implements IResourceChangeListener
 	 */
 	public void resourceChanged(IResourceChangeEvent event)
 	{
+		if (event.getType() == IResourceChangeEvent.PRE_DELETE)
+		{
+			IProject project = (IProject) event.getResource();
+			GitRepository.removeRepository(project);
+			return;			
+		}
 		final Set<GitRepository> resourcesToUpdate = new HashSet<GitRepository>();
 		final Set<IProject> projectsToAttach = new HashSet<IProject>();
 

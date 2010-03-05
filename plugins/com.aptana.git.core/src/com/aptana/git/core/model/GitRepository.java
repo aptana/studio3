@@ -182,7 +182,7 @@ public class GitRepository
 			// TODO Also listen for changes to "index" and force refresh of our model here? That way we don't have to
 			// call refresh after a bunch of the actions we take! Of course that means we assume filewatcher is fast and
 			// works on all platforms, which isn;t true for 64-bit Windows/Linux yet.
-			
+
 			// Add listener for changes in HEAD (i.e. switched branches)
 			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
 					false, new JNotifyListener()
@@ -945,12 +945,23 @@ public class GitRepository
 	public static void removeRepository(IProject p)
 	{
 		GitRepository repo = getUnattachedExisting(p.getLocationURI());
-		if (repo != null)
-			cachedRepos.remove(p.getLocationURI().getPath());
+		if (repo == null)
+			return;
+		cachedRepos.remove(p.getLocationURI().getPath());
 
 		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
 		for (IGitRepositoryListener listener : listeners)
 			listener.repositoryRemoved(e);
+
+		// Only dispose if there's no other projects attached to same repo!
+		for (SoftReference<GitRepository> ref : cachedRepos.values())
+		{
+			if (ref == null || ref.get() == null)
+				continue;
+			GitRepository other = ref.get();
+			if (other.equals(repo))
+				return;
+		}
 		repo.dispose();
 		repo = null;
 	}

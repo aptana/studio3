@@ -54,7 +54,7 @@ public class GitPlugin extends Plugin
 			{
 				fGitResourceListener = new GitResourceListener();
 				ResourcesPlugin.getWorkspace().addResourceChangeListener(fGitResourceListener,
-						IResourceChangeEvent.POST_CHANGE);
+						IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE);
 				fRepoListener = new GitProjectRefresher();
 				GitRepository.addListener(fRepoListener);
 				return Status.OK_STATUS;
