@@ -432,18 +432,22 @@ public class TerminalBrowser
 			this._fontChangeListener = null;
 		}
 
-		if (this._keyListener != null)
-		{
-			this._browser.removeKeyListener(this._keyListener);
-			this._keyListener = null;
-		}
-
 		try
 		{
-			if (this._browser != null)
+			if (this._browser != null && this._browser.isDisposed() == false)
 			{
+				if (this._keyListener != null)
+				{
+					this._browser.removeKeyListener(this._keyListener);
+					this._keyListener = null;
+				}
+				
 				this._browser.dispose();
 				this._browser = null;
+			}
+			else
+			{
+				this._keyListener = null;
 			}
 		}
 		catch (Exception e)
