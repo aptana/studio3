@@ -99,7 +99,7 @@ public class BundleTests extends BundleTestBase
 	{
 		this.compareScopedBundles(bundleName, prec1, prec2, command1, command2);
 
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(2, bundles.length);
 		entry.removeBundle(bundles[1]);
@@ -117,7 +117,7 @@ public class BundleTests extends BundleTestBase
 	{
 		super.setUp();
 
-		BundleManager.getInstance().reset();
+		BundleTestBase.getBundleManagerInstance().reset();
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class BundleTests extends BundleTestBase
 	{
 		// confirm first bundle loaded properly
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -364,7 +364,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
 		// get bundle entry
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 	}
 
@@ -377,7 +377,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry("bundleNameWithExtension.ruble", BundlePrecedence.PROJECT);
 
 		// get bundle entry
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleNameWithExtension");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleNameWithExtension");
 		assertNotNull(entry);
 	}
 
@@ -389,7 +389,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleDefinition";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
 		BundleElement[] bundles = entry.getBundles();
@@ -406,7 +406,7 @@ public class BundleTests extends BundleTestBase
 		String bundleName = "bundleDefinition2";
 		this.loadBundleEntry(bundleName, BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
 		BundleElement[] bundles = entry.getBundles();
@@ -422,7 +422,7 @@ public class BundleTests extends BundleTestBase
 	{
 		this.loadBundleEntry("bundleReference", BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("MyBundle");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("MyBundle");
 		assertNotNull(entry);
 
 		BundleElement[] bundles = entry.getBundles();
@@ -437,7 +437,7 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.APPLICATION);
 		this.loadBundleEntry("bundleWithCommandReference", BundlePrecedence.PROJECT);
 
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry("bundleWithCommand");
+		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 
 		BundleElement[] bundles = entry.getBundles();

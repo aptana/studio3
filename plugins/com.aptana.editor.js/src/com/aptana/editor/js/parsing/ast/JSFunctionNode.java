@@ -14,23 +14,6 @@ public class JSFunctionNode extends JSNode
 	}
 
 	@Override
-	public boolean equals(Object obj)
-	{
-		if (!super.equals(obj))
-			return false;
-		if (!(obj instanceof JSFunctionNode))
-			return false;
-
-		return getName().equals(((JSFunctionNode) obj).getName());
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return 31 * super.hashCode() + getName().hashCode();
-	}
-
-	@Override
 	public String getText()
 	{
 		return getName();

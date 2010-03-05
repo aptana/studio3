@@ -115,14 +115,17 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof JSOutlineItem))
+		{
 			return false;
-		return fReferenceNode.equals(((JSOutlineItem) obj).fReferenceNode);
+		}
+		JSOutlineItem other = (JSOutlineItem) obj;
+		return fLabel.equals(other.fLabel) && fReferenceNode.equals(other.fReferenceNode);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 + fReferenceNode.hashCode();
+		return 31 * fLabel.hashCode() + fReferenceNode.hashCode();
 	}
 
 	@Override

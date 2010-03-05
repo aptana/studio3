@@ -28,6 +28,7 @@ public class BundleManager
 {
 	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
+	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
 	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
 	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
 	static final MenuElement[] NO_MENUS = new MenuElement[0];
@@ -737,6 +738,11 @@ public class BundleManager
 			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 
 			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
+			
+			// look for templates inside "templates" directory
+			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
+
+			result.addAll(Arrays.asList(this.getScriptsFromDirectory(templatesDirectory)));
 		}
 
 		return result.toArray(new File[result.size()]);
@@ -767,6 +773,14 @@ public class BundleManager
 	 */
 	public CommandElement[] getCommands(IModelFilter filter)
 	{
+		// If the user specified a filter,
+		// AND it with the IsExecutableCommandFilter
+		// to filter the commands that are executable on
+		// current platform
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, new IsExecutableCommandFilter());
+		}
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		if (filter != null)

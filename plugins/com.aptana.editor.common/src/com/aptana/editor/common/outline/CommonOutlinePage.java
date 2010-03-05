@@ -6,6 +6,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -86,13 +88,23 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	{
 		super.createControl(parent);
 
-		TreeViewer viewer = getTreeViewer();
+		final TreeViewer viewer = getTreeViewer();
 		viewer.setAutoExpandLevel(2);
 		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
+		viewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+
+			@Override
+			public void doubleClick(DoubleClickEvent event)
+			{
+				// expands the selection one level if applicable
+				viewer.expandToLevel(((IStructuredSelection) event.getSelection()).getFirstElement(), 1);
+			}
+		});
 
 		hookToThemes();
 

@@ -11,6 +11,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(BundleTests.class);
 		suite.addTestSuite(CommandTests.class);
+		suite.addTestSuite(PlatformSpecificCommandTests.class);
 		suite.addTestSuite(ContextTests.class);
 		suite.addTestSuite(FilterTests.class);
 		suite.addTestSuite(KeyBindingTests.class);
