@@ -48,6 +48,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
@@ -329,7 +330,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	public void dispose()
 	{
 		GitRepository.removeListener(this);
-		
+
 		branchToPullIndicator = null;
 		if (pullCalc != null)
 		{
@@ -340,7 +341,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			refreshUIJob.cancel();
 			refreshUIJob = null;
-		}		
+		}
 		super.dispose();
 	}
 
@@ -395,6 +396,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						SubMonitor sub = SubMonitor.convert(monitor, 100);
 						try
 						{
+							if (GitExecutable.instance() == null)
+							{
+								throw new CoreException(
+										new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
+												Messages.GitProjectView_UnableToFindGitExecutableError));
+							}
+
 							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
 							if (repo == null)
 							{
@@ -409,6 +417,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						}
 						catch (CoreException e)
 						{
+							ExplorerPlugin.logError(e);
 							return e.getStatus();
 						}
 						finally
