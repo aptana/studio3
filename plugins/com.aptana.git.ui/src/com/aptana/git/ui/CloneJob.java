@@ -2,7 +2,6 @@ package com.aptana.git.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -95,12 +94,14 @@ public class CloneJob extends Job
 				}
 			}
 		}
-		catch (InvocationTargetException e)
+		catch (CoreException e)
 		{
-			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
+			GitUIPlugin.logError(e);
+			return e.getStatus();
 		}
-		catch (InterruptedException e)
+		catch (Throwable e)
 		{
+			GitUIPlugin.logError(e.getMessage(), e);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -147,6 +148,7 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
+				GitUIPlugin.logError(exception.getMessage(), exception);
 				StatusManager.getManager().handle(
 						StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
 			}
@@ -183,6 +185,7 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
+						GitUIPlugin.logError(exception.getMessage(), exception);
 						StatusManager.getManager().handle(
 								StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
 
@@ -200,11 +203,9 @@ public class CloneJob extends Job
 	 * @param record
 	 * @param monitor
 	 * @return boolean <code>true</code> if successful
-	 * @throws InvocationTargetException
-	 * @throws InterruptedException
+	 * @throws CoreException
 	 */
-	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws InvocationTargetException,
-			InterruptedException
+	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws CoreException
 	{
 		try
 		{
@@ -237,10 +238,6 @@ public class CloneJob extends Job
 				return false;
 			ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
 			connectProviderOperation.run(new SubProgressMonitor(monitor, 20));
-		}
-		catch (CoreException e)
-		{
-			throw new InvocationTargetException(e);
 		}
 		finally
 		{
