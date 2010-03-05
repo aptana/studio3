@@ -2,7 +2,7 @@ package com.aptana.git.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,14 +67,24 @@ public class CloneJob extends Job
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 200);
 		try
 		{
-			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+						Messages.CloneJob_UnableToFindGitExecutableError));
+			}
+			ILaunch launch = Launcher.launch(GitExecutable.instance().path(), null, subMonitor.newChild(100),
+					"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+			if (launch == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
+						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
+			}
 			while (!launch.isTerminated())
 			{
 				if (subMonitor.isCanceled())
 					return Status.CANCEL_STATUS;
 				Thread.yield();
 			}
-			subMonitor.worked(100);
 			Collection<File> existingProjects = new ArrayList<File>();
 			if (!forceRootAsProject)
 			{
@@ -91,16 +101,20 @@ public class CloneJob extends Job
 				int step = 75 / existingProjects.size();
 				for (File file : existingProjects)
 				{
+					if (file == null)
+						continue;
 					createExistingProject(file, subMonitor.newChild(step));
 				}
 			}
 		}
-		catch (InvocationTargetException e)
+		catch (CoreException e)
 		{
-			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
+			GitUIPlugin.logError(e);
+			return e.getStatus();
 		}
-		catch (InterruptedException e)
+		catch (Throwable e)
 		{
+			GitUIPlugin.logError(e.getMessage(), e);
 			return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
 		}
 		finally
@@ -147,17 +161,19 @@ public class CloneJob extends Job
 			}
 			catch (IOException exception)
 			{
+				GitUIPlugin.logError(exception.getMessage(), exception);
 				StatusManager.getManager().handle(
 						StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
 			}
 		}
 
 		// first look for project description files
-		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
 		for (int i = 0; i < contents.length; i++)
 		{
 			File file = contents[i];
-			if (file.isFile() && file.getName().equals(dotProject))
+			if (file == null)
+				continue;
+			if (file.isFile() && file.getName().equals(IProjectDescription.DESCRIPTION_FILE_NAME))
 			{
 				files.add(file);
 				// don't search sub-directories since we can't have nested
@@ -168,6 +184,8 @@ public class CloneJob extends Job
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++)
 		{
+			if (contents[i] == null)
+				continue;
 			if (contents[i].isDirectory())
 			{
 				if (!contents[i].getName().equals(METADATA_FOLDER))
@@ -183,6 +201,7 @@ public class CloneJob extends Job
 					}
 					catch (IOException exception)
 					{
+						GitUIPlugin.logError(exception.getMessage(), exception);
 						StatusManager.getManager().handle(
 								StatusUtil.newStatus(IStatus.ERROR, exception.getLocalizedMessage(), exception));
 
@@ -200,11 +219,9 @@ public class CloneJob extends Job
 	 * @param record
 	 * @param monitor
 	 * @return boolean <code>true</code> if successful
-	 * @throws InvocationTargetException
-	 * @throws InterruptedException
+	 * @throws CoreException
 	 */
-	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws InvocationTargetException,
-			InterruptedException
+	private boolean createExistingProject(final File dest, IProgressMonitor monitor) throws CoreException
 	{
 		try
 		{
@@ -238,15 +255,11 @@ public class CloneJob extends Job
 			ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
 			connectProviderOperation.run(new SubProgressMonitor(monitor, 20));
 		}
-		catch (CoreException e)
-		{
-			throw new InvocationTargetException(e);
-		}
 		finally
 		{
-			monitor.done();
+			if (monitor != null)
+				monitor.done();
 		}
-
 		return true;
 	}
 

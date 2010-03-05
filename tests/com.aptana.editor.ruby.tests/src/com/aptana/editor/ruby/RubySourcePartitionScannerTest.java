@@ -61,6 +61,12 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assert (true);
 	}
 
+	public void testDivideAndRegexInHeredocInterpolation()
+	{
+		getContentType("test.execute <<END\n" + "#{/[0-9]+/ / 5}\n" + "END", 0);
+		assert (true);
+	}
+
 	public void testPartitioningOfSingleLineComment()
 	{
 		String source = "# This is a comment\n";

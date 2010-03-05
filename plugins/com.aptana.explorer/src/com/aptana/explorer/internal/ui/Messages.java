@@ -32,6 +32,8 @@ public class Messages extends NLS
 	public static String GitProjectView_StashJobTitle;
 	public static String GitProjectView_StashTooltip;
 	public static String GitProjectView_SwitchToBranch;
+	public static String GitProjectView_UnableToFindGitExecutableError;
+
 	public static String GitProjectView_UnresolvedMerges_msg;
 	public static String GitProjectView_UnstashJobTitle;
 	public static String GitProjectView_UnstashTooltip;

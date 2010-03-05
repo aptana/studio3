@@ -13,9 +13,9 @@ public class PullAction extends SimpleGitCommandAction
 	@Override
 	protected void postLaunch()
 	{
-		// Refresh the in-memory index of the repo!
 		getSelectedRepository().firePullEvent();
+		// Refresh the in-memory index of the repo!
 		refreshRepoIndex();		
-		refreshAffectedProjects();
+//		refreshAffectedProjects(); Handled by GitProjectRefresher
 	}
 }

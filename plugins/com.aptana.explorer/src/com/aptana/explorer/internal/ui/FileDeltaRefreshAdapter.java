@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.explorer.ExplorerPlugin;
+
 class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
 	private WorkspaceJob job;
@@ -94,17 +96,22 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 						if (refreshing instanceof IContainer)
 						{
 							IContainer container = (IContainer) refreshing;
-							if (container.getLocation().isPrefixOf(resource.getLocation()))
+							if (resource.getLocation() != null && container.getLocation().isPrefixOf(resource.getLocation()))
 							{
-								// We already have an ancestor in the map. If it's refreshing infinitely don't add this resource
+								// We already have an ancestor in the map. If it's refreshing infinitely don't add this
+								// resource
 								if (toRefresh.get(container) == IResource.DEPTH_INFINITE)
 									return;
 							}
 						}
 					}
-					toRefresh.put(resource, depth); 
+					toRefresh.put(resource, depth);
 				}
 			}
+		}
+		catch (Throwable e)
+		{
+			ExplorerPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -115,8 +122,9 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	@Override
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		String pathString = rootPath + (name.length() > 0 ?  Path.SEPARATOR + name : ""); //$NON-NLS-1$
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(new Path(pathString).removeLastSegments(1));
+		String pathString = rootPath + (name.length() > 0 ? Path.SEPARATOR + name : ""); //$NON-NLS-1$
+		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(
+				new Path(pathString).removeLastSegments(1));
 		addToRefreshList(resource, IResource.DEPTH_ONE);
 	}
 

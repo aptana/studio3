@@ -15,8 +15,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
@@ -34,6 +36,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -99,6 +102,12 @@ class ExistingOrNewPage extends WizardPage
 				File gitDir = new File(repositoryToCreate.getText(), GitRepository.GIT_DIR);
 				try
 				{
+					if (GitExecutable.instance() == null)
+					{
+						throw new CoreException(
+								new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
+										Messages.ExistingOrNewPage_UnabletoFindGitExecutableError));
+					}
 					GitRepository.create(gitDir.getParentFile().getAbsolutePath());
 					for (IProject project : getProjects())
 					{
@@ -117,7 +126,8 @@ class ExistingOrNewPage extends WizardPage
 				}
 				catch (CoreException e2)
 				{
-					GitUIPlugin.logError(NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir), e2);
+					GitUIPlugin.logError(NLS.bind(Messages.ExistingOrNewPage_ErrorFailedToRefreshRepository, gitDir),
+							e2);
 				}
 				for (TreeItem ti : tree.getSelection())
 				{

@@ -22,6 +22,18 @@ public abstract class AbstractGitRepositoryListener implements IGitRepositoryLis
 	}
 
 	@Override
+	public void branchAdded(BranchAddedEvent e)
+	{
+		// do nothing
+	}
+
+	@Override
+	public void branchRemoved(BranchRemovedEvent e)
+	{
+		// do nothing
+	}
+
+	@Override
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 		// do nothing
@@ -29,6 +41,12 @@ public abstract class AbstractGitRepositoryListener implements IGitRepositoryLis
 
 	@Override
 	public void pulled(PullEvent e)
+	{
+		// do nothing
+	}
+
+	@Override
+	public void pushed(PushEvent e)
 	{
 		// do nothing
 	}
