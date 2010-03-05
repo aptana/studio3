@@ -128,7 +128,7 @@ public class TerminalBrowser
 		this._startingDirectory = startingDirectory;
 		this._id = UUID.randomUUID().toString();
 	}
-
+	
 	/**
 	 * addFontChangeListener
 	 */
@@ -432,11 +432,7 @@ public class TerminalBrowser
 			this._fontChangeListener = null;
 		}
 
-		if (this._keyListener != null)
-		{
-			this._browser.removeKeyListener(this._keyListener);
-			this._keyListener = null;
-		}
+		// NOTE: we don't need to remove the key listener from the browser
 
 		try
 		{
