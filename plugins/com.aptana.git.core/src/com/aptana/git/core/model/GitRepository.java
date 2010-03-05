@@ -22,6 +22,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.contentobjects.jnotify.IJNotify;
+import net.contentobjects.jnotify.JNotifyException;
+import net.contentobjects.jnotify.JNotifyListener;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +37,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.TeamException;
 
+import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
@@ -56,6 +61,7 @@ public class GitRepository
 	private GitIndex index;
 	private boolean hasChanged;
 	GitRevSpecifier currentBranch;
+	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
 
 	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
 
@@ -171,6 +177,99 @@ public class GitRepository
 		this.branches = new ArrayList<GitRevSpecifier>();
 		reloadRefs();
 		readCurrentBranch();
+		try
+		{
+			// TODO Also listen for changes to "index" and force refresh of our model here? That way we don't have to
+			// call refresh after a bunch of the actions we take! Of course that means we assume filewatcher is fast and
+			// works on all platforms, which isn;t true for 64-bit Windows/Linux yet.
+
+			// Add listener for changes in HEAD (i.e. switched branches)
+			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
+					false, new JNotifyListener()
+					{
+
+						@Override
+						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						{
+							if (newName == null || !newName.equals(HEAD))
+								return;
+							checkForBranchChange();
+						}
+
+						@Override
+						public void fileModified(int wd, String rootPath, String name)
+						{
+							if (name == null || !name.equals(HEAD))
+								return;
+							checkForBranchChange();
+						}
+
+						protected void checkForBranchChange()
+						{
+							String oldBranchName = currentBranch.simpleRef().shortName();
+							_headRef = null;
+							readCurrentBranch();
+							String newBranchName = currentBranch.simpleRef().shortName();
+							if (oldBranchName.equals(newBranchName))
+								return;
+							fireBranchChangeEvent(oldBranchName, newBranchName);
+						}
+
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							// ignore, should never happen
+						}
+
+						@Override
+						public void fileCreated(int wd, String rootPath, String name)
+						{
+							// ignore, should never happen
+						}
+					}));
+			// Add listener for added/removed branches
+			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_CREATED
+					| IJNotify.FILE_DELETED, false, new JNotifyListener()
+			{
+
+				@Override
+				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+				{
+					// ignore, should never happen
+				}
+
+				@Override
+				public void fileModified(int wd, String rootPath, String name)
+				{
+					// ignore, should never happen
+				}
+
+				@Override
+				public void fileDeleted(int wd, String rootPath, String name)
+				{
+					// Remove branch in model!
+					branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+				}
+
+				@Override
+				public void fileCreated(int wd, String rootPath, String name)
+				{
+					// a branch has been added
+					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+					// Check if our HEAD changed
+					String oldBranchName = currentBranch.simpleRef().shortName();
+					if (oldBranchName.equals(name))
+						return;
+					_headRef = null;
+					readCurrentBranch();
+					fireBranchChangeEvent(oldBranchName, name);
+				}
+			}));
+		}
+		catch (JNotifyException e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+		}
 	}
 
 	public String workingDirectory()
@@ -320,9 +419,8 @@ public class GitRepository
 			if (rev.equals(r))
 				return r;
 
-		// willChangeValueForKey("branches");
 		branches.add(rev);
-		// didChangeValueForKey("branches");
+		// TODO Fire a branchAddedEvent?
 		return rev;
 	}
 
@@ -847,12 +945,47 @@ public class GitRepository
 	public static void removeRepository(IProject p)
 	{
 		GitRepository repo = getUnattachedExisting(p.getLocationURI());
-		if (repo != null)
-			cachedRepos.remove(p.getLocationURI().getPath());
+		if (repo == null)
+			return;
+		cachedRepos.remove(p.getLocationURI().getPath());
 
 		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
 		for (IGitRepositoryListener listener : listeners)
 			listener.repositoryRemoved(e);
+
+		// Only dispose if there's no other projects attached to same repo!
+		for (SoftReference<GitRepository> ref : cachedRepos.values())
+		{
+			if (ref == null || ref.get() == null)
+				continue;
+			GitRepository other = ref.get();
+			if (other.equals(repo))
+				return;
+		}
+		repo.dispose();
+		repo = null;
+	}
+
+	private void dispose()
+	{
+		// clean up any listeners/etc!
+		for (Integer fileWatcherId : fileWatcherIds)
+		{
+			try
+			{
+				FileWatcher.removeWatch(fileWatcherId);
+			}
+			catch (JNotifyException e)
+			{
+				GitPlugin.logError(e.getMessage(), e);
+			}
+		}
+		fileWatcherIds = null;
+		_headRef = null;
+		hasChanged = false;
+		index = null;
+		refs = null;
+		branches = null;
 	}
 
 	public boolean hasUnresolvedMergeConflicts()
@@ -915,6 +1048,28 @@ public class GitRepository
 		PullEvent e = new PullEvent(this);
 		for (IGitRepositoryListener listener : listeners)
 			listener.pulled(e);
+	}
+
+	public void firePushEvent()
+	{
+		PushEvent e = new PushEvent(this);
+		for (IGitRepositoryListener listener : listeners)
+			listener.pushed(e);
+	}
+
+	/**
+	 * Used to clean up all the repos from memory when plugin stops.
+	 */
+	public static void cleanup()
+	{
+		for (SoftReference<GitRepository> reference : cachedRepos.values())
+		{
+			if (reference == null || reference.get() == null)
+				continue;
+			GitRepository cachedRepo = reference.get();
+			cachedRepo.dispose();
+		}
+		cachedRepos.clear();
 	}
 
 }

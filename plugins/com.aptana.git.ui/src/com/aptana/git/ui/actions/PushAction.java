@@ -16,6 +16,7 @@ public class PushAction extends SimpleGitCommandAction
 	@Override
 	protected void postLaunch()
 	{
+		getSelectedRepository().firePushEvent();
 		refreshRepoIndex();
 	}
 

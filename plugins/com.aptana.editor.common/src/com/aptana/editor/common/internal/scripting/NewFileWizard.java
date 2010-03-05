@@ -10,6 +10,7 @@ import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 
+@SuppressWarnings("restriction")
 public class NewFileWizard extends BasicNewFileResourceWizard
 {
 

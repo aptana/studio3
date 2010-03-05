@@ -31,11 +31,22 @@ import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.HasTriggerFilter;
+import com.aptana.scripting.model.OutputType;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
+
+	private static class TextFontStyler extends Styler
+	{
+		public void applyStyles(TextStyle textStyle)
+		{
+			textStyle.font = JFaceResources.getTextFont();
+		}
+	}
+
+	private static Styler FIXED_WIDTH_STYLER = new TextFontStyler();
 
 	public SnippetsCompletionProcessor()
 	{
@@ -65,11 +76,13 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	@Override
 	protected Image getImage(Template template)
 	{
-		if (template instanceof CommandTemplate)
+		if (template instanceof SnippetTemplate ||
+				(template instanceof CommandTemplate &&
+						OutputType.INSERT_AS_SNIPPET.getName().equals(((CommandTemplate) template).getCommandElement().getOutputType())))
 		{
-			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND);
+			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
 		}
-		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
+		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND);
 	}
 
 	@Override
@@ -153,7 +166,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 						String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
 
 				styledString.append(new StyledString(
-						String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$ //$NON-NLS-2$
+						String.format("%1$10.10s ", template.getName() + "\u00bb"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (i < 9)
 				{
@@ -235,30 +248,4 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 	}
 
-	private static class CustomStyler extends Styler
-	{
-		private static String fForegroundColorName;
-
-		CustomStyler()
-		{
-			this(null);
-		}
-
-		CustomStyler(String foregroundColorName)
-		{
-			fForegroundColorName = foregroundColorName;
-		}
-
-		public void applyStyles(TextStyle textStyle)
-		{
-			if (fForegroundColorName != null)
-			{
-				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
-			}
-
-			textStyle.font = JFaceResources.getTextFont();
-		}
-	}
-
-	private static Styler FIXED_WIDTH_STYLER = new CustomStyler();
 }

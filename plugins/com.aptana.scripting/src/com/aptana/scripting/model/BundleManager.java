@@ -773,6 +773,14 @@ public class BundleManager
 	 */
 	public CommandElement[] getCommands(IModelFilter filter)
 	{
+		// If the user specified a filter,
+		// AND it with the IsExecutableCommandFilter
+		// to filter the commands that are executable on
+		// current platform
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, new IsExecutableCommandFilter());
+		}
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		if (filter != null)

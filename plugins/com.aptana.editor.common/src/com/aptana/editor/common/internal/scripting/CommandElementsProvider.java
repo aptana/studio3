@@ -18,6 +18,7 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.IModelFilter;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
@@ -51,8 +52,8 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		try
 		{
 			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
-			ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
-			
+			IModelFilter filter = new ScopeFilter(contentTypeAtOffset);
+
 			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 			for (CommandElement commandElement : commandsFromScope)
 			{
