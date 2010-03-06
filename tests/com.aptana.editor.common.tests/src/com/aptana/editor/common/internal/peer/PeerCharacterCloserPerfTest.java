@@ -1,16 +1,14 @@
 package com.aptana.editor.common.internal.peer;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 
-public class PeerCharacterCloserPerf
+public class PeerCharacterCloserPerfTest extends TestCase
 {
 
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) throws Exception
+	public void testTime() throws Exception
 	{
 		char[] pairs = new char[] { '(', ')', '"', '"' };
 		PeerCharacterCloser closer = new PeerCharacterCloser(null, pairs);
@@ -27,7 +25,7 @@ public class PeerCharacterCloserPerf
 		IDocument document = new Document(builder.toString());
 		builder = null;
 		int offset = times * 10;
-		int iterations = 1000;
+		int iterations = 5;
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < iterations; i++)
 		{
