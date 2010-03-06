@@ -30,7 +30,7 @@ public class RubyParserTest extends TestCase
 		fParseState.clearEditState();
 	}
 
-	public void testClass() throws Exception
+	public void testClassWithFieldAndMethod() throws Exception
 	{
 		String source = "class Person\n\tattr_reader :name, :age\n\tdef initialize(name, age)\n\t\t@name, @age = name, age\n\tend\nend";
 		fParseState.setEditState(source, source, 0, 0);
@@ -46,6 +46,63 @@ public class RubyParserTest extends TestCase
 		assertFields(rubyClass, new String[] { "@:name", "@:age", "@name", "@age" });
 		// checks methods
 		assertMethods(rubyClass, new String[] { "name()", "age()", "initialize(name, age)" });
+	}
+
+	public void testModuleWithConst() throws Exception
+	{
+		String source = "module Mod\n\tinclude Math\n\tCONST = 1\nend";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length); // one module declaration
+		assertEquals(IRubyElement.TYPE, children[0].getType());
+		IRubyType module = (IRubyType) children[0];
+		assertEquals(false, module.isClass());
+		assertEquals(true, module.isModule());
+		assertEquals("Mod", children[0].toString()); // module name
+
+		assertFields(module, new String[] { "CONST" });
+	}
+
+	public void testRequire() throws Exception
+	{
+		String source = "require 'yaml'";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length); // the container for require/load statements
+		assertEquals(IRubyElement.IMPORT_CONTAINER, children[0].getType());
+
+		IParseNode[] imports = children[0].getChildren();
+		assertEquals(1, imports.length); // one require statement
+		assertEquals(IRubyElement.IMPORT_DECLARATION, imports[0].getType());
+		assertEquals("yaml", imports[0].toString());
+	}
+
+	public void testGlobalVar() throws Exception
+	{
+		String source = "$foo = 5";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length); // one global variable
+		assertEquals(IRubyElement.GLOBAL, children[0].getType());
+		assertEquals("$foo", children[0].toString());
+	}
+
+	public void testClassVar() throws Exception
+	{
+		String source = "@@foo = 5";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		assertEquals(1, children.length); // one global variable
+		assertEquals(IRubyElement.CLASS_VAR, children[0].getType());
+		assertEquals("@@foo", children[0].toString());
 	}
 
 	private void assertFields(IRubyType rubyClass, String[] fieldNames)
