@@ -100,14 +100,13 @@ public class SnippetTemplateTranslatorTest extends TestCase
 				"${TM_SELECTED_TEXT:environment('in case there is no slection')}");
 	}
 
-	public void testENDVariableWithMultipleDefaultValues()
+	public void testENVVariableWithMultipleDefaultValues()
 	{
 		assertTranslatesTo("${TM_SELECTED_TEXT:alt selection1/alt selection2}",
 				"${TM_SELECTED_TEXT:environment('alt selection1','alt selection2')}");
 	}
 
 	// escapes!
-
 	public void testEscapedBackticks()
 	{
 		assertTranslatesTo("# vars = \\`find cookbooks\\`${0}", "# vars = `find cookbooks`${cursor}");
@@ -139,16 +138,17 @@ public class SnippetTemplateTranslatorTest extends TestCase
 	{
 		assertTranslatesTo("${1:\\/*body {height:10em;\\}*\\/}", "${1:tabstop('/*body {height:10em;}*/')}");
 	}
-	
+
+	public void testMultilineContentInTabstopValue()
+	{
+		assertTranslatesTo("${1:# test.execute <<END\n" + "#   WHEN a > 2 THEN DO SOMETHING\n" + "# END\n" + "}",
+				"${1:tabstop('# test.execute <<END\n" + "#   WHEN a > 2 THEN DO SOMETHING\n" + "# END\n" + "')}");
+	}
+
 	public void testMultilineContentWithEscapedEndCurlyInTabstopValueRR3_160()
 	{
-		assertTranslatesTo("${1:# test.execute <<END\n" +
-		"#   WHEN a > 2 THEN #{a\\}\n" +
-		"# END\n" +
-		"}", "${1:tabstop('# test.execute <<END\n" +
-		"#   WHEN a > 2 THEN #{a\\}\n" +
-		"# END\n" +
-		"}')");
+		assertTranslatesTo("${1:# test.execute <<END\n" + "#   WHEN a > 2 THEN #{a\\}\n" + "# END\n" + "}",
+				"${1:tabstop('# test.execute <<END\n" + "#   WHEN a > 2 THEN #{a}\n" + "# END\n" + "')}");
 	}
 
 	private void assertTranslatesTo(String input, String expected)
