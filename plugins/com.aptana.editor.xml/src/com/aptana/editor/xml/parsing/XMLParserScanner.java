@@ -65,7 +65,16 @@ public class XMLParserScanner extends Scanner
 
 	private boolean isIgnored(IToken token)
 	{
-		// ignores the whitespace by default
-		return token.isWhitespace();
+		// ignores the whitespace and comments by default
+		if (token.isWhitespace())
+		{
+			return true;
+		}
+		Object data = token.getData();
+		if (data == null)
+		{
+			return false;
+		}
+		return data.equals(XMLToken.COMMENT);
 	}
 }
