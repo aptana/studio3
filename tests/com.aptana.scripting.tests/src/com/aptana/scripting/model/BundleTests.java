@@ -280,6 +280,7 @@ public class BundleTests extends BundleTestBase
 		// confirm first bundle loaded properly
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
+		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
