@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -685,8 +686,20 @@ public class GitRepository
 		// Parse out the sha and compare vs the branch's local sha!
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote",
 				remote.getRemoteName(), remote.getRemoteBranchName());
+		if (output == null || output.length() < 40)
+		{
+			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote {0} {1}: {2}", remote
+					.getRemoteName(), remote.getRemoteBranchName(), output));
+			return false;
+		}
 		String remoteSHA = output.substring(0, 40);
 		output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote", ".", "heads/" + branchName);
+		if (output == null || output.length() < 40)
+		{
+			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote . heads/{0}: {1}",
+					branchName, output));
+			return false;
+		}
 		String localSHA = output.substring(0, 40);
 		return !localSHA.equals(remoteSHA);
 	}
