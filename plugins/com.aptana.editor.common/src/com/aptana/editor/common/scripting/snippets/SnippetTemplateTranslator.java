@@ -28,8 +28,8 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 	private static final String NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING = "\\$([\\p{Alnum}_]+)"; //$NON-NLS-1$
 	private static final Pattern NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN = Pattern
 			.compile(NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING);
-	private static final String CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING = "\\$\\{" + SPACES + "([\\p{Alnum}_]+)" + SPACES + "(:([^\\}]+))?\\}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+	
+	private static final String CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING = "\\$\\{" + SPACES + "([\\p{Alnum}_]+)" + SPACES + "(:.+?)?(?<!\\\\)\\}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Pattern CURLY_BRACE_SNIPPET_VARIABLE_PATTERN = Pattern
 			.compile(CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING);
 
@@ -113,9 +113,11 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 								// It is an environment variable
 								buffer.append(name + COLON + EnvironmentVariableVariableResolver.VARIABLE_TYPE);
 							}
-							String defaultValues = m.group(3);
+							String defaultValues = m.group(2);
 							if (defaultValues != null)
 							{
+								if (defaultValues.startsWith(":")) //$NON-NLS-1$
+									defaultValues = defaultValues.substring(1);
 								buffer.append("("); //$NON-NLS-1$
 								boolean first = true;
 								// We want to split on non-escaped '/'
@@ -130,7 +132,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 									{
 										buffer.append(","); //$NON-NLS-1$
 									}
-									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/") + SINGLE_QUOTE); //$NON-NLS-1$ //$NON-NLS-2$
+									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/").replaceAll("\\\\}", "\\}") + SINGLE_QUOTE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 								}
 								buffer.append(")"); //$NON-NLS-1$
 							}
