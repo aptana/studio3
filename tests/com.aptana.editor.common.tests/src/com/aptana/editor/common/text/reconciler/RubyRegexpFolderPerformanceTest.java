@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -14,10 +16,10 @@ import org.eclipse.jface.text.Position;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
 
-public class RubyRegexpFolderPerformance
+public class RubyRegexpFolderPerformanceTest extends TestCase
 {
 
-	public static void main(String[] args) throws Exception
+	public void testTime() throws Exception
 	{
 		Ruby runtime = Ruby.newInstance();
 		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", 0);
@@ -62,7 +64,7 @@ public class RubyRegexpFolderPerformance
 
 	protected static String readFile(String fileName) throws IOException
 	{
-		InputStream stream = RubyRegexpFolderPerformance.class.getResourceAsStream(fileName);
+		InputStream stream = RubyRegexpFolderPerformanceTest.class.getResourceAsStream(fileName);
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)

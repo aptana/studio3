@@ -51,7 +51,8 @@ public class JSRegexpScanner extends BufferedRuleBasedScanner
 	public JSRegexpScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
-		rules.add(new RegexpRule("\\\\.", getToken("constant.character.escape.js"))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new RegexpRule("\\\\(x[0-9a-fA-F]{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)", //$NON-NLS-1$
+				getToken("constant.character.escape.js"))); //$NON-NLS-1$
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(getToken("string.regexp.js")); //$NON-NLS-1$
 	}

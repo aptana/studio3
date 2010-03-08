@@ -8,6 +8,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.IModelFilter;
@@ -53,13 +54,26 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (getFileName().matches(pattern))
 				{
-					CommandResult result = template.execute();
+					CommandContext context = template.createCommandContext();
+					context.getMap().put("TM_NEW_FILE_BASENAME", getFileBaseName()); //$NON-NLS-1$
+					CommandResult result = template.execute(context);
 					String output = result.getOutputString();
 					return new ByteArrayInputStream(output.getBytes());
 				}
 			}
 		}
 		return super.getInitialContents();
+	}
+
+	private String getFileBaseName()
+	{
+		String filename = getFileName();
+		int index = filename.indexOf('.');
+		if (index != -1)
+		{
+			return filename.substring(0, index);
+		}
+		return filename;
 	}
 
 }

@@ -108,6 +108,12 @@ public class GitPlugin extends Plugin
 	{
 		getDefault().getLog().log(e.getStatus());
 	}
+	
+	public static void logWarning(String warning)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
+	}
 
 	public static void logInfo(String string)
 	{
