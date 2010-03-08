@@ -42,6 +42,7 @@ public class PlatformSpecificCommandTests extends BundleTestBase
 		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
 
 		assertNotNull(commands);
+		assertTrue(commands.length > 0);
 
 		assertEquals("implicitAllPlatformString", executeCommand(commands[0]));
 		assertEquals("explicitAllPlatformString", executeCommand(commands[1]));
