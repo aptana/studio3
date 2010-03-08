@@ -290,7 +290,12 @@ public class MenuElement extends AbstractBundleElement
 	protected void printBody(SourcePrinter printer)
 	{
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
+		
+		if (this.getScopeSelector() != null)
+		{
+			printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
+		}
+		
 		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
 
 		synchronized (childrenLock)

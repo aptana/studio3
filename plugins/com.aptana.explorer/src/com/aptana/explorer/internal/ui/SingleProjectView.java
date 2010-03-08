@@ -150,6 +150,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
 		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
+		branchComboData.minimumWidth = 24;
 		commandsToolBar.setLayoutData(branchComboData);
 			
 		commandsToolItem.addSelectionListener(new SelectionAdapter()

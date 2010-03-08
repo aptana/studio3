@@ -10,7 +10,14 @@ module Ruble
       end
 
       def add_bundle(bundle)
+        java_object = bundle.java_object
+        
+        # add to Java bundle manager
         manager.add_bundle(bundle.java_object)
+        
+        # use the instance on the Java side now
+        path = java_object.bundle_directory.absolute_path
+        @@bundles_by_path.delete(path)
       end
       
       def bundle_from_path(path)
@@ -28,15 +35,15 @@ module Ruble
         # commands/snippets if we're in a different runtime
         if bundle.nil?
           test_path = (File.directory? path) ? path : File.dirname(path)
-          bundle = manager.get_bundle_from_path(test_path)
+          java_bundle = manager.get_bundle_from_path(test_path)
           
           # else try parent
-          if bundle.nil?
+          if java_bundle.nil?
             test_path = File.dirname test_path
-            bundle = manager.get_bundle_from_path(test_path)
+            java_bundle = manager.get_bundle_from_path(test_path)
           end
           
-          bundle = Bundle.new(bundle) unless bundle.nil?
+          bundle = Bundle.new(java_bundle) unless java_bundle.nil?
         end
         
         return bundle

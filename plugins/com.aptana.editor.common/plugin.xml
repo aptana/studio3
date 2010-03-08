@@ -203,4 +203,34 @@
          </selection>
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="com.aptana.editor.common.internal.commands.NextEditorHandler"
+            id="com.aptana.editor.NextEditorCommand"
+            name="%command.NextEditorNoPrompt">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="com.aptana.editor.common.internal.commands.PreviousEditorHandler"
+            id="com.aptana.editor.PreviousEditorCommand"
+            name="%command.PreviousEditorNoPrompt">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.editor.NextEditorCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+TAB">
+      </key>
+      <key
+            commandId="com.aptana.editor.PreviousEditorCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+SHIFT+TAB">
+      </key>
+   </extension>
 </plugin>

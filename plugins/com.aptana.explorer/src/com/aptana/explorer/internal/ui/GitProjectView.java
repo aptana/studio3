@@ -400,9 +400,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						{
 							if (GitExecutable.instance() == null)
 							{
-								throw new CoreException(
-										new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
-												Messages.GitProjectView_UnableToFindGitExecutableError));
+								throw new CoreException(new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
+										Messages.GitProjectView_UnableToFindGitExecutableError));
 							}
 
 							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
@@ -975,7 +974,25 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 			});
 			if (branchName.equals(currentBranchName))
-				currentBranchName = modifiedBranchName;
+			{
+				if (modifiedBranchName.length() > 20)
+				{
+					// truncate the current branch name and append the indicators
+					if (!currentBranchName.equals(modifiedBranchName))
+					{
+						currentBranchName = currentBranchName.substring(0, 15) + "..." //$NON-NLS-1$
+								+ modifiedBranchName.substring(currentBranchName.length());
+					}
+					else
+					{
+						currentBranchName = currentBranchName.substring(0, 15) + "..."; //$NON-NLS-1$
+					}
+				}
+				else
+				{
+					currentBranchName = modifiedBranchName;
+				}
+			}
 		}
 
 		if (monitor != null && monitor.isCanceled())
@@ -1010,7 +1027,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			pullCalc.schedule();
 		}
 	}
-	
+
 	@Override
 	public void pushed(PushEvent e)
 	{
