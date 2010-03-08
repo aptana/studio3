@@ -29,7 +29,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 	private static final Pattern NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN = Pattern
 			.compile(NON_CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING);
 	
-	private static final String CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING = "\\$\\{" + SPACES + "([\\p{Alnum}_]+)" + SPACES + "(:.+?)?(?<!\\\\)\\}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	private static final String CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING = "\\$\\{" + SPACES + "([\\p{Alnum}_]+)" + SPACES + "(:((?:\\\\.|[^}])+))?\\}"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final Pattern CURLY_BRACE_SNIPPET_VARIABLE_PATTERN = Pattern
 			.compile(CURLY_BRACE_SNIPPET_VARIABLE_PATTERN_STRING);
 
