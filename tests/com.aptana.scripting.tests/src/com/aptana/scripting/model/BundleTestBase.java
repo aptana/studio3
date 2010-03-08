@@ -28,11 +28,11 @@ public abstract class BundleTestBase extends TestCase
 	private static File getFile(IPath path)
 	{
 		File bundleFile = null;
-		
+
 		try
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
-			
+
 			url = FileLocator.toFileURL(url);
 			bundleFile = new File(url.toURI());
 		}
@@ -44,13 +44,13 @@ public abstract class BundleTestBase extends TestCase
 		{
 			fail(e.getMessage());
 		}
-		
+
 		assertNotNull(bundleFile);
 		assertTrue(bundleFile.exists());
-		
+
 		return bundleFile;
 	}
-	
+
 	/**
 	 * getBundleEntry
 	 * 
@@ -61,14 +61,14 @@ public abstract class BundleTestBase extends TestCase
 	protected BundleEntry getBundleEntry(String bundleName, BundlePrecedence precedence)
 	{
 		this.loadBundleEntry(bundleName, precedence);
-		
+
 		// get bundle entry
-		BundleEntry entry =  getBundleManagerInstance().getBundleEntry(bundleName);
+		BundleEntry entry = getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
-		
+
 		return entry;
 	}
-	
+
 	/**
 	 * loadBundle
 	 * 
@@ -79,7 +79,7 @@ public abstract class BundleTestBase extends TestCase
 	protected BundleElement loadBundle(String bundleName, BundlePrecedence precedence)
 	{
 		BundleEntry entry = this.getBundleEntry(bundleName, precedence);
-		
+
 		BundleElement[] bundles = entry.getBundles();
 		assertEquals(1, bundles.length);
 
@@ -96,33 +96,38 @@ public abstract class BundleTestBase extends TestCase
 	{
 		BundleManager manager = getBundleManagerInstance();
 		String baseDirectory = null;
-		
+
 		// make sure we have a test bundle
 		switch (precedence)
 		{
 			case APPLICATION:
 				baseDirectory = APPLICATION_BUNDLES;
 				break;
-				
+
 			case PROJECT:
 				baseDirectory = PROJECT_BUNDLES;
 				break;
-				
+
 			case USER:
 				baseDirectory = USER_BUNDLES;
 				break;
-				
+
 			default:
 				fail("Unrecognized bundle scope: " + precedence);
 		}
-		
+
 		File bundleFile = new File(baseDirectory + File.separator + bundleName);
 		assertTrue(bundleFile.exists());
-		
+
 		// load bundle
 		manager.loadBundle(bundleFile);
 	}
 
+	/**
+	 * getBundleManagerInstance
+	 * 
+	 * @return
+	 */
 	public static BundleManager getBundleManagerInstance()
 	{
 		return BundleManager.getInstance(APPLICATION_BUNDLES, USER_BUNDLES);
@@ -135,7 +140,7 @@ public abstract class BundleTestBase extends TestCase
 	protected void tearDown() throws Exception
 	{
 		BundleManager.getInstance().reset();
-		
+
 		super.tearDown();
 	}
 }
