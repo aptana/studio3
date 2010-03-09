@@ -1,11 +1,11 @@
 package com.aptana.editor.common.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.text.Position;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
@@ -21,7 +21,7 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 {
 
 	private ProjectionAnnotationModel annotationModel;
-	private Annotation[] oldAnnotations;
+	private Map<ProjectionAnnotation, Position> oldAnnotations = new HashMap<ProjectionAnnotation, Position>(3);
 
 	/**
 	 * AbstractFoldingEditor
@@ -53,18 +53,47 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		return viewer;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IFoldingEditor#updateFoldingStructure(java.util.List)
 	 */
 	public void updateFoldingStructure(List<Position> positions)
 	{
 		Map<ProjectionAnnotation, Position> newAnnotations = new HashMap<ProjectionAnnotation, Position>();
+		Map<ProjectionAnnotation, Position> toAdd = new HashMap<ProjectionAnnotation, Position>();
 		for (Position position : positions)
 		{
 			ProjectionAnnotation annotation = new ProjectionAnnotation();
+			if (oldAnnotations.containsValue(position)) // old set had the same position, grab it's annotation
+			{
+				for (Map.Entry<ProjectionAnnotation, Position> oldEntry : oldAnnotations.entrySet())
+				{
+					if (position.equals(oldEntry.getValue()))
+					{
+						annotation = oldEntry.getKey();
+						break;
+					}
+				}
+			}
+			else
+			{
+				// this is actually a brand new position, throw it on toAdd
+				toAdd.put(annotation, position);
+			}
 			newAnnotations.put(annotation, position);
 		}
-		annotationModel.replaceAnnotations(oldAnnotations, newAnnotations);
-		oldAnnotations = newAnnotations.keySet().toArray(new Annotation[newAnnotations.size()]);
+
+		// Now we need to traverse over the old set and find any that should be deleted...
+		List<ProjectionAnnotation> toDelete = new ArrayList<ProjectionAnnotation>();
+		for (ProjectionAnnotation old : oldAnnotations.keySet())
+		{
+			if (!newAnnotations.containsKey(old)) // old isn't in new set, needs to be deleted
+			{
+				toDelete.add(old);
+			}
+		}
+
+		annotationModel.modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd, null);
+		oldAnnotations = newAnnotations;
 	}
 }
