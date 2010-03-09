@@ -27,7 +27,7 @@ public class SnippetTemplateTranslatorTest extends TestCase
 	
 	public void testTabstopWithSingleQuotedContent()
 	{
-		assertTranslatesTo("${1:'string'}", "${1:tabstop('\'string\'')}");
+		assertTranslatesTo("validates_presence_of :message => \"${4:can't be blank}\"", "validates_presence_of :message => \"${4:tabstop('can''t be blank')}\"");
 	}
 
 	public void testtwoTabstopsWthoutBraces()
