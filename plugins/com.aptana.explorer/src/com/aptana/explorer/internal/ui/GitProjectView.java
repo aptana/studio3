@@ -1090,7 +1090,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 				catch (CoreException e)
 				{
+					ExplorerPlugin.logError(e);
 					return e.getStatus();
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
+					return new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID, e.getMessage(), e);
 				}
 			}
 		};
