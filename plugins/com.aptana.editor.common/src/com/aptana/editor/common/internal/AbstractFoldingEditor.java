@@ -2,6 +2,7 @@ package com.aptana.editor.common.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -92,8 +93,32 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 				toDelete.add(old);
 			}
 		}
-
-		annotationModel.modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd, null);
+		
+		// Try and find positions that aren't really a deletion and addition, but are just a modification (i.e. same offset, length changed)
+		List<ProjectionAnnotation> modifications = new ArrayList<ProjectionAnnotation>();
+		Iterator<ProjectionAnnotation> possibleAddition = toAdd.keySet().iterator();
+		while (possibleAddition.hasNext())
+		{
+			ProjectionAnnotation possible = possibleAddition.next();
+			Position something = toAdd.get(possible);
+			// go through all toDelete and find position with same offset as this...
+			for (Map.Entry<ProjectionAnnotation, Position> old : oldAnnotations.entrySet())
+			{
+				if (old.getValue().getOffset() == something.getOffset())
+				{
+					// same start offset! 
+					possibleAddition.remove(); //Remove from toAdd
+					modifications.add(old.getKey()); // stick old position into modifications
+					break;
+				}
+			}
+		}
+		// Now remove all the ones in modifications from toDelete
+		for (ProjectionAnnotation mod : modifications)
+		{
+			toDelete.remove(mod);
+		}		
+		annotationModel.modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd, modifications.toArray(new ProjectionAnnotation[modifications.size()]));
 		oldAnnotations = newAnnotations;
 	}
 }
