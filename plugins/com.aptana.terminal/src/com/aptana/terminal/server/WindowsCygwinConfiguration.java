@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -18,16 +16,15 @@ import com.aptana.util.ResourceUtils;
 /**
  * BuiltinCygwinConfiguration
  */
-public class DefaultWindowsConfiguration implements ProcessConfiguration
+public class WindowsCygwinConfiguration implements ProcessConfiguration
 {
 	private static final String CYGWIN_ROOT = "/cygwin/";
 	private static final String REDTTY_EXE = "/cygwin/bin/redtty.exe";
-	private static final boolean useCmdExe = false;
 
 	/**
 	 * BuiltinCygwinConfiguration
 	 */
-	public DefaultWindowsConfiguration()
+	public WindowsCygwinConfiguration()
 	{
 	}
 	
@@ -37,32 +34,6 @@ public class DefaultWindowsConfiguration implements ProcessConfiguration
 	@Override
 	public void afterStart(ProcessWrapper wrapper)
 	{
-		if (useCmdExe)
-		{
-			// Turn on filtering
-			String marker = UUID.randomUUID().toString();
-			Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE);
-			
-			wrapper.setStandardOutputFilter(filter);
-			
-			// Set current directory, if needed
-			String startingDirectory = wrapper.getStartingDirectory();
-			
-			if (startingDirectory != null && startingDirectory.length() > 0)
-			{
-				File dir = new File(startingDirectory);
-				
-				if (dir.exists())
-				{
-					wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n");
-				}
-			}
-			
-			// startup cmd.exe and turn filtering off
-			String command = "cmd.exe /K '@echo " + marker + "'";
-			
-			wrapper.sendText(command + ";exit\n");
-		}
 	}
 
 	/*
