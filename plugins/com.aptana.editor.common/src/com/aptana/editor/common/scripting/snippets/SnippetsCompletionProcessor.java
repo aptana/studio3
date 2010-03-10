@@ -18,9 +18,10 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
@@ -40,13 +41,54 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 
 	private static class TextFontStyler extends Styler
 	{
+
+		private Font maxHeightTextFont;
+
+		private TextFontStyler()
+		{
+			Font textFont = JFaceResources.getFont(JFaceResources.TEXT_FONT);
+			FontData[] textFontData = textFont.getFontData();
+			// limit the height of the font
+			if (textFontData[0].getHeight() > SnippetsContentAssistant.MAX_HEIGHT)
+			{
+				maxHeightTextFont = new Font(textFont.getDevice(),
+						textFontData[0].getName(),
+						SnippetsContentAssistant.MAX_HEIGHT,
+						textFontData[0].getStyle());
+			}
+		}
+
+		@Override
 		public void applyStyles(TextStyle textStyle)
 		{
-			textStyle.font = JFaceResources.getTextFont();
+			if (maxHeightTextFont != null)
+			{
+				// Use font with limited max height
+				textStyle.font = maxHeightTextFont;
+			}
+			else
+			{
+				textStyle.font = JFaceResources.getTextFont();
+			}
 		}
+
+		private void dispose()
+		{
+			// if we allocated a height limited font - dispose it
+			if (maxHeightTextFont != null)
+			{
+				if (!maxHeightTextFont.isDisposed())
+				{
+					maxHeightTextFont.dispose();
+				}
+				maxHeightTextFont = null;
+			}
+		}
+
 	}
 
-	private static Styler FIXED_WIDTH_STYLER = new TextFontStyler();
+	// Styler used to style the proposals
+	private TextFontStyler textFontStyler;
 
 	public SnippetsCompletionProcessor()
 	{
@@ -128,16 +170,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		{
 			SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
 			Template template = snippetTemplateProposal.getTemplateSuper();
-			if (template instanceof SnippetTemplate)
-			{
-				SnippetTemplate snippetTemplate = (SnippetTemplate) template;
-				if (snippetTemplate.exactMatches(extractPrefix))
-				{
-					exactPrefixMatches++;
-					exactPrefixMatchIndex = i;
-				}
-			}
-			else if (template instanceof CommandTemplate)
+			if (template instanceof CommandTemplate)
 			{
 				CommandTemplate commandTemplate = (CommandTemplate) template;
 				if (commandTemplate.exactMatches(extractPrefix))
@@ -161,20 +194,11 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			{
 				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
 				snippetTemplateProposal.setTemplateProposals(completionProposals);
-				Template template = snippetTemplateProposal.getTemplateSuper();
-				StyledString styledString = new StyledString(
-						String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
-
-				styledString.append(new StyledString(
-						String.format("%1$10.10s ", template.getName() + "\u00bb"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$ //$NON-NLS-2$
-
+				snippetTemplateProposal.setStyler(getStyler());
 				if (i < 9)
 				{
-					char triggerChar = (char) ('1' + i);
-					snippetTemplateProposal.setTriggerChar(triggerChar);
-					styledString.append(new StyledString(String.valueOf(triggerChar), FIXED_WIDTH_STYLER));
+					snippetTemplateProposal.setTriggerChar((char) ('1' + i));
 				}
-				snippetTemplateProposal.setStyledDisplayString(styledString);
 			}
 		}
 		return completionProposals;
@@ -245,6 +269,23 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		if (selection != null) {
 			textViewer.setSelectedRange(selection.x, selection.y);
 			textViewer.revealRange(selection.x, selection.y);
+		}
+	}
+
+	private Styler getStyler()
+	{
+		if (textFontStyler == null)
+		{
+			textFontStyler = new TextFontStyler();
+		}
+		return textFontStyler;
+	}
+
+	void possibleCompletionsClosed() {
+		if (textFontStyler != null)
+		{
+			textFontStyler.dispose();
+			textFontStyler = null;
 		}
 	}
 
