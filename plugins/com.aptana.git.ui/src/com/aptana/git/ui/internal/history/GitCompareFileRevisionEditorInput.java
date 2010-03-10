@@ -32,10 +32,8 @@ import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.internal.core.history.LocalFileRevision;
@@ -43,7 +41,6 @@ import org.eclipse.team.internal.ui.Utils;
 import org.eclipse.team.internal.ui.history.FileRevisionTypedElement;
 import org.eclipse.team.internal.ui.synchronize.LocalResourceTypedElement;
 import org.eclipse.team.ui.synchronize.SaveableCompareEditorInput;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -59,7 +56,6 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 
 	private ITypedElement left;
 	private ITypedElement right;
-	private Viewer fViewer;
 	private CompareViewerSwitchingPane fPane;
 	private CompareViewerPane fStructurePane;
 	private TreeThemer fTreeThemer;
@@ -507,30 +503,25 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		}
 	}
 
-	@Override
 	protected void contentsCreated()
 	{
 		super.contentsCreated();
-		// FIXME We're not hijacking the structure/outline area!
-		fViewer = fPane.getViewer();
-		if (fViewer instanceof TextMergeViewer)
+		if (fPane.getViewer() instanceof TextMergeViewer)
 		{
-			((TextMergeViewer) fViewer).setBackgroundColor(CommonEditorPlugin.getDefault().getThemeManager()
+			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(CommonEditorPlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getBackground());
 		}
 		fTreeThemer = new TreeThemer((Tree) fStructurePane.getContent());
 		fTreeThemer.apply();
 	}
-	@Override
+	
 	protected void handleDispose()
 	{
 		fTreeThemer.dispose();
-		fViewer = null;
 		fPane = null;
 		super.handleDispose();
 	}
 	
-	@Override
 	protected CompareViewerPane createStructureInputPane(Composite parent)
 	{
 		CompareViewerPane pane = super.createStructureInputPane(parent);
@@ -538,7 +529,6 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		return pane;
 	}
 
-	@Override
 	protected CompareViewerSwitchingPane createContentViewerSwitchingPane(Splitter parent, int style,
 			CompareEditorInput cei)
 	{
