@@ -1,5 +1,7 @@
 package com.aptana.editor.erb.html.outline;
 
+import java.util.StringTokenizer;
+
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.erb.html.parsing.ERBScript;
@@ -48,9 +50,12 @@ public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 	{
 		StringBuilder text = new StringBuilder();
 		text.append(script.getStartTag()).append(" "); //$NON-NLS-1$
-
 		String source = new String(fParseState.getSource());
+		// locates the ruby source
 		source = source.substring(script.getStartingOffset(), script.getEndingOffset());
+		// gets the first line of the ruby source
+		StringTokenizer st = new StringTokenizer(source, "\n\r\f"); //$NON-NLS-1$
+		source = st.nextToken();
 		if (source.length() <= TRIM_TO_LENGTH)
 		{
 			text.append(source);
