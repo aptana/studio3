@@ -1,5 +1,7 @@
 package com.aptana.editor.js.parsing.ast;
 
+import java.util.Arrays;
+
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
@@ -56,6 +58,27 @@ public class JSNode extends ParseBaseNode
 	public boolean isEmpty()
 	{
 		return getType() == JSNodeTypes.EMPTY;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof JSNode))
+		{
+			return false;
+		}
+		JSNode other = (JSNode) obj;
+		return getType() == other.getType() && getSemicolonIncluded() == other.getSemicolonIncluded()
+				&& Arrays.equals(getChildren(), other.getChildren());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = getType();
+		hash = 31 * hash + (getSemicolonIncluded() ? 1 : 0);
+		hash = 31 * hash + Arrays.hashCode(getChildren());
+		return hash;
 	}
 
 	@Override

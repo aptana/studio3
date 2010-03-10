@@ -62,22 +62,29 @@ public class TerminalServerWorker implements Runnable
 
 		try
 		{
-			URL fileURL = FileLocator.toFileURL(url);
-			File file = new File(new Path(fileURL.getPath()).toOSString());
-
-			if (file.exists() && file.canRead())
+			if (url != null)
 			{
-				int length = (int) file.length();
-				byte[] bytes = new byte[length];
-
-				new FileInputStream(file).read(bytes);
-
-				if (p.endsWith(".template")) //$NON-NLS-1$
+				URL fileURL = FileLocator.toFileURL(url);
+				File file = new File(new Path(fileURL.getPath()).toOSString());
+	
+				if (file.exists() && file.canRead())
 				{
-					String result = populateTemplate(new String(bytes));
-					bytes = result.getBytes();
+					int length = (int) file.length();
+					byte[] bytes = new byte[length];
+	
+					new FileInputStream(file).read(bytes);
+	
+					if (p.endsWith(".template")) //$NON-NLS-1$
+					{
+						String result = populateTemplate(new String(bytes));
+						bytes = result.getBytes();
+					}
+					this.sendResponse(output, STATUS_200, bytes);
 				}
-				this.sendResponse(output, STATUS_200, bytes);
+				else
+				{
+					this.sendErrorResponse(output);
+				}
 			}
 			else
 			{

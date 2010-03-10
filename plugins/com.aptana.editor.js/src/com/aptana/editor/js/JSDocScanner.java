@@ -74,9 +74,10 @@ public class JSDocScanner extends RuleBasedScanner
 		}
 	}
 
-	private static String[] KEYWORDS = { "@author", "@deprecated", "@exception", "@param", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"@return", "@see", "@serial", "@serialData", "@serialField", "@since", "@throws", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
-			"@version" }; //$NON-NLS-1$
+	@SuppressWarnings("nls")
+	private static String[] KEYWORDS = { "@author", "@class", "@constructor", "@deprecated", "@exception", "@extends",
+			"@final", "@member", "@param", "@private", "@requires", "@return", "@returns", "@see", "@serial",
+			"@serialData", "@serialField", "@since", "@throws", "@type", "@version" };
 
 	/**
 	 * Create a new javadoc scanner for the given color provider.

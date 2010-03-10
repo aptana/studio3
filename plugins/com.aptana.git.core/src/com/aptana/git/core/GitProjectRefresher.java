@@ -20,23 +20,28 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
-import com.aptana.git.core.model.RepositoryAddedEvent;
-import com.aptana.git.core.model.RepositoryRemovedEvent;
+import com.aptana.git.core.model.PullEvent;
 
 /**
  * Listens to repository changes and forces the relevant resources in the workspace to refresh.
  * 
  * @author cwilliams
  */
-class GitProjectRefresher implements IGitRepositoryListener
+class GitProjectRefresher extends AbstractGitRepositoryListener
 {
 
 	public void branchChanged(BranchChangedEvent e)
+	{
+		refreshAffectedProjects(e.getRepository());
+	}
+
+	@Override
+	public void pulled(PullEvent e)
 	{
 		refreshAffectedProjects(e.getRepository());
 	}
@@ -60,16 +65,6 @@ class GitProjectRefresher implements IGitRepositoryListener
 		refreshResources(files, IResource.DEPTH_ZERO);
 	}
 
-	public void repositoryAdded(RepositoryAddedEvent e)
-	{
-		// do nothing
-	}
-
-	public void repositoryRemoved(RepositoryRemovedEvent e)
-	{
-		// do nothing
-	}
-
 	protected void refreshAffectedProjects(GitRepository repo)
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
@@ -87,7 +82,7 @@ class GitProjectRefresher implements IGitRepositoryListener
 	{
 		if (resources == null || resources.isEmpty())
 			return;
-		
+
 		WorkspaceJob job = new WorkspaceJob("Refresh projects") //$NON-NLS-1$
 		{
 			@Override

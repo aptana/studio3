@@ -13,6 +13,23 @@ public class CSSCharSetNode extends CSSNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSCharSetNode))
+		{
+			return false;
+		}
+		CSSCharSetNode other = (CSSCharSetNode) obj;
+		return fEncoding.equals(other.fEncoding);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return fEncoding.hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		if (fText == null)

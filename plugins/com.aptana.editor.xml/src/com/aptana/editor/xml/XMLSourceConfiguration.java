@@ -76,7 +76,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
-			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT)), //$NON-NLS-1$ //$NON-NLS-2$
+			new MultiLineRule("<!--", "-->", new Token(XML_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("/", new Token(XML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(XML_TAG)) };

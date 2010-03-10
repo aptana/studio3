@@ -1,6 +1,7 @@
 package com.aptana.git.core;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,7 +28,8 @@ public class GitPlugin extends Plugin
 	// The shared instance
 	private static GitPlugin plugin;
 
-	private com.aptana.git.core.GitProjectRefresher fRepoListener;
+	private GitProjectRefresher fRepoListener;
+	private IResourceChangeListener fGitResourceListener;
 
 	/**
 	 * The constructor
@@ -50,8 +52,9 @@ public class GitPlugin extends Plugin
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ResourcesPlugin.getWorkspace().addResourceChangeListener(new GitResourceListener(),
-						IResourceChangeEvent.POST_CHANGE);
+				fGitResourceListener = new GitResourceListener();
+				ResourcesPlugin.getWorkspace().addResourceChangeListener(fGitResourceListener,
+						IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE);
 				fRepoListener = new GitProjectRefresher();
 				GitRepository.addListener(fRepoListener);
 				return Status.OK_STATUS;
@@ -67,9 +70,18 @@ public class GitPlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		GitRepository.removeListener(fRepoListener);
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fGitResourceListener);
+			GitRepository.removeListener(fRepoListener);
+			// Remove all the GitRepositories from memory!
+			GitRepository.cleanup();
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**
@@ -95,6 +107,12 @@ public class GitPlugin extends Plugin
 	public static void logError(CoreException e)
 	{
 		getDefault().getLog().log(e.getStatus());
+	}
+	
+	public static void logWarning(String warning)
+	{
+		if (getDefault() != null)
+			getDefault().getLog().log(new Status(IStatus.WARNING, getPluginId(), warning));
 	}
 
 	public static void logInfo(String string)

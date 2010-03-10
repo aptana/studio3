@@ -1,6 +1,7 @@
 require "java"
 require "ruble/base_element"
 require "ruble/key_binding"
+require "ruble/invoke"
 require "ruble/scope_selector"
 require "pathname"
 
@@ -12,6 +13,7 @@ module Ruble
         super(name)
 
         @key_binding = KeyBinding.new(java_object)
+        @invoke = Invoke.new(self, java_object)
         bundle = BundleManager.bundle_from_path(path)
         bundle.apply_defaults(self) unless bundle.nil?
       else
@@ -49,16 +51,27 @@ module Ruble
       end
     end
 
+    #
+    # Handles cmd.invoke do...end
+    # In other cases provides instanceo of Invoke
+    # cmd.invoke provides the instance of Invoke
     def invoke(&block)
       if block_given?
-        @jobj.invoke_block = block
-      else
-        @jobj.invoke
+        @jobj.set_invoke_block(:all.to_s, &block)
       end
+        @invoke
+      else
     end
 
-    def invoke=(invoke)
-      @jobj.invoke = invoke
+	#
+    # Handles cmd.invoke = "..."
+    #
+    def invoke=(invokeString)
+      if invokeString
+        @jobj.set_invoke(:all.to_s, invokeString)
+      else
+        log_error("Missing invoke string in invoke.mac= of Command #{display_name}")
+      end
     end
 
     def key_binding

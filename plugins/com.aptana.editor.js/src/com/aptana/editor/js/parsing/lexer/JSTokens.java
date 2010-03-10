@@ -17,18 +17,18 @@ public class JSTokens
 	static public final short NUMBER = 8;
 	static public final short MINUS = 9;
 	static public final short PLUS = 10;
-	static public final short THIS = 11;
-	static public final short NEW = 12;
-	static public final short NULL = 13;
-	static public final short TRUE = 14;
-	static public final short FALSE = 15;
-	static public final short REGEX = 16;
-	static public final short DELETE = 17;
-	static public final short EXCLAMATION = 18;
-	static public final short TILDE = 19;
-	static public final short TYPEOF = 20;
-	static public final short VOID = 21;
-	static public final short FUNCTION = 22;
+	static public final short FUNCTION = 11;
+	static public final short THIS = 12;
+	static public final short NEW = 13;
+	static public final short NULL = 14;
+	static public final short TRUE = 15;
+	static public final short FALSE = 16;
+	static public final short REGEX = 17;
+	static public final short DELETE = 18;
+	static public final short EXCLAMATION = 19;
+	static public final short TILDE = 20;
+	static public final short TYPEOF = 21;
+	static public final short VOID = 22;
 	static public final short SEMICOLON = 23;
 	static public final short COMMA = 24;
 	static public final short VAR = 25;
@@ -95,7 +95,7 @@ public class JSTokens
 
 	@SuppressWarnings("nls")
 	private static final String[] NAMES = { "EOF", "(", "IDENTIFIER", "{", "[", "++", "--", "STRING", "NUMBER", "-",
-			"+", "this", "new", "null", "true", "false", "REGEX", "delete", "!", "~", "typeof", "void", "function",
+			"+", "function", "this", "new", "null", "true", "false", "REGEX", "delete", "!", "~", "typeof", "void",
 			";", ",", "var", "while", "for", "do", "switch", "if", "continue", "break", "with", "return", "throw",
 			"try", ")", "else", "}", ":", "]", "in", "=", "case", ".", "<<", ">>", ">>>", "<", ">", "<=", ">=",
 			"instanceof", "==", "!=", "===", "!==", "&", "^", "|", "&&", "*=", "/=", "%=", "+=", "-=", "<<=", ">>=",

@@ -235,14 +235,6 @@ module Ruble
       def active_page
         active_window.active_page if active_window
       end
-      
-      def previous_editor
-      	activate_editor(-1)
-      end
-
-      def next_editor
-      	activate_editor(1)
-      end
 
       # Executes a block inline if we're already in the UI thread or in a UIJob if we're not. if run in a job, we run synchronously by joining the thread.
       def run(title, &blk)
@@ -256,30 +248,6 @@ module Ruble
       end
       
       private
-
-      def activate_editor(offset)
-        # Get reference to active editor
-        active_editor_reference = active_page.active_editor_reference if active_page
-        # Get array of editor references
-        editor_references = active_page.editor_references.to_a if active_page
-        if active_editor_reference && editor_references && editor_references.length >= 2
-          # Find index of active editor reference
-          active_editor_reference_index = editor_references.index(active_editor_reference)
-          if active_editor_reference_index
-            # Add offset
-            active_editor_reference_index = (active_editor_reference_index + offset)
-            # Normalize index - there may be a better ruby idiom for this
-            if active_editor_reference_index >= editor_references.length
-              # Wrap around
-              active_editor_reference_index = 0
-            end
-            # Now get the handle to the editor
-            editor_part = editor_references[active_editor_reference_index].get_part(true)
-            # Activate the editor
-            active_page.activate(editor_part) if editor_part
-          end
-        end
-      end
 
       # Used to request a secure string
       class PasswordInputDialog < org.eclipse.jface.dialogs.InputDialog

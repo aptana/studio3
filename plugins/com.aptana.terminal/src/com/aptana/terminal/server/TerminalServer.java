@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.terminal.Activator;
+
 /**
  * @author Kevin Lindsey
  */
@@ -80,7 +82,7 @@ public class TerminalServer extends Thread
 		}
 		else
 		{
-			throw new RuntimeException(Messages.HttpServer_Process_ID_Already_In_Use + id);
+			Activator.logWarning(Messages.HttpServer_Process_ID_Already_In_Use + id);
 		}
 	}
 
@@ -144,7 +146,7 @@ public class TerminalServer extends Thread
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException(Messages.HttpServer_Unable_To_Open_Port, e);
+			Activator.logError(Messages.HttpServer_Unable_To_Open_Port, e);
 		}
 	}
 
@@ -165,7 +167,7 @@ public class TerminalServer extends Thread
 		}
 		else
 		{
-			throw new RuntimeException(Messages.HttpServer_Process_ID_Does_Not_Exist + id);
+			Activator.logWarning(Messages.HttpServer_Process_ID_Does_Not_Exist + id);
 		}
 	}
 
@@ -188,7 +190,7 @@ public class TerminalServer extends Thread
 			}
 			catch (IOException e)
 			{
-				throw new RuntimeException(Messages.HttpServer_Client_Accept_Error, e);
+				Activator.logError(Messages.HttpServer_Client_Accept_Error, e);
 			}
 		}
 	}

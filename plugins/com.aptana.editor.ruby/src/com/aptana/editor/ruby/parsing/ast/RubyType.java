@@ -1,6 +1,11 @@
 package com.aptana.editor.ruby.parsing.ast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.aptana.editor.ruby.core.IRubyElement;
+import com.aptana.editor.ruby.core.IRubyField;
 import com.aptana.editor.ruby.core.IRubyMethod;
 import com.aptana.editor.ruby.core.IRubyType;
 
@@ -23,6 +28,16 @@ public class RubyType extends NamedMember implements IRubyType
 	{
 		super(name, start, end);
 		includedModuleNames = EMPTY_ARRAY;
+	}
+
+	@Override
+	public IRubyField[] getFields()
+	{
+		List<IRubyElement> elements = new ArrayList<IRubyElement>();
+		elements.addAll(Arrays.asList(getChildrenOfType(IRubyElement.CONSTANT)));
+		elements.addAll(Arrays.asList(getChildrenOfType(INSTANCE_VAR)));
+		elements.addAll(Arrays.asList(getChildrenOfType(CLASS_VAR)));
+		return elements.toArray(new IRubyField[elements.size()]);
 	}
 
 	@Override

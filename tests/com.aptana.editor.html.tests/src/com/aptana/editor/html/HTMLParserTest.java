@@ -4,7 +4,9 @@ import junit.framework.TestCase;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.Range;
 
 public class HTMLParserTest extends TestCase
 {
@@ -39,7 +41,8 @@ public class HTMLParserTest extends TestCase
 	public void testEmptyTagInXHTML() throws Exception
 	{
 		String source = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n"
-				+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" + "<body><br /><table></table></body>\n";
+				+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+				+ "<body><br /><table></table></body>\n";
 		parseTest(source, "<body><br></br><table></table></body>\n");
 	}
 
@@ -64,6 +67,18 @@ public class HTMLParserTest extends TestCase
 		IParseNode[] children = result.getChildren();
 		assertEquals(1, children.length);
 		assertEquals("html#aptana.cool", children[0].getText());
+	}
+
+	public void testNameNode() throws Exception
+	{
+		String source = "<html><head></head></html>\n";
+		fParseState.setEditState(source, source, 0, 0);
+
+		IParseNode result = fParser.parse(fParseState);
+		IParseNode[] children = result.getChildren();
+		INameNode nameNode = children[0].getNameNode();
+		assertEquals("html", nameNode.getName());
+		assertEquals(new Range(0, 5), nameNode.getNameRange());
 	}
 
 	public void testStyle() throws Exception

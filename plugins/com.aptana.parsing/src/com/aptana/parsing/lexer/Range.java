@@ -21,12 +21,29 @@ public class Range implements IRange
 	@Override
 	public int getLength()
 	{
-		return fEnd - fStart;
+		return getEndingOffset() - getStartingOffset() + 1;
 	}
 
 	@Override
 	public int getStartingOffset()
 	{
 		return fStart;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof Range))
+		{
+			return false;
+		}
+		Range otherRange = (Range) obj;
+		return getStartingOffset() == otherRange.getStartingOffset() && getLength() == otherRange.getLength();
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * getStartingOffset() + getLength();
 	}
 }

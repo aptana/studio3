@@ -1,6 +1,7 @@
 package com.aptana.git.ui.internal;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
@@ -30,10 +31,15 @@ public abstract class Launcher
 	 */
 	public static ILaunch launch(String command, String workingDir, String... args)
 	{
+		return launch(command, workingDir, new NullProgressMonitor(), args);
+	}
+
+	public static ILaunch launch(String command, String workingDir, IProgressMonitor monitor, String... args)
+	{
 		try
 		{
 			ILaunchConfigurationWorkingCopy config = createLaunchConfig(command, workingDir, args);
-			return config.launch(ILaunchManager.RUN_MODE, new NullProgressMonitor());
+			return config.launch(ILaunchManager.RUN_MODE, monitor);
 		}
 		catch (CoreException e)
 		{

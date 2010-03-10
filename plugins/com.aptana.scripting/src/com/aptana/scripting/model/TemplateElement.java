@@ -61,4 +61,14 @@ public class TemplateElement extends CommandElement
 	{
 		return new String[0];
 	}
+
+	/**
+	 * Always executable.
+	 */
+	@Override
+	public boolean isExecutable()
+	{
+		return true;
+	}
+
 }

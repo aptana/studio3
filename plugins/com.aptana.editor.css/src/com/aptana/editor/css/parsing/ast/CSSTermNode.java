@@ -14,6 +14,23 @@ public class CSSTermNode extends CSSExpressionNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSTermNode))
+		{
+			return false;
+		}
+		CSSTermNode other = (CSSTermNode) obj;
+		return fTerm.equals(other.fTerm);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return fTerm.hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		return fTerm;

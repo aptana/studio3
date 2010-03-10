@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.model.BundleElement;
@@ -66,7 +67,13 @@ class EditBundleJob extends Job
 		}
 		catch (CoreException e)
 		{
+			CommonEditorPlugin.logError(e);
 			return e.getStatus();
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+			return new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		return Status.OK_STATUS;
 	}
@@ -84,7 +91,10 @@ class EditBundleJob extends Job
 	{
 		File destRuble = new File(destinationDir, bundle.getBundleDirectory().getName());
 		if (destRuble.isDirectory())
+		{
+			CommonEditorPlugin.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.getAbsolutePath()); //$NON-NLS-1$
 			return destRuble; // Already exists, just return it.
+		}
 
 		if (bundle.getRepository() == null)
 		{

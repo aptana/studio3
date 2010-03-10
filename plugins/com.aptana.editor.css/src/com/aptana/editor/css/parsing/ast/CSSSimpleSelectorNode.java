@@ -1,6 +1,11 @@
 package com.aptana.editor.css.parsing.ast;
 
+import java.util.Arrays;
+import java.util.List;
+
 import beaver.Symbol;
+
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSSimpleSelectorNode extends CSSNode
 {
@@ -46,7 +51,26 @@ public class CSSSimpleSelectorNode extends CSSNode
 
 	public CSSAttributeSelectorNode[] getAttributeSelectors()
 	{
-		return (CSSAttributeSelectorNode[]) getChildren();
+		List<IParseNode> list = Arrays.asList(getChildren());
+		return list.toArray(new CSSAttributeSelectorNode[list.size()]);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSSimpleSelectorNode))
+		{
+			return false;
+		}
+		CSSSimpleSelectorNode other = (CSSSimpleSelectorNode) obj;
+		return (fTypeSelector == null ? other.fTypeSelector == null : fTypeSelector.equals(other.fTypeSelector))
+				&& Arrays.equals(getAttributeSelectors(), other.getAttributeSelectors());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * (fTypeSelector == null ? 0 : fTypeSelector.hashCode()) + Arrays.hashCode(getAttributeSelectors());
 	}
 
 	@Override

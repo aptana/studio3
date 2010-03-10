@@ -32,11 +32,15 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
+import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.PullEvent;
+import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
@@ -323,14 +327,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	private boolean currentThemeHasDarkBG()
 	{
 		RGB themeBG = getActiveTheme().getBackground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
 		return grey <= 128;
 	}
-	
+
 	private boolean currentThemeHasLightFG()
 	{
 		RGB themeBG = getActiveTheme().getForeground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
 		return grey >= 90;
 	}
 
@@ -404,6 +408,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
+		// FIXME Force a total refresh if the number of changed files is over some maximum!
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
@@ -481,5 +486,38 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
+		Set<IResource> resources = new HashSet<IResource>();
+		GitRepository repo = e.getRepository();
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject project : projects)
+		{
+			if (repo.equals(GitRepository.getAttached(project)))
+				resources.add(project);
+		}
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
+	}
+
+	@Override
+	public void pulled(PullEvent e)
+	{
+		// FIXME do nothing? Call refresh?
+	}
+
+	@Override
+	public void pushed(PushEvent e)
+	{
+		// FIXME do nothing? Call refresh?
+	}
+
+	@Override
+	public void branchAdded(BranchAddedEvent e)
+	{
+		// do nothing
+	}
+
+	@Override
+	public void branchRemoved(BranchRemovedEvent e)
+	{
+		// do nothing
 	}
 }

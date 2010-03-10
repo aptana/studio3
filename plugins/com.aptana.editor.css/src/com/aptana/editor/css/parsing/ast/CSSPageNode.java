@@ -1,6 +1,9 @@
 package com.aptana.editor.css.parsing.ast;
 
+import java.util.Arrays;
 import java.util.List;
+
+import com.aptana.parsing.ast.IParseNode;
 
 public class CSSPageNode extends CSSNode
 {
@@ -40,7 +43,26 @@ public class CSSPageNode extends CSSNode
 
 	public CSSDeclarationNode[] getDeclarations()
 	{
-		return (CSSDeclarationNode[]) getChildren();
+		List<IParseNode> list = Arrays.asList(getChildren());
+		return list.toArray(new CSSDeclarationNode[list.size()]);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSPageNode))
+		{
+			return false;
+		}
+		CSSPageNode other = (CSSPageNode) obj;
+		return (fPageSelector == null ? other.fPageSelector == null : fPageSelector.equals(other.fPageSelector))
+				&& Arrays.equals(getDeclarations(), other.getDeclarations());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 31 * (fPageSelector == null ? 0 : fPageSelector.hashCode()) + Arrays.hashCode(getDeclarations());
 	}
 
 	@Override

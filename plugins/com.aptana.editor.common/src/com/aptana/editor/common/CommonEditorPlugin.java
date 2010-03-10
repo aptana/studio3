@@ -151,6 +151,11 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
 	}
+	
+	public static void logInfo(String message)
+	{
+		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
+	}
 
 	@Override
 	protected ImageRegistry createImageRegistry()
