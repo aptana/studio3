@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.aptana.git.ui.internal.history;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.compare.CompareConfiguration;
@@ -18,7 +19,6 @@ import org.eclipse.compare.CompareViewerSwitchingPane;
 import org.eclipse.compare.IEditableContent;
 import org.eclipse.compare.IResourceProvider;
 import org.eclipse.compare.ITypedElement;
-import org.eclipse.compare.Splitter;
 import org.eclipse.compare.contentmergeviewer.TextMergeViewer;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.compare.structuremergeviewer.Differencer;
@@ -506,35 +506,44 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 	protected void contentsCreated()
 	{
 		super.contentsCreated();
-		if (fPane.getViewer() instanceof TextMergeViewer)
+		if (fPane == null)
+		{
+			try
+			{
+				Field f = CompareEditorInput.class.getDeclaredField("fContentInputPane"); //$NON-NLS-1$
+				fPane = (CompareViewerSwitchingPane) f.get(this);
+			}
+			catch (Exception e)
+			{
+				GitUIPlugin.logError(e.getMessage(), e);
+			}
+		}
+
+		if (fPane != null && (fPane.getViewer() instanceof TextMergeViewer))
 		{
 			((TextMergeViewer) fPane.getViewer()).setBackgroundColor(CommonEditorPlugin.getDefault().getThemeManager()
 					.getCurrentTheme().getBackground());
 		}
-		fTreeThemer = new TreeThemer((Tree) fStructurePane.getContent());
-		fTreeThemer.apply();
+		if (fStructurePane != null && (fStructurePane.getContent() instanceof Tree))
+		{
+			fTreeThemer = new TreeThemer((Tree) fStructurePane.getContent());
+			fTreeThemer.apply();
+		}
 	}
-	
+
 	protected void handleDispose()
 	{
-		fTreeThemer.dispose();
+		if (fTreeThemer != null)
+			fTreeThemer.dispose();
+		fTreeThemer = null;
 		fPane = null;
 		super.handleDispose();
 	}
-	
+
 	protected CompareViewerPane createStructureInputPane(Composite parent)
 	{
 		CompareViewerPane pane = super.createStructureInputPane(parent);
 		fStructurePane = pane;
 		return pane;
 	}
-
-	protected CompareViewerSwitchingPane createContentViewerSwitchingPane(Splitter parent, int style,
-			CompareEditorInput cei)
-	{
-		CompareViewerSwitchingPane pane = super.createContentViewerSwitchingPane(parent, style, cei);
-		fPane = pane;
-		return pane;
-	}
-
 }
