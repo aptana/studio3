@@ -13,16 +13,16 @@ import com.aptana.terminal.Activator;
 import com.aptana.util.ResourceUtils;
 
 /**
- * DefaultMacConfiguration
+ * DefaultLinuxConfiguration
  */
-public class DefaultMacOsXConfiguration implements ProcessConfiguration
+public class LinuxBashConfiguration implements ProcessConfiguration
 {
-	private static final String REDTTY = "redtty";
+	private static final String REDTTY = "redtty." + Platform.getOS() + "." + Platform.getOSArch();
 
 	/**
-	 * BuiltinCygwinConfiguration
+	 * DefaultLinuxConfiguration
 	 */
-	public DefaultMacOsXConfiguration()
+	public LinuxBashConfiguration()
 	{
 	}
 	
@@ -59,7 +59,7 @@ public class DefaultMacOsXConfiguration implements ProcessConfiguration
 	@Override
 	public String getPlatform()
 	{
-		return Platform.OS_MACOSX;
+		return Platform.OS_LINUX;
 	}
 
 	/*

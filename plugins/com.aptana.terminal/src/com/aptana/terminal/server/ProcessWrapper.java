@@ -70,17 +70,17 @@ public class ProcessWrapper
 			
 			// MAC OS X
 			configurations = new ArrayList<ProcessConfiguration>();
-			configurations.add(new DefaultMacOsXConfiguration());
+			configurations.add(new MacOsXBashConfiguration());
 			configurationMap.put(Platform.OS_MACOSX, configurations);
 			
 			// LINUX
 			configurations = new ArrayList<ProcessConfiguration>();
-			configurations.add(new DefaultLinuxConfiguration());
+			configurations.add(new LinuxBashConfiguration());
 			configurationMap.put(Platform.OS_LINUX, configurations);
 			
 			// WIN32
 			configurations = new ArrayList<ProcessConfiguration>();
-			configurations.add(new DefaultWindowsConfiguration());
+			configurations.add(new WindowsCygwinConfiguration());
 			configurationMap.put(Platform.OS_WIN32, configurations);
 		}
 	}
