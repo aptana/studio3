@@ -1,4 +1,4 @@
-package com.aptana.editor.common.outline;
+package com.aptana.editor.common.theme;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -10,7 +10,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
 
 /**
  * This label provider wraps another label provider and extends it to use them active theme's colors and font. This is
