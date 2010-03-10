@@ -23,7 +23,7 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 
 	private ILabelProvider wrapped;
 
-	ThemedDelegatingLabelProvider(ILabelProvider wrapped)
+	public ThemedDelegatingLabelProvider(ILabelProvider wrapped)
 	{
 		this.wrapped = wrapped;
 	}
