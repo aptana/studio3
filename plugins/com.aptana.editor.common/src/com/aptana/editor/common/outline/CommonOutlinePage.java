@@ -25,6 +25,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.ThemedDelegatingLabelProvider;
 import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.parsing.lexer.IRange;
 

@@ -13,6 +13,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
@@ -42,7 +43,8 @@ public class TreeThemer
 	private static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
 	private static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
 
-	private TreeViewer treeViewer;
+	private TreeViewer fTreeViewer;
+	private Tree fTree;
 	private IPropertyChangeListener fontListener;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private Listener measureItemListener;
@@ -50,14 +52,19 @@ public class TreeThemer
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
-		this.treeViewer = treeViewer;
+		this.fTreeViewer = treeViewer;
+	}
+
+	public TreeThemer(Tree tree)
+	{
+		this.fTree = tree;
 	}
 
 	public void apply()
 	{
 		// Set the background of tree to theme background.
-		treeViewer.getTree().setBackground(getBackground());
-		treeViewer.getTree().setForeground(getForeground());
+		getTree().setBackground(getBackground());
+		getTree().setForeground(getForeground());
 		addSelectionColorOverride();
 		addMeasureItemListener();
 		addFontListener();
@@ -67,37 +74,42 @@ public class TreeThemer
 
 	private void overrideLabelProvider()
 	{
-		ViewerColumn viewer = (ViewerColumn) treeViewer.getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
+		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
 		ColumnViewer colViewer = viewer.getViewer();
 		IBaseLabelProvider provider = colViewer.getLabelProvider();
-		if (!(provider instanceof CellLabelProvider))
-			return; // TODO Wrap in ThemedDelegatingLabelProvider?
-		final CellLabelProvider cellProvider = (CellLabelProvider) provider;
-		viewer.setLabelProvider(new CellLabelProvider()
+		if (provider instanceof CellLabelProvider)
 		{
-
-			@Override
-			public void update(ViewerCell cell)
+			final CellLabelProvider cellProvider = (CellLabelProvider) provider;
+			viewer.setLabelProvider(new CellLabelProvider()
 			{
-				cellProvider.update(cell);
-				Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-				if (font == null)
-				{
-					font = JFaceResources.getTextFont();
-				}
-				if (font != null)
-				{
-					cell.setFont(font);
-				}
 
-				cell.setForeground(getForeground());
-			}
-		});
+				@Override
+				public void update(ViewerCell cell)
+				{
+					cellProvider.update(cell);
+					Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+					if (font == null)
+					{
+						font = JFaceResources.getTextFont();
+					}
+					if (font != null)
+					{
+						cell.setFont(font);
+					}
+
+					cell.setForeground(getForeground());
+				}
+			});
+		}
+		else if (provider instanceof ILabelProvider)
+		{
+			colViewer.setLabelProvider(new ThemedDelegatingLabelProvider((ILabelProvider) provider));
+		}
 	}
 
 	private void addSelectionColorOverride()
 	{
-		final Tree tree = treeViewer.getTree();
+		final Tree tree = getTree();
 		// Override selection color to match what is set in theme
 		selectionOverride = new Listener()
 		{
@@ -125,7 +137,7 @@ public class TreeThemer
 
 	private void addMeasureItemListener()
 	{
-		final Tree tree = treeViewer.getTree();
+		final Tree tree = getTree();
 		// Hack to force a specific row height and width based on font
 		measureItemListener = new Listener()
 		{
@@ -154,7 +166,7 @@ public class TreeThemer
 
 	private void addFontListener()
 	{
-		final Tree tree = treeViewer.getTree();
+		final Tree tree = getTree();
 		fontListener = new IPropertyChangeListener()
 		{
 
@@ -226,7 +238,8 @@ public class TreeThemer
 							}
 						}
 						// OK, the app explorer font changed. We need to force a refresh of the app explorer tree
-						treeViewer.refresh();
+						if (fTreeViewer != null)
+							fTreeViewer.refresh();
 						tree.redraw();
 						tree.update();
 					}
@@ -247,9 +260,10 @@ public class TreeThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					treeViewer.getTree().setBackground(getBackground());
-					treeViewer.getTree().setForeground(getForeground());
-					treeViewer.refresh();
+					getTree().setBackground(getBackground());
+					getTree().setForeground(getForeground());
+					if (fTreeViewer != null)
+						fTreeViewer.refresh();
 				}
 			}
 		};
@@ -284,7 +298,9 @@ public class TreeThemer
 
 	private Tree getTree()
 	{
-		return treeViewer.getTree();
+		if (fTree == null && fTreeViewer != null)
+			fTree = fTreeViewer.getTree();
+		return fTree;
 	}
 
 	private void removeFontListener()
@@ -309,31 +325,28 @@ public class TreeThemer
 		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
-	protected Color getForeground() 
+	protected Color getForeground()
 	{
-		return getColorManager().getColor(
-				getThemeManager().getCurrentTheme().getForeground());
+		return getColorManager().getColor(getThemeManager().getCurrentTheme().getForeground());
 	}
-	
+
 	/**
 	 * @return
 	 */
-	protected Color getBackground() 
+	protected Color getBackground()
 	{
-		return getColorManager().getColor(
-				getThemeManager().getCurrentTheme().getBackground());
+		return getColorManager().getColor(getThemeManager().getCurrentTheme().getBackground());
 	}
-	
-	protected Color getSelection() 
+
+	protected Color getSelection()
 	{
-		return getColorManager().getColor(
-				getThemeManager().getCurrentTheme().getSelection());
+		return getColorManager().getColor(getThemeManager().getCurrentTheme().getSelection());
 	}
-	
+
 	/**
 	 * @return
 	 */
-	protected ColorManager getColorManager() 
+	protected ColorManager getColorManager()
 	{
 		return CommonEditorPlugin.getDefault().getColorManager();
 	}

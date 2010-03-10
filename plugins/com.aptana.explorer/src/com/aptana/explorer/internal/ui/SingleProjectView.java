@@ -1012,10 +1012,15 @@ public abstract class SingleProjectView extends CommonNavigator
 						getThemeManager().getCurrentTheme().getBackground()));
 	}
 
+	/**
+	 * Here we dynamically remove a large number of the right-click context menu's items for the App Explorer.
+	 * 
+	 * @param menu
+	 */
 	protected void mangleContextMenu(Menu menu)
 	{
-		MenuItem[] items = menu.getItems();
-		for (MenuItem menuItem : items)
+		// Remove a whole bunch of the contributed items that we don't want
+		for (MenuItem menuItem : menu.getItems())
 		{
 			Object data = menuItem.getData();
 			if (data instanceof IContributionItem)
@@ -1027,7 +1032,23 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			}
 		}
-		// TODO Need to remove the Team submenu and insert the individual git actions at top level...
+		// Check for two separators in a row, remove one if you see that...
+		boolean lastWasSeparator = false;
+		for (MenuItem menuItem : menu.getItems())
+		{
+			Object data = menuItem.getData();
+			if (data instanceof Separator)
+			{
+				if (lastWasSeparator)
+					menuItem.dispose();
+				else
+					lastWasSeparator = true;
+			}
+			else
+			{
+				lastWasSeparator = false;
+			}
+		}
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput

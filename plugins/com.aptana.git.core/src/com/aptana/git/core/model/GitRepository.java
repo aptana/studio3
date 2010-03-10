@@ -42,6 +42,7 @@ import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
+import com.aptana.git.core.model.GitRef.TYPE;
 import com.aptana.util.ProcessUtil;
 import com.aptana.util.StringUtil;
 
@@ -332,6 +333,9 @@ public class GitRepository
 					break;
 			}
 			if (!validTypes.contains(ref.type()))
+				continue;
+			// Skip these magical "*.lock" files
+			if (ref.type() == TYPE.HEAD && ref.shortName().endsWith(".lock")) //$NON-NLS-1$
 				continue;
 			allBranches.add(ref.shortName());
 		}

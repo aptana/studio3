@@ -300,7 +300,7 @@ public class GitRepositoryTest extends TestCase
 
 		// make sure the branch is listed in model
 		branches = fRepo.allBranches();
-		assertEquals("Should have two branches: " + branches.toString(), 2, branches.size());
+		assertEquals("Should have one new branch: " + branches.toString(), 2, branches.size());
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
 

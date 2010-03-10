@@ -234,7 +234,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	private IToken handleHeredocInMiddleOfLine() throws IOException
 	{
 		String opening = getOpeningStringToEndOfLine();
-		int endOfMarker = indexOf(opening.trim(), ", +)"); //$NON-NLS-1$
+		int endOfMarker = indexOf(opening.trim(), "., +()"); //$NON-NLS-1$
 		if (opening.trim().startsWith(HEREDOC_MARKER_PREFIX) && endOfMarker != -1)
 		{
 			adjustOffset(opening);
@@ -533,7 +533,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 		// Add a token for the heredoc string we just ate up!
 		fContentType = RubySourceConfiguration.STRING_DOUBLE;
-		int afterHeredoc = fOffset + heredocMarker.length();
+		int afterHeredoc = fOffset;
 		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), afterHeredoc, getAdjustedOffset()
 				- afterHeredoc));
 	}
