@@ -688,8 +688,8 @@ public class GitRepository
 				remote.getRemoteName(), remote.getRemoteBranchName());
 		if (output == null || output.length() < 40)
 		{
-			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote {0} {1}: {2}", remote
-					.getRemoteName(), remote.getRemoteBranchName(), output));
+			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}", remote
+					.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
 			return false;
 		}
 		String remoteSHA = output.substring(0, 40);

@@ -1,5 +1,8 @@
 package com.aptana.explorer.internal.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
@@ -21,6 +24,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
@@ -36,6 +40,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -81,6 +87,28 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
+	/**
+	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
+	 */
+	private static final Set<String> TO_REMOVE = new HashSet<String>();
+	static
+	{
+		TO_REMOVE.add("org.eclipse.ui.PasteAction"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.ui.CopyAction"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.ui.MoveResourceAction"); //$NON-NLS-1$
+		TO_REMOVE.add("import"); //$NON-NLS-1$
+		TO_REMOVE.add("export"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.run.submenu"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.profile.submenu"); //$NON-NLS-1$
+		TO_REMOVE.add("compareWithMenu"); //$NON-NLS-1$
+		TO_REMOVE.add("replaceWithMenu"); //$NON-NLS-1$
+		TO_REMOVE.add("org.eclipse.ui.framelist.goInto"); //$NON-NLS-1$
+		TO_REMOVE.add("addFromHistoryAction"); //$NON-NLS-1$
+		TO_REMOVE.add("org.radrails.rails.ui.actions.RunScriptServerAction"); //$NON-NLS-1$
+		TO_REMOVE.add("team.main"); //$NON-NLS-1$
+	};
+
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
@@ -117,7 +145,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 
-	protected static final String GROUP_RUN = "group.run";
+	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(Composite parent)
@@ -150,8 +178,9 @@ public abstract class SingleProjectView extends CommonNavigator
 		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
 		commandsToolItem.setImage(ExplorerPlugin.getImage("icons/full/elcl16/command.png")); //$NON-NLS-1$
 		GridData branchComboData = new GridData(SWT.END, SWT.CENTER, true, false);
+		branchComboData.minimumWidth = 24;
 		commandsToolBar.setLayoutData(branchComboData);
-			
+
 		commandsToolItem.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent selectionEvent)
@@ -159,14 +188,13 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager();	
+				final MenuManager commandsMenuManager = new MenuManager();
 				fillCommandsMenu(commandsMenuManager);
 				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
 			}
 		});
-		
 
 		// Create search
 		createSearchComposite(parent);
@@ -511,6 +539,23 @@ public abstract class SingleProjectView extends CommonNavigator
 		job.setSystem(true);
 		job.setPriority(Job.BUILD);
 		job.schedule(250);
+
+		getCommonViewer().getTree().getMenu().addMenuListener(new MenuListener()
+		{
+
+			@Override
+			public void menuShown(MenuEvent e)
+			{
+				Menu menu = (Menu) e.getSource();
+				mangleContextMenu(menu);
+			}
+
+			@Override
+			public void menuHidden(MenuEvent e)
+			{
+				// do nothing
+			}
+		});
 		return navManager;
 	}
 
@@ -965,6 +1010,24 @@ public abstract class SingleProjectView extends CommonNavigator
 		getCommonViewer().getTree().setBackground(
 				CommonEditorPlugin.getDefault().getColorManager().getColor(
 						getThemeManager().getCurrentTheme().getBackground()));
+	}
+
+	protected void mangleContextMenu(Menu menu)
+	{
+		MenuItem[] items = menu.getItems();
+		for (MenuItem menuItem : items)
+		{
+			Object data = menuItem.getData();
+			if (data instanceof IContributionItem)
+			{
+				IContributionItem contrib = (IContributionItem) data;
+				if (TO_REMOVE.contains(contrib.getId()))
+				{
+					menuItem.dispose();
+				}
+			}
+		}
+		// TODO Need to remove the Team submenu and insert the individual git actions at top level...
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput

@@ -327,14 +327,14 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	private boolean currentThemeHasDarkBG()
 	{
 		RGB themeBG = getActiveTheme().getBackground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
 		return grey <= 128;
 	}
-	
+
 	private boolean currentThemeHasLightFG()
 	{
 		RGB themeBG = getActiveTheme().getForeground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
+		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
 		return grey >= 90;
 	}
 
@@ -486,26 +486,35 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
+		Set<IResource> resources = new HashSet<IResource>();
+		GitRepository repo = e.getRepository();
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject project : projects)
+		{
+			if (repo.equals(GitRepository.getAttached(project)))
+				resources.add(project);
+		}
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
-	
+
 	@Override
 	public void pulled(PullEvent e)
 	{
 		// FIXME do nothing? Call refresh?
 	}
-	
+
 	@Override
 	public void pushed(PushEvent e)
 	{
-		// FIXME do nothing? Call refresh?		
+		// FIXME do nothing? Call refresh?
 	}
-	
+
 	@Override
 	public void branchAdded(BranchAddedEvent e)
 	{
 		// do nothing
 	}
-	
+
 	@Override
 	public void branchRemoved(BranchRemovedEvent e)
 	{

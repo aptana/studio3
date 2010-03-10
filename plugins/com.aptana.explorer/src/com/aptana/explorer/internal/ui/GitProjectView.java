@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -43,6 +44,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
@@ -255,11 +257,11 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				@Override
 				public void fill(Menu menu, int index)
 				{
-					createStageMenuItem(menu);
-					createUnstageMenuItem(menu);
-					createDiffMenuItem(menu);
+					createStageMenuItem(menu, -1);
+					createUnstageMenuItem(menu, -1);
+					createDiffMenuItem(menu, -1);
 					// TODO Conflicts
-					createRevertMenuItem(menu);
+					createRevertMenuItem(menu, -1);
 				}
 			});
 			// Add the git branching/misc items
@@ -400,9 +402,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						{
 							if (GitExecutable.instance() == null)
 							{
-								throw new CoreException(
-										new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
-												Messages.GitProjectView_UnableToFindGitExecutableError));
+								throw new CoreException(new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
+										Messages.GitProjectView_UnableToFindGitExecutableError));
 							}
 
 							GitRepository repo = GitRepository.getUnattachedExisting(selectedProject.getLocationURI());
@@ -436,9 +437,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		});
 	}
 
-	private void createDiffMenuItem(Menu menu)
+	private void createDiffMenuItem(Menu menu, int index)
 	{
-		MenuItem commit = new MenuItem(menu, SWT.PUSH);
+		if (index < 0)
+		{
+			index = menu.getItemCount();
+		}
+		MenuItem commit = new MenuItem(menu, SWT.PUSH, index);
 		commit.setText(Messages.GitProjectView_DiffTooltip);
 		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedFiles().isEmpty());
 		commit.addSelectionListener(new SelectionAdapter()
@@ -499,21 +504,21 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		});
 	}
 
-	private void createRevertMenuItem(Menu menu)
+	private void createRevertMenuItem(Menu menu, int index)
 	{
-		createSimpleGitAction(menu, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
+		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
 				Messages.GitProjectView_RevertJobTitle, new RevertAction());
 	}
 
-	private void createStageMenuItem(Menu menu)
+	private void createStageMenuItem(Menu menu, int index)
 	{
-		createSimpleGitAction(menu, getSelectedUnstagedFiles(), Messages.GitProjectView_StageTooltip,
+		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_StageTooltip,
 				Messages.GitProjectView_StageJobTitle, new StageAction());
 	}
 
-	private void createUnstageMenuItem(Menu menu)
+	private void createUnstageMenuItem(Menu menu, int index)
 	{
-		createSimpleGitAction(menu, getSelectedStagedFiles(), Messages.GitProjectView_UnstageTooltip,
+		createSimpleGitAction(menu, index, getSelectedStagedFiles(), Messages.GitProjectView_UnstageTooltip,
 				Messages.GitProjectView_UnstageJobTitle, new UnstageAction());
 	}
 
@@ -554,10 +559,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		return selected;
 	}
 
-	private void createSimpleGitAction(Menu menu, final Set<IResource> selected, String tooltip, final String jobTitle,
-			final GitAction action)
+	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,
+			final String jobTitle, final GitAction action)
 	{
-		MenuItem stage = new MenuItem(menu, SWT.PUSH);
+		if (index < 0)
+		{
+			index = menu.getItemCount();
+		}
+		MenuItem stage = new MenuItem(menu, SWT.PUSH, index);
 		stage.setText(tooltip);
 		stage.setEnabled(!selected.isEmpty());
 		stage.addSelectionListener(new SelectionAdapter()
@@ -975,7 +984,25 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 			});
 			if (branchName.equals(currentBranchName))
-				currentBranchName = modifiedBranchName;
+			{
+				if (modifiedBranchName.length() > 20)
+				{
+					// truncate the current branch name and append the indicators
+					if (!currentBranchName.equals(modifiedBranchName))
+					{
+						currentBranchName = currentBranchName.substring(0, 15) + "..." //$NON-NLS-1$
+								+ modifiedBranchName.substring(currentBranchName.length());
+					}
+					else
+					{
+						currentBranchName = currentBranchName.substring(0, 15) + "..."; //$NON-NLS-1$
+					}
+				}
+				else
+				{
+					currentBranchName = modifiedBranchName;
+				}
+			}
 		}
 
 		if (monitor != null && monitor.isCanceled())
@@ -1010,7 +1037,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			pullCalc.schedule();
 		}
 	}
-	
+
 	@Override
 	public void pushed(PushEvent e)
 	{
@@ -1063,7 +1090,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 				catch (CoreException e)
 				{
+					ExplorerPlugin.logError(e);
 					return e.getStatus();
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
+					return new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID, e.getMessage(), e);
 				}
 			}
 		};
@@ -1228,5 +1261,54 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		action.fillMenu(deleteBranchSubmenu);
 		deleteBranchMenuItem.setEnabled(repository.localBranches().size() > 1);
 		deleteBranchMenuItem.setMenu(deleteBranchSubmenu);
+	}
+
+	@Override
+	protected void mangleContextMenu(Menu menu)
+	{
+		super.mangleContextMenu(menu);
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		if (repo == null)
+			return;
+
+		// Add the git actions Diff..., Stage/Unstage, Revert
+		MenuItem additions = getAdditionsMenuItem(menu);
+		int index = menu.indexOf(additions);
+		if (index > 0)
+			index++;
+		createDiffMenuItem(menu, index++);
+
+		// Don't add the following unless a file is selected!
+		Set<IResource> selected = getSelectedFiles();
+		boolean add = false;
+		for (IResource resource : selected)
+		{
+			if (resource instanceof IFile)
+			{
+				add = true;
+				break;
+			}
+		}
+		if (!add)
+			return;
+		createStageMenuItem(menu, index++);
+		createUnstageMenuItem(menu, index++);
+		createRevertMenuItem(menu, index);
+	}
+
+	private MenuItem getAdditionsMenuItem(Menu menu)
+	{
+		MenuItem[] items = menu.getItems();
+		for (MenuItem item : items)
+		{
+			Object data = item.getData();
+			if (data instanceof Separator)
+			{
+				Separator sep = (Separator) data;
+				if (sep.getId().equals(ICommonMenuConstants.GROUP_ADDITIONS))
+					return item;
+			}
+		}
+		return null;
 	}
 }
