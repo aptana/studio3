@@ -292,9 +292,7 @@ public class GitRepositoryTest extends TestCase
 
 		// Make sure we just have master branch
 		Set<String> branches = fRepo.allBranches();
-		int originalNumberOfBranches = branches.size();
-		// FIXME For some reason on the unit test build we have "master" and "master.lock"!
-//		assertEquals("Should only have one branch: " + branches.toString(), 1, branches.size());
+		assertEquals("Should only have one branch: " + branches.toString(), 1, branches.size());
 		assertTrue(branches.contains("master"));
 
 		// Create a new branch off master
@@ -302,7 +300,7 @@ public class GitRepositoryTest extends TestCase
 
 		// make sure the branch is listed in model
 		branches = fRepo.allBranches();
-		assertEquals("Should have one new branch: " + branches.toString(), originalNumberOfBranches + 1, branches.size());
+		assertEquals("Should have one new branch: " + branches.toString(), 2, branches.size());
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
 
