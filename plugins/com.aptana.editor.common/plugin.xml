@@ -26,6 +26,20 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+R">
       </key>
+      
+      <!-- First we remove the binding for M1-Shift-R from the Open Resource command, then we add M1-T -->
+      <key
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Shift+R">
+      </key>
+      <key
+            commandId="org.eclipse.ui.navigate.openResource"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+T">
+      </key>
+
    </extension>
    <extension
          point="org.eclipse.ui.commands">

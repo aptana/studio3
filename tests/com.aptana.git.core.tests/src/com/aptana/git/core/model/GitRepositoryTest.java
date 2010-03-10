@@ -292,7 +292,7 @@ public class GitRepositoryTest extends TestCase
 
 		// Make sure we just have master branch
 		Set<String> branches = fRepo.allBranches();
-		assertEquals(1, branches.size());
+		assertEquals("Should only have one branch: " + branches.toString(), 1, branches.size());
 		assertTrue(branches.contains("master"));
 
 		// Create a new branch off master
@@ -300,7 +300,7 @@ public class GitRepositoryTest extends TestCase
 
 		// make sure the branch is listed in model
 		branches = fRepo.allBranches();
-		assertEquals(2, branches.size());
+		assertEquals("Should have two branches: " + branches.toString(), 2, branches.size());
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
 

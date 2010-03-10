@@ -1063,6 +1063,11 @@ e.stopPropagation();
 if(e.preventDefault){
 e.preventDefault();
 }
+try{
+e.keyCode=0;
+}
+catch(e){
+}
 }
 return false;
 };
