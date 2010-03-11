@@ -30,6 +30,22 @@ import com.aptana.parsing.ast.ParseRootNode;
 public class HTMLParser implements IParser
 {
 
+	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+
+	// a map between the possible values of type attribute and their respective languages
+	private static final Map<String, String> TYPE_ATTR_MAP = new HashMap<String, String>();
+	static
+	{
+		TYPE_ATTR_MAP.put("text/css", ICSSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("application/javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("application/ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("application/x-javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("application/x-ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("text/javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("text/ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+		TYPE_ATTR_MAP.put("text/jscript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
+	}
+
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
@@ -82,10 +98,10 @@ public class HTMLParser implements IParser
 				processEndTag();
 				break;
 			case HTMLTokens.STYLE:
-				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END);
+				processStyleTag();
 				break;
 			case HTMLTokens.SCRIPT:
-				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END);
+				processScriptTag();
 				break;
 		}
 	}
@@ -105,12 +121,30 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
+		IParseNode[] nested;
+		IParser parser = fLanguageParsers.get(language);
+		if (parser == null)
+		{
+			nested = new IParseNode[0];
+		}
+		else
+		{
+			nested = getParseResult(parser, start, end);
+		}
 		if (fCurrentElement != null)
 		{
-			fCurrentElement
-					.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
+			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
+			parseAttribute(node, startTag.value.toString());
+			fCurrentElement.addChild(node);
 		}
+	}
+
+	protected HTMLElementNode processCurrentTag()
+	{
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
+				.getEnd());
+		parseAttribute(element, fCurrentSymbol.value.toString());
+		return element;
 	}
 
 	protected void addLanguageParser(String language, IParser parser)
@@ -155,12 +189,9 @@ public class HTMLParser implements IParser
 
 	private void processStartTag() throws IOException, Exception
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
-				.getEnd());
+		HTMLElementNode element = processCurrentTag();
 		// pushes the element onto the stack
 		openElement(element);
-
-		parseAttribute(element, fCurrentSymbol.value.toString());
 	}
 
 	private void processEndTag() throws IOException, Exception
@@ -178,6 +209,32 @@ public class HTMLParser implements IParser
 				closeElement();
 			}
 		}
+	}
+
+	private void processStyleTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		// by default, the style tag is for CSS when there is no type attribute
+		String language = ICSSParserConstants.LANGUAGE;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type != null)
+		{
+			language = TYPE_ATTR_MAP.get(type);
+		}
+		processLanguage(language, HTMLTokens.STYLE_END);
+	}
+
+	private void processScriptTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		// by default, the script tag is for JS when there is no type attribute
+		String language = IJSParserConstants.LANGUAGE;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type != null)
+		{
+			language = TYPE_ATTR_MAP.get(type);
+		}
+		processLanguage(language, HTMLTokens.SCRIPT_END);
 	}
 
 	private void parseAttribute(HTMLElementNode element, String tag)
