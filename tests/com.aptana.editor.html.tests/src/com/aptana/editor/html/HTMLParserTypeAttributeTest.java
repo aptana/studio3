@@ -95,6 +95,24 @@ public class HTMLParserTypeAttributeTest extends TestCase
 		parseTest(source);
 	}
 
+	public void testScriptWithTypeVersion() throws Exception
+	{
+		String source = "<html><head><script type=\"text/javascript;version=1.5\">var one = 1;</script></head></html>\n";
+		parseTest(source);
+	}
+
+	public void testScriptWithLanguageJS() throws Exception
+	{
+		String source = "<html><head><script language=\"JavaScript\">var one = 1;</script></head></html>\n";
+		parseTest(source);
+	}
+
+	public void testScriptWithLanguageVersion() throws Exception
+	{
+		String source = "<html><head><script language=\"JavaScript1.5\">var one = 1;</script></head></html>\n";
+		parseTest(source);
+	}
+
 	public void testScriptWithInvalidType() throws Exception
 	{
 		String source = "<html><head><script type=\"javascript\">var one = 1;</script></head></html>\n";

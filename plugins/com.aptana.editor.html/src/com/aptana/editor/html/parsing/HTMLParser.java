@@ -31,20 +31,16 @@ public class HTMLParser implements IParser
 {
 
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
 
-	// a map between the possible values of type attribute and their respective languages
-	private static final Map<String, String> TYPE_ATTR_MAP = new HashMap<String, String>();
-	static
-	{
-		TYPE_ATTR_MAP.put("text/css", ICSSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("application/javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("application/ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("application/x-javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("application/x-ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("text/javascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("text/ecmascript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-		TYPE_ATTR_MAP.put("text/jscript", IJSParserConstants.LANGUAGE); //$NON-NLS-1$
-	}
+	@SuppressWarnings("nls")
+	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
+			"text/ecmascript", "text/jscript" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
 
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
@@ -214,12 +210,15 @@ public class HTMLParser implements IParser
 	private void processStyleTag() throws IOException, Exception
 	{
 		HTMLElementNode node = processCurrentTag();
-		// by default, the style tag is for CSS when there is no type attribute
-		String language = ICSSParserConstants.LANGUAGE;
+		String language = null;
 		String type = node.getAttributeValue(ATTR_TYPE);
-		if (type != null)
+		if (type == null || isInArray(type, CSS_VALID_TYPE_ATTR))
 		{
-			language = TYPE_ATTR_MAP.get(type);
+			language = ICSSParserConstants.LANGUAGE;
+		}
+		else if (isJavaScript(node))
+		{
+			language = IJSParserConstants.LANGUAGE;
 		}
 		processLanguage(language, HTMLTokens.STYLE_END);
 	}
@@ -227,12 +226,11 @@ public class HTMLParser implements IParser
 	private void processScriptTag() throws IOException, Exception
 	{
 		HTMLElementNode node = processCurrentTag();
-		// by default, the script tag is for JS when there is no type attribute
-		String language = IJSParserConstants.LANGUAGE;
+		String language = null;
 		String type = node.getAttributeValue(ATTR_TYPE);
-		if (type != null)
+		if (type == null || isJavaScript(node))
 		{
-			language = TYPE_ATTR_MAP.get(type);
+			language = IJSParserConstants.LANGUAGE;
 		}
 		processLanguage(language, HTMLTokens.SCRIPT_END);
 	}
@@ -314,5 +312,32 @@ public class HTMLParser implements IParser
 		{
 			addOffset(child, offset);
 		}
+	}
+
+	private static boolean isJavaScript(HTMLElementNode node)
+	{
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (isInArray(type, JS_VALID_TYPE_ATTR))
+		{
+			return true;
+		}
+		String langAttr = node.getAttributeValue(ATTR_LANG);
+		if (langAttr != null && isInArray(langAttr, JS_VALID_LANG_ATTR))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isInArray(String element, String[] array)
+	{
+		for (String arrayElement : array)
+		{
+			if (element.startsWith(arrayElement))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
