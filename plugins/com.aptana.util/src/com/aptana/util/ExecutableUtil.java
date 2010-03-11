@@ -13,14 +13,16 @@ public abstract class ExecutableUtil
 
 	/**
 	 * @param exeName
-	 *            name of the binary. ".exe" is appended for windows when searching the path.
+	 *            name of the binary.
+	 * @param appendEXE
+	 *            ".exe" is appended for windows when searching the PATH.
 	 * @param prefPath
 	 *            Path specified in user's preferences.
 	 * @param searchLocations
 	 *            Common locations to search.
 	 * @return
 	 */
-	public static String find(String exeName, String prefPath, List<String> searchLocations)
+	public static String find(String exeName, boolean appendEXE, String prefPath, List<String> searchLocations)
 	{
 		if (prefPath != null && prefPath.length() > 0)
 		{
@@ -37,7 +39,9 @@ public abstract class ExecutableUtil
 			String[] paths = path.split(File.pathSeparator);
 			for (String pathString : paths)
 			{
-				String possiblePath = pathString + File.separator + exeName + ".exe"; //$NON-NLS-1$
+				String possiblePath = pathString + File.separator + exeName;
+				if (appendEXE)
+					possiblePath += ".exe"; //$NON-NLS-1$
 				if (acceptBinary(possiblePath))
 				{
 					return possiblePath;
