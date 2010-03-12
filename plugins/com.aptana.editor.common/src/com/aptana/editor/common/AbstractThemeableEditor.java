@@ -33,6 +33,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -88,6 +89,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 
 	private Image fCaretImage;
 	private RGB fCaretColor;
+
+	private Cursor fCursor;
 
 	private ISelectionChangedListener selectionListener;
 
@@ -214,6 +217,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	private void overrideThemeColors()
 	{
 		overrideSelectionColor();
+		overrideCursor();
 		overrideCaretColor();
 		overrideRulerColors();
 	}
@@ -458,6 +462,36 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		return CommonEditorPlugin.getDefault().getThemeManager();
 	}
 
+	protected void overrideCursor()
+	{
+		if (getSourceViewer().getTextWidget() == null)
+			return;
+
+		RGB backgroundColor = getThemeManager().getCurrentTheme().getBackground();
+
+		Image cursorImage = null;
+		// Is this a lighter background
+		if (backgroundColor.red >= 128 || backgroundColor.green >= 128 || backgroundColor.blue >= 128)
+		{
+			cursorImage =  CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_BLACK);
+		}
+		else
+		{
+			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
+		}
+
+		Display display = getSourceViewer().getTextWidget().getDisplay();
+		Cursor oldCursor = fCursor;
+
+		final Cursor fCursor = new Cursor(display, cursorImage.getImageData(), 7, 11);
+		getSourceViewer().getTextWidget().setCursor(fCursor);
+
+		if (oldCursor != null)
+		{
+			oldCursor.dispose();
+		}
+	}
+
 	protected void overrideCaretColor()
 	{
 		if (getSourceViewer().getTextWidget() == null)
@@ -513,7 +547,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			{
 			}
 		}
-
 	}
 
 	private void setCharacterPairColor(RGB rgb)
@@ -539,6 +572,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 			fCaretImage.dispose();
 			fCaretImage = null;
 		}
+
+		if (fCursor != null)
+		{
+			fCursor.dispose();
+			fCursor = null;
+		}
+
 		removeLineHighlightListener();
 		if (blockSelectionModeFontAdjuster != null)
 		{

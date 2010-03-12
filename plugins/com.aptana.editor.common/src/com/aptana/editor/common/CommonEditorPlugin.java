@@ -35,6 +35,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
+	public static final String IBEAM_BLACK = "/icons/ibeam-black.png"; //$NON-NLS-1$
+	public static final String IBEAM_WHITE = "/icons/ibeam-white.png"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
@@ -193,6 +195,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		reg.put(PENCIL_ICON, imageDescriptorFromPlugin(PLUGIN_ID, PENCIL_ICON));
 		reg.put(SNIPPET, imageDescriptorFromPlugin(PLUGIN_ID, SNIPPET));
 		reg.put(COMMAND, imageDescriptorFromPlugin(PLUGIN_ID, COMMAND));
+		reg.put(IBEAM_BLACK, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_BLACK));
+		reg.put(IBEAM_WHITE, imageDescriptorFromPlugin(PLUGIN_ID, IBEAM_WHITE));
 	}
 
 	public Image getImageFromImageRegistry(String imageID)
