@@ -7,6 +7,7 @@
             class="com.aptana.editor.html.HTMLEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="html,htm,xhtml,shtml"
             icon="icons/html.png"
             id="com.aptana.editor.html"
             name="%editor.html.name">

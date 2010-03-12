@@ -953,6 +953,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			throw new CoreException(Status.CANCEL_STATUS);
 
 		String currentBranchName = repo.currentBranch();
+		String tooltip = currentBranchName;
 		for (String branchName : repo.localBranches())
 		{
 			// Construct the menu item to for this project
@@ -961,6 +962,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			if (branchName.equals(currentBranchName) && repo.isDirty())
 			{
 				modifiedBranchName += "*"; //$NON-NLS-1$
+				tooltip += Messages.GitProjectView_BranchDirtyTooltipMessage;
 			}
 
 			synchronized (branchToPullIndicator)
@@ -968,11 +970,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				if (branchToPullIndicator.containsKey(branchName) && branchToPullIndicator.get(branchName))
 				{
 					modifiedBranchName += " \u2190"; // left arrow //$NON-NLS-1$
+					if (branchName.equals(currentBranchName))
+						tooltip += Messages.GitProjectView_PullChangesTooltipMessage;
 				}
 			}
 			String[] ahead = repo.commitsAhead(branchName);
 			if (ahead != null && ahead.length > 0)
+			{
 				modifiedBranchName += " \u2192"; // right arrow //$NON-NLS-1$
+				if (branchName.equals(currentBranchName))
+					tooltip += Messages.GitProjectView_PushChangesTooltipMessage;
+			}
 
 			branchNameMenuItem.setText(modifiedBranchName);
 			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
@@ -1020,6 +1028,10 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			}
 		});
 		branchesToolItem.setText(currentBranchName);
+		if (tooltip != null)
+		{
+			branchesToolItem.setToolTipText(tooltip);
+		}
 		branchesToolbar.pack();
 	}
 
@@ -1150,6 +1162,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void addGitChangedFilesFilter()
 	{
+		removeFilter();
 		fChangedFilesFilter = new GitChangedFilesFilter();
 		getCommonViewer().addFilter(fChangedFilesFilter);
 		getCommonViewer().expandAll();

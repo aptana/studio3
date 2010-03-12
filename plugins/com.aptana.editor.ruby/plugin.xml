@@ -7,6 +7,7 @@
             class="com.aptana.editor.ruby.RubySourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="rb,rake,cgi,fcgi,rbx,rjs,gemspec,irbrc,ru"
             icon="icons/rb.png"
             id="com.aptana.editor.ruby"
             name="%editor.rb.name">

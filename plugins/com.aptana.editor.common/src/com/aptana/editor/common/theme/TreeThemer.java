@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -154,7 +155,16 @@ public class TreeThemer
 					FontMetrics metrics = event.gc.getFontMetrics();
 					int height = metrics.getHeight() + 2;
 					TreeItem item = (TreeItem) event.item;
-					int width = event.gc.stringExtent(item.getText()).x + 24;
+					int width = event.gc.stringExtent(item.getText()).x + 24; // minimum width we need for text plus eye
+					// FIX For RR3 #200, Tree items aren't expanding to full width of view, breaking our hover code
+					if (isWindows)
+					{
+						int clientWidth = item.getParent().getClientArea().width; // width of view area
+						Rectangle bounds = item.getBounds(); // bounds of the actual item
+						clientWidth -= bounds.x; // subtract where this item starts on left from width of client area
+						clientWidth += 19; // width of tree control arrows					
+						width = Math.max(width, clientWidth);
+					}
 					event.height = height;
 					if (width > event.width)
 						event.width = width;

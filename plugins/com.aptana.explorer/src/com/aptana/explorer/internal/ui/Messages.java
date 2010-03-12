@@ -12,6 +12,8 @@ public class Messages extends NLS
 	public static String GitProjectView_AttachGitRepo_jobTitle;
 	public static String GitProjectView_BranchAlreadyExistsMessage;
 
+	public static String GitProjectView_BranchDirtyTooltipMessage;
+
 	public static String GitProjectView_BranchSubmenuLabel;
 	public static String GitProjectView_ChangedFilesFilterTooltip;
 	public static String GitProjectView_Collapse_tooltip;
@@ -24,8 +26,12 @@ public class Messages extends NLS
 	public static String GitProjectView_LBL_ShowGitHubNetwork;
 	public static String GitProjectView_NonEmptyBranchNameMessage;
 	public static String GitProjectView_NoWhitespaceBranchNameMessage;
+	public static String GitProjectView_PullChangesTooltipMessage;
+
 	public static String GitProjectView_PullJobTitle;
 	public static String GitProjectView_PullTooltip;
+	public static String GitProjectView_PushChangesTooltipMessage;
+
 	public static String GitProjectView_PushJobTitle;
 	public static String GitProjectView_PushTooltip;
 	public static String GitProjectView_ShowGitHubNetworkJobTitle;

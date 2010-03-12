@@ -99,7 +99,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		TO_REMOVE.add("import"); //$NON-NLS-1$
 		TO_REMOVE.add("export"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.run.submenu"); //$NON-NLS-1$
-		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
+//		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.profile.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("compareWithMenu"); //$NON-NLS-1$
 		TO_REMOVE.add("replaceWithMenu"); //$NON-NLS-1$
