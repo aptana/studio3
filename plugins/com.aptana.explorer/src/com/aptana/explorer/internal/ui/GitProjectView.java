@@ -1162,6 +1162,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 	protected void addGitChangedFilesFilter()
 	{
+		removeFilter();
 		fChangedFilesFilter = new GitChangedFilesFilter();
 		getCommonViewer().addFilter(fChangedFilesFilter);
 		getCommonViewer().expandAll();
