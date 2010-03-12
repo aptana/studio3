@@ -32,7 +32,10 @@ public class ExpandLevelHandler extends AbstractHandler
 			IPage page = ((ContentOutline) part).getCurrentPage();
 			if (page instanceof CommonOutlinePage)
 			{
-				((CommonOutlinePage) page).expandToLevel(level);
+				CommonOutlinePage outlinePage = (CommonOutlinePage) page;
+				// we want to expand to the specified level and collapse everything below
+				outlinePage.collapseAll();
+				outlinePage.expandToLevel(level);
 			}
 		}
 		return null;
