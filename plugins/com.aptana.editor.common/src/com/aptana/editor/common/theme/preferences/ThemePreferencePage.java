@@ -23,7 +23,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -46,9 +45,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -462,7 +458,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
-		table.setLayoutData(GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).grab(true, true).create());
+		GridData gridData = new GridData();
+		gridData.heightHint = 200;
+		table.setLayoutData(gridData);
 		TableLayout layout = new TableLayout();
 		table.setLayout(layout);
 		// Hack to force a specific row height
@@ -681,25 +679,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			protected boolean canEdit(Object element)
 			{
 				return true;
-			}
-		});
-		
-		table.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				Table table = (Table) e.widget;
-				int width = table.getClientArea().width;
-				TableColumn column = null;
-				for (TableColumn i : table.getColumns()) {
-					if (column == null) {
-						column = i;
-					} else {
-						width -= i.getWidth();
-					}
-				}
-				if (column != null) {
-					column.setWidth(width);
-				}
 			}
 		});
 
