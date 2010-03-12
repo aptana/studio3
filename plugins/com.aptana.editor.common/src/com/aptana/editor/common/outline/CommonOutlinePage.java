@@ -168,6 +168,30 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
+	public void collapseAll()
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().collapseAll();
+		}
+	}
+
+	public void expandAll()
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().expandAll();
+		}
+	}
+
+	public void expandToLevel(int level)
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().expandToLevel(level);
+		}
+	}
+
 	public void refresh()
 	{
 		if (!isDisposed())

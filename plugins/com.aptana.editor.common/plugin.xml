@@ -17,6 +17,25 @@
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             name="%command.filter.name">
       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandCollapseAllHandler"
+             description="%command.expandcollapse.description"
+             id="com.aptana.editor.commands.ExpandCollapseAll"
+             name="%command.expandcollapse.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandLevelHandler"
+             description="%command.expandLevel.description"
+             id="com.aptana.editor.commands.ExpandLevel"
+             name="%command.expandLevel.name">
+          <commandParameter
+                id="level"
+                name="%commandParameter.level.name"
+                optional="true">
+          </commandParameter>
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -38,6 +57,101 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+T">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandCollapseAll"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+A">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+1">
+         <parameter
+               id="level"
+               value="1"></parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+2">
+         <parameter
+               id="level"
+               value="2">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+3">
+         <parameter
+               id="level"
+               value="3">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+4">
+         <parameter
+               id="level"
+               value="4">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+5">
+         <parameter
+               id="level"
+               value="5">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+6">
+         <parameter
+               id="level"
+               value="6">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+7">
+         <parameter
+               id="level"
+               value="7">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+8">
+         <parameter
+               id="level"
+               value="8">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+9">
+         <parameter
+               id="level"
+               value="9">
+         </parameter>
       </key>
 
    </extension>
