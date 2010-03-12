@@ -23,7 +23,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -33,12 +33,12 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -61,13 +61,12 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -458,12 +457,15 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createTokenEditTable(Composite composite)
 	{
-		final Table table = new Table(composite, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
+		Composite comp = new Composite(composite, SWT.NONE);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.heightHint = 200;
+		comp.setLayoutData(gridData);
+		TableColumnLayout layout = new TableColumnLayout();
+		comp.setLayout(layout);
+		final Table table = new Table(comp, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
-		table.setLayoutData(GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).grab(true, true).create());
-		TableLayout layout = new TableLayout();
-		table.setLayout(layout);
 		// Hack to force a specific row height
 		table.addListener(SWT.MeasureItem, new Listener()
 		{
@@ -571,10 +573,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		TableViewerColumn column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn tokenName = column.getColumn();
-		tokenName.setResizable(true);
 		tokenName.setText("Element"); //$NON-NLS-1$
-		tokenName.setWidth(250);
-		layout.addColumnData(new ColumnWeightData(50, true));
+		layout.setColumnData(tokenName, new ColumnWeightData(100, true));
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
 			@SuppressWarnings("unchecked")
@@ -682,32 +682,12 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				return true;
 			}
 		});
-		
-		table.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				Table table = (Table) e.widget;
-				int width = table.getClientArea().width;
-				TableColumn column = null;
-				for (TableColumn i : table.getColumns()) {
-					if (column == null) {
-						column = i;
-					} else {
-						width -= i.getWidth();
-					}
-				}
-				if (column != null) {
-					column.setWidth(width);
-				}
-			}
-		});
 
 		column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn foreground = column.getColumn();
-		foreground.setResizable(true);
+		foreground.setResizable(false);
 		foreground.setText(Messages.ThemePreferencePage_ForegroundColumnLabel);
-		foreground.setWidth(25);
-		layout.addColumnData(new ColumnWeightData(5, true));
+		layout.setColumnData(foreground, new ColumnPixelData(30, false));
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
 			@Override
@@ -719,10 +699,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		column = new TableViewerColumn(tableViewer, SWT.NONE);
 		final TableColumn background = column.getColumn();
-		background.setResizable(true);
+		background.setResizable(false);
 		background.setText(Messages.ThemePreferencePage_BackgroundColumnLabel);
-		background.setWidth(25);
-		layout.addColumnData(new ColumnWeightData(5, true));
+		layout.setColumnData(background, new ColumnPixelData(30, false));
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
 			@Override
@@ -733,19 +712,23 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		});
 
 		final TableColumn fontStyle = new TableColumn(table, SWT.NONE);
-		fontStyle.setResizable(true);
+		fontStyle.setResizable(false);
 		fontStyle.setText(Messages.ThemePreferencePage_FontStyleColumnLabel);
-		fontStyle.setWidth(75);
-		layout.addColumnData(new ColumnWeightData(15, true));
+		layout.setColumnData(fontStyle, new ColumnPixelData(75, false));
 
 		Composite editTokenList = new Composite(composite, SWT.NONE);
+		editTokenList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		GridLayout grid = new GridLayout(2, false);
-		grid.marginWidth = -3;
 		editTokenList.setLayout(grid);
 
 		Composite buttons = new Composite(editTokenList, SWT.NONE);
-		buttons.setLayout(new RowLayout(SWT.HORIZONTAL));
+		GridLayout buttonsLayout = new GridLayout(2, true);
+		buttonsLayout.marginWidth = 0;
+		buttonsLayout.horizontalSpacing = 0;
+		buttons.setLayout(buttonsLayout);
 		Button addToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		addToken.setBounds(0, 0, 16, 16);
+		addToken.setLayoutData(new GridData(GridData.FILL_BOTH));
 		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);
 		addToken.addSelectionListener(new SelectionAdapter()
 		{
@@ -770,11 +753,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					}
 					i++;
 				}
-				table.select(i);
-				// TODO Somehow set focus on the first column so we can have the user edit right away?
+				// Have the new addition in an edit mode
+				Object newElement = tableViewer.getElementAt(i);
+				if (newElement != null)
+				{
+					tableViewer.editElement(newElement, 0);
+				}
 			}
 		});
 		Button removeToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		removeToken.setLayoutData(new GridData(GridData.FILL_BOTH));
 		removeToken.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
 		removeToken.addSelectionListener(new SelectionAdapter()
 		{
@@ -796,16 +784,15 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				setTheme(fSelectedTheme);
 			}
 		});
-
+		
 		Composite textField = new Composite(editTokenList, SWT.NONE);
-		textField.setLayoutData(new GridData(GridData.END, GridData.CENTER, true, false));
-		textField.setLayout(new RowLayout(SWT.HORIZONTAL));
+		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		textField.setLayout(new GridLayout(2, false));
 		Label addTokenLabel = new Label(textField, SWT.RIGHT);
 		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
 
 		final Text text = new Text(textField, SWT.SINGLE);
-		RowData data = new RowData();
-		data.width = 250;
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		text.setLayoutData(data);
 		text.setEditable(false);
 		table.addSelectionListener(new SelectionListener()
@@ -958,7 +945,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		boolean isUnderline = (text.getStyle() & TextAttribute.UNDERLINE) != 0;
 		TableEditor editor = new TableEditor(table);
 		Composite buttons = new Composite(table, SWT.NONE);
-		GridLayout grid = new GridLayout(3, false);
+		GridLayout grid = new GridLayout(3, true);
 		grid.marginHeight = 0;
 		grid.marginWidth = 0;
 		grid.horizontalSpacing = 0;
@@ -966,12 +953,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		final Button b = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
 		b.setText(Messages.ThemePreferencePage_BoldButtonLabel);
 		b.setSelection(isBold);
+		b.setSize(16, 16);
+		b.setLayoutData(new GridData(GridData.FILL_BOTH));
 		final Button italic = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
 		italic.setText(Messages.ThemePreferencePage_ItalicButtonLabel);
 		italic.setSelection(isItalic);
+		italic.setLayoutData(new GridData(GridData.FILL_BOTH));
+		italic.setSize(16, 16);
 		final Button u = new Button(buttons, SWT.TOGGLE | SWT.FLAT);
 		u.setText(Messages.ThemePreferencePage_UnderlineButtonLabel);
 		u.setSelection(isUnderline);
+		u.setLayoutData(new GridData(GridData.FILL_BOTH));
+		u.setSize(16, 16);
+		
 		buttons.pack();
 		editor.minimumWidth = buttons.getSize().x;
 		editor.horizontalAlignment = SWT.LEFT;
@@ -1014,8 +1008,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		gc.dispose();
 		button.setImage(image);
 		button.pack();
-		editor.minimumWidth = button.getSize().x;
-		editor.horizontalAlignment = SWT.LEFT;
+		editor.minimumWidth = button.getSize().x - 4;
+		editor.horizontalAlignment = SWT.CENTER;
 		editor.setEditor(button, tableItem, index);
 		fTableEditors.add(editor);
 
