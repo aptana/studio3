@@ -34,11 +34,5 @@
             priority="normal">
       </content-type>
    </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.aptana.editor.ruby.RubyPreferenceInitializer">
-      </initializer>
-   </extension>
 
 </plugin>
