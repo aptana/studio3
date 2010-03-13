@@ -72,6 +72,7 @@ public class CommitDialog extends StatusDialog
 	private String fMessage;
 	private Table unstagedTable;
 	private Table stagedTable;
+	private Control draggingFromTable;
 
 	private Image newFileImage;
 	private Image deletedFileImage;
@@ -232,6 +233,11 @@ public class CommitDialog extends StatusDialog
 		source.setTransfer(types);
 		source.addDragListener(new DragSourceAdapter()
 		{
+			public void dragStart(DragSourceEvent event) {
+				DragSource ds = (DragSource) event.widget;
+				draggingFromTable = ds.getControl();
+			}
+
 			public void dragSetData(DragSourceEvent event)
 			{
 				// Get the selected items in the drag source
@@ -257,6 +263,12 @@ public class CommitDialog extends StatusDialog
 			target.setDropTargetEffect(null);
 		target.addDropListener(new DropTargetAdapter()
 		{
+			public void dropAccept(DropTargetEvent event) {
+				DropTarget dp = (DropTarget) event.widget;
+				if (dp.getControl() == draggingFromTable) {
+					event.detail = DND.DROP_NONE;
+				}
+			}
 
 			public void dragEnter(DropTargetEvent event)
 			{
