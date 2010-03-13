@@ -25,6 +25,7 @@ public class AllTests
 		suite.addTestSuite(HTMLTagScannerTest.class);
 		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(OpenTagCloserTest.class);
+		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
