@@ -483,7 +483,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		Display display = getSourceViewer().getTextWidget().getDisplay();
 		Cursor oldCursor = fCursor;
 
-		final Cursor fCursor = new Cursor(display, cursorImage.getImageData(), 7, 11);
+		fCursor = new Cursor(display, cursorImage.getImageData(), 7, 11);
 		getSourceViewer().getTextWidget().setCursor(fCursor);
 
 		if (oldCursor != null)
