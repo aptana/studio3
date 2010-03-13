@@ -147,7 +147,8 @@ public class ScriptingConsole implements IStartup, IConsolePageParticipant
 					console.setFont(JFaceResources.getTextFont());
 
 					// set stream colors
-					applyTheme(CONSOLE_OUTPUT, outputConsoleStream, display.getSystemColor(SWT.COLOR_WIDGET_FOREGROUND));
+					// For CONSOLE_OUTPUT stream we should use the foreground color of the theme
+					applyTheme(CONSOLE_OUTPUT, outputConsoleStream, colorManager.getColor(theme.getForeground()));
 					applyTheme(CONSOLE_ERROR, errorConsoleStream, display.getSystemColor(SWT.COLOR_DARK_RED));
 					applyTheme(CONSOLE_INFO, infoConsoleStream, display.getSystemColor(SWT.COLOR_DARK_BLUE));
 					applyTheme(CONSOLE_WARNING, warningConsoleStream, display.getSystemColor(SWT.COLOR_DARK_YELLOW));
