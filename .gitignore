@@ -2,6 +2,10 @@
 bin/
 *~
 *.swp
+*.aps
+*.ncb
+*.suo
+*.user
 
 build/
 *.pbxuser

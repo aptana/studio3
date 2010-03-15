@@ -166,9 +166,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				synchronized (branchToPullIndicator)
 				{
 					branchToPullIndicator.clear();
-					for (String branch : repo.localBranches())
+				}
+				for (String branch : repo.localBranches())
+				{
+					boolean shouldPull = repo.shouldPull(branch);
+					synchronized (branchToPullIndicator)
 					{
-						branchToPullIndicator.put(branch, repo.shouldPull(branch));
+						branchToPullIndicator.put(branch, shouldPull);
 					}
 				}
 
