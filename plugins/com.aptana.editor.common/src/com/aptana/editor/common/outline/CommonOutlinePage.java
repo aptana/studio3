@@ -102,8 +102,13 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 			@Override
 			public void doubleClick(DoubleClickEvent event)
 			{
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 				// expands the selection one level if applicable
-				viewer.expandToLevel(((IStructuredSelection) event.getSelection()).getFirstElement(), 1);
+				viewer.expandToLevel(selection.getFirstElement(), 1);
+				// selects the corresponding text in editor
+				if (!isLinkedWithEditor()) {
+					setEditorSelection(selection, true);
+				}
 			}
 		});
 
