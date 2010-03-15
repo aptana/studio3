@@ -1,6 +1,10 @@
 package com.aptana.git.ui.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -12,6 +16,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.ui.GitUIPlugin;
 
 /**
@@ -65,6 +70,15 @@ public abstract class Launcher
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
+		Map<String, String> env = new HashMap<String, String>();
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		if (!env.isEmpty()) {
+			config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
+			config.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
+		}
 		return config;
 	}
 
