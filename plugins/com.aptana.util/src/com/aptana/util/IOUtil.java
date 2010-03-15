@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 public abstract class IOUtil
@@ -138,6 +139,40 @@ public abstract class IOUtil
 			catch (Exception e)
 			{
 				// ignore
+			}
+		}
+	}
+
+	/**
+	 * extractFile
+	 *
+	 * @param path
+	 * @param file
+	 * @throws IOException
+	 */
+	public static void extractFile(String bundleId, String path, File file) throws IOException {
+		InputStream in = null;
+		FileOutputStream out = null;
+		try {
+			in = Platform.getBundle(bundleId).getEntry(path).openStream();
+			out = new FileOutputStream(file);
+			byte[] buffer = new byte[1024];
+			int n;
+			while ((n = in.read(buffer)) > 0) {
+				out.write(buffer, 0, n);
+			}
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+				}
+			}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+				}
 			}
 		}
 	}
