@@ -326,16 +326,12 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	private boolean currentThemeHasDarkBG()
 	{
-		RGB themeBG = getActiveTheme().getBackground();
-		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
-		return grey <= 128;
+		return getActiveTheme().hasDarkBG();
 	}
 
 	private boolean currentThemeHasLightFG()
 	{
-		RGB themeBG = getActiveTheme().getForeground();
-		double grey = 0.3 * themeBG.red + 0.59 * themeBG.green + 0.11 * themeBG.blue;
-		return grey >= 90;
+		return getActiveTheme().hasLightFG();
 	}
 
 	protected Theme getActiveTheme()

@@ -467,17 +467,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		if (getSourceViewer().getTextWidget() == null)
 			return;
 
-		RGB backgroundColor = getThemeManager().getCurrentTheme().getBackground();
-
 		Image cursorImage = null;
-		// Is this a lighter background
-		if (backgroundColor.red >= 128 || backgroundColor.green >= 128 || backgroundColor.blue >= 128)
+		if (getThemeManager().getCurrentTheme().hasDarkBG())
 		{
-			cursorImage =  CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_BLACK);
+			cursorImage =  CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
 		}
 		else
 		{
-			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
+			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_BLACK);
 		}
 
 		Display display = getSourceViewer().getTextWidget().getDisplay();

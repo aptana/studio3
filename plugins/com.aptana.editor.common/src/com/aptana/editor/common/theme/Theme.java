@@ -64,6 +64,8 @@ public class Theme
 	private RGB caret;
 	private String name;
 
+	private RGB searchResultBG;
+
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
@@ -552,6 +554,44 @@ public class Theme
 		if (bg == null)
 			return null;
 		return bg.getRGB();
+	}
+
+	public RGB getSearchResultColor()
+	{
+		if (searchResultBG == null)
+		{
+			searchResultBG = isDark(getSelection()) ? lighten(getSelection()) : darken(getSelection());
+		}
+		return searchResultBG;
+	}
+
+	private RGB lighten(RGB color)
+	{
+		float[] hsb = color.getHSB();
+		return new RGB(hsb[0], hsb[1], (float) (hsb[2] + 0.15));
+	}
+
+	private RGB darken(RGB color)
+	{
+		float[] hsb = color.getHSB();
+		return new RGB(hsb[0], hsb[1], (float) (hsb[2] - 0.15));
+	}
+
+	public boolean hasDarkBG()
+	{
+		return isDark(getBackground());
+	}
+
+	public boolean hasLightFG()
+	{
+		return !isDark(getForeground());
+	}
+
+	private boolean isDark(RGB color)
+	{
+		// Convert to grayscale
+		double grey = 0.3 * color.red + 0.59 * color.green + 0.11 * color.blue;
+		return grey <= 128;
 	}
 
 }
