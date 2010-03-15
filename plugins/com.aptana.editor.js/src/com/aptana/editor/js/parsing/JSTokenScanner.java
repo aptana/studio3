@@ -37,6 +37,7 @@ package com.aptana.editor.js.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -50,19 +51,23 @@ import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
+import com.aptana.editor.js.IJSTokenScanner;
 import com.aptana.editor.js.JSCodeScanner;
+import com.aptana.editor.js.JSRegexpRule;
 import com.aptana.editor.js.parsing.lexer.JSTokens;
 
 /**
  * @author Michael Xia
  */
-public class JSTokenScanner extends JSCodeScanner
+public class JSTokenScanner extends JSCodeScanner implements IJSTokenScanner
 {
 
 	@SuppressWarnings("nls")
 	private static String[] GRAMMAR_KEYWORDS = { "function", "var", "void", "true", "false", "null", "this" };
 
 	private static String VAR_CONST = "const"; //$NON-NLS-1$
+
+	private IToken fToken;
 
 	public JSTokenScanner()
 	{
@@ -85,7 +90,7 @@ public class JSTokenScanner extends JSCodeScanner
 		rules.add(new SingleLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(new SingleLineRule("\'", "\'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		// regex
-		rules.add(new RegexpRule("/([^/]|\\\\/)*?([^/\\\\]+|\\\\\\\\|\\\\/)/[igm]*", createToken(getTokenName(JSTokens.REGEX)), true)); //$NON-NLS-1$
+		rules.add(new JSRegexpRule(createToken(getTokenName(JSTokens.REGEX))));
 
 		WordRule wordRule = new WordRule(new LettersAndDigitsWordDetector(), Token.UNDEFINED);
 		for (String keyword : KEYWORD_OPERATORS)
@@ -147,6 +152,48 @@ public class JSTokenScanner extends JSCodeScanner
 		rules.add(new RegexpRule("[_a-zA-Z0-9$]+", createToken(identifier), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));
+	}
+
+	@Override
+	public boolean hasDivisionStart()
+	{
+		if (fToken == null || fToken.getData() == null)
+		{
+			return false;
+		}
+		short tokenType = JSTokens.getToken(fToken.getData().toString());
+		switch (tokenType)
+		{
+			case JSTokens.IDENTIFIER:
+			case JSTokens.NUMBER:
+			case JSTokens.REGEX:
+			case JSTokens.STRING:
+			case JSTokens.RPAREN:
+			case JSTokens.PLUS_PLUS:
+			case JSTokens.MINUS_MINUS:
+			case JSTokens.RBRACKET:
+			case JSTokens.RCURLY:
+			case JSTokens.FALSE:
+			case JSTokens.NULL:
+			case JSTokens.THIS:
+			case JSTokens.TRUE:
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void setRange(final IDocument document, int offset, int length)
+	{
+		fToken = null;
+		super.setRange(document, offset, length);
+	}
+
+	@Override
+	public IToken nextToken()
+	{
+		fToken = super.nextToken();
+		return fToken;
 	}
 
 	@Override
