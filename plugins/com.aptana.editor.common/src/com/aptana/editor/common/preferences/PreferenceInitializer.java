@@ -24,6 +24,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		IPreferenceStore store = EditorsPlugin.getDefault().getPreferenceStore();
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
+		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
 	}
 
 }
