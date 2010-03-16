@@ -49,6 +49,7 @@ import com.aptana.util.StringUtil;
 public class GitRepository
 {
 
+	private static final String INDEX = "index"; //$NON-NLS-1$
 	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
 	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
@@ -181,29 +182,49 @@ public class GitRepository
 		readCurrentBranch();
 		try
 		{
-			// TODO Also listen for changes to "index" and force refresh of our model here? That way we don't have to
-			// call refresh after a bunch of the actions we take! Of course that means we assume filewatcher is fast and
-			// works on all platforms, which isn;t true for 64-bit Windows/Linux yet.
-
-			// Add listener for changes in HEAD (i.e. switched branches)
+			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
+			// index appears to change on commit/stage/unstage/pull
+			// Add listener for changes in HEAD (i.e. switched branches), and index
 			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
 					false, new JNotifyListener()
 					{
 
+						private Set<String> filesToWatch;
+
 						@Override
 						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 						{
-							if (newName == null || !newName.equals(HEAD))
+							if (newName == null || !filesToWatch().contains(newName))
 								return;
-							checkForBranchChange();
+							// TODO listen for ORIG_HEAD for merges?
+							if (newName.equals(HEAD))
+								checkForBranchChange();
+							else if (newName.equals(INDEX))
+								index().refresh();
+						}
+
+						private Set<String> filesToWatch()
+						{
+							if (filesToWatch == null)
+							{
+								filesToWatch = new HashSet<String>();
+								filesToWatch.add(HEAD);
+								filesToWatch.add(INDEX);
+							}
+							return filesToWatch;
 						}
 
 						@Override
 						public void fileModified(int wd, String rootPath, String name)
 						{
-							if (name == null || !name.equals(HEAD))
+							if (name == null || !filesToWatch().contains(name))
 								return;
-							checkForBranchChange();
+							// TODO Listen for COMMIT_EDITMSG for commits...?
+							// TODO Listen for FETCH_HEAD to determine when we've fetched?!
+							if (name.equals(HEAD))
+								checkForBranchChange();
+							else if (name.equals(INDEX))
+								index().refresh();
 						}
 
 						protected void checkForBranchChange()
@@ -229,6 +250,73 @@ public class GitRepository
 							// ignore, should never happen
 						}
 					}));
+
+			// Add listener for remotes
+			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_REMOTES, IJNotify.FILE_ANY, true,
+					new JNotifyListener()
+					{
+
+						@Override
+						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						{
+							if (newName == null)
+								return;
+							if (isProbablyBranch(newName))
+							{
+								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+								// now,
+								// seems harmless to fire both.
+								firePullEvent();
+								firePushEvent();
+							}
+						}
+
+						// Determine if filename is referring to a remote branch, and not the remote itself.
+						private boolean isProbablyBranch(String newName)
+						{
+							return newName != null && newName.indexOf(File.separator) != -1;
+						}
+
+						@Override
+						public void fileModified(int wd, String rootPath, String name)
+						{
+							if (name == null)
+								return;
+							if (isProbablyBranch(name))
+							{
+								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+								// now,
+								// seems harmless to fire both.
+								firePullEvent();
+								firePushEvent();
+							}
+						}
+
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							// if path is longer than one segment, then remote branch was deleted. Means we probably
+							// pulled.
+							if (isProbablyBranch(name))
+							{
+								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+								firePullEvent();
+							}
+						}
+
+						@Override
+						public void fileCreated(int wd, String rootPath, String name)
+						{
+							if (isProbablyBranch(name))
+							{
+								// if path is longer than one segment, then remote branch was created.
+								addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+								// Since we suddenly know about a new remote branch, we probably pulled.
+								firePullEvent();
+							}
+						}
+					}));
+
 			// Add listener for added/removed branches
 			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_CREATED
 					| IJNotify.FILE_DELETED, false, new JNotifyListener()
@@ -385,7 +473,7 @@ public class GitRepository
 
 		refs = new HashMap<String, List<GitRef>>();
 
-		String output = GitExecutable.instance().outputForCommand(fileURL.getPath(), "for-each-ref", //$NON-NLS-1$
+		String output = GitExecutable.instance().outputForCommand(gitDirPath(), "for-each-ref", //$NON-NLS-1$
 				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs"); //$NON-NLS-1$ //$NON-NLS-2$
 		List<String> lines = StringUtil.tokenize(output, "\n"); //$NON-NLS-1$
 
@@ -530,7 +618,7 @@ public class GitRepository
 
 	boolean executeHook(String name, String... arguments)
 	{
-		String hookPath = fileURL.getPath();
+		String hookPath = gitDirPath();
 		if (!hookPath.endsWith(File.separator))
 			hookPath += File.separator;
 		hookPath += "hooks" + File.separator + name; //$NON-NLS-1$
@@ -554,8 +642,8 @@ public class GitRepository
 		}
 
 		Map<String, String> env = new HashMap<String, String>();
-		env.put(GitEnv.GIT_DIR, fileURL.getPath());
-		env.put(GitEnv.GIT_INDEX_FILE, gitFile("index").getAbsolutePath()); //$NON-NLS-1$
+		env.put(GitEnv.GIT_DIR, gitDirPath());
+		env.put(GitEnv.GIT_INDEX_FILE, gitFile(INDEX).getAbsolutePath());
 
 		int ret = 1;
 		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath, workingDirectory(), env, arguments);
@@ -692,8 +780,9 @@ public class GitRepository
 				remote.getRemoteName(), remote.getRemoteBranchName());
 		if (output == null || output.length() < 40)
 		{
-			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}", remote
-					.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
+			GitPlugin.logWarning(MessageFormat.format(
+					"Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}", remote
+							.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
 			return false;
 		}
 		String remoteSHA = output.substring(0, 40);
@@ -1057,7 +1146,14 @@ public class GitRepository
 
 	File gitFile(String string)
 	{
-		return new File(fileURL.getPath(), string);
+		return new File(gitDirPath(), string);
+	}
+
+	private String gitDirPath()
+	{
+		String path = fileURL.getPath();
+		// FIXME On windows sometimes it gives wacky paths like "/C:/..."
+		return path;
 	}
 
 	public void firePullEvent()
