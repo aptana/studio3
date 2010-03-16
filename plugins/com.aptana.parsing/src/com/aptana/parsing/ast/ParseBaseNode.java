@@ -1,9 +1,9 @@
 package com.aptana.parsing.ast;
 
-import com.aptana.parsing.lexer.IRange;
-
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
+
+import com.aptana.parsing.lexer.IRange;
 
 public class ParseBaseNode extends Node implements IParseNode
 {
@@ -78,6 +78,25 @@ public class ParseBaseNode extends Node implements IParseNode
 	public int getChildrenCount()
 	{
 		return fChildrenCount;
+	}
+
+	@Override
+	public IParseNode getElementAt(int offset)
+	{
+		if (offset < getStartingOffset() || offset > getEndingOffset())
+		{
+			// not in this node
+			return null;
+		}
+		IParseNode[] children = getChildren();
+		for (IParseNode child : children)
+		{
+			if (child.getStartingOffset() <= offset && offset <= child.getEndingOffset())
+			{
+				return child.getElementAt(offset);
+			}
+		}
+		return this;
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
@@ -19,6 +20,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineContentProvider());
 		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
+	}
+
+	public static HTMLOutlineItem getOutlineItem(IParseNode node)
+	{
+		return new HTMLOutlineItem(node.getNameNode().getNameRange(), node);
 	}
 
 	@Override
@@ -36,6 +42,23 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			return getChildren(((HTMLSpecialNode) parentElement).getChild(0));
 		}
 		return super.getChildren(parentElement);
+	}
+
+	@Override
+	public Object getParent(Object element)
+	{
+		if (element instanceof HTMLOutlineItem)
+		{
+			IParseNode node = ((HTMLOutlineItem) element).getReferenceNode();
+			IParseNode parent = node.getParent();
+			if (parent instanceof ParseRootNode)
+			{
+				// we're at the root of the nested language, which is not displayed; go one level up
+				parent = parent.getParent();
+			}
+			return new HTMLOutlineItem(parent, parent);
+		}
+		return super.getParent(element);
 	}
 
 	@Override

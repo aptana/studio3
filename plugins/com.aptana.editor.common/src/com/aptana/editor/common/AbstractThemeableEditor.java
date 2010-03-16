@@ -68,6 +68,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -798,7 +799,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	 */
 	protected Object getOutlineElementAt(int caret)
 	{
-		return null;
+		return getASTNodeAt(caret);
 	}
 
 	/**
@@ -807,6 +808,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
 		return CommonEditorPlugin.getDefault().getPreferenceStore();
+	}
+
+	protected IParseNode getASTNodeAt(int offset)
+	{
+		IParseNode root = getFileService().getParseResult();
+		if (root == null)
+		{
+			return null;
+		}
+		return root.getElementAt(offset);
 	}
 
 	private boolean isLinkedWithEditor()
