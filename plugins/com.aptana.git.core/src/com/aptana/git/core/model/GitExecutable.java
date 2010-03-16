@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -188,7 +190,13 @@ public class GitExecutable
 	 */
 	public String outputForCommand(String workingDir, String... args)
 	{
-		return ProcessUtil.outputForCommand(gitPath, workingDir, args);
+		Map<String, String> env = null;
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			env = new HashMap<String, String>();
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		return ProcessUtil.outputForCommand(gitPath, workingDir, env, args);
 	}
 
 	/**
@@ -215,6 +223,13 @@ public class GitExecutable
 	public Map<Integer, String> runInBackground(String workingDirectory, String input,
 			Map<String, String> amendEnvironment, String... args)
 	{
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			if (amendEnvironment == null) {
+				amendEnvironment = new HashMap<String, String>();
+			}
+			amendEnvironment.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
 		return ProcessUtil.runInBackground(gitPath, workingDirectory, input, amendEnvironment, args);
 	}
 
