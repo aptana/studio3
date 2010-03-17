@@ -173,8 +173,6 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		if (isUserBundleFile(name))
 		{
-			System.out.println("modified: " + name);
-			
 			File file = new File(rootPath, name);
 
 			BundleManager.getInstance().reloadScript(file);
