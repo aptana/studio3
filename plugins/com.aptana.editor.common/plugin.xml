@@ -60,9 +60,9 @@
       </key>
       <key
             commandId="com.aptana.editor.commands.ExpandCollapseAll"
-            contextId="org.eclipse.ui.contexts.window"
+            contextId="com.aptana.editor.common.outline"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+A">
+            sequence="M1+M3+A">
       </key>
       <key
             commandId="com.aptana.editor.commands.ExpandLevel"
@@ -360,5 +360,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+SHIFT+TAB">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.editor.common.outline"
+            name="%context.outline.name">
+      </context>
    </extension>
 </plugin>
