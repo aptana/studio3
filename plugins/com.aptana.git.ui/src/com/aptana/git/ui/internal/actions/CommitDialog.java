@@ -43,6 +43,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -51,6 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -103,7 +106,7 @@ public class CommitDialog extends StatusDialog
 		}
 		return dialogSettings;
 	}
-	
+
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
@@ -129,6 +132,34 @@ public class CommitDialog extends StatusDialog
 		validate();
 
 		return container;
+	}
+
+	/**
+	 * Override the default implementation to get a bigger commit dialog on large monitors.
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
+	 */
+	protected Point getInitialSize()
+	{
+		IDialogSettings dialogSettings = getDialogBoundsSettings();
+		try
+		{
+			dialogSettings.getInt("DIALOG_WIDTH");
+		}
+		catch (NumberFormatException e)
+		{
+			// The dialog settings are empty, so we need to compute the initial
+			// size according to the size of the monitor. Large monitors will get a bigger commit dialog.
+			Composite parent = getShell().getParent();
+			Monitor monitor = getShell().getDisplay().getPrimaryMonitor();
+			if (parent != null)
+			{
+				monitor = parent.getMonitor();
+			}
+			Rectangle monitorBounds = monitor.getClientArea();
+			return new Point((int) (0.618 * monitorBounds.width), (int) (0.618 * monitorBounds.height));
+		}
+		return super.getInitialSize();
 	}
 
 	private void createDiffArea(Composite container)
@@ -233,7 +264,8 @@ public class CommitDialog extends StatusDialog
 		source.setTransfer(types);
 		source.addDragListener(new DragSourceAdapter()
 		{
-			public void dragStart(DragSourceEvent event) {
+			public void dragStart(DragSourceEvent event)
+			{
 				DragSource ds = (DragSource) event.widget;
 				draggingFromTable = ds.getControl();
 			}
@@ -263,9 +295,11 @@ public class CommitDialog extends StatusDialog
 			target.setDropTargetEffect(null);
 		target.addDropListener(new DropTargetAdapter()
 		{
-			public void dropAccept(DropTargetEvent event) {
+			public void dropAccept(DropTargetEvent event)
+			{
 				DropTarget dp = (DropTarget) event.widget;
-				if (dp.getControl() == draggingFromTable) {
+				if (dp.getControl() == draggingFromTable)
+				{
 					event.detail = DND.DROP_NONE;
 				}
 			}
