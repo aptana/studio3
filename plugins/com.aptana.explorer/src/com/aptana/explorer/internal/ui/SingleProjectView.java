@@ -106,7 +106,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		TO_REMOVE.add("org.eclipse.ui.framelist.goInto"); //$NON-NLS-1$
 		TO_REMOVE.add("addFromHistoryAction"); //$NON-NLS-1$
 		TO_REMOVE.add("org.radrails.rails.ui.actions.RunScriptServerAction"); //$NON-NLS-1$
-		TO_REMOVE.add("team.main"); //$NON-NLS-1$
 	};
 
 	private ToolItem projectToolItem;
@@ -1020,18 +1019,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected void mangleContextMenu(Menu menu)
 	{
 		// Remove a whole bunch of the contributed items that we don't want
-		for (MenuItem menuItem : menu.getItems())
-		{
-			Object data = menuItem.getData();
-			if (data instanceof IContributionItem)
-			{
-				IContributionItem contrib = (IContributionItem) data;
-				if (TO_REMOVE.contains(contrib.getId()))
-				{
-					menuItem.dispose();
-				}
-			}
-		}
+		removeMenuItems(menu, TO_REMOVE);
 		// Check for two separators in a row, remove one if you see that...
 		boolean lastWasSeparator = false;
 		for (MenuItem menuItem : menu.getItems())
@@ -1047,6 +1035,24 @@ public abstract class SingleProjectView extends CommonNavigator
 			else
 			{
 				lastWasSeparator = false;
+			}
+		}
+	}
+
+	protected void removeMenuItems(Menu menu, Set<String> idsToRemove)
+	{
+		if (idsToRemove == null || idsToRemove.isEmpty())
+			return;
+		for (MenuItem menuItem : menu.getItems())
+		{
+			Object data = menuItem.getData();
+			if (data instanceof IContributionItem)
+			{
+				IContributionItem contrib = (IContributionItem) data;
+				if (idsToRemove.contains(contrib.getId()))
+				{
+					menuItem.dispose();
+				}
 			}
 		}
 	}

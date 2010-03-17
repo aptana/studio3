@@ -1152,7 +1152,12 @@ public class GitRepository
 	private String gitDirPath()
 	{
 		String path = fileURL.getPath();
-		// FIXME On windows sometimes it gives wacky paths like "/C:/..."
+		// On windows sometimes it gives wacky paths like "/C:/..."
+		if (Platform.getOS().equals(Platform.OS_WIN32)
+				&& path.startsWith("/") && path.length() >= 3 && path.charAt(2) == ':') //$NON-NLS-1$
+		{
+			return path.substring(1);
+		}
 		return path;
 	}
 

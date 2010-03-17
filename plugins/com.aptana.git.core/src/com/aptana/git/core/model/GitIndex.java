@@ -393,6 +393,7 @@ public class GitIndex
 
 	public List<ChangedFile> changedFiles()
 	{
+		// FIXME If we're in the middle of refreshing the index, this list could be wrong/incomplete
 		return new ArrayList<ChangedFile>(files);
 	}
 

@@ -83,6 +83,8 @@ public class XMLParser implements IParser
 
 	private void processEndTag(Symbol symbol) throws IOException, Exception
 	{
+		// adjusts the ending offset of current element to include the entire block
+		((XMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), symbol.getEnd());
 		closeElement();
 	}
 

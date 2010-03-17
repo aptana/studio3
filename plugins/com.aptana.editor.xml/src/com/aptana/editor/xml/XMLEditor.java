@@ -41,6 +41,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
 import com.aptana.editor.xml.parsing.XMLParser;
+import com.aptana.parsing.ast.IParseNode;
 
 public class XMLEditor extends AbstractThemeableEditor {
 
@@ -62,6 +63,16 @@ public class XMLEditor extends AbstractThemeableEditor {
 		outline.setLabelProvider(new XMLOutlineLabelProvider());
 
 		return outline;
+	}
+
+	@Override
+	protected Object getOutlineElementAt(int caret)
+	{
+		IParseNode astNode = getASTNodeAt(caret);
+		if (astNode == null) {
+			return null;
+		}
+		return XMLOutlineContentProvider.getOutlineItem(astNode);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -312,7 +314,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				if (repository == null)
 				{
-					createAttachRepoMenuItem(menu);
+					createAttachRepoMenuItem(menu, -1);
 				}
 				else
 				{
@@ -387,9 +389,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		super.removeFilter();
 	}
 
-	private void createAttachRepoMenuItem(Menu menu)
+	private void createAttachRepoMenuItem(Menu menu, int index)
 	{
-		MenuItem createRepo = new MenuItem(menu, SWT.PUSH);
+		if (index < 0)
+		{
+			index = menu.getItemCount();
+		}
+		MenuItem createRepo = new MenuItem(menu, SWT.PUSH, index);
 		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
 		createRepo.addSelectionListener(new SelectionAdapter()
 		{
@@ -1283,8 +1289,43 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	protected void mangleContextMenu(Menu menu)
 	{
-		super.mangleContextMenu(menu);
 		GitRepository repo = GitRepository.getAttached(selectedProject);
+		// Remove Team menu if project is attached to our git provider.
+		if (repo != null)
+		{
+			Set<String> toRemove = new HashSet<String>();
+			toRemove.add("team.main"); //$NON-NLS-1$
+			removeMenuItems(menu, toRemove);
+		}
+		else
+		{
+			RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
+			if (provider == null)
+			{
+				// no other provider, keep Team menu, but modify it's submenu
+				MenuItem[] menuItems = menu.getItems();
+				for (int i = 0; i < menuItems.length; i++)
+				{
+					MenuItem menuItem = menuItems[i];
+					Object data = menuItem.getData();
+					if (data instanceof IContributionItem)
+					{
+						IContributionItem contrib = (IContributionItem) data;
+						// Just replace team with initialize git repo
+						if ("team.main".equals(contrib.getId())) //$NON-NLS-1$
+						{
+							createAttachRepoMenuItem(menu, i + 1);
+							break;
+						}
+					}
+				}
+				Set<String> toRemove = new HashSet<String>();
+				toRemove.add("team.main"); //$NON-NLS-1$
+				removeMenuItems(menu, toRemove);
+			}
+		}
+		// Remove all the other stuff we normally do...
+		super.mangleContextMenu(menu);
 		if (repo == null)
 			return;
 

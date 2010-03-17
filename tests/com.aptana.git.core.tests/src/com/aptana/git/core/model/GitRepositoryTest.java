@@ -97,19 +97,22 @@ public class GitRepositoryTest extends TestCase
 		assertStatus(Status.NEW, index.changedFiles().get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		List<ChangedFile> toStage = index.changedFiles();
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.NEW, toStage.get(0));
 
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		List<ChangedFile> toUnstage = index.changedFiles();
+		assertTrue(index.unstageFiles(toUnstage));
+		assertUnstaged(toUnstage.get(0));
+		assertStatus(Status.NEW, toUnstage.get(0));
 
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		toStage = index.changedFiles();
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.NEW, toStage.get(0));
 
 		index.commit("Initial commit");
 		// No more changed files now...
