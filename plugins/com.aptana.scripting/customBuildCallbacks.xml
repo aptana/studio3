@@ -66,6 +66,8 @@
 			<arg value="-c" />
 			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} master`" />
 		</exec>
+		<!-- Now remove the .git subdirectory -->
+		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
 	</target>
 
 	<target name="pre.@dot">
