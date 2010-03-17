@@ -78,7 +78,7 @@ public class JNotifyAdapterMacOSX implements IJNotify
 		@Override
 		public int hashCode()
 		{
-			return toString().hashCode();
+			return (inode + "," + deviceid).hashCode(); //$NON-NLS-1$
 		}
 
 		@Override
