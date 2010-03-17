@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -40,6 +41,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
@@ -1283,8 +1285,47 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	@Override
 	protected void mangleContextMenu(Menu menu)
 	{
-		super.mangleContextMenu(menu);
 		GitRepository repo = GitRepository.getAttached(selectedProject);
+		// Remove Team menu if project is attached to our git provider.
+		if (repo != null)
+		{
+			Set<String> toRemove = new HashSet<String>();
+			toRemove.add("team.main"); //$NON-NLS-1$
+			removeMenuItems(menu, toRemove);
+		}
+		else
+		{
+			RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
+			if (provider == null)
+			{
+				// no other provider, keep Team menu, but modify it's submenu
+				for (MenuItem menuItem : menu.getItems())
+				{
+					Object data = menuItem.getData();
+					if (data instanceof IContributionItem)
+					{
+						IContributionItem contrib = (IContributionItem) data;
+						if ("team.main".equals(contrib.getId())) //$NON-NLS-1$
+						{
+							// Remove all children and just add the initialize git repo item as child
+							MenuManager manager = (MenuManager) data;
+							manager.removeAll();
+							manager.add(new ContributionItem()
+							{
+								@Override
+								public void fill(Menu menu, int index)
+								{
+									createAttachRepoMenuItem(menu);
+								}
+							});
+							break;
+						}
+					}
+				}
+			}
+		}
+		// Remove all the other stuff we normally do...
+		super.mangleContextMenu(menu);
 		if (repo == null)
 			return;
 
