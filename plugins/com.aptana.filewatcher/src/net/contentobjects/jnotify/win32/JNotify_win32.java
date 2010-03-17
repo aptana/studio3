@@ -35,15 +35,27 @@ package net.contentobjects.jnotify.win32;
 
 import net.contentobjects.jnotify.JNotifyException;
 
+
 @SuppressWarnings("nls")
 public class JNotify_win32
 {
 	static
 	{
-		if (System.getProperty("os.arch").equals("amd64")) {
-			System.loadLibrary("64-jnotify");
-		} else {
-			System.loadLibrary("jnotify");
+		try 
+		{
+			if (System.getProperty("os.arch").equals("amd64")) 
+			{
+				System.loadLibrary("jnotify_64bit");
+			}
+			else 
+			{
+				System.loadLibrary("jnotify");
+			}
+		}
+		catch (UnsatisfiedLinkError e) 
+		{
+			System.err.println("Error loading library, java.library.path=" + System.getProperty("java.library.path"));
+			throw e;
 		}
 		int res = nativeInit();
 		if (res != 0)
