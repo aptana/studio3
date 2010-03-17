@@ -314,7 +314,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				if (repository == null)
 				{
-					createAttachRepoMenuItem(menu);
+					createAttachRepoMenuItem(menu, -1);
 				}
 				else
 				{
@@ -389,9 +389,13 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		super.removeFilter();
 	}
 
-	private void createAttachRepoMenuItem(Menu menu)
+	private void createAttachRepoMenuItem(Menu menu, int index)
 	{
-		MenuItem createRepo = new MenuItem(menu, SWT.PUSH);
+		if (index < 0)
+		{
+			index = menu.getItemCount();
+		}
+		MenuItem createRepo = new MenuItem(menu, SWT.PUSH, index);
 		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
 		createRepo.addSelectionListener(new SelectionAdapter()
 		{
@@ -1299,29 +1303,25 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			if (provider == null)
 			{
 				// no other provider, keep Team menu, but modify it's submenu
-				for (MenuItem menuItem : menu.getItems())
+				MenuItem[] menuItems = menu.getItems();
+				for (int i = 0; i < menuItems.length; i++)
 				{
+					MenuItem menuItem = menuItems[i];
 					Object data = menuItem.getData();
 					if (data instanceof IContributionItem)
 					{
 						IContributionItem contrib = (IContributionItem) data;
+						// Just replace team with initialize git repo
 						if ("team.main".equals(contrib.getId())) //$NON-NLS-1$
 						{
-							// Remove all children and just add the initialize git repo item as child
-							MenuManager manager = (MenuManager) data;
-							manager.removeAll();
-							manager.add(new ContributionItem()
-							{
-								@Override
-								public void fill(Menu menu, int index)
-								{
-									createAttachRepoMenuItem(menu);
-								}
-							});
+							createAttachRepoMenuItem(menu, i + 1);
 							break;
 						}
 					}
 				}
+				Set<String> toRemove = new HashSet<String>();
+				toRemove.add("team.main"); //$NON-NLS-1$
+				removeMenuItems(menu, toRemove);
 			}
 		}
 		// Remove all the other stuff we normally do...
