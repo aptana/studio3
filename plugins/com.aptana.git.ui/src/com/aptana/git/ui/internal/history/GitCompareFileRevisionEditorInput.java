@@ -511,6 +511,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 			try
 			{
 				Field f = CompareEditorInput.class.getDeclaredField("fContentInputPane"); //$NON-NLS-1$
+				f.setAccessible(true);
 				fPane = (CompareViewerSwitchingPane) f.get(this);
 			}
 			catch (Exception e)

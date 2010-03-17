@@ -76,7 +76,11 @@ public class TreeThemer
 	private void overrideLabelProvider()
 	{
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
+		if (viewer == null)
+			return;
 		ColumnViewer colViewer = viewer.getViewer();
+		if (colViewer == null)
+			return;
 		IBaseLabelProvider provider = colViewer.getLabelProvider();
 		if (provider instanceof CellLabelProvider)
 		{
@@ -162,7 +166,7 @@ public class TreeThemer
 						int clientWidth = item.getParent().getClientArea().width; // width of view area
 						Rectangle bounds = item.getBounds(); // bounds of the actual item
 						clientWidth -= bounds.x; // subtract where this item starts on left from width of client area
-						clientWidth += 19; // width of tree control arrows					
+						clientWidth += 19; // width of tree control arrows
 						width = Math.max(width, clientWidth);
 					}
 					event.height = height;
