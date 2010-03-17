@@ -548,6 +548,8 @@ public class JNotifyAdapterMacOSX implements IJNotify
 					// merge into a rename event
 					String newpath = created.getValue().pollFirst();
 					String oldpath = deleted.getValue().pollFirst();
+					if (e.renamed == null)
+						e.renamed = new TreeMap<String, String>();
 					e.renamed.put(oldpath, newpath);
 
 					// this inode is no longer associated with anything

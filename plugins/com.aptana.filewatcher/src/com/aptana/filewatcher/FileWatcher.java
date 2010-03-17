@@ -17,7 +17,7 @@ public class FileWatcher
 		{
 			String osName = System.getProperty("os.name").toLowerCase(); //$NON-NLS-1$
 			String osArch = System.getProperty("os.arch").toLowerCase(); //$NON-NLS-1$
-			if (osName.equals("linux") && !osArch.equals("amd64")) //$NON-NLS-1$
+			if (osName.equals("linux") && !osArch.equals("amd64")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				try
 				{

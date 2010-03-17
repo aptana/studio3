@@ -20,7 +20,12 @@ public abstract class ProcessUtil
 
 	public static String outputForCommand(String command, String workingDir, String... args)
 	{
-		Map<Integer, String> result = runInBackground(command, workingDir, args);
+		return outputForCommand(command, workingDir, null, args);
+	}
+
+	public static String outputForCommand(String command, String workingDir, Map<String, String> env, String... args)
+	{
+		Map<Integer, String> result = runInBackground(command, workingDir, env, args);
 		if (result == null || result.isEmpty())
 			return null;
 		return result.values().iterator().next();
