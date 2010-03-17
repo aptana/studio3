@@ -35,8 +35,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static final String PENCIL_ICON = "icons/pencil.png"; //$NON-NLS-1$
 	public static final String SNIPPET = "/icons/snippet.png"; //$NON-NLS-1$
 	public static final String COMMAND = "/icons/command.png"; //$NON-NLS-1$
-	public static final String IBEAM_BLACK = "/icons/ibeam-black.png"; //$NON-NLS-1$
-	public static final String IBEAM_WHITE = "/icons/ibeam-white.png"; //$NON-NLS-1$
+	public static final String IBEAM_BLACK = "/icons/ibeam-black.gif"; //$NON-NLS-1$
+	public static final String IBEAM_WHITE = "/icons/ibeam-white.gif"; //$NON-NLS-1$
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$

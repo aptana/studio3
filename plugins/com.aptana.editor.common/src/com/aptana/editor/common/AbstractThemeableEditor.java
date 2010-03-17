@@ -471,7 +471,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		Image cursorImage = null;
 		if (getThemeManager().getCurrentTheme().hasDarkBG())
 		{
-			cursorImage =  CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
+			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
 		}
 		else
 		{
