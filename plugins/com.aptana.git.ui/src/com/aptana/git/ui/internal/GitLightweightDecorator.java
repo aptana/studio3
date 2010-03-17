@@ -21,9 +21,7 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
@@ -31,7 +29,6 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
@@ -48,31 +45,6 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
-	/**
-	 * Default colors to use for staged/unstaged files when the theme doesn't define overrides.
-	 */
-	private static final RGB DEFAULT_RED_BG = new RGB(255, 238, 238);
-	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
-	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
-	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
-
-	/**
-	 * Default set to use when bg is very dark!
-	 */
-	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
-	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
-	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
-	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
-
-	/**
-	 * The token used from the theme for staged file decorations.
-	 */
-	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
-
-	/**
-	 * The token used from the theme for unstaged file decorations.
-	 */
-	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
 
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
@@ -214,8 +186,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
 		if (changed.hasUnstagedChanges())
 		{
-			decoration.setForegroundColor(redFG());
-			decoration.setBackgroundColor(redBG());
+			decoration.setForegroundColor(GitColors.redFG());
+			decoration.setBackgroundColor(GitColors.redBG());
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = untrackedImage;
@@ -227,8 +199,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		else if (changed.hasStagedChanges())
 		{
-			decoration.setForegroundColor(greenFG());
-			decoration.setBackgroundColor(greenBG());
+			decoration.setForegroundColor(GitColors.greenFG());
+			decoration.setBackgroundColor(GitColors.greenBG());
 			if (changed.getStatus() == ChangedFile.Status.DELETED)
 			{
 				overlay = stagedRemovedImage;
@@ -270,79 +242,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		decoration.addSuffix(builder.toString());
 	}
 
-	private Color greenFG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(STAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
-	}
-
-	private Color greenBG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(STAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
-	}
-
-	private Color redFG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
-	}
-
-	private Color redBG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
-	}
-
-	private boolean currentThemeHasDarkBG()
-	{
-		return getActiveTheme().hasDarkBG();
-	}
-
-	private boolean currentThemeHasLightFG()
-	{
-		return getActiveTheme().hasLightFG();
-	}
-
-	protected Theme getActiveTheme()
-	{
-		return getThemeManager().getCurrentTheme();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
+	
 
 	@Override
 	public void dispose()
