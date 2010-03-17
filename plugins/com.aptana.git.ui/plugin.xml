@@ -156,7 +156,7 @@
                enablesFor="+"
                id="com.aptana.git.ui.actions.CompareWithHEADAction"
                label="%CompareWithHEADAction_label"
-               menubarPath="team.main/targetGroup"
+               menubarPath="compareWithMenu/compareWithGroup"
                tooltip="%CompareWithHEADAction_tooltip">
          </action>
       </objectContribution>
