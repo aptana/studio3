@@ -817,7 +817,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		{
 			return null;
 		}
-		return root.getElementAt(offset);
+		return root.getNodeAt(offset);
 	}
 
 	private boolean isLinkedWithEditor()

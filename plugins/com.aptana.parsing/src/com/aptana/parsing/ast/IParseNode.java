@@ -26,5 +26,5 @@ public interface IParseNode extends IRange, ILanguageNode
 
 	public String getLanguage();
 
-	public IParseNode getElementAt(int offset);
+	public IParseNode getNodeAt(int offset);
 }

@@ -4,9 +4,35 @@ import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 
 public class ParseBaseNode extends Node implements IParseNode
 {
+
+	protected static final class NameNode implements INameNode
+	{
+
+		private final String fName;
+		private final IRange fRange;
+
+		public NameNode(String name, int start, int end)
+		{
+			fName = name;
+			fRange = new Range(start, end);
+		}
+
+		@Override
+		public String getName()
+		{
+			return fName;
+		}
+
+		@Override
+		public IRange getNameRange()
+		{
+			return fRange;
+		}
+	}
 
 	private IParseNode[] fChildren;
 	private IParseNode fParent;
@@ -81,7 +107,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	}
 
 	@Override
-	public IParseNode getElementAt(int offset)
+	public IParseNode getNodeAt(int offset)
 	{
 		if (offset < getStartingOffset() || offset > getEndingOffset())
 		{
@@ -93,7 +119,7 @@ public class ParseBaseNode extends Node implements IParseNode
 		{
 			if (child.getStartingOffset() <= offset && offset <= child.getEndingOffset())
 			{
-				return child.getElementAt(offset);
+				return child.getNodeAt(offset);
 			}
 		}
 		return this;
@@ -133,21 +159,7 @@ public class ParseBaseNode extends Node implements IParseNode
 	@Override
 	public INameNode getNameNode()
 	{
-		return new INameNode()
-		{
-
-			@Override
-			public String getName()
-			{
-				return getText();
-			}
-
-			@Override
-			public IRange getNameRange()
-			{
-				return ParseBaseNode.this;
-			}
-		};
+		return new NameNode(getText(), getStartingOffset(), getEndingOffset());
 	}
 
 	@Override

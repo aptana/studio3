@@ -4,36 +4,9 @@ import java.util.StringTokenizer;
 
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.lexer.IRange;
-import com.aptana.parsing.lexer.Range;
 
 public class XMLElementNode extends XMLNode
 {
-
-	private static final class NameNode implements INameNode
-	{
-
-		private final String fName;
-		private final IRange fRange;
-
-		public NameNode(String name, int start, int end)
-		{
-			fName = name;
-			fRange = new Range(start, end);
-		}
-
-		@Override
-		public String getName()
-		{
-			return fName;
-		}
-
-		@Override
-		public IRange getNameRange()
-		{
-			return fRange;
-		}
-	}
 
 	private INameNode fNameNode;
 	private boolean fIsSelfClosing;

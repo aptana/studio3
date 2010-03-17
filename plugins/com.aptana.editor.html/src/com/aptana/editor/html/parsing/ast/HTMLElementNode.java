@@ -9,39 +9,12 @@ import beaver.Symbol;
 
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.lexer.IRange;
-import com.aptana.parsing.lexer.Range;
 
 public class HTMLElementNode extends HTMLNode
 {
 
 	private static final String ID = "id"; //$NON-NLS-1$
 	private static final String CLASS = "class"; //$NON-NLS-1$
-
-	private static final class NameNode implements INameNode
-	{
-
-		private final String fName;
-		private final IRange fRange;
-
-		public NameNode(String name, int start, int end)
-		{
-			fName = name;
-			fRange = new Range(start, end);
-		}
-
-		@Override
-		public String getName()
-		{
-			return fName;
-		}
-
-		@Override
-		public IRange getNameRange()
-		{
-			return fRange;
-		}
-	}
 
 	private INameNode fNameNode;
 	private Map<String, String> fAttributes;
