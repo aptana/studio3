@@ -98,22 +98,31 @@ public class GitRepositoryTest extends TestCase
 
 		// Stage the new file
 		List<ChangedFile> toStage = index.changedFiles();
+		assertFalse(toStage.isEmpty());
 		assertTrue(index.stageFiles(toStage));
 		assertStaged(toStage.get(0));
 		assertStatus(Status.NEW, toStage.get(0));
 
+		index.refresh();
+		
 		// Unstage the file
 		List<ChangedFile> toUnstage = index.changedFiles();
+		assertFalse(toUnstage.isEmpty());
 		assertTrue(index.unstageFiles(toUnstage));
 		assertUnstaged(toUnstage.get(0));
 		assertStatus(Status.NEW, toUnstage.get(0));
 
+		index.refresh();
+		
 		// stage again so we can commit...
 		toStage = index.changedFiles();
+		assertFalse(toStage.isEmpty());
 		assertTrue(index.stageFiles(toStage));
 		assertStaged(toStage.get(0));
 		assertStatus(Status.NEW, toStage.get(0));
 
+		index.refresh();
+		
 		index.commit("Initial commit");
 		// No more changed files now...
 		assertTrue(index.changedFiles().isEmpty());
@@ -173,27 +182,34 @@ public class GitRepositoryTest extends TestCase
 		index.refresh();
 
 		// Now there should be a single file that's been changed!
-		assertFalse(index.changedFiles().isEmpty());
-		assertEquals(1, index.changedFiles().size());
+		List<ChangedFile> changed = index.changedFiles();
+		assertFalse(changed.isEmpty());
+		assertEquals(1, changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is MODIFIED
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertUnstaged(changed.get(0));
+		assertStatus(Status.MODIFIED, changed.get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(changed));
+		assertStaged(changed.get(0));
+		assertStatus(Status.MODIFIED, changed.get(0));
+
+		index.refresh();
 
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		List<ChangedFile> toUnstage = index.changedFiles();
+		assertTrue(index.unstageFiles(toUnstage));
+		assertUnstaged(toUnstage.get(0));
+		assertStatus(Status.MODIFIED, toUnstage.get(0));
 
+		index.refresh();
+		
+		List<ChangedFile> toStage = index.changedFiles();
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.MODIFIED, toStage.get(0));
 
 		index.commit("Add second line");
 		// No more changed files now...
