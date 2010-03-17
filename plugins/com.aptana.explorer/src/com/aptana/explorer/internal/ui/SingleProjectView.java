@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
+import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -67,6 +68,8 @@ import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
+import org.eclipse.ui.wizards.IWizardDescriptor;
+import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -82,6 +85,7 @@ import com.aptana.terminal.views.TerminalView;
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public abstract class SingleProjectView extends CommonNavigator
 {
 
@@ -1018,6 +1022,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	protected void mangleContextMenu(Menu menu)
 	{
+		forceOurNewFileWizard(menu);
+		
 		// Remove a whole bunch of the contributed items that we don't want
 		removeMenuItems(menu, TO_REMOVE);
 		// Check for two separators in a row, remove one if you see that...
@@ -1035,6 +1041,30 @@ public abstract class SingleProjectView extends CommonNavigator
 			else
 			{
 				lastWasSeparator = false;
+			}
+		}
+	}
+
+	@SuppressWarnings({ "nls" })
+	protected void forceOurNewFileWizard(Menu menu)
+	{
+		// Hack the New > File entry
+		for (MenuItem menuItem : menu.getItems())
+		{
+			Object data = menuItem.getData();
+			if (data instanceof IContributionItem)
+			{
+				IContributionItem contrib = (IContributionItem) data;
+				if ("common.new.menu".equals(contrib.getId()))
+				{
+					MenuManager manager = (MenuManager) contrib;
+					// force an entry for our special template New File wizard!
+					IWizardRegistry registry = PlatformUI.getWorkbench().getNewWizardRegistry();
+					IWizardDescriptor desc = registry.findWizard("com.aptana.ui.wizards.new.file");					
+					manager.insertAfter("new", new WizardShortcutAction(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), desc));
+					manager.remove("new");
+					break;
+				}
 			}
 		}
 	}
