@@ -179,7 +179,9 @@ public class CommandElement extends AbstractBundleElement
 				// create output stream and attach to context
 				context.setOutputStream(new ByteArrayOutputStream());
 
-				job = new CommandBlockRunner(this, context, this.getOwningBundle().getLoadPaths());
+				BundleElement bundle = this.getOwningBundle();
+				String bundleName = bundle.getDisplayName();
+				job = new CommandBlockRunner(this, context, BundleManager.getInstance().getBundleLoadPaths(bundleName));
 			}
 
 			// run the job, if we have one

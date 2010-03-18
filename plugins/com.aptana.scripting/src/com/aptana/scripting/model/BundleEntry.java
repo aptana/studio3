@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -388,6 +389,28 @@ public class BundleEntry
 		return result;
 	}
 
+	/**
+	 * getLoadPaths
+	 * 
+	 * @return
+	 */
+	public List<String> getLoadPaths()
+	{
+		final List<String> result = new LinkedList<String>();
+		
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				result.addAll(bundle.getLoadPaths());
+				
+				return true;
+			}
+		});
+		
+		return result;
+	}
+	
 	/**
 	 * geMenus
 	 * 
