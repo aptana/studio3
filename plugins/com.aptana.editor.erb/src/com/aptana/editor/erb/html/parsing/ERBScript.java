@@ -33,6 +33,11 @@ public class ERBScript extends ParseBaseNode
 		return fEndTag;
 	}
 
+	public IRubyScript getScript()
+	{
+		return fScript;
+	}
+
 	@Override
 	public IParseNode getChild(int index)
 	{
@@ -68,12 +73,15 @@ public class ERBScript extends ParseBaseNode
 		{
 			return false;
 		}
-		return fScript.equals(((ERBScript) obj).fScript);
+		ERBScript other = (ERBScript) obj;
+		return start == other.start && end == other.end && fScript.equals(other.fScript);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return fScript.hashCode();
+		int hash = start * 31 + end;
+		hash = hash * 31 + fScript.hashCode();
+		return hash;
 	}
 }
