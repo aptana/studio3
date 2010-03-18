@@ -56,7 +56,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				// we're at the root of the nested language, which is not displayed; go one level up
 				parent = parent.getParent();
 			}
-			return new HTMLOutlineItem(parent, parent);
+			if (parent != null)
+			{
+				return new HTMLOutlineItem(parent, parent);
+			}
 		}
 		return super.getParent(element);
 	}

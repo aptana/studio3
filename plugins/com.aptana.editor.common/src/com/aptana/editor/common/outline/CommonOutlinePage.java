@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -65,6 +66,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
+	private static final String OUTLINE_CONTEXT = "com.aptana.editor.common.outline"; //$NON-NLS-1$
+
 	private AbstractThemeableEditor fEditor;
 
 	private ITreeContentProvider fContentProvider;
@@ -88,6 +91,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	public void createControl(Composite parent)
 	{
 		super.createControl(parent);
+		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
 		final TreeViewer viewer = getTreeViewer();
 		viewer.setAutoExpandLevel(2);
