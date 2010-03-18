@@ -1,3 +1,4 @@
 -*Test*
 -*Application*
 -*Messages
+-net.contentobjects.*
