@@ -56,7 +56,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener
 		List<IResource> files = new ArrayList<IResource>();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			String path = workingDirectory + File.separator + changedFile.getPath();
+			String path = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
 			if (file == null)
 				continue;
