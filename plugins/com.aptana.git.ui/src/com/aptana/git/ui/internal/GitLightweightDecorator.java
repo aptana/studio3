@@ -1,9 +1,7 @@
 package com.aptana.git.ui.internal;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -180,20 +178,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (repo == null)
 			return;
 
-		List<ChangedFile> changedFiles = repo.index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (repo.resourceOrChildHasChanges(resource))
 		{
-			return;
-		}
-		String workingDirectory = repo.workingDirectory();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			if (fullPath.startsWith(new File(resource.getLocationURI()).getAbsolutePath()))
-			{
-				decoration.addPrefix(DIRTY_PREFIX);
-				return;
-			}
+			decoration.addPrefix(DIRTY_PREFIX);
 		}
 	}
 

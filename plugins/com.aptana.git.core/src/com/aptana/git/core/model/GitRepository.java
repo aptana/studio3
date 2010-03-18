@@ -152,7 +152,7 @@ public class GitRepository
 		if (repositoryURL.getScheme().equals("file"))
 		{
 			repositoryPath = new File(repositoryURL).getAbsolutePath();
-		}		
+		}
 		if (!new File(repositoryPath).exists())
 			return null;
 
@@ -263,41 +263,43 @@ public class GitRepository
 			else
 			{
 				// If refs/remote doesn't exist, we need to add a listener on "refs" for creation of remotes!
-				fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS).getAbsolutePath(), IJNotify.FILE_CREATED, false, new JNotifyListener()
-				{
-					public void fileCreated(int wd, String rootPath, String name) 
-					{
-						if (name != null && name.equals("remotes"))
+				fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS).getAbsolutePath(), IJNotify.FILE_CREATED,
+						false, new JNotifyListener()
 						{
-							try 
+							public void fileCreated(int wd, String rootPath, String name)
 							{
-								addRemotesFileWatcher();
-							} catch (JNotifyException e) 
-							{
-								GitPlugin.logError(e.getMessage(), e);
+								if (name != null && name.equals("remotes"))
+								{
+									try
+									{
+										addRemotesFileWatcher();
+									}
+									catch (JNotifyException e)
+									{
+										GitPlugin.logError(e.getMessage(), e);
+									}
+									// TODO Remove this watcher!
+								}
 							}
-							// TODO Remove this watcher!
-						}
-					}
-	
-					@Override
-					public void fileDeleted(int wd, String rootPath, String name) 
-					{
-						// ignore
-					}
-	
-					@Override
-					public void fileModified(int wd, String rootPath, String name)
-					{
-						// ignore
-					}
-	
-					@Override
-					public void fileRenamed(int wd, String rootPath, String oldName, String newName) 
-					{
-						// ignore
-					}
-				}));
+
+							@Override
+							public void fileDeleted(int wd, String rootPath, String name)
+							{
+								// ignore
+							}
+
+							@Override
+							public void fileModified(int wd, String rootPath, String name)
+							{
+								// ignore
+							}
+
+							@Override
+							public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+							{
+								// ignore
+							}
+						}));
 			}
 
 			// Add listener for added/removed branches
@@ -348,9 +350,10 @@ public class GitRepository
 	/**
 	 * @throws JNotifyException
 	 */
-	protected void addRemotesFileWatcher() throws JNotifyException {
-		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY, true,
-				new JNotifyListener()
+	protected void addRemotesFileWatcher() throws JNotifyException
+	{
+		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY,
+				true, new JNotifyListener()
 				{
 
 					@Override
@@ -1230,6 +1233,30 @@ public class GitRepository
 			cachedRepo.dispose();
 		}
 		cachedRepos.clear();
+	}
+
+	/**
+	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
+	 * 
+	 * @param resource
+	 * @param changedFiles
+	 * @return
+	 */
+	public boolean resourceOrChildHasChanges(IResource resource)
+	{
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+			return false;
+
+		String workingDirectory = workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
+			if (fullPath.startsWith(resourcePath))
+				return true;
+		}
+		return false;
 	}
 
 }
