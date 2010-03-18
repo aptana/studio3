@@ -1,5 +1,11 @@
 package com.aptana.scripting.model;
 
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.HasTriggerFilter;
+import com.aptana.scripting.model.filters.NotFilter;
+import com.aptana.scripting.model.filters.OrFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
+
 public class FilterTests extends BundleTestBase
 {
 	/*

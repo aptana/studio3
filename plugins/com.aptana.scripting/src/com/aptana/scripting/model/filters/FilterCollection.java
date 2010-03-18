@@ -1,4 +1,4 @@
-package com.aptana.scripting.model;
+package com.aptana.scripting.model.filters;
 
 import java.util.ArrayList;
 import java.util.List;
