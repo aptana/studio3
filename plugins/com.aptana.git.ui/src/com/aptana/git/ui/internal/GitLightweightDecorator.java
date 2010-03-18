@@ -189,7 +189,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		for (ChangedFile changedFile : changedFiles)
 		{
 			String fullPath = workingDirectory + File.separator + changedFile.getPath();
-			if (fullPath.startsWith(resource.getLocationURI().getPath()))
+			if (fullPath.startsWith(new File(resource.getLocationURI()).getAbsolutePath()))
 			{
 				decoration.addPrefix(DIRTY_PREFIX);
 				return;

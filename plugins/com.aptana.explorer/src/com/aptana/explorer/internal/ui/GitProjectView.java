@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -421,7 +422,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 							{
 								if (sub.isCanceled())
 									return Status.CANCEL_STATUS;
-								GitRepository.create(selectedProject.getLocationURI().getPath());
+								GitRepository.create(new File(selectedProject.getLocationURI()).getAbsolutePath());
 							}
 							sub.worked(50);
 							if (sub.isCanceled())

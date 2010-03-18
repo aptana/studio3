@@ -149,6 +149,10 @@ public class GitRepository
 			return null;
 
 		String repositoryPath = repositoryURL.getPath();
+		if (repositoryURL.getScheme().equals("file"))
+		{
+			repositoryPath = new File(repositoryURL).getAbsolutePath();
+		}		
 		if (!new File(repositoryPath).exists())
 			return null;
 
@@ -252,73 +256,52 @@ public class GitRepository
 					}));
 
 			// Add listener for remotes
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath() + GitRef.REFS_REMOTES, IJNotify.FILE_ANY, true,
-					new JNotifyListener()
+			if (gitFile(GitRef.REFS_REMOTES).isDirectory())
+			{
+				addRemotesFileWatcher();
+			}
+			else
+			{
+				// If refs/remote doesn't exist, we need to add a listener on "refs" for creation of remotes!
+				fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS).getAbsolutePath(), IJNotify.FILE_CREATED, false, new JNotifyListener()
+				{
+					public void fileCreated(int wd, String rootPath, String name) 
 					{
-
-						@Override
-						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						if (name != null && name.equals("remotes"))
 						{
-							if (newName == null)
-								return;
-							if (isProbablyBranch(newName))
+							try 
 							{
-								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
-								// now,
-								// seems harmless to fire both.
-								firePullEvent();
-								firePushEvent();
-							}
-						}
-
-						// Determine if filename is referring to a remote branch, and not the remote itself.
-						private boolean isProbablyBranch(String newName)
-						{
-							return newName != null && newName.indexOf(File.separator) != -1;
-						}
-
-						@Override
-						public void fileModified(int wd, String rootPath, String name)
-						{
-							if (name == null)
-								return;
-							if (isProbablyBranch(name))
+								addRemotesFileWatcher();
+							} catch (JNotifyException e) 
 							{
-								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
-								// now,
-								// seems harmless to fire both.
-								firePullEvent();
-								firePushEvent();
+								GitPlugin.logError(e.getMessage(), e);
 							}
+							// TODO Remove this watcher!
 						}
-
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							// if path is longer than one segment, then remote branch was deleted. Means we probably
-							// pulled.
-							if (isProbablyBranch(name))
-							{
-								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
-								firePullEvent();
-							}
-						}
-
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							if (isProbablyBranch(name))
-							{
-								// if path is longer than one segment, then remote branch was created.
-								addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
-								// Since we suddenly know about a new remote branch, we probably pulled.
-								firePullEvent();
-							}
-						}
-					}));
+					}
+	
+					@Override
+					public void fileDeleted(int wd, String rootPath, String name) 
+					{
+						// ignore
+					}
+	
+					@Override
+					public void fileModified(int wd, String rootPath, String name)
+					{
+						// ignore
+					}
+	
+					@Override
+					public void fileRenamed(int wd, String rootPath, String oldName, String newName) 
+					{
+						// ignore
+					}
+				}));
+			}
 
 			// Add listener for added/removed branches
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath() + GitRef.REFS_HEADS, IJNotify.FILE_CREATED
+			fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_HEADS).getAbsolutePath(), IJNotify.FILE_CREATED
 					| IJNotify.FILE_DELETED, false, new JNotifyListener()
 			{
 
@@ -362,10 +345,80 @@ public class GitRepository
 		}
 	}
 
+	/**
+	 * @throws JNotifyException
+	 */
+	protected void addRemotesFileWatcher() throws JNotifyException {
+		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY, true,
+				new JNotifyListener()
+				{
+
+					@Override
+					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+					{
+						if (newName == null)
+							return;
+						if (isProbablyBranch(newName))
+						{
+							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+							// now,
+							// seems harmless to fire both.
+							firePullEvent();
+							firePushEvent();
+						}
+					}
+
+					// Determine if filename is referring to a remote branch, and not the remote itself.
+					private boolean isProbablyBranch(String newName)
+					{
+						return newName != null && newName.indexOf(File.separator) != -1;
+					}
+
+					@Override
+					public void fileModified(int wd, String rootPath, String name)
+					{
+						if (name == null)
+							return;
+						if (isProbablyBranch(name))
+						{
+							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+							// now,
+							// seems harmless to fire both.
+							firePullEvent();
+							firePushEvent();
+						}
+					}
+
+					@Override
+					public void fileDeleted(int wd, String rootPath, String name)
+					{
+						// if path is longer than one segment, then remote branch was deleted. Means we probably
+						// pulled.
+						if (isProbablyBranch(name))
+						{
+							branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							firePullEvent();
+						}
+					}
+
+					@Override
+					public void fileCreated(int wd, String rootPath, String name)
+					{
+						if (isProbablyBranch(name))
+						{
+							// if path is longer than one segment, then remote branch was created.
+							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							// Since we suddenly know about a new remote branch, we probably pulled.
+							firePullEvent();
+						}
+					}
+				}));
+	}
+
 	public String workingDirectory()
 	{
-		if (gitDirPath().endsWith(File.separator + GIT_DIR + File.separator))
-			return gitDirPath().substring(0, gitDirPath().length() - 6);
+		if (gitDirPath().endsWith(File.separator + GIT_DIR))
+			return gitDirPath().substring(0, gitDirPath().length() - 5);
 		else if (GitExecutable.instance().outputForCommand(gitDirPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
 				.equals("true")) //$NON-NLS-1$
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
@@ -730,14 +783,10 @@ public class GitRepository
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
 		String workingDirectory = workingDirectory();
-		if (!workingDirectory.endsWith("/")) //$NON-NLS-1$
-		{
-			workingDirectory += "/"; //$NON-NLS-1$
-		}
 		for (ChangedFile changedFile : index().changedFiles())
 		{
-			String fullPath = workingDirectory + changedFile.getPath();
-			if (resource.getLocationURI().getPath().equals(fullPath))
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			if (new File(resource.getLocationURI()).getAbsolutePath().equals(fullPath))
 			{
 				return changedFile;
 			}
@@ -1151,14 +1200,7 @@ public class GitRepository
 
 	private String gitDirPath()
 	{
-		String path = fileURL.getPath();
-		// On windows sometimes it gives wacky paths like "/C:/..."
-		if (Platform.getOS().equals(Platform.OS_WIN32)
-				&& path.startsWith("/") && path.length() >= 3 && path.charAt(2) == ':') //$NON-NLS-1$
-		{
-			return path.substring(1);
-		}
-		return path;
+		return new File(fileURL).getAbsolutePath();
 	}
 
 	public void firePullEvent()
