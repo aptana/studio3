@@ -213,25 +213,6 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            class="com.aptana.editor.common.hyperlinks.CommonHyperlinkDetector"
-            id="com.aptana.editor.common.hyperlinkDetector"
-            name="Aptana Editor Detector"
-            targetId="com.aptana.editor.ui.hyperlinkTarget">
-      </hyperlinkDetector>
-   </extension>
-   <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
-      <target
-            id="com.aptana.editor.ui.hyperlinkTarget"
-            name="Aptana Editor">
-         <context
-               type="org.eclipse.ui.texteditor.ITextEditor">
-         </context>
-      </target>
-   </extension>
-   <extension
          point="org.eclipse.ui.themes">
       <colorDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
