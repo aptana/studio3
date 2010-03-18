@@ -1,5 +1,7 @@
 package com.aptana.editor.erb.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 
@@ -47,4 +49,22 @@ public abstract class ERBContentDescriberTestCase extends TestCase
 	}
 
 	// TODO Call describe(InputStream, IConentDescription)
+
+	public void testDescribeInputStreamWithEmptyContent() throws Exception
+	{
+		InputStream stream = new ByteArrayInputStream("".getBytes());
+		assertEquals(ITextContentDescriber.INDETERMINATE, describer.describe(stream, null));
+	}
+
+	public void testDescribeInputStreamWithPrefix() throws Exception
+	{
+		InputStream stream = new ByteArrayInputStream(describer.getPrefix().getBytes());
+		assertEquals(ITextContentDescriber.VALID, describer.describe(stream, null));
+	}
+
+	public void testDescribeInputStreamWithGarbage() throws Exception
+	{
+		InputStream stream = new ByteArrayInputStream("gjfhjdhj".getBytes());
+		assertEquals(ITextContentDescriber.INDETERMINATE, describer.describe(stream, null));
+	}
 }
