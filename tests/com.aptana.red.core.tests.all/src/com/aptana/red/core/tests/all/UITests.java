@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import com.aptana.editor.common.internal.commands.ExpandCollapseAllHandlerTest;
+import com.aptana.editor.common.internal.commands.ExpandLevelHandlerTest;
 
 public class UITests
 {
@@ -29,8 +30,9 @@ public class UITests
 		// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
 		// test)
 		
-		// require HTML editor to have outline contents to test common editor command
-		suite.addTestSuite(ExpandCollapseAllHandlerTest.class); 
+		// require HTML editor to have outline contents to test common editor commands
+		suite.addTestSuite(ExpandCollapseAllHandlerTest.class);
+		suite.addTestSuite(ExpandLevelHandlerTest.class);
 		return suite;
 	}
 
