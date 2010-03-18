@@ -41,6 +41,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.JSParserFactory;
+import com.aptana.parsing.ast.IParseNode;
 
 public class JSSourceEditor extends AbstractThemeableEditor
 {
@@ -64,6 +65,17 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		outline.setLabelProvider(new JSOutlineLabelProvider());
 
 		return outline;
+	}
+
+	@Override
+	protected Object getOutlineElementAt(int caret)
+	{
+		IParseNode astNode = getASTNodeAt(caret);
+		if (astNode == null)
+		{
+			return null;
+		}
+		return JSOutlineContentProvider.getOutlineItem(astNode);
 	}
 
 	@Override

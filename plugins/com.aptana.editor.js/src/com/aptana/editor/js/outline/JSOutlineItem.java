@@ -119,13 +119,13 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 			return false;
 		}
 		JSOutlineItem other = (JSOutlineItem) obj;
-		return fLabel.equals(other.fLabel) && fReferenceNode.equals(other.fReferenceNode);
+		return fLabel.equals(other.fLabel) && fSourceRange.equals(other.fSourceRange);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * fLabel.hashCode() + fReferenceNode.hashCode();
+		return 31 * fLabel.hashCode() + fSourceRange.hashCode();
 	}
 
 	@Override
