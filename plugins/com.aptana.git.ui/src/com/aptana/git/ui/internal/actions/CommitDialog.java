@@ -540,7 +540,7 @@ public class CommitDialog extends StatusDialog
 			{
 				if (file.getPath().endsWith(extension))
 				{
-					String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
+					String fullPath = new File(gitRepository.workingDirectory(), file.getPath()).getAbsolutePath();
 					updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
 					return;
 				}

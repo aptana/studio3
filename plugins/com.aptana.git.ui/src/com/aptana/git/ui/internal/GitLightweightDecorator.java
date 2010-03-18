@@ -188,7 +188,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		String workingDirectory = repo.workingDirectory();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			String fullPath = workingDirectory + File.separator + changedFile.getPath();
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
 			if (fullPath.startsWith(new File(resource.getLocationURI()).getAbsolutePath()))
 			{
 				decoration.addPrefix(DIRTY_PREFIX);

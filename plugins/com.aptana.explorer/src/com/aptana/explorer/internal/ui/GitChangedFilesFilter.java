@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -44,15 +45,10 @@ class GitChangedFilesFilter extends ViewerFilter
 			return false;
 
 		String workingDirectory = repo.workingDirectory();
-		if (!workingDirectory.endsWith("/")) //$NON-NLS-1$
-		{
-			workingDirectory += "/"; //$NON-NLS-1$
-		}
-
 		for (ChangedFile changedFile : changedFiles)
 		{
-			String fullPath = workingDirectory + changedFile.getPath();
-			String resourcePath = resource.getLocationURI().getPath();
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
 			if (fullPath.startsWith(resourcePath))
 				return true;
 
