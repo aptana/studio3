@@ -126,19 +126,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		registerActions(actionBars);
 		actionBars.updateActionBars();
 
-		MenuManager manager = new MenuManager();
-		manager.setRemoveAllWhenShown(true);
-		manager.addMenuListener(new IMenuListener()
-		{
-
-			@Override
-			public void menuAboutToShow(IMenuManager manager)
-			{
-			}
-		});
-		Tree tree = viewer.getTree();
-		tree.setMenu(manager.createContextMenu(tree));
-
 		fPrefs.addPropertyChangeListener(this);
 	}
 
