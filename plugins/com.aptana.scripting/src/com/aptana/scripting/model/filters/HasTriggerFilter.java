@@ -1,4 +1,7 @@
-package com.aptana.scripting.model;
+package com.aptana.scripting.model.filters;
+
+import com.aptana.scripting.model.AbstractElement;
+import com.aptana.scripting.model.CommandElement;
 
 public class HasTriggerFilter implements IModelFilter
 {

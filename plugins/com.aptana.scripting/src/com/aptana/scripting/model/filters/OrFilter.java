@@ -1,13 +1,15 @@
-package com.aptana.scripting.model;
+package com.aptana.scripting.model.filters;
 
-public class AndFilter extends FilterCollection
+import com.aptana.scripting.model.AbstractElement;
+
+public class OrFilter extends FilterCollection
 {
 	/**
-	 * AndFilter
+	 * OrFilter
 	 * 
 	 * @param filter
 	 */
-	public AndFilter(IModelFilter... filters)
+	public OrFilter(IModelFilter... filters)
 	{
 		super(filters);
 	}
@@ -18,15 +20,15 @@ public class AndFilter extends FilterCollection
 	 */
 	public boolean include(AbstractElement element)
 	{
-		boolean result = true;
+		boolean result = false;
 
 		if (element != null)
 		{
 			for (IModelFilter filter : this.getFilters())
 			{
-				if (filter.include(element) == false)
+				if (filter.include(element))
 				{
-					result = false;
+					result = true;
 					break;
 				}
 			}

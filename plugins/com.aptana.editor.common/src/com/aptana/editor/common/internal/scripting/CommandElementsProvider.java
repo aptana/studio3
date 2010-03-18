@@ -18,10 +18,10 @@ import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
-import com.aptana.scripting.model.IModelFilter;
 import com.aptana.scripting.model.InvocationType;
-import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommandElementsProvider implements ICommandElementsProvider
 {

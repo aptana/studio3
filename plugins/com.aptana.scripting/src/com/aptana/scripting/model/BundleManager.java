@@ -22,6 +22,9 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 import com.aptana.util.ResourceUtils;
 
 public class BundleManager

@@ -36,9 +36,9 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
-import com.aptana.scripting.model.NotFilter;
-import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.NotFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 import com.aptana.util.CollectionsUtil;
 
 /**
