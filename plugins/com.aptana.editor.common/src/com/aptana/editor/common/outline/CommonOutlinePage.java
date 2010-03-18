@@ -1,8 +1,10 @@
 package com.aptana.editor.common.outline;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -17,6 +19,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
@@ -110,7 +113,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				// expands the selection one level if applicable
 				viewer.expandToLevel(selection.getFirstElement(), 1);
 				// selects the corresponding text in editor
-				if (!isLinkedWithEditor()) {
+				if (!isLinkedWithEditor())
+				{
 					setEditorSelection(selection, true);
 				}
 			}
@@ -121,6 +125,19 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		IActionBars actionBars = getSite().getActionBars();
 		registerActions(actionBars);
 		actionBars.updateActionBars();
+
+		MenuManager manager = new MenuManager();
+		manager.setRemoveAllWhenShown(true);
+		manager.addMenuListener(new IMenuListener()
+		{
+
+			@Override
+			public void menuAboutToShow(IMenuManager manager)
+			{
+			}
+		});
+		Tree tree = viewer.getTree();
+		tree.setMenu(manager.createContextMenu(tree));
 
 		fPrefs.addPropertyChangeListener(this);
 	}

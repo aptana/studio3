@@ -31,7 +31,9 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 {
 
 	private static final String HTML_EDITOR_ID = "com.aptana.editor.html";
-	private static final String COMMAND_ID = "com.aptana.editor.commands.ExpandCollapseAll";
+	private static final String EXPAND_ALL_COMMAND_ID = "com.aptana.editor.commands.ExpandAll";
+	private static final String COLLAPSE_ALL_COMMAND_ID = "com.aptana.editor.commands.CollapseAll";
+
 	private IProject project;
 	private IFile file;
 	private ITextEditor editor;
@@ -124,14 +126,14 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 
 		// Grab the handler service to execute our command
 		IHandlerService service = (IHandlerService) outline.getSite().getService(IHandlerService.class);
-		service.executeCommand(COMMAND_ID, null);
+		service.executeCommand(EXPAND_ALL_COMMAND_ID, null);
 
 		// check expansion state, should be expanded
 		expanded = treeViewer.getExpandedElements();
 		assertEquals(4, expanded.length); // html, head, body, div
 
 		// toggle expansion
-		service.executeCommand(COMMAND_ID, null);
+		service.executeCommand(COLLAPSE_ALL_COMMAND_ID, null);
 
 		// check expansion state
 		expanded = treeViewer.getExpandedElements();
