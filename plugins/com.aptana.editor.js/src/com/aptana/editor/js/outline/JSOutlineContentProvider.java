@@ -43,6 +43,11 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		fItemsByScope = new HashMap<String, JSOutlineItem>();
 	}
 
+	public static JSOutlineItem getOutlineItem(IParseNode node)
+	{
+		return new JSOutlineItem(node.getText(), getOutlineType(node), node, node);
+	}
+
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
@@ -65,7 +70,11 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		if (element instanceof JSOutlineItem)
 		{
 			JSOutlineItem item = (JSOutlineItem) element;
-			return item.getReferenceNode().getParent();
+			IParseNode parentNode = item.getReferenceNode().getParent();
+			if (parentNode != null)
+			{
+				return new JSOutlineItem(parentNode.getText(), getOutlineType(parentNode), parentNode, parentNode);
+			}
 		}
 
 		return super.getParent(element);

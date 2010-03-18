@@ -119,7 +119,10 @@ public class ParseBaseNode extends Node implements IParseNode
 		{
 			if (child.getStartingOffset() <= offset && offset <= child.getEndingOffset())
 			{
-				return child.getNodeAt(offset);
+				IParseNode node = child.getNodeAt(offset);
+				if (node != null) {
+					return node;
+				}
 			}
 		}
 		return this;

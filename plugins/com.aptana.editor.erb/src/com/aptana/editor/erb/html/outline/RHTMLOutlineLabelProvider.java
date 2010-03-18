@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.erb.html.parsing.ERBScript;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
+import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.parsing.IParseState;
@@ -52,7 +53,8 @@ public class RHTMLOutlineLabelProvider extends HTMLOutlineLabelProvider
 		text.append(script.getStartTag()).append(" "); //$NON-NLS-1$
 		String source = new String(fParseState.getSource());
 		// locates the ruby source
-		source = source.substring(script.getStartingOffset(), script.getEndingOffset());
+		IRubyScript ruby = script.getScript();
+		source = source.substring(ruby.getStartingOffset(), ruby.getEndingOffset());
 		// gets the first line of the ruby source
 		StringTokenizer st = new StringTokenizer(source, "\n\r\f"); //$NON-NLS-1$
 		source = st.nextToken();
