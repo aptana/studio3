@@ -111,7 +111,7 @@ public class CommitDialog extends StatusDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(Messages.CommitDialog_3);
+		parent.getShell().setText(Messages.CommitDialog_Changes);
 
 		container.setLayout(new GridLayout(1, true));
 
@@ -126,7 +126,7 @@ public class CommitDialog extends StatusDialog
 		createCommitMessageArea(sashForm);
 		createStagedFileArea(sashForm);
 
-		sashForm.setSashWidth(10);
+		sashForm.setSashWidth(5);
 		sashForm.setWeights(new int[] { 25, 50, 25 });
 
 		validate();
@@ -144,7 +144,7 @@ public class CommitDialog extends StatusDialog
 		IDialogSettings dialogSettings = getDialogBoundsSettings();
 		try
 		{
-			dialogSettings.getInt("DIALOG_WIDTH");
+			dialogSettings.getInt("DIALOG_WIDTH"); //$NON-NLS-1$
 		}
 		catch (NumberFormatException e)
 		{
@@ -168,7 +168,7 @@ public class CommitDialog extends StatusDialog
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		data.heightHint = 300;
 		diffArea.setLayoutData(data);
-		diffArea.setText(Messages.CommitDialog_4);
+		diffArea.setText(Messages.CommitDialog_NoFileSelected);
 	}
 
 	private void createUnstagedFileArea(SashForm sashForm)
@@ -184,23 +184,64 @@ public class CommitDialog extends StatusDialog
 	private void createFileArea(SashForm sashForm, boolean staged)
 	{
 		Composite composite = new Composite(sashForm, SWT.NONE);
-		composite.setLayout(new GridLayout(1, true));
-		Label label = new Label(composite, SWT.NONE);
-		String text = Messages.CommitDialog_5;
-		if (!staged)
-			text = Messages.CommitDialog_6;
-		label.setText(text);
-		Table table = createTable(composite, staged);
+		composite.setLayout(new GridLayout(2, false));
+		StagingButtons buttons = null;
+		if (staged)
+		{
+			buttons = new StagingButtons(composite, Messages.CommitDialog_UnstageAllMarker,
+					Messages.CommitDialog_UnstageAll, Messages.CommitDialog_UnstageSelectedMarker,
+					Messages.CommitDialog_UnstageSelected);
+			createTableComposite(composite, staged);
+			buttons.setTable(stagedTable, staged);
+		}
+		else
+		{
+			createTableComposite(composite, staged);
+			buttons = new StagingButtons(composite, Messages.CommitDialog_StageAllMarker,
+					Messages.CommitDialog_StageAll, Messages.CommitDialog_StageSelectedMarker,
+					Messages.CommitDialog_StageSelected);
+			buttons.setTable(unstagedTable, staged);
+		}
+	}
+
+	// Creates a table with a title label on top of it.
+	private Composite createTableComposite(Composite parent, boolean staged)
+	{
+		Composite tableComp = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+		layout.horizontalSpacing = 1;
+		layout.marginWidth = 1;
+		tableComp.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		data.heightHint = 200;
+		data.widthHint = 250;
+		tableComp.setLayoutData(data);
+		Label label = new Label(tableComp, SWT.NONE);
+		Table table = null;
+		if (staged)
+		{
+			label.setText(Messages.CommitDialog_StagedChanges);
+			table = createTable(tableComp, true);
+		}
+		else
+		{
+			label.setText(Messages.CommitDialog_UnstagedChanges);
+			table = createTable(tableComp, false);
+		}
 		if (staged)
 			stagedTable = table;
 		else
 			unstagedTable = table;
+		return tableComp;
 	}
 
 	private void createCommitMessageArea(SashForm sashForm)
 	{
 		Composite msgComp = new Composite(sashForm, SWT.NONE);
-		msgComp.setLayout(new GridLayout(1, true));
+		GridLayout layout = new GridLayout(1, true);
+		layout.horizontalSpacing = 0;
+		layout.marginWidth = 0;
+		msgComp.setLayout(layout);
 		Label messageLabel = new Label(msgComp, SWT.NONE);
 		messageLabel.setText(Messages.CommitDialog_MessageLabel);
 		commitMessage = new Text(msgComp, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
@@ -358,39 +399,8 @@ public class CommitDialog extends StatusDialog
 				super.widgetSelected(e);
 				if (e.item == null)
 					return;
-				String path = ((TableItem) e.item).getText(1);
-				ChangedFile file = findChangedFile(path);
-				if (file == null)
-					return;
-				if (gitRepository.index().hasBinaryAttributes(file)
-						&& !file.getStatus().equals(ChangedFile.Status.DELETED))
-				{
-					// Special code to draw the image if the binary file is an image
-					String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-					for (String extension : imageExtensions)
-					{
-						if (file.getPath().endsWith(extension))
-						{
-							String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
-							updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
-							return;
-						}
-					}
-				}
-				// Don't recalc if it's the same file as we are already showing
-				if (fLastDiffFile != null && file.equals(fLastDiffFile))
-					return;
-
-				String diff = gitRepository.index().diffForFile(file, staged, 3);
-				try
-				{
-					diff = DiffFormatter.toHTML(file.getPath(), diff);
-				}
-				catch (Throwable t)
-				{
-					GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
-				}
-				updateDiff(file, diff);
+				String filePath = ((TableItem) e.item).getText(1);
+				updateDiff(staged, filePath);
 			}
 		});
 		// Allow double-clicking to toggle staged/unstaged
@@ -403,27 +413,7 @@ public class CommitDialog extends StatusDialog
 					return;
 				Table table = (Table) e.getSource();
 				TableItem[] selected = table.getSelection();
-				Map<String, ChangedFile> selectedFiles = new HashMap<String, ChangedFile>();
-				for (TableItem item : selected)
-				{
-					String path = item.getText(1);
-					ChangedFile file = findChangedFile(path);
-					if (file == null)
-						continue;
-					selectedFiles.put(path, file);
-				}
-				if (selectedFiles.isEmpty())
-					return;
-
-				// Actually stage or unstage the files
-				if (staged)
-				{
-					unstageFiles(selectedFiles);
-				}
-				else
-				{
-					stageFiles(selectedFiles);
-				}
+				moveItems(staged, selected);
 			}
 		});
 
@@ -474,7 +464,7 @@ public class CommitDialog extends StatusDialog
 										{
 											if (file != null && file.equals(fLastDiffFile))
 											{
-												updateDiff(null, Messages.CommitDialog_4);
+												updateDiff(null, Messages.CommitDialog_NoFileSelected);
 											}
 										}
 									}
@@ -530,6 +520,55 @@ public class CommitDialog extends StatusDialog
 		validate();
 	}
 
+	/**
+	 * Update the diff area.
+	 * 
+	 * @param staged
+	 * @param filePath
+	 * @see #updateDiff(ChangedFile, String)
+	 */
+	private void updateDiff(final boolean staged, String filePath)
+	{
+		ChangedFile file = findChangedFile(filePath);
+		if (file == null)
+			return;
+		if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
+		{
+			// Special code to draw the image if the binary file is an image
+			String[] imageExtensions = new String[] { ".png", ".gif", ".jpeg", ".jpg", ".ico" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+			for (String extension : imageExtensions)
+			{
+				if (file.getPath().endsWith(extension))
+				{
+					String fullPath = gitRepository.workingDirectory() + File.separator + file.getPath();
+					updateDiff(file, "<img src=\"" + fullPath + "\" />"); //$NON-NLS-1$ //$NON-NLS-2$
+					return;
+				}
+			}
+		}
+		// Don't recalc if it's the same file as we are already showing
+		if (fLastDiffFile != null && file.equals(fLastDiffFile))
+			return;
+
+		String diff = gitRepository.index().diffForFile(file, staged, 3);
+		try
+		{
+			diff = DiffFormatter.toHTML(file.getPath(), diff);
+		}
+		catch (Throwable t)
+		{
+			GitUIPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
+		}
+		updateDiff(file, diff);
+	}
+
+	/**
+	 * Update the diff area.
+	 * 
+	 * @param file
+	 * @param diff
+	 * @see #updateDiff(boolean, String)
+	 */
 	protected void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
@@ -678,5 +717,177 @@ public class CommitDialog extends StatusDialog
 	protected boolean isResizable()
 	{
 		return true;
+	}
+
+	/*
+	 * Stage or Un-Stage the selected items (files).
+	 * @param staged
+	 * @param selected
+	 */
+	private void moveItems(final boolean staged, TableItem[] selected)
+	{
+		Map<String, ChangedFile> selectedFiles = new HashMap<String, ChangedFile>();
+		for (TableItem item : selected)
+		{
+			String path = item.getText(1);
+			ChangedFile file = findChangedFile(path);
+			if (file == null)
+				continue;
+			selectedFiles.put(path, file);
+		}
+		if (selectedFiles.isEmpty())
+			return;
+
+		// Actually stage or unstage the files
+		if (staged)
+		{
+			unstageFiles(selectedFiles);
+		}
+		else
+		{
+			stageFiles(selectedFiles);
+		}
+	}
+
+	/*
+	 * This class will create buttons next to the tables in order to allow staging and un-staging operations.
+	 */
+	private class StagingButtons extends SelectionAdapter
+	{
+		private String doAllLabel;
+		private String doAllTooltip;
+		private String doSelectionLabel;
+		private String doSelectionTooltip;
+		private Table table;
+		private boolean staged;
+		private Button doSelectionBt;
+
+		/**
+		 * Constructs a new StagingButtons instance.
+		 * 
+		 * @param parent
+		 * @param doAllLabel
+		 * @param doAllTooltip
+		 * @param doSelectionLabel
+		 * @param doSelectionTooltip
+		 */
+		protected StagingButtons(Composite parent, String doAllLabel, String doAllTooltip, String doSelectionLabel,
+				String doSelectionTooltip)
+		{
+			this.doAllLabel = doAllLabel;
+			this.doAllTooltip = doAllTooltip;
+			this.doSelectionLabel = doSelectionLabel;
+			this.doSelectionTooltip = doSelectionTooltip;
+			createComponent(parent);
+		}
+
+		/**
+		 * Set the table (staged or un-staged) that this component controls.
+		 * 
+		 * @param table
+		 * @param staged
+		 */
+		protected void setTable(Table table, boolean staged)
+		{
+			this.table = table;
+			this.staged = staged;
+			table.addSelectionListener(this);
+			updateSelectionButton();
+		}
+
+		protected void createComponent(Composite parent)
+		{
+			Composite comp = new Composite(parent, SWT.NONE);
+			GridLayout layout = new GridLayout(1, true);
+			layout.horizontalSpacing = 0;
+			layout.marginWidth = 1;
+			comp.setLayout(layout);
+			Button doAllBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doAllBt.setText(doAllLabel);
+			doAllBt.setToolTipText(doAllTooltip);
+			doSelectionBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doSelectionBt.setText(doSelectionLabel);
+			doSelectionBt.setToolTipText(doSelectionTooltip);
+
+			GridData data = new GridData(GridData.FILL_HORIZONTAL);
+			doAllBt.setLayoutData(data);
+			data = new GridData(GridData.FILL_HORIZONTAL);
+			doSelectionBt.setLayoutData(data);
+
+			// minimize the width of this component
+			Point doAllSize = doAllBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point doSelectionSize = doSelectionBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			Point bigger = null;
+			if (doAllSize.x > doSelectionSize.x)
+				bigger = doAllSize;
+			else
+				bigger = doSelectionSize;
+			data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+			data.widthHint = bigger.x + 10;
+			comp.setLayoutData(data);
+
+			// Hook the actions
+
+			doAllBt.addSelectionListener(new SelectionAdapter()
+			{
+				public void widgetSelected(SelectionEvent e)
+				{
+					if (table != null)
+					{
+						moveItems(staged, table.getItems());
+						updateSelectionDiff(-1);
+						updateSelectionButton();
+					}
+				}
+			});
+			doSelectionBt.addSelectionListener(new SelectionAdapter()
+			{
+				public void widgetSelected(SelectionEvent e)
+				{
+					if (table != null)
+					{
+						int selectionIndex = table.getSelectionIndex();
+						TableItem[] selection = table.getSelection();
+						moveItems(staged, selection);
+						updateSelectionDiff(selectionIndex);
+						updateSelectionButton();
+					}
+				}
+			});
+		}
+
+		@Override
+		public void widgetSelected(SelectionEvent e)
+		{
+			updateSelectionButton();
+		}
+
+		// Enable the doSelectionBt when the table has a selection
+		private void updateSelectionButton()
+		{
+			doSelectionBt.setEnabled(table.getSelectionCount() > 0);
+		}
+
+		private void updateSelectionDiff(int previousSelectionIndex)
+		{
+			// Select the next file in line (if exists)
+			if (table.getItemCount() > 0 && previousSelectionIndex > -1)
+			{
+				if (table.getItemCount() > previousSelectionIndex)
+				{
+					table.select(previousSelectionIndex);
+				}
+				else
+				{
+					table.select(table.getItemCount() - 1);
+				}
+				String filePath = table.getSelection()[0].getText(1);
+				updateDiff(!staged, filePath);
+			}
+			else
+			{
+				updateDiff(null, Messages.CommitDialog_NoFileSelected);
+			}
+		}
 	}
 }
