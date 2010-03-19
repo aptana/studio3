@@ -10,15 +10,11 @@ import org.eclipse.ui.views.contentoutline.ContentOutline;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
 
-public class ExpandCollapseAllHandler extends AbstractHandler
+public class CollapseAllHandler extends AbstractHandler
 {
 
-	// a toggling flag to indicate what the next action should be (i.e. expand or collapse)
-	private boolean fExpandToggle;
-
-	public ExpandCollapseAllHandler()
+	public CollapseAllHandler()
 	{
-		fExpandToggle = true;
 	}
 
 	@Override
@@ -30,16 +26,7 @@ public class ExpandCollapseAllHandler extends AbstractHandler
 			IPage page = ((ContentOutline) part).getCurrentPage();
 			if (page instanceof CommonOutlinePage)
 			{
-				CommonOutlinePage outlinePage = (CommonOutlinePage) page;
-				if (fExpandToggle)
-				{
-					outlinePage.expandAll();
-				}
-				else
-				{
-					outlinePage.collapseAll();
-				}
-				fExpandToggle = !fExpandToggle;
+				((CommonOutlinePage) page).collapseAll();
 			}
 		}
 		return null;

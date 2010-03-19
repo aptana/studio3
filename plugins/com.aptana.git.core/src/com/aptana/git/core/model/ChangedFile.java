@@ -1,6 +1,7 @@
 package com.aptana.git.core.model;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Path;
 
 public class ChangedFile
 {
@@ -24,7 +25,7 @@ public class ChangedFile
 
 	public String getPath()
 	{
-		return path;
+		return new Path(path).toOSString();
 	}
 
 	public Status getStatus()
