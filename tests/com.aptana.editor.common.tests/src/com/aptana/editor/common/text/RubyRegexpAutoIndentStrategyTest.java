@@ -136,6 +136,33 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("\n    \t", command.text);
 		assertTrue(command.doit);
 	}
+	
+	public void testRR3_129()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			private int count = 0;
+			
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				// match the second call, decrease regexp
+				return count++ == 1;
+			}
+			
+			@Override
+			protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
+					throws BadLocationException
+			{
+				return "\t\t";
+			}
+		};
+		IDocument document = new Document("\tvar advance = function()\n\t\t{\n\t\t\treturn word = that.getWord();\n\t\t};");
+		DocumentCommand command = createNewlineCommand(66);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n", command.text);
+		assertTrue(command.doit);
+	}
 
 	protected DocumentCommand createNewlineCommand(int offset)
 	{
