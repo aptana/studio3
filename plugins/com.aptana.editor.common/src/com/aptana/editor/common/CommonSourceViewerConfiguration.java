@@ -61,8 +61,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
-import com.aptana.editor.common.contentassist.CommonTemplateCompletionProcessor;
-import com.aptana.editor.common.contentassist.CompositeContentAssistProcessor;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
@@ -277,15 +275,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	protected ILanguageService getLanguageService()
 	{
 		return null;
-	}
-
-	protected IContentAssistProcessor addTemplateCompleteProcessor(IContentAssistProcessor processor, String contentType)
-	{
-		if (processor == null)
-		{
-			return new CommonTemplateCompletionProcessor(contentType);
-		}
-		return new CompositeContentAssistProcessor(processor, new CommonTemplateCompletionProcessor(contentType));
 	}
 
 	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)

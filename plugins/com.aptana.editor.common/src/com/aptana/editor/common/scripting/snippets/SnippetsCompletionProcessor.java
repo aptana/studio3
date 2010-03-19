@@ -28,13 +28,13 @@ import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.HasTriggerFilter;
 import com.aptana.scripting.model.OutputType;
-import com.aptana.scripting.model.ScopeFilter;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.HasTriggerFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {

@@ -14,8 +14,8 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.IModelFilter;
 import com.aptana.scripting.model.TemplateElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class WizardNewFilePage extends WizardNewFileCreationPage
 {

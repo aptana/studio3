@@ -144,22 +144,23 @@ public class GitRepositoryTest extends TestCase
 		GitIndex index = fRepo.index();
 
 		// Now there should be a single file that's been changed!
-		assertFalse(index.changedFiles().isEmpty());
-		assertEquals(1, index.changedFiles().size());
+		List<ChangedFile> changedFiles = index.changedFiles();
+		assertFalse(changedFiles.isEmpty());
+		assertEquals(1, changedFiles.size());
 
-		// Make sure it's shown as having unstaged changes only and is MODIFIED
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		// Make sure it's shown as having staged changes only and is DELETED
+		assertStaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		assertTrue(index.unstageFiles(changedFiles));
+		assertUnstaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(changedFiles));
+		assertStaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		index.commit("Delete files");
 		// No more changed files now...

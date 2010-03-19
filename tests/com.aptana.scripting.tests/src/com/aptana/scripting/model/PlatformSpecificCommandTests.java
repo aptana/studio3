@@ -2,6 +2,8 @@ package com.aptana.scripting.model;
 
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.scripting.model.filters.ScopeFilter;
+
 public class PlatformSpecificCommandTests extends BundleTestBase
 {
 	/*

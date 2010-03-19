@@ -1,4 +1,6 @@
-package com.aptana.scripting.model;
+package com.aptana.scripting.model.filters;
+
+import com.aptana.scripting.model.AbstractElement;
 
 public class NotFilter implements IModelFilter
 {

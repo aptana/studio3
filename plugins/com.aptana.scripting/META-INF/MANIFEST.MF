@@ -19,6 +19,7 @@ Bundle-ClassPath: .
 Export-Package: com.aptana.scope,
  com.aptana.scripting,
  com.aptana.scripting.keybindings,
- com.aptana.scripting.model
+ com.aptana.scripting.model,
+ com.aptana.scripting.model.filters
 Eclipse-BuddyPolicy: global
 Eclipse-ExtensibleAPI: true
