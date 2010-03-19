@@ -33,6 +33,7 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 	private static final String HTML_EDITOR_ID = "com.aptana.editor.html";
 	private static final String EXPAND_ALL_COMMAND_ID = "com.aptana.editor.commands.ExpandAll";
 	private static final String COLLAPSE_ALL_COMMAND_ID = "com.aptana.editor.commands.CollapseAll";
+	private static final String PROJECT_NAME = "expand_collapse";
 
 	private IProject project;
 	private IFile file;
@@ -78,7 +79,7 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 	protected IProject createProject() throws CoreException
 	{
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProject project = workspace.getRoot().getProject("myTest");
+		IProject project = workspace.getRoot().getProject(PROJECT_NAME);
 		project.create(new NullProgressMonitor());
 		project.open(new NullProgressMonitor());
 		return project;
@@ -120,16 +121,12 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 		m.setAccessible(true);
 		TreeViewer treeViewer = (TreeViewer) m.invoke(outlinePage);
 
-		// check expansion state
-		Object[] expanded = treeViewer.getExpandedElements();
-		assertEquals(0, expanded.length);
-
 		// Grab the handler service to execute our command
 		IHandlerService service = (IHandlerService) outline.getSite().getService(IHandlerService.class);
 		service.executeCommand(EXPAND_ALL_COMMAND_ID, null);
 
 		// check expansion state, should be expanded
-		expanded = treeViewer.getExpandedElements();
+		Object[] expanded = treeViewer.getExpandedElements();
 		assertEquals(4, expanded.length); // html, head, body, div
 
 		// toggle expansion
@@ -138,6 +135,13 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 		// check expansion state
 		expanded = treeViewer.getExpandedElements();
 		assertEquals(0, expanded.length); // collapsed
+		
+		// toggle expansion
+		service.executeCommand(EXPAND_ALL_COMMAND_ID, null);
+
+		// check expansion state
+		expanded = treeViewer.getExpandedElements();
+		assertEquals(4, expanded.length);  // html, head, body, div
 	}
 
 }
