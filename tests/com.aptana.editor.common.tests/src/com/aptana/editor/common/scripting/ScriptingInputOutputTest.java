@@ -35,6 +35,8 @@ import com.aptana.scripting.model.OutputType;
 public class ScriptingInputOutputTest extends TestCase
 {
 
+	private static final String PROJECT_NAME = "scripting_io";
+	
 	private IProject project;
 	private IFile file;
 	private ITextEditor editor;
@@ -642,9 +644,11 @@ public class ScriptingInputOutputTest extends TestCase
 	protected IProject createProject() throws CoreException
 	{
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProject project = workspace.getRoot().getProject("myTest");
-		project.create(new NullProgressMonitor());
-		project.open(new NullProgressMonitor());
+		IProject project = workspace.getRoot().getProject(PROJECT_NAME);
+		if (!project.exists())
+			project.create(new NullProgressMonitor());
+		if (!project.isOpen())
+			project.open(new NullProgressMonitor());
 		return project;
 	}
 
