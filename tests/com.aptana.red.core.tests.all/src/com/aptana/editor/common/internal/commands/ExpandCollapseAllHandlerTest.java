@@ -120,7 +120,8 @@ public class ExpandCollapseAllHandlerTest extends TestCase
 		Method m = ContentOutlinePage.class.getDeclaredMethod("getTreeViewer");
 		m.setAccessible(true);
 		TreeViewer treeViewer = (TreeViewer) m.invoke(outlinePage);
-
+		Thread.sleep(500);
+		
 		// Grab the handler service to execute our command
 		IHandlerService service = (IHandlerService) outline.getSite().getService(IHandlerService.class);
 		service.executeCommand(EXPAND_ALL_COMMAND_ID, null);

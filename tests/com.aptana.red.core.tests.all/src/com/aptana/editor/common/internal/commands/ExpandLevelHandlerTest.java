@@ -1,6 +1,7 @@
 package com.aptana.editor.common.internal.commands;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -45,6 +45,8 @@ public class ExpandLevelHandlerTest extends TestCase
 	private IProject project;
 	private IFile file;
 	private ITextEditor editor;
+	private IViewPart outline;
+	private TreeViewer treeViewer;
 
 	@Override
 	protected void setUp() throws Exception
@@ -52,6 +54,19 @@ public class ExpandLevelHandlerTest extends TestCase
 		super.setUp();
 		Class.forName("com.aptana.editor.html.Activator");
 		project = createProject();
+
+		// Create and open an HTML file
+		createAndOpenFile("example" + System.currentTimeMillis() + ".html",
+				"<html>\n<head>\n<title>Title goes here</title>\n</head>\n<body>\n<div>\n<p>Hi</p>\n</div>\n</body>\n</html>");
+		// Open the Outline view
+		outline = getOutline();
+
+		// Grab tree viewer for outline contents
+		treeViewer = getTreeViewer(outline);
+		// FIXME Tree viewer isn't set up with items before we start asking it to expand! Sleeping gives it some time...
+		Thread.sleep(500);
+		
+		// We're in the UI thread and this doesn't allow the treeviewer to refresh in a separate thread/job properly...
 	}
 
 	@Override
@@ -59,6 +74,8 @@ public class ExpandLevelHandlerTest extends TestCase
 	{
 		try
 		{
+			getActivePage().hideView(outline);
+			outline.dispose();
 			// Need to force the editor shut!
 			editor.close(false);
 			// Delete the generated file
@@ -71,8 +88,34 @@ public class ExpandLevelHandlerTest extends TestCase
 			editor = null;
 			file = null;
 			project = null;
+			treeViewer = null;
+			outline = null;
 			super.tearDown();
 		}
+	}
+
+	public void testExpandToLevel1() throws Exception
+	{
+		expandToLevel(outline, "1");
+		assertEquals(0, treeViewer.getExpandedElements().length); // collapsed (root)
+	}
+
+	public void testExpandtoLevel2() throws Exception
+	{
+		expandToLevel(outline, "2");
+		assertEquals(1, treeViewer.getExpandedElements().length); // html
+	}
+
+	public void testExpandtoLevel3() throws Exception
+	{
+		expandToLevel(outline, "3");
+		assertEquals(3, treeViewer.getExpandedElements().length); // html, head, body
+	}
+
+	public void testExpandtoLevel4() throws Exception
+	{
+		expandToLevel(outline, "4");
+		assertEquals(4, treeViewer.getExpandedElements().length); // html, head, body, div
 	}
 
 	protected IFile createFile(IProject project, String fileName, String contents) throws CoreException
@@ -106,60 +149,56 @@ public class ExpandLevelHandlerTest extends TestCase
 	{
 		if (editor == null)
 		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			editor = (ITextEditor) IDE.openEditor(page, file, HTML_EDITOR_ID);
+			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+			{
+				
+				@Override
+				public void run()
+				{
+					try
+					{
+						editor = (ITextEditor) IDE.openEditor(getActivePage(), file, HTML_EDITOR_ID);
+					}
+					catch (PartInitException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
 		}
 		return editor;
 	}
 
-	public void testExecute() throws Exception
+	protected IWorkbenchPage getActivePage()
 	{
-		// Create an open an HTML file
-		createAndOpenFile("example" + System.currentTimeMillis() + ".html",
-				"<html>\n<head>\n<title>Title goes here</title>\n</head>\n<body>\n<div>\n<p>Hi</p>\n</div>\n</body>");
-		// Open the Outline view
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		IWorkbenchPage page = window.getActivePage();
-		IViewPart outline = page.showView(IPageLayout.ID_OUTLINE);
+		final IWorkbenchPage[] result = new IWorkbenchPage[1];
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				result[0] = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+			}
+		});
+		return result[0];
+	}
 
-		// Grab tree viewer for outline contents
+	protected TreeViewer getTreeViewer(IViewPart outline) throws NoSuchMethodException, IllegalAccessException,
+			InvocationTargetException
+	{
 		IPage curPage = ((ContentOutline) outline).getCurrentPage();
 		CommonOutlinePage outlinePage = (CommonOutlinePage) curPage;
 		Method m = ContentOutlinePage.class.getDeclaredMethod("getTreeViewer");
 		m.setAccessible(true);
 		TreeViewer treeViewer = (TreeViewer) m.invoke(outlinePage);
+		return treeViewer;
+	}
 
-		// check expansion state
-		Object[] expanded = treeViewer.getExpandedElements();
-		assertEquals(0, expanded.length);
-
-		expandToLevel(outline, "1");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(0, expanded.length); // collapsed (root)
-
-		expandToLevel(outline, "2");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(1, expanded.length); // html
-
-		expandToLevel(outline, "3");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(3, expanded.length); // html, head, body
-
-		expandToLevel(outline, "4");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(4, expanded.length); // html, head, body, div
-
-		expandToLevel(outline, "2");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(1, expanded.length); // html
-
-		expandToLevel(outline, "4");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(4, expanded.length); // html, head, body, div
-
-		expandToLevel(outline, "1");
-		expanded = treeViewer.getExpandedElements();
-		assertEquals(0, expanded.length); // collapsed (root)
+	protected IViewPart getOutline() throws PartInitException
+	{
+		return getActivePage().showView(IPageLayout.ID_OUTLINE);
 	}
 
 	protected void expandToLevel(IViewPart outline, String level) throws ExecutionException, NotDefinedException,
