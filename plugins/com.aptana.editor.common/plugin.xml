@@ -19,10 +19,17 @@
       </command>
        <command
              categoryId="org.eclipse.ui.category.views"
-             defaultHandler="com.aptana.editor.common.internal.commands.ExpandCollapseAllHandler"
-             description="%command.expandcollapse.description"
-             id="com.aptana.editor.commands.ExpandCollapseAll"
-             name="%command.expandcollapse.name">
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
+             description="%command.expandall.description"
+             id="com.aptana.editor.commands.ExpandAll"
+             name="%command.expandall.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.CollapseAllHandler"
+             description="%command.collapseall.description"
+             id="com.aptana.editor.commands.CollapseAll"
+             name="%command.collapseall.name">
        </command>
        <command
              categoryId="org.eclipse.ui.category.views"
@@ -59,10 +66,16 @@
             sequence="M1+T">
       </key>
       <key
-            commandId="com.aptana.editor.commands.ExpandCollapseAll"
+            commandId="com.aptana.editor.commands.ExpandAll"
             contextId="com.aptana.editor.common.outline"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M3+A">
+            sequence="M1+M3++">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.CollapseAll"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+-">
       </key>
       <key
             commandId="com.aptana.editor.commands.ExpandLevel"
@@ -348,5 +361,92 @@
             id="com.aptana.editor.common.outline"
             name="%context.outline.name">
       </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.views.ContentOutline?after=additions">
+         <command
+               commandId="com.aptana.editor.commands.ExpandAll">
+         </command>
+         <command
+               commandId="com.aptana.editor.commands.CollapseAll">
+         </command>
+         <menu
+               label="%menu.expand.label">
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="1">
+               <parameter
+                     name="level"
+                     value="1">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="2">
+               <parameter
+                     name="level"
+                     value="2">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="3">
+               <parameter
+                     name="level"
+                     value="3">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="4">
+               <parameter
+                     name="level"
+                     value="4">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="5">
+               <parameter
+                     name="level"
+                     value="5">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="6">
+               <parameter
+                     name="level"
+                     value="6">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="7">
+               <parameter
+                     name="level"
+                     value="7">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="8">
+               <parameter
+                     name="level"
+                     value="8">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="9">
+               <parameter
+                     name="level"
+                     value="9">
+               </parameter>
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 </plugin>

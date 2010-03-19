@@ -3,6 +3,7 @@ package com.aptana.git.ui.actions;
 import java.io.File;
 import java.text.MessageFormat;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -53,23 +54,30 @@ public abstract class SimpleGitCommandAction extends GitAction
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), finWorking, command);
-				while (!launch.isTerminated())
-				{
-					Thread.yield();
-					if (monitor.isCanceled())
-						return Status.CANCEL_STATUS;
-				}
 				try
 				{
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), finWorking, command);
+					while (!launch.isTerminated())
+					{
+						Thread.yield();
+						if (monitor.isCanceled())
+							return Status.CANCEL_STATUS;
+					}
+
 					int exitValue = launch.getProcesses()[0].getExitValue();
 					if (exitValue != 0)
 						GitPlugin.trace(MessageFormat.format(
 								"command returned non-zero exit value. wd: {0}, command: {1}", finWorking, command)); //$NON-NLS-1$
 				}
+				catch (CoreException e)
+				{
+					GitPlugin.logError(e);
+					return e.getStatus();
+				}
 				catch (Throwable e)
 				{
 					GitPlugin.logError(e.getMessage(), e);
+					// TODO Return back an error status!
 				}
 				postLaunch();
 				return Status.OK_STATUS;

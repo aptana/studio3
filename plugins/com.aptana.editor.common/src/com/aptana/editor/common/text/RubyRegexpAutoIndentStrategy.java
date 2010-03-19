@@ -95,6 +95,11 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 					return true;
 				}
 				String decreasedIndent = findCorrectIndentString(d, lineNumber, currentLineIndent);
+				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and same indent level along
+				{
+					c.text = newline + decreasedIndent;
+					return true;
+				}
 				// Shift the current line...
 				int i = 0;
 				while (Character.isWhitespace(lineContent.charAt(i)))
@@ -106,7 +111,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				d.replace(curLineRegion.getOffset(), curLineRegion.getLength(), newContent);
 				// Set the new indent level for next line
 				c.text = newline + decreasedIndent;
-				c.offset = curLineRegion.getOffset() + newContent.length() - restOfLine.length();
+				c.offset = curLineRegion.getOffset() + newContent.length() - (decreasedIndent + restOfLine).length();
 				c.shiftsCaret = false;
 				return true;
 			}

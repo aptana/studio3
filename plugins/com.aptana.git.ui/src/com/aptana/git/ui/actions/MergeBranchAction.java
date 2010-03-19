@@ -3,6 +3,7 @@ package com.aptana.git.ui.actions;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -20,6 +21,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.dialogs.BranchDialog;
 
@@ -64,13 +66,26 @@ public class MergeBranchAction extends MenuAction
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge", //$NON-NLS-1$
-						branchName);
-				while (!launch.isTerminated())
+				try
 				{
-					Thread.yield();
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge", //$NON-NLS-1$
+							branchName);
+					while (!launch.isTerminated())
+					{
+						Thread.yield();
+					}
+					repo.index().refresh();
 				}
-				repo.index().refresh();
+				catch (CoreException e)
+				{
+					GitUIPlugin.logError(e);
+					return e.getStatus();
+				}
+				catch (Throwable e)
+				{
+					GitUIPlugin.logError(e.getMessage(), e);
+					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
+				}
 				return Status.OK_STATUS;
 			}
 		};
