@@ -70,7 +70,8 @@ public class GitIndex
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+		if (result == null) // couldn't even execute!
+			return;
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
 			return;

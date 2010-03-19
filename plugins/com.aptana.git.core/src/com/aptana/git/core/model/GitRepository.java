@@ -590,7 +590,7 @@ public class GitRepository
 	private String parseSymbolicReference(String reference)
 	{
 		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference); //$NON-NLS-1$ //$NON-NLS-2$
-		if (ref.startsWith(GitRef.REFS))
+		if (ref != null && ref.startsWith(GitRef.REFS))
 			return ref;
 
 		return null;
