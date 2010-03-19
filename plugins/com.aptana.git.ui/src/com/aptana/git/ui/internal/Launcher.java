@@ -61,12 +61,12 @@ public abstract class Launcher
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType configType = manager
 				.getLaunchConfigurationType(IExternalToolConstants.ID_PROGRAM_BUILDER_LAUNCH_CONFIGURATION_TYPE);
-		String name = getLastPortion(command) + " " + toolArgs; //$NON-NLS-1$
+		String name = getLastPortion(command) + " " + join(args, " "); //$NON-NLS-1$ //$NON-NLS-2$
 		// if 3.6M6+
 		try
 		{
 			// name = manager.generateLaunchConfigurationName(name);
-			Method m = ILaunchManager.class.getMethod("generateLaunchConfigurationName", String.class);
+			Method m = ILaunchManager.class.getMethod("generateLaunchConfigurationName", String.class); //$NON-NLS-1$
 			name = (String) m.invoke(manager, name);
 		}
 		catch (Exception e)
