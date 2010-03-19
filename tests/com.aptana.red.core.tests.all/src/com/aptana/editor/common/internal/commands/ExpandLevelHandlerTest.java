@@ -64,8 +64,7 @@ public class ExpandLevelHandlerTest extends TestCase
 		// Grab tree viewer for outline contents
 		treeViewer = getTreeViewer(outline);
 		// FIXME Tree viewer isn't set up with items before we start asking it to expand! Sleeping gives it some time...
-		Thread.sleep(500);
-		
+		Thread.sleep(750);		
 		// We're in the UI thread and this doesn't allow the treeviewer to refresh in a separate thread/job properly...
 	}
 
