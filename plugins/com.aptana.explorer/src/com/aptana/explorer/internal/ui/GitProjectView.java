@@ -1292,7 +1292,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		GitRepository repo = GitRepository.getAttached(selectedProject);
 		// Remove Team menu if project is attached to our git provider.
-		if (repo != null)
+		if (repo != null || selectedProject == null)
 		{
 			Set<String> toRemove = new HashSet<String>();
 			toRemove.add("team.main"); //$NON-NLS-1$
