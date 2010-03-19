@@ -160,7 +160,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		IDocument document = new Document("\tvar advance = function()\n\t\t{\n\t\t\treturn word = that.getWord();\n\t\t};");
 		DocumentCommand command = createNewlineCommand(66);
 		strategy.customizeDocumentCommand(document, command);
-		assertEquals("\n", command.text);
+		assertEquals("\n\t\t", command.text);
 		assertTrue(command.doit);
 	}
 

@@ -95,8 +95,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 					return true;
 				}
 				String decreasedIndent = findCorrectIndentString(d, lineNumber, currentLineIndent);
-				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline keystroke through unchanged
+				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and same indent level along
 				{
+					c.text = newline + decreasedIndent;
 					return true;
 				}
 				// Shift the current line...
