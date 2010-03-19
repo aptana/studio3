@@ -477,6 +477,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			if (repo.equals(GitRepository.getAttached(project)))
 				resources.add(project);
 		}
+		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with staged/unstaged changes, dirty carry over).
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
