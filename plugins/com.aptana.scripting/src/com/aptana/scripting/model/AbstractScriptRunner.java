@@ -48,7 +48,7 @@ public abstract class AbstractScriptRunner extends Job implements Runnable
 		{
 			IRubyObject object = runtime.getLoadService().getLoadPath();
 
-			if (object != null && object instanceof RubyArray)
+			if (object instanceof RubyArray)
 			{
 				RubyArray loadPathArray = (RubyArray) object;
 
