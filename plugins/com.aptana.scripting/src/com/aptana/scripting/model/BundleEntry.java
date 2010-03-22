@@ -485,6 +485,22 @@ public class BundleEntry
 	}
 
 	/**
+	 * reload
+	 */
+	public void reload()
+	{
+		BundleManager manager = BundleManager.getInstance();
+		
+		synchronized (this._bundles)
+		{
+			for (BundleElement bundle : this._bundles)
+			{
+				manager.reloadBundle(bundle);
+			}
+		}
+	}
+	
+	/**
 	 * removeBundle
 	 * 
 	 * @param bundle

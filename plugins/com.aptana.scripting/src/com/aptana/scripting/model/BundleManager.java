@@ -1335,6 +1335,24 @@ public class BundleManager
 	}
 
 	/**
+	 * reloadBundle
+	 * 
+	 * @param bundle
+	 */
+	public void reloadBundle(BundleElement bundle)
+	{
+		File[] scripts = this.getBundleScripts(bundle.getBundleDirectory());
+		
+		if (scripts != null)
+		{
+			for (File script : scripts)
+			{
+				this.reloadScript(script);
+			}
+		}
+	}
+	
+	/**
 	 * reloadScript
 	 * 
 	 * @param script
