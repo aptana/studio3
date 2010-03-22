@@ -1,11 +1,14 @@
 package com.aptana.explorer.internal.ui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -542,11 +545,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasStagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasStagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
@@ -560,14 +569,36 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasUnstagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasUnstagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
+	}
+
+	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
+	{
+		List<ChangedFile> files = new ArrayList<ChangedFile>();
+		if (resource instanceof IContainer)
+		{
+			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
+		}
+		else
+		{
+			ChangedFile changedFile = repo.getChangedFileForResource(resource);
+			if (changedFile != null)
+				files.add(changedFile);
+		}
+		return files;
 	}
 
 	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,
