@@ -277,8 +277,8 @@ public class GitRepositoryTest extends TestCase
 
 		int size = eventsReceived.size();
 		assertTrue(size > 0);
-		assertBranchChangedEvent(eventsReceived, "master", "my_new_branch");
-		assertBranchChangedEvent(eventsReceived, "my_new_branch", "master");
+		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
+		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
 		GitRepository.removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
