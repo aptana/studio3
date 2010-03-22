@@ -1,11 +1,14 @@
 package com.aptana.explorer.internal.ui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -456,7 +459,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		MenuItem commit = new MenuItem(menu, SWT.PUSH, index);
 		commit.setText(Messages.GitProjectView_DiffTooltip);
-		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedFiles().isEmpty());
+		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedChangedFiles().isEmpty());
 		commit.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -467,13 +470,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					return;
 
 				Map<String, String> diffs = new HashMap<String, String>();
-				Set<IResource> resources = getSelectedFiles();
-				for (IResource resource : resources)
+				List<ChangedFile> changedFiles = getSelectedChangedFiles();
+				for (ChangedFile file : changedFiles)
 				{
-					ChangedFile file = repo.getChangedFileForResource(resource);
 					if (file == null)
 						continue;
 
+					if (diffs.containsKey(file.getPath()))
+						continue; // already calculated diff...
 					String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
 					diffs.put(file.getPath(), diff);
 				}
@@ -515,6 +519,20 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		});
 	}
 
+	private List<ChangedFile> getSelectedChangedFiles()
+	{
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				changedFiles.addAll(getChangedFilesForResource(repo, resource));
+			}
+		}
+		return changedFiles;
+	}
+
 	private void createRevertMenuItem(Menu menu, int index)
 	{
 		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
@@ -542,11 +560,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasStagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasStagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
@@ -560,14 +584,36 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			for (IResource resource : getSelectedFiles())
 			{
-				ChangedFile changedFile = repo.getChangedFileForResource(resource);
-				if (changedFile == null)
-					continue;
-				if (changedFile.hasUnstagedChanges())
-					selected.add(resource);
+				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
+				for (ChangedFile changedFile : changedFiles)
+				{
+					if (changedFile == null)
+						continue;
+					if (changedFile.hasUnstagedChanges())
+					{
+						selected.add(resource);
+						break;
+					}
+				}
 			}
 		}
 		return selected;
+	}
+
+	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
+	{
+		List<ChangedFile> files = new ArrayList<ChangedFile>();
+		if (resource instanceof IContainer)
+		{
+			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
+		}
+		else
+		{
+			ChangedFile changedFile = repo.getChangedFileForResource(resource);
+			if (changedFile != null)
+				files.add(changedFile);
+		}
+		return files;
 	}
 
 	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,

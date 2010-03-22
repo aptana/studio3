@@ -27,6 +27,7 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -1257,6 +1258,30 @@ public class GitRepository
 				return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the list of changed files that are underneath the given container.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
+	{
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+			return Collections.emptyList();
+
+		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
+		String workingDirectory = workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
+			if (fullPath.startsWith(resourcePath))
+				filtered.add(changedFile);
+		}
+		return filtered;
 	}
 
 }
