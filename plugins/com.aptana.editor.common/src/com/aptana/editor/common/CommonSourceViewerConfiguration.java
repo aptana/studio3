@@ -44,14 +44,12 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
-import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
-import org.eclipse.jface.text.information.IInformationProvider;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.Annotation;
@@ -62,11 +60,9 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.hover.CommonAnnotationHover;
-import com.aptana.editor.common.hover.CommonTextHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
-import com.aptana.editor.common.text.information.CommonInformationProvider;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
 
@@ -154,12 +150,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	}
 
 	@Override
-	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
-	{
-		return new CommonTextHover(getLanguageService());
-	}
-
-	@Override
 	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
 	{
 		return new IInformationControlCreator()
@@ -179,18 +169,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 		presenter.setDocumentPartitioning(getConfiguredDocumentPartitioning(sourceViewer));
 		presenter.setSizeConstraints(60, 10, true, true);
-
-		// registers information provider
-		String[] contentTypes = getConfiguredContentTypes(sourceViewer);
-		IInformationProvider provider;
-		for (String type : contentTypes)
-		{
-			provider = getInformationProvider(sourceViewer, type);
-			if (provider != null)
-			{
-				presenter.setInformationProvider(provider, type);
-			}
-		}
 
 		return presenter;
 	}
@@ -257,26 +235,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return null;
 	}
 
-	/**
-	 * Returns the information provider that will be used for information presentation in the given source viewer and
-	 * for the given partition type.
-	 * 
-	 * @param sourceViewer
-	 *            the source viewer to be configured by this configuration
-	 * @param contentType
-	 *            the partition type for which the information provider is applicable
-	 * @return IInformationProvider or null if the content type is not supported
-	 */
-	protected IInformationProvider getInformationProvider(ISourceViewer sourceViewer, String contentType)
-	{
-		return new CommonInformationProvider(getLanguageService());
-	}
-
-	protected ILanguageService getLanguageService()
-	{
-		return null;
-	}
-
 	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)
 	{
 		return new IInformationControlCreator()
@@ -289,12 +247,6 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source.
-	 * ISourceViewer, java.lang.String)
-	 */
 	@Override
 	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
 	{
