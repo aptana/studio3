@@ -177,6 +177,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 
 			BundleManager.getInstance().reloadScript(file);
 		}
+		else
+		{
+			reloadDependentScripts(new File(rootPath, name));
+		}
 	}
 
 	/**
@@ -294,6 +298,26 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 	}
 
+	/**
+	 * realoadDependentScripts
+	 * 
+	 * @param file
+	 */
+	private void reloadDependentScripts(File file)
+	{
+		BundleManager manager = BundleManager.getInstance();
+		String fullPath = file.getAbsolutePath();
+		LibraryCrossReference xref = LibraryCrossReference.getInstance();
+		
+		if (xref.hasLibrary(fullPath))
+		{
+			for (String script : xref.getPathsFromLibrary(fullPath))
+			{
+				manager.reloadScript(new File(script));
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -324,6 +348,16 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		if (isProjectBundleFile(fullProjectPath))
 		{
 			this.processFile(delta);
+		}
+		else
+		{
+			if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0)
+			{
+				IResource resource = delta.getResource();
+				File file = resource.getLocation().toFile();
+				
+				reloadDependentScripts(file);
+			}
 		}
 
 		return true;
