@@ -459,7 +459,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		MenuItem commit = new MenuItem(menu, SWT.PUSH, index);
 		commit.setText(Messages.GitProjectView_DiffTooltip);
-		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedFiles().isEmpty());
+		commit.setEnabled(GitRepository.getAttached(selectedProject) != null && !getSelectedChangedFiles().isEmpty());
 		commit.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -470,13 +470,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					return;
 
 				Map<String, String> diffs = new HashMap<String, String>();
-				Set<IResource> resources = getSelectedFiles();
-				for (IResource resource : resources)
+				List<ChangedFile> changedFiles = getSelectedChangedFiles();
+				for (ChangedFile file : changedFiles)
 				{
-					ChangedFile file = repo.getChangedFileForResource(resource);
 					if (file == null)
 						continue;
 
+					if (diffs.containsKey(file.getPath()))
+						continue; // already calculated diff...
 					String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
 					diffs.put(file.getPath(), diff);
 				}
@@ -516,6 +517,20 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				dialog.open();
 			}
 		});
+	}
+
+	private List<ChangedFile> getSelectedChangedFiles()
+	{
+		GitRepository repo = GitRepository.getAttached(selectedProject);
+		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
+		if (repo != null)
+		{
+			for (IResource resource : getSelectedFiles())
+			{
+				changedFiles.addAll(getChangedFilesForResource(repo, resource));
+			}
+		}
+		return changedFiles;
 	}
 
 	private void createRevertMenuItem(Menu menu, int index)
