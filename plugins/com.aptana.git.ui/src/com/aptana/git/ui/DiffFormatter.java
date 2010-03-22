@@ -42,6 +42,8 @@ public abstract class DiffFormatter
 	{
 		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
+			if (diff.length() == 0)
+				diff = "(no content)";
 			return "<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (title == null)
@@ -129,7 +131,7 @@ public abstract class DiffFormatter
 					.append("diff.html"), false); //$NON-NLS-1$
 			String template = IOUtil.read(stream);
 			Map<String, String> variables = new HashMap<String, String>();
-			variables.put("\\{diff\\}", html); //$NON-NLS-1$
+			variables.put("\\{diff\\}", Matcher.quoteReplacement(html)); //$NON-NLS-1$
 			return StringUtil.replaceAll(template, variables);
 		}
 		catch (Exception e)
