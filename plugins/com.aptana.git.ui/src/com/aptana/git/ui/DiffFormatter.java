@@ -42,6 +42,8 @@ public abstract class DiffFormatter
 	{
 		if (!diff.startsWith("diff")) //$NON-NLS-1$
 		{
+			if (diff.length() == 0)
+				diff = "(no content)";
 			return "<pre>" + StringUtil.sanitizeHTML(diff) + "</pre>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (title == null)
