@@ -9,6 +9,7 @@ public class LibraryCrossReference
 {
 	private static final Map<String, Set<String>> LIBS_BY_PATH;
 	private static final Map<String, Set<String>> PATHS_BY_LIB;
+	private static final String[] NO_STRINGS = new String[0];
 	
 	private static LibraryCrossReference INSTANCE;
 	
@@ -38,6 +39,40 @@ public class LibraryCrossReference
 	 */
 	private LibraryCrossReference()
 	{
+	}
+	
+	/**
+	 * getPathsFromLibrary
+	 * 
+	 * @param libraryPath
+	 * @return
+	 */
+	public String[] getPathsFromLibrary(String libraryPath)
+	{
+		String[] result = NO_STRINGS;
+		
+		synchronized (PATHS_BY_LIB)
+		{
+			Set<String> paths = PATHS_BY_LIB.get(libraryPath);
+			
+			if (paths != null)
+			{
+				result = paths.toArray(new String[paths.size()]);
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * hasLibrary
+	 * 
+	 * @param libraryPath
+	 * @return
+	 */
+	public boolean hasLibrary(String libraryPath)
+	{
+		return PATHS_BY_LIB.containsKey(libraryPath);
 	}
 	
 	/**
