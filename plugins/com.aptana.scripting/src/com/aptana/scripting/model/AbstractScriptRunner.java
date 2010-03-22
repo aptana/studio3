@@ -105,10 +105,15 @@ public abstract class AbstractScriptRunner extends Job implements Runnable
 						if (featureObject instanceof String)
 						{
 							String feature = (String) featureObject;
+							
+							// Windows-ify, if necessary
+							if (File.separatorChar == '\\')
+							{
+								feature = feature.replace('/', '\\');
+							}
 
 							for (File path : paths)
 							{
-								// TODO: convert file separator, if needed
 								File lib = new File(path, feature);
 
 								if (lib.isFile())
