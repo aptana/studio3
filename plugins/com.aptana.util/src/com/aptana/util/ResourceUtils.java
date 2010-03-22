@@ -2,7 +2,6 @@ package com.aptana.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -116,25 +115,6 @@ public class ResourceUtils
 			// try multi-argument URI constructor to perform encoding
 			return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
 		}
-	}
-
-	public static URL uriToURL(String uri)
-	{
-		URI uri2;
-		String encodedUri;
-		try
-		{
-			encodedUri = URLEncoder.encode(uri, null, null);
-			uri2 = new URI(encodedUri);
-			return uri2.toURL();
-		}
-		catch (MalformedURLException e)
-		{
-		}
-		catch (URISyntaxException e)
-		{
-		}
-		return null;
 	}
 
 	/**

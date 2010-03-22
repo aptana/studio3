@@ -35,7 +35,6 @@
 package com.aptana.usage;
 
 import java.io.File;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -43,6 +42,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.service.datalocation.Location;
 
 import com.aptana.util.ResourceUtils;
 
@@ -96,7 +98,7 @@ public class AptanaDB
 
 	public void execute(String query, IResultSetHandler handler)
 	{
-		Connection connection = INSTANCE.getConnection();
+		Connection connection = getInstance().getConnection();
 
 		if (connection != null)
 		{
@@ -265,19 +267,33 @@ public class AptanaDB
 	{
 		try
 		{
-			String homeDirectoryName = System.getProperty("osgi.configuration.area"); //$NON-NLS-1$
-			URL homeDirectoryURL = ResourceUtils.uriToURL(homeDirectoryName);
-			File homeDirectory = ResourceUtils.resourcePathToFile(homeDirectoryURL);
+			Location location = Platform.getConfigurationLocation();
+			if (location == null || location.isReadOnly())
+			{
+				location = Platform.getInstallLocation();
+				if (location == null || location.isReadOnly())
+				{
+					location = Platform.getUserLocation();
+					if (location == null || location.isReadOnly())
+					{
+						location = null;
+					}
+				}
+			}
+			if (location != null)
+			{
+				File homeDirectory = ResourceUtils.resourcePathToFile(location.getURL());
 
-			// makes sure home directory exists
-			homeDirectory.mkdirs();
-			// points Derby home to directory
-			System.setProperty("derby.system.home", homeDirectory.getAbsolutePath()); //$NON-NLS-1$
-			// loads driver into VM
-			Class.forName(DRIVER).newInstance();
+				// makes sure home directory exists
+				homeDirectory.mkdirs();
+				// points Derby home to directory
+				System.setProperty("derby.system.home", homeDirectory.getAbsolutePath()); //$NON-NLS-1$
+				// loads driver into VM
+				Class.forName(DRIVER).newInstance();
 
-			// tags as successfully loaded
-			_driverLoaded = true;
+				// tags as successfully loaded
+				_driverLoaded = true;
+			}
 		}
 		catch (InstantiationException e)
 		{
@@ -290,10 +306,6 @@ public class AptanaDB
 		catch (ClassNotFoundException e)
 		{
 			UsagePlugin.logError(Messages.AptanaDB_FailedToLoad, e);
-		}
-		catch (Exception e)
-		{
-			UsagePlugin.logError(Messages.AptanaDB_ErrorLocateHome, e);
 		}
 	}
 }

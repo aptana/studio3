@@ -228,7 +228,7 @@ public class PingStartup implements IStartup
 
 	private static String getUserAgent()
 	{
-		return "Aptana/1.5"; //$NON-NLS-1$
+		return "Aptana/3.0"; //$NON-NLS-1$
 	}
 
 	private static boolean sendUpdate(String queryString)
@@ -253,6 +253,7 @@ public class PingStartup implements IStartup
 			// opens the connection and configure it
 			URLConnection connection = url.openConnection();
 			connection.setDoOutput(true);
+			connection.setUseCaches(false);
 			connection.setRequestProperty("Content-Encoding", "gzip"); //$NON-NLS-1$ //$NON-NLS-2$
 			connection.setRequestProperty("Content-Length", String.valueOf(gzippedData.length)); //$NON-NLS-1$
 			connection.setRequestProperty("User-Agent", getUserAgent()); //$NON-NLS-1$
