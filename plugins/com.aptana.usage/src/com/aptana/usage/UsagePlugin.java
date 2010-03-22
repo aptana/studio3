@@ -1,6 +1,7 @@
 package com.aptana.usage;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.Bundle;
@@ -41,8 +42,11 @@ public class UsagePlugin extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
+		if (!Platform.inDevelopmentMode())
+		{
+			AptanaDB.getInstance().shutdown();
+		}
 		plugin = null;
-		AptanaDB.getInstance().shutdown();
 		super.stop(context);
 	}
 

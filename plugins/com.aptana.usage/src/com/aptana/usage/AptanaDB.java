@@ -202,8 +202,7 @@ public class AptanaDB
 			{
 				// NOTE: We always get an exception when shutting down the database. We make sure it was the right
 				// one for successful shutdown. SQLState is "08006" and ErrorCode is 45000 for single database shutdown
-				if (e.getErrorCode() != 45000 && "XJ015".equals(e.getSQLState()) == false //$NON-NLS-1$
-						&& "08006".equals(e.getSQLState()) == false) //$NON-NLS-1$
+				if (e.getErrorCode() != 45000 && !"XJ015".equals(e.getSQLState()) && !"08006".equals(e.getSQLState())) //$NON-NLS-1$ //$NON-NLS-2$
 				{
 					UsagePlugin.logError(Messages.AptanaDB_ErrorShutdown, e);
 				}

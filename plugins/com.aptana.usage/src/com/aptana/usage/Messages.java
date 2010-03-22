@@ -5,7 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.db.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.usage.messages"; //$NON-NLS-1$
 
 	public static String AptanaDB_Error_Execute_Query;
 	public static String AptanaDB_ErrorShutdown;
