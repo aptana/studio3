@@ -264,7 +264,7 @@ public class ScriptingEngine
 
 		try
 		{
-			job.run("Load '" + fullPath + "'", this._runType, async); //$NON-NLS-1$ //$NON-NLS-2$
+			job.run("Load '" + fullPath + "'", runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (InterruptedException e)
 		{
