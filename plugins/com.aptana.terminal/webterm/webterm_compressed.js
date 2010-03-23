@@ -1527,7 +1527,7 @@ _111=_110-0;
 var _112=this._term.getRow();
 var _113=this._term.getScrollRegion().bottom;
 var _114=_112+_111;
-if(_112<=_113){
+if(_114<=_113){
 this._term.setRow(_114);
 }else{
 this._term.scrollUp(_111);
@@ -1986,7 +1986,8 @@ ch=" ";
 line.putCharacter(ch,this._currentAttribute,this._column);
 this._column++;
 if(this._column>=this._width){
-this._column=this._width-1;
+this._column=0;
+this.getParser().getHandler().SU("SU",1);
 }
 }
 }
