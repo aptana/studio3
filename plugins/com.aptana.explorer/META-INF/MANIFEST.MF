@@ -21,9 +21,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.terminal;bundle-version="1.0.0",
  org.jruby;bundle-version="1.4.0",
  org.eclipse.ui.ide;bundle-version="3.4.0",
- org.eclipse.team.core;bundle-version="3.4.0",
- org.eclipse.ui.workbench.texteditor;bundle-version="3.4.0",
- org.eclipse.text;bundle-version="3.4.0"
+ org.eclipse.team.core;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
