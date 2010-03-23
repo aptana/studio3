@@ -68,7 +68,16 @@ public class GitFileHistory extends FileHistory
 
 	public IFileRevision getFileRevision(String id)
 	{
-		// TODO The id should be a commit sha, grab the CommitFileRevision for it...
+		if (revisions != null)
+		{
+			for (IFileRevision revision : revisions)
+			{
+				if (revision.getContentIdentifier().equals(id))
+				{
+					return revision;
+				}
+			}
+		}
 		return null;
 	}
 
