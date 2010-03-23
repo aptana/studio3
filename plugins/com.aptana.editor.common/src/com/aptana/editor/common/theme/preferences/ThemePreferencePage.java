@@ -462,12 +462,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		final Table table = new Table(comp, SWT.FULL_SELECTION | SWT.SINGLE | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(false);
-		gridData = new GridData();
-		gridData.heightHint = 200;
-		table.setLayoutData(gridData);
-		layout = new TableLayout();
-		table.setLayout(layout);
-
 		// Hack to force a specific row height
 		table.addListener(SWT.MeasureItem, new Listener()
 		{
@@ -786,7 +780,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				setTheme(fSelectedTheme);
 			}
 		});
-		
+
 		Composite textField = new Composite(editTokenList, SWT.NONE);
 		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		textField.setLayout(new GridLayout(2, false));
@@ -967,7 +961,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		u.setSelection(isUnderline);
 		u.setLayoutData(new GridData(GridData.FILL_BOTH));
 		u.setSize(16, 16);
-		
+
 		buttons.pack();
 		editor.minimumWidth = buttons.getSize().x;
 		editor.horizontalAlignment = SWT.LEFT;
