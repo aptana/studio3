@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -102,12 +104,18 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	public String executeScript()
 	{
+		List<String> attributes = new ArrayList<String>(3);
+		if ("cmd".equals(this._shell)) //$NON-NLS-1$
+		{
+			// Run the 'cmd' with the /Q and /C (only for Windows)
+			attributes.add("/Q"); //$NON-NLS-1$
+			attributes.add("/C"); //$NON-NLS-1$
+		}
+		attributes.add(this._tempFile.getAbsolutePath());
 		String resultText = null;
-
 		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
 		Map<Integer, String> result = ProcessUtil.runInBackground(this._shell, this.getCommand().getWorkingDirectory(),
-				input, this.getContributedEnvironment(), new String[] { this._tempFile.getAbsolutePath() });
-
+				input, this.getContributedEnvironment(), attributes.toArray(new String[attributes.size()]));
 		if (result == null)
 		{
 			this._exitValue = 1;
