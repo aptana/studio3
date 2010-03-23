@@ -9,10 +9,11 @@ public class CoreStorageTests
 	public static Test suite()
 	{
 		TestSuite suite = new TestSuite(CoreStorageTests.class.getName());
-		//$JUnit-BEGIN$
+		// $JUnit-BEGIN$
 		suite.addTestSuite(CommitFileRevisionTest.class);
 		suite.addTestSuite(GitFileHistoryProviderTest.class);
-		//$JUnit-END$
+		suite.addTestSuite(GitFileHistoryTest.class);
+		// $JUnit-END$
 		return suite;
 	}
 
