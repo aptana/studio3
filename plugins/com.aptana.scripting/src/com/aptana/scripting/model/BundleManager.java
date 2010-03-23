@@ -520,6 +520,19 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleDirectory
+	 * 
+	 * @param script
+	 * @return
+	 */
+	protected File getBundleDirectory(File script)
+	{
+		String scriptPath = script.getAbsolutePath();
+		
+		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+	}
+	
+	/**
 	 * getBundles
 	 * 
 	 * @param bundlesDirectory
@@ -1257,17 +1270,7 @@ public class BundleManager
 		if (script != null)
 		{
 			// determine bundle root directory
-			String scriptPath = script.getAbsolutePath();
-			File bundleDirectory = null;
-
-			if (scriptPath.endsWith(BUNDLE_FILE))
-			{
-				bundleDirectory = script.getParentFile();
-			}
-			else
-			{
-				bundleDirectory = script.getParentFile().getParentFile();
-			}
+			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
@@ -1362,8 +1365,17 @@ public class BundleManager
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			this.loadScript(script, false);
+			
+			// determine bundle root directory
+			File bundleDirectory = this.getBundleDirectory(script);
 
+			// get bundle load paths
+			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			// execute script
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
+
+			// fire reload event
 			this.fireScriptReloadedEvent(script);
 		}
 		else
