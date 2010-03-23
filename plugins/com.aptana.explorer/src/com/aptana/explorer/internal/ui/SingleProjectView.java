@@ -1,8 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.contentobjects.jnotify.IJNotify;
@@ -26,12 +24,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.search.ui.IContextMenuConstants;
@@ -62,39 +57,26 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
-import org.eclipse.ui.menus.CommandContributionItem;
-import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
-import org.eclipse.ui.texteditor.ITextEditor;
-import org.eclipse.ui.views.markers.internal.MarkerSupportRegistry;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.scripting.commands.TextEditorUtils;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.filters.AndFilter;
-import com.aptana.scripting.model.filters.IModelFilter;
-import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
-import com.aptana.scripting.model.filters.ScopeFilter;
 import com.aptana.terminal.views.TerminalView;
 
 /**
@@ -105,6 +87,8 @@ import com.aptana.terminal.views.TerminalView;
 @SuppressWarnings("restriction")
 public abstract class SingleProjectView extends CommonNavigator
 {
+
+	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
@@ -208,10 +192,10 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, "com.aptana.explorer.gear");				
+				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);				
 				fillCommandsMenu(commandsMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId());
+				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
 				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
@@ -258,81 +242,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
 
 		// Add run related items
-		// Run script/server
-		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
-				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
-				SWT.PUSH);
-		menuManager.appendToGroup(GROUP_RUN, new CommandContributionItem(runScriptServer)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
-		// Preview
-		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				final MenuItem terminalMenuItem = new MenuItem(menu, SWT.PUSH);
-				terminalMenuItem.setText("Preview");
-				terminalMenuItem.addSelectionListener(new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						List<IModelFilter> filters = new ArrayList<IModelFilter>();
-						filters.add(new IsExecutableCommandFilter()
-						{
-							@Override
-							public boolean include(AbstractElement element)
-							{
-								if (!super.include(element))
-									return false;
-								if (!(element instanceof CommandElement))
-									return false;
-								CommandElement node = (CommandElement) element;
-								return node.getDisplayName().equals("Preview"); //$NON-NLS-1$
-							}
-						});
-
-						IEditorPart textEditor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-								.getActiveEditor();
-						if (textEditor instanceof ITextEditor)
-						{
-							try
-							{
-								ITextEditor abstractThemeableEditor = (ITextEditor) textEditor;
-								IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(
-										abstractThemeableEditor.getEditorInput());
-								int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
-								// Get the scope at caret offset
-								String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-										.getScopeAtOffset(document, caretOffset);
-								filters.add(new ScopeFilter(contentTypeAtOffset));
-							}
-							catch (BadLocationException e1)
-							{
-								ExplorerPlugin.logError(e1.getMessage(), e1);
-							}
-						}
-						else
-						{
-							// If no active editor, "use project root". Assume rails scope.
-							filters.add(new ScopeFilter("source.ruby.rails")); //$NON-NLS-1$
-						}
-						CommandElement[] commands = BundleManager.getInstance().getCommands(
-								new AndFilter(filters.toArray(new IModelFilter[filters.size()])));
-						if (commands != null && commands.length > 0)
-						{
-							commands[0].execute();
-						}
-					}
-				});
-				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
-			}
-		});
 		// Open Terminal
 		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
 		{
