@@ -7,6 +7,7 @@ import com.aptana.git.core.model.GitExecutableTest;
 import com.aptana.git.core.model.GitRefTest;
 import com.aptana.git.core.model.GitRepositoryTest;
 import com.aptana.git.core.model.GitRevSpecifierTest;
+import com.aptana.git.internal.core.storage.CommitFileRevisionTest;
 
 public class AllTests
 {
@@ -19,6 +20,7 @@ public class AllTests
 		suite.addTestSuite(GitRefTest.class);
 		suite.addTestSuite(GitRepositoryTest.class);
 		suite.addTestSuite(GitRevSpecifierTest.class);
+		suite.addTestSuite(CommitFileRevisionTest.class);
 		// $JUnit-END$
 		return suite;
 	}
