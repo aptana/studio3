@@ -32,6 +32,8 @@ public class GitFileHistory extends FileHistory
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		try
 		{
+			if (resource == null || resource.getProject() == null)
+				return new IFileRevision[0];
 			GitRepository repo = GitRepository.getAttached(this.resource.getProject());
 			if (repo == null)
 				return new IFileRevision[0];
@@ -60,13 +62,13 @@ public class GitFileHistory extends FileHistory
 
 	public IFileRevision[] getContributors(IFileRevision revision)
 	{
-		// TODO Auto-generated method stub
+		// TODO Return the versions right before the passed in version (previous commit(s))
 		return null;
 	}
 
 	public IFileRevision getFileRevision(String id)
 	{
-		// TODO Auto-generated method stub
+		// TODO The id should be a commit sha, grab the CommitFileRevision for it...
 		return null;
 	}
 
@@ -79,7 +81,7 @@ public class GitFileHistory extends FileHistory
 
 	public IFileRevision[] getTargets(IFileRevision revision)
 	{
-		// TODO Auto-generated method stub
+		// TODO Return the version right after the passed in version (next commit(s))
 		return null;
 	}
 
