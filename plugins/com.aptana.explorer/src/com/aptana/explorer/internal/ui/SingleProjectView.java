@@ -75,6 +75,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.terminal.views.TerminalView;
@@ -89,8 +90,6 @@ public abstract class SingleProjectView extends CommonNavigator
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
-
-	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	/**
 	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
@@ -388,7 +387,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		// Register with focus service so that Cut/Copy/Paste/SelecAll handlers will work.
 		IFocusService focusService = (IFocusService) getViewSite().getService(IFocusService.class);
-		focusService.addFocusTracker(searchText, ID + ".searchText"); //$NON-NLS-1$
+		focusService.addFocusTracker(searchText, IExplorerUIConstants.VIEW_ID + ".searchText"); //$NON-NLS-1$
 
 		searchText.addFocusListener(new FocusListener()
 		{
