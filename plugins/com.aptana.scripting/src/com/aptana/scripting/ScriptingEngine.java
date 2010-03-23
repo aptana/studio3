@@ -233,7 +233,7 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths)
 	{
-		return this.runScript(fullPath, loadPaths, false);
+		return this.runScript(fullPath, loadPaths, this._runType, false);
 	}
 
 	/**
@@ -246,11 +246,25 @@ public class ScriptingEngine
 	 */
 	public Object runScript(String fullPath, List<String> loadPaths, boolean async)
 	{
+		return this.runScript(fullPath, loadPaths, this._runType, async);
+	}
+	
+	/**
+	 * runScript
+	 * 
+	 * @param fullPath
+	 * @param loadPaths
+	 * @param runType
+	 * @param async
+	 * @return
+	 */
+	public Object runScript(String fullPath, List<String> loadPaths, RunType runType, boolean async)
+	{
 		ScriptLoadJob job = new ScriptLoadJob(fullPath, loadPaths);
 
 		try
 		{
-			job.run("Load '" + fullPath + "'", this._runType, async); //$NON-NLS-1$ //$NON-NLS-2$
+			job.run("Load '" + fullPath + "'", runType, async); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (InterruptedException e)
 		{

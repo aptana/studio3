@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: com.aptana.red.core.tests.all.Activator
 Bundle-Vendor: APTANA
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.4.0",
  org.junit;bundle-version="[3.7.0,4.0.0)",
  com.aptana.commandline.launcher;bundle-version="1.0.0",
  com.aptana.editor.common;bundle-version="1.0.0",
@@ -27,6 +28,12 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.scripting;bundle-version="1.0.0",
  com.aptana.scripting.ui;bundle-version="1.0.0",
  com.aptana.terminal;bundle-version="1.0.0",
- com.aptana.util;bundle-version="1.0.0"
+ com.aptana.util;bundle-version="1.0.0",
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.4.0",
+ org.eclipse.ui.views;bundle-version="3.4.0",
+ org.eclipse.ui.workbench;bundle-version="3.4.0",
+ org.eclipse.ui.ide;bundle-version="3.4.0",
+ org.eclipse.core.commands;bundle-version="3.4.0",
+ org.eclipse.jface;bundle-version="3.4.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

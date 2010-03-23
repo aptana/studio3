@@ -1,5 +1,6 @@
 package com.aptana.editor.common.scripting.snippets;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
@@ -12,6 +13,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.link.ILinkedModeListener;
+import org.eclipse.jface.text.link.InclusivePositionUpdater;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
@@ -25,6 +27,7 @@ import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
@@ -35,15 +38,19 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	protected ICompletionProposal[] templateProposals;
 	protected char triggerChar;
 	protected char[] triggerChars;
-	private StyledString styledDisplayString;
 
 	private final Template fTemplate;
 	private final TemplateContext fContext;
 	private final IRegion fRegion;
 
+	private ICompletionProposal delegateTemplateProposal;
 	private IRegion fSelectedRegion; // initialized by apply()
 
 	private InclusivePositionUpdater fUpdater;
+
+	private StyledString styledDisplayString;
+
+	private Styler styler;
 
 	public SnippetTemplateProposal(Template template, TemplateContext context, IRegion region, Image image,
 			int relevance)
@@ -65,6 +72,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	@Override
 	public void apply(final ITextViewer viewer, char trigger, int stateMask, final int offset)
 	{
+		delegateTemplateProposal = null;
 		if (contains(triggerChars, trigger))
 		{
 			if (triggerChar == trigger)
@@ -73,6 +81,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 			}
 			else
 			{
+				delegateTemplateProposal = templateProposals[trigger - '1'];
 				((ICompletionProposalExtension2) templateProposals[trigger - '1']).apply(viewer, trigger, stateMask,
 						offset);
 			}
@@ -332,7 +341,11 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	 */
 	public Point getSelection(IDocument document)
 	{
-		return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
+		if (delegateTemplateProposal == null)
+		{
+			return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
+		}
+		return delegateTemplateProposal.getSelection(document);
 	}
 
 	@Override
@@ -344,12 +357,24 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	@Override
 	public String getDisplayString()
 	{
-		Template template = getTemplate();
-		return template.getDescription() + " [ " + template.getName() + "\u21E5 ]"; //$NON-NLS-1$ //$NON-NLS-2$
+		return getStyledDisplayString().getString().trim();
 	}
 
+	@Override
 	public StyledString getStyledDisplayString()
 	{
+		if (styledDisplayString == null)
+		{
+			Template template = getTemplate();
+			styledDisplayString = new StyledString(
+					String.format("%1$-20.20s%2$10.10s ",  //$NON-NLS-1$
+							template.getDescription(),
+							template.getName() + "\u00bb") //$NON-NLS-1$
+							+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
+							// Need padding on windows to work around the width computation
+							+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
+							styler);
+		}
 		return styledDisplayString;
 	}
 
@@ -358,14 +383,14 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		return super.getTemplate();
 	}
 
-	void setStyledDisplayString(StyledString styledDisplayString)
-	{
-		this.styledDisplayString = styledDisplayString;
-	}
-
 	void setTriggerChar(char triggerChar)
 	{
 		this.triggerChar = triggerChar;
+	}
+
+	void setStyler(Styler styler)
+	{
+		this.styler = styler;
 	}
 
 	private static final String TRIGGER_CHARS = "123456789"; //$NON-NLS-1$
@@ -390,4 +415,5 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 
 		return false;
 	}
+
 }

@@ -9,8 +9,8 @@ import com.aptana.util.StringUtil;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {
-	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
+	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 
 	private String _path;
 	private String _displayName;
@@ -77,7 +77,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-
+	
 	/**
 	 * unregisterElement
 	 * 
@@ -105,6 +105,8 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 						}
 					}
 				}
+				
+				LibraryCrossReference.getInstance().unregisterPath(path);
 			}
 		}
 	}

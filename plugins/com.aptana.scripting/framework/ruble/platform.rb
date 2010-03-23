@@ -8,5 +8,21 @@ module Ruble
   def Ruble.platforms
     platforms = com.aptana.scripting.model.Platform.getPlatformsForEclipsePlatform(org.eclipse.core.runtime.Platform.getOS())
     platforms.map {|platform| platform.getName.to_sym }
+  end  
+  
+  def Ruble.is_windows_xp?
+    os_name.start_with? "Windows XP"
+  end  
+  
+  def Ruble.is_windows_7?
+    os_name == "Windows 7"
   end
+  
+  def Ruble.is_windows_vista?
+    os_name == "Windows Vista"
+  end
+  
+  def Ruble.os_name
+    java.lang.System.getProperty("os.name")
+  end  
 end

@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.terminal.Activator;
 import com.aptana.util.StringUtil;
 
@@ -61,22 +62,29 @@ public class TerminalServerWorker implements Runnable
 
 		try
 		{
-			URL fileURL = FileLocator.toFileURL(url);
-			File file = new File(new Path(fileURL.getPath()).toOSString());
-
-			if (file.exists() && file.canRead())
+			if (url != null)
 			{
-				int length = (int) file.length();
-				byte[] bytes = new byte[length];
-
-				new FileInputStream(file).read(bytes);
-
-				if (p.endsWith(".template")) //$NON-NLS-1$
+				URL fileURL = FileLocator.toFileURL(url);
+				File file = new File(new Path(fileURL.getPath()).toOSString());
+	
+				if (file.exists() && file.canRead())
 				{
-					String result = populateTemplate(new String(bytes));
-					bytes = result.getBytes();
+					int length = (int) file.length();
+					byte[] bytes = new byte[length];
+	
+					new FileInputStream(file).read(bytes);
+	
+					if (p.endsWith(".template")) //$NON-NLS-1$
+					{
+						String result = populateTemplate(new String(bytes));
+						bytes = result.getBytes();
+					}
+					this.sendResponse(output, STATUS_200, bytes);
 				}
-				this.sendResponse(output, STATUS_200, bytes);
+				else
+				{
+					this.sendErrorResponse(output);
+				}
 			}
 			else
 			{
@@ -100,11 +108,14 @@ public class TerminalServerWorker implements Runnable
 	 */
 	private String populateTemplate(String content)
 	{
+		Theme currentTheme = this.getThemeManager().getCurrentTheme();
+		
 		Map<String, String> variables = new HashMap<String, String>();
 		// Add theme colors
-		variables.put("\\{caret\\}", toCSSRGB(getThemeManager().getCurrentTheme().getCaret())); //$NON-NLS-1$
-		variables.put("\\{foreground\\}", toCSSRGB(getThemeManager().getCurrentTheme().getForeground())); //$NON-NLS-1$
-		variables.put("\\{background\\}", toCSSRGB(getThemeManager().getCurrentTheme().getBackground())); //$NON-NLS-1$
+		variables.put("\\{caret\\}", toCSSRGB(currentTheme.getCaret())); //$NON-NLS-1$
+		variables.put("\\{foreground\\}", toCSSRGB(currentTheme.getForeground())); //$NON-NLS-1$
+		variables.put("\\{background\\}", toCSSRGB(currentTheme.getBackground())); //$NON-NLS-1$
+		variables.put("\\{selection\\}", toCSSRGB(currentTheme.getSelection()));  //$NON-NLS-1$
 
 		// ANSI Colors
 		addAnsiColor(variables, "ansi.black", "0,0,0"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -150,6 +161,7 @@ public class TerminalServerWorker implements Runnable
 				variables.put("\\{line-height\\}", Integer.toString(lineHeight[0]) + units); //$NON-NLS-1$
 			}
 		}
+		
 		return StringUtil.replaceAll(content, variables);
 	}
 

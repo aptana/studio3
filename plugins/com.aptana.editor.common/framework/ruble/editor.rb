@@ -1,5 +1,5 @@
 require "java"
-require "uri"
+require "addressable/uri"
 require "ruble/ui"
 
 module Ruble
@@ -11,7 +11,8 @@ module Ruble
       # there's a registered handler for the scheme. Local files should always open.
       def open(absolute_path)
         uri = absolute_path
-        uri = URI.parse(uri) if !uri.respond_to? :scheme
+        # We use Addressable::URI instead of standard URI class to be able to parse windows paths correctly
+        uri = Addressable::URI.convert_path(uri) if !uri.respond_to? :scheme
         absolute_path = uri.path
         uri_string = uri.scheme ? uri.to_s : "file:#{absolute_path}"
         editor = nil
@@ -59,7 +60,7 @@ module Ruble
         else
           editor = Ruble::Editor.active
         end
-        return nil unless editor        
+        return nil unless editor
         region = editor.document.getLineInformation(options[:line].to_i - 1)
         editor.selection = [region.offset + options[:column].to_i - 1, 0]
         editor
@@ -195,6 +196,16 @@ module Ruble
     
     def current_line
       styled_text.line(caret_line)
+    end    
+    
+    def insert_as_text(text)
+      self[caret_offset, 0] = snippet
+    end    
+
+    def insert_as_snippet(snippet)
+      region = org.eclipse.jface.text.Region.new(caret_offset, 0)
+      text_viewer = editor_part.source_viewer
+      com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor.insertAsTemplate(text_viewer, region, snippet, nil)
     end
     
     def to_env

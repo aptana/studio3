@@ -77,4 +77,14 @@ public class SnippetElement extends CommandElement
 	{
 		this._expansion = expansion;
 	}
+
+	/**
+	 * Always executable.
+	 */
+	@Override
+	public boolean isExecutable()
+	{
+		return true;
+	}
+
 }

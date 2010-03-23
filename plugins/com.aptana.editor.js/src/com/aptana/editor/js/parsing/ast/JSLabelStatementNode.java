@@ -1,6 +1,5 @@
 package com.aptana.editor.js.parsing.ast;
 
-
 /**
  * Represents continue and break statements.
  */
@@ -24,12 +23,12 @@ public class JSLabelStatementNode extends JSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj))
+		if (!super.equals(obj) || !(obj instanceof JSLabelStatementNode))
+		{
 			return false;
-		if (!(obj instanceof JSLabelStatementNode))
-			return false;
-		// FIXME What about when it's null!?
-		return fIdentifier.equals(((JSLabelStatementNode) obj).fIdentifier);
+		}
+		JSLabelStatementNode other = (JSLabelStatementNode) obj;
+		return fIdentifier == null ? other.fIdentifier == null : fIdentifier.equals(other.fIdentifier);
 	}
 
 	@Override
@@ -38,7 +37,7 @@ public class JSLabelStatementNode extends JSNode
 		int hash = super.hashCode();
 		return hash * 31 + (fIdentifier == null ? 0 : fIdentifier.hashCode());
 	}
-	
+
 	@Override
 	public String toString()
 	{

@@ -7,7 +7,7 @@ import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-public class JSOutlineItem implements IRange, ILanguageNode
+public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 {
 
 	public static enum Type
@@ -110,18 +110,27 @@ public class JSOutlineItem implements IRange, ILanguageNode
 	{
 		return fReferenceNode.getLanguage();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof JSOutlineItem))
+		{
 			return false;
-		return fReferenceNode.equals(((JSOutlineItem) obj).fReferenceNode); 
+		}
+		JSOutlineItem other = (JSOutlineItem) obj;
+		return fLabel.equals(other.fLabel) && fSourceRange.equals(other.fSourceRange);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
-		return 31 + fReferenceNode.hashCode();
+		return 31 * fLabel.hashCode() + fSourceRange.hashCode();
+	}
+
+	@Override
+	public int compareTo(IRange o)
+	{
+		return getStartingOffset() - o.getStartingOffset();
 	}
 }

@@ -235,7 +235,7 @@ module Ruble
       def active_page
         active_window.active_page if active_window
       end
-      
+
       # Executes a block inline if we're already in the UI thread or in a UIJob if we're not. if run in a job, we run synchronously by joining the thread.
       def run(title, &blk)
         if in_ui_thread?
@@ -248,6 +248,7 @@ module Ruble
       end
       
       private
+
       # Used to request a secure string
       class PasswordInputDialog < org.eclipse.jface.dialogs.InputDialog
         def getInputTextStyle

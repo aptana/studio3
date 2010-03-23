@@ -97,20 +97,32 @@ public class GitRepositoryTest extends TestCase
 		assertStatus(Status.NEW, index.changedFiles().get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		List<ChangedFile> toStage = index.changedFiles();
+		assertFalse(toStage.isEmpty());
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.NEW, toStage.get(0));
 
+		index.refresh();
+		
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		List<ChangedFile> toUnstage = index.changedFiles();
+		assertFalse(toUnstage.isEmpty());
+		assertTrue(index.unstageFiles(toUnstage));
+		assertUnstaged(toUnstage.get(0));
+		assertStatus(Status.NEW, toUnstage.get(0));
 
+		index.refresh();
+		
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		toStage = index.changedFiles();
+		assertFalse(toStage.isEmpty());
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.NEW, toStage.get(0));
 
+		index.refresh();
+		
 		index.commit("Initial commit");
 		// No more changed files now...
 		assertTrue(index.changedFiles().isEmpty());
@@ -132,22 +144,23 @@ public class GitRepositoryTest extends TestCase
 		GitIndex index = fRepo.index();
 
 		// Now there should be a single file that's been changed!
-		assertFalse(index.changedFiles().isEmpty());
-		assertEquals(1, index.changedFiles().size());
+		List<ChangedFile> changedFiles = index.changedFiles();
+		assertFalse(changedFiles.isEmpty());
+		assertEquals(1, changedFiles.size());
 
-		// Make sure it's shown as having unstaged changes only and is MODIFIED
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		// Make sure it's shown as having staged changes only and is DELETED
+		assertStaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		assertTrue(index.unstageFiles(changedFiles));
+		assertUnstaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.DELETED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(changedFiles));
+		assertStaged(changedFiles.get(0));
+		assertStatus(Status.DELETED, changedFiles.get(0));
 
 		index.commit("Delete files");
 		// No more changed files now...
@@ -170,27 +183,34 @@ public class GitRepositoryTest extends TestCase
 		index.refresh();
 
 		// Now there should be a single file that's been changed!
-		assertFalse(index.changedFiles().isEmpty());
-		assertEquals(1, index.changedFiles().size());
+		List<ChangedFile> changed = index.changedFiles();
+		assertFalse(changed.isEmpty());
+		assertEquals(1, changed.size());
 
 		// Make sure it's shown as having unstaged changes only and is MODIFIED
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertUnstaged(changed.get(0));
+		assertStatus(Status.MODIFIED, changed.get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(changed));
+		assertStaged(changed.get(0));
+		assertStatus(Status.MODIFIED, changed.get(0));
+
+		index.refresh();
 
 		// Unstage the file
-		assertTrue(index.unstageFiles(index.changedFiles()));
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		List<ChangedFile> toUnstage = index.changedFiles();
+		assertTrue(index.unstageFiles(toUnstage));
+		assertUnstaged(toUnstage.get(0));
+		assertStatus(Status.MODIFIED, toUnstage.get(0));
 
+		index.refresh();
+		
+		List<ChangedFile> toStage = index.changedFiles();
 		// stage again so we can commit...
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.MODIFIED, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(toStage));
+		assertStaged(toStage.get(0));
+		assertStatus(Status.MODIFIED, toStage.get(0));
 
 		index.commit("Add second line");
 		// No more changed files now...
@@ -225,6 +245,30 @@ public class GitRepositoryTest extends TestCase
 			{
 				eventsReceived.add(e);
 			}
+
+			@Override
+			public void pulled(PullEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void branchAdded(BranchAddedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void branchRemoved(BranchRemovedEvent e)
+			{
+				eventsReceived.add(e);
+			}
+
+			@Override
+			public void pushed(PushEvent e)
+			{
+				eventsReceived.add(e);
+			}
 		};
 		GitRepository.addListener(listener);
 		// TODO Attach and unattach repo with the RepositoryProvider and check those events
@@ -233,8 +277,8 @@ public class GitRepositoryTest extends TestCase
 
 		int size = eventsReceived.size();
 		assertTrue(size > 0);
-		assertBranchChangedEvent(eventsReceived, "master", "my_new_branch");
-		assertBranchChangedEvent(eventsReceived, "my_new_branch", "master");
+		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
+		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
 		GitRepository.removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
@@ -249,7 +293,8 @@ public class GitRepositoryTest extends TestCase
 			if (event instanceof BranchChangedEvent)
 			{
 				BranchChangedEvent branchChangeEvent = (BranchChangedEvent) event;
-				if (branchChangeEvent.getOldBranchName().equals(oldName) && branchChangeEvent.getNewBranchName().equals(newName))
+				if (branchChangeEvent.getOldBranchName().equals(oldName)
+						&& branchChangeEvent.getNewBranchName().equals(newName))
 				{
 					return;
 				}
@@ -267,7 +312,7 @@ public class GitRepositoryTest extends TestCase
 
 		// Make sure we just have master branch
 		Set<String> branches = fRepo.allBranches();
-		assertEquals(1, branches.size());
+		assertEquals("Should only have one branch: " + branches.toString(), 1, branches.size());
 		assertTrue(branches.contains("master"));
 
 		// Create a new branch off master
@@ -275,7 +320,7 @@ public class GitRepositoryTest extends TestCase
 
 		// make sure the branch is listed in model
 		branches = fRepo.allBranches();
-		assertEquals(2, branches.size());
+		assertEquals("Should have one new branch: " + branches.toString(), 2, branches.size());
 		assertTrue(branches.contains("master"));
 		assertTrue(branches.contains("my_new_branch"));
 
@@ -324,17 +369,18 @@ public class GitRepositoryTest extends TestCase
 		index.refresh();
 
 		// Now there should be a single file that's been changed!
-		assertFalse(index.changedFiles().isEmpty());
-		assertEquals(1, index.changedFiles().size());
+		List<ChangedFile> changedFiles = index.changedFiles();
+		assertFalse(changedFiles.isEmpty());
+		assertEquals(1, changedFiles.size());
 
 		// Make sure it's shown as having unstaged changes only and is NEW
-		assertUnstaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		assertUnstaged(changedFiles.get(0));
+		assertStatus(Status.NEW, changedFiles.get(0));
 
 		// Stage the new file
-		assertTrue(index.stageFiles(index.changedFiles()));
-		assertStaged(index.changedFiles().get(0));
-		assertStatus(Status.NEW, index.changedFiles().get(0));
+		assertTrue(index.stageFiles(changedFiles));
+		assertStaged(changedFiles.get(0));
+		assertStatus(Status.NEW, changedFiles.get(0));
 
 		index.commit("Initial commit");
 		// No more changed files now...
@@ -347,9 +393,9 @@ public class GitRepositoryTest extends TestCase
 		assertFalse(status.isOK());
 		assertEquals(1, status.getCode());
 		// Can't rely on the unmerged failure message from git to remain the same across versions.
-//		assertEquals(
-//				"error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
-//				status.getMessage());
+		// assertEquals(
+		// "error: The branch 'my_new_branch' is not an ancestor of your current HEAD.\nIf you are sure you want to delete it, run 'git branch -D my_new_branch'.",
+		// status.getMessage());
 	}
 
 	protected IPath repoToGenerate()

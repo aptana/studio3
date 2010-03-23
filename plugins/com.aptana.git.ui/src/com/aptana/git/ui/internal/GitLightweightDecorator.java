@@ -1,9 +1,7 @@
 package com.aptana.git.ui.internal;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -21,9 +19,7 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
@@ -31,12 +27,15 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryListener;
 import com.aptana.git.core.model.IndexChangedEvent;
+import com.aptana.git.core.model.PullEvent;
+import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
@@ -44,31 +43,6 @@ import com.aptana.git.ui.GitUIPlugin;
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener
 {
-	/**
-	 * Default colors to use for staged/unstaged files when the theme doesn't define overrides.
-	 */
-	private static final RGB DEFAULT_RED_BG = new RGB(255, 238, 238);
-	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
-	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
-	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
-
-	/**
-	 * Default set to use when bg is very dark!
-	 */
-	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
-	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
-	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
-	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
-
-	/**
-	 * The token used from the theme for staged file decorations.
-	 */
-	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
-
-	/**
-	 * The token used from the theme for unstaged file decorations.
-	 */
-	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
 
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
@@ -176,20 +150,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (repo == null)
 			return;
 
-		List<ChangedFile> changedFiles = repo.index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (repo.resourceOrChildHasChanges(resource))
 		{
-			return;
-		}
-		String workingDirectory = repo.workingDirectory();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = workingDirectory + File.separator + changedFile.getPath();
-			if (fullPath.startsWith(resource.getLocationURI().getPath()))
-			{
-				decoration.addPrefix(DIRTY_PREFIX);
-				return;
-			}
+			decoration.addPrefix(DIRTY_PREFIX);
 		}
 	}
 
@@ -210,8 +173,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
 		if (changed.hasUnstagedChanges())
 		{
-			decoration.setForegroundColor(redFG());
-			decoration.setBackgroundColor(redBG());
+			decoration.setForegroundColor(GitColors.redFG());
+			decoration.setBackgroundColor(GitColors.redBG());
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = untrackedImage;
@@ -223,8 +186,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		else if (changed.hasStagedChanges())
 		{
-			decoration.setForegroundColor(greenFG());
-			decoration.setBackgroundColor(greenBG());
+			decoration.setForegroundColor(GitColors.greenFG());
+			decoration.setBackgroundColor(GitColors.greenBG());
 			if (changed.getStatus() == ChangedFile.Status.DELETED)
 			{
 				overlay = stagedRemovedImage;
@@ -266,83 +229,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		decoration.addSuffix(builder.toString());
 	}
 
-	private Color greenFG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(STAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
-	}
-
-	private Color greenBG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(STAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
-	}
-
-	private Color redFG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
-	}
-
-	private Color redBG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
-	}
-
-	private boolean currentThemeHasDarkBG()
-	{
-		RGB themeBG = getActiveTheme().getBackground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
-		return grey <= 128;
-	}
 	
-	private boolean currentThemeHasLightFG()
-	{
-		RGB themeBG = getActiveTheme().getForeground();
-		double grey = 0.3*themeBG.red + 0.59*themeBG.green + 0.11*themeBG.blue;
-		return grey >= 90;
-	}
-
-	protected Theme getActiveTheme()
-	{
-		return getThemeManager().getCurrentTheme();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
 
 	@Override
 	public void dispose()
@@ -404,6 +291,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void indexChanged(IndexChangedEvent e)
 	{
+		// FIXME Force a total refresh if the number of changed files is over some maximum!
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
@@ -481,5 +369,39 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void branchChanged(BranchChangedEvent e)
 	{
+		Set<IResource> resources = new HashSet<IResource>();
+		GitRepository repo = e.getRepository();
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (IProject project : projects)
+		{
+			if (repo.equals(GitRepository.getAttached(project)))
+				resources.add(project);
+		}
+		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with staged/unstaged changes, dirty carry over).
+		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
+	}
+
+	@Override
+	public void pulled(PullEvent e)
+	{
+		// FIXME do nothing? Call refresh?
+	}
+
+	@Override
+	public void pushed(PushEvent e)
+	{
+		// FIXME do nothing? Call refresh?
+	}
+
+	@Override
+	public void branchAdded(BranchAddedEvent e)
+	{
+		// do nothing
+	}
+
+	@Override
+	public void branchRemoved(BranchRemovedEvent e)
+	{
+		// do nothing
 	}
 }

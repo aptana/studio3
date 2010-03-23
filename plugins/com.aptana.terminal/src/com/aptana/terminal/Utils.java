@@ -49,7 +49,10 @@ public class Utils
 		if (window != null)
 		{
 			IWorkbenchPage page = window.getActivePage();
-			
+			if (page == null)
+			{
+				return null;
+			}
 			try
 			{
 				// TODO: changed MATCH pattern from MATCH_ID to MATCH_INPUT, so we'll probably need our own version

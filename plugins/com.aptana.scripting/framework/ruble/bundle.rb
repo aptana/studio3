@@ -188,18 +188,24 @@ module Ruble
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
 
-        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets)$/
+        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets|templates)$/
           log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{$fullpath}")
         else
-          # create new bundle
-          bundle = Bundle.new(name)
+          # try to grab a cached bundle
+          bundle = Ruble::BundleManager.bundle_from_path(File.dirname($fullpath))
+          
+          # flag if we're using a cached bundle or not
+          add_bundle = bundle.nil?
+          
+          # create a new bundle if we didn't have a cached one
+          bundle = Bundle.new(name) if bundle.nil?
 
           # associate default values
           bundle.push_defaults values
 
-          # add to bundle manager so the block, if given,
-          # can lookup the bundle by path name
-          BundleManager.reference_bundle bundle
+          # add to bundle manager so the block, if given, can lookup the bundle
+          # by path name
+          BundleManager.reference_bundle bundle if add_bundle
 
           # process block
           block.call(bundle) if block_given?
@@ -207,8 +213,10 @@ module Ruble
           # remove defaults
           bundle.pop_defaults
 
-          # add the bundle
-          BundleManager.add_bundle(bundle)
+          # add the bundle, if we created a new one
+          BundleManager.add_bundle(bundle) if add_bundle
+          
+          nil
         end
       end
     end
@@ -232,7 +240,7 @@ def with_defaults(values, &block)
   bundle = Ruble::BundleManager.bundle_from_path(File.dirname($fullpath))
 
   if bundle.nil?
-    bundle = Ruble::Bundle.define_bundle("", values, &block)
+    Ruble::Bundle.define_bundle("", values, &block)
   else
     bundle.push_defaults values
     block.call(bundle) if block_given?

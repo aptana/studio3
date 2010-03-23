@@ -3,6 +3,7 @@ package com.aptana.scripting.ui.views;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -23,6 +24,9 @@ class BundleEntryNode extends BaseNode
 
 	private static final Image BUNDLE_ENTRY_ICON = ScriptingUIPlugin.getImage("icons/bundle_entry.png"); //$NON-NLS-1$
 	private BundleEntry _entry;
+	
+	private Action reloadAction;
+	
 
 	/**
 	 * BundleEntryNode
@@ -32,6 +36,16 @@ class BundleEntryNode extends BaseNode
 	public BundleEntryNode(BundleEntry entry)
 	{
 		this._entry = entry;
+		
+		this.makeActions();
+	}
+
+	/**
+	 * getActions
+	 */
+	public Action[] getActions()
+	{
+		return new Action[] { reloadAction };
 	}
 
 	/*
@@ -144,6 +158,7 @@ class BundleEntryNode extends BaseNode
 		return result;
 	}
 
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.ui.views.BaseNode#hasChildren()
@@ -162,5 +177,21 @@ class BundleEntryNode extends BaseNode
 		}
 
 		return result;
+	}
+	
+	/**
+	 * makeActions
+	 */
+	private void makeActions()
+	{
+		reloadAction = new Action()
+		{
+			public void run()
+			{
+				_entry.reload();
+			}
+		};
+		reloadAction.setText("Reload");
+		//reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
 	}
 }

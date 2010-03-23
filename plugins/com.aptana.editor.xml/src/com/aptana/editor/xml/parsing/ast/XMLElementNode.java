@@ -2,11 +2,13 @@ package com.aptana.editor.xml.parsing.ast;
 
 import java.util.StringTokenizer;
 
+import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
 
 public class XMLElementNode extends XMLNode
 {
-	private String fName;
+
+	private INameNode fNameNode;
 	private boolean fIsSelfClosing;
 
 	public XMLElementNode(String tag, int start, int end)
@@ -17,7 +19,6 @@ public class XMLElementNode extends XMLNode
 	public XMLElementNode(String tag, XMLNode[] children, int start, int end)
 	{
 		super(XMLNodeTypes.ELEMENT.getIndex(), children, start, end);
-		fName = tag;
 		if (tag.length() > 0)
 		{
 			try
@@ -25,23 +26,30 @@ public class XMLElementNode extends XMLNode
 				if (tag.endsWith("/>")) //$NON-NLS-1$
 				{
 					// self-closing
-					fName = getTagName(tag.substring(1, tag.length() - 2));
+					tag = getTagName(tag.substring(1, tag.length() - 2));
 					fIsSelfClosing = true;
 				}
 				else
 				{
-					fName = getTagName(tag.substring(1, tag.length() - 1));
+					tag = getTagName(tag.substring(1, tag.length() - 1));
 				}
 			}
 			catch (IndexOutOfBoundsException e)
 			{
 			}
 		}
+		fNameNode = new NameNode(tag, start, end);
 	}
 
 	public String getName()
 	{
-		return fName;
+		return fNameNode.getName();
+	}
+
+	@Override
+	public INameNode getNameNode()
+	{
+		return fNameNode;
 	}
 
 	public boolean isSelfClosing()
@@ -74,16 +82,17 @@ public class XMLElementNode extends XMLNode
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
-		if (fName.length() > 0)
+		String name = getName();
+		if (name.length() > 0)
 		{
-			text.append("<").append(fName); //$NON-NLS-1$
+			text.append("<").append(name); //$NON-NLS-1$
 			text.append(">"); //$NON-NLS-1$
 			IParseNode[] children = getChildren();
 			for (IParseNode child : children)
 			{
 				text.append(child);
 			}
-			text.append("</").append(fName).append(">"); //$NON-NLS-1$//$NON-NLS-2$
+			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
 		return text.toString();
 	}

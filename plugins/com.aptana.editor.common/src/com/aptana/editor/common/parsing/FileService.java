@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.Messages;
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
@@ -43,7 +41,8 @@ public class FileService
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(Messages.FileService_FailedToParse, e);
+			// not logging the parsing error here since the source could be in an intermediate state of being edited by
+			// the user
 		}
 	}
 

@@ -17,6 +17,32 @@
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             name="%command.filter.name">
       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
+             description="%command.expandall.description"
+             id="com.aptana.editor.commands.ExpandAll"
+             name="%command.expandall.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.CollapseAllHandler"
+             description="%command.collapseall.description"
+             id="com.aptana.editor.commands.CollapseAll"
+             name="%command.collapseall.name">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.views"
+             defaultHandler="com.aptana.editor.common.internal.commands.ExpandLevelHandler"
+             description="%command.expandLevel.description"
+             id="com.aptana.editor.commands.ExpandLevel"
+             name="%command.expandLevel.name">
+          <commandParameter
+                id="level"
+                name="%commandParameter.level.name"
+                optional="true">
+          </commandParameter>
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -26,6 +52,121 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+R">
       </key>
+      
+      <!-- First we remove the binding for M1-Shift-R from the Open Resource command, then we add M1-T -->
+      <key
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Shift+R">
+      </key>
+      <key
+            commandId="org.eclipse.ui.navigate.openResource"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+T">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandAll"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3++">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.CollapseAll"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+-">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+1">
+         <parameter
+               id="level"
+               value="1"></parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+2">
+         <parameter
+               id="level"
+               value="2">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+3">
+         <parameter
+               id="level"
+               value="3">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+4">
+         <parameter
+               id="level"
+               value="4">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+5">
+         <parameter
+               id="level"
+               value="5">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+6">
+         <parameter
+               id="level"
+               value="6">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+7">
+         <parameter
+               id="level"
+               value="7">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+8">
+         <parameter
+               id="level"
+               value="8">
+         </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.ExpandLevel"
+            contextId="com.aptana.editor.common.outline"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M3+9">
+         <parameter
+               id="level"
+               value="9">
+         </parameter>
+      </key>
+
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -83,25 +224,6 @@
       <initializer
             class="com.aptana.editor.common.preferences.PreferenceInitializer">
       </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            class="com.aptana.editor.common.hyperlinks.CommonHyperlinkDetector"
-            id="com.aptana.editor.common.hyperlinkDetector"
-            name="Aptana Editor Detector"
-            targetId="com.aptana.editor.ui.hyperlinkTarget">
-      </hyperlinkDetector>
-   </extension>
-   <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
-      <target
-            id="com.aptana.editor.ui.hyperlinkTarget"
-            name="Aptana Editor">
-         <context
-               type="org.eclipse.ui.texteditor.ITextEditor">
-         </context>
-      </target>
    </extension>
    <extension
          point="org.eclipse.ui.themes">
@@ -186,5 +308,145 @@
       <contributor
             class="com.aptana.editor.common.internal.scripting.BrowserContextContributor">
       </contributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            name="%NewWizards.file"
+            icon="$nl$/icons/full/etool16/text.png"
+            category="org.eclipse.ui.Basic"
+            class="com.aptana.editor.common.internal.scripting.NewFileWizard"
+            id="com.aptana.ui.wizards.new.file">
+         <description>
+            %NewWizards.file.description
+         </description>
+         <selection
+               class="org.eclipse.core.resources.IResource">
+         </selection>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="com.aptana.editor.common.internal.commands.NextEditorHandler"
+            id="com.aptana.editor.NextEditorCommand"
+            name="%command.NextEditorNoPrompt">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="com.aptana.editor.common.internal.commands.PreviousEditorHandler"
+            id="com.aptana.editor.PreviousEditorCommand"
+            name="%command.PreviousEditorNoPrompt">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.editor.NextEditorCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+TAB">
+      </key>
+      <key
+            commandId="com.aptana.editor.PreviousEditorCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+SHIFT+TAB">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="com.aptana.editor.common.outline"
+            name="%context.outline.name">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.views.ContentOutline?after=additions">
+         <command
+               commandId="com.aptana.editor.commands.ExpandAll">
+         </command>
+         <command
+               commandId="com.aptana.editor.commands.CollapseAll">
+         </command>
+         <menu
+               label="%menu.expand.label">
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="1">
+               <parameter
+                     name="level"
+                     value="1">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="2">
+               <parameter
+                     name="level"
+                     value="2">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="3">
+               <parameter
+                     name="level"
+                     value="3">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="4">
+               <parameter
+                     name="level"
+                     value="4">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="5">
+               <parameter
+                     name="level"
+                     value="5">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="6">
+               <parameter
+                     name="level"
+                     value="6">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="7">
+               <parameter
+                     name="level"
+                     value="7">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="8">
+               <parameter
+                     name="level"
+                     value="8">
+               </parameter>
+            </command>
+            <command
+                  commandId="com.aptana.editor.commands.ExpandLevel"
+                  label="9">
+               <parameter
+                     name="level"
+                     value="9">
+               </parameter>
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 </plugin>

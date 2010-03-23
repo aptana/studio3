@@ -6,6 +6,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -16,6 +18,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -23,6 +26,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.ThemedDelegatingLabelProvider;
 import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.parsing.lexer.IRange;
 
@@ -62,6 +66,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
+	private static final String OUTLINE_CONTEXT = "com.aptana.editor.common.outline"; //$NON-NLS-1$
+
 	private AbstractThemeableEditor fEditor;
 
 	private ITreeContentProvider fContentProvider;
@@ -85,14 +91,30 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	public void createControl(Composite parent)
 	{
 		super.createControl(parent);
+		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
-		TreeViewer viewer = getTreeViewer();
+		final TreeViewer viewer = getTreeViewer();
 		viewer.setAutoExpandLevel(2);
 		viewer.setUseHashlookup(true);
 		viewer.setContentProvider(fContentProvider);
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
+		viewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+
+			@Override
+			public void doubleClick(DoubleClickEvent event)
+			{
+				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+				// expands the selection one level if applicable
+				viewer.expandToLevel(selection.getFirstElement(), 1);
+				// selects the corresponding text in editor
+				if (!isLinkedWithEditor()) {
+					setEditorSelection(selection, true);
+				}
+			}
+		});
 
 		hookToThemes();
 
@@ -152,6 +174,30 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		{
 			boolean sort = ((Boolean) event.getNewValue()).booleanValue();
 			getTreeViewer().setComparator(sort ? new ViewerComparator() : null);
+		}
+	}
+
+	public void collapseAll()
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().collapseAll();
+		}
+	}
+
+	public void expandAll()
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().expandAll();
+		}
+	}
+
+	public void expandToLevel(int level)
+	{
+		if (!isDisposed())
+		{
+			getTreeViewer().expandToLevel(level);
 		}
 	}
 

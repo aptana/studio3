@@ -18,24 +18,77 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateCompletionProcessor;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateContextType;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.scripting.model.AndFilter;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.HasTriggerFilter;
-import com.aptana.scripting.model.ScopeFilter;
+import com.aptana.scripting.model.OutputType;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.HasTriggerFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 {
+
+	private static class TextFontStyler extends Styler
+	{
+
+		private Font maxHeightTextFont;
+
+		private TextFontStyler()
+		{
+			Font textFont = JFaceResources.getFont(JFaceResources.TEXT_FONT);
+			FontData[] textFontData = textFont.getFontData();
+			// limit the height of the font
+			if (textFontData[0].getHeight() > SnippetsContentAssistant.MAX_HEIGHT)
+			{
+				maxHeightTextFont = new Font(textFont.getDevice(),
+						textFontData[0].getName(),
+						SnippetsContentAssistant.MAX_HEIGHT,
+						textFontData[0].getStyle());
+			}
+		}
+
+		@Override
+		public void applyStyles(TextStyle textStyle)
+		{
+			if (maxHeightTextFont != null)
+			{
+				// Use font with limited max height
+				textStyle.font = maxHeightTextFont;
+			}
+			else
+			{
+				textStyle.font = JFaceResources.getTextFont();
+			}
+		}
+
+		private void dispose()
+		{
+			// if we allocated a height limited font - dispose it
+			if (maxHeightTextFont != null)
+			{
+				if (!maxHeightTextFont.isDisposed())
+				{
+					maxHeightTextFont.dispose();
+				}
+				maxHeightTextFont = null;
+			}
+		}
+
+	}
+
+	// Styler used to style the proposals
+	private TextFontStyler textFontStyler;
 
 	public SnippetsCompletionProcessor()
 	{
@@ -65,11 +118,13 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	@Override
 	protected Image getImage(Template template)
 	{
-		if (template instanceof CommandTemplate)
+		if (template instanceof SnippetTemplate ||
+				(template instanceof CommandTemplate &&
+						OutputType.INSERT_AS_SNIPPET.getName().equals(((CommandTemplate) template).getCommandElement().getOutputType())))
 		{
-			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND);
+			return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
 		}
-		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.SNIPPET);
+		return CommonEditorPlugin.getDefault().getImageFromImageRegistry(CommonEditorPlugin.COMMAND);
 	}
 
 	@Override
@@ -115,16 +170,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		{
 			SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
 			Template template = snippetTemplateProposal.getTemplateSuper();
-			if (template instanceof SnippetTemplate)
-			{
-				SnippetTemplate snippetTemplate = (SnippetTemplate) template;
-				if (snippetTemplate.exactMatches(extractPrefix))
-				{
-					exactPrefixMatches++;
-					exactPrefixMatchIndex = i;
-				}
-			}
-			else if (template instanceof CommandTemplate)
+			if (template instanceof CommandTemplate)
 			{
 				CommandTemplate commandTemplate = (CommandTemplate) template;
 				if (commandTemplate.exactMatches(extractPrefix))
@@ -148,20 +194,11 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 			{
 				SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
 				snippetTemplateProposal.setTemplateProposals(completionProposals);
-				Template template = snippetTemplateProposal.getTemplateSuper();
-				StyledString styledString = new StyledString(
-						String.format("%1$-20.20s", template.getDescription()), FIXED_WIDTH_STYLER); //$NON-NLS-1$
-
-				styledString.append(new StyledString(
-						String.format("%1$10.10s ", template.getName() + "\u21E5"), FIXED_WIDTH_STYLER)); //$NON-NLS-1$ //$NON-NLS-2$
-
+				snippetTemplateProposal.setStyler(getStyler());
 				if (i < 9)
 				{
-					char triggerChar = (char) ('1' + i);
-					snippetTemplateProposal.setTriggerChar(triggerChar);
-					styledString.append(new StyledString(String.valueOf(triggerChar), FIXED_WIDTH_STYLER));
+					snippetTemplateProposal.setTriggerChar((char) ('1' + i));
 				}
-				snippetTemplateProposal.setStyledDisplayString(styledString);
 			}
 		}
 		return completionProposals;
@@ -235,30 +272,21 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		}
 	}
 
-	private static class CustomStyler extends Styler
+	private Styler getStyler()
 	{
-		private static String fForegroundColorName;
-
-		CustomStyler()
+		if (textFontStyler == null)
 		{
-			this(null);
+			textFontStyler = new TextFontStyler();
 		}
+		return textFontStyler;
+	}
 
-		CustomStyler(String foregroundColorName)
+	void possibleCompletionsClosed() {
+		if (textFontStyler != null)
 		{
-			fForegroundColorName = foregroundColorName;
-		}
-
-		public void applyStyles(TextStyle textStyle)
-		{
-			if (fForegroundColorName != null)
-			{
-				textStyle.foreground = JFaceResources.getColorRegistry().get(fForegroundColorName);
-			}
-
-			textStyle.font = JFaceResources.getTextFont();
+			textFontStyler.dispose();
+			textFontStyler = null;
 		}
 	}
 
-	private static Styler FIXED_WIDTH_STYLER = new CustomStyler();
 }

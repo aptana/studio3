@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.rules.IToken;
+
 import beaver.Symbol;
 import beaver.Scanner.Exception;
 
 import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -26,9 +30,22 @@ import com.aptana.parsing.ast.ParseRootNode;
 public class HTMLParser implements IParser
 {
 
+	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+	private static final String ATTR_LANG = "language"; //$NON-NLS-1$
+
+	@SuppressWarnings("nls")
+	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
+			"text/ecmascript", "text/jscript" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
+
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
+	private HTMLTagScanner fTagScanner;
 
 	private IParseNode fCurrentElement;
 	private Symbol fCurrentSymbol;
@@ -44,6 +61,7 @@ public class HTMLParser implements IParser
 	{
 		fScanner = scanner;
 		fElementStack = new Stack<IParseNode>();
+		fTagScanner = new HTMLTagScanner();
 		fLanguageParsers = new HashMap<String, IParser>();
 		fLanguageParsers.put(ICSSParserConstants.LANGUAGE, CSSParserFactory.getInstance().getParser());
 		fLanguageParsers.put(IJSParserConstants.LANGUAGE, JSParserFactory.getInstance().getParser());
@@ -76,10 +94,10 @@ public class HTMLParser implements IParser
 				processEndTag();
 				break;
 			case HTMLTokens.STYLE:
-				processLanguage(ICSSParserConstants.LANGUAGE, HTMLTokens.STYLE_END);
+				processStyleTag();
 				break;
 			case HTMLTokens.SCRIPT:
-				processLanguage(IJSParserConstants.LANGUAGE, HTMLTokens.SCRIPT_END);
+				processScriptTag();
 				break;
 		}
 	}
@@ -99,11 +117,30 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested = getParseResult(fLanguageParsers.get(language), start, end);
+		IParseNode[] nested;
+		IParser parser = fLanguageParsers.get(language);
+		if (parser == null)
+		{
+			nested = new IParseNode[0];
+		}
+		else
+		{
+			nested = getParseResult(parser, start, end);
+		}
 		if (fCurrentElement != null)
 		{
-			fCurrentElement.addChild(new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd()));
+			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
+			parseAttribute(node, startTag.value.toString());
+			fCurrentElement.addChild(node);
 		}
+	}
+
+	protected HTMLElementNode processCurrentTag()
+	{
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
+				.getEnd());
+		parseAttribute(element, fCurrentSymbol.value.toString());
+		return element;
 	}
 
 	protected void addLanguageParser(String language, IParser parser)
@@ -148,8 +185,7 @@ public class HTMLParser implements IParser
 
 	private void processStartTag() throws IOException, Exception
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol
-				.getEnd());
+		HTMLElementNode element = processCurrentTag();
 		// pushes the element onto the stack
 		openElement(element);
 	}
@@ -164,8 +200,67 @@ public class HTMLParser implements IParser
 					&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 			{
 				// adjusts the ending offset of current element to include the entire block
-				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getEnd());
+				((HTMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol
+						.getEnd());
 				closeElement();
+			}
+		}
+	}
+
+	private void processStyleTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		String language = null;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type == null || isInArray(type, CSS_VALID_TYPE_ATTR))
+		{
+			language = ICSSParserConstants.LANGUAGE;
+		}
+		else if (isJavaScript(node))
+		{
+			language = IJSParserConstants.LANGUAGE;
+		}
+		processLanguage(language, HTMLTokens.STYLE_END);
+	}
+
+	private void processScriptTag() throws IOException, Exception
+	{
+		HTMLElementNode node = processCurrentTag();
+		String language = null;
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (type == null || isJavaScript(node))
+		{
+			language = IJSParserConstants.LANGUAGE;
+		}
+		processLanguage(language, HTMLTokens.SCRIPT_END);
+	}
+
+	private void parseAttribute(HTMLElementNode element, String tag)
+	{
+		fTagScanner.setRange(new Document(tag), 0, tag.length());
+		IToken token;
+		Object data;
+		String name = null, value = null;
+		while (!(token = fTagScanner.nextToken()).isEOF())
+		{
+			data = token.getData();
+			if (data == null)
+			{
+				continue;
+			}
+
+			if (data == TokenType.ATTR_NAME)
+			{
+				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+			}
+			else if (data == TokenType.ATTR_VALUE)
+			{
+				// found a pair
+				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset()
+						+ fTagScanner.getTokenLength());
+				// strips the quotation marks and any surrounding whitespaces
+				element.setAttribute(name, value.substring(1, value.length() - 1).trim());
 			}
 		}
 	}
@@ -217,5 +312,32 @@ public class HTMLParser implements IParser
 		{
 			addOffset(child, offset);
 		}
+	}
+
+	private static boolean isJavaScript(HTMLElementNode node)
+	{
+		String type = node.getAttributeValue(ATTR_TYPE);
+		if (isInArray(type, JS_VALID_TYPE_ATTR))
+		{
+			return true;
+		}
+		String langAttr = node.getAttributeValue(ATTR_LANG);
+		if (langAttr != null && isInArray(langAttr, JS_VALID_LANG_ATTR))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	private static boolean isInArray(String element, String[] array)
+	{
+		for (String arrayElement : array)
+		{
+			if (element.startsWith(arrayElement))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

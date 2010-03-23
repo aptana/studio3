@@ -66,6 +66,8 @@
 			<arg value="-c" />
 			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} master`" />
 		</exec>
+		<!-- Now remove the .git subdirectory -->
+		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
 	</target>
 
 	<target name="pre.@dot">
@@ -108,10 +110,6 @@
 		  	<param name="bundle.dir.name" value="js.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
-		  	<param name="bundle.name" value="sass.ruble" />
-		  	<param name="bundle.dir.name" value="sass.ruble" />
-		</antcall>
-		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="xml.ruble" />
 		  	<param name="bundle.dir.name" value="xml.ruble" />
 		</antcall>
@@ -124,8 +122,24 @@
 		  	<param name="bundle.dir.name" value="haml.ruble" />
 		</antcall>
 		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="sass.ruble" />
+		  	<param name="bundle.dir.name" value="sass.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="json.ruble" />
 		  	<param name="bundle.dir.name" value="json.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="rspec.ruble" />
+		  	<param name="bundle.dir.name" value="rspec.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="cucumber.ruble" />
+		  	<param name="bundle.dir.name" value="cucumber.ruble" />
+		</antcall>
+		<antcall target="clone-bundle">
+		  	<param name="bundle.name" value="yaml.ruble" />
+		  	<param name="bundle.dir.name" value="yaml.ruble" />
 		</antcall>
 	</target>
 

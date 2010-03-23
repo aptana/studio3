@@ -234,7 +234,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 	private IToken handleHeredocInMiddleOfLine() throws IOException
 	{
 		String opening = getOpeningStringToEndOfLine();
-		int endOfMarker = indexOf(opening.trim(), ", +)"); //$NON-NLS-1$
+		int endOfMarker = indexOf(opening.trim(), "., +()"); //$NON-NLS-1$
 		if (opening.trim().startsWith(HEREDOC_MARKER_PREFIX) && endOfMarker != -1)
 		{
 			adjustOffset(opening);
@@ -533,7 +533,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 		// Add a token for the heredoc string we just ate up!
 		fContentType = RubySourceConfiguration.STRING_DOUBLE;
-		int afterHeredoc = fOffset + heredocMarker.length();
+		int afterHeredoc = fOffset;
 		push(new QueuedToken(new Token(RubySourceConfiguration.STRING_DOUBLE), afterHeredoc, getAdjustedOffset()
 				- afterHeredoc));
 	}
@@ -837,6 +837,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 		 */
 		public int find()
 		{
+			int lastEndBrace = -1;
 			for (int i = 0; i < input.length(); i++)
 			{
 				char c = input.charAt(i);
@@ -865,6 +866,8 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 					case '/':
 						if (topEquals("/")) { //$NON-NLS-1$
 							pop();
+							// found a regex
+							lastEndBrace = -1;
 						}
 						else
 						{
@@ -908,12 +911,16 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 						if (topEquals("#{") || topEquals("{")) { //$NON-NLS-1$ //$NON-NLS-2$
 							pop();
 						}
+						if (topEquals("/")) { //$NON-NLS-1$
+							// assumes '/' is for division until we find a matching '/' to make it a regex
+							lastEndBrace = i;
+						}
 						break;
 					default:
 						break;
 				}
 			}
-			return -1;
+			return lastEndBrace < 0 ? -1 : lastEndBrace;
 		}
 
 		private boolean topEquals(String string)

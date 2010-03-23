@@ -25,13 +25,87 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
+	private static interface InvokeUnion
+	{
+		String getInvoke();
+
+		RubyProc getInvokeBlock();
+	}
+
+	private static final class Invoke implements InvokeUnion
+	{
+		private final String _invoke;
+
+		private Invoke(String invoke)
+		{
+			this._invoke = invoke;
+		}
+
+		public String getInvoke()
+		{
+			return this._invoke;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return null;
+		}
+
+		public String toString()
+		{
+			return "invoke= " + _invoke; //$NON-NLS-1$
+		}
+	}
+
+	private static final class InvokeBlock implements InvokeUnion
+	{
+		private final RubyProc _invokeBlock;
+
+		private InvokeBlock(RubyProc invokeBlock)
+		{
+			this._invokeBlock = invokeBlock;
+		}
+
+		public String getInvoke()
+		{
+			return null;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return this._invokeBlock;
+		}
+
+		public String toString()
+		{
+			return "invoke <block>"; //$NON-NLS-1$
+		}
+	}
+
+	private static final InvokeUnion NO_INVOKE = new InvokeUnion()
+	{
+		public String getInvoke()
+		{
+			return null;
+		}
+
+		public RubyProc getInvokeBlock()
+		{
+			return null;
+		}
+
+		public String toString()
+		{
+			return ""; //$NON-NLS-1$
+		}
+	};
+
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private String[] _triggers;
-	private String _invoke;
-	private RubyProc _invokeBlock;
+	private Map<Platform, InvokeUnion> _invokeUnionMap;
 	private Map<Platform, String[]> _keyBindings;
 	private InputType[] _inputTypes;
 	private String _inputPath;
@@ -109,7 +183,9 @@ public class CommandElement extends AbstractBundleElement
 				// create output stream and attach to context
 				context.setOutputStream(new ByteArrayOutputStream());
 
-				job = new CommandBlockRunner(this, context, this.getOwningBundle().getLoadPaths());
+				BundleElement bundle = this.getOwningBundle();
+				String bundleName = bundle.getDisplayName();
+				job = new CommandBlockRunner(this, context, BundleManager.getInstance().getBundleLoadPaths(bundleName));
 			}
 
 			// run the job, if we have one
@@ -174,13 +250,80 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * getInvokeUnion
+	 * 
+	 * @return
+	 */
+	private InvokeUnion getInvokeUnion()
+	{
+		Platform[] platforms = Platform.getCurrentPlatforms();
+		InvokeUnion result = null;
+
+		if (this._invokeUnionMap == null)
+		{
+			return NO_INVOKE;
+		}
+
+		for (Platform platform : platforms)
+		{
+			if (platform != Platform.UNDEFINED)
+			{
+				result = this._invokeUnionMap.get(platform);
+
+				if (result != null)
+				{
+					break;
+				}
+			}
+		}
+
+		if (result == null)
+		{
+			result = this._invokeUnionMap.get(Platform.ALL);
+		}
+		if (result == null)
+		{
+			result = NO_INVOKE;
+		}
+		return result;
+	}
+
+	/**
+	 * setInvokeUnion
+	 * 
+	 * @param OS
+	 * @param invokeUnion
+	 */
+	private void setInvokeUnion(String OS, InvokeUnion invokeUnion)
+	{
+		Platform bindingOS = Platform.get(OS);
+
+		if (bindingOS != Platform.UNDEFINED)
+		{
+			if (this._invokeUnionMap == null)
+			{
+				this._invokeUnionMap = new HashMap<Platform, InvokeUnion>();
+			}
+
+			this._invokeUnionMap.put(bindingOS, invokeUnion);
+		}
+		else
+		{
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
+					this.getPath(), OS });
+
+			ScriptLogger.logWarning(message);
+		}
+	}
+
+	/**
 	 * getInvoke
 	 * 
 	 * @return
 	 */
 	public String getInvoke()
 	{
-		return this._invoke;
+		return this.getInvokeUnion().getInvoke();
 	}
 
 	/**
@@ -190,7 +333,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public RubyProc getInvokeBlock()
 	{
-		return this._invokeBlock;
+		return this.getInvokeUnion().getInvokeBlock();
 	}
 
 	/**
@@ -324,7 +467,8 @@ public class CommandElement extends AbstractBundleElement
 		{
 			case PATH:
 			case CURRENT_PROJECT:
-				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for this type and will turn it into a PATH type and set the path to the current project
+				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for
+				// this type and will turn it into a PATH type and set the path to the current project
 				return this._workingDirectoryPath;
 			case CURRENT_BUNDLE:
 				return getOwningBundle().getBundleDirectory().toString();
@@ -334,7 +478,7 @@ public class CommandElement extends AbstractBundleElement
 				return new File(this.getPath()).getParentFile().toString();
 		}
 	}
-	
+
 	public WorkingDirectoryType getWorkingDirectoryType()
 	{
 		return this._workingDirectoryType;
@@ -357,7 +501,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isBlockCommand()
 	{
-		return (this._invokeBlock != null);
+		return (this.getInvokeUnion().getInvokeBlock() != null);
 	}
 
 	/**
@@ -367,7 +511,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isExecutable()
 	{
-		return ((this._invoke != null && this._invoke.length() > 0) || this._invokeBlock != null);
+		return ((this.getInvoke() != null && this.getInvoke().length() > 0) || this.getInvokeBlock() != null);
 	}
 
 	/**
@@ -377,7 +521,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public boolean isShellCommand()
 	{
-		return (this._invokeBlock == null && this._invoke != null && this._invoke.length() > 0);
+		return (this.getInvokeBlock() == null && this.getInvoke() != null && this.getInvoke().length() > 0);
 	}
 
 	/**
@@ -453,15 +597,15 @@ public class CommandElement extends AbstractBundleElement
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
 
 		// output invoke/expansion, if it is defined
-		if (this._invoke != null)
+		if (this.getInvoke() != null)
 		{
-			printer.printWithIndent("invoke: ").println(this._invoke); //$NON-NLS-1$
+			printer.printWithIndent("invoke: ").println(this.getInvoke()); //$NON-NLS-1$
 		}
 
 		// output invoke block, if it is defined
-		if (this._invokeBlock != null)
+		if (this.getInvokeBlock() != null)
 		{
-			printer.printWithIndent("block: ").println(this._invokeBlock.to_s().asJavaString()); //$NON-NLS-1$
+			printer.printWithIndent("block: ").println(this.getInvokeBlock().to_s().asJavaString()); //$NON-NLS-1$
 		}
 
 		// output key bindings, if it is defined
@@ -624,7 +768,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInvoke(String invoke)
 	{
-		this._invoke = invoke;
+		this.setInvoke(Platform.ALL.getName(), invoke);
 	}
 
 	/**
@@ -634,7 +778,29 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	public void setInvokeBlock(RubyProc block)
 	{
-		this._invokeBlock = block;
+		this.setInvokeBlock(Platform.ALL.getName(), block);
+	}
+
+	/**
+	 * setInvoke
+	 * 
+	 * @param invoke
+	 */
+	public void setInvoke(String OS, String invoke)
+	{
+		InvokeUnion invokeUnion = new Invoke(invoke);
+		setInvokeUnion(OS, invokeUnion);
+	}
+
+	/**
+	 * setInvokeBlock
+	 * 
+	 * @param block
+	 */
+	public void setInvokeBlock(String OS, RubyProc block)
+	{
+		InvokeUnion invokeUnion = new InvokeBlock(block);
+		setInvokeUnion(OS, invokeUnion);
 		this.setRuntime((block != null) ? block.getRuntime() : null);
 	}
 

@@ -26,12 +26,10 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		// comments
 		rules.add(new MultiLineRule("<!--", "-->", createToken(getTokenName(HTMLTokens.COMMENT)))); //$NON-NLS-1$ //$NON-NLS-2$
-		// quoted string
-		IToken token = createToken(getTokenName(HTMLTokens.STRING));
-		rules.add(new MultiLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("'", "'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		// DOCTYPE
 		rules.add(new MultiLineRule("<!DOCTYPE ", ">", createToken(getTokenName(HTMLTokens.DOCTYPE)))); //$NON-NLS-1$ //$NON-NLS-2$
+		// CDATA
+		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(getTokenName(HTMLTokens.CDATA)))); //$NON-NLS-1$ //$NON-NLS-2$
 		// script
 		rules.add(new TagRule("script", createToken(getTokenName(HTMLTokens.SCRIPT)))); //$NON-NLS-1$
 		rules.add(new TagRule("/script", createToken(getTokenName(HTMLTokens.SCRIPT_END)))); //$NON-NLS-1$
@@ -45,7 +43,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new TagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
 
 		// text
-		token = createToken(getTokenName(HTMLTokens.TEXT));
+		IToken token = createToken(getTokenName(HTMLTokens.TEXT));
 		rules.add(new WordRule(new WordDetector(), token));
 
 		setRules(rules.toArray(new IRule[rules.size()]));

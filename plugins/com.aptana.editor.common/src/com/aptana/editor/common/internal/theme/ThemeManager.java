@@ -97,13 +97,38 @@ public class ThemeManager implements IThemeManager
 		return fCurrentTheme;
 	}
 
+	@SuppressWarnings("nls")
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
 		adaptTokens();
 
-		IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		// Set the find in file search color
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.search");
+		prefs.put("org.eclipse.search.potentialMatch.fgColor", toString(theme.getSearchResultColor()));
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
+		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
+		prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, toString(theme.getSelection()));
 

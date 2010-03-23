@@ -2,6 +2,8 @@ package com.aptana.editor.erb.html.parsing;
 
 import java.io.IOException;
 
+import beaver.Symbol;
+
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.erb.parsing.lexer.ERBTokens;
 import com.aptana.editor.html.parsing.HTMLParser;
@@ -48,7 +50,7 @@ public class RHTMLParser extends CompositeParser
 
 	private void processRubyBlock(IParseNode root) throws IOException, Exception
 	{
-		String startTag = getCurrentSymbol().value.toString();
+		Symbol startTag = getCurrentSymbol();
 		advance();
 
 		// finds the entire ruby block
@@ -65,7 +67,9 @@ public class RHTMLParser extends CompositeParser
 		IParseNode result = getParseResult(new RubyParser(), start, end);
 		if (result != null)
 		{
-			ERBScript erb = new ERBScript((IRubyScript) result, startTag, getCurrentSymbol().value.toString());
+			Symbol endTag = getCurrentSymbol();
+			ERBScript erb = new ERBScript((IRubyScript) result, startTag.value.toString(), endTag.value.toString());
+			erb.setLocation(startTag.getStart(), endTag.getEnd());
 			root.addChild(erb);
 		}
 	}

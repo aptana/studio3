@@ -29,6 +29,31 @@ public class CSSAttributeSelectorNode extends CSSNode
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof CSSAttributeSelectorNode))
+		{
+			return false;
+		}
+		CSSAttributeSelectorNode other = (CSSAttributeSelectorNode) obj;
+		if (fAttributeText == null)
+		{
+			return getFunction().equals(other.getFunction());
+		}
+		return fAttributeText.equals(other.fAttributeText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		if (fAttributeText == null)
+		{
+			return getFunction().hashCode();
+		}
+		return fAttributeText.hashCode();
+	}
+
+	@Override
 	public String toString()
 	{
 		if (fAttributeText == null)

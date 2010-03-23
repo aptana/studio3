@@ -41,7 +41,6 @@ public class Messages extends NLS {
     private static final String BUNDLE_NAME = "com.aptana.editor.common.hover.messages"; //$NON-NLS-1$
 
     public static String CommonAnnotationHover_MultipleMarkers;
-    public static String CommonTextHover_Hover_Status;
 
     static {
         // initialize resource bundle

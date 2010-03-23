@@ -18,7 +18,7 @@ public class XMLOutlineLabelProvider extends LabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
-		if (element instanceof XMLElementNode)
+		if (element instanceof XMLOutlineItem)
 		{
 			return ELEMENT_ICON;
 		}
@@ -28,6 +28,10 @@ public class XMLOutlineLabelProvider extends LabelProvider
 	@Override
 	public String getText(Object element)
 	{
+		if (element instanceof XMLOutlineItem)
+		{
+			return getText(((XMLOutlineItem) element).getReferenceNode());
+		}
 		if (element instanceof XMLElementNode)
 		{
 			return ((XMLElementNode) element).getName();

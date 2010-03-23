@@ -7,7 +7,7 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.actions.GitAction;
 
-abstract class ChangedFileAction extends GitAction
+public abstract class ChangedFileAction extends GitAction
 {
 	protected ChangedFile getChangedFile(IResource resource)
 	{

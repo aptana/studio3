@@ -15,6 +15,10 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
 		suite.addTestSuite(CSSCodeScannerTest.class);
+//		suite.addTestSuite(CSSCodeScannerPerformanceTest.class);
+//		suite.addTestSuite(CSSParserPerformanceTest.class);
+		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
+		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

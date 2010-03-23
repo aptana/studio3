@@ -27,7 +27,7 @@
 %goal Program;
 
 Program
-	=	SourceElements.p {:return new ParseRootNode(JSNode.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	=	SourceElements.p {:return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
 	;
 
 SourceElements
@@ -36,16 +36,15 @@ SourceElements
 	;
 
 SourceElement
-	=	FunctionDeclaration
-	|	Statement
+	=	Statement
 	;
 
 FunctionDeclaration
-	=	FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(i, new JSNode[] { p, b }, f.getStart(), b.getEnd());:}
+	=	FUNCTION.f IDENTIFIER.i FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { new JSPrimitiveNode(JSNodeTypes.IDENTIFIER, i, _symbol_i.getStart(), _symbol_i.getEnd()), p, b }, f.getStart(), b.getEnd());:}
 	;
 
 FunctionExpression
-	=	FUNCTION.f FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { p, b }, f.getStart(), b.getEnd());:}
+	=	FUNCTION.f FunctionParameters.p FunctionBody.b {:return new JSFunctionNode(new JSNode[] { new JSNode(), p, b }, f.getStart(), b.getEnd());:}
 	|	FunctionDeclaration
 	;
 
@@ -66,6 +65,7 @@ FunctionBody
 
 Statement
 	=	Block
+	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e {:JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;:}
 	|	Expression_NoLBF.e SEMICOLON {:e.setSemicolonIncluded(true); return e;:}
 	|	IfStatement
@@ -84,6 +84,7 @@ Statement
 
 Statement_NoIf
 	=	Block
+	|	FunctionDeclaration
 	|	VAR.s VariableDeclarationList.l SEMICOLON.e {:JSNode node = new JSNaryNode(JSNodeTypes.VAR, l, s.getStart(), e.getEnd());node.setSemicolonIncluded(true);return node;:}
 	|	Expression_NoLBF.e SEMICOLON {:e.setSemicolonIncluded(true); return e;:}
 	|	IfStatement_NoIf

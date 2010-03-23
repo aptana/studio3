@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -77,12 +79,20 @@ public class GitExecutable
 			// Grab PATH and search it!
 			String path = System.getenv("PATH"); //$NON-NLS-1$
 			String[] paths = path.split(File.pathSeparator);
-			for (String pathString : paths)
+			// If the user is using msysgit we prefer using git.cmd wrapper
+			// instead of the git.exe because it sets the HOME variable
+			// correctly which in turn allows the ssh to find the
+			// ${HOME}/.ssh folder.
+			for (String extension : new String[] {".cmd", ".exe"}) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				String possiblePath = pathString + File.separator + "git.exe"; //$NON-NLS-1$
-				if (acceptBinary(possiblePath))
+				String gitFilename = "git" + extension; //$NON-NLS-1$;
+				for (String pathString : paths)
 				{
-					return new GitExecutable(possiblePath);
+					String possiblePath = pathString + File.separator + gitFilename;
+					if (acceptBinary(possiblePath))
+					{
+						return new GitExecutable(possiblePath);
+					}
 				}
 			}
 		}
@@ -117,8 +127,8 @@ public class GitExecutable
 			fgLocations = new ArrayList<String>();
 			if (Platform.getOS().equals(Platform.OS_WIN32))
 			{
-				fgLocations.add("C:\\Program Files (x86)\\Git\\bin\\git.exe"); //$NON-NLS-1$
-				fgLocations.add("C:\\Program Files\\Git\\bin\\git.exe"); //$NON-NLS-1$
+				fgLocations.add("C:\\Program Files (x86)\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
+				fgLocations.add("C:\\Program Files\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
 			}
 			else
 			{
@@ -188,7 +198,13 @@ public class GitExecutable
 	 */
 	public String outputForCommand(String workingDir, String... args)
 	{
-		return ProcessUtil.outputForCommand(gitPath, workingDir, args);
+		Map<String, String> env = null;
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			env = new HashMap<String, String>();
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		return ProcessUtil.outputForCommand(gitPath, workingDir, env, args);
 	}
 
 	/**
@@ -215,6 +231,13 @@ public class GitExecutable
 	public Map<Integer, String> runInBackground(String workingDirectory, String input,
 			Map<String, String> amendEnvironment, String... args)
 	{
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null) {
+			if (amendEnvironment == null) {
+				amendEnvironment = new HashMap<String, String>();
+			}
+			amendEnvironment.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
 		return ProcessUtil.runInBackground(gitPath, workingDirectory, input, amendEnvironment, args);
 	}
 

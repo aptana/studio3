@@ -9,6 +9,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 public class OpenTagCloserTest extends TestCase
 {
@@ -18,14 +20,18 @@ public class OpenTagCloserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		viewer = new TextViewer(Display.getDefault().getActiveShell(), SWT.NONE);
+		Display display = PlatformUI.getWorkbench().getDisplay();
+		Shell shell = display.getActiveShell();
+		if (shell == null)
+			shell = new Shell(display);
+		viewer = new TextViewer(shell, SWT.NONE);
 	}
 
 	public void testDoesntCloseIfIsClosingTag()
 	{
 		IDocument document = setDocument("</p");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(3);
+		VerifyEvent event = createGreaterThanKeyEvent(3);
 		closer.verifyKey(event);
 
 		// This looks wrong, but we didn't add our close tag and the event will eventually finish and stick the '>' in
@@ -37,7 +43,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p></p>", document.get());
@@ -48,7 +54,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p </p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		// This looks wrong, but we didn't add our close tag and the event will eventually finish and stick the '>' in
@@ -60,7 +66,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p <div></div>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p></p> <div></div>", document.get());
@@ -72,7 +78,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p <b></b></p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p <b></b></p>", document.get());
@@ -83,7 +89,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p <b></b><p></p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p></p> <b></b><p></p>", document.get());
@@ -95,19 +101,19 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p></p>", document.get());
 		assertFalse(event.doit);
 		assertEquals(3, viewer.getSelectedRange().x);
 	}
-	
+
 	public void testDoesCloseProperlyWithOpenTagContaingAttrsIfNextCharIsLessThanAndWeNeedToClose()
 	{
 		IDocument document = setDocument("<a href=\"\">");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(10);
+		VerifyEvent event = createGreaterThanKeyEvent(10);
 		closer.verifyKey(event);
 
 		assertEquals("<a href=\"\"></a>", document.get());
@@ -119,7 +125,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<p></p>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(2);
+		VerifyEvent event = createGreaterThanKeyEvent(2);
 		closer.verifyKey(event);
 
 		assertEquals("<p></p>", document.get());
@@ -131,7 +137,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<br");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(4);
+		VerifyEvent event = createGreaterThanKeyEvent(4);
 		closer.verifyKey(event);
 
 		assertEquals("<br", document.get());
@@ -142,7 +148,7 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<br/");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(4);
+		VerifyEvent event = createGreaterThanKeyEvent(4);
 		closer.verifyKey(event);
 
 		assertEquals("<br/", document.get());
@@ -154,19 +160,29 @@ public class OpenTagCloserTest extends TestCase
 	{
 		IDocument document = setDocument("<br /");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(5);
+		VerifyEvent event = createGreaterThanKeyEvent(5);
 		closer.verifyKey(event);
 
 		assertEquals("<br /", document.get());
 		assertTrue(event.doit);
 	}
 
-	
+	public void testDoesntCloseSpecialERBTags()
+	{
+		IDocument document = setDocument("<%= %");
+		OpenTagCloser closer = new OpenTagCloser(viewer);
+		VerifyEvent event = createGreaterThanKeyEvent(5);
+		closer.verifyKey(event);
+
+		assertEquals("<%= %", document.get());
+		assertTrue(event.doit);
+	}
+
 	public void testDoesStickCursorBetweenAutoClosedTagPair()
 	{
 		IDocument document = setDocument("<html>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(6);
+		VerifyEvent event = createGreaterThanKeyEvent(6);
 		closer.verifyKey(event);
 
 		assertEquals("<html></html>", document.get());
@@ -174,20 +190,20 @@ public class OpenTagCloserTest extends TestCase
 		assertEquals(6, viewer.getTextWidget().getCaretOffset());
 		assertEquals(6, viewer.getSelectedRange().x);
 	}
-	
+
 	public void testDoesntCloseIfHasSpacesInOpenTagAndHasClosingTag()
 	{
 		IDocument document = setDocument("<script src=\"http://example.org/src.js\">\n\n</script>");
 		OpenTagCloser closer = new OpenTagCloser(viewer);
-		VerifyEvent event = createLessThanKeyEvent(39);
+		VerifyEvent event = createGreaterThanKeyEvent(39);
 		closer.verifyKey(event);
 
 		assertEquals("<script src=\"http://example.org/src.js\">\n\n</script>", document.get());
 		assertFalse(event.doit); // don't insert it, we'll just overwrite '>'
 		assertEquals(40, viewer.getSelectedRange().x);
 	}
-	
-	protected VerifyEvent createLessThanKeyEvent(int offset)
+
+	protected VerifyEvent createGreaterThanKeyEvent(int offset)
 	{
 		Event e = new Event();
 		e.character = '>';

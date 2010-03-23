@@ -83,6 +83,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 							if (node.getChildrenCount() > 0)
 							{
 								page.refresh();
+								page.expandToLevel(2);
 							}
 						}
 					});

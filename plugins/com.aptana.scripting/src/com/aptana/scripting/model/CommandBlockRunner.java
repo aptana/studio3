@@ -65,6 +65,9 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = this.getRuntime();
 
+		// register any bundle libraries that were loaded by this script 
+		this.registerLibraries(runtime, this.getCommand().getPath());
+		
 		// unapply load paths
 		this.unapplyLoadPaths(runtime);
 

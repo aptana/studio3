@@ -7,6 +7,7 @@
             class="com.aptana.editor.ruby.RubySourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
+            extensions="rb,rake,cgi,fcgi,rbx,rjs,gemspec,irbrc,ru"
             icon="icons/rb.png"
             id="com.aptana.editor.ruby"
             name="%editor.rb.name">
@@ -33,12 +34,6 @@
             name="Ambiguously Ruby"
             priority="normal">
       </content-type>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.aptana.editor.ruby.RubyPreferenceInitializer">
-      </initializer>
    </extension>
 
 </plugin>
