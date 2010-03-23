@@ -409,4 +409,12 @@
             name="Git">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.quickDiffReferenceProvider">
+      <referenceprovider
+            class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
+            id="com.aptana.git.ui.quickdiff"
+            label="Git Quick Diff">
+      </referenceprovider>
+   </extension>
 </plugin>

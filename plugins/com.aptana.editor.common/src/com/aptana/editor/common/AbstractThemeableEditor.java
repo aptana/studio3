@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
@@ -22,7 +21,6 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -114,8 +112,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	private FileService fFileService;
 
 	private boolean fCursorChangeListened;
-
-	private IPropertyChangeListener blockSelectionModeFontAdjuster;
 
 	/**
 	 * AbstractThemeableEditor
@@ -578,10 +574,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		}
 
 		removeLineHighlightListener();
-		if (blockSelectionModeFontAdjuster != null)
-		{
-			JFaceResources.getFontRegistry().removeListener(blockSelectionModeFontAdjuster);
-		}
 		super.dispose();
 	}
 
@@ -600,28 +592,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 		fFileService = new FileService();
-
-		/**
-		 * This listener is used to track changes to the font settings.
-		 */
-		blockSelectionModeFontAdjuster = new IPropertyChangeListener()
-		{
-			@Override
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				String property = event.getProperty();
-				if (JFaceResources.TEXT_FONT.equals(property));
-				{
-					if (isBlockSelectionModeEnabled())
-					{
-						// Force the editor to refresh the font.
-						setBlockSelectionMode(false);
-						setBlockSelectionMode(true);
-					}
-				}
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(blockSelectionModeFontAdjuster);
 	}
 
 	@Override

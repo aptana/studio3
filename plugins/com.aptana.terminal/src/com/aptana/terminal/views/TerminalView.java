@@ -1,5 +1,6 @@
 package com.aptana.terminal.views;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ import com.aptana.terminal.Activator;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
+import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.server.TerminalServer;
 
 public class TerminalView extends ViewPart
@@ -85,7 +87,7 @@ public class TerminalView extends ViewPart
 			{
 				pushStartingDirectory(workingDirectory);
 			}
-
+			// FIXME What if view with same ids is already open? We need to close and re-open, or issue cd explcitiy or our starting dir stack is messed up
 			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
 		}
 		catch (IllegalStateException e)
@@ -100,6 +102,14 @@ public class TerminalView extends ViewPart
 		if (term != null)
 		{
 			term.setPartName(title);
+			// For some reason the stack for working directories isn't working as expected always, 
+			// so we force a cd to the working dir before returning the reference to terminal
+			ProcessWrapper wrapper = TerminalServer.getInstance().getProcess(term.getId());
+			if (workingDirectory != null)
+			{
+				// FIXME We may need to tweak the working dir path based on cmd/cygwin/mingw
+				wrapper.sendText(MessageFormat.format("cd \"{0}\"\n", workingDirectory)); //$NON-NLS-1$
+			}
 		}
 
 		return term;
