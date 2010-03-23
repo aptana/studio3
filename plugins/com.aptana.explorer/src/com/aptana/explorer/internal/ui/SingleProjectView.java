@@ -20,9 +20,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -61,8 +61,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
-import org.eclipse.ui.menus.CommandContributionItem;
-import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -89,6 +88,8 @@ import com.aptana.terminal.views.TerminalView;
 public abstract class SingleProjectView extends CommonNavigator
 {
 
+	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
+
 	public static final String ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	/**
@@ -103,7 +104,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		TO_REMOVE.add("import"); //$NON-NLS-1$
 		TO_REMOVE.add("export"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.run.submenu"); //$NON-NLS-1$
-//		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
+		//		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.debug.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("org.eclipse.debug.ui.contextualLaunch.profile.submenu"); //$NON-NLS-1$
 		TO_REMOVE.add("compareWithMenu"); //$NON-NLS-1$
 		TO_REMOVE.add("replaceWithMenu"); //$NON-NLS-1$
@@ -191,8 +192,10 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager();
+				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);				
 				fillCommandsMenu(commandsMenuManager);
+				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
+				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
 				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
@@ -239,18 +242,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
 
 		// Add run related items
-		// Run script/server
-		CommandContributionItemParameter runScriptServer = new CommandContributionItemParameter(getSite(),
-				Messages.SingleProjectView_RunMenuTitle, "org.radrails.rails.ui.command.server", //$NON-NLS-1$
-				SWT.PUSH);
-		menuManager.appendToGroup(GROUP_RUN, new CommandContributionItem(runScriptServer)
-		{
-			@Override
-			public boolean isEnabled()
-			{
-				return super.isEnabled() && selectedProject != null && selectedProject.exists();
-			}
-		});
 		// Open Terminal
 		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
 		{
@@ -1023,7 +1014,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected void mangleContextMenu(Menu menu)
 	{
 		forceOurNewFileWizard(menu);
-		
+
 		// Remove a whole bunch of the contributed items that we don't want
 		removeMenuItems(menu, TO_REMOVE);
 		// Check for two separators in a row, remove one if you see that...
@@ -1060,8 +1051,9 @@ public abstract class SingleProjectView extends CommonNavigator
 					MenuManager manager = (MenuManager) contrib;
 					// force an entry for our special template New File wizard!
 					IWizardRegistry registry = PlatformUI.getWorkbench().getNewWizardRegistry();
-					IWizardDescriptor desc = registry.findWizard("com.aptana.ui.wizards.new.file");					
-					manager.insertAfter("new", new WizardShortcutAction(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), desc));
+					IWizardDescriptor desc = registry.findWizard("com.aptana.ui.wizards.new.file");
+					manager.insertAfter("new", new WizardShortcutAction(PlatformUI.getWorkbench()
+							.getActiveWorkbenchWindow(), desc));
 					manager.remove("new");
 					break;
 				}
