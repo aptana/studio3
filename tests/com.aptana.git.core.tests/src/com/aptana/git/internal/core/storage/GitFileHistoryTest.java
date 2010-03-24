@@ -51,7 +51,19 @@ public class GitFileHistoryTest extends TestCase
 			index.refresh();
 
 			// Stage the new file
+			int tries = 100;
 			List<ChangedFile> toStage = index.changedFiles();
+			// HACK Wait until we get a non-empty list?
+			while (toStage == null || toStage.isEmpty())
+			{
+				Thread.sleep(50);
+				toStage = index.changedFiles();
+				tries--;
+				if (tries <= 0)
+					break;
+			}
+			assertNotNull(toStage);
+			assertTrue(toStage.size() > 0);
 			index.stageFiles(toStage);
 			index.refresh();
 			index.commit(contents);
