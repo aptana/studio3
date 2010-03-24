@@ -14,7 +14,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 
@@ -26,12 +25,13 @@ import com.aptana.util.IOUtil;
 public class GitFileHistoryTest extends TestCase
 {
 
-	private GitRepository fRepo;
+	private static final String PROJECT_NAME = "gfh_test"; //$NON-NLS-1$
 	private IProject fProject;
+	private GitRepository fRepo;
 
 	public void testGetFileRevisions() throws Exception
 	{
-		GitRepository repo = createRepo();
+		GitRepository repo = getRepo();
 		final String filename = "comitted_file.txt";
 
 		List<String> commitsToMake = new ArrayList<String>();
@@ -99,68 +99,40 @@ public class GitFileHistoryTest extends TestCase
 	}
 
 	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+	}
+
+	@Override
 	protected void tearDown() throws Exception
 	{
 		try
 		{
-			IPath path = new Path(fRepo.workingDirectory());
-			File generatedRepo = path.toFile();
-			if (generatedRepo.exists())
-			{
-				delete(generatedRepo);
-			}
-			fRepo = null;
 			if (fProject != null)
 				fProject.delete(true, new NullProgressMonitor());
-			fProject = null;
 		}
 		finally
 		{
+			fProject = null;
+			fRepo = null;
 			super.tearDown();
 		}
 	}
 
-	/**
-	 * Recursively delete a directory tree.
-	 * 
-	 * @param generatedRepo
-	 */
-	private void delete(File generatedRepo)
+	protected GitRepository getRepo() throws CoreException
 	{
-		if (generatedRepo == null)
-			return;
-		File[] children = generatedRepo.listFiles();
-		if (children != null)
+		if (fRepo == null)
 		{
-			for (File child : children)
-			{
-				delete(child);
-			}
+			fRepo = createRepo();
 		}
-
-		if (!generatedRepo.delete())
-			generatedRepo.deleteOnExit();
+		return fRepo;
 	}
 
 	protected GitRepository createRepo() throws CoreException
 	{
-		createRepo(repoToGenerate());
+		GitRepository.create(getProject().getLocation().toOSString());
 		return GitRepository.attachExisting(getProject(), new NullProgressMonitor());
-	}
-
-	/**
-	 * Create a git repo and make sure it actually generate a model object and not null
-	 * 
-	 * @param path
-	 * @return
-	 */
-	protected GitRepository createRepo(IPath path)
-	{
-		GitRepository.create(path.toOSString());
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
-		assertNotNull(repo);
-		fRepo = repo;
-		return repo;
 	}
 
 	protected IPath repoToGenerate() throws CoreException
@@ -172,7 +144,7 @@ public class GitFileHistoryTest extends TestCase
 	{
 		if (fProject == null)
 		{
-			fProject = ResourcesPlugin.getWorkspace().getRoot().getProject("gfh_test");
+			fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME);
 			if (!fProject.exists())
 				fProject.create(new NullProgressMonitor());
 			if (!fProject.isOpen())
