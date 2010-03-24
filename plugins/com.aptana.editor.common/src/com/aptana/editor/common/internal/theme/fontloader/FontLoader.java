@@ -17,65 +17,64 @@ import org.eclipse.ui.themes.IColorFactory;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
- * This is a hack used to load the custom font used by Aptana theme
- * before the theme itself is loaded.
+ * This is a hack used to load the custom font used by Aptana theme before the theme itself is loaded.
  * 
  * @author schitale
- *
  */
 public class FontLoader implements IColorFactory
 {
-    private static final RGB FONT_LOADER = new RGB(255, 255, 255);
-    
+	private static final RGB FONT_LOADER = new RGB(255, 255, 255);
+
 	/**
 	 * Filename of the font we're using.
 	 */
 	private static final String FONT_FILE = "Inconsolata.otf"; //$NON-NLS-1$
-	
+
 	public FontLoader()
 	{
 		// Make sure that the custom font is copied to the plugin state location
 		IPath targetPath = CommonEditorPlugin.getDefault().getStateLocation().append(FONT_FILE);
-        if (!targetPath.toFile().exists())
-        {
-            copyFontToStateLocation(targetPath);
-        }
-        
-        // Possibly install the font in the user's home directory
-        if (Platform.getOS().equals(Platform.OS_LINUX))
-        {
-        	// TODO: Does this apply to gnome only and if so, should we check if it is running
-        	// before copying the font?
-        	File userHome = new File(System.getProperty("user.home")); //$NON-NLS-1$
-        	File fontsDirectory = new File(userHome, ".fonts"); //$NON-NLS-1$
-        	File font = new File(fontsDirectory, FONT_FILE);
-        	
-        	if (!font.exists())
-        	{
-        		// Make sure .fonts directory exists
-        		if (!fontsDirectory.exists())
-        		{
-        			fontsDirectory.mkdirs();
-        		}
-        		
-        		// Make sure we have a directory and can write to it
-        		if (fontsDirectory.isDirectory() && fontsDirectory.canWrite())
-        		{
-        			// Install the font
-        			copyFontToFile(font);
-        		}
-        	}
-        }
-        
-        // Load the custom font
-        if (targetPath.toFile().exists())
-        {
-        	Display display = PlatformUI.getWorkbench().getDisplay();
-        	display.loadFont(targetPath.toOSString());
-        }
+		if (!targetPath.toFile().exists())
+		{
+			copyFontToStateLocation(targetPath);
+		}
+
+		// Possibly install the font in the user's home directory
+		if (Platform.getOS().equals(Platform.OS_LINUX))
+		{
+			// TODO: Does this apply to gnome only and if so, should we check if it is running
+			// before copying the font?
+			File userHome = new File(System.getProperty("user.home")); //$NON-NLS-1$
+			File fontsDirectory = new File(userHome, ".fonts"); //$NON-NLS-1$
+			File font = new File(fontsDirectory, FONT_FILE);
+
+			if (!font.exists())
+			{
+				// Make sure .fonts directory exists
+				if (!fontsDirectory.exists())
+				{
+					fontsDirectory.mkdirs();
+				}
+
+				// Make sure we have a directory and can write to it
+				if (fontsDirectory.isDirectory() && fontsDirectory.canWrite())
+				{
+					// Install the font
+					copyFontToFile(font);
+				}
+			}
+		}
+
+		// Load the custom font
+		if (targetPath.toFile().exists())
+		{
+			Display display = PlatformUI.getWorkbench().getDisplay();
+			display.loadFont(targetPath.toOSString());
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
 	 */
 	@Override
@@ -88,7 +87,7 @@ public class FontLoader implements IColorFactory
 	{
 		copyFontToFile(targetPath.toFile());
 	}
-	
+
 	private static void copyFontToFile(File file)
 	{
 		// Copy font out of the JARred plug-in and stick it in the plug-in state location.
