@@ -51,10 +51,7 @@ public class FontLoader implements IColorFactory
 			if (!font.exists())
 			{
 				// Make sure .fonts directory exists
-				if (!fontsDirectory.exists())
-				{
-					fontsDirectory.mkdirs();
-				}
+				fontsDirectory.mkdirs();
 
 				// Make sure we have a directory and can write to it
 				if (fontsDirectory.isDirectory() && fontsDirectory.canWrite())
