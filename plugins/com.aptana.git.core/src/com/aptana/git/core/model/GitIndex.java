@@ -400,6 +400,9 @@ public class GitIndex
 
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
+		if (stageFiles == null || stageFiles.isEmpty())
+			return false;
+		
 		List<String> args = new ArrayList<String>();
 		args.add("update-index"); //$NON-NLS-1$
 		args.add("--add"); //$NON-NLS-1$
@@ -411,8 +414,10 @@ public class GitIndex
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 				args.toArray(new String[args.size()]));
+		if (result == null)
+			return false;
+		
 		int ret = result.keySet().iterator().next();
-
 		if (ret != 0)
 		{
 			return false;
@@ -430,16 +435,21 @@ public class GitIndex
 
 	public boolean unstageFiles(Collection<ChangedFile> unstageFiles)
 	{
+		if (unstageFiles == null || unstageFiles.isEmpty())
+			return false;
+		
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : unstageFiles)
 		{
 			input.append(file.indexInfo());
 		}
 
-		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
 				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		ret = result.keySet().iterator().next();
+		if (result == null)
+			return false;
+		
+		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
 			return false;
