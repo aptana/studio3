@@ -1,7 +1,6 @@
 package com.aptana.git.internal.core.storage;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +8,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,13 +40,11 @@ public class GitFileHistoryTest extends TestCase
 
 		GitIndex index = repo.index();
 		// Actually add a file to the location
-
-		String txtFile = new File(repo.workingDirectory(), filename).getAbsolutePath();
+		IFile resource = getProject().getFile(filename);
 		for (String contents : commitsToMake)
 		{
-			FileWriter writer = new FileWriter(txtFile);
-			writer.write(contents);
-			writer.close();
+			resource.setContents(new ByteArrayInputStream(contents.getBytes()), IResource.FORCE,
+					new NullProgressMonitor());
 			// refresh the index
 			index.refresh();
 
@@ -70,7 +68,6 @@ public class GitFileHistoryTest extends TestCase
 		}
 
 		// Normal test
-		IFile resource = getProject().getFile(filename);
 		GitFileHistory history = new GitFileHistory(resource, IFileHistoryProvider.NONE, null);
 		IFileRevision[] revs = history.getFileRevisions();
 		assertNotNull(revs);
