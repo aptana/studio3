@@ -43,8 +43,15 @@ public class GitFileHistoryTest extends TestCase
 		IFile resource = getProject().getFile(filename);
 		for (String contents : commitsToMake)
 		{
-			resource.setContents(new ByteArrayInputStream(contents.getBytes()), IResource.FORCE,
-					new NullProgressMonitor());
+			if (!resource.exists())
+			{
+				resource.create(new ByteArrayInputStream(contents.getBytes()), true, new NullProgressMonitor());
+			}
+			else
+			{
+				resource.setContents(new ByteArrayInputStream(contents.getBytes()), IResource.FORCE,
+						new NullProgressMonitor());
+			}
 			// refresh the index
 			index.refresh();
 
