@@ -275,9 +275,17 @@ module Ruble
         
         result["TM_CURRENT_SCOPE"] = current_scope
         result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
-      end
-      
+        end
+                
+      # Allow each bundle to modify env vars based on scope, in order.
+      scopes = current_scope.split(' ')
+      scopes.each { |scope| result = modify_env(scope, result) } 
       result
+    end
+    
+    # Default impl returns back unmodified
+    def modify_env(scope, env)
+      env
     end
     
   end
