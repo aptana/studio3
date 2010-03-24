@@ -49,6 +49,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	private char[][] sequences;
 	private boolean found = false;
 	private boolean eof = false;
+	private boolean ignored;
 	
 	/**
 	 * @param baseCharacterScanner
@@ -78,7 +79,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	public int read() {
 		eof = false;
 		int c = characterScanner.read();
-		if (c != ICharacterScanner.EOF) {
+		if (c != ICharacterScanner.EOF && !ignored) {
 			for (char[] sequence : sequences) {
 				if (c == sequence[0] && sequenceDetected(sequence)) {
 					found = true;
@@ -102,7 +103,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		found = false;
 		characterScanner.unread();
 	}
-		
+
 	public boolean foundSequence() {
 		try {
 			return found;
@@ -110,7 +111,12 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 			found = false;
 		}
 	}
-	
+
+	public void setSequenceIgnored(boolean ignored)
+	{
+		this.ignored = ignored;
+	}
+
 	private boolean sequenceDetected(char[] sequence) {
 		for (int i = 1; i < sequence.length; ++i) {
 			int c = characterScanner.read();
