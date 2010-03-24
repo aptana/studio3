@@ -1527,7 +1527,7 @@ _111=_110-0;
 var _112=this._term.getRow();
 var _113=this._term.getScrollRegion().bottom;
 var _114=_112+_111;
-if(_112<=_113){
+if(_114<=_113){
 this._term.setRow(_114);
 }else{
 this._term.scrollUp(_111);
@@ -1979,15 +1979,16 @@ Term.prototype.displayCharacters=function(_158){
 if(isString(_158)){
 for(var i=0;i<_158.length;i++){
 var ch=_158.charAt(i);
-var line=this._lines[this._row];
 if(/[\x00-\x1F]+/.test(ch)){
 ch=" ";
 }
+if(this._column>=this._width){
+this._column=0;
+this.getParser().getHandler().SU("SU",1);
+}
+var line=this._lines[this._row];
 line.putCharacter(ch,this._currentAttribute,this._column);
 this._column++;
-if(this._column>=this._width){
-this._column=this._width-1;
-}
 }
 }
 };
