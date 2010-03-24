@@ -29,16 +29,6 @@ public class GitFileHistoryTest extends TestCase
 	private GitRepository fRepo;
 	private IProject fProject;
 
-	public void testGetContributors()
-	{
-		fail("Not yet implemented");
-	}
-
-	public void testGetTargets()
-	{
-		fail("Not yet implemented");
-	}
-
 	public void testGetFileRevisions() throws Exception
 	{
 		GitRepository repo = createRepo();
@@ -82,11 +72,30 @@ public class GitFileHistoryTest extends TestCase
 			// Make sure getFileRevision works as we expect
 			assertSame(revision, history.getFileRevision(revision.getContentIdentifier()));
 		}
+
+		// Test getContributors
+		IFileRevision[] contributors = history.getContributors(revs[0]);
+		assertNotNull(contributors);
+		assertEquals(1, contributors.length);
+		assertSame(contributors[0], revs[1]);
+
+		// TODO Test when there are two+ contributors!
+
+		// Test getTargets
+		IFileRevision[] targets = history.getTargets(revs[1]);
+		assertNotNull(targets);
+		assertEquals(1, targets.length);
+		assertSame(targets[0], revs[0]);
+
+		// TODO Test when there are two+ targets!
+
 		// Test with a flag for single revision!
 		history = new GitFileHistory(resource, IFileHistoryProvider.SINGLE_REVISION, null);
 		revs = history.getFileRevisions();
 		assertNotNull(revs);
 		assertEquals(1, revs.length);
+
+		// TODO Test with single line of descent flag!
 	}
 
 	@Override
