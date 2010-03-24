@@ -3,6 +3,7 @@ package com.aptana.editor.html.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.html.HTMLEditorTest;
 import com.aptana.editor.html.HTMLParserTest;
 import com.aptana.editor.html.HTMLParserTypeAttributeTest;
 import com.aptana.editor.html.HTMLScannerTest;
@@ -23,6 +24,7 @@ public class AllTests
 		suite.addTestSuite(HTMLSourcePartitionScannerTest.class);
 		suite.addTestSuite(HTMLTagScannerTest.class);
 //		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
+		suite.addTestSuite(HTMLEditorTest.class);
 		suite.addTestSuite(OpenTagCloserTest.class);
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		// $JUnit-END$

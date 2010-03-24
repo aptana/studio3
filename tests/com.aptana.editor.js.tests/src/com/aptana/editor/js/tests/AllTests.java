@@ -6,6 +6,7 @@ import junit.framework.TestSuite;
 import com.aptana.editor.js.JSCodeScannerTest;
 import com.aptana.editor.js.JSDocScannerTest;
 import com.aptana.editor.js.JSDoubleQuotedStringScannerTest;
+import com.aptana.editor.js.JSEditorTest;
 import com.aptana.editor.js.JSParserTest;
 import com.aptana.editor.js.JSRegexScannerTest;
 import com.aptana.editor.js.JSSingleQuotedStringScannerTest;
@@ -27,6 +28,7 @@ public class AllTests
 		suite.addTestSuite(JSRegexScannerTest.class);
 		suite.addTestSuite(JSParserTest.class);
 //		suite.addTestSuite(JSParserPerformanceTest.class);
+		suite.addTestSuite(JSEditorTest.class);
 		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
 		// $JUnit-END$
 		return suite;
