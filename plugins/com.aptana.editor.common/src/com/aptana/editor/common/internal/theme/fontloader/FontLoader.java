@@ -1,5 +1,6 @@
 package com.aptana.editor.common.internal.theme.fontloader;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
@@ -39,6 +41,32 @@ public class FontLoader implements IColorFactory
             copyFontToStateLocation(targetPath);
         }
         
+        // Possibly install the font in the user's home directory
+        if (Platform.getOS().equals(Platform.OS_LINUX))
+        {
+        	// TODO: Does this apply to gnome only and if so, should we check if it is running
+        	// before copying the font?
+        	File userHome = new File(System.getProperty("user.home")); //$NON-NLS-1$
+        	File fontsDirectory = new File(userHome, ".fonts"); //$NON-NLS-1$
+        	File font = new File(fontsDirectory, FONT_FILE);
+        	
+        	if (!font.exists())
+        	{
+        		// Make sure .fonts directory exists
+        		if (!fontsDirectory.exists())
+        		{
+        			fontsDirectory.mkdirs();
+        		}
+        		
+        		// Make sure we have a directory and can write to it
+        		if (fontsDirectory.isDirectory() && fontsDirectory.canWrite())
+        		{
+        			// Install the font
+        			copyFontToFile(font);
+        		}
+        	}
+        }
+        
         // Load the custom font
         if (targetPath.toFile().exists())
         {
@@ -58,13 +86,18 @@ public class FontLoader implements IColorFactory
 
 	private static void copyFontToStateLocation(IPath targetPath)
 	{
+		copyFontToFile(targetPath.toFile());
+	}
+	
+	private static void copyFontToFile(File file)
+	{
 		// Copy font out of the JARred plug-in and stick it in the plug-in state location.
 		InputStream stream = null;
 		FileOutputStream out = null;
 		try
 		{
 			stream = FileLocator.openStream(CommonEditorPlugin.getDefault().getBundle(), new Path(FONT_FILE), false);
-			out = new FileOutputStream(targetPath.toFile());
+			out = new FileOutputStream(file);
 			int b = -1;
 			while ((b = stream.read()) != -1)
 			{
