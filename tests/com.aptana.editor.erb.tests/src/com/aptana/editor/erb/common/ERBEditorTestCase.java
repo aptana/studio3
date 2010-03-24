@@ -28,7 +28,7 @@ public abstract class ERBEditorTestCase extends TestCase
 		editor = (ITextEditor) page.openEditor(new FileStoreEditorInput(getFileStore()), getEditorId(), false,
 				IWorkbenchPage.MATCH_INPUT);
 		assertNotNull(editor);
-		assertEquals(editor.getClass().getName(), getClassName());
+		assertEquals(getClassName(), editor.getClass().getName());
 	}
 
 	protected abstract IFileStore getFileStore() throws Exception;

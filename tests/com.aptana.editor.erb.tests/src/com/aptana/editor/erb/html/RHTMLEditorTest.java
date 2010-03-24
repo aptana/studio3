@@ -13,7 +13,7 @@ public class RHTMLEditorTest extends ERBEditorTestCase
 	@Override
 	protected IFileStore getFileStore() throws Exception
 	{
-		return EFS.getStore((new File("test.erb").toURI())); //$NON-NLS-1$
+		return EFS.getStore((new File("testhtml.erb").toURI())); //$NON-NLS-1$
 	}
 
 	@Override
