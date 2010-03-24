@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +18,6 @@ public class CommandScriptRunner extends AbstractCommandRunner
 {
 	private int _exitValue;
 	private File _tempFile;
-	private String _shell;
 
 	/**
 	 * CommandScriptJob
@@ -49,8 +46,6 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	protected void beforeExecute() throws IOException
 	{
 		this.createScriptFile();
-
-		this.createShellCommand();
 	}
 
 	/**
@@ -77,24 +72,48 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	}
 
 	/**
-	 * createShellCommand
+	 * getCommandLineArguments
+	 * 
+	 * @return
 	 */
-	protected void createShellCommand()
+	protected String[] getCommandLineArguments()
 	{
 		String OS = org.eclipse.core.runtime.Platform.getOS();
-
-		// create the shell to execute
-		if (OS.equals(org.eclipse.core.runtime.Platform.OS_MACOSX)
-				|| OS.equals(org.eclipse.core.runtime.Platform.OS_LINUX))
+		String[] result;
+		
+		if (OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32))
 		{
-			// FIXME: should we be using the user's preferred shell instead of hardcoding?
-			this._shell = "/bin/bash"; //$NON-NLS-1$
+			result = new String[] { "/Q", "/C", this._tempFile.getAbsolutePath() };
 		}
 		else
 		{
-			// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-			this._shell = "cmd"; //$NON-NLS-1$
+			result = new String[] { "-l", this._tempFile.getAbsolutePath() };
 		}
+		
+		return result;
+	}
+	
+	/**
+	 * createShellCommand
+	 */
+	protected String getShell()
+	{
+		String OS = org.eclipse.core.runtime.Platform.getOS();
+		String result;
+
+		// create the shell to execute
+		if (OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32))
+		{
+			// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
+			result = "cmd"; //$NON-NLS-1$
+		}
+		else
+		{
+			// FIXME: should we be using the user's preferred shell instead of hardcoding?
+			result = "/bin/bash"; //$NON-NLS-1$
+		}
+		
+		return result;
 	}
 
 	/**
@@ -104,18 +123,14 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	public String executeScript()
 	{
-		List<String> attributes = new ArrayList<String>(3);
-		if ("cmd".equals(this._shell)) //$NON-NLS-1$
-		{
-			// Run the 'cmd' with the /Q and /C (only for Windows)
-			attributes.add("/Q"); //$NON-NLS-1$
-			attributes.add("/C"); //$NON-NLS-1$
-		}
-		attributes.add(this._tempFile.getAbsolutePath());
+		String shell = this.getShell();
+		String[] commandLine = this.getCommandLineArguments();
 		String resultText = null;
+		
 		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-		Map<Integer, String> result = ProcessUtil.runInBackground(this._shell, this.getCommand().getWorkingDirectory(),
-				input, this.getContributedEnvironment(), attributes.toArray(new String[attributes.size()]));
+		Map<Integer, String> result = ProcessUtil.runInBackground(shell, this.getCommand().getWorkingDirectory(),
+				input, this.getContributedEnvironment(), commandLine);
+		
 		if (result == null)
 		{
 			this._exitValue = 1;
