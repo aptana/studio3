@@ -1,8 +1,11 @@
 package com.aptana.git.core;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.team.IResourceTree;
@@ -21,7 +24,9 @@ public class GitMoveDeleteHookTest extends TestCase
 	private Mockery context;
 	private IResourceTree tree;
 	private IFile file;
+	private IFolder folder;
 	private GitRepository repo;
+	private GitMoveDeleteHook hook;
 
 	protected void setUp() throws Exception
 	{
@@ -34,7 +39,16 @@ public class GitMoveDeleteHookTest extends TestCase
 		};
 		tree = context.mock(IResourceTree.class);
 		file = context.mock(IFile.class);
+		folder = context.mock(IFolder.class);
 		repo = context.mock(GitRepository.class);
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+		};
 	}
 
 	@Override
@@ -42,6 +56,7 @@ public class GitMoveDeleteHookTest extends TestCase
 	{
 		try
 		{
+			hook = null;
 			context = null;
 			tree = null;
 			file = null;
@@ -55,15 +70,6 @@ public class GitMoveDeleteHookTest extends TestCase
 
 	public void testDeleteFileUnforcedWithHistorySucceeds()
 	{
-		GitMoveDeleteHook hook = new GitMoveDeleteHook()
-		{
-			@Override
-			protected GitRepository getAttachedGitRepository(IProject project)
-			{
-				return repo;
-			}
-		};
-
 		context.checking(new Expectations()
 		{
 			{
@@ -90,9 +96,29 @@ public class GitMoveDeleteHookTest extends TestCase
 		context.assertIsSatisfied();
 	}
 
+	public void testDeleteFileThatIsNewDoesntGoThroughRepo()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(file, IResource.DEPTH_ZERO);
+				will(returnValue(true));
+
+				oneOf(file).getProject();
+
+				oneOf(repo).getChangedFileForResource(file);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.NEW);
+				will(returnValue(changedFile));
+			}
+		});
+		assertFalse(hook.deleteFile(tree, file, IResource.KEEP_HISTORY, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
 	public void testDeleteFileForcedDoesntCheckSynchronized()
 	{
-		GitMoveDeleteHook hook = new GitMoveDeleteHook()
+		hook = new GitMoveDeleteHook()
 		{
 			@Override
 			protected GitRepository getAttachedGitRepository(IProject project)
@@ -115,15 +141,6 @@ public class GitMoveDeleteHookTest extends TestCase
 
 	public void testDeleteFileFailsInGitRepo()
 	{
-		GitMoveDeleteHook hook = new GitMoveDeleteHook()
-		{
-			@Override
-			protected GitRepository getAttachedGitRepository(IProject project)
-			{
-				return repo;
-			}
-		};
-
 		context.checking(new Expectations()
 		{
 			{
@@ -144,8 +161,123 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(tree).failed(status);
 			}
 		});
-		// shoudl still return true, because we tried, but failed
+		// should still return true, because we tried, but failed
 		assertTrue(hook.deleteFile(tree, file, IResource.NONE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testDeleteFolderUnforcedWithHistorySucceeds()
+	{
+		final boolean[] addFilesToHistoryCalled = new boolean[1];
+		addFilesToHistoryCalled[0] = false;
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			protected void addFilesToLocalHistoryRecursively(IResourceTree tree, IFolder folder)
+			{
+				// Make sure we get called here!
+				addFilesToHistoryCalled[0] = true;
+			};
+
+		};
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(folder).getName();
+				will(returnValue("folder"));
+
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				oneOf(folder).getProject();
+
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				oneOf(folder).getLocationURI();
+				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator + "folder")
+						.toURI()));
+
+				oneOf(repo).deleteFolder("folder");
+				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
+				// repo says we deleted ok, so we should mark that on the tree
+				oneOf(tree).deletedFolder(folder);
+			}
+		});
+		assertTrue(hook.deleteFolder(tree, folder, IResource.KEEP_HISTORY, new NullProgressMonitor()));
+		assertTrue("Should have tried to save file history", addFilesToHistoryCalled[0]);
+		context.assertIsSatisfied();
+	}
+
+	public void testDeleteFolderForcedChecksSynch()
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return null;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				// We're forcing, so we don't need to check if file is synched
+				never(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
+				oneOf(folder).getProject();
+			}
+		});
+		assertFalse(hook.deleteFolder(tree, folder, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testWontDeleteDotGitFolderIfRepoIsAttached()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				oneOf(folder).getProject();
+
+				oneOf(folder).getName();
+				will(returnValue(GitRepository.GIT_DIR));
+
+				oneOf(tree).failed(GitMoveDeleteHook.CANNOT_MODIFY_REPO);
+			}
+		});
+		// Should return true to indicate we handled the delete request (though in this case we punted because it's
+		// unsafe)
+		assertTrue(hook.deleteFolder(tree, folder, IResource.NONE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testWillLetFilesystemAPIDeleteDotGitFolderIfRepoIsNotAttached()
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return null;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(folder).getProject();
+			}
+		});
+		// Should return false to tell the normal filesystem to delete it
+		assertFalse(hook.deleteFolder(tree, folder, IResource.FORCE, new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
 }

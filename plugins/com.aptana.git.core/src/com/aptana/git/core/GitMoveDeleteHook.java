@@ -23,6 +23,8 @@ import com.aptana.git.core.model.GitRepository;
 class GitMoveDeleteHook implements IMoveDeleteHook
 {
 
+	static final Status CANNOT_MODIFY_REPO = new Status(IStatus.ERROR, GitPlugin.getPluginId(), 0,
+			Messages.GitMoveDeleteHook_CannotModifyRepository_ErrorMessage, null);
 	private static final boolean I_AM_DONE = true;
 	private static final boolean FINISH_FOR_ME = false;
 
@@ -61,13 +63,6 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	public boolean deleteFolder(final IResourceTree tree, final IFolder folder, final int updateFlags,
 			final IProgressMonitor monitor)
 	{
-		// Deleting a GIT repository which is in use is a pretty bad idea. To
-		// delete disconnect the team provider first.
-		if (folder.getName().equals(GitRepository.GIT_DIR))
-		{
-			return cannotModifyRepository(tree);
-		}
-
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
 		if (!force && !tree.isSynchronized(folder, IResource.DEPTH_INFINITE))
 			return false;
@@ -75,6 +70,13 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		final GitRepository repo = getAttachedGitRepository(folder.getProject());
 		if (repo == null)
 			return false;
+
+		// Deleting a GIT repository which is in use is a pretty bad idea. To
+		// delete disconnect the team provider first.
+		if (folder.getName().equals(GitRepository.GIT_DIR))
+		{
+			return cannotModifyRepository(tree);
+		}
 
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
@@ -190,15 +192,14 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	private boolean cannotModifyRepository(final IResourceTree tree)
 	{
-		tree.failed(new Status(IStatus.ERROR, GitPlugin.getPluginId(), 0,
-				Messages.GitMoveDeleteHook_CannotModifyRepository_ErrorMessage, null));
+		tree.failed(CANNOT_MODIFY_REPO);
 		return I_AM_DONE;
 	}
 
 	protected String getRepoRelativePath(final IResource file, GitRepository repo)
 	{
 		String workingDir = repo.workingDirectory();
-		String filePath = file.getLocationURI().getPath();
+		String filePath = new File(file.getLocationURI()).getAbsolutePath();
 		if (filePath.startsWith(workingDir))
 		{
 			filePath = filePath.substring(workingDir.length());
@@ -219,7 +220,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	 * @param tree
 	 * @param folder
 	 */
-	private void addFilesToLocalHistoryRecursively(final IResourceTree tree, IFolder folder)
+	protected void addFilesToLocalHistoryRecursively(final IResourceTree tree, IFolder folder)
 	{
 		try
 		{
