@@ -108,7 +108,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 		// If repo root is same as project root, we need to just punt and return false
 		// so filesystem takes care of it
-		if (new Path(repo.workingDirectory()).equals(project.getLocation()))
+		if (new File(repo.workingDirectory()).getAbsolutePath().equals(project.getLocation().toFile().getAbsolutePath()))
 			return false;
 
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
