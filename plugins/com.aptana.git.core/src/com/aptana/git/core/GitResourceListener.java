@@ -42,7 +42,7 @@ class GitResourceListener implements IResourceChangeListener
 		{
 			IProject project = (IProject) event.getResource();
 			GitRepository.removeRepository(project);
-			return;			
+			return;
 		}
 		final Set<GitRepository> resourcesToUpdate = new HashSet<GitRepository>();
 		final Set<IProject> projectsToAttach = new HashSet<IProject>();
@@ -125,7 +125,8 @@ class GitResourceListener implements IResourceChangeListener
 					{
 						try
 						{
-							GitRepository.attachExisting(project, sub.newChild(10));
+							if (project.isAccessible())
+								GitRepository.attachExisting(project, sub.newChild(10));
 						}
 						catch (CoreException e)
 						{

@@ -8,15 +8,17 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.testing.utils.ProjectCreator;
 
 public class GitMoveDeleteIntegrationTest extends TestCase
 {
+
+	private static final String PROJECT_NAME = "gmdht"; //$NON-NLS-1$
 
 	private IProject project;
 	private GitRepository repo;
@@ -26,11 +28,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 	{
 		super.setUp();
 
-		project = ResourcesPlugin.getWorkspace().getRoot().getProject("gmdht");
-		if (!project.exists())
-			project.create(new NullProgressMonitor());
-		if (!project.isOpen())
-			project.open(new NullProgressMonitor());
+		project = ProjectCreator.createAndOpen(PROJECT_NAME);
 
 		// create a git repo
 		GitRepository.create(project.getLocation().toOSString());

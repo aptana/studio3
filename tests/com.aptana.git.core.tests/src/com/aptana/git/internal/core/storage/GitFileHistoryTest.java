@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -20,6 +19,7 @@ import org.eclipse.team.core.history.IFileRevision;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.testing.utils.ProjectCreator;
 import com.aptana.util.IOUtil;
 
 public class GitFileHistoryTest extends TestCase
@@ -160,11 +160,7 @@ public class GitFileHistoryTest extends TestCase
 	{
 		if (fProject == null)
 		{
-			fProject = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME);
-			if (!fProject.exists())
-				fProject.create(new NullProgressMonitor());
-			if (!fProject.isOpen())
-				fProject.open(new NullProgressMonitor());
+			fProject = ProjectCreator.createAndOpen(PROJECT_NAME);
 		}
 		return fProject;
 	}
