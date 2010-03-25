@@ -3,6 +3,7 @@ package com.aptana.git.core;
 import java.io.File;
 import java.util.Map;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -14,6 +15,7 @@ import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.git.core.model.ChangedFile;
@@ -100,8 +102,45 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	public boolean deleteProject(final IResourceTree tree, final IProject project, final int updateFlags,
 			final IProgressMonitor monitor)
 	{
-		// TODO Delete the project through git if it is a subfolder of a git repo (project root isn't root of repo)
-		return FINISH_FOR_ME;
+		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
+		if (!force && !tree.isSynchronized(project, IResource.DEPTH_INFINITE))
+			return false;
+		// FIXME Should we return true, but call tree.failed if unsynched?
+
+		final GitRepository repo = getAttachedGitRepository(project);
+		if (repo == null)
+			return false;
+
+		// If repo root is same as project root, we need to just punt and return false
+		// so filesystem takes care of it
+		if (new Path(repo.workingDirectory()).equals(project.getLocation()))
+			return false;
+
+		// We may not actually need to delete the contents....
+		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
+		boolean neverDeleteContent = (updateFlags & IResource.NEVER_DELETE_PROJECT_CONTENT) != 0;
+		boolean deleteContents = (alwaysDeleteContent || (project.isOpen() && !neverDeleteContent));
+
+		IStatus status;
+		if (deleteContents)
+		{
+			// Delete the project through the repo
+			status = repo.deleteFolder(getRepoRelativePath(project, repo));
+		}
+		else
+		{
+			status = Status.OK_STATUS;
+		}
+
+		if (status.isOK())
+		{
+			tree.deletedProject(project);
+		}
+		else
+		{
+			tree.failed(status);
+		}
+		return true;
 	}
 
 	public boolean moveFile(final IResourceTree tree, final IFile srcf, final IFile dstf, final int updateFlags,
@@ -220,7 +259,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	 * @param tree
 	 * @param folder
 	 */
-	protected void addFilesToLocalHistoryRecursively(final IResourceTree tree, IFolder folder)
+	protected void addFilesToLocalHistoryRecursively(final IResourceTree tree, IContainer folder)
 	{
 		try
 		{

@@ -280,4 +280,8 @@ public class GitMoveDeleteHookTest extends TestCase
 		assertFalse(hook.deleteFolder(tree, folder, IResource.FORCE, new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
+	// TODO Add tests for deleting projects
+	// TODO Add tests for moving files
+	// TODO Add tests for moving folders
+	// TODO Add tests for moving projects
 }
