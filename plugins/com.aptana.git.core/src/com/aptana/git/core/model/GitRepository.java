@@ -1029,7 +1029,7 @@ public class GitRepository
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm");
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f");
 		if (result.keySet().iterator().next() != 0)
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
@@ -1038,10 +1038,10 @@ public class GitRepository
 
 	public IStatus deleteFolder(String folderPath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r", //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath);
 		if (result == null)
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -r");
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf");
 		if (result.keySet().iterator().next() != 0)
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
