@@ -1,28 +1,25 @@
 package com.aptana.git.core;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.testing.utils.ProjectCreator;
 
 public class GitMoveDeleteIntegrationTest extends TestCase
 {
 
 	private static final String PROJECT_NAME = "gmdht"; //$NON-NLS-1$
-	
+
 	private IProject project;
 	private GitRepository repo;
 
@@ -31,18 +28,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 	{
 		super.setUp();
 
-		project = ResourcesPlugin.getWorkspace().getRoot().getProject(PROJECT_NAME);
-		if (!project.exists())
-		{
-			// Create in a new directory inside the temp dir, otherwise on unit test machine we may get messed up because we're already under a git repo!
-			IProjectDescription desc = ResourcesPlugin.getWorkspace().newProjectDescription(PROJECT_NAME);
-			File tmpfile = File.createTempFile(PROJECT_NAME, null);
-			File projectDir = new File(tmpfile.getParentFile(), PROJECT_NAME);
-			desc.setLocation(new Path(projectDir.getAbsolutePath()));
-			project.create(desc, new NullProgressMonitor());
-		}
-		if (!project.isOpen())
-			project.open(new NullProgressMonitor());
+		project = ProjectCreator.createAndOpen(PROJECT_NAME);
 
 		// create a git repo
 		GitRepository.create(project.getLocation().toOSString());
