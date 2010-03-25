@@ -8,8 +8,10 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.team.IMoveDeleteHook;
 import org.eclipse.core.resources.team.IResourceTree;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,7 +33,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (!force && !tree.isSynchronized(file, IResource.DEPTH_ZERO))
 			return false;
 
-		final GitRepository repo = GitRepository.getAttached(file.getProject());
+		final GitRepository repo = getAttachedGitRepository(file.getProject());
 		if (repo == null)
 			return false;
 
@@ -40,8 +42,20 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (changed == null || changed.getStatus() == ChangedFile.Status.NEW)
 			return false;
 
+		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
+			tree.addToLocalHistory(file);
+
 		// Delete the file through the repo
-		return repo.deleteFile(getRepoRelativePath(file, repo));
+		IStatus status = repo.deleteFile(getRepoRelativePath(file, repo));
+		if (status.isOK())
+		{
+			tree.deletedFile(file);
+		}
+		else
+		{
+			tree.failed(status);
+		}
+		return true;
 	}
 
 	public boolean deleteFolder(final IResourceTree tree, final IFolder folder, final int updateFlags,
@@ -54,19 +68,37 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return cannotModifyRepository(tree);
 		}
 
-		final GitRepository repo = GitRepository.getAttached(folder.getProject());
+		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
+		if (!force && !tree.isSynchronized(folder, IResource.DEPTH_INFINITE))
+			return false;
+
+		final GitRepository repo = getAttachedGitRepository(folder.getProject());
 		if (repo == null)
 			return false;
 
-		// Delete the file through the repo
-		return repo.deleteFolder(getRepoRelativePath(folder, repo));
+		// Honor the KEEP LOCAL HISTORY update flag!
+		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
+		{
+			addFilesToLocalHistoryRecursively(tree, folder);
+		}
+
+		// Delete the folder through the repo
+		IStatus status = repo.deleteFolder(getRepoRelativePath(folder, repo));
+		if (status.isOK())
+		{
+			tree.deletedFolder(folder);
+		}
+		else
+		{
+			tree.failed(status);
+		}
+		return true;
 	}
 
 	public boolean deleteProject(final IResourceTree tree, final IProject project, final int updateFlags,
 			final IProgressMonitor monitor)
 	{
-		// TODO: Note that eclipse thinks folders are real, while
-		// Git does not care.
+		// TODO Delete the project through git if it is a subfolder of a git repo (project root isn't root of repo)
 		return FINISH_FOR_ME;
 	}
 
@@ -77,10 +109,10 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (!force && !tree.isSynchronized(srcf, IResource.DEPTH_ZERO))
 			return false;
 
-		final GitRepository repo = GitRepository.getAttached(srcf.getProject());
+		final GitRepository repo = getAttachedGitRepository(srcf.getProject());
 		if (repo == null)
 			return false;
-		final GitRepository dstm = GitRepository.getAttached(dstf.getProject());
+		final GitRepository dstm = getAttachedGitRepository(dstf.getProject());
 		if (dstm == null || !dstm.equals(repo))
 			return false;
 		// TODO If they're in separate repos, we need to delete and add!
@@ -108,10 +140,10 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	public boolean moveFolder(final IResourceTree tree, final IFolder srcf, final IFolder dstf, final int updateFlags,
 			final IProgressMonitor monitor)
 	{
-		final GitRepository repo = GitRepository.getAttached(srcf.getProject());
+		final GitRepository repo = getAttachedGitRepository(srcf.getProject());
 		if (repo == null)
 			return false;
-		final GitRepository dstm = GitRepository.getAttached(dstf.getProject());
+		final GitRepository dstm = getAttachedGitRepository(dstf.getProject());
 		if (dstm == null || !dstm.equals(repo))
 			return false;
 		// TODO If they're in separate repos, we need to delete and add!
@@ -120,12 +152,11 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// If source folder contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
-		
+
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 		{
-			// TODO Add all files that will be affected to local history!
-			// tree.addToLocalHistory(srcf);
+			addFilesToLocalHistoryRecursively(tree, srcf);
 		}
 
 		String dest = getRepoRelativePath(dstf, repo);
@@ -175,6 +206,41 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 				filePath = filePath.substring(1);
 		}
 		return filePath;
+	}
+
+	protected GitRepository getAttachedGitRepository(IProject project)
+	{
+		return GitRepository.getAttached(project);
+	}
+
+	/**
+	 * Traverses a folder to infinite depth, adding each file visited to the IResourceTree's local file history.
+	 * 
+	 * @param tree
+	 * @param folder
+	 */
+	private void addFilesToLocalHistoryRecursively(final IResourceTree tree, IFolder folder)
+	{
+		try
+		{
+			folder.accept(new IResourceVisitor()
+			{
+
+				@Override
+				public boolean visit(IResource resource) throws CoreException
+				{
+					if (resource instanceof IFile)
+					{
+						tree.addToLocalHistory((IFile) resource);
+					}
+					return true;
+				}
+			});
+		}
+		catch (CoreException e)
+		{
+			GitPlugin.logError(e);
+		}
 	}
 
 }

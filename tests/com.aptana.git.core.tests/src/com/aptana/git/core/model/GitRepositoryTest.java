@@ -128,7 +128,8 @@ public class GitRepositoryTest extends TestCase
 		// make sure it's there first
 		assertTrue(new File(addedFile).exists());
 		// delete it
-		assertTrue(fRepo.deleteFile(addedFile));
+		IStatus status = fRepo.deleteFile(addedFile);
+		assertTrue(status.isOK());
 		// make sure its deleted from filesystem
 		assertFalse(new File(addedFile).exists());
 

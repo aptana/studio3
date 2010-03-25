@@ -1025,23 +1025,27 @@ public class GitRepository
 		return result.keySet().iterator().next() == 0;
 	}
 
-	public boolean deleteFile(String filePath)
+	public IStatus deleteFile(String filePath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm");
 		if (result.keySet().iterator().next() != 0)
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
-	public boolean deleteFolder(String folderPath)
+	public IStatus deleteFolder(String folderPath)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath);
+		if (result == null)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -r");
 		if (result.keySet().iterator().next() != 0)
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	public IStatus moveFile(String source, String dest)
