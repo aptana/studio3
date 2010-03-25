@@ -10,8 +10,7 @@ Bundle-ClassPath: lib/cglib-nodep-2.1_3.jar,
  lib/hamcrest-library-1.1.jar,
  lib/jmock-2.5.1.jar,
  lib/jmock-legacy-2.5.1.jar,
- lib/objenesis-1.0.jar,
- .
+ lib/objenesis-1.0.jar
 Export-Package: net.sf.cglib.asm,
  net.sf.cglib.asm.attrs,
  net.sf.cglib.beans,
@@ -48,3 +47,4 @@ Export-Package: net.sf.cglib.asm,
  org.objenesis.instantiator.jrockit,
  org.objenesis.instantiator.sun,
  org.objenesis.strategy
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"

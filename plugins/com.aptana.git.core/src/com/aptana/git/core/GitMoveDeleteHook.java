@@ -15,7 +15,6 @@ import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.git.core.model.ChangedFile;
@@ -80,6 +79,11 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return cannotModifyRepository(tree);
 		}
 
+		String source = getRepoRelativePath(folder, repo);
+		// If project contains no already committed files, we need to punt!
+		if (hasNoCommittedFiles(source, repo))
+			return false;
+		
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 		{
@@ -87,7 +91,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		}
 
 		// Delete the folder through the repo
-		IStatus status = repo.deleteFolder(getRepoRelativePath(folder, repo));
+		IStatus status = repo.deleteFolder(source);
 		if (status.isOK())
 		{
 			tree.deletedFolder(folder);
@@ -108,14 +112,20 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 		// If repo root is same as project root, we need to just punt and return false
 		// so filesystem takes care of it
-		if (new Path(repo.workingDirectory()).equals(project.getLocation()))
+		if (new File(repo.workingDirectory()).getAbsolutePath()
+				.equals(project.getLocation().toFile().getAbsolutePath()))
+			return false;
+
+		String source = getRepoRelativePath(project, repo);
+		// If project contains no already committed files, we need to punt!
+		if (hasNoCommittedFiles(source, repo))
 			return false;
 
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
 		if (!force && !tree.isSynchronized(project, IResource.DEPTH_INFINITE))
 			return false;
 		// FIXME Should we return true, but call tree.failed if unsynched?
-		
+
 		// We may not actually need to delete the contents....
 		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
 		boolean neverDeleteContent = (updateFlags & IResource.NEVER_DELETE_PROJECT_CONTENT) != 0;
@@ -125,7 +135,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (deleteContents)
 		{
 			// Delete the project through the repo
-			status = repo.deleteFolder(getRepoRelativePath(project, repo));
+			status = repo.deleteFolder(source);
 		}
 		else
 		{
@@ -210,14 +220,13 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
-	private boolean hasNoCommittedFiles(String source, GitRepository repo)
+	protected boolean hasNoCommittedFiles(String source, GitRepository repo)
 	{
 		int exitCode = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
 				"-r", "HEAD:" + source); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && !result.isEmpty())
 			exitCode = result.keySet().iterator().next();
-
 		return exitCode != 0;
 	}
 
