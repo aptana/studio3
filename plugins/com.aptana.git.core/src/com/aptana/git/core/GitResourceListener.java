@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 
 class GitResourceListener implements IResourceChangeListener
@@ -144,6 +145,8 @@ class GitResourceListener implements IResourceChangeListener
 
 		for (final GitRepository repo : resourcesToUpdate)
 		{
+			if (repo == null)
+				continue;
 			Job job = new Job("Updating Git repo index") //$NON-NLS-1$
 			{
 				@Override
@@ -151,7 +154,9 @@ class GitResourceListener implements IResourceChangeListener
 				{
 					// FIXME This seems to be getting triggered even when we're staging/unstaging files through the
 					// model
-					repo.index().refresh();
+					GitIndex index = repo.index();
+					if (index != null)
+						index.refresh();
 					return Status.OK_STATUS;
 				}
 			};
