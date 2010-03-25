@@ -102,11 +102,6 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	public boolean deleteProject(final IResourceTree tree, final IProject project, final int updateFlags,
 			final IProgressMonitor monitor)
 	{
-		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
-		if (!force && !tree.isSynchronized(project, IResource.DEPTH_INFINITE))
-			return false;
-		// FIXME Should we return true, but call tree.failed if unsynched?
-
 		final GitRepository repo = getAttachedGitRepository(project);
 		if (repo == null)
 			return false;
@@ -116,10 +111,15 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (new Path(repo.workingDirectory()).equals(project.getLocation()))
 			return false;
 
+		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
+		if (!force && !tree.isSynchronized(project, IResource.DEPTH_INFINITE))
+			return false;
+		// FIXME Should we return true, but call tree.failed if unsynched?
+		
 		// We may not actually need to delete the contents....
 		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
 		boolean neverDeleteContent = (updateFlags & IResource.NEVER_DELETE_PROJECT_CONTENT) != 0;
-		boolean deleteContents = (alwaysDeleteContent || (project.isOpen() && !neverDeleteContent));
+		boolean deleteContents = alwaysDeleteContent || (project.isOpen() && !neverDeleteContent);
 
 		IStatus status;
 		if (deleteContents)

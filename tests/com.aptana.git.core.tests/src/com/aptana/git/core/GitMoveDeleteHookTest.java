@@ -4,6 +4,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -11,6 +12,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -25,6 +27,7 @@ public class GitMoveDeleteHookTest extends TestCase
 	private IResourceTree tree;
 	private IFile file;
 	private IFolder folder;
+	private IProject project;
 	private GitRepository repo;
 	private GitMoveDeleteHook hook;
 
@@ -40,6 +43,7 @@ public class GitMoveDeleteHookTest extends TestCase
 		tree = context.mock(IResourceTree.class);
 		file = context.mock(IFile.class);
 		folder = context.mock(IFolder.class);
+		project = context.mock(IProject.class);
 		repo = context.mock(GitRepository.class);
 		hook = new GitMoveDeleteHook()
 		{
@@ -60,6 +64,8 @@ public class GitMoveDeleteHookTest extends TestCase
 			context = null;
 			tree = null;
 			file = null;
+			project = null;
+			folder = null;
 			repo = null;
 		}
 		finally
@@ -178,7 +184,7 @@ public class GitMoveDeleteHookTest extends TestCase
 				return repo;
 			}
 
-			protected void addFilesToLocalHistoryRecursively(IResourceTree tree, IFolder folder)
+			protected void addFilesToLocalHistoryRecursively(IResourceTree tree, IContainer folder)
 			{
 				// Make sure we get called here!
 				addFilesToHistoryCalled[0] = true;
@@ -280,7 +286,73 @@ public class GitMoveDeleteHookTest extends TestCase
 		assertFalse(hook.deleteFolder(tree, folder, IResource.FORCE, new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
-	// TODO Add tests for deleting projects
+
+	public void testDeleteProjectUnforcedSucceeds()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				oneOf(project).getLocation();
+				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				// Repo relative path
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+				oneOf(project).getLocationURI();
+				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project").toURI()));
+
+				// Now actually delete contents
+				oneOf(repo).deleteFolder("project");
+				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
+				// repo says we deleted ok, so we should mark that on the tree
+				oneOf(tree).deletedProject(project);
+			}
+		});
+		assertTrue(hook
+				.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testPuntsOnDeleteProjectWhenItIsNotAttachedToGit()
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return null;
+			}
+		};
+		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,
+				new NullProgressMonitor()));
+	}
+
+	public void testPuntsOnDeleteProjectWhenItIsGitRoot()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				oneOf(project).getLocation();
+				will(returnValue(new Path(File.separator + "some" + File.separator + "root")));
+			}
+		});
+		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,
+				new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
 	// TODO Add tests for moving files
 	// TODO Add tests for moving folders
 	// TODO Add tests for moving projects
