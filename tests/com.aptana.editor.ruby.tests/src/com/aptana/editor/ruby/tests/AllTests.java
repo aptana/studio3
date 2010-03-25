@@ -3,6 +3,7 @@ package com.aptana.editor.ruby.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.ruby.RubyEditorTest;
 import com.aptana.editor.ruby.RubyParserTest;
 import com.aptana.editor.ruby.RubyRegexScannerTest;
 import com.aptana.editor.ruby.RubySourcePartitionScannerTest;
@@ -19,6 +20,7 @@ public class AllTests
 		suite.addTestSuite(RubyTokenScannerTest.class);
 		suite.addTestSuite(RubyRegexScannerTest.class);
 		suite.addTestSuite(RubyParserTest.class);
+		suite.addTestSuite(RubyEditorTest.class);
 		// $JUnit-END$
 		return suite;
 	}
