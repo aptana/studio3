@@ -69,13 +69,13 @@ public class GitFileHistoryTest extends TestCase
 			}
 			assertNotNull(toStage);
 			assertTrue(toStage.size() > 0);
-			index.stageFiles(toStage);
+			assertTrue(index.stageFiles(toStage));
 			index.refresh();
-			index.commit(contents);
+			assertTrue(index.commit(contents));
 		}
 
 		// Normal test
-		GitFileHistory history = new GitFileHistory(resource, IFileHistoryProvider.NONE, null);
+		GitFileHistory history = new GitFileHistory(resource, IFileHistoryProvider.NONE, new NullProgressMonitor());
 		IFileRevision[] revs = history.getFileRevisions();
 		assertNotNull(revs);
 		assertEquals(2, revs.length);

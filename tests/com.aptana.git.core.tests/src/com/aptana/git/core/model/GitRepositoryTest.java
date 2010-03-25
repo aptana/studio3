@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
 @SuppressWarnings("nls")
@@ -81,8 +80,7 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(index.changedFiles().isEmpty());
 
 		// Actually add a file to the location
-		String txtFile = fileToAdd();
-		FileWriter writer = new FileWriter(txtFile);
+		FileWriter writer = new FileWriter(fileToAdd());
 		writer.write("Hello World!");
 		writer.close();
 		// refresh the index
@@ -102,19 +100,19 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(index.stageFiles(changed));
 		assertStaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		// Unstage the file
 		assertFalse(changed.isEmpty());
 		assertTrue(index.unstageFiles(changed));
 		assertUnstaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		// stage again so we can commit...
 		assertFalse(changed.isEmpty());
 		assertTrue(index.stageFiles(changed));
 		assertStaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		index.commit("Initial commit");
 		// No more changed files now...
 		assertTrue(index.changedFiles().isEmpty());
@@ -124,14 +122,14 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddFileStageUnstageAndCommit();
 		// Now delete the file we committed!
-		String addedFile = fileToAdd();
+		File addedFile = new File(fileToAdd());
 		// make sure it's there first
-		assertTrue(new File(addedFile).exists());
+		assertTrue(addedFile.exists());
 		// delete it
-		IStatus status = fRepo.deleteFile(addedFile);
+		IStatus status = fRepo.deleteFile(addedFile.getName());
 		assertTrue(status.isOK());
 		// make sure its deleted from filesystem
-		assertFalse(new File(addedFile).exists());
+		assertFalse(addedFile.exists());
 
 		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
 		GitIndex index = fRepo.index();
@@ -168,8 +166,7 @@ public class GitRepositoryTest extends TestCase
 		GitIndex index = fRepo.index();
 
 		// Actually add a file to the location
-		String txtFile = fileToAdd();
-		FileWriter writer = new FileWriter(txtFile, true);
+		FileWriter writer = new FileWriter(fileToAdd(), true);
 		writer.write("\nHello second line!");
 		writer.close();
 		// refresh the index
@@ -388,7 +385,11 @@ public class GitRepositoryTest extends TestCase
 	protected IPath repoToGenerate()
 	{
 		if (fPath == null)
-			fPath = GitPlugin.getDefault().getStateLocation().append("git_repo" + System.currentTimeMillis());
+		{
+			String tmpDirString = System.getProperty("java.io.tmpdir");
+			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
+			// fPath = GitPlugin.getDefault().getStateLocation().append("git_repo" + System.currentTimeMillis());
+		}
 		return fPath;
 	}
 
@@ -410,6 +411,7 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected GitRepository createRepo(IPath path)
 	{
+		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
 		GitRepository.create(path.toOSString());
 		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);

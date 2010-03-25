@@ -123,6 +123,10 @@ public class CommitFileRevisionTest extends TestCase
 		GitCommit gitCommit = new GitCommit(repo, "HEAD");
 		CommitFileRevision revision = new CommitFileRevision(gitCommit, filename);
 		assertTrue(revision.exists());
+		assertEquals(filename, revision.getName());
+		assertFalse(revision.isPropertyMissing());
+		assertSame(revision, revision.withAllProperties(null));
+		assertEquals(filename, revision.getURI().getPath());
 		IStorage storage = revision.getStorage(new NullProgressMonitor());
 		assertEquals(contents, IOUtil.read(storage.getContents()));
 	}
