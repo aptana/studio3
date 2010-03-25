@@ -1,40 +1,40 @@
 package com.aptana.git.core;
 
-import java.io.ByteArrayInputStream;
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.team.IResourceTree;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitIndex;
+import com.aptana.git.core.model.ChangedFile.Status;
 import com.aptana.git.core.model.GitRepository;
 
 public class GitMoveDeleteHookTest extends TestCase
 {
-
-	private IProject project;
+	private Mockery context;
+	private IResourceTree tree;
+	private IFile file;
 	private GitRepository repo;
 
-	@Override
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-
-		project = ResourcesPlugin.getWorkspace().getRoot().getProject("gmdht");
-		if (!project.exists())
-			project.create(new NullProgressMonitor());
-		if (!project.isOpen())
-			project.open(new NullProgressMonitor());
-
-		// create a git repo
-		GitRepository.create(project.getLocation().toOSString());
-		repo = GitRepository.attachExisting(project, new NullProgressMonitor());
+		context = new Mockery()
+		{
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		tree = context.mock(IResourceTree.class);
+		file = context.mock(IFile.class);
+		repo = context.mock(GitRepository.class);
 	}
 
 	@Override
@@ -42,106 +42,110 @@ public class GitMoveDeleteHookTest extends TestCase
 	{
 		try
 		{
-			if (project != null)
-				project.delete(true, new NullProgressMonitor());
+			context = null;
+			tree = null;
+			file = null;
+			repo = null;
 		}
 		finally
 		{
-			project = null;
-			repo = null;
 			super.tearDown();
 		}
 	}
 
-	public void testDeleteNewUnstagedFile() throws Exception
+	public void testDeleteFileUnforcedWithHistorySucceeds()
 	{
-		IFile file = project.getFile("newfile.txt");
-		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
+		GitMoveDeleteHook hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+		};
 
-		file.delete(IResource.NONE, new NullProgressMonitor());
-		assertFalse(file.exists());
-		// TODO Assert that we didn't delete through repo
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(file, IResource.DEPTH_ZERO);
+				will(returnValue(true));
+
+				oneOf(file).getProject();
+
+				oneOf(repo).getChangedFileForResource(file);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.MODIFIED);
+				will(returnValue(changedFile));
+
+				// keep history
+				oneOf(tree).addToLocalHistory(file);
+
+				oneOf(repo).deleteFile(changedFile.getPath());
+				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
+				// repo says we deleted ok, so we should mark that on the tree
+				oneOf(tree).deletedFile(file);
+			}
+		});
+		assertTrue(hook.deleteFile(tree, file, IResource.KEEP_HISTORY, new NullProgressMonitor()));
+		context.assertIsSatisfied();
 	}
 
-	public void testDeleteStagedFile() throws Exception
+	public void testDeleteFileForcedDoesntCheckSynchronized()
 	{
-		IFile file = project.getFile("newfile2.txt");
-		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
+		GitMoveDeleteHook hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return null;
+			}
+		};
 
-		GitIndex index = repo.index();
-		index.refresh();
-		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
-
-		file.delete(IResource.NONE, new NullProgressMonitor());
-		assertFalse(file.exists());
-		// TODO Assert that we did delete through repo
+		context.checking(new Expectations()
+		{
+			{
+				// We're forcing, so we don't need to check if file is synched
+				never(tree).isSynchronized(file, IResource.DEPTH_ZERO);
+				oneOf(file).getProject();
+			}
+		});
+		assertFalse(hook.deleteFile(tree, file, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
 	}
 
-	public void testDeleteAlreadyCommittedFileWithNoChanges() throws Exception
+	public void testDeleteFileFailsInGitRepo()
 	{
-		IFile file = project.getFile("newfile3.txt");
-		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
+		GitMoveDeleteHook hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+		};
 
-		GitIndex index = repo.index();
-		index.refresh();
-		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(file, IResource.DEPTH_ZERO);
+				will(returnValue(true));
 
-		repo.index().commit("Initial commit");
+				oneOf(file).getProject();
 
-		file.delete(IResource.NONE, new NullProgressMonitor());
-		assertFalse(file.exists());
-		// TODO Assert that we did delete through repo
+				oneOf(repo).getChangedFileForResource(file);
+				ChangedFile changedFile = new ChangedFile("fake_path.txt", Status.MODIFIED);
+				will(returnValue(changedFile));
+
+				oneOf(repo).deleteFile(changedFile.getPath());
+				IStatus status = org.eclipse.core.runtime.Status.CANCEL_STATUS;
+				will(returnValue(status));
+				// repo says we deleted ok, so we should mark that on the tree
+				oneOf(tree).failed(status);
+			}
+		});
+		// shoudl still return true, because we tried, but failed
+		assertTrue(hook.deleteFile(tree, file, IResource.NONE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
 	}
-
-	public void testDeleteUnstagedAlreadyCommittedFile() throws Exception
-	{
-		IFile file = project.getFile("newfile4.txt");
-		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
-
-		GitIndex index = repo.index();
-		index.refresh();
-		List<ChangedFile> changedFiles = index.changedFiles();
-		assertEquals(2, changedFiles.size());
-		repo.index().stageFiles(changedFiles);
-
-		repo.index().commit("Initial commit");
-
-		file.setContents(new ByteArrayInputStream("Modified contents".getBytes()), IResource.FORCE,
-				new NullProgressMonitor());
-		repo.index().refresh();
-
-		file.delete(IResource.NONE, new NullProgressMonitor());
-		assertFalse(file.exists());
-		// TODO Assert that we did delete through repo
-	}
-
-	// public void testDeleteFolder()
-	// {
-	// fail("Not yet implemented.");
-	// }
-	//
-	// public void testDeleteProject()
-	// {
-	// fail("Not yet implemented.");
-	// }
-	//
-	// public void testMoveFile()
-	// {
-	// fail("Not yet implemented.");
-	// }
-	//
-	// public void testMoveFolder()
-	// {
-	// fail("Not yet implemented.");
-	// }
-	//
-	// public void testMoveProject()
-	// {
-	// fail("Not yet implemented.");
-	// }
-
 }

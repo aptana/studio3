@@ -10,8 +10,8 @@ public class GitCoreTests
 	{
 		TestSuite suite = new TestSuite(GitCoreTests.class.getName());
 		//$JUnit-BEGIN$
+		suite.addTestSuite(GitMoveDeleteIntegrationTest.class);
 		suite.addTestSuite(GitMoveDeleteHookTest.class);
-		suite.addTestSuite(BlahTest.class);
 		//$JUnit-END$
 		return suite;
 	}
