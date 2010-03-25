@@ -83,10 +83,13 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 								"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
 								"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readOtherFiles(output);
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readOtherFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
@@ -96,8 +99,11 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readUnstagedFiles(output);
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readUnstagedFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
@@ -107,10 +113,13 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 								"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 								"-z", getParentTree()); //$NON-NLS-1$
-						readStagedFiles(output);
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readStagedFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
