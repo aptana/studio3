@@ -15,6 +15,13 @@ public class ChangedFile
 	{
 		this.path = path;
 	}
+	
+	// Used for unit tests!
+	public ChangedFile(String path, Status status)
+	{
+		this.path = path;
+		this.status = status;
+	}
 
 	String path;
 	Status status;

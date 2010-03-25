@@ -119,29 +119,29 @@ public class GitMoveDeleteHookTest extends TestCase
 		// TODO Assert that we did delete through repo
 	}
 
-	public void testDeleteFolder()
-	{
-		fail("Not yet implemented.");
-	}
-
-	public void testDeleteProject()
-	{
-		fail("Not yet implemented.");
-	}
-
-	public void testMoveFile()
-	{
-		fail("Not yet implemented.");
-	}
-
-	public void testMoveFolder()
-	{
-		fail("Not yet implemented.");
-	}
-
-	public void testMoveProject()
-	{
-		fail("Not yet implemented.");
-	}
+	// public void testDeleteFolder()
+	// {
+	// fail("Not yet implemented.");
+	// }
+	//
+	// public void testDeleteProject()
+	// {
+	// fail("Not yet implemented.");
+	// }
+	//
+	// public void testMoveFile()
+	// {
+	// fail("Not yet implemented.");
+	// }
+	//
+	// public void testMoveFolder()
+	// {
+	// fail("Not yet implemented.");
+	// }
+	//
+	// public void testMoveProject()
+	// {
+	// fail("Not yet implemented.");
+	// }
 
 }
