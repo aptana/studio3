@@ -52,6 +52,11 @@ public class GitMoveDeleteHookTest extends TestCase
 			{
 				return repo;
 			}
+
+			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			{
+				return false;
+			}
 		};
 	}
 
@@ -188,28 +193,39 @@ public class GitMoveDeleteHookTest extends TestCase
 			{
 				// Make sure we get called here!
 				addFilesToHistoryCalled[0] = true;
-			};
+			}
+
+			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			{
+				return false;
+			}
 
 		};
 		context.checking(new Expectations()
 		{
 			{
-				oneOf(folder).getName();
-				will(returnValue("folder"));
-
 				// We're not forcing, so we need to check if file is synched
 				oneOf(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
 				will(returnValue(true));
 
 				oneOf(folder).getProject();
 
+				// check for .git
+				oneOf(folder).getName();
+				will(returnValue("folder"));
+
+				// repo relative path
 				oneOf(repo).workingDirectory();
 				will(returnValue(File.separator + "some" + File.separator + "root"));
-
 				oneOf(folder).getLocationURI();
 				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator + "folder")
 						.toURI()));
 
+				// check for committed files
+
+				// local history
+
+				// delete via repo
 				oneOf(repo).deleteFolder("folder");
 				will(returnValue(org.eclipse.core.runtime.Status.OK_STATUS));
 				// repo says we deleted ok, so we should mark that on the tree
@@ -240,6 +256,51 @@ public class GitMoveDeleteHookTest extends TestCase
 			}
 		});
 		assertFalse(hook.deleteFolder(tree, folder, IResource.FORCE, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testPuntsDeleteFolderWhenUnderGitRepoButUncommitted()
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			{
+				return true;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(folder, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				// get Repo
+				oneOf(folder).getProject();
+
+				// check name for .git
+				oneOf(folder).getName();
+				will(returnValue("folder"));
+
+				// repo relative path
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+				oneOf(folder).getLocationURI();
+				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator + "folder")
+						.toURI()));
+
+				// We don't try these because we punted
+				never(repo).deleteFolder("folder");
+				never(tree).deletedFolder(folder);
+			}
+		});
+		assertFalse(hook.deleteFolder(tree, folder, IResource.NONE, new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
 
@@ -319,6 +380,45 @@ public class GitMoveDeleteHookTest extends TestCase
 		});
 		assertTrue(hook
 				.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testDeleteProjectWhenUnderGitRepoButUncommitted()
+	{
+		hook = new GitMoveDeleteHook()
+		{
+			@Override
+			protected GitRepository getAttachedGitRepository(IProject project)
+			{
+				return repo;
+			}
+
+			protected boolean hasNoCommittedFiles(String source, GitRepository repo)
+			{
+				return true;
+			}
+		};
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				oneOf(project).getLocation();
+				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				// Repo relative path
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+				oneOf(project).getLocationURI();
+				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project").toURI()));
+				never(repo).deleteFolder("project");
+			}
+		});
+		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,
+				new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
 
