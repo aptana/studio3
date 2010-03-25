@@ -2,12 +2,13 @@ package com.aptana.editor.js.outline;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
@@ -59,7 +60,18 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		else if (parentElement instanceof JSOutlineItem)
 		{
 			JSOutlineItem item = (JSOutlineItem) parentElement;
-			return filter(item.getAllReferenceNodes());
+			Object[] children = filter(item.getAllReferenceNodes());
+			// the returned list potentially contains item itself; filters that out
+			List<Object> list = new ArrayList<Object>();
+			for (Object child : children)
+			{
+				if (child.equals(item))
+				{
+					continue;
+				}
+				list.add(child);
+			}
+			return list.toArray(new Object[list.size()]);
 		}
 		return super.getChildren(parentElement);
 	}
@@ -94,7 +106,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
-		List<JSOutlineItem> elements = new ArrayList<JSOutlineItem>();
+		Set<JSOutlineItem> elements = new TreeSet<JSOutlineItem>();
 		if (nodes.length > 0 && nodes[0].getParent() instanceof ParseRootNode)
 		{
 			// treating the root node as type STATEMENTS and process its children directly
@@ -107,16 +119,15 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				processNode(elements, node);
 			}
 		}
-		Collections.sort(elements);
 		return elements.toArray(new JSOutlineItem[elements.size()]);
 	}
 
-	private void addValue(List<JSOutlineItem> elements, Reference reference, IParseNode value)
+	private void addValue(Collection<JSOutlineItem> elements, Reference reference, IParseNode value)
 	{
 		addValue(elements, reference, value, null);
 	}
 
-	private void addValue(List<JSOutlineItem> elements, Reference reference, IParseNode value, IParseNode parent)
+	private void addValue(Collection<JSOutlineItem> elements, Reference reference, IParseNode value, IParseNode parent)
 	{
 		boolean processed = false;
 		switch (value.getType())
@@ -143,7 +154,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		{
 			// keeps track of this item's scope so we can add virtual children later, if needed
 			String path = reference.toString();
-			if (!fItemsByScope.containsKey(path))
+			JSOutlineItem item = fItemsByScope.get(path);
+			if (item == null)
 			{
 				int count = 0;
 				if (value.getType() == JSNodeTypes.OBJECT_LITERAL)
@@ -151,22 +163,19 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 					count = value.getChildrenCount();
 				}
 
-				JSOutlineItem item = new JSOutlineItem(reference.getName(), getOutlineType(value), reference.getNameNode(), value, count);
+				item = new JSOutlineItem(reference.getName(), getOutlineType(value), reference.getNameNode(), value,
+						count);
 				fItemsByScope.put(path, item);
-				elements.add(item);
 			}
+			elements.add(item);
 		}
 	}
 
-	private void addVirtualChild(List<JSOutlineItem> elements, Reference reference, IParseNode node, IParseNode target)
+	private void addVirtualChild(Collection<JSOutlineItem> elements, Reference reference, IParseNode node, IParseNode target)
 	{
 		String key = reference.getScope();
-		JSOutlineItem item;
-		if (fItemsByScope.containsKey(key))
-		{
-			item = fItemsByScope.get(key);
-		}
-		else
+		JSOutlineItem item = fItemsByScope.get(key);
+		if (item == null)
 		{
 			// gets the outline node type
 			Type type = (node.getType() == JSNodeTypes.FUNCTION) ? Type.FUNCTION : Type.PROPERTY;
@@ -174,13 +183,12 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			item = new JSOutlineItem(node.getText(), type, node, node);
 			// caches associated by scope
 			fItemsByScope.put(key, item);
-			// adds item to the result list
-			elements.add(item);
 		}
+		elements.add(item);
 		item.addVirtualChild(target);
 	}
 
-	private void processNode(List<JSOutlineItem> elements, IParseNode node)
+	private void processNode(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		short type = node.getType();
 		switch (type)
@@ -246,7 +254,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private IParseNode processAssignment(List<JSOutlineItem> elements, IParseNode lhs, IParseNode rhs)
+	private IParseNode processAssignment(Collection<JSOutlineItem> elements, IParseNode lhs, IParseNode rhs)
 	{
 		short lhsType = lhs.getType();
 		short rhsType = rhs.getType();
@@ -314,7 +322,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		return rhs;
 	}
 
-	private void processFunction(List<JSOutlineItem> elements, IParseNode node, Reference reference)
+	private void processFunction(Collection<JSOutlineItem> elements, IParseNode node, Reference reference)
 	{
 		IParseNode nameNode;
 		String name;
@@ -344,7 +352,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 
 		String fullpath = reference.toString();
-		if (!fItemsByScope.containsKey(fullpath))
+		JSOutlineItem item = fItemsByScope.get(fullpath);
+		if (item == null)
 		{
 			IParseNode parameters = node.getChild(1);
 			IParseNode body = node.getChild(2);
@@ -353,15 +362,15 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			String parmsString = parameters.toString();
 			if (parmsString.startsWith("(")) //$NON-NLS-1$
 				pattern = "{0}{1}"; //$NON-NLS-1$
-			
-			JSOutlineItem item = new JSOutlineItem(MessageFormat.format(pattern, name, parmsString), Type.FUNCTION,
-					reference.getNameNode(), body, getChildrenCount(body));
+
+			item = new JSOutlineItem(MessageFormat.format(pattern, name, parmsString), Type.FUNCTION, reference
+					.getNameNode(), body, getChildrenCount(body));
 			fItemsByScope.put(fullpath, item);
-			elements.add(item);
 		}
+		elements.add(item);
 	}
 
-	private void processIdentifier(List<JSOutlineItem> elements, IParseNode node)
+	private void processIdentifier(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		IParseNode parent = node.getParent();
 		if (parent.getChildrenCount() > 1)
@@ -390,13 +399,15 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 								keyValuePair = target.getChild(i);
 								IParseNode key = keyValuePair.getChild(0);
 								String keyString = key.toString();
-								Reference keyValueReference = new Reference(parentFullPath, key, keyString, PROPERTY_TYPE);
+								Reference keyValueReference = new Reference(parentFullPath, key, keyString,
+										PROPERTY_TYPE);
 								addVirtualChild(elements, keyValueReference, node, keyValuePair);
 							}
 							break;
 						case JSNodeTypes.ASSIGN:
 							reference = new Reference(parent, rhs, rhs.getText(), PROPERTY_TYPE);
-							while (target.getType() == JSNodeTypes.ASSIGN) {
+							while (target.getType() == JSNodeTypes.ASSIGN)
+							{
 								// finds the right-most element
 								target = target.getChild(1);
 							}
@@ -413,7 +424,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private void processInvoke(List<JSOutlineItem> elements, IParseNode node)
+	private void processInvoke(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		IParseNode lhs = node.getChild(0);
 		String source = lhs.toString();
@@ -486,7 +497,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	 * @param elements
 	 * @param node
 	 */
-	private void processNameValuePair(List<JSOutlineItem> elements, IParseNode node)
+	private void processNameValuePair(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		IParseNode property = node.getChild(0);
 		String name = property.getText();
@@ -511,7 +522,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private void processStatements(List<JSOutlineItem> elements, IParseNode node)
+	private void processStatements(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		// processes named functions first
 		IParseNode child;
@@ -567,7 +578,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private void processVar(List<JSOutlineItem> elements, IParseNode node)
+	private void processVar(Collection<JSOutlineItem> elements, IParseNode node)
 	{
 		// processes all declarations
 		IParseNode declaration;
