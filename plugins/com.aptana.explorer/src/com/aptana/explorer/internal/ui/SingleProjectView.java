@@ -1001,7 +1001,13 @@ public abstract class SingleProjectView extends CommonNavigator
 		getCommonViewer().setInput(newProject);
 		// Update the tree since project changed
 		// updateViewer(oldProject, newProject); // no structural change, just project changed
-		browser.setUrl(getURLForProject());
+		updateMessageArea();
+	}
+
+	private void updateMessageArea()
+	{
+		// TODO If we're offline, point to some static tooltip content, otherwise we do...
+		browser.setUrl(getURLForProject());		
 	}
 
 	private void removeFileWatcher()
