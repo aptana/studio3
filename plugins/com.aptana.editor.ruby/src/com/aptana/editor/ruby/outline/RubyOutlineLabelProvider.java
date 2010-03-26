@@ -28,6 +28,10 @@ public class RubyOutlineLabelProvider extends LabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
+		if (element instanceof RubyOutlineItem)
+		{
+			return getImage(((RubyOutlineItem) element).getReferenceNode());
+		}
 		if (element instanceof IRubyType)
 		{
 			return ((IRubyType) element).isModule() ? MODULE : CLASS;
@@ -68,5 +72,15 @@ public class RubyOutlineLabelProvider extends LabelProvider
 			}
 		}
 		return super.getImage(element);
+	}
+
+	@Override
+	public String getText(Object element)
+	{
+		if (element instanceof RubyOutlineItem)
+		{
+			return getText(((RubyOutlineItem) element).getReferenceNode());
+		}
+		return super.getText(element);
 	}
 }

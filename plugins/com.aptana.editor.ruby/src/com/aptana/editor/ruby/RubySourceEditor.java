@@ -43,8 +43,10 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
+import com.aptana.editor.ruby.outline.RubyOutlineItem;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.RubyParser;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
 @SuppressWarnings("restriction")
@@ -85,16 +87,28 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
+	protected Object getOutlineElementAt(int caret)
+	{
+		IParseNode astNode = getASTNodeAt(caret);
+		if (astNode == null)
+		{
+			return null;
+		}
+		return RubyOutlineContentProvider.getOutlineItem(astNode);
+	}
+
+	@Override
 	protected void setSelectedElement(IRange element)
 	{
-		if (element instanceof IImportContainer)
+		if (element instanceof RubyOutlineItem)
 		{
-			// just sets the highlight range and moves the cursor
-			setHighlightRange(element.getStartingOffset(), element.getLength(), true);
+			IParseNode node = ((RubyOutlineItem) element).getReferenceNode();
+			if (node instanceof IImportContainer) {
+				// just sets the highlight range and moves the cursor
+				setHighlightRange(element.getStartingOffset(), element.getLength(), true);
+				return;
+			}
 		}
-		else
-		{
-			super.setSelectedElement(element);
-		}
+		super.setSelectedElement(element);
 	}
 }
