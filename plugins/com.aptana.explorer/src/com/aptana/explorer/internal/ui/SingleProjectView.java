@@ -1,6 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
-import java.net.URL;
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,8 +38,8 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.OpenWindowListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -72,10 +72,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.internal.browser.BrowserViewer;
+import org.eclipse.ui.internal.browser.WebBrowserEditor;
+import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -167,7 +172,6 @@ public abstract class SingleProjectView extends CommonNavigator
 	 * Message area
 	 */
 	private Browser browser;
-	private boolean openLinkInNewBrowser = false;
 
 	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 128;
@@ -727,44 +731,33 @@ public abstract class SingleProjectView extends CommonNavigator
 		browserParent.setLayoutData(layoutData);
 
 		browser = new Browser(browserParent, SWT.NONE);
-		browser.addLocationListener(new LocationListener()
+		// Open links with target of _new in an internal browser editor
+		browser.addOpenWindowListener(new OpenWindowListener()
 		{
 
 			@Override
-			public void changing(LocationEvent event)
+			public void open(WindowEvent event)
 			{
-				if (!openLinkInNewBrowser)
-					return;
-				// FIXME should only hijack if link has target of "new"
-				String url = event.location;
-				try
+				if (event.required)
 				{
-					IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-					if (support.isInternalWebBrowserAvailable())
+					try
 					{
-						support.createBrowser(
-								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
-								BROWSER_ID, null, // Set the name to null. That way the browser tab will display the
-													// title of page
-													// loaded in the browser.
-								null).openURL(new URL(url));
+						int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+								| IWorkbenchBrowserSupport.STATUS;
+						WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
+						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+						IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+						WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
+						Field f = WebBrowserEditor.class.getDeclaredField("webBrowser");
+						f.setAccessible(true);
+						BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
+						event.browser = viewer.getBrowser();
 					}
-					else
+					catch (Exception e)
 					{
-						support.getExternalBrowser().openURL(new URL(url));
+						ExplorerPlugin.logError(e.getMessage(), e);
 					}
-					event.doit = false;
 				}
-				catch (Exception e)
-				{
-					ExplorerPlugin.logError(e.getMessage(), e);
-				}
-			}
-
-			@Override
-			public void changed(LocationEvent event)
-			{
 			}
 		});
 		return browserParent;
@@ -1053,9 +1046,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private void updateMessageArea()
 	{
 		// TODO If we're offline, point to some static tooltip content, otherwise we do...
-		openLinkInNewBrowser = false;
 		browser.setUrl(getURLForProject());
-		openLinkInNewBrowser = true;
 	}
 
 	private void removeFileWatcher()
