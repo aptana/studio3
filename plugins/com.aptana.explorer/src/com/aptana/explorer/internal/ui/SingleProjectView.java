@@ -806,8 +806,19 @@ public abstract class SingleProjectView extends CommonNavigator
 		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
 		if (provider == null)
 			return 'N';
-		// TODO Check provider id, recognize subversive, subclipse, cvs, egit, etc...
 		String id = provider.getID();
+		if (id == null)
+			return 'O';
+		if (id.equals("org.tigris.subversion.subclipse.core.svnnature")) // subclipse //$NON-NLS-1$
+			return 'S';
+		if (id.equals("org.eclipse.team.svn.core.svnnature")) // subversive //$NON-NLS-1$
+			return 'S';
+		if (id.equals("org.eclipse.egit.core")) // egit //$NON-NLS-1$
+			return 'G';
+		if (id.equals("com.vectrace.MercurialEclipse.team.MercurialTeamProvider")) // hgEclipse //$NON-NLS-1$
+			return 'M';
+		if (id.equals("org.eclipse.team.cvs.core.cvsnature")) // CVS //$NON-NLS-1$
+			return 'C';
 		return 'O';
 	}
 
