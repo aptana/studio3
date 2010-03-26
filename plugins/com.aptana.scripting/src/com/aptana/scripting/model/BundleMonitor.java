@@ -137,11 +137,23 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileCreated(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		if (isUserBundleFile(rootPath, name))
 		{
+			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
-			BundleManager.getInstance().loadScript(file);
+			if (USER_BUNDLE_PATTERN.matcher(name).matches())
+			{
+				// load the entire bundle now that we have a bundle.rb file
+				manager.loadBundle(file.getParentFile());
+			}
+			else
+			{
+				// load the script. isUserBundleFile only returns true if this
+				// is part of an existing bundle; otherwise, it will get loaded
+				// later once its bundle.rb file has been created
+				manager.loadScript(file);
+			}
 		}
 	}
 
@@ -154,11 +166,25 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		if (isUserBundleFile(rootPath, name))
 		{
+			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
-			BundleManager.getInstance().unloadScript(file);
+			if (USER_BUNDLE_PATTERN.matcher(name).matches())
+			{
+				// unload entire bundle now that we don't have bundle.rb file
+				// anymore
+				manager.unloadBundle(file.getParentFile());
+			}
+			else
+			{
+				manager.unloadScript(file);
+			}
+		}
+		else
+		{
+			reloadDependentScripts(new File(rootPath, name));
 		}
 	}
 
@@ -171,7 +197,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileModified(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		if (isUserBundleFile(rootPath, name))
 		{
 			File file = new File(rootPath, name);
 
@@ -193,41 +219,76 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		if (isUserBundleFile(oldName))
-		{
-			File oldFile = new File(rootPath, oldName);
-
-			BundleManager.getInstance().unloadScript(oldFile);
-		}
-
-		if (isUserBundleFile(newName))
-		{
-			File newFile = new File(rootPath, newName);
-
-			BundleManager.getInstance().loadScript(newFile);
-		}
+		this.fileDeleted(wd, rootPath, oldName);
+		this.fileCreated(wd, rootPath, newName);
 	}
 
 	/**
 	 * isProjectBundleFile
 	 * 
-	 * @param fullProjectPath
+	 * @param delta
 	 * @return
 	 */
-	private boolean isProjectBundleFile(String fullProjectPath)
+	private boolean isProjectBundleFile(IResourceDelta delta)
 	{
-		return BUNDLE_PATTERN.matcher(fullProjectPath).matches() || FILE_PATTERN.matcher(fullProjectPath).matches();
+		String fullProjectPath = delta.getFullPath().toString();
+		boolean result = false;
+		
+		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// always return true for bundle.rb files
+			result = true;
+		}
+		else if (FILE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			File script = delta.getResource().getLocation().toFile();
+			
+			result = this.isScriptInExistingBundle(script);
+		}
+		
+		return result;
 	}
 
 	/**
-	 * isUserbundlesFile
+	 * isScriptInExistingBundle
 	 * 
-	 * @param name
+	 * @param script
 	 * @return
 	 */
-	private boolean isUserBundleFile(String name)
+	private boolean isScriptInExistingBundle(File script)
 	{
-		return USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches();
+		BundleManager manager = BundleManager.getInstance();
+		File bundleDirectory = manager.getBundleDirectory(script);
+		
+		return manager.hasBundleAtPath(bundleDirectory);
+	}
+	
+	/**
+	 * isUserbundlesFile
+	 * @param rootPath
+	 * @param name
+	 * 
+	 * @return
+	 */
+	private boolean isUserBundleFile(String rootPath, String name)
+	{
+		boolean result = false;
+		
+		if (USER_BUNDLE_PATTERN.matcher(name).matches())
+		{
+			// always return true for bundle.rb files
+			result = true;
+		}
+		else if (USER_FILE_PATTERN.matcher(name).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			File script = new File(rootPath, name);
+			
+			result = this.isScriptInExistingBundle(script);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -342,10 +403,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public boolean visit(IResourceDelta delta) throws CoreException
 	{
-		String fullProjectPath = delta.getFullPath().toString();
-
-		// project project bundle files, but ignore user bundles since file watcher will take care of those
-		if (isProjectBundleFile(fullProjectPath))
+		// process project bundle files, but ignore user bundles since file watcher will take care of those
+		if (isProjectBundleFile(delta))
 		{
 			this.processFile(delta);
 		}
@@ -356,7 +415,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				IResource resource = delta.getResource();
 				File file = resource.getLocation().toFile();
 				
-				reloadDependentScripts(file);
+				this.reloadDependentScripts(file);
 			}
 		}
 

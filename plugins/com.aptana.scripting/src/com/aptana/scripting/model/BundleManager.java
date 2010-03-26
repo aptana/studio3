@@ -525,7 +525,7 @@ public class BundleManager
 	 * @param script
 	 * @return
 	 */
-	protected File getBundleDirectory(File script)
+	public File getBundleDirectory(File script)
 	{
 		String scriptPath = script.getAbsolutePath();
 		
@@ -1113,6 +1113,27 @@ public class BundleManager
 	}
 
 	/**
+	 * hasBndleAtPath
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	public boolean hasBundleAtPath(File bundleDirectory)
+	{
+		boolean result = false;
+
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				result = this._bundlesByPath.containsKey(bundleDirectory);
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * isValidBundleDirectory
 	 * 
 	 * @param bundleDirectory
@@ -1344,15 +1365,10 @@ public class BundleManager
 	 */
 	public void reloadBundle(BundleElement bundle)
 	{
-		File[] scripts = this.getBundleScripts(bundle.getBundleDirectory());
+		File bundleDirectory = bundle.getBundleDirectory();
 		
-		if (scripts != null)
-		{
-			for (File script : scripts)
-			{
-				this.reloadScript(script);
-			}
-		}
+		this.unloadBundle(bundleDirectory);
+		this.loadBundle(bundleDirectory);
 	}
 	
 	/**
@@ -1495,6 +1511,24 @@ public class BundleManager
 		}
 	}
 
+	/**
+	 * unloadBundle
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void unloadBundle(File bundleDirectory)
+	{
+		File[] scripts = this.getBundleScripts(bundleDirectory);
+		
+		if (scripts != null)
+		{
+			for (File script : scripts)
+			{
+				this.unloadScript(script);
+			}
+		}
+	}
+	
 	/**
 	 * unloadScript
 	 * 
