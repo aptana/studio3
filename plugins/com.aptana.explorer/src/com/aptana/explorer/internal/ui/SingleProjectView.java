@@ -145,6 +145,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	protected String initialText = Messages.SingleProjectView_InitialFileFilterText;
 	private Text searchText;
+	private Composite filterComp;
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
 	protected boolean caseSensitiveSearch;
@@ -168,6 +169,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	 * Message area
 	 */
 	private Browser browser;
+	private boolean openLinkInNewBrowser = false;
+
 	private static final int MINIMUM_BROWSER_HEIGHT = 128;
 	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
 	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
@@ -232,17 +235,18 @@ public abstract class SingleProjectView extends CommonNavigator
 		final Composite master = new Composite(parent, SWT.NONE);
 		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		// Normal contents
+		// Normal contents, wraps the search, filter and navigator areas
 		Composite normal = new Composite(master, SWT.NONE);
-		GridData blahData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		normal.setLayoutData(blahData);
+		normal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		normal.setLayout(gridLayout);
+
 		createSearchComposite(normal);
+		filterComp = createFilterComposite(normal);
 		createNavigator(normal);
-		createFilterComposite(normal);
 
 		// sash/splitter
 		final Sash sash = new Sash(master, SWT.HORIZONTAL);
+
 		// message area
 		Composite browserComposite = createBrowserComposite(master);
 
@@ -585,7 +589,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	/**
 	 * Force us to return the active project as the implicit selection if there' an empty selection. This fixes the
-	 * issue where new file/Flder won't show in right click menu with no selection 9like in a barnd new generic
+	 * issue where new file/Folder won't show in right click menu with no selection (like in a brand new generic
 	 * project).
 	 */
 	@Override
@@ -697,7 +701,6 @@ public abstract class SingleProjectView extends CommonNavigator
 		Composite browserParent = new Composite(myComposite, SWT.NONE);
 		FillLayout layout = new FillLayout();
 		layout.marginWidth = 2;
-		// layout.marginHeight = 2;
 		browserParent.setLayout(layout);
 
 		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -711,6 +714,8 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void changing(LocationEvent event)
 			{
+				if (!openLinkInNewBrowser)
+					return;
 				// FIXME should only hijack if link has target of "new"
 				String url = event.location;
 				try
@@ -835,8 +840,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected void hideFilterLable()
 	{
 		filterLayoutData.exclude = true;
-		filterLabel.setVisible(false);
-		filterLabel.getParent().getParent().layout();
+		filterComp.setVisible(false);
+		filterComp.getParent().layout();
 	}
 
 	protected void showFilterLabel(Image image, String text)
@@ -844,8 +849,8 @@ public abstract class SingleProjectView extends CommonNavigator
 		filterLabel.setImage(image);
 		filterLabel.setText(text);
 		filterLayoutData.exclude = false;
-		filterLabel.setVisible(true);
-		filterLabel.getParent().getParent().layout();
+		filterComp.setVisible(true);
+		filterComp.getParent().layout();
 	}
 
 	protected void removeFilter()
@@ -1007,7 +1012,9 @@ public abstract class SingleProjectView extends CommonNavigator
 	private void updateMessageArea()
 	{
 		// TODO If we're offline, point to some static tooltip content, otherwise we do...
-		browser.setUrl(getURLForProject());		
+		openLinkInNewBrowser = false;
+		browser.setUrl(getURLForProject());
+		openLinkInNewBrowser = true;
 	}
 
 	private void removeFileWatcher()
