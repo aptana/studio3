@@ -106,8 +106,6 @@ import com.aptana.terminal.views.TerminalView;
 public abstract class SingleProjectView extends CommonNavigator
 {
 
-	private static final String BASE_AD_URL = "http://www.aptana.com"; //$NON-NLS-1$
-
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 
 	/**
@@ -171,6 +169,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private Browser browser;
 	private boolean openLinkInNewBrowser = false;
 
+	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 128;
 	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
 	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
@@ -286,7 +285,6 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 		// Force relayout on resize of view so that splitter gets resized.
-		// FIXME Resizing down can still result in a message area being smaller than minimum!
 		parent.addListener(SWT.Resize, new Listener()
 		{
 
@@ -294,6 +292,27 @@ public abstract class SingleProjectView extends CommonNavigator
 			public void handleEvent(Event event)
 			{
 				parent.layout();
+
+				// resize at 3:1 ration first
+				sashData.top = new FormAttachment(75, 0);
+				master.layout();
+
+				// Now Enforce constraints of size on message area
+				Rectangle sashRect = sash.getBounds();
+				Rectangle shellRect = master.getClientArea();
+				int newOffset = sashRect.y;
+				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
+				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
+				if (newOffset > minHeightY)
+				{
+					sashData.top = new FormAttachment(0, minHeightY);
+					master.layout();
+				}
+				else if (newOffset < maxHeightY)
+				{
+					sashData.top = new FormAttachment(0, maxHeightY);
+					master.layout();
+				}
 			}
 		});
 
@@ -754,7 +773,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	@SuppressWarnings("nls")
 	private String getURLForProject()
 	{
-		StringBuilder builder = new StringBuilder(BASE_AD_URL);
+		StringBuilder builder = new StringBuilder(BASE_MESSAGE_URL);
 		builder.append("?v=");
 		builder.append(getVersion());
 		builder.append("&bg=");
