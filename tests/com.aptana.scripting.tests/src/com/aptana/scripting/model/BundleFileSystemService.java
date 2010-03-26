@@ -10,6 +10,7 @@ public class BundleFileSystemService
 	private Object _bundleDirectory;
 	private Object _commandsDirectory;
 	private Object _snippetsDirectory;
+	private Object _libDirectory;
 
 	/**
 	 * BundleFileSystemService
@@ -19,9 +20,31 @@ public class BundleFileSystemService
 		this._fs = fileSystem;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#cleanUp()
+	/**
+	 * bundleDirectoryExists
+	 * 
+	 * @return
+	 */
+	public boolean bundleDirectoryExists()
+	{
+		return this._fs.exists(this._bundleDirectory);
+	}
+
+	/**
+	 * bundleFileExists
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean bundleFileExists() throws Exception
+	{
+		return this._fs.exists(this.getBundleFile());
+	}
+
+	/**
+	 * cleanup
+	 * 
+	 * @throws Exception
 	 */
 	public void cleanUp() throws Exception
 	{
@@ -32,9 +55,31 @@ public class BundleFileSystemService
 		this._fs.deleteProject(this._project);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#createBundleDirectory()
+	/**
+	 * commandExists
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean commandExists() throws Exception
+	{
+		return this._fs.exists(this.getCommandFile());
+	}
+
+	/**
+	 * commandsDirectoryExists
+	 * 
+	 * @return
+	 */
+	public boolean commandsDirectoryExists()
+	{
+		return this._fs.exists(this._commandsDirectory);
+	}
+
+	/**
+	 * createBundleDirectory
+	 * 
+	 * @throws Exception
 	 */
 	public void createBundleDirectory() throws Exception
 	{
@@ -43,83 +88,127 @@ public class BundleFileSystemService
 		this._bundleDirectory = this._fs.createDirectory(this._bundlesDirectory, BundleMonitorTests.BUNDLE_NAME);
 		this._commandsDirectory = this._fs.createDirectory(this._bundleDirectory, "commands");
 		this._snippetsDirectory = this._fs.createDirectory(this._bundleDirectory, "snippets");
+		this._libDirectory = this._fs.createDirectory(this._bundleDirectory, "lib");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#createBundleFile(java.lang.String)
+	/**
+	 * createBundleFile
+	 * 
+	 * @param content
+	 * @throws Exception
 	 */
 	public void createBundleFile(String content) throws Exception
 	{
 		this._fs.createFile(this._bundleDirectory, BundleMonitorTests.BUNDLE_FILE_NAME, content);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#createCommand(java.lang.String)
+	/**
+	 * createCommand
+	 * 
+	 * @param content
+	 * @throws Exception
 	 */
 	public void createCommand(String content) throws Exception
 	{
 		this._fs.createFile(this._commandsDirectory, BundleMonitorTests.COMMAND_NAME + ".rb", content);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#createSnippet(java.lang.String)
+	/**
+	 * createLib
+	 * 
+	 * @param content
+	 * @throws Exception
+	 */
+	public void createLib(String content) throws Exception
+	{
+		this._fs.createFile(this._libDirectory, BundleMonitorTests.LIB_NAME + ".rb", content);
+	}
+
+	/**
+	 * createSnippet
+	 * 
+	 * @param content
+	 * @throws Exception
 	 */
 	public void createSnippet(String content) throws Exception
 	{
 		this._fs.createFile(this._snippetsDirectory, BundleMonitorTests.SNIPPET_NAME + ".rb", content);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteBundleDirectory()
+	/**
+	 * deleteBundleDirectory
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteBundleDirectory() throws Exception
 	{
 		this._fs.deleteDirectory(this._bundleDirectory);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteBundleFile()
+	/**
+	 * deleteBundleFile
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteBundleFile() throws Exception
 	{
 		this._fs.deleteFile(this.getBundleFile());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteCommand()
+	/**
+	 * deleteCommand
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteCommand() throws Exception
 	{
 		this._fs.deleteFile(this.getCommandFile());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteCommandsDirectory()
+	/**
+	 * deleteCommandsDirectory
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteCommandsDirectory() throws Exception
 	{
 		this._fs.deleteDirectory(this._commandsDirectory);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteSnippet()
+	/**
+	 * deleteLib
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteLib() throws Exception
+	{
+		this._fs.deleteDirectory(this.getLibFile());
+	}
+
+	/**
+	 * deleteLibDirectory
+	 * 
+	 * @throws Exception
+	 */
+	public void deleteLibDirectory() throws Exception
+	{
+		this._fs.deleteDirectory(this._libDirectory);
+	}
+
+	/**
+	 * deleteSnippet
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteSnippet() throws Exception
 	{
 		this._fs.deleteFile(this.getSnippetFile());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#deleteSnippetsDirectory()
+	/**
+	 * deleteSnippetsDirectory
+	 * 
+	 * @throws Exception
 	 */
 	public void deleteSnippetsDirectory() throws Exception
 	{
@@ -147,6 +236,17 @@ public class BundleFileSystemService
 	}
 
 	/**
+	 * getLibFile
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Object getLibFile() throws Exception
+	{
+		return this._fs.getFile(this._libDirectory, BundleMonitorTests.LIB_NAME + ".rb");
+	}
+
+	/**
 	 * getSnippetFile
 	 * 
 	 * @return
@@ -156,57 +256,111 @@ public class BundleFileSystemService
 		return this._fs.getFile(this._snippetsDirectory, BundleMonitorTests.SNIPPET_NAME + ".rb");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveBundleDirectory(java.lang.String)
+	/**
+	 * libDirectoryExists
+	 * 
+	 * @return
+	 */
+	public boolean libDirectoryExists()
+	{
+		return this._fs.exists(this._libDirectory);
+	}
+
+	/**
+	 * libExists
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean libExists() throws Exception
+	{
+		return this._fs.exists(this.getLibFile());
+	}
+
+	/**
+	 * moveBundleDirectory
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveBundleDirectory(String newName) throws Exception
 	{
 		this._fs.moveDirectory(this._bundleDirectory, newName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveBundleFile(java.lang.String)
+	/**
+	 * moveBundleFile
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveBundleFile(String newName) throws Exception
 	{
 		this._fs.moveFile(this.getBundleFile(), newName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveCommand(java.lang.String)
+	/**
+	 * moveCommand
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveCommand(String newName) throws Exception
 	{
 		this._fs.moveFile(this.getCommandFile(), newName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveCommandsDirectory(java.lang.String)
+	/**
+	 * moveCommandsDirectory
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveCommandsDirectory(String newName) throws Exception
 	{
 		this._fs.moveDirectory(this._commandsDirectory, newName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveSnippet(java.lang.String)
+	/**
+	 * moveSnippet
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveSnippet(String newName) throws Exception
 	{
 		this._fs.moveFile(this.getSnippetFile(), newName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.IBundleDirectoryManager#moveSnippetsDirectory(java.lang.String)
+	/**
+	 * moveSnippetsDirectory
+	 * 
+	 * @param newName
+	 * @throws Exception
 	 */
 	public void moveSnippetsDirectory(String newName) throws Exception
 	{
 		this._fs.moveDirectory(this._snippetsDirectory, newName);
+	}
+
+	/**
+	 * snippetExists
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean snippetExists() throws Exception
+	{
+		return this._fs.exists(this.getSnippetFile());
+	}
+
+	/**
+	 * snippetsDirectoryExists
+	 * 
+	 * @return
+	 */
+	public boolean snippetsDirectoryExists()
+	{
+		return this._fs.exists(this._snippetsDirectory);
 	}
 }

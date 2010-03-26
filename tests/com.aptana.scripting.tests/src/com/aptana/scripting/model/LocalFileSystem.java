@@ -90,6 +90,15 @@ public class LocalFileSystem implements IBundleFileSystem
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.IBundleFileSystem#exists(java.lang.Object)
+	 */
+	public boolean exists(Object file)
+	{
+		return ((File) file).exists();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.IBundleFileSystem#getFile(java.lang.Object, java.lang.String)
 	 */
 	public Object getFile(Object directory, String name) throws Exception

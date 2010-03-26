@@ -50,6 +50,14 @@ public interface IBundleFileSystem
 	void deleteProject(Object project) throws Exception;
 
 	/**
+	 * exists
+	 * 
+	 * @param file
+	 * @return
+	 */
+	boolean exists(Object file);
+
+	/**
 	 * getFile
 	 * 
 	 * @param bundleDirectory

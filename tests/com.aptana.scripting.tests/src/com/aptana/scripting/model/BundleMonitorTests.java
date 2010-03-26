@@ -8,6 +8,7 @@ public abstract class BundleMonitorTests extends TestCase
 	public static final String BUNDLE_FILE_NAME = "bundle.rb";
 	public static final String COMMAND_NAME = "MyCommand";
 	public static final String SNIPPET_NAME = "MySnippet";
+	public static final String LIB_NAME = "my_lib";
 
 	private BundleFileSystemService _fileSystemService;
 
@@ -61,6 +62,8 @@ public abstract class BundleMonitorTests extends TestCase
 		String content = "";
 
 		this._fileSystemService.createBundleFile(content);
+		
+		assertTrue(this._fileSystemService.bundleFileExists());
 	}
 
 	/**
@@ -73,8 +76,24 @@ public abstract class BundleMonitorTests extends TestCase
 		String content = "";
 
 		this._fileSystemService.createCommand(content);
+		
+		assertTrue(this._fileSystemService.commandExists());
 	}
 
+	/**
+	 * addLib
+	 * 
+	 * @throws Exception
+	 */
+	protected void addLib() throws Exception
+	{
+		String content = "";
+		
+		this._fileSystemService.createLib(content);
+		
+		assertTrue(this._fileSystemService.libExists());
+	}
+	
 	/**
 	 * addSnippet
 	 * 
@@ -85,8 +104,22 @@ public abstract class BundleMonitorTests extends TestCase
 		String content = "";
 
 		this._fileSystemService.createSnippet(content);
+		
+		assertTrue(this._fileSystemService.snippetExists());
 	}
 
+	/**
+	 * removeBundleDirectory
+	 * 
+	 * @throws Exception
+	 */
+	protected void removeBundleDirectory() throws Exception
+	{
+		this._fileSystemService.deleteBundleDirectory();
+		
+		assertFalse(this._fileSystemService.bundleDirectoryExists());
+	}
+	
 	/**
 	 * removeBundleFile
 	 * 
@@ -95,6 +128,8 @@ public abstract class BundleMonitorTests extends TestCase
 	protected void removeBundleFile() throws Exception
 	{
 		this._fileSystemService.deleteBundleFile();
+		
+		assertFalse(this._fileSystemService.bundleFileExists());
 	}
 
 	/**
@@ -105,8 +140,46 @@ public abstract class BundleMonitorTests extends TestCase
 	protected void removeCommand() throws Exception
 	{
 		this._fileSystemService.deleteCommand();
+		
+		assertFalse(this._fileSystemService.commandExists());
 	}
 
+	/**
+	 * removeCommandsDirectory
+	 * 
+	 * @throws Exception
+	 */
+	protected void removeCommandsDirectory() throws Exception
+	{
+		this._fileSystemService.deleteCommandsDirectory();
+		
+		assertFalse(this._fileSystemService.commandsDirectoryExists());
+	}
+	
+	/**
+	 * removeLib
+	 * 
+	 * @throws Exception
+	 */
+	protected void removeLib() throws Exception
+	{
+		this._fileSystemService.deleteLib();
+		
+		assertFalse(this._fileSystemService.libExists());
+	}
+	
+	/**
+	 * removeLibDirectory
+	 * 
+	 * @throws Exception
+	 */
+	protected void removeLibDirectory() throws Exception
+	{
+		this._fileSystemService.deleteLibDirectory();
+		
+		assertFalse(this._fileSystemService.libDirectoryExists());
+	}
+	
 	/**
 	 * removeSnippet
 	 * 
@@ -115,8 +188,22 @@ public abstract class BundleMonitorTests extends TestCase
 	protected void removeSnippet() throws Exception
 	{
 		this._fileSystemService.deleteSnippet();
+		
+		assertFalse(this._fileSystemService.snippetExists());
 	}
 
+	/**
+	 * removeSnippetsDirectory
+	 * 
+	 * @throws Exception
+	 */
+	protected void removeSnippetsDirectory() throws Exception
+	{
+		this._fileSystemService.deleteSnippetsDirectory();
+		
+		assertFalse(this._fileSystemService.snippetsDirectoryExists());
+	}
+	
 	/**
 	 * testAddBundleFile
 	 * 
@@ -271,7 +358,7 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addCommand();
 		this.addSnippet();
 
-		this._fileSystemService.deleteBundleDirectory();
+		this.removeBundleDirectory();
 	}
 
 	/**
@@ -284,7 +371,7 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile();
 		this.addCommand();
 
-		this._fileSystemService.deleteCommandsDirectory();
+		this.removeCommandsDirectory();
 	}
 
 	/**
@@ -297,7 +384,7 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile();
 		this.addSnippet();
 
-		this._fileSystemService.deleteSnippetsDirectory();
+		this.removeSnippetsDirectory();
 	}
 
 	/**

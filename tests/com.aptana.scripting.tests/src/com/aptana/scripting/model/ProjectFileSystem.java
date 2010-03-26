@@ -96,6 +96,15 @@ public class ProjectFileSystem implements IBundleFileSystem
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.IBundleFileSystem#exists(java.lang.Object)
+	 */
+	public boolean exists(Object file)
+	{
+		return ((IContainer) file).exists();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.IBundleFileSystem#getFile(java.lang.Object, java.lang.String)
 	 */
 	public Object getFile(Object directory, String name) throws Exception
@@ -123,7 +132,7 @@ public class ProjectFileSystem implements IBundleFileSystem
 	{
 		IFile current = (IFile) file;
 		IPath newPath = current.getParent().getFullPath().append(newName);
-		
+
 		current.move(newPath, true, new NullProgressMonitor());
 	}
 }
