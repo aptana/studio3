@@ -1,5 +1,7 @@
 package com.aptana.explorer.internal.ui;
 
+import java.net.URL;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +37,9 @@ import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -45,21 +50,32 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -78,6 +94,7 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.terminal.views.TerminalView;
 
 /**
@@ -126,6 +143,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	protected String initialText = Messages.SingleProjectView_InitialFileFilterText;
 	private Text searchText;
+	private Composite filterComp;
 	private CLabel filterLabel;
 	private GridData filterLayoutData;
 	protected boolean caseSensitiveSearch;
@@ -145,13 +163,24 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private TreeThemer treeThemer;
 
+	/**
+	 * Message area
+	 */
+	private Browser browser;
+	private boolean openLinkInNewBrowser = false;
+
+	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
+	private static final int MINIMUM_BROWSER_HEIGHT = 128;
+	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
+	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
+
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 
 	@Override
-	public void createPartControl(Composite parent)
+	public void createPartControl(final Composite parent)
 	{
 		GridLayout gridLayout = (GridLayout) parent.getLayout();
 		gridLayout.marginHeight = 0;
@@ -191,7 +220,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);				
+				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
 				fillCommandsMenu(commandsMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
@@ -201,12 +230,99 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		// Create search
-		createSearchComposite(parent);
+		// Holds normal contents, then splitter, then message area
+		final Composite master = new Composite(parent, SWT.NONE);
+		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createNavigator(parent);
+		// Normal contents, wraps the search, filter and navigator areas
+		Composite normal = new Composite(master, SWT.NONE);
+		normal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		normal.setLayout(gridLayout);
 
-		createFilterComposite(parent);
+		createSearchComposite(normal);
+		filterComp = createFilterComposite(normal);
+		createNavigator(normal);
+
+		// sash/splitter
+		final Sash sash = new Sash(master, SWT.HORIZONTAL);
+
+		// message area
+		Composite browserComposite = createBrowserComposite(master);
+
+		// Set up splitter code
+		master.setLayout(new FormLayout());
+
+		FormData normalData = new FormData();
+		normalData.left = new FormAttachment(0, 0);
+		normalData.right = new FormAttachment(100, 0);
+		normalData.top = new FormAttachment(0, 0);
+		normalData.bottom = new FormAttachment(sash, 0);
+		normal.setLayoutData(normalData);
+
+		final FormData sashData = new FormData();
+		sashData.left = new FormAttachment(0, 0);
+		sashData.right = new FormAttachment(100, 0);
+		sashData.top = new FormAttachment(75, 0);
+		sash.setLayoutData(sashData);
+		sash.addListener(SWT.Selection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
+				// Force message area to be 128 to 256 pixels high, even on drag of splitter
+				Rectangle sashRect = sash.getBounds();
+				Rectangle shellRect = master.getClientArea();
+
+				// e.y can be from (shellRect.height - sashRect.height - 256) to (shellRect.height - sashRect.height -
+				// 128)
+				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
+				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
+				e.y = Math.min(minHeightY, Math.max(maxHeightY, e.y));
+				if (e.y != sashRect.y)
+				{
+					sashData.top = new FormAttachment(0, e.y);
+					master.layout();
+				}
+			}
+		});
+		// Force relayout on resize of view so that splitter gets resized.
+		parent.addListener(SWT.Resize, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				parent.layout();
+
+				// resize at 3:1 ration first
+				sashData.top = new FormAttachment(75, 0);
+				master.layout();
+
+				// Now Enforce constraints of size on message area
+				Rectangle sashRect = sash.getBounds();
+				Rectangle shellRect = master.getClientArea();
+				int newOffset = sashRect.y;
+				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
+				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
+				if (newOffset > minHeightY)
+				{
+					sashData.top = new FormAttachment(0, minHeightY);
+					master.layout();
+				}
+				else if (newOffset < maxHeightY)
+				{
+					sashData.top = new FormAttachment(0, maxHeightY);
+					master.layout();
+				}
+			}
+		});
+
+		// Browser message area
+		FormData browserData = new FormData();
+		browserData.left = new FormAttachment(0, 0);
+		browserData.right = new FormAttachment(100, 0);
+		browserData.top = new FormAttachment(sash, 0);
+		browserData.bottom = new FormAttachment(100, 0);
+		browserComposite.setLayoutData(browserData);
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
@@ -492,7 +608,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	/**
 	 * Force us to return the active project as the implicit selection if there' an empty selection. This fixes the
-	 * issue where new file/Flder won't show in right click menu with no selection 9like in a barnd new generic
+	 * issue where new file/Folder won't show in right click menu with no selection (like in a brand new generic
 	 * project).
 	 */
 	@Override
@@ -599,11 +715,174 @@ public abstract class SingleProjectView extends CommonNavigator
 		return filter;
 	}
 
+	private Composite createBrowserComposite(final Composite myComposite)
+	{
+		Composite browserParent = new Composite(myComposite, SWT.NONE);
+		FillLayout layout = new FillLayout();
+		layout.marginWidth = 2;
+		browserParent.setLayout(layout);
+
+		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		layoutData.minimumHeight = MINIMUM_BROWSER_HEIGHT;
+		browserParent.setLayoutData(layoutData);
+
+		browser = new Browser(browserParent, SWT.NONE);
+		browser.addLocationListener(new LocationListener()
+		{
+
+			@Override
+			public void changing(LocationEvent event)
+			{
+				if (!openLinkInNewBrowser)
+					return;
+				// FIXME should only hijack if link has target of "new"
+				String url = event.location;
+				try
+				{
+					IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+					if (support.isInternalWebBrowserAvailable())
+					{
+						support.createBrowser(
+								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
+								BROWSER_ID, null, // Set the name to null. That way the browser tab will display the
+													// title of page
+													// loaded in the browser.
+								null).openURL(new URL(url));
+					}
+					else
+					{
+						support.getExternalBrowser().openURL(new URL(url));
+					}
+					event.doit = false;
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
+				}
+			}
+
+			@Override
+			public void changed(LocationEvent event)
+			{
+			}
+		});
+		return browserParent;
+	}
+
+	@SuppressWarnings("nls")
+	private String getURLForProject()
+	{
+		StringBuilder builder = new StringBuilder(BASE_MESSAGE_URL);
+		builder.append("?v=");
+		builder.append(getVersion());
+		builder.append("&bg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
+		builder.append("&fg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+		// "chrome"
+		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
+		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		builder.append(toHex(color.getRGB()));
+		// project type
+		builder.append("&p=");
+		builder.append(getProjectType());
+		// version control
+		builder.append("&vc=");
+		builder.append(getVersionControl());
+		// github
+		builder.append("&gh=");
+		builder.append(hasGithubRemote() ? '1' : '0');
+		return builder.toString();
+	}
+
+	private boolean hasGithubRemote()
+	{
+		if (selectedProject == null)
+			return false;
+		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		if (repo == null)
+			return false;
+		Set<String> remoteURLs = repo.remoteURLs();
+		if (remoteURLs != null)
+		{
+			for (String remoteURL : remoteURLs)
+			{
+				if (remoteURL.contains("github.com")) //$NON-NLS-1$
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private char getVersionControl()
+	{
+		// G for git, S for SVN, H for Mercurial, N for none, O for other
+		if (selectedProject == null)
+			return 'N';
+		if (GitRepository.getAttached(selectedProject) != null)
+			return 'G';
+		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
+		if (provider == null)
+			return 'N';
+		String id = provider.getID();
+		if (id == null)
+			return 'O';
+		if (id.equals("org.tigris.subversion.subclipse.core.svnnature")) // subclipse //$NON-NLS-1$
+			return 'S';
+		if (id.equals("org.eclipse.team.svn.core.svnnature")) // subversive //$NON-NLS-1$
+			return 'S';
+		if (id.equals("org.eclipse.egit.core")) // egit //$NON-NLS-1$
+			return 'G';
+		if (id.equals("com.vectrace.MercurialEclipse.team.MercurialTeamProvider")) // hgEclipse //$NON-NLS-1$
+			return 'M';
+		if (id.equals("org.eclipse.team.cvs.core.cvsnature")) // CVS //$NON-NLS-1$
+			return 'C';
+		return 'O';
+	}
+
+	private char getProjectType()
+	{
+		// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+		try
+		{
+			// FIXME This id is a constant in the rails plugins...
+			if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+				return 'R';
+		}
+		catch (CoreException e)
+		{
+			ExplorerPlugin.logError(e);
+		}
+		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
+		return 'O';
+	}
+
+	private String getVersion()
+	{
+		// FIXME Do we want this plugin's version, or some other version?
+		return ExplorerPlugin.getDefault().getBundle().getVersion().toString();
+	}
+
+	private String toHex(RGB rgb)
+	{
+		// FIXME This and pad are copy-pasted from Theme class
+		return MessageFormat.format("{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
+	}
+
 	protected void hideFilterLable()
 	{
 		filterLayoutData.exclude = true;
-		filterLabel.setVisible(false);
-		filterLabel.getParent().getParent().layout();
+		filterComp.setVisible(false);
+		filterComp.getParent().layout();
 	}
 
 	protected void showFilterLabel(Image image, String text)
@@ -611,8 +890,8 @@ public abstract class SingleProjectView extends CommonNavigator
 		filterLabel.setImage(image);
 		filterLabel.setText(text);
 		filterLayoutData.exclude = false;
-		filterLabel.setVisible(true);
-		filterLabel.getParent().getParent().layout();
+		filterComp.setVisible(true);
+		filterComp.getParent().layout();
 	}
 
 	protected void removeFilter()
@@ -768,6 +1047,15 @@ public abstract class SingleProjectView extends CommonNavigator
 		getCommonViewer().setInput(newProject);
 		// Update the tree since project changed
 		// updateViewer(oldProject, newProject); // no structural change, just project changed
+		updateMessageArea();
+	}
+
+	private void updateMessageArea()
+	{
+		// TODO If we're offline, point to some static tooltip content, otherwise we do...
+		openLinkInNewBrowser = false;
+		browser.setUrl(getURLForProject());
+		openLinkInNewBrowser = true;
 	}
 
 	private void removeFileWatcher()
