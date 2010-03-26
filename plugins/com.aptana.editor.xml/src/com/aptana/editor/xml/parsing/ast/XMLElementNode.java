@@ -4,6 +4,7 @@ import java.util.StringTokenizer;
 
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
 
 public class XMLElementNode extends XMLNode
 {
@@ -39,6 +40,15 @@ public class XMLElementNode extends XMLNode
 			}
 		}
 		fNameNode = new NameNode(tag, start, end);
+	}
+
+	@Override
+	public void addOffset(int offset)
+	{
+		IRange range = fNameNode.getNameRange();
+		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
+				+ offset);
+		super.addOffset(offset);
 	}
 
 	public String getName()

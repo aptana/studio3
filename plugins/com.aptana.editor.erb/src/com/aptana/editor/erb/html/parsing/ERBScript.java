@@ -2,7 +2,6 @@ package com.aptana.editor.erb.html.parsing;
 
 import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
-import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseBaseNode;
 
 public class ERBScript extends ParseBaseNode
@@ -19,8 +18,8 @@ public class ERBScript extends ParseBaseNode
 		fStartTag = startTag;
 		fEndTag = endTag;
 
-		this.start = script.getStartingOffset();
-		this.end = script.getEndingOffset();
+		setChildren(fScript.getChildren());
+		setLocation(script.getStartingOffset(), script.getEndingOffset());
 	}
 
 	public String getStartTag()
@@ -36,30 +35,6 @@ public class ERBScript extends ParseBaseNode
 	public IRubyScript getScript()
 	{
 		return fScript;
-	}
-
-	@Override
-	public IParseNode getChild(int index)
-	{
-		return fScript.getChild(index);
-	}
-
-	@Override
-	public IParseNode[] getChildren()
-	{
-		return fScript.getChildren();
-	}
-
-	@Override
-	public int getChildrenCount()
-	{
-		return fScript.getChildrenCount();
-	}
-
-	@Override
-	public int getIndex(IParseNode child)
-	{
-		return fScript.getIndex(child);
 	}
 
 	@Override
