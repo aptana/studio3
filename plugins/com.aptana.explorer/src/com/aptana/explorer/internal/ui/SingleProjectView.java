@@ -843,8 +843,19 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private char getProjectType()
 	{
-		// TODO R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
-		return 'R';
+		// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+		try
+		{
+			// FIXME This id is a constant in the rails plugins...
+			if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+				return 'R';
+		}
+		catch (CoreException e)
+		{
+			ExplorerPlugin.logError(e);
+		}
+		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
+		return 'O';
 	}
 
 	private String getVersion()
