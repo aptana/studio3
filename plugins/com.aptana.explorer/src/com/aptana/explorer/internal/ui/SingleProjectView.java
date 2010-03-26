@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +38,8 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -72,6 +75,7 @@ import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
@@ -166,6 +170,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private Browser browser;
 	private static final int MINIMUM_BROWSER_HEIGHT = 128;
 	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
+	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -173,7 +178,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 
 	@Override
-	public void createPartControl(Composite parent)
+	public void createPartControl(final Composite parent)
 	{
 		GridLayout gridLayout = (GridLayout) parent.getLayout();
 		gridLayout.marginHeight = 0;
@@ -238,11 +243,11 @@ public abstract class SingleProjectView extends CommonNavigator
 
 		// sash/splitter
 		final Sash sash = new Sash(master, SWT.HORIZONTAL);
-
+		// message area
 		Composite browserComposite = createBrowserComposite(master);
 
-		final FormLayout form = new FormLayout();
-		master.setLayout(form);
+		// Set up splitter code
+		master.setLayout(new FormLayout());
 
 		FormData normalData = new FormData();
 		normalData.left = new FormAttachment(0, 0);
@@ -260,6 +265,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		{
 			public void handleEvent(Event e)
 			{
+				// Force message area to be 128 to 256 pixels high, even on drag of splitter
 				Rectangle sashRect = sash.getBounds();
 				Rectangle shellRect = master.getClientArea();
 
@@ -275,6 +281,18 @@ public abstract class SingleProjectView extends CommonNavigator
 				}
 			}
 		});
+		// Force relayout on resize of view so that splitter gets resized.
+		// FIXME Resizing down can still result in a message area being smaller than minimum!
+		parent.addListener(SWT.Resize, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				parent.layout();
+			}
+		});
+
 		// Browser message area
 		FormData browserData = new FormData();
 		browserData.left = new FormAttachment(0, 0);
@@ -687,8 +705,44 @@ public abstract class SingleProjectView extends CommonNavigator
 		browserParent.setLayoutData(layoutData);
 
 		browser = new Browser(browserParent, SWT.NONE);
-		// TODO Do we need to do anything special to make links with a target of new open in a full-sized browser window
-		// within the editor area?
+		browser.addLocationListener(new LocationListener()
+		{
+
+			@Override
+			public void changing(LocationEvent event)
+			{
+				// FIXME should only hijack if link has target of "new"
+				String url = event.location;
+				try
+				{
+					IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+					if (support.isInternalWebBrowserAvailable())
+					{
+						support.createBrowser(
+								IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+										| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS,
+								BROWSER_ID, null, // Set the name to null. That way the browser tab will display the
+													// title of page
+													// loaded in the browser.
+								null).openURL(new URL(url));
+					}
+					else
+					{
+						support.getExternalBrowser().openURL(new URL(url));
+					}
+					event.doit = false;
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
+				}
+			}
+
+			@Override
+			public void changed(LocationEvent event)
+			{
+			}
+		});
 		return browserParent;
 	}
 
