@@ -12,6 +12,10 @@ public class XMLOutlineContentProvider extends CommonOutlineContentProvider
 
 	public static XMLOutlineItem getOutlineItem(IParseNode node)
 	{
+		if (node == null)
+		{
+			return null;
+		}
 		return new XMLOutlineItem(node.getNameNode().getNameRange(), node);
 	}
 
@@ -27,6 +31,17 @@ public class XMLOutlineContentProvider extends CommonOutlineContentProvider
 	}
 
 	@Override
+	public Object getParent(Object element)
+	{
+		if (element instanceof XMLOutlineItem)
+		{
+			IParseNode node = ((XMLOutlineItem) element).getReferenceNode();
+			return getOutlineItem(node.getParent());
+		}
+		return super.getParent(element);
+	}
+
+	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
 		List<XMLOutlineItem> items = new ArrayList<XMLOutlineItem>();
@@ -34,7 +49,7 @@ public class XMLOutlineContentProvider extends CommonOutlineContentProvider
 		{
 			if (node instanceof XMLElementNode)
 			{
-				items.add(new XMLOutlineItem(node.getNameNode().getNameRange(), node));
+				items.add(getOutlineItem(node));
 			}
 		}
 		return items.toArray(new XMLOutlineItem[items.size()]);
