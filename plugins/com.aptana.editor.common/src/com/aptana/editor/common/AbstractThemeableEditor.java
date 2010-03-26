@@ -769,7 +769,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	 */
 	protected Object getOutlineElementAt(int caret)
 	{
-		return getASTNodeAt(caret);
+		IParseNode astNode = getASTNodeAt(caret);
+		if (astNode == null) {
+			return null;
+		}
+		return fOutlinePage.getOutlineItem(astNode);
 	}
 
 	/**

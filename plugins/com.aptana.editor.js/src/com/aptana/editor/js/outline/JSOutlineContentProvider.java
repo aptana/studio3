@@ -12,6 +12,7 @@ import java.util.TreeSet;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.parsing.ast.IParseNode;
@@ -44,8 +45,13 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		fItemsByScope = new HashMap<String, JSOutlineItem>();
 	}
 
-	public static JSOutlineItem getOutlineItem(IParseNode node)
+	@Override
+	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
+		if (node == null)
+		{
+			return null;
+		}
 		return new JSOutlineItem(node.getText(), getOutlineType(node), node, node);
 	}
 
@@ -74,22 +80,6 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 			return list.toArray(new Object[list.size()]);
 		}
 		return super.getChildren(parentElement);
-	}
-
-	@Override
-	public Object getParent(Object element)
-	{
-		if (element instanceof JSOutlineItem)
-		{
-			JSOutlineItem item = (JSOutlineItem) element;
-			IParseNode parentNode = item.getReferenceNode().getParent();
-			if (parentNode != null)
-			{
-				return new JSOutlineItem(parentNode.getText(), getOutlineType(parentNode), parentNode, parentNode);
-			}
-		}
-
-		return super.getParent(element);
 	}
 
 	@Override
@@ -171,7 +161,8 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 	}
 
-	private void addVirtualChild(Collection<JSOutlineItem> elements, Reference reference, IParseNode node, IParseNode target)
+	private void addVirtualChild(Collection<JSOutlineItem> elements, Reference reference, IParseNode node,
+			IParseNode target)
 	{
 		String key = reference.getScope();
 		JSOutlineItem item = fItemsByScope.get(key);

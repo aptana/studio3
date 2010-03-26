@@ -40,10 +40,10 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.ruby.core.IImportContainer;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
-import com.aptana.editor.ruby.outline.RubyOutlineItem;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.parsing.ast.IParseNode;
@@ -87,22 +87,11 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	}
 
 	@Override
-	protected Object getOutlineElementAt(int caret)
-	{
-		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null)
-		{
-			return null;
-		}
-		return RubyOutlineContentProvider.getOutlineItem(astNode);
-	}
-
-	@Override
 	protected void setSelectedElement(IRange element)
 	{
-		if (element instanceof RubyOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			IParseNode node = ((RubyOutlineItem) element).getReferenceNode();
+			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
 			if (node instanceof IImportContainer) {
 				// just sets the highlight range and moves the cursor
 				setHighlightRange(element.getStartingOffset(), element.getLength(), true);

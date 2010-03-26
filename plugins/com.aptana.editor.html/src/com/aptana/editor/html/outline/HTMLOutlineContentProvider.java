@@ -3,6 +3,7 @@ package com.aptana.editor.html.outline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -22,18 +23,13 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
 	}
 
-	public static HTMLOutlineItem getOutlineItem(IParseNode node)
-	{
-		return new HTMLOutlineItem(node.getNameNode().getNameRange(), node);
-	}
-
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
-		if (parentElement instanceof HTMLOutlineItem)
+		if (parentElement instanceof CommonOutlineItem)
 		{
 			// delegates to the parse node it references to
-			return getChildren(((HTMLOutlineItem) parentElement).getReferenceNode());
+			return getChildren(((CommonOutlineItem) parentElement).getReferenceNode());
 		}
 		if (parentElement instanceof HTMLSpecialNode)
 		{
@@ -47,19 +43,16 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	@Override
 	public Object getParent(Object element)
 	{
-		if (element instanceof HTMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			IParseNode node = ((HTMLOutlineItem) element).getReferenceNode();
+			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
 			IParseNode parent = node.getParent();
 			if (parent instanceof ParseRootNode)
 			{
 				// we're at the root of the nested language, which is not displayed; go one level up
 				parent = parent.getParent();
 			}
-			if (parent != null)
-			{
-				return new HTMLOutlineItem(parent, parent);
-			}
+			return getOutlineItem(parent);
 		}
 		return super.getParent(element);
 	}
@@ -67,7 +60,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
-		List<HTMLOutlineItem> items = new ArrayList<HTMLOutlineItem>();
+		List<CommonOutlineItem> items = new ArrayList<CommonOutlineItem>();
 		HTMLElementNode element;
 		for (IParseNode node : nodes)
 		{
@@ -77,15 +70,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				element = (HTMLElementNode) node;
 				if (element.getName().length() > 0)
 				{
-					items.add(new HTMLOutlineItem(element.getNameNode().getNameRange(), element));
+					items.add(getOutlineItem(element));
 				}
 			}
 			else
 			{
 				// includes all non-HTML nodes and let the nested language handle its own filtering
-				items.add(new HTMLOutlineItem(node, node));
+				items.add(getOutlineItem(node));
 			}
 		}
-		return items.toArray(new HTMLOutlineItem[items.size()]);
+		return items.toArray(new CommonOutlineItem[items.size()]);
 	}
 }

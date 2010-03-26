@@ -3,6 +3,7 @@ package com.aptana.editor.xml.outline;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 
@@ -18,7 +19,7 @@ public class XMLOutlineLabelProvider extends LabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
-		if (element instanceof XMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
 			return ELEMENT_ICON;
 		}
@@ -28,9 +29,9 @@ public class XMLOutlineLabelProvider extends LabelProvider
 	@Override
 	public String getText(Object element)
 	{
-		if (element instanceof XMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getText(((XMLOutlineItem) element).getReferenceNode());
+			return getText(((CommonOutlineItem) element).getReferenceNode());
 		}
 		if (element instanceof XMLElementNode)
 		{
