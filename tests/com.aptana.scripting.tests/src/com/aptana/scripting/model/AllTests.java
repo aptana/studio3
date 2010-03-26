@@ -17,6 +17,8 @@ public class AllTests
 		suite.addTestSuite(KeyBindingTests.class);
 		suite.addTestSuite(BundleVisibilityTests.class);
 		suite.addTestSuite(WithDefaultsTests.class);
+		suite.addTestSuite(ProjectBundleMonitorTests.class);
+		suite.addTestSuite(UserBundleMonitorTests.class);
 		// $JUnit-END$
 		return suite;
 	}
