@@ -38,6 +38,7 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -58,6 +59,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -210,11 +212,24 @@ public abstract class SingleProjectView extends CommonNavigator
 				commandsMenu.setVisible(true);
 			}
 		});
-
-		createSearchComposite(parent);
-		createNavigator(parent);
-		createFilterComposite(parent);
-		createBrowserComposite(parent);
+		
+		
+		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
+		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		sashForm.setLayout(new GridLayout());
+		
+		Composite blah = new Composite(sashForm, SWT.NONE);
+		GridData blahData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		blah.setLayoutData(blahData);
+		blah.setLayout(gridLayout);
+		
+		createSearchComposite(blah);
+		createNavigator(blah);
+		createFilterComposite(blah);
+		
+		createBrowserComposite(sashForm);
+		sashForm.setSashWidth(2);
+		sashForm.setWeights(new int[] { 75, 25 });
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
