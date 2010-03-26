@@ -79,6 +79,11 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 	{
 		if (resource == null)
 			return;
+		// Don't refresh stuff we don't want/can't access/can't see (i.e. .git and it's sub-tree)
+		if (!resource.isAccessible() || resource.isTeamPrivateMember() || resource.isPhantom() || resource.isHidden() || resource.isVirtual())
+		{
+			return;
+		}
 		try
 		{
 			synchronized (toRefresh)
