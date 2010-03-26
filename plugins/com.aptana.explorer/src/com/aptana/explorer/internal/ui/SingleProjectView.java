@@ -1,5 +1,6 @@
 package com.aptana.explorer.internal.ui;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
 import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -45,8 +47,10 @@ import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -57,6 +61,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
@@ -78,6 +83,7 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.terminal.views.TerminalView;
 
 /**
@@ -88,6 +94,8 @@ import com.aptana.terminal.views.TerminalView;
 @SuppressWarnings("restriction")
 public abstract class SingleProjectView extends CommonNavigator
 {
+
+	private static final String BASE_AD_URL = "http://www.aptana.com";
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 
@@ -145,6 +153,8 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private TreeThemer treeThemer;
 
+	private Browser browser;
+
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
 
@@ -191,7 +201,7 @@ public abstract class SingleProjectView extends CommonNavigator
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);				
+				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
 				fillCommandsMenu(commandsMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
@@ -201,12 +211,10 @@ public abstract class SingleProjectView extends CommonNavigator
 			}
 		});
 
-		// Create search
 		createSearchComposite(parent);
-
 		createNavigator(parent);
-
 		createFilterComposite(parent);
+		createBrowserComposite(parent);
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
@@ -599,6 +607,111 @@ public abstract class SingleProjectView extends CommonNavigator
 		return filter;
 	}
 
+	private Composite createBrowserComposite(final Composite myComposite)
+	{
+		Composite browserParent = new Composite(myComposite, SWT.NONE);
+		FillLayout layout = new FillLayout();
+		layout.marginWidth = 2;
+		layout.marginHeight = 2;
+		browserParent.setLayout(layout);
+
+		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		layoutData.minimumHeight = 128;
+		// TODO How do enforce a max height of 256?
+		browserParent.setLayoutData(layoutData);
+
+		browser = new Browser(browserParent, SWT.NONE);
+		// TODO Do we need to do anything special to make links with a target of new open in a full-sized browser window
+		// within the editor area?
+		return browserParent;
+	}
+
+	@SuppressWarnings("nls")
+	private String getURLForProject()
+	{
+		StringBuilder builder = new StringBuilder(BASE_AD_URL);
+		builder.append("?v=");
+		builder.append(getVersion());
+		builder.append("&bg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
+		builder.append("&fg=");
+		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+		// "chrome"
+		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
+		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		builder.append(toHex(color.getRGB()));
+		// project type
+		builder.append("&p=");
+		builder.append(getProjectType());
+		// version control
+		builder.append("&vc=");
+		builder.append(getVersionControl());
+		// github
+		builder.append("&gh=");
+		builder.append(hasGithubRemote() ? '1' : '0');
+		return builder.toString();
+	}
+
+	private boolean hasGithubRemote()
+	{
+		if (selectedProject == null)
+			return false;
+		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		if (repo == null)
+			return false;
+		Set<String> remoteURLs = repo.remoteURLs();
+		if (remoteURLs != null)
+		{
+			for (String remoteURL : remoteURLs)
+			{
+				if (remoteURL.contains("github.com")) //$NON-NLS-1$
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private char getVersionControl()
+	{
+		// G for git, S for SVN, H for Mercurial, N for none, O for other
+		if (selectedProject == null)
+			return 'N';
+		if (GitRepository.getAttached(selectedProject) != null)
+			return 'G';
+		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
+		if (provider == null)
+			return 'N';
+		// TODO Check provider id, recognize subversive, subclipse, cvs, egit, etc...
+		String id = provider.getID();
+		return 'O';
+	}
+
+	private char getProjectType()
+	{
+		// TODO R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+		return 'R';
+	}
+
+	private String getVersion()
+	{
+		// FIXME Do we want this plugin's version, or some other version?
+		return ExplorerPlugin.getDefault().getBundle().getVersion().toString();
+	}
+
+	private String toHex(RGB rgb)
+	{
+		// FIXME This and pad are copy-pasted from Theme class
+		return MessageFormat.format("{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
+				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
+	}
+
+	private String pad(String string, int desiredLength, char padChar)
+	{
+		while (string.length() < desiredLength)
+			string = padChar + string;
+		return string;
+	}
+
 	protected void hideFilterLable()
 	{
 		filterLayoutData.exclude = true;
@@ -768,6 +881,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		getCommonViewer().setInput(newProject);
 		// Update the tree since project changed
 		// updateViewer(oldProject, newProject); // no structural change, just project changed
+		browser.setUrl(getURLForProject());
 	}
 
 	private void removeFileWatcher()
