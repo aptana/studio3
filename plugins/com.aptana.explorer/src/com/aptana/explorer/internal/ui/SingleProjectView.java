@@ -38,7 +38,6 @@ import org.eclipse.search.ui.text.TextSearchQueryProvider.TextSearchInput;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -52,11 +51,17 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Sash;
@@ -97,7 +102,7 @@ import com.aptana.terminal.views.TerminalView;
 public abstract class SingleProjectView extends CommonNavigator
 {
 
-	private static final String BASE_AD_URL = "http://www.aptana.com";
+	private static final String BASE_AD_URL = "http://www.aptana.com"; //$NON-NLS-1$
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 
@@ -155,7 +160,12 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private TreeThemer treeThemer;
 
+	/**
+	 * Message area
+	 */
 	private Browser browser;
+	private static final int MINIMUM_BROWSER_HEIGHT = 128;
+	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
 	private static final String REGULAR_EXPRESSION_ICON_PATH = "icons/full/elcl16/regularexpression.png"; //$NON-NLS-1$
@@ -212,24 +222,66 @@ public abstract class SingleProjectView extends CommonNavigator
 				commandsMenu.setVisible(true);
 			}
 		});
-		
-		
-		SashForm sashForm = new SashForm(parent, SWT.VERTICAL);
-		sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		sashForm.setLayout(new GridLayout());
-		
-		Composite blah = new Composite(sashForm, SWT.NONE);
+
+		// Holds normal contents, then splitter, then message area
+		final Composite master = new Composite(parent, SWT.NONE);
+		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		// Normal contents
+		Composite normal = new Composite(master, SWT.NONE);
 		GridData blahData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		blah.setLayoutData(blahData);
-		blah.setLayout(gridLayout);
-		
-		createSearchComposite(blah);
-		createNavigator(blah);
-		createFilterComposite(blah);
-		
-		createBrowserComposite(sashForm);
-		sashForm.setSashWidth(2);
-		sashForm.setWeights(new int[] { 75, 25 });
+		normal.setLayoutData(blahData);
+		normal.setLayout(gridLayout);
+		createSearchComposite(normal);
+		createNavigator(normal);
+		createFilterComposite(normal);
+
+		// sash/splitter
+		final Sash sash = new Sash(master, SWT.HORIZONTAL);
+
+		Composite browserComposite = createBrowserComposite(master);
+
+		final FormLayout form = new FormLayout();
+		master.setLayout(form);
+
+		FormData normalData = new FormData();
+		normalData.left = new FormAttachment(0, 0);
+		normalData.right = new FormAttachment(100, 0);
+		normalData.top = new FormAttachment(0, 0);
+		normalData.bottom = new FormAttachment(sash, 0);
+		normal.setLayoutData(normalData);
+
+		final FormData sashData = new FormData();
+		sashData.left = new FormAttachment(0, 0);
+		sashData.right = new FormAttachment(100, 0);
+		sashData.top = new FormAttachment(75, 0);
+		sash.setLayoutData(sashData);
+		sash.addListener(SWT.Selection, new Listener()
+		{
+			public void handleEvent(Event e)
+			{
+				Rectangle sashRect = sash.getBounds();
+				Rectangle shellRect = master.getClientArea();
+
+				// e.y can be from (shellRect.height - sashRect.height - 256) to (shellRect.height - sashRect.height -
+				// 128)
+				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
+				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
+				e.y = Math.min(minHeightY, Math.max(maxHeightY, e.y));
+				if (e.y != sashRect.y)
+				{
+					sashData.top = new FormAttachment(0, e.y);
+					master.layout();
+				}
+			}
+		});
+		// Browser message area
+		FormData browserData = new FormData();
+		browserData.left = new FormAttachment(0, 0);
+		browserData.right = new FormAttachment(100, 0);
+		browserData.top = new FormAttachment(sash, 0);
+		browserData.bottom = new FormAttachment(100, 0);
+		browserComposite.setLayoutData(browserData);
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
@@ -627,12 +679,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		Composite browserParent = new Composite(myComposite, SWT.NONE);
 		FillLayout layout = new FillLayout();
 		layout.marginWidth = 2;
-		layout.marginHeight = 2;
+		// layout.marginHeight = 2;
 		browserParent.setLayout(layout);
 
 		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		layoutData.minimumHeight = 128;
-		// TODO How do enforce a max height of 256?
+		layoutData.minimumHeight = MINIMUM_BROWSER_HEIGHT;
 		browserParent.setLayoutData(layoutData);
 
 		browser = new Browser(browserParent, SWT.NONE);
