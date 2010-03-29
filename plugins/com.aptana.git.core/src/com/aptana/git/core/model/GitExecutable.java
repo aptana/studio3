@@ -35,6 +35,7 @@ public class GitExecutable
 
 	public static GitExecutable instance()
 	{
+		// FIXME Singletons are bad! hid behind an interface and grab the global instance of this from the plugin?
 		if (fgExecutable == null)
 		{
 			fgExecutable = GitExecutable.find();

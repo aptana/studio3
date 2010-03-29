@@ -382,6 +382,42 @@ public class GitRepositoryTest extends TestCase
 		// status.getMessage());
 	}
 
+	public void testFirePullEvent()
+	{
+		GitRepository repo = createRepo();
+		final List<PullEvent> pullEvents = new ArrayList<PullEvent>();
+		GitRepository.addListener(new AbstractGitRepositoryListener()
+		{
+			@Override
+			public void pulled(PullEvent e)
+			{
+				pullEvents.add(e);
+			}
+		});
+		assertTrue(pullEvents.isEmpty());
+		repo.firePullEvent();
+		assertEquals(1, pullEvents.size());
+		assertSame(repo, pullEvents.get(0).getRepository());
+	}
+
+	public void testFirePushEvent()
+	{
+		GitRepository repo = createRepo();
+		final List<PushEvent> pushEvents = new ArrayList<PushEvent>();
+		GitRepository.addListener(new AbstractGitRepositoryListener()
+		{
+			@Override
+			public void pushed(PushEvent e)
+			{
+				pushEvents.add(e);
+			}
+		});
+		assertTrue(pushEvents.isEmpty());
+		repo.firePullEvent();
+		assertEquals(1, pushEvents.size());
+		assertSame(repo, pushEvents.get(0).getRepository());
+	}
+
 	protected IPath repoToGenerate()
 	{
 		if (fPath == null)

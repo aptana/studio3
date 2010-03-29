@@ -182,6 +182,10 @@ public class GitRepository
 		return null;
 	}
 
+	// TODO Split off the static actions into a GitRepositoryManager class and the instance stuff remains on repository!
+	// This means we'll probably need to split up the listener classes too for events on manager vs events on an
+	// instance!
+
 	private GitRepository(URI fileURL)
 	{
 		this.fileURL = fileURL;
