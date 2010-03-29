@@ -19,7 +19,7 @@ import com.aptana.util.ResourceUtils;
 public class WindowsCygwinConfiguration implements ProcessConfiguration
 {
 	private static final String CYGWIN_ROOT = "/cygwin/";
-	private static final String REDTTY_EXE = "/cygwin/bin/redtty.exe";
+	private static final String REDTTY_EXE = "/redttyw.exe";
 
 	/**
 	 * BuiltinCygwinConfiguration
@@ -50,7 +50,9 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public List<String> getCommandLineArguments()
 	{
-		return new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
+		list.add("\"\\\"C:\\Program Files\\Git\\bin\\sh.exe\\\"  --login -i\"");
+		return list;
 	}
 
 	/*
@@ -88,6 +90,7 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public void setupEnvironment(Map<String, String> env)
 	{
+		if (1 == 1) return;
 		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CYGWIN_ROOT), null); //$NON-NLS-1$
 		String root = ResourceUtils.resourcePathToString(url);
 		
