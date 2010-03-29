@@ -20,8 +20,8 @@ import com.aptana.util.ResourceUtils;
  */
 public class WindowsCygwinConfiguration implements ProcessConfiguration
 {
-	private static final String CYGWIN_ROOT = "/cygwin/";
-	private static final String REDTTY_EXE = "/redttyw.exe";
+//	private static final String CYGWIN_ROOT = "/cygwin/"; //$NON-NLS-1$
+	private static final String REDTTY_EXE = "/redttyw.exe"; //$NON-NLS-1$
 
 	/**
 	 * BuiltinCygwinConfiguration
@@ -38,7 +38,7 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	{
 		// Turn on filtering
 		String marker = UUID.randomUUID().toString();
-		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE);
+		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		wrapper.setStandardOutputFilter(filter);
 		
@@ -51,11 +51,11 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 			
 			if (dir.exists())
 			{
-				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n");
+				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		
-		wrapper.sendText("echo " + marker + "\n");
+		wrapper.sendText("echo " + marker + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/*
@@ -73,7 +73,7 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	public List<String> getCommandLineArguments()
 	{
 		List<String> list = new ArrayList<String>();
-		list.add("\"\\\"C:\\Program Files\\Git\\bin\\sh.exe\\\"  --login -i\"");
+		list.add("\"\\\"C:\\Program Files\\Git\\bin\\sh.exe\\\"  --login -i\""); //$NON-NLS-1$
 		return list;
 	}
 
@@ -92,7 +92,7 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public String getProcessName()
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(REDTTY_EXE), null); //$NON-NLS-1$
+		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(REDTTY_EXE), null);
 		
 		return ResourceUtils.resourcePathToString(url);
 	}
@@ -112,25 +112,24 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public void setupEnvironment(Map<String, String> env)
 	{
-		if (1 == 1) return;
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CYGWIN_ROOT), null); //$NON-NLS-1$
-		String root = ResourceUtils.resourcePathToString(url);
-		
-		if (root != null)
-		{
-			String usrLocalBin = root + "\\usr\\local\\bin";
-			String usrBin = root + "\\usr\\bin";
-			String bin = root + "\\bin";
-			String path = usrLocalBin + File.pathSeparator + usrBin + File.pathSeparator + bin;
-			
-			if (env.containsKey("Path"))
-			{
-				path += File.pathSeparator + env.get("Path");
-			}
-			
-			env.put("Path", path);
-		}
-		
-		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
+//		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(CYGWIN_ROOT), null); //$NON-NLS-1$
+//		String root = ResourceUtils.resourcePathToString(url);
+//		
+//		if (root != null)
+//		{
+//			String usrLocalBin = root + "\\usr\\local\\bin";
+//			String usrBin = root + "\\usr\\bin";
+//			String bin = root + "\\bin";
+//			String path = usrLocalBin + File.pathSeparator + usrBin + File.pathSeparator + bin;
+//			
+//			if (env.containsKey("Path"))
+//			{
+//				path += File.pathSeparator + env.get("Path");
+//			}
+//			
+//			env.put("Path", path);
+//		}
+//		
+//		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }
