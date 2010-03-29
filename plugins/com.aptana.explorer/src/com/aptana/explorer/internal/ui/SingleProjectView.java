@@ -72,6 +72,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.ISizeProvider;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
@@ -106,7 +107,7 @@ import com.aptana.terminal.views.TerminalView;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator
+public abstract class SingleProjectView extends CommonNavigator implements ISizeProvider
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
@@ -1368,4 +1369,20 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
+	public int computePreferredSize(boolean width, int availableParallel, int availablePerpendicular,
+			int preferredResult)
+	{
+		if (width)
+		{
+			return Math.max(MINIMUM_BROWSER_WIDTH, preferredResult);
+		}
+		return preferredResult;
+	}
+
+	public int getSizeFlags(boolean width)
+	{
+		if (width)
+			return SWT.MIN;
+		return SWT.NONE;
+	}
 }
