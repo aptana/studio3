@@ -304,6 +304,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			BundleManager manager = BundleManager.getInstance();
 			File file = resource.getLocation().toFile();
+			String fullProjectPath = delta.getFullPath().toString();
 
 			BundlePrecedence scope = manager.getBundlePrecedence(file);
 
@@ -313,10 +314,25 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				switch (delta.getKind())
 				{
 					case IResourceDelta.ADDED:
-						manager.loadScript(file);
+						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+						{
+							manager.loadBundle(file.getParentFile());
+						}
+						else
+						{
+							manager.loadScript(file);
+						}
 						break;
 
 					case IResourceDelta.REMOVED:
+						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+						{
+							// NOTE: we have to both unload all scripts associated with this bundle
+							// and the bundle file itself. Technically, the bundle file doesn't
+							// exist any more so it won't get unloaded
+							manager.unloadBundle(file.getParentFile());
+						}
+						
 						manager.unloadScript(file);
 						break;
 
