@@ -25,7 +25,7 @@ public class UserBundleMonitorTests extends BundleMonitorTests
 	 * @seecom.aptana.scripting.model.BundleMonitorTests#waitForEvent(com.aptana.scripting.model.BundleMonitorTests.
 	 * FileSystemAction)
 	 */
-	protected void waitForEvent(FileSystemAction action) throws Exception
+	protected void waitForAction(FileSystemAction action) throws Exception
 	{
 		// Thread.sleep(WAIT_TIME);
 		synchronized (BundleMonitor.getInstance())

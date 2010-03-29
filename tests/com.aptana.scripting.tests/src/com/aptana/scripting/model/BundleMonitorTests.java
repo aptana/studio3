@@ -81,9 +81,9 @@ public abstract class BundleMonitorTests extends TestCase
 	protected abstract IBundleFileSystem createFileSystem();
 
 	/**
-	 * waitForEvent
+	 * waitForAction
 	 */
-	protected abstract void waitForEvent(FileSystemAction action) throws Exception;
+	protected abstract void waitForAction(FileSystemAction action) throws Exception;
 
 	/**
 	 * getFileContent
@@ -109,7 +109,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		final String content = this.getFileContent(filename);
 
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -130,7 +130,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		final String content = this.getFileContent(filename);
 
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -151,7 +151,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		final String content = this.getFileContent(filename);
 
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -172,7 +172,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		final String content = this.getFileContent(filename);
 
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -190,7 +190,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeBundleDirectory() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -208,7 +208,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeBundleFile() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -226,7 +226,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeCommand() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -244,7 +244,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeCommandsDirectory() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -262,7 +262,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeLib() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -280,7 +280,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeLibDirectory() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -298,7 +298,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeSnippet() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -316,7 +316,7 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeSnippetsDirectory() throws Exception
 	{
-		this.waitForEvent(new FileSystemAction()
+		this.waitForAction(new FileSystemAction()
 		{
 			public void performAction() throws Exception
 			{
@@ -662,7 +662,13 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 
-		this._fileSystemService.moveCommand(COMMAND_NAME + "2.rb");
+		this.waitForAction(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.moveCommand(COMMAND_NAME + "2.rb");
+			}
+		});
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
@@ -686,7 +692,13 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
 
-		this._fileSystemService.moveSnippet(SNIPPET_NAME + "2.rb");
+		this.waitForAction(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.moveSnippet(SNIPPET_NAME + "2.rb");
+			}
+		});
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
@@ -711,7 +723,13 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(commands);
 		assertEquals(2, commands.length);
 
-		this._fileSystemService.moveBundleFile("someName.rb");
+		this.waitForAction(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.moveBundleFile("someName.rb");
+			}
+		});
 
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
@@ -734,7 +752,13 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(commands);
 		assertEquals(2, commands.length);
 
-		this._fileSystemService.moveBundleDirectory(BUNDLE_NAME + "2");
+		this.waitForAction(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.moveBundleDirectory(BUNDLE_NAME + "2");
+			}
+		});
 
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
