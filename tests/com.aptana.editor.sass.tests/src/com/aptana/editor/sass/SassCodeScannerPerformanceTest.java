@@ -3,19 +3,19 @@ package com.aptana.editor.sass;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import junit.framework.TestCase;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.sass.SassCodeScanner;
-
-public class SassCodeScannerPerformance
+public class SassCodeScannerPerformanceTest extends TestCase
 {
 
-	public static void main(String[] args) throws Exception
+	public static void testTime() throws Exception
 	{
-		InputStream stream = SassCodeScannerPerformance.class.getResourceAsStream("yui.css");
+		InputStream stream = SassCodeScannerPerformanceTest.class.getResourceAsStream("yui.css");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int read = -1;
 		while ((read = stream.read()) != -1)
