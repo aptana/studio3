@@ -54,7 +54,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -67,7 +66,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -174,8 +172,8 @@ public abstract class SingleProjectView extends CommonNavigator
 	private Browser browser;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
-	private static final int MINIMUM_BROWSER_HEIGHT = 128;
-	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
+	private static final int MINIMUM_BROWSER_HEIGHT = 150;
+	private static final int MINIMUM_BROWSER_WIDTH = 310;
 	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
 
 	private static final String CASE_SENSITIVE_ICON_PATH = "icons/full/elcl16/casesensitive.png"; //$NON-NLS-1$
@@ -247,47 +245,25 @@ public abstract class SingleProjectView extends CommonNavigator
 		filterComp = createFilterComposite(normal);
 		createNavigator(normal);
 
-		// sash/splitter
-		final Sash sash = new Sash(master, SWT.HORIZONTAL);
-
-		// message area
 		Composite browserComposite = createBrowserComposite(master);
 
-		// Set up splitter code
 		master.setLayout(new FormLayout());
 
 		FormData normalData = new FormData();
 		normalData.left = new FormAttachment(0, 0);
 		normalData.right = new FormAttachment(100, 0);
 		normalData.top = new FormAttachment(0, 0);
-		normalData.bottom = new FormAttachment(sash, 0);
+		normalData.bottom = new FormAttachment(browserComposite, 0);
 		normal.setLayoutData(normalData);
 
-		final FormData sashData = new FormData();
-		sashData.left = new FormAttachment(0, 0);
-		sashData.right = new FormAttachment(100, 0);
-		sashData.top = new FormAttachment(75, 0);
-		sash.setLayoutData(sashData);
-		sash.addListener(SWT.Selection, new Listener()
-		{
-			public void handleEvent(Event e)
-			{
-				// Force message area to be 128 to 256 pixels high, even on drag of splitter
-				Rectangle sashRect = sash.getBounds();
-				Rectangle shellRect = master.getClientArea();
+		// Browser message area
+		final FormData browserData = new FormData();
+		browserData.left = new FormAttachment(0, 0);
+		browserData.right = new FormAttachment(100, 0);
+		browserData.top = new FormAttachment(100, -MINIMUM_BROWSER_HEIGHT);
+		browserData.bottom = new FormAttachment(100, 0);
+		browserComposite.setLayoutData(browserData);
 
-				// e.y can be from (shellRect.height - sashRect.height - 256) to (shellRect.height - sashRect.height -
-				// 128)
-				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
-				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
-				e.y = Math.min(minHeightY, Math.max(maxHeightY, e.y));
-				if (e.y != sashRect.y)
-				{
-					sashData.top = new FormAttachment(0, e.y);
-					master.layout();
-				}
-			}
-		});
 		// Force relayout on resize of view so that splitter gets resized.
 		parent.addListener(SWT.Resize, new Listener()
 		{
@@ -295,38 +271,11 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void handleEvent(Event event)
 			{
+				browserData.top = new FormAttachment(100, -MINIMUM_BROWSER_HEIGHT);
+				browserData.bottom = new FormAttachment(100, 0);
 				parent.layout();
-
-				// resize at 3:1 ration first
-				sashData.top = new FormAttachment(75, 0);
-				master.layout();
-
-				// Now Enforce constraints of size on message area
-				Rectangle sashRect = sash.getBounds();
-				Rectangle shellRect = master.getClientArea();
-				int newOffset = sashRect.y;
-				int minHeightY = shellRect.height - sashRect.height - MINIMUM_BROWSER_HEIGHT;
-				int maxHeightY = shellRect.height - sashRect.height - MAXIMUM_BROWSER_HEIGHT;
-				if (newOffset > minHeightY)
-				{
-					sashData.top = new FormAttachment(0, minHeightY);
-					master.layout();
-				}
-				else if (newOffset < maxHeightY)
-				{
-					sashData.top = new FormAttachment(0, maxHeightY);
-					master.layout();
-				}
 			}
 		});
-
-		// Browser message area
-		FormData browserData = new FormData();
-		browserData.left = new FormAttachment(0, 0);
-		browserData.right = new FormAttachment(100, 0);
-		browserData.top = new FormAttachment(sash, 0);
-		browserData.bottom = new FormAttachment(100, 0);
-		browserComposite.setLayoutData(browserData);
 
 		// Remove the navigation actions
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.back"); //$NON-NLS-1$
@@ -723,11 +672,12 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		Composite browserParent = new Composite(myComposite, SWT.NONE);
 		FillLayout layout = new FillLayout();
-		layout.marginWidth = 2;
+		layout.marginWidth = 1;
 		browserParent.setLayout(layout);
 
-		GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
 		layoutData.minimumHeight = MINIMUM_BROWSER_HEIGHT;
+		layoutData.minimumWidth = MINIMUM_BROWSER_WIDTH;
 		browserParent.setLayoutData(layoutData);
 
 		browser = new Browser(browserParent, SWT.NONE);
