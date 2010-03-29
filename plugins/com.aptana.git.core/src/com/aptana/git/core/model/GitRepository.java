@@ -1191,15 +1191,18 @@ public class GitRepository
 	private void dispose()
 	{
 		// clean up any listeners/etc!
-		for (Integer fileWatcherId : fileWatcherIds)
+		if (fileWatcherIds != null)
 		{
-			try
+			for (Integer fileWatcherId : fileWatcherIds)
 			{
-				FileWatcher.removeWatch(fileWatcherId);
-			}
-			catch (JNotifyException e)
-			{
-				GitPlugin.logError(e.getMessage(), e);
+				try
+				{
+					FileWatcher.removeWatch(fileWatcherId);
+				}
+				catch (JNotifyException e)
+				{
+					GitPlugin.logError(e.getMessage(), e);
+				}
 			}
 		}
 		fileWatcherIds = null;
