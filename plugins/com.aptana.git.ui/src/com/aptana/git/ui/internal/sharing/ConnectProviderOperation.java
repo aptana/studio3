@@ -17,7 +17,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 /**
  * Connects Eclipse to an existing Git repository
@@ -62,7 +63,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 			for (IProject project : projects)
 			{
 				m.setTaskName(NLS.bind(Messages.ConnectProviderOperation_ConnectingProjectJob_Title, project.getName()));
-				GitRepository.attachExisting(project, new SubProgressMonitor(m, 100));
+				getGitRepositoryManager().attachExisting(project, new SubProgressMonitor(m, 100));
 			}
 		}
 		finally
@@ -70,4 +71,10 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 			m.done();
 		}
 	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 }

@@ -97,7 +97,9 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
 
 /**
@@ -743,7 +745,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		if (selectedProject == null)
 			return false;
-		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		final GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		if (repo == null)
 			return false;
 		Set<String> remoteURLs = repo.remoteURLs();
@@ -763,7 +765,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		// G for git, S for SVN, H for Mercurial, N for none, O for other
 		if (selectedProject == null)
 			return 'N';
-		if (GitRepository.getAttached(selectedProject) != null)
+		if (getGitRepositoryManager().getAttached(selectedProject) != null)
 			return 'G';
 		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
 		if (provider == null)
@@ -782,6 +784,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		if (id.equals("org.eclipse.team.cvs.core.cvsnature")) // CVS //$NON-NLS-1$
 			return 'C';
 		return 'O';
+	}
+	
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private char getProjectType()

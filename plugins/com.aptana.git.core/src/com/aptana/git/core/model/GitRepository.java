@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -29,21 +28,15 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.team.core.RepositoryProvider;
-import org.eclipse.team.core.TeamException;
 
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitRef.TYPE;
 import com.aptana.util.ProcessUtil;
@@ -69,124 +62,9 @@ public class GitRepository
 	GitRevSpecifier currentBranch;
 	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
 	private int remoteDirCreationWatchId = -1;
+	private HashSet<IGitRepositoryListener> listeners;
 
-	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
-
-	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(
-			3);
-
-	public static void addListener(IGitRepositoryListener listener)
-	{
-		synchronized (listeners)
-		{
-			listeners.add(listener);
-		}
-	}
-
-	public static void removeListener(IGitRepositoryListener listener)
-	{
-		synchronized (listeners)
-		{
-			listeners.remove(listener);
-		}
-	}
-
-	/**
-	 * Used to retrieve a git repository for a project. Will return null if Eclipse team provider is not hooked up!
-	 * 
-	 * @param project
-	 * @return
-	 */
-	public static GitRepository getAttached(IProject project)
-	{
-		if (project == null)
-			return null;
-
-		RepositoryProvider provider = RepositoryProvider.getProvider(project, GitRepositoryProvider.ID);
-		if (provider == null)
-			return null;
-
-		return getUnattachedExisting(project.getLocationURI());
-	}
-
-	/**
-	 * Used solely for grabbing an existing repository when attaching Eclipse team stuff to a project!
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static synchronized GitRepository getUnattachedExisting(URI path)
-	{
-		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
-			return null;
-
-		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
-		if (ref == null || ref.get() == null)
-		{
-			URI gitDirURL = gitDirForURL(path);
-			if (gitDirURL == null)
-				return null;
-			// Check to see if any cached repo has the same git dir
-			for (SoftReference<GitRepository> reference : cachedRepos.values())
-			{
-				if (reference == null || reference.get() == null)
-					continue;
-				GitRepository cachedRepo = reference.get();
-				if (cachedRepo.fileURL.getPath().equals(gitDirURL.getPath()))
-				{
-					// Same git dir, so cache under our new path as well
-					cachedRepos.put(path.getPath(), reference);
-					return cachedRepo;
-				}
-			}
-			// no cache for this repo or any repo sharing same git dir
-			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
-			cachedRepos.put(path.getPath(), ref);
-		}
-		// TODO What if the underlying .git dir was wiped while we still had the object cached?
-		return ref.get();
-	}
-
-	public static URI gitDirForURL(URI repositoryURL)
-	{
-		if (GitExecutable.instance() == null)
-			return null;
-
-		String repositoryPath = repositoryURL.getPath();
-		if (repositoryURL.getScheme().equals("file")) //$NON-NLS-1$
-		{
-			repositoryPath = new File(repositoryURL).getAbsolutePath();
-		}
-		if (!new File(repositoryPath).exists())
-			return null;
-
-		if (isBareRepository(repositoryPath))
-			return repositoryURL;
-
-		// Use rev-parse to find the .git dir for the repository being opened
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (result == null || result.isEmpty())
-			return null;
-		Integer exitCode = result.keySet().iterator().next();
-		if (exitCode != 0)
-			return null;
-		String newPath = result.values().iterator().next();
-		if (newPath == null)
-			return null;
-		if (newPath.equals(GIT_DIR))
-			return new File(repositoryPath, GIT_DIR).toURI();
-		if (newPath.length() > 0)
-			return new File(newPath).toURI();
-
-		return null;
-	}
-
-	// TODO Split off the static actions into a GitRepositoryManager class and the instance stuff remains on repository!
-	// This means we'll probably need to split up the listener classes too for events on manager vs events on an
-	// instance!
-
-	private GitRepository(URI fileURL)
+	GitRepository(URI fileURL)
 	{
 		this.fileURL = fileURL;
 		this.branches = new ArrayList<GitRevSpecifier>();
@@ -579,12 +457,6 @@ public class GitRepository
 		return result.values().iterator().next();
 	}
 
-	private static boolean isBareRepository(String path)
-	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
-		return "true".equals(output); //$NON-NLS-1$
-	}
-
 	private boolean reloadRefs()
 	{
 		_headRef = null;
@@ -716,13 +588,6 @@ public class GitRepository
 		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
-	}
-
-	private static void fireRepositoryAddedEvent(GitRepository repo, IProject project)
-	{
-		RepositoryAddedEvent e = new RepositoryAddedEvent(repo, project);
-		for (IGitRepositoryListener listener : listeners)
-			listener.repositoryAdded(e);
 	}
 
 	public boolean hasMerges()
@@ -910,60 +775,6 @@ public class GitRepository
 		}
 		String localSHA = output.substring(0, 40);
 		return !localSHA.equals(remoteSHA);
-	}
-
-	/**
-	 * Generates a brand new git repository in the specified location.
-	 */
-	public static void create(String path)
-	{
-		if (path == null)
-			return;
-		if (path.endsWith(File.separator + GIT_DIR))
-		{
-			path = path.substring(0, path.length() - GIT_DIR.length());
-		}
-
-		File file = new File(path);
-		URI existing = gitDirForURL(file.toURI());
-		if (existing != null)
-			return;
-
-		if (!file.exists())
-		{
-			file.mkdirs();
-		}
-		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Given an existing repo on disk, we wrap it with our model and hook it up to the eclipse team provider.
-	 * 
-	 * @param project
-	 * @param m
-	 * @return
-	 */
-	public static GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
-	{
-		if (m == null)
-			m = new NullProgressMonitor();
-		GitRepository repo = GitRepository.getUnattachedExisting(project.getLocationURI());
-		m.worked(40);
-		if (repo == null)
-			return null;
-
-		try
-		{
-			RepositoryProvider.map(project, GitRepositoryProvider.ID);
-			m.worked(10);
-			fireRepositoryAddedEvent(repo, project);
-			m.worked(50);
-		}
-		catch (TeamException e)
-		{
-			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
-		}
-		return repo;
 	}
 
 	public boolean isDirty()
@@ -1162,37 +973,7 @@ public class GitRepository
 		return allRefs;
 	}
 
-	/**
-	 * Used when the user disconnects the project from the repository. We should notify listeners that the repo has been
-	 * unattached. We should also flush the cached copy.
-	 * 
-	 * @param p
-	 */
-	public static void removeRepository(IProject p)
-	{
-		GitRepository repo = getUnattachedExisting(p.getLocationURI());
-		if (repo == null)
-			return;
-		cachedRepos.remove(p.getLocationURI().getPath());
-
-		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
-		for (IGitRepositoryListener listener : listeners)
-			listener.repositoryRemoved(e);
-
-		// Only dispose if there's no other projects attached to same repo!
-		for (SoftReference<GitRepository> ref : cachedRepos.values())
-		{
-			if (ref == null || ref.get() == null)
-				continue;
-			GitRepository other = ref.get();
-			if (other.equals(repo))
-				return;
-		}
-		repo.dispose();
-		repo = null;
-	}
-
-	private void dispose()
+	void dispose()
 	{
 		// clean up any listeners/etc!
 		if (fileWatcherIds != null)
@@ -1292,21 +1073,6 @@ public class GitRepository
 	}
 
 	/**
-	 * Used to clean up all the repos from memory when plugin stops.
-	 */
-	public static void cleanup()
-	{
-		for (SoftReference<GitRepository> reference : cachedRepos.values())
-		{
-			if (reference == null || reference.get() == null)
-				continue;
-			GitRepository cachedRepo = reference.get();
-			cachedRepo.dispose();
-		}
-		cachedRepos.clear();
-	}
-
-	/**
 	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
 	 * 
 	 * @param resource
@@ -1352,6 +1118,29 @@ public class GitRepository
 				filtered.add(changedFile);
 		}
 		return filtered;
+	}
+
+	URI getFileURL()
+	{
+		return fileURL;
+	}
+
+	public void addListener(IGitRepositoryListener listener)
+	{
+		if (listener == null)
+			return;
+		if (listeners == null)
+		{
+			listeners = new HashSet<IGitRepositoryListener>(3);
+		}
+		listeners.add(listener);
+	}
+
+	public void removeListener(IGitRepositoryListener listener)
+	{
+		if (listener == null || listeners == null)
+			return;
+		listeners.remove(listener);
 	}
 
 }
