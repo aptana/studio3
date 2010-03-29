@@ -11,8 +11,11 @@ import com.aptana.scripting.TestUtils;
 
 public abstract class BundleMonitorTests extends TestCase
 {
-	private static final int WAIT_TIME = 10;
-	
+	public interface FileSystemAction
+	{
+		void performAction() throws Exception;
+	}
+
 	public static final String BUNDLE_NAME = "TestBundle";
 	public static final String BUNDLE_FILE_NAME = "bundle.rb";
 	public static final String COMMAND_NAME = "MyCommand";
@@ -37,18 +40,18 @@ public abstract class BundleMonitorTests extends TestCase
 		// store reference to bundle manager
 		this._manager = BundleManager.getInstance();
 		this._manager.reset();
-		
+
 		// setup application and user bundles paths
 		String applicationBundlesPath = this._manager.getApplicationBundlesPath();
 		String userBundlesPath = new File(new File(System.getProperty("java.io.tmpdir")), "bundles").getAbsolutePath();
 		BundleManager.getInstance(applicationBundlesPath, userBundlesPath);
-		
+
 		// monitoring is turned on by an early startup job, so let's make sure it
 		// has been turned off before turning it on; otherwise, we'll end up
 		// monitoring the default application and user bundles directories
 		// instead of our custom paths
 		BundleMonitor.getInstance().endMonitoring();
-		
+
 		// turn on monitoring
 		BundleMonitor.getInstance().beginMonitoring();
 	}
@@ -78,6 +81,11 @@ public abstract class BundleMonitorTests extends TestCase
 	protected abstract IBundleFileSystem createFileSystem();
 
 	/**
+	 * waitForEvent
+	 */
+	protected abstract void waitForEvent(FileSystemAction action) throws Exception;
+
+	/**
 	 * getFileContent
 	 * 
 	 * @param filename
@@ -99,13 +107,17 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void addBundleFile(String filename) throws Exception
 	{
-		String content = this.getFileContent(filename);
+		final String content = this.getFileContent(filename);
 
-		this._fileSystemService.createBundleFile(content);
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.createBundleFile(content);
 
-		assertTrue(this._fileSystemService.bundleFileExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertTrue(_fileSystemService.bundleFileExists());
+			}
+		});
 	}
 
 	/**
@@ -116,13 +128,17 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void addCommand(String filename) throws Exception
 	{
-		String content = this.getFileContent(filename);
+		final String content = this.getFileContent(filename);
 
-		this._fileSystemService.createCommand(content);
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.createCommand(content);
 
-		assertTrue(this._fileSystemService.commandExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertTrue(_fileSystemService.commandExists());
+			}
+		});
 	}
 
 	/**
@@ -133,13 +149,17 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void addLib(String filename) throws Exception
 	{
-		String content = this.getFileContent(filename);
+		final String content = this.getFileContent(filename);
 
-		this._fileSystemService.createLib(content);
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.createLib(content);
 
-		assertTrue(this._fileSystemService.libExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertTrue(_fileSystemService.libExists());
+			}
+		});
 	}
 
 	/**
@@ -150,13 +170,17 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void addSnippet(String filename) throws Exception
 	{
-		String content = this.getFileContent(filename);
+		final String content = this.getFileContent(filename);
 
-		this._fileSystemService.createSnippet(content);
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.createSnippet(content);
 
-		assertTrue(this._fileSystemService.snippetExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertTrue(_fileSystemService.snippetExists());
+			}
+		});
 	}
 
 	/**
@@ -166,11 +190,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeBundleDirectory() throws Exception
 	{
-		this._fileSystemService.deleteBundleDirectory();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteBundleDirectory();
 
-		assertFalse(this._fileSystemService.bundleDirectoryExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.bundleDirectoryExists());
+			}
+		});
 	}
 
 	/**
@@ -180,11 +208,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeBundleFile() throws Exception
 	{
-		this._fileSystemService.deleteBundleFile();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteBundleFile();
 
-		assertFalse(this._fileSystemService.bundleFileExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.bundleFileExists());
+			}
+		});
 	}
 
 	/**
@@ -194,11 +226,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeCommand() throws Exception
 	{
-		this._fileSystemService.deleteCommand();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteCommand();
 
-		assertFalse(this._fileSystemService.commandExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.commandExists());
+			}
+		});
 	}
 
 	/**
@@ -208,11 +244,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeCommandsDirectory() throws Exception
 	{
-		this._fileSystemService.deleteCommandsDirectory();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteCommandsDirectory();
 
-		assertFalse(this._fileSystemService.commandsDirectoryExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.commandsDirectoryExists());
+			}
+		});
 	}
 
 	/**
@@ -222,11 +262,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeLib() throws Exception
 	{
-		this._fileSystemService.deleteLib();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteLib();
 
-		assertFalse(this._fileSystemService.libExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.libExists());
+			}
+		});
 	}
 
 	/**
@@ -236,11 +280,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeLibDirectory() throws Exception
 	{
-		this._fileSystemService.deleteLibDirectory();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteLibDirectory();
 
-		assertFalse(this._fileSystemService.libDirectoryExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.libDirectoryExists());
+			}
+		});
 	}
 
 	/**
@@ -250,11 +298,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeSnippet() throws Exception
 	{
-		this._fileSystemService.deleteSnippet();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteSnippet();
 
-		assertFalse(this._fileSystemService.snippetExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.snippetExists());
+			}
+		});
 	}
 
 	/**
@@ -264,11 +316,15 @@ public abstract class BundleMonitorTests extends TestCase
 	 */
 	protected void removeSnippetsDirectory() throws Exception
 	{
-		this._fileSystemService.deleteSnippetsDirectory();
+		this.waitForEvent(new FileSystemAction()
+		{
+			public void performAction() throws Exception
+			{
+				_fileSystemService.deleteSnippetsDirectory();
 
-		assertFalse(this._fileSystemService.snippetsDirectoryExists());
-		
-		Thread.sleep(WAIT_TIME);
+				assertFalse(_fileSystemService.snippetsDirectoryExists());
+			}
+		});
 	}
 
 	/**
@@ -279,7 +335,7 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testAddBundleFile() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 	}
@@ -293,11 +349,11 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		// create bundle
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		// make sure it created a bundle entry
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		
+
 		// now add a command
 		this.addCommand("simple-command.rb");
 
@@ -316,17 +372,17 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		// add a command to an invalid bundle directory
 		this.addCommand("simple-command.rb");
-		
+
 		// there should be no entry
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
-		
+
 		// now add the bundle file to make it valid
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		
+
 		// we should see the command now too
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
@@ -341,13 +397,13 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testAddSnippetAfterBundleFile() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		// make sure it created a bundle entry
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		
+
 		this.addSnippet("simple-snippet.rb");
-		
+
 		// and make sure that shows up
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
@@ -362,16 +418,16 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testAddSnippetBeforeBundleFile() throws Exception
 	{
 		this.addSnippet("simple-snippet.rb");
-		
+
 		// make sure it created a bundle entry
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
-		
+
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		
+
 		// we should see the snippet now too
 		CommandElement[] commands = entry.getCommands();
 		assertNotNull(commands);
@@ -387,7 +443,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
-		
+
 		// make sure it created a bundle entry an a command
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
@@ -396,7 +452,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeCommand();
-		
+
 		// we should no commands now
 		commands = entry.getCommands();
 		assertNotNull(commands);
@@ -411,12 +467,12 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testRemoveCommandNoBundleFile() throws Exception
 	{
 		this.addCommand("simple-command.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
-		
+
 		this.removeCommand();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -430,7 +486,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		// make sure it created a bundle entry an a command
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
@@ -439,7 +495,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeSnippet();
-		
+
 		// we should no commands now
 		commands = entry.getCommands();
 		assertNotNull(commands);
@@ -454,12 +510,12 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testRemoveSnippetNoBundleFile() throws Exception
 	{
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
-		
+
 		this.removeSnippet();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -472,12 +528,12 @@ public abstract class BundleMonitorTests extends TestCase
 	public void testRemoveBundleFileWithoutMembers() throws Exception
 	{
 		this.addBundleFile("simple-bundle.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		
+
 		this.removeBundleFile();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -492,12 +548,12 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 
 		this.removeBundleFile();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -512,14 +568,14 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 
 		this.removeCommand();
 		this.removeSnippet();
 		this.removeBundleFile();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -534,12 +590,12 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 
 		this.removeBundleDirectory();
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -553,7 +609,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -561,7 +617,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeCommandsDirectory();
-		
+
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(0, commands.length);
@@ -576,7 +632,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -584,7 +640,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeSnippetsDirectory();
-		
+
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(0, commands.length);
@@ -599,7 +655,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -607,7 +663,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this._fileSystemService.moveCommand(COMMAND_NAME + "2.rb");
-		
+
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -623,7 +679,7 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		this.addBundleFile("simple-bundle.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -631,7 +687,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this._fileSystemService.moveSnippet(SNIPPET_NAME + "2.rb");
-		
+
 		commands = entry.getCommands();
 		assertNotNull(commands);
 		assertEquals(1, commands.length);
@@ -648,7 +704,7 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -656,7 +712,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(2, commands.length);
 
 		this._fileSystemService.moveBundleFile("someName.rb");
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
@@ -671,7 +727,7 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addBundleFile("simple-bundle.rb");
 		this.addCommand("simple-command.rb");
 		this.addSnippet("simple-snippet.rb");
-		
+
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
 		CommandElement[] commands = entry.getCommands();
@@ -679,7 +735,7 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(2, commands.length);
 
 		this._fileSystemService.moveBundleDirectory(BUNDLE_NAME + "2");
-		
+
 		entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNull(entry);
 	}
