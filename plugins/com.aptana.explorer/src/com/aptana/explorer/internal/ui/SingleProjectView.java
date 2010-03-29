@@ -172,7 +172,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 * Message area
 	 */
 	private Browser browser;
-
+	private IPreferenceChangeListener fThemeChangeListener;
 	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 128;
 	private static final int MAXIMUM_BROWSER_HEIGHT = 256;
@@ -748,7 +748,7 @@ public abstract class SingleProjectView extends CommonNavigator
 						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 						IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
 						WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-						Field f = WebBrowserEditor.class.getDeclaredField("webBrowser");
+						Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
 						f.setAccessible(true);
 						BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
 						event.browser = viewer.getBrowser();
@@ -930,6 +930,18 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		treeThemer = new TreeThemer(getCommonViewer());
 		treeThemer.apply();
+		// list for theme changes, update message area
+		fThemeChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (!event.getKey().equals(IThemeManager.THEME_CHANGED))
+					return;
+				updateMessageArea();
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 	}
 
 	protected IThemeManager getThemeManager()
@@ -1095,7 +1107,18 @@ public abstract class SingleProjectView extends CommonNavigator
 		treeThemer = null;
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
+		removeThemeListener();
 		super.dispose();
+	}
+
+	private void removeThemeListener()
+	{
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fThemeChangeListener);
+		}
+		fThemeChangeListener = null;
 	}
 
 	private void removeProjectResourceListener()
