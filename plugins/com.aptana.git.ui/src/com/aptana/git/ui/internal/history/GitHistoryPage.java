@@ -38,10 +38,12 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.util.IOUtil;
 import com.aptana.util.StringUtil;
@@ -89,7 +91,7 @@ public class GitHistoryPage extends HistoryPage
 			{
 				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 				// Generate the commit list and set the components up with it!
-				GitRepository repo = GitRepository.getAttached(theResource.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(theResource.getProject());
 				if (repo == null)
 					return Status.OK_STATUS;
 				GitRevList revList = new GitRevList(repo);
@@ -117,6 +119,11 @@ public class GitHistoryPage extends HistoryPage
 		job.setPriority(Job.SHORT);
 		schedule(job);
 		return true;
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private IWorkbenchPartSite getWorkbenchSite()

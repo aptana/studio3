@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 class GitResourceListener implements IResourceChangeListener
 {
@@ -41,7 +42,7 @@ class GitResourceListener implements IResourceChangeListener
 		if (event.getType() == IResourceChangeEvent.PRE_DELETE)
 		{
 			IProject project = (IProject) event.getResource();
-			GitRepository.removeRepository(project);
+			getGitRepositoryManager().removeRepository(project);
 			return;
 		}
 		final Set<GitRepository> resourcesToUpdate = new HashSet<GitRepository>();
@@ -126,7 +127,7 @@ class GitResourceListener implements IResourceChangeListener
 						try
 						{
 							if (project.isAccessible())
-								GitRepository.attachExisting(project, sub.newChild(10));
+								getGitRepositoryManager().attachExisting(project, sub.newChild(10));
 						}
 						catch (CoreException e)
 						{
@@ -167,6 +168,11 @@ class GitResourceListener implements IResourceChangeListener
 		}
 	}
 
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 	protected GitRepository getRepo(IResource resource)
 	{
 		if (resource == null)
@@ -174,6 +180,6 @@ class GitResourceListener implements IResourceChangeListener
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 }

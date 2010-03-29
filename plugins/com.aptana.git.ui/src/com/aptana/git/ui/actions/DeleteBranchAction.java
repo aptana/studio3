@@ -44,7 +44,7 @@ public class DeleteBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 
@@ -73,7 +73,7 @@ public class DeleteBranchAction extends MenuAction
 		if (resource == null)
 			return;
 
-		final GitRepository repo = GitRepository.getAttached(resource.getProject());
+		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return;
 

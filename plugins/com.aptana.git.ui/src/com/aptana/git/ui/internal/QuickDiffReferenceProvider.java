@@ -38,6 +38,7 @@ import org.eclipse.ui.texteditor.quickdiff.IQuickDiffReferenceProvider;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, IElementStateListener
 {
@@ -214,7 +215,7 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 			{
 				// Git specific part here....
 				IFile file = input.getFile();
-				GitRepository repo = GitRepository.getAttached(file.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(file.getProject());
 				if (repo == null)
 					return;
 				String name = repo.getChangedFileForResource(file).getPath();
@@ -278,6 +279,11 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider, 
 				}
 			}
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private ISchedulingRule getSchedulingRule(IStorage storage)

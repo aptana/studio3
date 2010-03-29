@@ -28,7 +28,7 @@ public class CompareWithHEADAction extends GitAction
 		IResource blah = resources[0];
 		if (blah.getType() != IResource.FILE)
 			return;
-		GitRepository repo = GitRepository.getAttached(blah.getProject());
+		GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
 		if (repo == null)
 			return;
 		String name = repo.getChangedFileForResource(blah).getPath();
@@ -49,7 +49,7 @@ public class CompareWithHEADAction extends GitAction
 		IResource blah = resources[0];
 		if (blah.getType() != IResource.FILE)
 			return false;
-		GitRepository repo = GitRepository.getAttached(blah.getProject());
+		GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
 		if (repo == null)
 			return false;
 		ChangedFile file = repo.getChangedFileForResource(blah);
