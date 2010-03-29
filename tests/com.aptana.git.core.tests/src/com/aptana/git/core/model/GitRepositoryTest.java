@@ -413,7 +413,7 @@ public class GitRepositoryTest extends TestCase
 			}
 		});
 		assertTrue(pushEvents.isEmpty());
-		repo.firePullEvent();
+		repo.firePushEvent();
 		assertEquals(1, pushEvents.size());
 		assertSame(repo, pushEvents.get(0).getRepository());
 	}
