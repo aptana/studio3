@@ -1,5 +1,7 @@
 package com.aptana.editor.erb.html;
 
+import com.aptana.editor.erb.html.outline.RHTMLOutlineTest;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -12,6 +14,7 @@ public class AllTests
 		// $JUnit-BEGIN$
 		suite.addTestSuite(RHTMLContentDescriberTest.class);
 		suite.addTestSuite(RHTMLEditorTest.class);
+		suite.addTestSuite(RHTMLOutlineTest.class);
 		// $JUnit-END$
 		return suite;
 	}
