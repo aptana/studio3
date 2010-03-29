@@ -6,6 +6,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -100,7 +101,7 @@ public class ProjectFileSystem implements IBundleFileSystem
 	 */
 	public boolean exists(Object file)
 	{
-		return ((IContainer) file).exists();
+		return ((IResource) file).exists();
 	}
 
 	/*
