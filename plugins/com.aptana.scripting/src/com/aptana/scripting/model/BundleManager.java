@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
+import com.aptana.scripting.model.filters.AndFilter;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 import com.aptana.util.ResourceUtils;
 
 public class BundleManager
@@ -40,7 +44,6 @@ public class BundleManager
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
-	private static final String LIB_DIRECTORY_NAME = "lib"; //$NON-NLS-1$
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
@@ -55,10 +58,9 @@ public class BundleManager
 
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
+	
 	private List<BundleChangeListener> _bundleListeners;
-
 	private List<ElementChangeListener> _elementListeners;
-
 	private List<LoadCycleListener> _loadCycleListeners;
 
 	/**
@@ -518,6 +520,19 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleDirectory
+	 * 
+	 * @param script
+	 * @return
+	 */
+	protected File getBundleDirectory(File script)
+	{
+		String scriptPath = script.getAbsolutePath();
+		
+		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+	}
+	
+	/**
 	 * getBundles
 	 * 
 	 * @param bundlesDirectory
@@ -619,11 +634,58 @@ public class BundleManager
 	 */
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
+		List<String> result = null;
+		
+		if (bundleDirectory != null)
+		{
+			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
+			String bundleName = BundleUtils.getBundleName(bundleFile);
+			
+			if (bundleName != null)
+			{
+				String defaultName = BundleUtils.getDefaultBundleName(bundleFile.getAbsolutePath());
+				
+				if (bundleName.equals(defaultName) == false)
+				{
+					result = this.getBundleLoadPaths(bundleName);
+				}
+			}
+			
+			if (result == null)
+			{
+				result = new LinkedList<String>();
+				
+				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
+			}
+			
+			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getBundleLoadPaths
+	 * 
+	 * @param bundleDirectory
+	 * @return
+	 */
+	protected List<String> getBundleLoadPaths(String name)
+	{
 		List<String> result = new ArrayList<String>();
-		List<String> paths = ScriptingEngine.getInstance().getContributedLoadPaths();
 
-		result.addAll(paths);
-		result.add(bundleDirectory.getAbsolutePath() + File.separator + LIB_DIRECTORY_NAME);
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+				
+				result.addAll(entry.getLoadPaths());
+			}
+		}
+		
+		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 
 		return result;
 	}
@@ -1164,7 +1226,7 @@ public class BundleManager
 	{
 		// clear out any existing bundles since we're rebuilding from scratch
 		this.reset();
-
+		
 		this.loadApplicationBundles();
 		this.loadUserBundles();
 		this.loadProjectBundles();
@@ -1208,17 +1270,7 @@ public class BundleManager
 		if (script != null)
 		{
 			// determine bundle root directory
-			String scriptPath = script.getAbsolutePath();
-			File bundleDirectory = null;
-
-			if (scriptPath.endsWith(BUNDLE_FILE))
-			{
-				bundleDirectory = script.getParentFile();
-			}
-			else
-			{
-				bundleDirectory = script.getParentFile().getParentFile();
-			}
+			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
@@ -1286,6 +1338,24 @@ public class BundleManager
 	}
 
 	/**
+	 * reloadBundle
+	 * 
+	 * @param bundle
+	 */
+	public void reloadBundle(BundleElement bundle)
+	{
+		File[] scripts = this.getBundleScripts(bundle.getBundleDirectory());
+		
+		if (scripts != null)
+		{
+			for (File script : scripts)
+			{
+				this.reloadScript(script);
+			}
+		}
+	}
+	
+	/**
 	 * reloadScript
 	 * 
 	 * @param script
@@ -1295,8 +1365,17 @@ public class BundleManager
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			this.loadScript(script, false);
+			
+			// determine bundle root directory
+			File bundleDirectory = this.getBundleDirectory(script);
 
+			// get bundle load paths
+			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
+			
+			// execute script
+			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
+
+			// fire reload event
 			this.fireScriptReloadedEvent(script);
 		}
 		else
@@ -1486,5 +1565,4 @@ public class BundleManager
 			ScriptLogger.logError(message);
 		}
 	}
-
 }

@@ -1,9 +1,7 @@
 package com.aptana.git.ui.internal;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -13,17 +11,15 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
@@ -31,13 +27,15 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
@@ -46,33 +44,8 @@ import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
-		IGitRepositoryListener
+		IGitRepositoryListener, IGitRepositoriesListener
 {
-	/**
-	 * Default colors to use for staged/unstaged files when the theme doesn't define overrides.
-	 */
-	private static final RGB DEFAULT_RED_BG = new RGB(255, 238, 238);
-	private static final RGB DEFAULT_RED_FG = new RGB(154, 11, 11);
-	private static final RGB DEFAULT_GREEN_BG = new RGB(221, 255, 221);
-	private static final RGB DEFAULT_GREEN_FG = new RGB(60, 168, 60);
-
-	/**
-	 * Default set to use when bg is very dark!
-	 */
-	private static final RGB DEFAULT_DARK_RED_BG = new RGB(74, 11, 11);
-	private static final RGB DEFAULT_LIGHT_RED_FG = new RGB(255, 224, 224);
-	private static final RGB DEFAULT_DARK_GREEN_BG = new RGB(0, 51, 0);
-	private static final RGB DEFAULT_LIGHT_GREEN_FG = new RGB(212, 255, 212);
-
-	/**
-	 * The token used from the theme for staged file decorations.
-	 */
-	private static final String STAGED_TOKEN = "markup.inserted"; //$NON-NLS-1$
-
-	/**
-	 * The token used from the theme for unstaged file decorations.
-	 */
-	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
 
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
 	private static final String DECORATOR_ID = "com.aptana.git.ui.internal.GitLightweightDecorator"; //$NON-NLS-1$
@@ -121,7 +94,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public GitLightweightDecorator()
 	{
-		GitRepository.addListener(this);
+		getGitRepositoryManager().addListener(this);
+		getGitRepositoryManager().addListenerToEachRepository(this);
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
@@ -135,6 +109,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			}
 		};
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public void decorate(Object element, IDecoration decoration)
@@ -180,20 +159,9 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		if (repo == null)
 			return;
 
-		List<ChangedFile> changedFiles = repo.index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
+		if (repo.resourceOrChildHasChanges(resource))
 		{
-			return;
-		}
-		String workingDirectory = repo.workingDirectory();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = workingDirectory + File.separator + changedFile.getPath();
-			if (fullPath.startsWith(resource.getLocationURI().getPath()))
-			{
-				decoration.addPrefix(DIRTY_PREFIX);
-				return;
-			}
+			decoration.addPrefix(DIRTY_PREFIX);
 		}
 	}
 
@@ -214,8 +182,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Unstaged trumps staged when decorating. One file may have both staged and unstaged changes.
 		if (changed.hasUnstagedChanges())
 		{
-			decoration.setForegroundColor(redFG());
-			decoration.setBackgroundColor(redBG());
+			decoration.setForegroundColor(GitColors.redFG());
+			decoration.setBackgroundColor(GitColors.redBG());
 			if (changed.getStatus() == ChangedFile.Status.NEW)
 			{
 				overlay = untrackedImage;
@@ -227,8 +195,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		}
 		else if (changed.hasStagedChanges())
 		{
-			decoration.setForegroundColor(greenFG());
-			decoration.setBackgroundColor(greenBG());
+			decoration.setForegroundColor(GitColors.greenFG());
+			decoration.setBackgroundColor(GitColors.greenBG());
 			if (changed.getStatus() == ChangedFile.Status.DELETED)
 			{
 				overlay = stagedRemovedImage;
@@ -270,86 +238,15 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		decoration.addSuffix(builder.toString());
 	}
 
-	private Color greenFG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(STAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_GREEN_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_FG);
-	}
-
-	private Color greenBG()
-	{
-		if (getActiveTheme().hasEntry(STAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(STAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_GREEN_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
-	}
-
-	private Color redFG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getForeground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasDarkBG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_LIGHT_RED_FG);
-		}
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_FG);
-	}
-
-	private Color redBG()
-	{
-		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
-		{
-			return getActiveTheme().getBackground(UNSTAGED_TOKEN);
-		}
-		if (currentThemeHasLightFG())
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_DARK_RED_BG);
-		}
-		// TODO Test if current theme's bg is too close to color we return here?
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(DEFAULT_RED_BG);
-	}
-
-	private boolean currentThemeHasDarkBG()
-	{
-		return getActiveTheme().hasDarkBG();
-	}
-
-	private boolean currentThemeHasLightFG()
-	{
-		return getActiveTheme().hasLightFG();
-	}
-
-	protected Theme getActiveTheme()
-	{
-		return getThemeManager().getCurrentTheme();
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
-	}
+	
 
 	@Override
 	public void dispose()
 	{
 		try
 		{
-			GitRepository.removeListener(this);
+			getGitRepositoryManager().removeListener(this);
+			getGitRepositoryManager().removeListenerFromEachRepository(this);
 			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
 		}
@@ -382,7 +279,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 
 	/**
@@ -412,7 +309,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository repo = GitRepository.getAttached(project);
+			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null && repo.equals(e.getRepository()))
 				resources.add(project);
 		}
@@ -453,6 +350,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
+		e.getRepository().addListener(this);
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
@@ -460,6 +358,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
+		e.getRepository().removeListener(this);
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
@@ -487,9 +386,10 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject project : projects)
 		{
-			if (repo.equals(GitRepository.getAttached(project)))
+			if (repo.equals(getGitRepositoryManager().getAttached(project)))
 				resources.add(project);
 		}
+		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with staged/unstaged changes, dirty carry over).
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 

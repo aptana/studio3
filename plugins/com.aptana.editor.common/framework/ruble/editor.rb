@@ -1,5 +1,5 @@
 require "java"
-require "uri"
+require "addressable/uri"
 require "ruble/ui"
 
 module Ruble
@@ -11,7 +11,8 @@ module Ruble
       # there's a registered handler for the scheme. Local files should always open.
       def open(absolute_path)
         uri = absolute_path
-        uri = URI.parse(uri) if !uri.respond_to? :scheme
+        # We use Addressable::URI instead of standard URI class to be able to parse windows paths correctly
+        uri = Addressable::URI.convert_path(uri) if !uri.respond_to? :scheme
         absolute_path = uri.path
         uri_string = uri.scheme ? uri.to_s : "file:#{absolute_path}"
         editor = nil
@@ -274,9 +275,17 @@ module Ruble
         
         result["TM_CURRENT_SCOPE"] = current_scope
         result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
-      end
-      
+        end
+                
+      # Allow each bundle to modify env vars based on scope, in order.
+      scopes = current_scope.split(' ')
+      scopes.each { |scope| result = modify_env(scope, result) } 
       result
+    end
+    
+    # Default impl returns back unmodified
+    def modify_env(scope, env)
+      env
     end
     
   end

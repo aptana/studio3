@@ -24,8 +24,8 @@ import com.aptana.scripting.Activator;
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
-	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?/(?:commands|snippets)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 
@@ -68,12 +68,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			// begin monitoring resource changes
 			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-			
+
 			// Make sure the user bundles directory exists
-			String userBundlePath = BundleManager.getInstance().getUserBundlesPath();
-			File bundleDirectory = new File(userBundlePath);
+			String userBundlesPath = BundleManager.getInstance().getUserBundlesPath();
+			File bundleDirectory = new File(userBundlesPath);
 			boolean directoryExists = true;
-			
+
 			if (bundleDirectory.exists() == false)
 			{
 				directoryExists = bundleDirectory.mkdirs();
@@ -82,12 +82,12 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			{
 				directoryExists = bundleDirectory.isDirectory();
 			}
-			
+
 			if (directoryExists)
 			{
 				try
 				{
-					this._watchId = FileWatcher.addWatch(BundleManager.getInstance().getUserBundlesPath(), IJNotify.FILE_ANY, true, this);
+					this._watchId = FileWatcher.addWatch(userBundlesPath, IJNotify.FILE_ANY, true, this);
 				}
 				catch (JNotifyException e)
 				{
@@ -97,10 +97,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 			else
 			{
 				String message = MessageFormat.format(
-					"Unable to register file watcher for {0}. The path is not a directory or does not exist",
-					userBundlePath
-				);
-				
+						"Unable to register file watcher for {0}. The path is not a directory or does not exist",
+						userBundlesPath);
+
 				Activator.logError(message, null);
 			}
 
@@ -118,13 +117,13 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		if (this._registered)
 		{
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(INSTANCE);
-			
+
 			if (this._watchId != -1)
 			{
 				FileWatcher.removeWatch(this._watchId);
 				this._watchId = -1;
 			}
-			
+
 			this._registered = false;
 		}
 	}
@@ -138,10 +137,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileCreated(int wd, String rootPath, String name)
 	{
-		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		if (isUserBundleFile(name))
 		{
-			File file = new File(rootPath + File.separator + name);
-			
+			File file = new File(rootPath, name);
+
 			BundleManager.getInstance().loadScript(file);
 		}
 	}
@@ -155,10 +154,10 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
-		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		if (isUserBundleFile(name))
 		{
-			File file = new File(rootPath + File.separator + name);
-			
+			File file = new File(rootPath, name);
+
 			BundleManager.getInstance().unloadScript(file);
 		}
 	}
@@ -172,11 +171,15 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileModified(int wd, String rootPath, String name)
 	{
-		if (USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches())
+		if (isUserBundleFile(name))
 		{
-			File file = new File(rootPath + File.separator + name);
-			
+			File file = new File(rootPath, name);
+
 			BundleManager.getInstance().reloadScript(file);
+		}
+		else
+		{
+			reloadDependentScripts(new File(rootPath, name));
 		}
 	}
 
@@ -190,19 +193,41 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		if (USER_BUNDLE_PATTERN.matcher(oldName).matches() || USER_FILE_PATTERN.matcher(oldName).matches())
+		if (isUserBundleFile(oldName))
 		{
-			File oldFile = new File(rootPath + File.separator + oldName);
-			
+			File oldFile = new File(rootPath, oldName);
+
 			BundleManager.getInstance().unloadScript(oldFile);
 		}
-		
-		if (USER_BUNDLE_PATTERN.matcher(newName).matches() || USER_FILE_PATTERN.matcher(newName).matches())
+
+		if (isUserBundleFile(newName))
 		{
-			File newFile = new File(rootPath + File.separator + newName);
-			
+			File newFile = new File(rootPath, newName);
+
 			BundleManager.getInstance().loadScript(newFile);
 		}
+	}
+
+	/**
+	 * isProjectBundleFile
+	 * 
+	 * @param fullProjectPath
+	 * @return
+	 */
+	private boolean isProjectBundleFile(String fullProjectPath)
+	{
+		return BUNDLE_PATTERN.matcher(fullProjectPath).matches() || FILE_PATTERN.matcher(fullProjectPath).matches();
+	}
+
+	/**
+	 * isUserbundlesFile
+	 * 
+	 * @param name
+	 * @return
+	 */
+	private boolean isUserBundleFile(String name)
+	{
+		return USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches();
 	}
 
 	/**
@@ -218,9 +243,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			BundleManager manager = BundleManager.getInstance();
 			File file = resource.getLocation().toFile();
-			
+
 			BundlePrecedence scope = manager.getBundlePrecedence(file);
-			
+
 			// don't process user bundles that are projects since file watcher will handle those
 			if (scope != BundlePrecedence.USER)
 			{
@@ -229,17 +254,18 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 					case IResourceDelta.ADDED:
 						manager.loadScript(file);
 						break;
-	
+
 					case IResourceDelta.REMOVED:
 						manager.unloadScript(file);
 						break;
-	
+
 					case IResourceDelta.CHANGED:
 						if ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0)
 						{
 							IPath movedFromPath = delta.getMovedFromPath();
-							IResource movedFrom = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(movedFromPath);
-	
+							IResource movedFrom = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
+									movedFromPath);
+
 							if (movedFrom != null && movedFrom instanceof IFile)
 							{
 								manager.unloadScript(movedFrom.getLocation().toFile());
@@ -249,8 +275,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						else if ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0)
 						{
 							IPath movedToPath = delta.getMovedToPath();
-							IResource movedTo = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(movedToPath);
-	
+							IResource movedTo = ResourcesPlugin.getWorkspace().getRoot()
+									.getFileForLocation(movedToPath);
+
 							if (movedTo != null && movedTo instanceof IFile)
 							{
 								manager.unloadScript(file);
@@ -267,6 +294,26 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						}
 						break;
 				}
+			}
+		}
+	}
+
+	/**
+	 * realoadDependentScripts
+	 * 
+	 * @param file
+	 */
+	private void reloadDependentScripts(File file)
+	{
+		BundleManager manager = BundleManager.getInstance();
+		String fullPath = file.getAbsolutePath();
+		LibraryCrossReference xref = LibraryCrossReference.getInstance();
+		
+		if (xref.hasLibrary(fullPath))
+		{
+			for (String script : xref.getPathsFromLibrary(fullPath))
+			{
+				manager.reloadScript(new File(script));
 			}
 		}
 	}
@@ -297,9 +344,20 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	{
 		String fullProjectPath = delta.getFullPath().toString();
 
-		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches() || FILE_PATTERN.matcher(fullProjectPath).matches())
+		// project project bundle files, but ignore user bundles since file watcher will take care of those
+		if (isProjectBundleFile(fullProjectPath))
 		{
 			this.processFile(delta);
+		}
+		else
+		{
+			if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0)
+			{
+				IResource resource = delta.getResource();
+				File file = resource.getLocation().toFile();
+				
+				reloadDependentScripts(file);
+			}
 		}
 
 		return true;

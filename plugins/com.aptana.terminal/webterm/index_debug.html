@@ -4,10 +4,9 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link href="Term.css.template" rel="stylesheet" type="text/css" id="ss" />
         <title>Aptana Web Terminal</title>
+        <script src="main.js"></script>
 		<script src="webterm_debug.js"></script>
         <script>
-            var terminal;
-			var terminalID = "terminal";
 			var xtermHandler;
 			var debugHandler;
 			var keyHandler;
@@ -35,7 +34,7 @@
 				};
 				
 				// create terminal
-                terminal = new Term(terminalID, 80,20, config);
+                terminal = new Term(terminalElementID, 80,20, config);
 
 				// save reference to key handler (used during debugging)
 				keyHandler = terminal.getKeyHandler();
@@ -46,24 +45,6 @@
 				// start processing
 				terminal.toggleRunState();
             }
-			
-			function getQuery()
-			{
-				var query = window.location.search.substring(1);
-				var keypairs = query.split("&");
-				var result = {};
-				
-				for (var i = 0; i < keypairs.length; i++)
-				{
-					var parts = keypairs[i].split("=");
-					var key = parts[0];
-					var value = parts[1];
-					
-					result[key] = value;
-				}
-				
-				return result;
-			}
             
 			/**
 			 * showActionSequence
@@ -206,7 +187,7 @@
     </head>
     <body onload="init();">
 		<div id="terminal"></div>
-		<div style="clear: both; padding: 15px; color: white">
+		<div style="position: relative; float: right; width: 200px; margin: 0 0 0 0; color: white; border: solid 1px green">
 	    	<button id="toggle" onclick="toggleRunState()">Stop</button>
 	    	<button onclick="showActionSequence()">Actions</button>
 	    	<button onclick="showProcessedActions()">Seen</button>

@@ -35,6 +35,7 @@ public class GitExecutable
 
 	public static GitExecutable instance()
 	{
+		// FIXME Singletons are bad! hid behind an interface and grab the global instance of this from the plugin?
 		if (fgExecutable == null)
 		{
 			fgExecutable = GitExecutable.find();
@@ -79,12 +80,20 @@ public class GitExecutable
 			// Grab PATH and search it!
 			String path = System.getenv("PATH"); //$NON-NLS-1$
 			String[] paths = path.split(File.pathSeparator);
-			for (String pathString : paths)
+			// If the user is using msysgit we prefer using git.cmd wrapper
+			// instead of the git.exe because it sets the HOME variable
+			// correctly which in turn allows the ssh to find the
+			// ${HOME}/.ssh folder.
+			for (String extension : new String[] {".cmd", ".exe"}) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				String possiblePath = pathString + File.separator + "git.exe"; //$NON-NLS-1$
-				if (acceptBinary(possiblePath))
+				String gitFilename = "git" + extension; //$NON-NLS-1$;
+				for (String pathString : paths)
 				{
-					return new GitExecutable(possiblePath);
+					String possiblePath = pathString + File.separator + gitFilename;
+					if (acceptBinary(possiblePath))
+					{
+						return new GitExecutable(possiblePath);
+					}
 				}
 			}
 		}
@@ -119,8 +128,8 @@ public class GitExecutable
 			fgLocations = new ArrayList<String>();
 			if (Platform.getOS().equals(Platform.OS_WIN32))
 			{
-				fgLocations.add("C:\\Program Files (x86)\\Git\\bin\\git.exe"); //$NON-NLS-1$
-				fgLocations.add("C:\\Program Files\\Git\\bin\\git.exe"); //$NON-NLS-1$
+				fgLocations.add("C:\\Program Files (x86)\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
+				fgLocations.add("C:\\Program Files\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
 			}
 			else
 			{

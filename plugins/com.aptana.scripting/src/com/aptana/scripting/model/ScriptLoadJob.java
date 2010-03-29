@@ -101,6 +101,9 @@ public class ScriptLoadJob extends AbstractScriptRunner
 			ScriptLogger.logError(message);
 		}
 		
+		// register any bundle libraries that were loaded by this script 
+		this.registerLibraries(runtime, this._filename);
+		
 		// unapply load paths
 		this.unapplyLoadPaths(runtime);
 		

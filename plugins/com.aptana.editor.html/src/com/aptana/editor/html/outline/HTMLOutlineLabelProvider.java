@@ -2,6 +2,7 @@ package com.aptana.editor.html.outline;
 
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -25,9 +26,9 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 	@Override
 	protected Image getDefaultImage(Object element)
 	{
-		if (element instanceof HTMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getDefaultImage(((HTMLOutlineItem) element).getReferenceNode());
+			return getDefaultImage(((CommonOutlineItem) element).getReferenceNode());
 		}
 		if (element instanceof HTMLNode)
 		{
@@ -39,9 +40,9 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 	@Override
 	protected String getDefaultText(Object element)
 	{
-		if (element instanceof HTMLOutlineItem)
+		if (element instanceof CommonOutlineItem)
 		{
-			return getDefaultText(((HTMLOutlineItem) element).getReferenceNode());
+			return getDefaultText(((CommonOutlineItem) element).getReferenceNode());
 		}
 		if (element instanceof HTMLElementNode)
 		{

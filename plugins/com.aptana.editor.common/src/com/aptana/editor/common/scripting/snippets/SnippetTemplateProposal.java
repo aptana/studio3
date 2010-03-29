@@ -13,6 +13,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension6;
 import org.eclipse.jface.text.link.ILinkedModeListener;
+import org.eclipse.jface.text.link.InclusivePositionUpdater;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
@@ -344,10 +345,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		{
 			return new Point(fSelectedRegion.getOffset(), fSelectedRegion.getLength());
 		}
-		else
-		{
-			return delegateTemplateProposal.getSelection(document);
-		}
+		return delegateTemplateProposal.getSelection(document);
 	}
 
 	@Override

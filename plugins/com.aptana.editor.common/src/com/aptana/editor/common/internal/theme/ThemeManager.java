@@ -97,6 +97,7 @@ public class ThemeManager implements IThemeManager
 		return fCurrentTheme;
 	}
 
+	@SuppressWarnings("nls")
 	public void setCurrentTheme(Theme theme)
 	{
 		fCurrentTheme = theme;
@@ -115,8 +116,8 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
-		prefs = new InstanceScope().getNode("org.eclipse.ui.editors");
-		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor()));
+		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();

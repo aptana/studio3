@@ -1,6 +1,7 @@
 package com.aptana.git.core.model;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Path;
 
 public class ChangedFile
 {
@@ -14,6 +15,13 @@ public class ChangedFile
 	{
 		this.path = path;
 	}
+	
+	// Used for unit tests!
+	public ChangedFile(String path, Status status)
+	{
+		this.path = path;
+		this.status = status;
+	}
 
 	String path;
 	Status status;
@@ -24,7 +32,7 @@ public class ChangedFile
 
 	public String getPath()
 	{
-		return path;
+		return new Path(path).toOSString();
 	}
 
 	public Status getStatus()

@@ -11,7 +11,9 @@ public class PeerTests
 		TestSuite suite = new TestSuite(PeerTests.class.getName());
 		// $JUnit-BEGIN$
 		suite.addTestSuite(PeerCharacterCloserTest.class);
-		suite.addTestSuite(PeerCharacterCloserPerfTest.class);
+		// Please do not include ad-hoc performance test classes in here. 
+		// They have no pass/fail and just slow down the build!
+//		suite.addTestSuite(PeerCharacterCloserPerfTest.class);
 		suite.addTestSuite(CharacterPairMatcherTest.class);
 		// $JUnit-END$
 		return suite;

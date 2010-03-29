@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
 import org.eclipse.jface.text.ITextSelection;
@@ -22,7 +21,6 @@ import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -68,6 +66,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.findbar.api.FindBarDecoratorFactory;
 import com.aptana.editor.findbar.api.IFindBarDecorated;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
@@ -113,8 +112,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	private FileService fFileService;
 
 	private boolean fCursorChangeListened;
-
-	private IPropertyChangeListener blockSelectionModeFontAdjuster;
 
 	/**
 	 * AbstractThemeableEditor
@@ -470,7 +467,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		Image cursorImage = null;
 		if (getThemeManager().getCurrentTheme().hasDarkBG())
 		{
-			cursorImage =  CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
+			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
 		}
 		else
 		{
@@ -577,10 +574,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		}
 
 		removeLineHighlightListener();
-		if (blockSelectionModeFontAdjuster != null)
-		{
-			JFaceResources.getFontRegistry().removeListener(blockSelectionModeFontAdjuster);
-		}
 		super.dispose();
 	}
 
@@ -599,28 +592,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
 				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 		fFileService = new FileService();
-
-		/**
-		 * This listener is used to track changes to the font settings.
-		 */
-		blockSelectionModeFontAdjuster = new IPropertyChangeListener()
-		{
-			@Override
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				String property = event.getProperty();
-				if (JFaceResources.TEXT_FONT.equals(property));
-				{
-					if (isBlockSelectionModeEnabled())
-					{
-						// Force the editor to refresh the font.
-						setBlockSelectionMode(false);
-						setBlockSelectionMode(true);
-					}
-				}
-			}
-		};
-		JFaceResources.getFontRegistry().addListener(blockSelectionModeFontAdjuster);
 	}
 
 	@Override
@@ -798,7 +769,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	 */
 	protected Object getOutlineElementAt(int caret)
 	{
-		return null;
+		IParseNode astNode = getASTNodeAt(caret);
+		if (astNode == null) {
+			return null;
+		}
+		return fOutlinePage.getOutlineItem(astNode);
 	}
 
 	/**
@@ -807,6 +782,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
 		return CommonEditorPlugin.getDefault().getPreferenceStore();
+	}
+
+	protected IParseNode getASTNodeAt(int offset)
+	{
+		IParseNode root = getFileService().getParseResult();
+		if (root == null)
+		{
+			return null;
+		}
+		return root.getNodeAt(offset);
 	}
 
 	private boolean isLinkedWithEditor()

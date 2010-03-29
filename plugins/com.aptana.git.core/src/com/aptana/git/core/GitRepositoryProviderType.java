@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProviderType;
 
-import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitRepositoryProviderType extends RepositoryProviderType
 {
@@ -22,7 +22,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 	public void metaFilesDetected(IProject project, IContainer[] containers)
 	{
 		// FIXME What if the container isn't the project root!
-		if (GitRepository.getAttached(project) != null)
+		if (getGitRepositoryManager().getAttached(project) != null)
 			return;
 
 		final IProject toConnect = project;
@@ -34,10 +34,11 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 			{
 				if (monitor == null)
 					monitor = new NullProgressMonitor();
-				monitor.beginTask(MessageFormat.format(Messages.GitRepositoryProviderType_AttachingProject_Message, toConnect.getName()), 100);
+				monitor.beginTask(MessageFormat.format(Messages.GitRepositoryProviderType_AttachingProject_Message,
+						toConnect.getName()), 100);
 				try
 				{
-					GitRepository.attachExisting(toConnect, new SubProgressMonitor(monitor, 100));
+					getGitRepositoryManager().attachExisting(toConnect, new SubProgressMonitor(monitor, 100));
 					monitor.done();
 				}
 				catch (CoreException e)
@@ -49,5 +50,10 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 		};
 		job.setSystem(true);
 		job.schedule();
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 }

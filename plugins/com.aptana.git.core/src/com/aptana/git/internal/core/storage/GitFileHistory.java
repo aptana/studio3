@@ -10,16 +10,18 @@ import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.provider.FileHistory;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitFileHistory extends FileHistory
 {
 
 	private IResource resource;
-	private final IFileRevision[] revisions;
+	private final CommitFileRevision[] revisions;
 
 	public GitFileHistory(IResource resource, int flags, IProgressMonitor monitor)
 	{
@@ -27,14 +29,16 @@ public class GitFileHistory extends FileHistory
 		this.revisions = buildRevisions(flags, monitor);
 	}
 
-	private IFileRevision[] buildRevisions(int flags, IProgressMonitor monitor)
+	private CommitFileRevision[] buildRevisions(int flags, IProgressMonitor monitor)
 	{
 		SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
 		try
 		{
-			GitRepository repo = GitRepository.getAttached(this.resource.getProject());
+			if (resource == null || resource.getProject() == null)
+				return new CommitFileRevision[0];
+			GitRepository repo = getGitRepositoryManager().getAttached(this.resource.getProject());
 			if (repo == null)
-				return new IFileRevision[0];
+				return new CommitFileRevision[0];
 			// Need the repo relative path
 			String resourcePath = repo.relativePath(resource);
 			List<IFileRevision> revisions = new ArrayList<IFileRevision>();
@@ -50,7 +54,7 @@ public class GitFileHistory extends FileHistory
 			{
 				revisions.add(new CommitFileRevision(gitCommit, resource.getProjectRelativePath().toPortableString()));
 			}
-			return revisions.toArray(new IFileRevision[revisions.size()]);
+			return revisions.toArray(new CommitFileRevision[revisions.size()]);
 		}
 		finally
 		{
@@ -58,15 +62,42 @@ public class GitFileHistory extends FileHistory
 		}
 	}
 
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 	public IFileRevision[] getContributors(IFileRevision revision)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (!(revision instanceof CommitFileRevision))
+			return new IFileRevision[0];
+		CommitFileRevision arg = (CommitFileRevision) revision;
+		List<IFileRevision> targets = new ArrayList<IFileRevision>();
+		if (revisions != null)
+		{
+			for (CommitFileRevision aRevision : revisions)
+			{
+				if (arg.isDescendantOf(aRevision))
+				{
+					targets.add(aRevision);
+				}
+			}
+		}
+		return targets.toArray(new IFileRevision[targets.size()]);
 	}
 
 	public IFileRevision getFileRevision(String id)
 	{
-		// TODO Auto-generated method stub
+		if (revisions != null)
+		{
+			for (IFileRevision revision : revisions)
+			{
+				if (revision.getContentIdentifier().equals(id))
+				{
+					return revision;
+				}
+			}
+		}
 		return null;
 	}
 
@@ -79,8 +110,20 @@ public class GitFileHistory extends FileHistory
 
 	public IFileRevision[] getTargets(IFileRevision revision)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if (!(revision instanceof CommitFileRevision))
+			return new IFileRevision[0];
+		List<IFileRevision> targets = new ArrayList<IFileRevision>();
+		if (revisions != null)
+		{
+			for (CommitFileRevision aRevision : revisions)
+			{
+				if (aRevision.isDescendantOf(revision))
+				{
+					targets.add(aRevision);
+				}
+			}
+		}
+		return targets.toArray(new IFileRevision[targets.size()]);
 	}
 
 }

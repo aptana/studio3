@@ -24,15 +24,19 @@ import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoriesListener;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
+import com.aptana.git.core.model.RepositoryAddedEvent;
+import com.aptana.git.core.model.RepositoryRemovedEvent;
 
 /**
  * Listens to repository changes and forces the relevant resources in the workspace to refresh.
  * 
  * @author cwilliams
  */
-class GitProjectRefresher extends AbstractGitRepositoryListener
+class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitRepositoriesListener
 {
 
 	public void branchChanged(BranchChangedEvent e)
@@ -56,7 +60,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener
 		List<IResource> files = new ArrayList<IResource>();
 		for (ChangedFile changedFile : changedFiles)
 		{
-			String path = workingDirectory + File.separator + changedFile.getPath();
+			String path = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
 			if (file == null)
 				continue;
@@ -70,12 +74,17 @@ class GitProjectRefresher extends AbstractGitRepositoryListener
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository other = GitRepository.getAttached(project);
+			GitRepository other = getRepositoryManager().getAttached(project);
 			if (other != null && other.equals(repo))
 				affectedProjects.add(project);
 		}
 
 		refreshResources(affectedProjects, IResource.DEPTH_INFINITE);
+	}
+
+	protected IGitRepositoryManager getRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private void refreshResources(final Collection<? extends IResource> resources, final int depth)
@@ -104,6 +113,18 @@ class GitProjectRefresher extends AbstractGitRepositoryListener
 		job.setUser(false);
 		job.setPriority(Job.LONG);
 		job.schedule();
+	}
+
+	@Override
+	public void repositoryAdded(RepositoryAddedEvent e)
+	{
+		e.getRepository().addListener(this);
+	}
+
+	@Override
+	public void repositoryRemoved(RepositoryRemovedEvent e)
+	{
+		e.getRepository().removeListener(this);
 	}
 
 }

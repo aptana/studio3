@@ -22,10 +22,12 @@ public abstract class TextEditorUtils
 	 * selection is forward (LtoR) or backward (RtoL) and uses that info to compute the location.
 	 * 
 	 * @param textEditor
-	 * @return
+	 * @return -1 if editor is null or there is no selection. Otherwise uses caret offset from selection.
 	 */
 	public static int getCaretOffset(ITextEditor textEditor)
 	{
+		if (textEditor == null)
+			return -1;
 		// Assume forward (LtoR) selection
 		boolean forwardSelection = true;
 		Object adapter = textEditor.getAdapter(Control.class);

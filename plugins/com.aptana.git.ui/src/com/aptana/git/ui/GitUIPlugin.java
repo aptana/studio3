@@ -3,10 +3,20 @@ package com.aptana.git.ui;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
+
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.git.ui.internal.GitColors;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,6 +29,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static GitUIPlugin plugin;
+
+	private IPreferenceChangeListener themeChangeListener;
 
 	/**
 	 * The constructor
@@ -35,6 +47,40 @@ public class GitUIPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		// Listen for theme changes and force the quick diff colors to match our git diff colors.
+		themeChangeListener = new IPreferenceChangeListener()
+		{
+
+			@SuppressWarnings("nls")
+			@Override
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+				{
+					IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+					// Quick Diff colors
+					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB()));
+					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB()));
+					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB()));
+					try
+					{
+						prefs.flush();
+					}
+					catch (BackingStoreException e)
+					{
+						GitUIPlugin.logError(e.getMessage(), e);
+					}
+				}
+			}
+
+			private String toString(RGB selection)
+			{
+				StringBuilder builder = new StringBuilder();
+				builder.append(selection.red).append(',').append(selection.green).append(',').append(selection.blue);
+				return builder.toString();
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 	}
 
 	/*
@@ -43,8 +89,20 @@ public class GitUIPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		plugin = null;
-		super.stop(context);
+		try
+		{
+			if (themeChangeListener != null)
+			{
+				new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+						themeChangeListener);
+			}
+			themeChangeListener = null;
+		}
+		finally
+		{
+			plugin = null;
+			super.stop(context);
+		}
 	}
 
 	/**

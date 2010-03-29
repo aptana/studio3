@@ -3,11 +3,12 @@ package com.aptana.editor.js.outline;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.parsing.ast.ILanguageNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
+public class JSOutlineItem extends CommonOutlineItem implements ILanguageNode
 {
 
 	public static enum Type
@@ -17,8 +18,6 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 
 	private String fLabel;
 	private Type fType;
-	private IRange fSourceRange;
-	private IParseNode fReferenceNode;
 	private int fChildrenCount;
 
 	private List<IParseNode> fVirtualChildren;
@@ -30,10 +29,9 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 
 	public JSOutlineItem(String label, Type type, IRange sourceRange, IParseNode referenceNode, int childrenCount)
 	{
+		super(sourceRange, referenceNode);
 		fLabel = label;
 		fType = type;
-		fSourceRange = sourceRange;
-		fReferenceNode = referenceNode;
 		fChildrenCount = childrenCount;
 	}
 
@@ -60,11 +58,6 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 		return fLabel;
 	}
 
-	public IParseNode getReferenceNode()
-	{
-		return fReferenceNode;
-	}
-
 	public IParseNode[] getAllReferenceNodes()
 	{
 		if (hasVirtualChildren())
@@ -88,27 +81,9 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 	}
 
 	@Override
-	public int getEndingOffset()
-	{
-		return fSourceRange.getEndingOffset();
-	}
-
-	@Override
-	public int getLength()
-	{
-		return fSourceRange.getLength();
-	}
-
-	@Override
-	public int getStartingOffset()
-	{
-		return fSourceRange.getStartingOffset();
-	}
-
-	@Override
 	public String getLanguage()
 	{
-		return fReferenceNode.getLanguage();
+		return getReferenceNode().getLanguage();
 	}
 
 	@Override
@@ -119,18 +94,12 @@ public class JSOutlineItem implements IRange, ILanguageNode, Comparable<IRange>
 			return false;
 		}
 		JSOutlineItem other = (JSOutlineItem) obj;
-		return fLabel.equals(other.fLabel) && fReferenceNode.equals(other.fReferenceNode);
+		return fLabel.equals(other.fLabel) && getSourceRange().equals(other.getSourceRange());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return 31 * fLabel.hashCode() + fReferenceNode.hashCode();
-	}
-
-	@Override
-	public int compareTo(IRange o)
-	{
-		return getStartingOffset() - o.getStartingOffset();
+		return 31 * fLabel.hashCode() + getSourceRange().hashCode();
 	}
 }

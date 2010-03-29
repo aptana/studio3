@@ -9,6 +9,7 @@
  *******************************************************************************/
 package com.aptana.git.internal.core.storage;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -33,7 +34,7 @@ public abstract class GitFileRevision extends FileRevision
 
 	public String getName()
 	{
-		final int last = path.lastIndexOf('/');
+		final int last = path.lastIndexOf(File.separator);
 		return last >= 0 ? path.substring(last + 1) : path;
 	}
 

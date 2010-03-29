@@ -25,12 +25,15 @@ import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
 {
-	private static interface InvokeUnion {
+	private static interface InvokeUnion
+	{
 		String getInvoke();
+
 		RubyProc getInvokeBlock();
 	}
 
-	private static final class Invoke implements InvokeUnion {
+	private static final class Invoke implements InvokeUnion
+	{
 		private final String _invoke;
 
 		private Invoke(String invoke)
@@ -54,7 +57,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 	}
 
-	private static final class InvokeBlock implements InvokeUnion {
+	private static final class InvokeBlock implements InvokeUnion
+	{
 		private final RubyProc _invokeBlock;
 
 		private InvokeBlock(RubyProc invokeBlock)
@@ -179,7 +183,9 @@ public class CommandElement extends AbstractBundleElement
 				// create output stream and attach to context
 				context.setOutputStream(new ByteArrayOutputStream());
 
-				job = new CommandBlockRunner(this, context, this.getOwningBundle().getLoadPaths());
+				BundleElement bundle = this.getOwningBundle();
+				String bundleName = bundle.getDisplayName();
+				job = new CommandBlockRunner(this, context, BundleManager.getInstance().getBundleLoadPaths(bundleName));
 			}
 
 			// run the job, if we have one
@@ -461,7 +467,8 @@ public class CommandElement extends AbstractBundleElement
 		{
 			case PATH:
 			case CURRENT_PROJECT:
-				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for this type and will turn it into a PATH type and set the path to the current project
+				// This case is handled specially because of bundle dependencies. The App Explorer plugin will look for
+				// this type and will turn it into a PATH type and set the path to the current project
 				return this._workingDirectoryPath;
 			case CURRENT_BUNDLE:
 				return getOwningBundle().getBundleDirectory().toString();
@@ -471,7 +478,7 @@ public class CommandElement extends AbstractBundleElement
 				return new File(this.getPath()).getParentFile().toString();
 		}
 	}
-	
+
 	public WorkingDirectoryType getWorkingDirectoryType()
 	{
 		return this._workingDirectoryType;

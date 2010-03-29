@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.MessageFormat;
@@ -24,23 +23,20 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.contentobjects.jnotify.IJNotify;
+import net.contentobjects.jnotify.JNotifyAdapter;
 import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.team.core.RepositoryProvider;
-import org.eclipse.team.core.TeamException;
+import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.GitRepositoryProvider;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitRef.TYPE;
 import com.aptana.util.ProcessUtil;
@@ -65,116 +61,10 @@ public class GitRepository
 	private boolean hasChanged;
 	GitRevSpecifier currentBranch;
 	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
+	private int remoteDirCreationWatchId = -1;
+	private HashSet<IGitRepositoryListener> listeners;
 
-	private static Set<IGitRepositoryListener> listeners = new HashSet<IGitRepositoryListener>();
-
-	private static Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(
-			3);
-
-	public static void addListener(IGitRepositoryListener listener)
-	{
-		synchronized (listeners)
-		{
-			listeners.add(listener);
-		}
-	}
-
-	public static void removeListener(IGitRepositoryListener listener)
-	{
-		synchronized (listeners)
-		{
-			listeners.remove(listener);
-		}
-	}
-
-	/**
-	 * Used to retrieve a git repository for a project. Will return null if Eclipse team provider is not hooked up!
-	 * 
-	 * @param project
-	 * @return
-	 */
-	public static GitRepository getAttached(IProject project)
-	{
-		if (project == null)
-			return null;
-
-		RepositoryProvider provider = RepositoryProvider.getProvider(project, GitRepositoryProvider.ID);
-		if (provider == null)
-			return null;
-
-		return getUnattachedExisting(project.getLocationURI());
-	}
-
-	/**
-	 * Used solely for grabbing an existing repository when attaching Eclipse team stuff to a project!
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public static synchronized GitRepository getUnattachedExisting(URI path)
-	{
-		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
-			return null;
-
-		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
-		if (ref == null || ref.get() == null)
-		{
-			URI gitDirURL = gitDirForURL(path);
-			if (gitDirURL == null)
-				return null;
-			// Check to see if any cached repo has the same git dir
-			for (SoftReference<GitRepository> reference : cachedRepos.values())
-			{
-				if (reference == null || reference.get() == null)
-					continue;
-				GitRepository cachedRepo = reference.get();
-				if (cachedRepo.fileURL.getPath().equals(gitDirURL.getPath()))
-				{
-					// Same git dir, so cache under our new path as well
-					cachedRepos.put(path.getPath(), reference);
-					return cachedRepo;
-				}
-			}
-			// no cache for this repo or any repo sharing same git dir
-			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
-			cachedRepos.put(path.getPath(), ref);
-		}
-		// TODO What if the underlying .git dir was wiped while we still had the object cached?
-		return ref.get();
-	}
-
-	public static URI gitDirForURL(URI repositoryURL)
-	{
-		if (GitExecutable.instance() == null)
-			return null;
-
-		String repositoryPath = repositoryURL.getPath();
-		if (!new File(repositoryPath).exists())
-			return null;
-
-		if (isBareRepository(repositoryPath))
-			return repositoryURL;
-
-		// Use rev-parse to find the .git dir for the repository being opened
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (result == null || result.isEmpty())
-			return null;
-		Integer exitCode = result.keySet().iterator().next();
-		if (exitCode != 0)
-			return null;
-		String newPath = result.values().iterator().next();
-		if (newPath == null)
-			return null;
-		if (newPath.equals(GIT_DIR))
-			return new File(repositoryPath, GIT_DIR).toURI();
-		if (newPath.length() > 0)
-			return new File(newPath).toURI();
-
-		return null;
-	}
-
-	private GitRepository(URI fileURL)
+	GitRepository(URI fileURL)
 	{
 		this.fileURL = fileURL;
 		this.branches = new ArrayList<GitRevSpecifier>();
@@ -185,8 +75,8 @@ public class GitRepository
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
 			// index appears to change on commit/stage/unstage/pull
 			// Add listener for changes in HEAD (i.e. switched branches), and index
-			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
-					false, new JNotifyListener()
+			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
+					false, new JNotifyAdapter()
 					{
 
 						private Set<String> filesToWatch;
@@ -196,11 +86,10 @@ public class GitRepository
 						{
 							if (newName == null || !filesToWatch().contains(newName))
 								return;
-							// TODO listen for ORIG_HEAD for merges?
 							if (newName.equals(HEAD))
 								checkForBranchChange();
 							else if (newName.equals(INDEX))
-								index().refresh();
+								refreshIndex();
 						}
 
 						private Set<String> filesToWatch()
@@ -219,120 +108,105 @@ public class GitRepository
 						{
 							if (name == null || !filesToWatch().contains(name))
 								return;
-							// TODO Listen for COMMIT_EDITMSG for commits...?
-							// TODO Listen for FETCH_HEAD to determine when we've fetched?!
 							if (name.equals(HEAD))
 								checkForBranchChange();
 							else if (name.equals(INDEX))
-								index().refresh();
+								refreshIndex();
+						}
+
+						// Do long running work in another thread/job so we don't tie up the jnotify locks!
+						private void refreshIndex()
+						{
+							Job job = new Job("Refreshing git index") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									index().refresh();
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
 						}
 
 						protected void checkForBranchChange()
 						{
-							String oldBranchName = currentBranch.simpleRef().shortName();
-							_headRef = null;
-							readCurrentBranch();
-							String newBranchName = currentBranch.simpleRef().shortName();
-							if (oldBranchName.equals(newBranchName))
-								return;
-							fireBranchChangeEvent(oldBranchName, newBranchName);
-						}
-
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							// ignore, should never happen
-						}
-
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							// ignore, should never happen
+							Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									String oldBranchName = currentBranch.simpleRef().shortName();
+									_headRef = null;
+									readCurrentBranch();
+									String newBranchName = currentBranch.simpleRef().shortName();
+									if (oldBranchName.equals(newBranchName))
+										return Status.OK_STATUS;
+									fireBranchChangeEvent(oldBranchName, newBranchName);
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
 						}
 					}));
 
 			// Add listener for remotes
-			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_REMOTES, IJNotify.FILE_ANY, true,
-					new JNotifyListener()
-					{
-
-						@Override
-						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+			if (gitFile(GitRef.REFS_REMOTES).isDirectory())
+			{
+				addRemotesFileWatcher();
+			}
+			else
+			{
+				// If refs/remote doesn't exist, we need to add a listener on "refs" for creation of remotes!
+				remoteDirCreationWatchId = FileWatcher.addWatch(gitFile(GitRef.REFS).getAbsolutePath(),
+						IJNotify.FILE_CREATED, false, new JNotifyAdapter()
 						{
-							if (newName == null)
-								return;
-							if (isProbablyBranch(newName))
+							public void fileCreated(int wd, String rootPath, String name)
 							{
-								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
-								// now,
-								// seems harmless to fire both.
-								firePullEvent();
-								firePushEvent();
-							}
-						}
+								if (name != null && name.equals("remotes")) //$NON-NLS-1$
+								{
+									try
+									{
+										addRemotesFileWatcher();
+									}
+									catch (JNotifyException e)
+									{
+										GitPlugin.logError(e.getMessage(), e);
+									}
 
-						// Determine if filename is referring to a remote branch, and not the remote itself.
-						private boolean isProbablyBranch(String newName)
-						{
-							return newName != null && newName.indexOf(File.separator) != -1;
-						}
-
-						@Override
-						public void fileModified(int wd, String rootPath, String name)
-						{
-							if (name == null)
-								return;
-							if (isProbablyBranch(name))
-							{
-								// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
-								// now,
-								// seems harmless to fire both.
-								firePullEvent();
-								firePushEvent();
+									if (remoteDirCreationWatchId == -1)
+										return;
+									// Remove this watcher!
+									Job job = new Job("Removing file watcher on remotes dir creation") //$NON-NLS-1$
+									{
+										@Override
+										protected IStatus run(IProgressMonitor monitor)
+										{
+											try
+											{
+												FileWatcher.removeWatch(remoteDirCreationWatchId);
+											}
+											catch (JNotifyException e)
+											{
+												GitPlugin.logError(e.getMessage(), e);
+											}
+											return Status.OK_STATUS;
+										}
+									};
+									job.setSystem(true);
+									job.schedule();
+								}
 							}
-						}
-
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							// if path is longer than one segment, then remote branch was deleted. Means we probably
-							// pulled.
-							if (isProbablyBranch(name))
-							{
-								branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
-								firePullEvent();
-							}
-						}
-
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							if (isProbablyBranch(name))
-							{
-								// if path is longer than one segment, then remote branch was created.
-								addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
-								// Since we suddenly know about a new remote branch, we probably pulled.
-								firePullEvent();
-							}
-						}
-					}));
+						});
+				fileWatcherIds.add(remoteDirCreationWatchId);
+			}
 
 			// Add listener for added/removed branches
-			fileWatcherIds.add(FileWatcher.addWatch(fileURL.getPath() + GitRef.REFS_HEADS, IJNotify.FILE_CREATED
-					| IJNotify.FILE_DELETED, false, new JNotifyListener()
+			fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_HEADS).getAbsolutePath(), IJNotify.FILE_CREATED
+					| IJNotify.FILE_DELETED, false, new JNotifyAdapter()
 			{
-
-				@Override
-				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
-				{
-					// ignore, should never happen
-				}
-
-				@Override
-				public void fileModified(int wd, String rootPath, String name)
-				{
-					// ignore, should never happen
-				}
 
 				@Override
 				public void fileDeleted(int wd, String rootPath, String name)
@@ -342,17 +216,28 @@ public class GitRepository
 				}
 
 				@Override
-				public void fileCreated(int wd, String rootPath, String name)
+				public void fileCreated(int wd, String rootPath, final String name)
 				{
 					// a branch has been added
 					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
-					// Check if our HEAD changed
-					String oldBranchName = currentBranch.simpleRef().shortName();
-					if (oldBranchName.equals(name))
-						return;
-					_headRef = null;
-					readCurrentBranch();
-					fireBranchChangeEvent(oldBranchName, name);
+
+					Job job = new Job("Checking if HEAD changed") //$NON-NLS-1$
+					{
+						@Override
+						protected IStatus run(IProgressMonitor monitor)
+						{
+							// Check if our HEAD changed
+							String oldBranchName = currentBranch.simpleRef().shortName();
+							if (oldBranchName.equals(name))
+								return Status.OK_STATUS;
+							_headRef = null;
+							readCurrentBranch();
+							fireBranchChangeEvent(oldBranchName, name);
+							return Status.OK_STATUS;
+						}
+					};
+					job.setSystem(true);
+					job.schedule();
 				}
 			}));
 		}
@@ -362,11 +247,123 @@ public class GitRepository
 		}
 	}
 
+	/**
+	 * @throws JNotifyException
+	 */
+	protected void addRemotesFileWatcher() throws JNotifyException
+	{
+		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY,
+				true, new JNotifyListener()
+				{
+
+					@Override
+					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+					{
+						if (newName == null)
+							return;
+						if (isProbablyBranch(newName))
+						{
+							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+							// now,
+							// seems harmless to fire both.
+							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									firePullEvent();
+									firePushEvent();
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
+						}
+					}
+
+					// Determine if filename is referring to a remote branch, and not the remote itself.
+					private boolean isProbablyBranch(String newName)
+					{
+						return newName != null && newName.indexOf(File.separator) != -1;
+					}
+
+					@Override
+					public void fileModified(int wd, String rootPath, String name)
+					{
+						if (name == null)
+							return;
+						if (isProbablyBranch(name))
+						{
+							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
+							// now,
+							// seems harmless to fire both.
+							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									firePullEvent();
+									firePushEvent();
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
+						}
+					}
+
+					@Override
+					public void fileDeleted(int wd, String rootPath, String name)
+					{
+						// if path is longer than one segment, then remote branch was deleted. Means we probably
+						// pulled.
+						if (isProbablyBranch(name))
+						{
+							branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									firePullEvent();
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
+						}
+					}
+
+					@Override
+					public void fileCreated(int wd, String rootPath, String name)
+					{
+						if (isProbablyBranch(name))
+						{
+							// if path is longer than one segment, then remote branch was created.
+							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
+							// Since we suddenly know about a new remote branch, we probably pulled.
+
+							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							{
+								@Override
+								protected IStatus run(IProgressMonitor monitor)
+								{
+									firePullEvent();
+									return Status.OK_STATUS;
+								}
+							};
+							job.setSystem(true);
+							job.schedule();
+						}
+					}
+				}));
+	}
+
 	public String workingDirectory()
 	{
-		if (fileURL.getPath().endsWith("/" + GIT_DIR + "/")) //$NON-NLS-1$ //$NON-NLS-2$
-			return fileURL.getPath().substring(0, fileURL.getPath().length() - 6);
-		else if (GitExecutable.instance().outputForCommand(fileURL.getPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
+		if (gitDirPath().endsWith(File.separator + GIT_DIR))
+			return gitDirPath().substring(0, gitDirPath().length() - 5);
+		else if (GitExecutable.instance().outputForCommand(gitDirPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
 				.equals("true")) //$NON-NLS-1$
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
 
@@ -460,12 +457,6 @@ public class GitRepository
 		return result.values().iterator().next();
 	}
 
-	private static boolean isBareRepository(String path)
-	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
-		return "true".equals(output); //$NON-NLS-1$
-	}
-
 	private boolean reloadRefs()
 	{
 		_headRef = null;
@@ -534,7 +525,7 @@ public class GitRepository
 	private String parseSymbolicReference(String reference)
 	{
 		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference); //$NON-NLS-1$ //$NON-NLS-2$
-		if (ref.startsWith(GitRef.REFS))
+		if (ref != null && ref.startsWith(GitRef.REFS))
 			return ref;
 
 		return null;
@@ -587,6 +578,8 @@ public class GitRepository
 
 	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
 		for (IGitRepositoryListener listener : listeners)
 			listener.branchChanged(e);
@@ -594,16 +587,11 @@ public class GitRepository
 
 	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
-	}
-
-	private static void fireRepositoryAddedEvent(GitRepository repo, IProject project)
-	{
-		RepositoryAddedEvent e = new RepositoryAddedEvent(repo, project);
-		for (IGitRepositoryListener listener : listeners)
-			listener.repositoryAdded(e);
 	}
 
 	public boolean hasMerges()
@@ -730,14 +718,10 @@ public class GitRepository
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
 		String workingDirectory = workingDirectory();
-		if (!workingDirectory.endsWith("/")) //$NON-NLS-1$
-		{
-			workingDirectory += "/"; //$NON-NLS-1$
-		}
 		for (ChangedFile changedFile : index().changedFiles())
 		{
-			String fullPath = workingDirectory + changedFile.getPath();
-			if (resource.getLocationURI().getPath().equals(fullPath))
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			if (new File(resource.getLocationURI()).getAbsolutePath().equals(fullPath))
 			{
 				return changedFile;
 			}
@@ -795,60 +779,6 @@ public class GitRepository
 		}
 		String localSHA = output.substring(0, 40);
 		return !localSHA.equals(remoteSHA);
-	}
-
-	/**
-	 * Generates a brand new git repository in the specified location.
-	 */
-	public static void create(String path)
-	{
-		if (path == null)
-			return;
-		if (path.endsWith(File.separator + GIT_DIR))
-		{
-			path = path.substring(0, path.length() - GIT_DIR.length());
-		}
-
-		File file = new File(path);
-		URI existing = gitDirForURL(file.toURI());
-		if (existing != null)
-			return;
-
-		if (!file.exists())
-		{
-			file.mkdirs();
-		}
-		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Given an existing repo on disk, we wrap it with our model and hook it up to the eclipse team provider.
-	 * 
-	 * @param project
-	 * @param m
-	 * @return
-	 */
-	public static GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
-	{
-		if (m == null)
-			m = new NullProgressMonitor();
-		GitRepository repo = GitRepository.getUnattachedExisting(project.getLocationURI());
-		m.worked(40);
-		if (repo == null)
-			return null;
-
-		try
-		{
-			RepositoryProvider.map(project, GitRepositoryProvider.ID);
-			m.worked(10);
-			fireRepositoryAddedEvent(repo, project);
-			m.worked(50);
-		}
-		catch (TeamException e)
-		{
-			throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
-		}
-		return repo;
 	}
 
 	public boolean isDirty()
@@ -972,23 +902,28 @@ public class GitRepository
 		return result.keySet().iterator().next() == 0;
 	}
 
-	public boolean deleteFile(String filePath)
+	public IStatus deleteFile(String filePath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", filePath); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance()
+				.runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
-	public boolean deleteFolder(String folderPath)
+	public IStatus deleteFolder(String folderPath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-r", //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath);
+		if (result == null)
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 		index().refresh();
-		return true;
+		return Status.OK_STATUS;
 	}
 
 	public IStatus moveFile(String source, String dest)
@@ -1042,48 +977,21 @@ public class GitRepository
 		return allRefs;
 	}
 
-	/**
-	 * Used when the user disconnects the project from the repository. We should notify listeners that the repo has been
-	 * unattached. We should also flush the cached copy.
-	 * 
-	 * @param p
-	 */
-	public static void removeRepository(IProject p)
-	{
-		GitRepository repo = getUnattachedExisting(p.getLocationURI());
-		if (repo == null)
-			return;
-		cachedRepos.remove(p.getLocationURI().getPath());
-
-		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
-		for (IGitRepositoryListener listener : listeners)
-			listener.repositoryRemoved(e);
-
-		// Only dispose if there's no other projects attached to same repo!
-		for (SoftReference<GitRepository> ref : cachedRepos.values())
-		{
-			if (ref == null || ref.get() == null)
-				continue;
-			GitRepository other = ref.get();
-			if (other.equals(repo))
-				return;
-		}
-		repo.dispose();
-		repo = null;
-	}
-
-	private void dispose()
+	void dispose()
 	{
 		// clean up any listeners/etc!
-		for (Integer fileWatcherId : fileWatcherIds)
+		if (fileWatcherIds != null)
 		{
-			try
+			for (Integer fileWatcherId : fileWatcherIds)
 			{
-				FileWatcher.removeWatch(fileWatcherId);
-			}
-			catch (JNotifyException e)
-			{
-				GitPlugin.logError(e.getMessage(), e);
+				try
+				{
+					FileWatcher.removeWatch(fileWatcherId);
+				}
+				catch (JNotifyException e)
+				{
+					GitPlugin.logError(e.getMessage(), e);
+				}
 			}
 		}
 		fileWatcherIds = null;
@@ -1151,13 +1059,13 @@ public class GitRepository
 
 	private String gitDirPath()
 	{
-		String path = fileURL.getPath();
-		// FIXME On windows sometimes it gives wacky paths like "/C:/..."
-		return path;
+		return new File(fileURL).getAbsolutePath();
 	}
 
 	public void firePullEvent()
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		PullEvent e = new PullEvent(this);
 		for (IGitRepositoryListener listener : listeners)
 			listener.pulled(e);
@@ -1165,24 +1073,82 @@ public class GitRepository
 
 	public void firePushEvent()
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		PushEvent e = new PushEvent(this);
 		for (IGitRepositoryListener listener : listeners)
 			listener.pushed(e);
 	}
 
 	/**
-	 * Used to clean up all the repos from memory when plugin stops.
+	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
+	 * 
+	 * @param resource
+	 * @param changedFiles
+	 * @return
 	 */
-	public static void cleanup()
+	public boolean resourceOrChildHasChanges(IResource resource)
 	{
-		for (SoftReference<GitRepository> reference : cachedRepos.values())
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+			return false;
+
+		String workingDirectory = workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
 		{
-			if (reference == null || reference.get() == null)
-				continue;
-			GitRepository cachedRepo = reference.get();
-			cachedRepo.dispose();
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
+			if (fullPath.startsWith(resourcePath))
+				return true;
 		}
-		cachedRepos.clear();
+		return false;
+	}
+
+	/**
+	 * Gets the list of changed files that are underneath the given container.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
+	{
+		List<ChangedFile> changedFiles = index().changedFiles();
+		if (changedFiles == null || changedFiles.isEmpty())
+			return Collections.emptyList();
+
+		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
+		String workingDirectory = workingDirectory();
+		for (ChangedFile changedFile : changedFiles)
+		{
+			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+			String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
+			if (fullPath.startsWith(resourcePath))
+				filtered.add(changedFile);
+		}
+		return filtered;
+	}
+
+	URI getFileURL()
+	{
+		return fileURL;
+	}
+
+	public void addListener(IGitRepositoryListener listener)
+	{
+		if (listener == null)
+			return;
+		if (listeners == null)
+		{
+			listeners = new HashSet<IGitRepositoryListener>(3);
+		}
+		listeners.add(listener);
+	}
+
+	public void removeListener(IGitRepositoryListener listener)
+	{
+		if (listener == null || listeners == null)
+			return;
+		listeners.remove(listener);
 	}
 
 }

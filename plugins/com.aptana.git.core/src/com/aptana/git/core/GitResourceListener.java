@@ -17,7 +17,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 class GitResourceListener implements IResourceChangeListener
 {
@@ -40,8 +42,8 @@ class GitResourceListener implements IResourceChangeListener
 		if (event.getType() == IResourceChangeEvent.PRE_DELETE)
 		{
 			IProject project = (IProject) event.getResource();
-			GitRepository.removeRepository(project);
-			return;			
+			getGitRepositoryManager().removeRepository(project);
+			return;
 		}
 		final Set<GitRepository> resourcesToUpdate = new HashSet<GitRepository>();
 		final Set<IProject> projectsToAttach = new HashSet<IProject>();
@@ -124,7 +126,8 @@ class GitResourceListener implements IResourceChangeListener
 					{
 						try
 						{
-							GitRepository.attachExisting(project, sub.newChild(10));
+							if (project.isAccessible())
+								getGitRepositoryManager().attachExisting(project, sub.newChild(10));
 						}
 						catch (CoreException e)
 						{
@@ -144,6 +147,8 @@ class GitResourceListener implements IResourceChangeListener
 
 		for (final GitRepository repo : resourcesToUpdate)
 		{
+			if (repo == null)
+				continue;
 			Job job = new Job("Updating Git repo index") //$NON-NLS-1$
 			{
 				@Override
@@ -151,7 +156,9 @@ class GitResourceListener implements IResourceChangeListener
 				{
 					// FIXME This seems to be getting triggered even when we're staging/unstaging files through the
 					// model
-					repo.index().refresh();
+					GitIndex index = repo.index();
+					if (index != null)
+						index.refresh();
 					return Status.OK_STATUS;
 				}
 			};
@@ -161,6 +168,11 @@ class GitResourceListener implements IResourceChangeListener
 		}
 	}
 
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 	protected GitRepository getRepo(IResource resource)
 	{
 		if (resource == null)
@@ -168,6 +180,6 @@ class GitResourceListener implements IResourceChangeListener
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 }

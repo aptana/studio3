@@ -70,7 +70,8 @@ public class GitIndex
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+		if (result == null) // couldn't even execute!
+			return;
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
 			return;
@@ -82,10 +83,13 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 								"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
 								"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readOtherFiles(output);
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readOtherFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
@@ -95,8 +99,11 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						readUnstagedFiles(output);
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readUnstagedFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
@@ -106,10 +113,13 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						String output = GitExecutable.instance().outputForCommand(workingDirectory,
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 								"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 								"-z", getParentTree()); //$NON-NLS-1$
-						readStagedFiles(output);
+						if (result != null && result.keySet().iterator().next() == 0)
+						{
+							readStagedFiles(result.values().iterator().next());
+						}
 						return Status.OK_STATUS;
 					}
 				});
@@ -393,11 +403,15 @@ public class GitIndex
 
 	public List<ChangedFile> changedFiles()
 	{
+		// FIXME If we're in the middle of refreshing the index, this list could be wrong/incomplete
 		return new ArrayList<ChangedFile>(files);
 	}
 
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
+		if (stageFiles == null || stageFiles.isEmpty())
+			return false;
+		
 		List<String> args = new ArrayList<String>();
 		args.add("update-index"); //$NON-NLS-1$
 		args.add("--add"); //$NON-NLS-1$
@@ -409,10 +423,13 @@ public class GitIndex
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 				args.toArray(new String[args.size()]));
+		if (result == null)
+			return false;
+		
 		int ret = result.keySet().iterator().next();
-
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
 
@@ -428,18 +445,24 @@ public class GitIndex
 
 	public boolean unstageFiles(Collection<ChangedFile> unstageFiles)
 	{
+		if (unstageFiles == null || unstageFiles.isEmpty())
+			return false;
+		
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : unstageFiles)
 		{
 			input.append(file.indexInfo());
 		}
 
-		int ret = 1;
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, input.toString(),
 				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		ret = result.keySet().iterator().next();
+		if (result == null)
+			return false;
+		
+		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
 
@@ -480,11 +503,11 @@ public class GitIndex
 		postIndexChange(discardFiles);
 	}
 
-	public void commit(String commitMessage)
+	public boolean commit(String commitMessage)
 	{
 		boolean success = doCommit(commitMessage);
 		if (!success)
-			return;
+			return false;
 
 		// Need to explicitly fire off changes for the files that were staged and got committed
 		postIndexChange(getStagedFiles());
@@ -495,6 +518,7 @@ public class GitIndex
 			this.amend = false;
 		else
 			refresh();
+		return true;
 	}
 
 	private boolean doCommit(String commitMessage)
@@ -590,11 +614,15 @@ public class GitIndex
 		}
 		postCommitUpdate("Creating commit"); //$NON-NLS-1$
 		int ret = 1;
+		String commit = ""; //$NON-NLS-1$
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
 				amendEnvironment, arguments.toArray(new String[arguments.size()]));
-		String commit = result.values().iterator().next();
-		ret = result.keySet().iterator().next();
-		if (ret != 0 || commit.length() != 40)
+		if (result != null && !result.isEmpty())
+		{
+			commit = result.values().iterator().next();
+			ret = result.keySet().iterator().next();
+		}
+		if (ret != 0 || commit == null || commit.length() != 40)
 		{
 			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
 			return null;
