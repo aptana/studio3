@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.team.core.history.IFileHistoryProvider;
 
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.internal.core.storage.GitFileHistoryProvider;
 
 public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvider
@@ -34,8 +35,9 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 		if (dotGit != null && dotGit.exists())
 		{
 			// if it exists and it actually is the right .git meta dir, let's mark it as team private
-			URI gitDir = GitRepository.gitDirForURL(getProject().getLocationURI());
-			if (gitDir != null) {
+			URI gitDir = getGitRepositoryManager().gitDirForURL(getProject().getLocationURI());
+			if (gitDir != null)
+			{
 				// Need to perform IPath based equals() check instead of URI based comparison
 				// to deal with differences in the trailing / in two URIs
 				IPath dotGitPath = dotGit.getLocation();
@@ -45,6 +47,11 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 				}
 			}
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	@Override

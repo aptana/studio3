@@ -21,7 +21,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 
-import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
 
 /**
@@ -66,7 +67,7 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 					GitUIPlugin.trace("disconnect " + p.getName()); //$NON-NLS-1$
 					unmarkTeamPrivate(p);
 					RepositoryProvider.unmap(p);
-					GitRepository.removeRepository(p);
+					getGitRepositoryManager().removeRepository(p);
 					m.worked(100);
 
 					p.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 100));
@@ -81,6 +82,11 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 		{
 			m.done();
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	private void unmarkTeamPrivate(final IContainer p) throws CoreException

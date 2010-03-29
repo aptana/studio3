@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 class GitMoveDeleteHook implements IMoveDeleteHook
 {
@@ -83,7 +84,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
-		
+
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 		{
@@ -259,7 +260,12 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	protected GitRepository getAttachedGitRepository(IProject project)
 	{
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	/**

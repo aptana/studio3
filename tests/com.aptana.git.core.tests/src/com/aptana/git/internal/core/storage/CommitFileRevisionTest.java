@@ -21,6 +21,7 @@ import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.util.IOUtil;
 
 public class CommitFileRevisionTest extends TestCase
@@ -84,11 +85,16 @@ public class CommitFileRevisionTest extends TestCase
 	 */
 	protected GitRepository createRepo(IPath path)
 	{
-		GitRepository.create(path.toOSString());
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
+		getGitRepositoryManager().create(path.toOSString());
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;
 		return repo;
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	protected IPath repoToGenerate()

@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.testing.utils.ProjectCreator;
 
 public class GitMoveDeleteIntegrationTest extends TestCase
@@ -31,8 +32,13 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		project = ProjectCreator.createAndOpen(PROJECT_NAME);
 
 		// create a git repo
-		GitRepository.create(project.getLocation().toOSString());
-		repo = GitRepository.attachExisting(project, new NullProgressMonitor());
+		getGitRepositoryManager().create(project.getLocation().toOSString());
+		repo = getGitRepositoryManager().attachExisting(project, new NullProgressMonitor());
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	@Override

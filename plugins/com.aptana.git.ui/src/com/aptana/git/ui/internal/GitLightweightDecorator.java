@@ -11,9 +11,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -27,12 +27,15 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.core.model.IndexChangedEvent;
 import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
@@ -41,7 +44,7 @@ import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
 public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
-		IGitRepositoryListener
+		IGitRepositoryListener, IGitRepositoriesListener
 {
 
 	private static final String DIRTY_PREFIX = "* "; //$NON-NLS-1$
@@ -91,7 +94,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public GitLightweightDecorator()
 	{
-		GitRepository.addListener(this);
+		getGitRepositoryManager().addListener(this);
+		getGitRepositoryManager().addListenerToEachRepository(this);
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
 
@@ -105,6 +109,11 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 			}
 		};
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public void decorate(Object element, IDecoration decoration)
@@ -236,7 +245,8 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 	{
 		try
 		{
-			GitRepository.removeListener(this);
+			getGitRepositoryManager().removeListener(this);
+			getGitRepositoryManager().removeListenerFromEachRepository(this);
 			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
 		}
@@ -269,7 +279,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject project = resource.getProject();
 		if (project == null)
 			return null;
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
 	}
 
 	/**
@@ -299,7 +309,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository repo = GitRepository.getAttached(project);
+			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null && repo.equals(e.getRepository()))
 				resources.add(project);
 		}
@@ -340,6 +350,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
+		e.getRepository().addListener(this);
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
@@ -347,6 +358,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
+		e.getRepository().removeListener(this);
 		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
@@ -374,7 +386,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		for (IProject project : projects)
 		{
-			if (repo.equals(GitRepository.getAttached(project)))
+			if (repo.equals(getGitRepositoryManager().getAttached(project)))
 				resources.add(project);
 		}
 		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with staged/unstaged changes, dirty carry over).
