@@ -135,7 +135,21 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileCreated(int wd, String rootPath, String name)
+	synchronized public void fileCreated(int wd, String rootPath, String name)
+	{
+		fileCreatedHelper(rootPath, name);
+		
+		// used by unit tests
+		this.notifyAll();
+	}
+
+	/**
+	 * fileCreatedHelper
+	 * 
+	 * @param rootPath
+	 * @param name
+	 */
+	private void fileCreatedHelper(String rootPath, String name)
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
@@ -164,7 +178,21 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileDeleted(int wd, String rootPath, String name)
+	synchronized public void fileDeleted(int wd, String rootPath, String name)
+	{
+		fileDeletedHelper(rootPath, name);
+		
+		// used by unit tests
+		this.notifyAll();
+	}
+
+	/**
+	 * fileDeletedHelper
+	 * 
+	 * @param rootPath
+	 * @param name
+	 */
+	private void fileDeletedHelper(String rootPath, String name)
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
@@ -195,7 +223,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileModified(int wd, String rootPath, String name)
+	synchronized public void fileModified(int wd, String rootPath, String name)
 	{
 		if (isUserBundleFile(rootPath, name))
 		{
@@ -207,6 +235,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			reloadDependentScripts(new File(rootPath, name));
 		}
+		
+		// used by unit tests
+		this.notifyAll();
 	}
 
 	/**
@@ -217,10 +248,13 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param oldName
 	 * @param newName
 	 */
-	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+	synchronized public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		this.fileDeleted(wd, rootPath, oldName);
-		this.fileCreated(wd, rootPath, newName);
+		this.fileDeletedHelper(rootPath, oldName);
+		this.fileCreatedHelper(rootPath, newName);
+		
+		// used by unit tests
+		this.notifyAll();
 	}
 
 	/**
