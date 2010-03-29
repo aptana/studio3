@@ -8,6 +8,7 @@ import com.aptana.editor.xml.XMLParserTest;
 import com.aptana.editor.xml.XMLPartitionScannerTest;
 import com.aptana.editor.xml.XMLScannerTest;
 import com.aptana.editor.xml.XMLTagScannerTest;
+import com.aptana.editor.xml.outline.XMLOutlineTest;
 
 public class AllTests
 {
@@ -21,6 +22,7 @@ public class AllTests
 		suite.addTestSuite(XMLTagScannerTest.class);
 		suite.addTestSuite(XMLParserTest.class);
 		suite.addTestSuite(XMLEditorTest.class);
+		suite.addTestSuite(XMLOutlineTest.class);
 		// $JUnit-END$
 		return suite;
 	}
