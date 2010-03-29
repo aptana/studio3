@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -771,10 +773,11 @@ public class BundleManager
 
 		return result;
 	}
-
+	
 	/**
 	 * getBundleScripts
 	 * 
+	 * @param bundleDirectory
 	 * @return
 	 */
 	protected File[] getBundleScripts(File bundleDirectory)
@@ -1132,7 +1135,7 @@ public class BundleManager
 		
 		return result;
 	}
-	
+
 	/**
 	 * isValidBundleDirectory
 	 * 
@@ -1140,18 +1143,6 @@ public class BundleManager
 	 * @return
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
-	{
-		return this.isValidBundleDirectory(bundleDirectory, true);
-	}
-
-	/**
-	 * isValidBundleDirectory
-	 * 
-	 * @param bundleDirectory
-	 * @param logErrors
-	 * @return
-	 */
-	protected boolean isValidBundleDirectory(File bundleDirectory, boolean logErrors)
 	{
 		String message = null;
 		boolean result = false;
@@ -1194,7 +1185,7 @@ public class BundleManager
 					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false && logErrors && message != null && message.length() > 0)
+		if (result == false  && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
@@ -1518,14 +1509,20 @@ public class BundleManager
 	 */
 	public void unloadBundle(File bundleDirectory)
 	{
-		File[] scripts = this.getBundleScripts(bundleDirectory);
+		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
+		Set<File> scripts = new HashSet<File>();
 		
-		if (scripts != null)
+		if (elements != null)
 		{
-			for (File script : scripts)
+			for (AbstractElement element : elements)
 			{
-				this.unloadScript(script);
+				scripts.add(new File(element.getPath()));
 			}
+		}
+		
+		for (File script : scripts)
+		{
+			this.unloadScript(script);
 		}
 	}
 	
@@ -1550,7 +1547,7 @@ public class BundleManager
 		if (script != null)
 		{
 			String scriptPath = script.getAbsolutePath();
-			AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
+			AbstractElement[] elements = AbstractElement.getElementsByPath(scriptPath);
 
 			// remove bundle members in pass 1
 			for (AbstractElement element : elements)
