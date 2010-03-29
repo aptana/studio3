@@ -614,11 +614,15 @@ public class GitIndex
 		}
 		postCommitUpdate("Creating commit"); //$NON-NLS-1$
 		int ret = 1;
+		String commit = ""; //$NON-NLS-1$
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
 				amendEnvironment, arguments.toArray(new String[arguments.size()]));
-		String commit = result.values().iterator().next();
-		ret = result.keySet().iterator().next();
-		if (ret != 0 || commit.length() != 40)
+		if (result != null && !result.isEmpty())
+		{
+			commit = result.values().iterator().next();
+			ret = result.keySet().iterator().next();
+		}
+		if (ret != 0 || commit == null || commit.length() != 40)
 		{
 			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
 			return null;
