@@ -172,16 +172,10 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		}
 
 		CommandResult result = new CommandResult(this.getCommand(), this.getContext());
+		result.setOutputString(resultText);
 		result.setReturnValue(this._exitValue);
 		result.setExecutedSuccessfully(this.getExecutedSuccessfully());
-		if (result.executedSuccessfully())
-		{
-			result.setOutputString(resultText);
-		}
-		else
-		{
-			result.setErrorString(resultText);
-		}
+
 		// save result
 		this.setCommandResult(result);
 

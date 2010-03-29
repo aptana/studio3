@@ -74,7 +74,7 @@ public class CommandResult
 	{
 		return this._errorString;
 	}
-	
+
 	/**
 	 * getInputType
 	 * 
@@ -170,16 +170,6 @@ public class CommandResult
 	void setOutputString(String output)
 	{
 		this._outputString = output;
-	}
-
-	/**
-	 * Set the error string
-	 * 
-	 * @param err
-	 */
-	void setErrorString(String err)
-	{
-		this._errorString = err;
 	}
 	
 	/**

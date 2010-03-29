@@ -3,6 +3,7 @@ package com.aptana.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,42 +73,20 @@ public abstract class ProcessUtil
 		{
 			builder.environment().putAll(env);
 		}
-		String lineSeparator = EditorUtils.getLineSeparatorValue(null);
 		try
 		{
 			Process p = builder.start();
-			// Read and write in threads to avoid from choking the process streams
-			OutputStreamThread writerThread = null;
 			if (input != null)
 			{
-				// TODO - Use EditorUtils.getEncoding once we have an IFile reference.
-				// Using the UTF-8 will not work for all cases.
-				writerThread = new OutputStreamThread(p.getOutputStream(), input, "UTF-8"); //$NON-NLS-1$
+				write(input, p.getOutputStream());
 			}
-			InputStreamGobbler readerGobbler = new InputStreamGobbler(p.getInputStream(), lineSeparator, "UTF-8"); //$NON-NLS-1$
-			InputStreamGobbler errorGobbler = new InputStreamGobbler(p.getErrorStream(), lineSeparator, null); //$NON-NLS-1$
-
-			// Start the threads
-			if (writerThread != null)
-			{
-				writerThread.start();
-			}
-			readerGobbler.start();
-			errorGobbler.start();
-			// This will wait till the process is done.
+			String read = read(p.getInputStream());
+			if (read.endsWith("\n")) //$NON-NLS-1$
+				read = read.substring(0, read.length() - 1);
 			int exitValue = p.waitFor();
-
-			String read = readerGobbler.getResult();
 			if (exitValue != 0 && (read == null || read.trim().length() == 0))
 			{
-				read = errorGobbler.getResult();
-			}
-			else
-			{
-				if (read != null && read.endsWith("\n")) //$NON-NLS-1$
-				{
-					read = read.substring(0, read.length() - 1);
-				}
+				read = read(p.getErrorStream());
 			}
 			Map<Integer, String> result = new HashMap<Integer, String>();
 			result.put(exitValue, read);
@@ -122,6 +101,32 @@ public abstract class ProcessUtil
 			UtilPlugin.logError(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	private static void write(String input, OutputStream out)
+	{
+		if (out == null)
+			return;
+		try
+		{
+			out.write(input.getBytes());
+			out.flush();
+		}
+		catch (IOException e)
+		{
+			UtilPlugin.logError(e.getMessage(), e);
+		}
+		finally
+		{
+			try
+			{
+				out.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
 	}
 
 	/**
