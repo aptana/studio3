@@ -578,6 +578,8 @@ public class GitRepository
 
 	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
 		for (IGitRepositoryListener listener : listeners)
 			listener.branchChanged(e);
@@ -585,6 +587,8 @@ public class GitRepository
 
 	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
@@ -1060,6 +1064,8 @@ public class GitRepository
 
 	public void firePullEvent()
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		PullEvent e = new PullEvent(this);
 		for (IGitRepositoryListener listener : listeners)
 			listener.pulled(e);
@@ -1067,6 +1073,8 @@ public class GitRepository
 
 	public void firePushEvent()
 	{
+		if (listeners == null || listeners.isEmpty())
+			return;
 		PushEvent e = new PushEvent(this);
 		for (IGitRepositoryListener listener : listeners)
 			listener.pushed(e);

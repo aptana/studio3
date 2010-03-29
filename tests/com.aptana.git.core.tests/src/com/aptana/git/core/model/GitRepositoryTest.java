@@ -248,7 +248,7 @@ public class GitRepositoryTest extends TestCase
 				eventsReceived.add(e);
 			}
 		};
-		fRepo.addListener(listener);
+		getRepo().addListener(listener);
 		// TODO Attach and unattach repo with the RepositoryProvider and check those events
 
 		testSwitchBranch();
@@ -262,6 +262,13 @@ public class GitRepositoryTest extends TestCase
 		// Do some things that should send events and make sure we don't get any more.
 		assertSwitchBranch("my_new_branch");
 		assertEquals(size, eventsReceived.size());
+	}
+
+	protected GitRepository getRepo()
+	{
+		if (fRepo == null)
+			createRepo();
+		return fRepo;
 	}
 
 	protected void assertBranchChangedEvent(List<RepositoryEvent> events, String oldName, String newName)
@@ -407,7 +414,7 @@ public class GitRepositoryTest extends TestCase
 			}
 		});
 		assertTrue(pushEvents.isEmpty());
-		repo.firePullEvent();
+		repo.firePushEvent();
 		assertEquals(1, pushEvents.size());
 		assertSame(repo, pushEvents.get(0).getRepository());
 	}
