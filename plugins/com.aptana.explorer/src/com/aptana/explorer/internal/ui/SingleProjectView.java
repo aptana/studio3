@@ -268,6 +268,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		browserData.bottom = new FormAttachment(100, 0);
 		browserComposite.setLayoutData(browserData);
 
+		updateMessageArea();
+
 		// Force relayout on resize of view so that splitter gets resized.
 		parent.addListener(SWT.Resize, new Listener()
 		{
@@ -795,16 +797,19 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 
 	private char getProjectType()
 	{
-		// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
-		try
+		if (selectedProject != null)
 		{
-			// FIXME This id is a constant in the rails plugins...
-			if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
-				return 'R';
-		}
-		catch (CoreException e)
-		{
-			ExplorerPlugin.logError(e);
+			// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+			try
+			{
+				// FIXME This id is a constant in the rails plugins...
+				if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+					return 'R';
+			}
+			catch (CoreException e)
+			{
+				ExplorerPlugin.logError(e);
+			}
 		}
 		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
 		return 'O';
