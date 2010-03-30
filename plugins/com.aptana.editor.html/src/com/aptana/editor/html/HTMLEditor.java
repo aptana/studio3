@@ -44,7 +44,6 @@ import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.js.Activator;
-import com.aptana.parsing.ast.IParseNode;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
@@ -91,16 +90,6 @@ public class HTMLEditor extends AbstractThemeableEditor
 		super.createPartControl(parent);
 		// Install a verify key listener that auto-closes unclosed open tags!
 		OpenTagCloser.install(getSourceViewer());
-	}
-
-	@Override
-	protected Object getOutlineElementAt(int caret)
-	{
-		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null) {
-			return null;
-		}
-		return HTMLOutlineContentProvider.getOutlineItem(astNode);
 	}
 
 	@Override

@@ -10,7 +10,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -28,10 +27,12 @@ import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.ThemedDelegatingLabelProvider;
 import com.aptana.editor.common.theme.TreeThemer;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
+
 	public class ToggleLinkingAction extends BaseToggleLinkingAction
 	{
 		public ToggleLinkingAction()
@@ -70,7 +71,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private AbstractThemeableEditor fEditor;
 
-	private ITreeContentProvider fContentProvider;
+	private CommonOutlineContentProvider fContentProvider;
 	private ILabelProvider fLabelProvider;
 
 	private ToggleLinkingAction fToggleLinkingAction;
@@ -110,7 +111,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				// expands the selection one level if applicable
 				viewer.expandToLevel(selection.getFirstElement(), 1);
 				// selects the corresponding text in editor
-				if (!isLinkedWithEditor()) {
+				if (!isLinkedWithEditor())
+				{
 					setEditorSelection(selection, true);
 				}
 			}
@@ -201,6 +203,11 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
+	public Object getOutlineItem(IParseNode node)
+	{
+		return fContentProvider.getOutlineItem(node);
+	}
+
 	public void refresh()
 	{
 		if (!isDisposed())
@@ -209,7 +216,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	public void setContentProvider(ITreeContentProvider provider)
+	public void setContentProvider(CommonOutlineContentProvider provider)
 	{
 		fContentProvider = provider;
 		if (!isDisposed())

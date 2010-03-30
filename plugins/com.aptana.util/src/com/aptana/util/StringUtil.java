@@ -47,6 +47,8 @@ public abstract class StringUtil
 	public static List<String> tokenize(String inputString, String delim)
 	{
 		List<String> tokens = new ArrayList<String>();
+		if (inputString == null)
+			return tokens;
 		StringTokenizer tokenizer = new StringTokenizer(inputString, delim);
 		while (tokenizer.hasMoreTokens())
 			tokens.add(tokenizer.nextToken());
@@ -84,7 +86,7 @@ public abstract class StringUtil
 		return null;
 	}
 
-	/**
+/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * 
 	 * @param raw
@@ -94,7 +96,7 @@ public abstract class StringUtil
 	{
 		return raw.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
-	
+
 	/**
 	 * Compares two strings for equality taking into account that none, one, or both may be null
 	 * 

@@ -1,18 +1,23 @@
-package com.aptana.editor.xml.outline;
+package com.aptana.editor.common.outline;
 
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 
-class XMLOutlineItem implements IRange
+public class CommonOutlineItem implements IRange, Comparable<IRange>
 {
 
 	private IRange fSourceRange;
 	private IParseNode fReferenceNode;
 
-	public XMLOutlineItem(IRange sourceRange, IParseNode referenceNode)
+	public CommonOutlineItem(IRange sourceRange, IParseNode referenceNode)
 	{
 		fSourceRange = sourceRange;
 		fReferenceNode = referenceNode;
+	}
+
+	public IRange getSourceRange()
+	{
+		return fSourceRange;
 	}
 
 	public IParseNode getReferenceNode()
@@ -41,16 +46,22 @@ class XMLOutlineItem implements IRange
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof XMLOutlineItem))
+		if (!(obj instanceof CommonOutlineItem))
 		{
 			return false;
 		}
-		return fReferenceNode.equals(((XMLOutlineItem) obj).fReferenceNode);
+		return fReferenceNode.equals(((CommonOutlineItem) obj).fReferenceNode);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		return fReferenceNode.hashCode();
+	}
+
+	@Override
+	public int compareTo(IRange o)
+	{
+		return getStartingOffset() - o.getStartingOffset();
 	}
 }

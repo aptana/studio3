@@ -9,6 +9,7 @@ import beaver.Symbol;
 
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
 
 public class HTMLElementNode extends HTMLNode
 {
@@ -48,6 +49,15 @@ public class HTMLElementNode extends HTMLNode
 		}
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, String>();
+	}
+
+	@Override
+	public void addOffset(int offset)
+	{
+		IRange range = fNameNode.getNameRange();
+		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
+				+ offset);
+		super.addOffset(offset);
 	}
 
 	public String getName()

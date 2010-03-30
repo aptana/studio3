@@ -68,10 +68,15 @@ public class GitRepositoryTest extends TestCase
 	{
 		IPath path = repoToGenerate();
 		// Doesn't yet exist
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNull(repo);
 		// Create it now and assert that it was created
 		createRepo(path);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public void testAddFileStageUnstageAndCommit() throws Throwable
@@ -81,8 +86,7 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(index.changedFiles().isEmpty());
 
 		// Actually add a file to the location
-		String txtFile = fileToAdd();
-		FileWriter writer = new FileWriter(txtFile);
+		FileWriter writer = new FileWriter(fileToAdd());
 		writer.write("Hello World!");
 		writer.close();
 		// refresh the index
@@ -102,19 +106,19 @@ public class GitRepositoryTest extends TestCase
 		assertTrue(index.stageFiles(changed));
 		assertStaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		// Unstage the file
 		assertFalse(changed.isEmpty());
 		assertTrue(index.unstageFiles(changed));
 		assertUnstaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		// stage again so we can commit...
 		assertFalse(changed.isEmpty());
 		assertTrue(index.stageFiles(changed));
 		assertStaged(changed.get(0));
 		assertStatus(Status.NEW, changed.get(0));
-		
+
 		index.commit("Initial commit");
 		// No more changed files now...
 		assertTrue(index.changedFiles().isEmpty());
@@ -124,14 +128,14 @@ public class GitRepositoryTest extends TestCase
 	{
 		testAddFileStageUnstageAndCommit();
 		// Now delete the file we committed!
-		String addedFile = fileToAdd();
+		File addedFile = new File(fileToAdd());
 		// make sure it's there first
-		assertTrue(new File(addedFile).exists());
+		assertTrue(addedFile.exists());
 		// delete it
-		IStatus status = fRepo.deleteFile(addedFile);
+		IStatus status = fRepo.deleteFile(addedFile.getName());
 		assertTrue(status.isOK());
 		// make sure its deleted from filesystem
-		assertFalse(new File(addedFile).exists());
+		assertFalse(addedFile.exists());
 
 		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
 		GitIndex index = fRepo.index();
@@ -168,8 +172,7 @@ public class GitRepositoryTest extends TestCase
 		GitIndex index = fRepo.index();
 
 		// Actually add a file to the location
-		String txtFile = fileToAdd();
-		FileWriter writer = new FileWriter(txtFile, true);
+		FileWriter writer = new FileWriter(fileToAdd(), true);
 		writer.write("\nHello second line!");
 		writer.close();
 		// refresh the index
@@ -210,18 +213,6 @@ public class GitRepositoryTest extends TestCase
 		IGitRepositoryListener listener = new IGitRepositoryListener()
 		{
 			@Override
-			public void repositoryRemoved(RepositoryRemovedEvent e)
-			{
-				eventsReceived.add(e);
-			}
-
-			@Override
-			public void repositoryAdded(RepositoryAddedEvent e)
-			{
-				eventsReceived.add(e);
-			}
-
-			@Override
 			public void indexChanged(IndexChangedEvent e)
 			{
 				eventsReceived.add(e);
@@ -257,7 +248,7 @@ public class GitRepositoryTest extends TestCase
 				eventsReceived.add(e);
 			}
 		};
-		GitRepository.addListener(listener);
+		getRepo().addListener(listener);
 		// TODO Attach and unattach repo with the RepositoryProvider and check those events
 
 		testSwitchBranch();
@@ -267,10 +258,17 @@ public class GitRepositoryTest extends TestCase
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
-		GitRepository.removeListener(listener);
+		fRepo.removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
 		assertSwitchBranch("my_new_branch");
 		assertEquals(size, eventsReceived.size());
+	}
+
+	protected GitRepository getRepo()
+	{
+		if (fRepo == null)
+			createRepo();
+		return fRepo;
 	}
 
 	protected void assertBranchChangedEvent(List<RepositoryEvent> events, String oldName, String newName)
@@ -385,10 +383,50 @@ public class GitRepositoryTest extends TestCase
 		// status.getMessage());
 	}
 
+	public void testFirePullEvent()
+	{
+		GitRepository repo = createRepo();
+		final List<PullEvent> pullEvents = new ArrayList<PullEvent>();
+		repo.addListener(new AbstractGitRepositoryListener()
+		{
+			@Override
+			public void pulled(PullEvent e)
+			{
+				pullEvents.add(e);
+			}
+		});
+		assertTrue(pullEvents.isEmpty());
+		repo.firePullEvent();
+		assertEquals(1, pullEvents.size());
+		assertSame(repo, pullEvents.get(0).getRepository());
+	}
+
+	public void testFirePushEvent()
+	{
+		GitRepository repo = createRepo();
+		final List<PushEvent> pushEvents = new ArrayList<PushEvent>();
+		repo.addListener(new AbstractGitRepositoryListener()
+		{
+			@Override
+			public void pushed(PushEvent e)
+			{
+				pushEvents.add(e);
+			}
+		});
+		assertTrue(pushEvents.isEmpty());
+		repo.firePushEvent();
+		assertEquals(1, pushEvents.size());
+		assertSame(repo, pushEvents.get(0).getRepository());
+	}
+
 	protected IPath repoToGenerate()
 	{
 		if (fPath == null)
-			fPath = GitPlugin.getDefault().getStateLocation().append("git_repo" + System.currentTimeMillis());
+		{
+			String tmpDirString = System.getProperty("java.io.tmpdir");
+			fPath = new Path(tmpDirString).append("git_repo" + System.currentTimeMillis());
+			// fPath = GitPlugin.getDefault().getStateLocation().append("git_repo" + System.currentTimeMillis());
+		}
 		return fPath;
 	}
 
@@ -410,8 +448,9 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected GitRepository createRepo(IPath path)
 	{
-		GitRepository.create(path.toOSString());
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
+		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
+		getGitRepositoryManager().create(path.toOSString());
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;
 		return repo;

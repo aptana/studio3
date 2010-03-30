@@ -25,7 +25,7 @@ abstract class StagingAction extends ChangedFileAction
 			if (resource instanceof IContainer)
 			{
 				IContainer container = (IContainer) resource;
-				GitRepository repo = GitRepository.getAttached(resource.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 				List<ChangedFile> files = repo.getChangedFilesForContainer(container);
 				// FIXME just filter and add them all at the same time!
 				for (ChangedFile file : files)
@@ -47,7 +47,7 @@ abstract class StagingAction extends ChangedFileAction
 				ChangedFile correspondingChangedFile = getChangedFile(resource);
 				if (!changedFileIsValid(correspondingChangedFile))
 					continue;
-				GitRepository repo = GitRepository.getAttached(resource.getProject());
+				GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 				List<ChangedFile> changedFiles = repoToChangedFiles.get(repo);
 				if (changedFiles == null)
 				{
@@ -83,7 +83,7 @@ abstract class StagingAction extends ChangedFileAction
 		if (resource instanceof IContainer)
 		{
 			IContainer container = (IContainer) resource;
-			GitRepository repo = GitRepository.getAttached(resource.getProject());
+			GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 			List<ChangedFile> files = repo.getChangedFilesForContainer(container);
 			for (ChangedFile file : files)
 			{

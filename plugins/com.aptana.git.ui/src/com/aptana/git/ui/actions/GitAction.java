@@ -33,7 +33,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.internal.actions.Messages;
 
 /**
@@ -209,7 +211,7 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			if (resource == null)
 				continue;
 			IProject project = resource.getProject();
-			GitRepository repo = GitRepository.getAttached(project);
+			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null)
 				repos.add(repo);
 		}
@@ -255,7 +257,7 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 		Set<IProject> projects = new HashSet<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			GitRepository other = GitRepository.getAttached(project);
+			GitRepository other = getGitRepositoryManager().getAttached(project);
 			if (other != null && other.equals(repo))
 			{
 				projects.add(project);
@@ -315,5 +317,10 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			}
 		}
 		return targetPart;
+	}
+	
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 }

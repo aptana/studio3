@@ -429,6 +429,7 @@ public class GitIndex
 		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
 
@@ -461,6 +462,7 @@ public class GitIndex
 		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
+			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
 
@@ -501,11 +503,11 @@ public class GitIndex
 		postIndexChange(discardFiles);
 	}
 
-	public void commit(String commitMessage)
+	public boolean commit(String commitMessage)
 	{
 		boolean success = doCommit(commitMessage);
 		if (!success)
-			return;
+			return false;
 
 		// Need to explicitly fire off changes for the files that were staged and got committed
 		postIndexChange(getStagedFiles());
@@ -516,6 +518,7 @@ public class GitIndex
 			this.amend = false;
 		else
 			refresh();
+		return true;
 	}
 
 	private boolean doCommit(String commitMessage)
@@ -611,11 +614,15 @@ public class GitIndex
 		}
 		postCommitUpdate("Creating commit"); //$NON-NLS-1$
 		int ret = 1;
+		String commit = ""; //$NON-NLS-1$
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, commitMessage,
 				amendEnvironment, arguments.toArray(new String[arguments.size()]));
-		String commit = result.values().iterator().next();
-		ret = result.keySet().iterator().next();
-		if (ret != 0 || commit.length() != 40)
+		if (result != null && !result.isEmpty())
+		{
+			commit = result.values().iterator().next();
+			ret = result.keySet().iterator().next();
+		}
+		if (ret != 0 || commit == null || commit.length() != 40)
 		{
 			postCommitFailure("Could not create a commit object"); //$NON-NLS-1$
 			return null;

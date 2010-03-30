@@ -18,7 +18,8 @@ import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.GitRepositoryManager;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.internal.core.storage.CommitFileRevision;
 import com.aptana.util.IOUtil;
 
@@ -36,6 +37,8 @@ public class GitPlugin extends Plugin
 
 	private GitProjectRefresher fRepoListener;
 	private IResourceChangeListener fGitResourceListener;
+
+	private GitRepositoryManager fGitRepoManager;
 
 	/**
 	 * The constructor
@@ -62,7 +65,8 @@ public class GitPlugin extends Plugin
 				ResourcesPlugin.getWorkspace().addResourceChangeListener(fGitResourceListener,
 						IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_DELETE);
 				fRepoListener = new GitProjectRefresher();
-				GitRepository.addListener(fRepoListener);
+				getGitRepositoryManager().addListener(fRepoListener);
+				getGitRepositoryManager().addListenerToEachRepository(fRepoListener);
 				return Status.OK_STATUS;
 			}
 		};
@@ -79,12 +83,15 @@ public class GitPlugin extends Plugin
 		try
 		{
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fGitResourceListener);
-			GitRepository.removeListener(fRepoListener);
+			getGitRepositoryManager().removeListener(fRepoListener);
+			getGitRepositoryManager().removeListenerFromEachRepository(fRepoListener);
 			// Remove all the GitRepositories from memory!
-			GitRepository.cleanup();
+			if (fGitRepoManager != null)
+				fGitRepoManager.cleanup();
 		}
 		finally
 		{
+			fGitRepoManager = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -114,7 +121,7 @@ public class GitPlugin extends Plugin
 	{
 		getDefault().getLog().log(e.getStatus());
 	}
-	
+
 	public static void logWarning(String warning)
 	{
 		if (getDefault() != null)
@@ -144,25 +151,42 @@ public class GitPlugin extends Plugin
 	{
 		return new CommitFileRevision(commit, fileName);
 	}
-	
-	public IPath getGIT_SSH() {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+
+	public IPath getGIT_SSH()
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()))
+		{
 			IPath path = getStateLocation().append("bin").append("sshw.exe"); //$NON-NLS-1$ //$NON-NLS-2$
 			File file = path.toFile();
-			if (!file.exists()) {
-				try {
+			if (!file.exists())
+			{
+				try
+				{
 					file.getParentFile().mkdirs();
-					if (file.createNewFile()) {
+					if (file.createNewFile())
+					{
 						IOUtil.extractFile(PLUGIN_ID, "res/win32/sshw.exe", file); //$NON-NLS-1$
 					}
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					logError("Extract file failed.", e); //$NON-NLS-1$
 				}
 			}
-			if (file.exists()) {
+			if (file.exists())
+			{
 				return path;
 			}
 		}
 		return null;
+	}
+
+	public IGitRepositoryManager getGitRepositoryManager()
+	{
+		if (fGitRepoManager == null)
+		{
+			fGitRepoManager = new GitRepositoryManager();
+		}
+		return fGitRepoManager;
 	}
 }
