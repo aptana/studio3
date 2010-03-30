@@ -51,7 +51,7 @@ public abstract class ExecutableUtil
 		else
 		{
 			// No explicit path. Try it with "which"
-			String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, exeName); //$NON-NLS-1$ //$NON-NLS-2$
+			String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, exeName); //$NON-NLS-1$
 			if (acceptBinary(whichPath))
 				return whichPath;
 		}
