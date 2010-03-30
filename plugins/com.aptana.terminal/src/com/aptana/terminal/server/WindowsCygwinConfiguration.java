@@ -36,6 +36,7 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public void afterStart(ProcessWrapper wrapper)
 	{
+		if (1 == 1) return;
 		// Turn on filtering
 		String marker = UUID.randomUUID().toString();
 		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE);
@@ -74,6 +75,8 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	{
 		List<String> list = new ArrayList<String>();
 		list.add("\"\\\"C:\\Program Files\\Git\\bin\\sh.exe\\\"  --login -i\"");
+		list.add("80x40");
+		//list.add("-show");
 		return list;
 	}
 

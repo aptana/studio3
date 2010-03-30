@@ -15,7 +15,7 @@ static HANDLE hConsoleIn = NULL;
 static HANDLE hConsoleOut = NULL;
 static DWORD dwInputPollInterval = 10;
 static DWORD dwRefreshInterval = 500;
-static DWORD dwNotificationTimeout = 50;
+static DWORD dwNotificationTimeout = 10;
 
 static DWORD dwBufferFilled = 0L;
 static CHAR chInputBuffer[1024];
@@ -28,7 +28,11 @@ static CHAR_INFO* lpNextScreenBuffer = NULL;
 static DWORD dwBufferMemorySize = 0;
 static DWORD dwScreenBufferSize = 0;
 
-static WORD wCharAttributes = 0;
+#define COLOR_MASK (COMMON_LVB_REVERSE_VIDEO|COMMON_LVB_UNDERSCORE|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED|BACKGROUND_INTENSITY)
+#define DEFAULT_ATTRIBUTES (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)
+
+
+static WORD wCharAttributes = DEFAULT_ATTRIBUTES;
 
 
 BOOL InitConsoleHandler(void)
@@ -72,6 +76,7 @@ BOOL InitConsoleHandler(void)
 	hMonitorThread = ::CreateThread(NULL, 0, MonitorThreadProc, 0, 0, NULL);
 	if ( hMonitorThread != NULL ) {
 		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_HIGHEST);
+		::SwitchToThread();
 	}
 	return TRUE;
 }
@@ -178,7 +183,9 @@ static void MoveCursor(SHORT x, SHORT y)
 {
 	SHORT relX = x - csbiConsole.dwCursorPosition.X;
 	SHORT relY = y - csbiConsole.dwCursorPosition.Y;
-	if( (relX == 0) || (relY == 0) ) {
+	if( (x == 0) && (y == 0) ) {
+		MoveCursorAbs(x, y);
+	} else if( (relX == 0) || (relY == 0) ) {
 		MoveCursorRel(relX, relY);
 	} else {
 		MoveCursorAbs(x, y);
@@ -189,7 +196,7 @@ static void MoveCursor(SHORT x, SHORT y)
 
 static void EraseLine()
 {
-	OutputString("\x1B[K");
+	OutputString("\x1B[2K");
 }
 
 static void NextLine(SHORT count)
@@ -228,12 +235,14 @@ static void ScrollWindow(BOOL bUp)
 	}
 }
 
-#define SIZEOF_CHAR_INFO (2*sizeof(CHAR_INFO))
-#define COLOR_MASK (COMMON_LVB_REVERSE_VIDEO|COMMON_LVB_UNDERSCORE|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED|BACKGROUND_INTENSITY)
-
-static void ChangeColor(WORD attrs)
+static void ChangeAttributes(WORD attrs)
 {
+	WORD prevAttrs = wCharAttributes & COLOR_MASK;
+	wCharAttributes = attrs;
 	attrs &= COLOR_MASK;
+	if( attrs == prevAttrs ) {
+		return;
+	}
 	if( attrs == 0 )
 	{
 		OutputString("\x1B[0m");
@@ -244,78 +253,100 @@ static void ChangeColor(WORD attrs)
 	{
 		OutputChar('\x1B');
 		OutputChar('[');
-		if(  (attrs & FOREGROUND_INTENSITY) != 0 ) {
-			OutputString("1;");
+		BOOL bAddSep = FALSE;
+		if(  (attrs & FOREGROUND_INTENSITY) != (prevAttrs & FOREGROUND_INTENSITY) ) {
+			OutputString((attrs & FOREGROUND_INTENSITY) != 0 ? "1" : "22");
+			bAddSep = TRUE;
 		}
-		if( (attrs & COMMON_LVB_UNDERSCORE) != 0 ) {
-			OutputString("4;");
+		if( (attrs & COMMON_LVB_UNDERSCORE) != (prevAttrs & COMMON_LVB_UNDERSCORE) ) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & COMMON_LVB_UNDERSCORE) != 0 ? "4" : "24");
+			bAddSep = TRUE;
 		}
 		WORD fg = attrs & (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED);
-		OutputChar('3');
-		switch( fg ) {
-			case 0:
-				OutputChar('0');
-				break;
-			case FOREGROUND_BLUE:
-				OutputChar('4');
-				break;
-			case FOREGROUND_GREEN:
-				OutputChar('2');
-				break;
-			case FOREGROUND_RED:
-				OutputChar('1');
-				break;
-			case FOREGROUND_BLUE | FOREGROUND_GREEN:
-				OutputChar('6');
-				break;
-			case FOREGROUND_BLUE | FOREGROUND_RED:
-				OutputChar('5');
-				break;
-			case FOREGROUND_GREEN | FOREGROUND_RED:
-				OutputChar('3');
-				break;
-			case FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED:
-				OutputChar('9');
-				break;
+		if( fg != (prevAttrs & (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)) )
+		{
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputChar('3');
+			switch( fg ) {
+				case 0:
+					OutputChar('0');
+					break;
+				case FOREGROUND_BLUE:
+					OutputChar('4');
+					break;
+				case FOREGROUND_GREEN:
+					OutputChar('2');
+					break;
+				case FOREGROUND_RED:
+					OutputChar('1');
+					break;
+				case FOREGROUND_BLUE | FOREGROUND_GREEN:
+					OutputChar('6');
+					break;
+				case FOREGROUND_BLUE | FOREGROUND_RED:
+					OutputChar('5');
+					break;
+				case FOREGROUND_GREEN | FOREGROUND_RED:
+					OutputChar('3');
+					break;
+				case FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED:
+					OutputChar('9');
+					break;
+			}
+			bAddSep = TRUE;
 		}
-		OutputChar(';');
 		WORD bg = attrs & (BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED);
-		OutputChar('4');
-		switch( bg ) {
-			case 0:
-				OutputChar('9');
-				break;
-			case BACKGROUND_BLUE:
-				OutputChar('4');
-				break;
-			case BACKGROUND_GREEN:
-				OutputChar('2');
-				break;
-			case BACKGROUND_RED:
-				OutputChar('1');
-				break;
-			case BACKGROUND_BLUE | BACKGROUND_GREEN:
-				OutputChar('6');
-				break;
-			case BACKGROUND_BLUE | BACKGROUND_RED:
-				OutputChar('5');
-				break;
-			case BACKGROUND_GREEN | BACKGROUND_RED:
-				OutputChar('3');
-				break;
-			case BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED:
-				OutputChar('7');
-				break;
+		if( bg != (prevAttrs & (BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED)) )
+		{
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputChar('4');
+			switch( bg ) {
+				case 0:
+					OutputChar('9');
+					break;
+				case BACKGROUND_BLUE:
+					OutputChar('4');
+					break;
+				case BACKGROUND_GREEN:
+					OutputChar('2');
+					break;
+				case BACKGROUND_RED:
+					OutputChar('1');
+					break;
+				case BACKGROUND_BLUE | BACKGROUND_GREEN:
+					OutputChar('6');
+					break;
+				case BACKGROUND_BLUE | BACKGROUND_RED:
+					OutputChar('5');
+					break;
+				case BACKGROUND_GREEN | BACKGROUND_RED:
+					OutputChar('3');
+					break;
+				case BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED:
+					OutputChar('7');
+					break;
+			}
+			bAddSep = TRUE;
 		}
 		OutputChar('m');
 	}
 }
 
+static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength);
+static BOOL HasChanges(CHAR_INFO *lpPrevCharInfo, CHAR_INFO *lpNextCharInfo, SHORT sLength, SHORT sMinCount);
 
 static void ReadConsoleBuffer()
 {
-	HANDLE hConsoleOut2 = ::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
-
 	CONSOLE_SCREEN_BUFFER_INFO csbiNextConsole;
 	COORD coordConsoleSize;
 	COORD coordStart = {0, 0};
@@ -323,9 +354,13 @@ static void ReadConsoleBuffer()
 	SMALL_RECT srBuffer;
 
 	::ResetEvent(hConsoleOut);
-	::GetConsoleScreenBufferInfo(hConsoleOut2, &csbiNextConsole);
+	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	coordConsoleSize.X = csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
 	coordConsoleSize.Y = csbiNextConsole.srWindow.Bottom - csbiNextConsole.srWindow.Top + 1;
+
+	// make cursor positions relative to console window
+	csbiNextConsole.dwCursorPosition.X -= csbiNextConsole.srWindow.Left;
+	csbiNextConsole.dwCursorPosition.Y -= csbiNextConsole.srWindow.Top;
 	
 	coordBufferSize.X = coordConsoleSize.X;
 	coordBufferSize.Y = min(coordConsoleSize.Y, 6144 / coordBufferSize.X); // limit to ~6k per read operation
@@ -344,7 +379,7 @@ static void ReadConsoleBuffer()
 		}
 		csbiConsole = csbiNextConsole;
 		dwScreenBufferSize = dwNextScreenBufferSize;
-		if( dwScreenBufferSize*SIZEOF_CHAR_INFO > dwBufferMemorySize ) {
+		if( dwScreenBufferSize*sizeof(CHAR_INFO) > dwBufferMemorySize ) {
 			if( ::HeapValidate(hHeap, 0, NULL) == 0 ) {
 			}
 			if( lpPrevScreenBuffer != NULL ) {
@@ -353,26 +388,39 @@ static void ReadConsoleBuffer()
 			if( lpNextScreenBuffer ) {
 				::HeapFree(hHeap, 0, lpNextScreenBuffer);
 			}
-			dwBufferMemorySize = dwScreenBufferSize*SIZEOF_CHAR_INFO;
+			dwBufferMemorySize = dwScreenBufferSize*sizeof(CHAR_INFO);
 			lpPrevScreenBuffer = (CHAR_INFO*) ::HeapAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, dwBufferMemorySize);
 			lpNextScreenBuffer = (CHAR_INFO*) ::HeapAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, dwBufferMemorySize);
 		}
 		DWORD dwScreenBufferOffset = 0;
-		for( SHORT i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		SHORT i;
+		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
+			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
+			coordStart.Y += coordBufferSize.Y;
 			dwScreenBufferOffset += coordBufferSize.X * coordBufferSize.Y;
 		}
-		::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
+		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
+		if( coordBufferSize.Y != 0 ) { 
+			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		}
 
 		CHAR_INFO* lpCharInfo = lpPrevScreenBuffer;
 		BOOL bHasNonEmptyChar = FALSE;
 		csbiConsole.dwCursorPosition.X = 0;
 		csbiConsole.dwCursorPosition.Y = 0;
-		wCharAttributes = 0;
 		for( SHORT y = 0; y < coordConsoleSize.Y; ++y)
 		{
+			if( IsLineEmpty(lpCharInfo, coordConsoleSize.X) )
+			{
+				if( bHasNonEmptyChar ) {
+					OutputString("\r\n");
+				}
+				lpCharInfo += coordConsoleSize.X;
+				continue;
+			}
 			for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpCharInfo)
 			{
 				if( (lpCharInfo->Char.AsciiChar == ' ') && (lpCharInfo->Attributes == wCharAttributes) && !bHasNonEmptyChar ) {
@@ -388,47 +436,86 @@ static void ReadConsoleBuffer()
 					bHasNonEmptyChar = TRUE;
 				}
 				if( wCharAttributes != lpCharInfo->Attributes ) {
-					wCharAttributes = lpCharInfo->Attributes;
-					ChangeColor(wCharAttributes);
+					ChangeAttributes(lpCharInfo->Attributes);
+				} else if( (lpCharInfo->Char.AsciiChar == ' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
+					lpCharInfo += coordConsoleSize.X - x;
+					break;
 				}
 				OutputChar(lpCharInfo->Char.AsciiChar);
 				csbiConsole.dwCursorPosition.X = x + 1;
 				csbiConsole.dwCursorPosition.Y = y;
 			}
 			if( bHasNonEmptyChar ) {
+				if( IsLineEmpty(lpCharInfo, (coordConsoleSize.Y-y)*coordConsoleSize.X) ) {
+					break;
+				}
 				OutputString("\r\n");
 			}
 		}
 	} else
 	{
 		DWORD dwScreenBufferOffset = 0;
-		for( SHORT i = 1; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		SHORT i;
+		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
+			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
+			coordStart.Y += coordBufferSize.Y;
 			dwScreenBufferOffset += coordBufferSize.X * coordBufferSize.Y;
 		}
-		::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
+		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
+		if( coordBufferSize.Y != 0 ) { 
+			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		}
 
-		if( ::memcmp(lpPrevScreenBuffer, lpNextScreenBuffer, dwBufferMemorySize) != 0 )
+		if( ::memcmp(lpPrevScreenBuffer, lpNextScreenBuffer, dwScreenBufferSize*sizeof(CHAR_INFO)) != 0 )
 		{
 			// partial changes
 			CHAR_INFO* lpPrevCharInfo = lpPrevScreenBuffer;
 			CHAR_INFO* lpNextCharInfo = lpNextScreenBuffer;
 			for( SHORT y = 0; y < coordConsoleSize.Y; ++y)
 			{
+				BOOL bReplaceLine = FALSE;
+				if( bReplaceLine = HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 4) )
+				{
+					MoveCursor(0, y);
+					if( !IsLineEmpty(lpPrevCharInfo, coordConsoleSize.X) ) {
+						EraseLine();
+					}
+				} else {
+					if(!HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 0) && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X) ) {
+						lpPrevCharInfo += coordConsoleSize.X;
+						lpNextCharInfo += coordConsoleSize.X;
+						continue;
+					}
+				}
 				for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpPrevCharInfo, ++lpNextCharInfo)
 				{
-					if( ::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0 )
+					if( bReplaceLine || (::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0) )
 					{
-						MoveCursor(x, y);
-						if( wCharAttributes != lpNextScreenBuffer->Attributes ) {
-							wCharAttributes = lpNextScreenBuffer->Attributes;
-							ChangeColor(wCharAttributes);
+						if( wCharAttributes != lpNextCharInfo->Attributes ) {
+							MoveCursor(x, y);
+							ChangeAttributes(lpNextCharInfo->Attributes);
+						} else if( bReplaceLine && (lpNextCharInfo->Char.AsciiChar == ' ') && !HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X - x, 0) ) {
+							lpPrevCharInfo += coordConsoleSize.X - x;
+							lpNextCharInfo += coordConsoleSize.X - x;
+							csbiConsole.dwCursorPosition.X += coordConsoleSize.X - x;
+							break;
+						} else {
+							MoveCursor(x, y);
 						}
 						OutputChar(lpNextCharInfo->Char.AsciiChar);
 						++csbiConsole.dwCursorPosition.X;
 					}
+				}
+				if( bReplaceLine)
+				{
+					if( y !=  coordConsoleSize.Y -1 ) {
+						OutputString("\r\n");
+					}
+					csbiConsole.dwCursorPosition.X = 0;
+					++csbiConsole.dwCursorPosition.Y;
 				}
 			}
 			CHAR_INFO* tmpNext = lpPrevScreenBuffer;
@@ -438,10 +525,9 @@ static void ReadConsoleBuffer()
 	}
 	MoveCursor(csbiNextConsole.dwCursorPosition.X, csbiNextConsole.dwCursorPosition.Y);
 	FlushBuffer();
-	::CloseHandle(hConsoleOut2);
 }
 
-static void ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
+static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
 
 static void WriteConsole(void)
 {
@@ -464,32 +550,43 @@ static void WriteConsole(void)
 		for( DWORD i = 0; i < dwRead; ++i )
 		{
 			CHAR ch = chBuf[i];
-			if( ch == '\x1B' ) {
-				hasEscSequence = TRUE;
-				continue;
-			} else if ( hasEscSequence ) {
+			if ( hasEscSequence ) {
 				chSeq[dwSeqIndex++] = ch;
-				if ( isalpha(ch) )
-				{
-					chSeq[dwSeqIndex] = '\0';
-					hasEscSequence = FALSE;
-					ProcessEscSequence(chSeq, dwSeqIndex);
+				if ( (ch != '\x1B') && !isalpha(ch) ) {
+					continue;
 				}
+				chSeq[dwSeqIndex] = '\0';
+				hasEscSequence = FALSE;
+				if( ProcessEscSequence(chSeq, dwSeqIndex) ) {
+					continue;
+				} else {
+					i -= dwSeqIndex;
+					ch = chBuf[i];
+				}
+			} else if( ch == '\x1B' ) {
+				hasEscSequence = TRUE;
 				continue;
 			}
 			ir.Event.KeyEvent.uChar.UnicodeChar = ch;
 			SHORT key = ::VkKeyScan(ch);
-			ir.Event.KeyEvent.wVirtualKeyCode = LOBYTE(key);
-			ir.Event.KeyEvent.dwControlKeyState = 0;
 			SHORT state = HIBYTE(key);
-			if ((state & 1) == 1) {
-				ir.Event.KeyEvent.dwControlKeyState = SHIFT_PRESSED;
-			}
-			if ((state & 2) == 2) {
-				ir.Event.KeyEvent.dwControlKeyState = LEFT_CTRL_PRESSED;
-			}
-			if ((state & 4) == 4) {
-				ir.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
+			key = LOBYTE(key);
+			ir.Event.KeyEvent.wVirtualKeyCode = key;
+			ir.Event.KeyEvent.dwControlKeyState = 0;
+			if( (key == VK_BACK) )
+			{
+				ir.Event.KeyEvent.uChar.UnicodeChar = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 2/*MAPVK_VK_TO_CHAR*/);
+			} else
+			{
+				if ((state & 1) == 1) {
+					ir.Event.KeyEvent.dwControlKeyState = SHIFT_PRESSED;
+				}
+				if ((state & 2) == 2) {
+					ir.Event.KeyEvent.dwControlKeyState = LEFT_CTRL_PRESSED;
+				}
+				if ((state & 4) == 4) {
+					ir.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
+				}
 			}
 			ir.Event.KeyEvent.wVirtualScanCode = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 0/*MAPVK_VK_TO_VSC*/);
 			::WriteConsoleInput(hConsoleIn, &ir, 1, &dwWritten);
@@ -497,7 +594,7 @@ static void WriteConsole(void)
 	}
 }
 
-static void ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
+static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 {
 	int param[4];
 	if ( (chSequence[dwLength-1] == 't') && sscanf_s(chSequence, "[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3 )
@@ -541,8 +638,33 @@ static void ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 				::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
 				::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
 			}
+			return TRUE;
 		}
 	}
+	return FALSE;
+}
+
+static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength)
+{
+	for( SHORT x = 0; x < sLength; ++x, ++lpCharInfo) {
+		if( (lpCharInfo->Char.AsciiChar != ' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+static BOOL HasChanges(CHAR_INFO *lpPrevCharInfo, CHAR_INFO *lpNextCharInfo, SHORT sLength, SHORT sMinCount)
+{
+	SHORT sCount = 0;
+	for( SHORT x = 0; x < sLength; ++x, ++lpPrevCharInfo, ++lpNextCharInfo) {
+		if( ::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0 ) {
+			if( ++sCount >= sMinCount ) {
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
 }
 
 static void FlushBuffer()

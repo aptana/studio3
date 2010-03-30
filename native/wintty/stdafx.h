@@ -23,12 +23,13 @@
 #define _WIN32_IE 0x0600	// Change this to the appropriate value to target other versions of IE.
 #endif
 
+#undef _DLL
 #include <tchar.h>
 #include <windows.h>
 #include <winuser.h>
 #include <tlhelp32.h>
 #include <stdio.h>
-
+#define _DLL
 
 
 // TODO: reference additional headers your program requires here

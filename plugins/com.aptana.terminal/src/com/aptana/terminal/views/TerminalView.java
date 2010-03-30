@@ -108,7 +108,7 @@ public class TerminalView extends ViewPart
 			if (workingDirectory != null)
 			{
 				// FIXME We may need to tweak the working dir path based on cmd/cygwin/mingw
-				wrapper.sendText(MessageFormat.format("cd \"{0}\"\n", workingDirectory)); //$NON-NLS-1$
+				//wrapper.sendText(MessageFormat.format("cd \"{0}\"\n", workingDirectory)); //$NON-NLS-1$
 			}
 		}
 

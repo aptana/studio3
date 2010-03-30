@@ -77,6 +77,19 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	::ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
+	si.dwFlags = STARTF_FORCEOFFFEEDBACK | STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_HIDE;
+	if( argc > 2 ) {
+		int width, height;
+		if( _stscanf_s(argv[2], _T("%dx%d"), &width, &height) == 2 ) {
+			si.dwXCountChars = width;
+			si.dwYCountChars = height;
+			si.dwFlags |= STARTF_USECOUNTCHARS;
+		}
+	}
+	if( (argc > 3) && _tcscmp(argv[3], _T("-show")) == 0 ) {
+		si.dwFlags &= ~STARTF_USESHOWWINDOW;
+	}
 	::ZeroMemory(&pi, sizeof(pi));
 
 #ifdef UNICODE
