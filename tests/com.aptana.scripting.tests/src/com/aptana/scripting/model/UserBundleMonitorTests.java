@@ -2,7 +2,7 @@ package com.aptana.scripting.model;
 
 public class UserBundleMonitorTests extends BundleMonitorTests
 {
-	private static final int WAIT_TIME = 2000;
+	private static final int WAIT_TIME = 5000;
 
 	/**
 	 * UserBundleMonitorTests
