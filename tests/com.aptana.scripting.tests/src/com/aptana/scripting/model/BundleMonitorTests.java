@@ -15,7 +15,9 @@ public abstract class BundleMonitorTests extends TestCase
 	{
 		void performAction() throws Exception;
 	}
-
+	
+	private static final int POST_SLEEP = 5000;
+	
 	public static final String BUNDLE_NAME = "TestBundle";
 	public static final String BUNDLE_FILE_NAME = "bundle.rb";
 	public static final String COMMAND_NAME = "MyCommand";
@@ -617,6 +619,8 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeCommandsDirectory();
+		
+		Thread.sleep(POST_SLEEP);
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
@@ -640,6 +644,8 @@ public abstract class BundleMonitorTests extends TestCase
 		assertEquals(1, commands.length);
 
 		this.removeSnippetsDirectory();
+		
+		Thread.sleep(POST_SLEEP);
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
