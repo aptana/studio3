@@ -84,9 +84,12 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				}
 				// Textmate just assumes we subtract one indent level
 				String decreasedIndent = ""; //$NON-NLS-1$
-				if (currentLineIndent.length() > 2)
+
+				String indentString = getIndentString();
+				if (currentLineIndent.length() > indentString.length())
 				{
-					decreasedIndent = currentLineIndent.substring(0, currentLineIndent.length() - 2);
+					decreasedIndent = currentLineIndent
+							.substring(0, currentLineIndent.length() - indentString.length());
 				}
 				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and
 																// same indent level along
@@ -116,6 +119,20 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		return;
 	}
 
+	/**
+	 * Returns the string that makes up ONE indent level (typically 2 spaces, maybe a tab char, or 4 spaces, etc).
+	 * 
+	 * @return
+	 */
+	protected String getIndentString()
+	{
+		if (getSourceViewerConfiguration() instanceof CommonSourceViewerConfiguration)
+		{
+			return ((CommonSourceViewerConfiguration) getSourceViewerConfiguration()).getIndent();
+		}
+		return TAB_CHAR;
+	}
+
 	protected boolean shouldAutoDedent()
 	{
 		return true;
@@ -134,12 +151,6 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			return false;
 
 		String newline = c.text;
-		String indentString = TAB_CHAR;
-		if (getSourceViewerConfiguration() instanceof CommonSourceViewerConfiguration)
-		{
-			indentString = ((CommonSourceViewerConfiguration) getSourceViewerConfiguration()).getIndent();
-		}
-
 		try
 		{
 			// Get the line and run a regexp check against it
@@ -152,7 +163,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			{
 				String previousLineIndent = getAutoIndentAfterNewLine(d, c);
 				String restOfLine = d.get(c.offset, curLineRegion.getLength() - (c.offset - curLineRegion.getOffset()));
-				String startIndent = newline + previousLineIndent + indentString;
+				String startIndent = newline + previousLineIndent + getIndentString();
 				if (indentAndPushTrailingContentAfterNewlineAndCursor(lineContent, restOfLine))
 				{
 					c.text = startIndent + newline + previousLineIndent;
