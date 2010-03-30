@@ -28,7 +28,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), argv[1]);
 
-	//_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("C:\\WINDOWS\\system32\\cmd.exe /c \"\"C:\\Program Files\\Git\\bin\\sh.exe\"  --login -i\""));
+	//_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("C:\\WINDOWS\\system32\\cmd.exe /u /c \"\"C:\\Program Files\\Git\\bin\\sh.exe\"  --login -i\""));
 	//_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("\"C:\\Program Files\\Git\\bin\\sh.exe\"  --login -i"));
 
 	BOOL bIsTTY = (::GetFileType(hParentStdIn) == FILE_TYPE_CHAR)
@@ -79,6 +79,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_FORCEOFFFEEDBACK | STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
+	si.lpTitle = _T("WINTTY");
 	if( argc > 2 ) {
 		int width, height;
 		if( _stscanf_s(argv[2], _T("%dx%d"), &width, &height) == 2 ) {

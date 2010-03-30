@@ -100,9 +100,6 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 	hConsoleIn = ::CreateFile(_T("CONIN$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
 	hConsoleOut = ::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
 
-	::SetConsoleCP(65001); // UTF-8
-	::SetConsoleOutputCP(65001); // UTF-8
-
 	HANDLE  waitHandles[] = {
 		hMonitorThreadExitEvent,
 		hParentProcess,
@@ -352,9 +349,11 @@ static void ReadConsoleBuffer()
 	COORD coordStart = {0, 0};
 	COORD coordBufferSize;
 	SMALL_RECT srBuffer;
+	
+	HANDLE hConsoleOut2 = hConsoleOut;//::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
 
 	::ResetEvent(hConsoleOut);
-	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
+	::GetConsoleScreenBufferInfo(hConsoleOut2, &csbiNextConsole);
 	coordConsoleSize.X = csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
 	coordConsoleSize.Y = csbiNextConsole.srWindow.Bottom - csbiNextConsole.srWindow.Top + 1;
 
@@ -395,7 +394,7 @@ static void ReadConsoleBuffer()
 		DWORD dwScreenBufferOffset = 0;
 		SHORT i;
 		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
 			coordStart.Y += coordBufferSize.Y;
@@ -404,7 +403,7 @@ static void ReadConsoleBuffer()
 		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
 		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
 		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 		}
 
 		CHAR_INFO* lpCharInfo = lpPrevScreenBuffer;
@@ -416,7 +415,9 @@ static void ReadConsoleBuffer()
 			if( IsLineEmpty(lpCharInfo, coordConsoleSize.X) )
 			{
 				if( bHasNonEmptyChar ) {
-					OutputString("\r\n");
+					if ( y != coordConsoleSize.Y-1) {
+						OutputString("\r\n");
+					}
 				}
 				lpCharInfo += coordConsoleSize.X;
 				continue;
@@ -449,7 +450,9 @@ static void ReadConsoleBuffer()
 				if( IsLineEmpty(lpCharInfo, (coordConsoleSize.Y-y)*coordConsoleSize.X) ) {
 					break;
 				}
-				OutputString("\r\n");
+				if ( y != coordConsoleSize.Y-1) {
+					OutputString("\r\n");
+				}
 			}
 		}
 	} else
@@ -457,7 +460,7 @@ static void ReadConsoleBuffer()
 		DWORD dwScreenBufferOffset = 0;
 		SHORT i;
 		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
 			coordStart.Y += coordBufferSize.Y;
@@ -466,7 +469,7 @@ static void ReadConsoleBuffer()
 		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
 		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
 		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 		}
 
 		if( ::memcmp(lpPrevScreenBuffer, lpNextScreenBuffer, dwScreenBufferSize*sizeof(CHAR_INFO)) != 0 )
@@ -525,6 +528,7 @@ static void ReadConsoleBuffer()
 	}
 	MoveCursor(csbiNextConsole.dwCursorPosition.X, csbiNextConsole.dwCursorPosition.Y);
 	FlushBuffer();
+	//::CloseHandle(hConsoleOut2);
 }
 
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
@@ -594,6 +598,48 @@ static void WriteConsole(void)
 	}
 }
 
+
+static void SetConsoleSize(SHORT width, SHORT height)
+{
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	::GetConsoleScreenBufferInfo(hConsoleOut, &csbi);
+	
+	COORD coordBufferSize;
+	coordBufferSize.X = width;
+	coordBufferSize.Y = height;
+
+	SMALL_RECT srConsoleRect = csbi.srWindow;
+	srConsoleRect.Right = srConsoleRect.Left + coordBufferSize.X - 1;
+	srConsoleRect.Bottom = srConsoleRect.Top + coordBufferSize.Y - 1;
+
+	COORD finalCoordBufferSize = csbi.dwSize;
+	SMALL_RECT finalConsoleRect = csbi.srWindow;
+	// first, resize rows
+	//finalCoordBufferSize.Y  = coordBufferSize.Y;
+	finalConsoleRect.Top    = srConsoleRect.Top;
+	finalConsoleRect.Bottom = srConsoleRect.Bottom;
+	if( coordBufferSize.Y > csbi.dwSize.Y ) {
+		// if new buffer size is > than old one, we need to resize the buffer first
+		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+	} else {
+		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+	}
+	// then, resize columns
+	finalCoordBufferSize.X  = coordBufferSize.X;
+	finalConsoleRect.Left   = srConsoleRect.Left;
+	finalConsoleRect.Right  = srConsoleRect.Right;
+	if( coordBufferSize.X > csbi.dwSize.X ) {
+		// if new buffer size is > than old one, we need to resize the buffer first
+		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+	} else {
+		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+	}
+}
+
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 {
 	int param[4];
@@ -601,43 +647,7 @@ static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 	{
 		if ( param[0] == 8 )
 		{
-			CONSOLE_SCREEN_BUFFER_INFO csbi;
-			::GetConsoleScreenBufferInfo(hConsoleOut, &csbi);
-			
-			COORD coordBufferSize;
-			coordBufferSize.X = param[2];
-			coordBufferSize.Y = param[1];
-
-			SMALL_RECT srConsoleRect = csbi.srWindow;
-			srConsoleRect.Right = srConsoleRect.Left + coordBufferSize.X - 1;
-			srConsoleRect.Bottom = srConsoleRect.Top + coordBufferSize.Y - 1;
-
-			COORD finalCoordBufferSize = csbi.dwSize;
-			SMALL_RECT finalConsoleRect = csbi.srWindow;
-			// first, resize rows
-			//finalCoordBufferSize.Y  = coordBufferSize.Y;
-			finalConsoleRect.Top    = srConsoleRect.Top;
-			finalConsoleRect.Bottom = srConsoleRect.Bottom;
-			if( coordBufferSize.Y > csbi.dwSize.Y ) {
-				// if new buffer size is > than old one, we need to resize the buffer first
-				::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-				::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-			} else {
-				::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-				::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-			}
-			// then, resize columns
-			finalCoordBufferSize.X  = coordBufferSize.X;
-			finalConsoleRect.Left   = srConsoleRect.Left;
-			finalConsoleRect.Right  = srConsoleRect.Right;
-			if( coordBufferSize.X > csbi.dwSize.X ) {
-				// if new buffer size is > than old one, we need to resize the buffer first
-				::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-				::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-			} else {
-				::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-				::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-			}
+			SetConsoleSize(param[2], param[1]);
 			return TRUE;
 		}
 	}
