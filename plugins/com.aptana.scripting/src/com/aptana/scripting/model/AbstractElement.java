@@ -1,5 +1,6 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +37,11 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public static AbstractElement[] getElementsByDirectory(String path)
 	{
 		List<AbstractElement> result = new LinkedList<AbstractElement>();
+		
+		if (path.endsWith(File.separator) == false)
+		{
+			path += File.separator;
+		}
 		
 		synchronized (ELEMENTS_BY_PATH)
 		{
