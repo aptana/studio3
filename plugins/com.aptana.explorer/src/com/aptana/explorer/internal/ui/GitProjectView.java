@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -850,12 +851,15 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			public void widgetSelected(SelectionEvent e)
 			{
 				final DisconnectAction action = new DisconnectAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_DisconnectJobTitle)
+				IAction duh = new Action()
+				{
+				};
+				action.setActivePart(duh, GitProjectView.this);
+				UIJob job = new UIJob(Messages.GitProjectView_DisconnectJobTitle)
 				{
 
 					@Override
-					protected IStatus run(IProgressMonitor monitor)
+					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
 						action.run();
 						refreshUI(null);
