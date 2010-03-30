@@ -19,7 +19,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		strategy.customizeDocumentCommand(document, command);
 
 		// Looks wrong, but command still runs to insert the >
-		assertEquals("\n</script</head>", document.get());
+		assertEquals("\n\t</script</head>", document.get());
 		assertTrue(command.doit);
 		assertEquals(">", command.text);
 	}

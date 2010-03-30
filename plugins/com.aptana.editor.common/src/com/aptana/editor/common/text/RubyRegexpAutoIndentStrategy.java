@@ -58,9 +58,13 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		{
 			// Get the line and run a regexp check against it
 			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
+			// Only de-dent when at end of line!
+			int endOffset = curLineRegion.getOffset() + curLineRegion.getLength();
+			if (c.offset != endOffset)
+				return;
+
 			String scope = getScopeAtOffset(d, c.offset);
 			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
-			// TODO Only test regexp when at end of line!
 			// what line will be after new char is inserted....
 			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset()) + c.text;
 
