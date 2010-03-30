@@ -1,12 +1,9 @@
 package com.aptana.terminal.server;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -36,27 +33,27 @@ public class WindowsCygwinConfiguration implements ProcessConfiguration
 	@Override
 	public void afterStart(ProcessWrapper wrapper)
 	{
-		if (1 == 1) return;
-		// Turn on filtering
-		String marker = UUID.randomUUID().toString();
-		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		wrapper.setStandardOutputFilter(filter);
-		
-		// Set current directory, if needed
-		String startingDirectory = wrapper.getStartingDirectory();
-		
-		if (startingDirectory != null && startingDirectory.length() > 0)
-		{
-			File dir = new File(startingDirectory);
-			
-			if (dir.exists())
-			{
-				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-		
-		wrapper.sendText("echo " + marker + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//		if (1 == 1) return;
+//		// Turn on filtering
+//		String marker = UUID.randomUUID().toString();
+//		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE); //$NON-NLS-1$ //$NON-NLS-2$
+//		
+//		wrapper.setStandardOutputFilter(filter);
+//		
+//		// Set current directory, if needed
+//		String startingDirectory = wrapper.getStartingDirectory();
+//		
+//		if (startingDirectory != null && startingDirectory.length() > 0)
+//		{
+//			File dir = new File(startingDirectory);
+//			
+//			if (dir.exists())
+//			{
+//				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//			}
+//		}
+//		
+//		wrapper.sendText("echo " + marker + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/*
