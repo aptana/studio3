@@ -717,11 +717,14 @@ public class GitRepository
 
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
+		if (resource == null || resource.getLocationURI() == null)
+			return null;
+		String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
 		String workingDirectory = workingDirectory();
 		for (ChangedFile changedFile : index().changedFiles())
 		{
 			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			if (new File(resource.getLocationURI()).getAbsolutePath().equals(fullPath))
+			if (resourcePath.equals(fullPath))
 			{
 				return changedFile;
 			}
@@ -1116,12 +1119,15 @@ public class GitRepository
 		if (changedFiles == null || changedFiles.isEmpty())
 			return Collections.emptyList();
 
+		if (container == null || container.getLocationURI() == null)
+			return Collections.emptyList();
+
+		String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
 		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
 		String workingDirectory = workingDirectory();
 		for (ChangedFile changedFile : changedFiles)
 		{
 			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
 			if (fullPath.startsWith(resourcePath))
 				filtered.add(changedFile);
 		}
