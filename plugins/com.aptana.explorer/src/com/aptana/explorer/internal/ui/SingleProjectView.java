@@ -2,6 +2,7 @@ package com.aptana.explorer.internal.ui;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -719,23 +720,37 @@ public abstract class SingleProjectView extends CommonNavigator
 		StringBuilder builder = new StringBuilder(BASE_MESSAGE_URL);
 		builder.append("?v=");
 		builder.append(getVersion());
+
 		builder.append("&bg=");
 		builder.append(toHex(getThemeManager().getCurrentTheme().getBackground()));
 		builder.append("&fg=");
 		builder.append(toHex(getThemeManager().getCurrentTheme().getForeground()));
+
 		// "chrome"
 		builder.append("&ch=");// FIXME Grab one of the actual parent widgets and grab it's bg?
 		Color color = PlatformUI.getWorkbench().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		builder.append(toHex(color.getRGB()));
+
 		// project type
 		builder.append("&p=");
 		builder.append(getProjectType());
+
 		// version control
 		builder.append("&vc=");
 		builder.append(getVersionControl());
+
 		// github
 		builder.append("&gh=");
 		builder.append(hasGithubRemote() ? '1' : '0');
+
+		// timestamp to force updates to server (bypass browser cache)
+		builder.append("&ts=");
+		Date now = new Date();
+		builder.append(now.getTime());
+
+		// for debugging output
+		// builder.append("&debug=1");
+		
 		return builder.toString();
 	}
 
