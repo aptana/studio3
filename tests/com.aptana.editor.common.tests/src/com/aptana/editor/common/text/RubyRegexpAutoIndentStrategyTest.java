@@ -26,7 +26,14 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	
 	public void testDedent()
 	{
-		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy();
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected String getIndentString()
+			{
+				return "  ";
+			}
+		};
 		IDocument document = new Document("if a.nil?\n  a=1\n  els");
 		DocumentCommand command = createTextCommand(21, "e");
 		strategy.customizeDocumentCommand(document, command);
