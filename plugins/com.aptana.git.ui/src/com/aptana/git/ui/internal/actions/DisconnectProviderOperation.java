@@ -60,17 +60,25 @@ public class DisconnectProviderOperation implements IWorkspaceRunnable
 			for (IAdaptable obj : projectList)
 			{
 				IResource res = (IResource) obj.getAdapter(IResource.class);
+				IProject project;
 				if (res instanceof IProject)
 				{
-					final IProject p = (IProject) res;
+					project = (IProject) res;
+				}
+				else
+				{
+					project = res.getProject();
+				}
 
-					GitUIPlugin.trace("disconnect " + p.getName()); //$NON-NLS-1$
-					unmarkTeamPrivate(p);
-					RepositoryProvider.unmap(p);
-					getGitRepositoryManager().removeRepository(p);
+				if (project != null)
+				{
+					GitUIPlugin.trace("disconnect " + project.getName()); //$NON-NLS-1$
+					unmarkTeamPrivate(project);
+					RepositoryProvider.unmap(project);
+					getGitRepositoryManager().removeRepository(project);
 					m.worked(100);
 
-					p.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 100));
+					project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(m, 100));
 				}
 				else
 				{
