@@ -34,6 +34,100 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		super(contentType, configuration, sourceViewer);
 	}
 
+	public void customizeDocumentCommand(IDocument document, DocumentCommand command)
+	{
+		if (command.length == 0 && command.text != null)
+		{
+			if (shouldAutoIndent() && isLineDelimiter(document, command.text) && !autoIndent(document, command))
+			{
+				autoIndentAfterNewLine(document, command);
+			}
+			else if (shouldAutoDedent() && !isLineDelimiter(document, command.text))
+			{
+				autoDedent(document, command);
+			}
+		}
+	}
+
+	private void autoDedent(IDocument d, DocumentCommand c)
+	{
+		if (c.offset <= 0 || d.getLength() == 0)
+			return;
+
+		try
+		{
+			// Get the line and run a regexp check against it
+			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
+			// Only de-dent when at end of line!
+			int endOffset = curLineRegion.getOffset() + curLineRegion.getLength();
+			if (c.offset != endOffset)
+				return;
+
+			String scope = getScopeAtOffset(d, c.offset);
+			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
+			// what line will be after new char is inserted....
+			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset()) + c.text;
+
+			if (matchesRegexp(decreaseIndentRegexp, lineContent))
+			{
+				int lineNumber = d.getLineOfOffset(c.offset);
+				if (lineNumber == 0) // first line, should be no indent yet...
+				{
+					return;
+				}
+				int endIndex = findEndOfWhiteSpace(d, curLineRegion.getOffset(), curLineRegion.getOffset()
+						+ curLineRegion.getLength());
+				String currentLineIndent = d.get(curLineRegion.getOffset(), endIndex - curLineRegion.getOffset());
+				if (currentLineIndent.length() == 0)
+				{
+					return;
+				}
+				// Textmate just assumes we subtract one indent level
+				String decreasedIndent = ""; //$NON-NLS-1$
+
+				String indentString = TAB_CHAR;
+				if (getSourceViewerConfiguration() instanceof CommonSourceViewerConfiguration)
+				{
+					indentString = ((CommonSourceViewerConfiguration) getSourceViewerConfiguration()).getIndent();
+				}
+				if (currentLineIndent.length() > indentString.length())
+				{
+					decreasedIndent = currentLineIndent
+							.substring(0, currentLineIndent.length() - indentString.length());
+				}
+				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and
+																// same indent level along
+				{
+					return;
+				}
+				// Shift the current line...
+				int i = 0;
+				while (Character.isWhitespace(lineContent.charAt(i)))
+				{
+					i++;
+				}
+				// Just shift the content beforehand
+				String newContent = decreasedIndent + lineContent.substring(i, lineContent.length() - 1);
+				d.replace(curLineRegion.getOffset(), lineContent.length() - 1, newContent);
+				c.doit = true;
+				int diff = currentLineIndent.length() - decreasedIndent.length();
+				c.offset -= diff;
+				return;
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		return;
+	}
+
+	protected boolean shouldAutoDedent()
+	{
+		return true;
+	}
+
 	/**
 	 * @param d
 	 *            the document to work on
@@ -59,8 +153,6 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
 			String scope = getScopeAtOffset(d, c.offset);
 			RubyRegexp increaseIndentRegexp = getIncreaseIndentRegexp(scope);
-			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
-
 			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
 
 			if (matchesRegexp(increaseIndentRegexp, lineContent))
@@ -78,41 +170,6 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				}
 				c.shiftsCaret = false;
 				c.caretOffset = c.offset + startIndent.length();
-				return true;
-			}
-			else if (matchesRegexp(decreaseIndentRegexp, lineContent))
-			{
-				int lineNumber = d.getLineOfOffset(c.offset);
-				if (lineNumber == 0) // first line, should be no indent yet...
-				{
-					return true;
-				}
-				int endIndex = findEndOfWhiteSpace(d, curLineRegion.getOffset(), curLineRegion.getOffset()
-						+ curLineRegion.getLength());
-				String currentLineIndent = d.get(curLineRegion.getOffset(), endIndex - curLineRegion.getOffset());
-				if (currentLineIndent.length() == 0)
-				{
-					return true;
-				}
-				String decreasedIndent = findCorrectIndentString(d, lineNumber, currentLineIndent);
-				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and same indent level along
-				{
-					c.text = newline + decreasedIndent;
-					return true;
-				}
-				// Shift the current line...
-				int i = 0;
-				while (Character.isWhitespace(lineContent.charAt(i)))
-				{
-					i++;
-				}
-				String restOfLine = d.get(c.offset, curLineRegion.getLength() - (c.offset - curLineRegion.getOffset()));
-				String newContent = decreasedIndent + lineContent.substring(i) + decreasedIndent + restOfLine;
-				d.replace(curLineRegion.getOffset(), curLineRegion.getLength(), newContent);
-				// Set the new indent level for next line
-				c.text = newline + decreasedIndent;
-				c.offset = curLineRegion.getOffset() + newContent.length() - (decreasedIndent + restOfLine).length();
-				c.shiftsCaret = false;
 				return true;
 			}
 		}
@@ -316,7 +373,8 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			return true;
 		if (before == '(' && after == ')')
 			return true;
-		if (contentAfterNewline.length() >= 2) {
+		if (contentAfterNewline.length() >= 2)
+		{
 			char afterAfter = contentAfterNewline.charAt(1);
 			if (before == '>' && after == '<' && afterAfter == '/')
 				return true;
