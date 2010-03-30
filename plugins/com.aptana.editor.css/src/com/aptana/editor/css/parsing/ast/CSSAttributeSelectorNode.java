@@ -58,7 +58,7 @@ public class CSSAttributeSelectorNode extends CSSNode
 	{
 		if (fAttributeText == null)
 		{
-			return ":" + getChild(0); //$NON-NLS-1$
+			return ":" + getFunction(); //$NON-NLS-1$
 		}
 		return fAttributeText;
 	}
