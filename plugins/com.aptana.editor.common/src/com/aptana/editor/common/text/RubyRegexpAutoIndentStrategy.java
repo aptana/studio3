@@ -84,9 +84,16 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				}
 				// Textmate just assumes we subtract one indent level
 				String decreasedIndent = ""; //$NON-NLS-1$
-				if (currentLineIndent.length() > 2)
+
+				String indentString = TAB_CHAR;
+				if (getSourceViewerConfiguration() instanceof CommonSourceViewerConfiguration)
 				{
-					decreasedIndent = currentLineIndent.substring(0, currentLineIndent.length() - 2);
+					indentString = ((CommonSourceViewerConfiguration) getSourceViewerConfiguration()).getIndent();
+				}
+				if (currentLineIndent.length() > indentString.length())
+				{
+					decreasedIndent = currentLineIndent
+							.substring(0, currentLineIndent.length() - indentString.length());
 				}
 				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and
 																// same indent level along
