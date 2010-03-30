@@ -80,7 +80,7 @@ public class ProcessWrapper
 			
 			// WIN32
 			configurations = new ArrayList<ProcessConfiguration>();
-			configurations.add(new WindowsCygwinConfiguration());
+			configurations.add(new WindowsMingwConfiguration());
 			configurationMap.put(Platform.OS_WIN32, configurations);
 		}
 	}
