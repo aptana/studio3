@@ -23,6 +23,7 @@ static CHAR chOutputBuffer[1024];
 
 static HANDLE hHeap = NULL;
 static CONSOLE_SCREEN_BUFFER_INFO csbiConsole;
+//static CONSOLE_CURSOR_INFO cciCursor;
 static CHAR_INFO* lpPrevScreenBuffer = NULL;
 static CHAR_INFO* lpNextScreenBuffer = NULL;
 static DWORD dwBufferMemorySize = 0;
@@ -142,6 +143,7 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 }
 
 static void FlushBuffer();
+static void TestAndFlushBuffer();
 static void OutputChar(CHAR ch);
 static void OutputNumber(SHORT value);
 static void OutputString(CHAR* szStr);
@@ -244,7 +246,7 @@ static void ChangeAttributes(WORD attrs)
 	if( attrs == prevAttrs ) {
 		return;
 	}
-	if( attrs == 0 )
+	if( attrs == DEFAULT_ATTRIBUTES )
 	{
 		OutputString("\x1B[0m");
 	} else
@@ -252,34 +254,6 @@ static void ChangeAttributes(WORD attrs)
 		OutputChar('\x1B');
 		OutputChar('[');
 		BOOL bAddSep = FALSE;
-		if(  (attrs & FOREGROUND_INTENSITY) != (prevAttrs & FOREGROUND_INTENSITY) ) {
-			OutputString((attrs & FOREGROUND_INTENSITY) != 0 ? "1" : "22");
-			bAddSep = TRUE;
-		}
-		if(  (attrs & BACKGROUND_INTENSITY) != (prevAttrs & BACKGROUND_INTENSITY) ) {
-			if( bAddSep ) {
-				OutputChar(';');
-				bAddSep = FALSE;
-			}
-			OutputString((attrs & BACKGROUND_INTENSITY) != 0 ? "5" : "25");
-			bAddSep = TRUE;
-		}
-		if( (attrs & COMMON_LVB_UNDERSCORE) != (prevAttrs & COMMON_LVB_UNDERSCORE) ) {
-			if( bAddSep ) {
-				OutputChar(';');
-				bAddSep = FALSE;
-			}
-			OutputString((attrs & COMMON_LVB_UNDERSCORE) != 0 ? "4" : "24");
-			bAddSep = TRUE;
-		}
-		if( (attrs & COMMON_LVB_REVERSE_VIDEO) != (prevAttrs & COMMON_LVB_REVERSE_VIDEO)) {
-			if( bAddSep ) {
-				OutputChar(';');
-				bAddSep = FALSE;
-			}
-			OutputString((attrs & COMMON_LVB_REVERSE_VIDEO) != 0 ? "7" : "27");
-			bAddSep = TRUE;
-		}
 		WORD fg = attrs & (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED);
 		if( fg != (prevAttrs & (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)) )
 		{
@@ -352,6 +326,38 @@ static void ChangeAttributes(WORD attrs)
 			}
 			bAddSep = TRUE;
 		}
+		if(  (attrs & FOREGROUND_INTENSITY) != (prevAttrs & FOREGROUND_INTENSITY) ) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & FOREGROUND_INTENSITY) != 0 ? "1" : "22");
+			bAddSep = TRUE;
+		}
+		if(  (attrs & BACKGROUND_INTENSITY) != (prevAttrs & BACKGROUND_INTENSITY) ) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & BACKGROUND_INTENSITY) != 0 ? "7" : "27");
+			bAddSep = TRUE;
+		}
+		if( (attrs & COMMON_LVB_UNDERSCORE) != (prevAttrs & COMMON_LVB_UNDERSCORE) ) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & COMMON_LVB_UNDERSCORE) != 0 ? "4" : "24");
+			bAddSep = TRUE;
+		}
+		if( (attrs & COMMON_LVB_REVERSE_VIDEO) != (prevAttrs & COMMON_LVB_REVERSE_VIDEO)) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & COMMON_LVB_REVERSE_VIDEO) != 0 ? "7" : "27");
+			bAddSep = TRUE;
+		}
 		OutputChar('m');
 	}
 }
@@ -362,6 +368,7 @@ static BOOL HasChanges(CHAR_INFO *lpPrevCharInfo, CHAR_INFO *lpNextCharInfo, SHO
 static void ReadConsoleBuffer()
 {
 	CONSOLE_SCREEN_BUFFER_INFO csbiNextConsole;
+	//CONSOLE_CURSOR_INFO cciNextCursor;
 	COORD coordConsoleSize;
 	COORD coordStart = {0, 0};
 	COORD coordBufferSize;
@@ -394,8 +401,6 @@ static void ReadConsoleBuffer()
 		csbiConsole = csbiNextConsole;
 		dwScreenBufferSize = dwNextScreenBufferSize;
 		if( dwScreenBufferSize*sizeof(CHAR_INFO) > dwBufferMemorySize ) {
-			if( ::HeapValidate(hHeap, 0, NULL) == 0 ) {
-			}
 			if( lpPrevScreenBuffer != NULL ) {
 				::HeapFree(hHeap, 0, lpPrevScreenBuffer);
 			}
@@ -475,6 +480,7 @@ static void ReadConsoleBuffer()
 					++csbiConsole.dwCursorPosition.Y;
 				}
 			}
+			TestAndFlushBuffer();
 		}
 	} else
 	{
@@ -541,6 +547,7 @@ static void ReadConsoleBuffer()
 					csbiConsole.dwCursorPosition.X = 0;
 					++csbiConsole.dwCursorPosition.Y;
 				}
+				TestAndFlushBuffer();
 			}
 			CHAR_INFO* tmpNext = lpPrevScreenBuffer;
 			lpPrevScreenBuffer = lpNextScreenBuffer;
@@ -549,6 +556,9 @@ static void ReadConsoleBuffer()
 	}
 	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	MoveCursor(csbiNextConsole.dwCursorPosition.X, csbiNextConsole.dwCursorPosition.Y);
+	/*if( ::GetConsoleCursorInfo(hConsoleOut, &cciNextCursor) && (::memcmp(&cciCursor, &cciNextCursor, sizeof(CONSOLE_CURSOR_INFO)) != 0)) {
+		cciCursor = cciNextCursor;
+	}*/
 	FlushBuffer();
 }
 
@@ -739,6 +749,13 @@ static void FlushBuffer()
 	::WriteFile(hParentHandles[1], chOutputBuffer, dwBufferFilled, &dwWritten, NULL);
 	::FlushFileBuffers(hParentHandles[1]);
 	dwBufferFilled = 0L;
+}
+
+static void TestAndFlushBuffer()
+{
+	if( dwBufferFilled >= sizeof(chOutputBuffer)/2 ) {
+		FlushBuffer();
+	}
 }
 
 static void OutputChar(CHAR ch)
