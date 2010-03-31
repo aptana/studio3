@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
@@ -22,7 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -101,6 +99,7 @@ import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.usage.PingStartup;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -751,7 +750,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		// guid that relates to a single install of the IDE
 		builder.append("&id=");
 		builder.append(getGUID());
-		
+
 		// for debugging output
 		// builder.append("&debug=1");
 
@@ -760,25 +759,7 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	private String getGUID()
 	{
-		IEclipsePreferences preferences = new ConfigurationScope().getNode(ExplorerPlugin.PLUGIN_ID);
-		String applicationId = preferences.get(IPreferenceConstants.P_IDE_ID, null);
-		if (applicationId == null || applicationId.length() == 0)
-		{
-			// Use the id from previous release or generate a UUID
-			applicationId = UUID.randomUUID().toString();
-
-			// save results in preferences
-			preferences.put(IPreferenceConstants.P_IDE_ID, applicationId);
-			try
-			{
-				preferences.flush();
-			}
-			catch (BackingStoreException e)
-			{
-				ExplorerPlugin.logError(e.getMessage(), e);
-			}
-		}
-		return applicationId;
+		return PingStartup.getApplicationId();
 	}
 
 	private boolean hasGithubRemote()
