@@ -149,7 +149,7 @@ public class PingStartup implements IStartup
 		}
 	}
 
-	private static String getApplicationId()
+	public static String getApplicationId()
 	{
 		String id = Platform.getPreferencesService().getString(UsagePlugin.PLUGIN_ID, IPreferenceConstants.P_IDE_ID,
 				null, null);

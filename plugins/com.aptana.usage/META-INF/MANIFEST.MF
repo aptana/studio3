@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.libraries
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.usage

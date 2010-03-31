@@ -348,7 +348,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (selectedProject != null)
 		{
 			GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-			repo.removeListener(this);
+			if (repo != null)
+				repo.removeListener(this);
 		}
 		getGitRepositoryManager().removeListener(this);
 
@@ -885,6 +886,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				final ShowResourceInHistoryAction action = new ShowResourceInHistoryAction();
 				action.selectionChanged(null, new StructuredSelection(getSelectedFiles().toArray()));
+				action.run(null);
 			}
 		});
 	}
