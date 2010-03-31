@@ -348,7 +348,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (selectedProject != null)
 		{
 			GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-			repo.removeListener(this);
+			if (repo != null)
+				repo.removeListener(this);
 		}
 		getGitRepositoryManager().removeListener(this);
 
