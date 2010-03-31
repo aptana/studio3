@@ -243,7 +243,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		super.fillCommandsMenu(menuManager);
 
-		if (selectedProject == null || !selectedProject.exists())
+		if (selectedProject == null || !selectedProject.isAccessible())
 			return;
 		final GitRepository repository = getGitRepositoryManager().getAttached(selectedProject);
 		if (repository != null)
@@ -1370,7 +1370,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		// Remove Team menu if project is attached to our git provider.
-		if (repo != null || selectedProject == null)
+		if (repo != null || selectedProject == null || !selectedProject.isAccessible())
 		{
 			Set<String> toRemove = new HashSet<String>();
 			toRemove.add("team.main"); //$NON-NLS-1$

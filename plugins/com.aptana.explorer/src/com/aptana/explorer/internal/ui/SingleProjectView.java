@@ -1301,6 +1301,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	 */
 	protected void mangleContextMenu(Menu menu)
 	{
+		// TODO If the selected project isn't accessible, remove new file/folder, debug as
 		forceOurNewFileWizard(menu);
 
 		// Remove a whole bunch of the contributed items that we don't want
