@@ -209,10 +209,21 @@ public class GitRepository
 			{
 
 				@Override
-				public void fileDeleted(int wd, String rootPath, String name)
+				public void fileDeleted(int wd, String rootPath, final String name)
 				{
 					// Remove branch in model!
 					branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
+					Job job = new Job("Fire branch removed event") //$NON-NLS-1$
+					{
+						@Override
+						protected IStatus run(IProgressMonitor monitor)
+						{
+							fireBranchRemovedEvent(name);
+							return Status.OK_STATUS;
+						}
+					};
+					job.setSystem(true);
+					job.schedule();
 				}
 
 				@Override
@@ -226,6 +237,7 @@ public class GitRepository
 						@Override
 						protected IStatus run(IProgressMonitor monitor)
 						{
+							fireBranchAddedEvent(name);
 							// Check if our HEAD changed
 							String oldBranchName = currentBranch.simpleRef().shortName();
 							if (oldBranchName.equals(name))
@@ -313,7 +325,7 @@ public class GitRepository
 					}
 
 					@Override
-					public void fileDeleted(int wd, String rootPath, String name)
+					public void fileDeleted(int wd, String rootPath, final String name)
 					{
 						// if path is longer than one segment, then remote branch was deleted. Means we probably
 						// pulled.
@@ -325,6 +337,7 @@ public class GitRepository
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
 								{
+									fireBranchRemovedEvent(name);
 									firePullEvent();
 									return Status.OK_STATUS;
 								}
@@ -335,7 +348,7 @@ public class GitRepository
 					}
 
 					@Override
-					public void fileCreated(int wd, String rootPath, String name)
+					public void fileCreated(int wd, String rootPath, final String name)
 					{
 						if (isProbablyBranch(name))
 						{
@@ -348,6 +361,7 @@ public class GitRepository
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
 								{
+									fireBranchAddedEvent(name);
 									firePullEvent();
 									return Status.OK_STATUS;
 								}
@@ -583,6 +597,24 @@ public class GitRepository
 		BranchChangedEvent e = new BranchChangedEvent(this, oldBranchName, newBranchName);
 		for (IGitRepositoryListener listener : listeners)
 			listener.branchChanged(e);
+	}
+
+	void fireBranchRemovedEvent(String oldBranchName)
+	{
+		if (listeners == null || listeners.isEmpty())
+			return;
+		BranchRemovedEvent e = new BranchRemovedEvent(this, oldBranchName);
+		for (IGitRepositoryListener listener : listeners)
+			listener.branchRemoved(e);
+	}
+
+	void fireBranchAddedEvent(String newBranchName)
+	{
+		if (listeners == null || listeners.isEmpty())
+			return;
+		BranchAddedEvent e = new BranchAddedEvent(this, newBranchName);
+		for (IGitRepositoryListener listener : listeners)
+			listener.branchAdded(e);
 	}
 
 	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
@@ -866,6 +898,7 @@ public class GitRepository
 			return false;
 		// Add branch to list in model!
 		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		fireBranchAddedEvent(branchName);
 		return true;
 	}
 
@@ -895,6 +928,7 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
 		// Remove branch in model!
 		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
+		fireBranchRemovedEvent(branchName);
 		return Status.OK_STATUS;
 	}
 
