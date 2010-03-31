@@ -1339,7 +1339,11 @@ if(row>_f5){
 _f4.scrollUp();
 row=_f5;
 }
+if(this._term.getApplicationKeys()===false){
 _f4.setPosition(row,0);
+}else{
+_f4.setRow(row);
+}
 };
 XTermHandler.prototype.NEL=XTermHandler.prototype.LF;
 XTermHandler.prototype.processCharacter=function(_f6,_f7){
@@ -1991,6 +1995,9 @@ line.putCharacter(ch,this._currentAttribute,this._column);
 this._column++;
 }
 }
+};
+Term.prototype.getApplicationKeys=function(){
+return this._keyHandler.getApplicationKeys();
 };
 Term.prototype.getColumn=function(){
 return this._column;
