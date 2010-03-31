@@ -2,7 +2,6 @@ package com.aptana.explorer.internal.ui;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,6 +102,7 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.usage.PingStartup;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -751,13 +751,21 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 
 		// timestamp to force updates to server (bypass browser cache)
 		builder.append("&ts=");
-		Date now = new Date();
-		builder.append(now.getTime());
+		builder.append(System.currentTimeMillis());
+
+		// guid that relates to a single install of the IDE
+		builder.append("&id=");
+		builder.append(getGUID());
 
 		// for debugging output
 		// builder.append("&debug=1");
-		
+
 		return builder.toString();
+	}
+
+	private String getGUID()
+	{
+		return PingStartup.getApplicationId();
 	}
 
 	private boolean hasGithubRemote()
@@ -804,7 +812,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 			return 'C';
 		return 'O';
 	}
-	
+
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();

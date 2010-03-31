@@ -113,18 +113,11 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 	liDueTime.HighPart = (LONG)  ( qwDueTime >> 32 );
 	SetWaitableTimer(hTimer, &liDueTime, dwInputPollInterval, NULL, NULL, FALSE);
 	DWORD dwWaitResult = 0;
-	while ( (dwWaitResult = ::WaitForMultipleObjects(sizeof(waitHandles)/sizeof(waitHandles[0]), waitHandles, FALSE, dwRefreshInterval)) != WAIT_OBJECT_0 )
+	while ( ((dwWaitResult = ::WaitForMultipleObjects(sizeof(waitHandles)/sizeof(waitHandles[0]), waitHandles, FALSE, dwRefreshInterval)) != WAIT_OBJECT_0)
+		&& (dwWaitResult != WAIT_OBJECT_0 + 1))
 	{
 		switch(dwWaitResult)
 		{
-		case WAIT_OBJECT_0 + 1: {
-				TerminateProcessTree(::GetCurrentProcessId());
-				HWND hWnd = ::GetConsoleWindow();
-				if( hWnd != NULL ) {
-					::PostMessage(hWnd, WM_CLOSE, 0, 0) ;
-				}
-				return 0;
-			}
 		case WAIT_OBJECT_0 + 2:
 			WriteConsole();
 		case WAIT_OBJECT_0 + 3:
@@ -136,6 +129,15 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 	}
 	::CancelWaitableTimer(hTimer);
 	::CloseHandle(hTimer);
+	::CloseHandle(hConsoleIn);
+	::CloseHandle(hConsoleOut);
+
+	HWND hWnd = ::GetConsoleWindow();
+	if( hWnd != NULL ) {
+		::PostMessage(hWnd, WM_CLOSE, 0, 0) ;
+	} else {
+		TerminateProcessTree(::GetCurrentProcessId());
+	}
 	return 0;
 }
 
@@ -181,7 +183,9 @@ static void MoveCursor(SHORT x, SHORT y)
 	SHORT relX = x - csbiConsole.dwCursorPosition.X;
 	SHORT relY = y - csbiConsole.dwCursorPosition.Y;
 	if( (x == 0) && (y == 0) ) {
-		MoveCursorAbs(x, y);
+		if( (relX != 0) || (relY != 0) ) {
+			MoveCursorAbs(x, y);
+		}
 	} else if( (relX == 0) || (relY == 0) ) {
 		MoveCursorRel(relX, relY);
 	} else {
@@ -243,9 +247,6 @@ static void ChangeAttributes(WORD attrs)
 	if( attrs == 0 )
 	{
 		OutputString("\x1B[0m");
-	} else if(attrs & COMMON_LVB_REVERSE_VIDEO)
-	{
-		OutputString("\x1B[7m");
 	} else
 	{
 		OutputChar('\x1B');
@@ -255,12 +256,28 @@ static void ChangeAttributes(WORD attrs)
 			OutputString((attrs & FOREGROUND_INTENSITY) != 0 ? "1" : "22");
 			bAddSep = TRUE;
 		}
+		if(  (attrs & BACKGROUND_INTENSITY) != (prevAttrs & BACKGROUND_INTENSITY) ) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & BACKGROUND_INTENSITY) != 0 ? "5" : "25");
+			bAddSep = TRUE;
+		}
 		if( (attrs & COMMON_LVB_UNDERSCORE) != (prevAttrs & COMMON_LVB_UNDERSCORE) ) {
 			if( bAddSep ) {
 				OutputChar(';');
 				bAddSep = FALSE;
 			}
 			OutputString((attrs & COMMON_LVB_UNDERSCORE) != 0 ? "4" : "24");
+			bAddSep = TRUE;
+		}
+		if( (attrs & COMMON_LVB_REVERSE_VIDEO) != (prevAttrs & COMMON_LVB_REVERSE_VIDEO)) {
+			if( bAddSep ) {
+				OutputChar(';');
+				bAddSep = FALSE;
+			}
+			OutputString((attrs & COMMON_LVB_REVERSE_VIDEO) != 0 ? "7" : "27");
 			bAddSep = TRUE;
 		}
 		WORD fg = attrs & (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED);
@@ -350,10 +367,8 @@ static void ReadConsoleBuffer()
 	COORD coordBufferSize;
 	SMALL_RECT srBuffer;
 	
-	HANDLE hConsoleOut2 = hConsoleOut;//::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
-
 	::ResetEvent(hConsoleOut);
-	::GetConsoleScreenBufferInfo(hConsoleOut2, &csbiNextConsole);
+	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	coordConsoleSize.X = csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
 	coordConsoleSize.Y = csbiNextConsole.srWindow.Bottom - csbiNextConsole.srWindow.Top + 1;
 
@@ -394,7 +409,7 @@ static void ReadConsoleBuffer()
 		DWORD dwScreenBufferOffset = 0;
 		SHORT i;
 		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
 			coordStart.Y += coordBufferSize.Y;
@@ -403,7 +418,7 @@ static void ReadConsoleBuffer()
 		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
 		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
 		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut2, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 		}
 
 		CHAR_INFO* lpCharInfo = lpPrevScreenBuffer;
@@ -417,6 +432,8 @@ static void ReadConsoleBuffer()
 				if( bHasNonEmptyChar ) {
 					if ( y != coordConsoleSize.Y-1) {
 						OutputString("\r\n");
+						csbiConsole.dwCursorPosition.X = 0;
+						++csbiConsole.dwCursorPosition.Y;
 					}
 				}
 				lpCharInfo += coordConsoleSize.X;
@@ -430,9 +447,12 @@ static void ReadConsoleBuffer()
 				if( !bHasNonEmptyChar ) {
 					for( SHORT i = 0; i < y; ++i) {
 						OutputString("\r\n");
+						csbiConsole.dwCursorPosition.X = 0;
+						++csbiConsole.dwCursorPosition.Y;
 					}
 					for( SHORT i = 0; i < x; ++i) {
 						OutputChar(' ');
+						++csbiConsole.dwCursorPosition.X;
 					}
 					bHasNonEmptyChar = TRUE;
 				}
@@ -443,8 +463,7 @@ static void ReadConsoleBuffer()
 					break;
 				}
 				OutputChar(lpCharInfo->Char.AsciiChar);
-				csbiConsole.dwCursorPosition.X = x + 1;
-				csbiConsole.dwCursorPosition.Y = y;
+				++csbiConsole.dwCursorPosition.X;
 			}
 			if( bHasNonEmptyChar ) {
 				if( IsLineEmpty(lpCharInfo, (coordConsoleSize.Y-y)*coordConsoleSize.X) ) {
@@ -452,6 +471,8 @@ static void ReadConsoleBuffer()
 				}
 				if ( y != coordConsoleSize.Y-1) {
 					OutputString("\r\n");
+					csbiConsole.dwCursorPosition.X = 0;
+					++csbiConsole.dwCursorPosition.Y;
 				}
 			}
 		}
@@ -460,7 +481,7 @@ static void ReadConsoleBuffer()
 		DWORD dwScreenBufferOffset = 0;
 		SHORT i;
 		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
 			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
 			coordStart.Y += coordBufferSize.Y;
@@ -469,7 +490,7 @@ static void ReadConsoleBuffer()
 		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
 		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
 		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut2, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
 		}
 
 		if( ::memcmp(lpPrevScreenBuffer, lpNextScreenBuffer, dwScreenBufferSize*sizeof(CHAR_INFO)) != 0 )
@@ -526,9 +547,9 @@ static void ReadConsoleBuffer()
 			lpNextScreenBuffer = tmpNext;
 		}
 	}
+	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	MoveCursor(csbiNextConsole.dwCursorPosition.X, csbiNextConsole.dwCursorPosition.Y);
 	FlushBuffer();
-	//::CloseHandle(hConsoleOut2);
 }
 
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength);
@@ -598,6 +619,20 @@ static void WriteConsole(void)
 	}
 }
 
+static void SendConsoleKey(WORD key)
+{
+	DWORD dwWritten;
+	INPUT_RECORD ir;
+	ir.EventType = KEY_EVENT;
+	ir.Event.KeyEvent.bKeyDown = TRUE;
+	ir.Event.KeyEvent.wRepeatCount = 1;
+	ir.Event.KeyEvent.wVirtualKeyCode = key;
+	ir.Event.KeyEvent.dwControlKeyState = 0;
+	ir.Event.KeyEvent.uChar.UnicodeChar = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 2/*MAPVK_VK_TO_CHAR*/);
+	ir.Event.KeyEvent.wVirtualScanCode = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 0/*MAPVK_VK_TO_VSC*/);
+	::WriteConsoleInput(hConsoleIn, &ir, 1, &dwWritten);
+}
+
 
 static void SetConsoleSize(SHORT width, SHORT height)
 {
@@ -615,7 +650,7 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	COORD finalCoordBufferSize = csbi.dwSize;
 	SMALL_RECT finalConsoleRect = csbi.srWindow;
 	// first, resize rows
-	//finalCoordBufferSize.Y  = coordBufferSize.Y;
+	finalCoordBufferSize.Y  = coordBufferSize.Y;
 	finalConsoleRect.Top    = srConsoleRect.Top;
 	finalConsoleRect.Bottom = srConsoleRect.Bottom;
 	if( coordBufferSize.Y > csbi.dwSize.Y ) {
@@ -643,13 +678,31 @@ static void SetConsoleSize(SHORT width, SHORT height)
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 {
 	int param[4];
-	if ( (chSequence[dwLength-1] == 't') && sscanf_s(chSequence, "[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3 )
-	{
-		if ( param[0] == 8 )
-		{
-			SetConsoleSize(param[2], param[1]);
+	switch( chSequence[dwLength-1] ) {
+		case 't':
+			if( (sscanf_s(chSequence, "[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8) ) {
+				SetConsoleSize(param[2], param[1]);
+				return TRUE;
+			}
+			break;
+		case 'A':
+			SendConsoleKey(VK_UP);
 			return TRUE;
-		}
+		case 'B':
+			SendConsoleKey(VK_DOWN);
+			return TRUE;
+		case 'C':
+			SendConsoleKey(VK_RIGHT);
+			return TRUE;
+		case 'D':
+			SendConsoleKey(VK_LEFT);
+			return TRUE;
+		case 'F':
+			SendConsoleKey(VK_END);
+			return TRUE;
+		case 'H':
+			SendConsoleKey(VK_HOME);
+			return TRUE;
 	}
 	return FALSE;
 }
