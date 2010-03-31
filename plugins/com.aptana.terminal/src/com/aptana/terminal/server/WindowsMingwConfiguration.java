@@ -73,8 +73,9 @@ public class WindowsMingwConfiguration implements ProcessConfiguration
 		
 		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$
 		list.add("80x40"); //$NON-NLS-1$
-		list.add("-show"); //$NON-NLS-1$
-		
+		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
+			list.add("-show"); //$NON-NLS-1$
+		}
 		return list;
 	}
 
