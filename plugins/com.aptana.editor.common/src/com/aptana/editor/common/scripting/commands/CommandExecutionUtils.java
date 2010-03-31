@@ -456,6 +456,7 @@ public class CommandExecutionUtils
 	{
 		if (!commandResult.executedSuccessfully())
 		{
+			outputToConsole(commandResult);
 			return;
 		}
 
@@ -651,12 +652,17 @@ public class CommandExecutionUtils
 
 	private static void outputToConsole(CommandResult commandResult)
 	{
-		ScriptLogger.print(commandResult.getOutputString());
-		if (!commandResult.executedSuccessfully())
+		String outputString = commandResult.getOutputString();
+		if (outputString != null)
 		{
-			// Dump the error output if any
-			ScriptLogger.printError(commandResult.getErrorString());
+			ScriptLogger.print(outputString);
 		}
+		// Dump any errors or warning to the output
+		String errorString = commandResult.getErrorString();
+		if (errorString != null) {
+			ScriptLogger.printError(errorString);
+		}
+		
 	}
 
 	private static void outputToFile(CommandResult commandResult)
