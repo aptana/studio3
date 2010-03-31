@@ -886,6 +886,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			{
 				final ShowResourceInHistoryAction action = new ShowResourceInHistoryAction();
 				action.selectionChanged(null, new StructuredSelection(getSelectedFiles().toArray()));
+				action.run(null);
 			}
 		});
 	}
