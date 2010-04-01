@@ -17,7 +17,7 @@ import com.aptana.util.ResourceUtils;
  */
 public class MacOsXBashConfiguration implements ProcessConfiguration
 {
-	private static final String REDTTY = "redtty";
+	private static final String REDTTY = "redtty"; //$NON-NLS-1$
 
 	/**
 	 * BuiltinCygwinConfiguration

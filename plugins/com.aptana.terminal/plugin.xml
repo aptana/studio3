@@ -107,7 +107,7 @@
       <page
             class="com.aptana.terminal.preferences.TerminalPreferencePage"
             id="com.aptana.terminal.page"
-            name="Terminal">
+            name="%page.name">
       </page>
    </extension>
 

@@ -30,7 +30,7 @@ public class WindowsMingwConfiguration implements ProcessConfiguration
 	 */
 	public WindowsMingwConfiguration()
 	{
-		this._sh = ExecutableUtil.find("sh", true, null, getPossibleMysgitBinDirectories());
+		this._sh = ExecutableUtil.find("sh", true, null, getPossibleMysgitBinDirectories()); //$NON-NLS-1$
 	}
 	
 	private List<String> getPossibleMysgitBinDirectories()
@@ -39,8 +39,8 @@ public class WindowsMingwConfiguration implements ProcessConfiguration
 		
 		for (File root : File.listRoots())
 		{
-			result.add(FileUtils.buildPath(root, "Program Files", "Git", "bin", "sh.exe").getAbsolutePath());
-			result.add(FileUtils.buildPath(root, "Program Files (x86)", "Git", "bin", "sh.exe").getAbsolutePath());
+			result.add(FileUtils.buildPath(root, "Program Files", "Git", "bin", "sh.exe").getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			result.add(FileUtils.buildPath(root, "Program Files (x86)", "Git", "bin", "sh.exe").getAbsolutePath()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		
 		return result;
@@ -69,9 +69,9 @@ public class WindowsMingwConfiguration implements ProcessConfiguration
 	public List<String> getCommandLineArguments()
 	{
 		List<String> list = new ArrayList<String>();
-		String command = (this._sh != null) ? this._sh : "sh";
+		String command = (this._sh != null) ? this._sh : "sh"; //$NON-NLS-1$
 		
-		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$
+		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("80x40"); //$NON-NLS-1$
 		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
 			list.add("-show"); //$NON-NLS-1$

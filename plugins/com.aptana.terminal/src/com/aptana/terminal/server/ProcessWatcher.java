@@ -11,7 +11,7 @@ public class ProcessWatcher extends Thread
 	 */
 	public ProcessWatcher(ProcessWrapper wrapper)
 	{
-		super("Process watcher");
+		super(Messages.ProcessWatcher_Process_Watcher); 
 		
 		this._wrapper = wrapper;
 	}

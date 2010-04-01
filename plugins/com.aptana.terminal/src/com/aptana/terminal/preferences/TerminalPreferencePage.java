@@ -23,7 +23,7 @@ public class TerminalPreferencePage extends FieldEditorPreferencePage implements
 	{
 		Composite parent = this.getFieldEditorParent();
 		String key = IPreferenceConstants.CLOSE_VIEW_ON_EXIT;
-		String label = "&Close view when terminal's shell exits";
+		String label = Messages.TerminalPreferencePage_Close_View_On_Exit;
 		
 		this._closeOnExitEditor = new BooleanFieldEditor(key, label, parent);
 		

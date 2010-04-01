@@ -358,12 +358,12 @@ public class TerminalBrowser
 	{
 		if (this._browser != null)
 		{
-			final Object result = this._browser.evaluate("return copy();");
+			final Object result = this._browser.evaluate("return copy();"); //$NON-NLS-1$
 			
 			// only copy when we have text
 			if (result != null && result instanceof String && ((String) result).length() > 0)
 			{
-				UIJob job = new UIJob("Copy from Terminal")
+				UIJob job = new UIJob(Messages.TerminalBrowser_Copy_From_Terminal)
 				{
 					public IStatus runInUIThread(IProgressMonitor monitor)
 					{
@@ -525,7 +525,7 @@ public class TerminalBrowser
 	 */
 	public boolean hasSelection()
 	{
-		Object jsResult = this._browser.evaluate("return hasSelection();");
+		Object jsResult = this._browser.evaluate("return hasSelection();"); //$NON-NLS-1$
 		boolean result = false;
 		
 		if (jsResult instanceof Boolean)
@@ -546,8 +546,8 @@ public class TerminalBrowser
 				copy();
 			}
 		};
-		copy.setText("Copy");
-		copy.setToolTipText("Copy the selected text to the clipboard");
+		copy.setText(Messages.TerminalBrowser_Copy);
+		copy.setToolTipText(Messages.TerminalBrowser_Copy_Selected_Text);
 		copy.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
 				ISharedImages.IMG_TOOL_COPY));
 		copy.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.COPY_STROKE));
@@ -560,8 +560,8 @@ public class TerminalBrowser
 				paste();
 			}
 		};
-		paste.setText("Paste");
-		paste.setToolTipText("Paste clipboard text into the terminal");
+		paste.setText(Messages.TerminalBrowser_Paste);
+		paste.setToolTipText(Messages.TerminalBrowser_Paste_Clipboard_Text);
 		paste.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
 				ISharedImages.IMG_TOOL_PASTE));
 		paste.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.PASTE_STROKE));
@@ -574,8 +574,8 @@ public class TerminalBrowser
 				selectAll();
 			}
 		};
-		selectAll.setText("Select All");
-		selectAll.setToolTipText("Select all text in the terminal");
+		selectAll.setText(Messages.TerminalBrowser_Select_All);
+		selectAll.setToolTipText(Messages.TerminalBrowser_Select_All_In_Terminal);
 		selectAll.setAccelerator(SWTKeySupport.convertKeyStrokeToAccelerator(TerminalBrowser.SELECT_ALL_STROKE));
 	}
 	
@@ -586,7 +586,7 @@ public class TerminalBrowser
 	{
 		if (this._browser != null)
 		{
-			UIJob job = new UIJob("Paste into Terminal")
+			UIJob job = new UIJob(Messages.TerminalBrowser_Paste_Into_Terminal)
 			{
 				public IStatus runInUIThread(IProgressMonitor monitor)
 				{
@@ -624,7 +624,7 @@ public class TerminalBrowser
 	{
 		if (this._browser != null)
 		{
-			this._browser.execute("selectAll();");
+			this._browser.execute("selectAll();"); //$NON-NLS-1$
 		}
 	}
 	
@@ -636,7 +636,7 @@ public class TerminalBrowser
 		if (this._browser != null)
 		{
 			this._browser.setFocus();
-			this._browser.execute("window.focus();");
+			this._browser.execute("window.focus();"); //$NON-NLS-1$
 		}
 	}
 
@@ -658,6 +658,6 @@ public class TerminalBrowser
 	 */
 	protected void update()
 	{
-		this._browser.execute("getInput();");
+		this._browser.execute("getInput();"); //$NON-NLS-1$
 	}
 }
