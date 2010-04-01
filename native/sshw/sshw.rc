@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "resource."
+#include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -109,15 +109,17 @@ END
 // Dialog
 //
 
-IDD_DIALOG DIALOGEX 0, 0, 274, 70
+IDD_DIALOG DIALOGEX 0, 0, 274, 86
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SSH"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     EDITTEXT        IDC_PASSWORD,7,27,260,14,ES_PASSWORD | ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,78,49,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,145,49,50,14
+    DEFPUSHBUTTON   "OK",IDOK,78,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,145,65,50,14
     LTEXT           "Please provide private key password:",IDC_MESSAGE,7,7,260,20
+    CONTROL         "Remember passphrase for this session",IDC_REMEMBER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,64,46,203,10
 END
 
 
@@ -133,12 +135,14 @@ BEGIN
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 267
+        VERTGUIDE, 64
         VERTGUIDE, 128
         VERTGUIDE, 145
         TOPMARGIN, 7
-        BOTTOMMARGIN, 63
+        BOTTOMMARGIN, 79
         HORZGUIDE, 27
         HORZGUIDE, 41
+        HORZGUIDE, 56
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -153,7 +157,8 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 
