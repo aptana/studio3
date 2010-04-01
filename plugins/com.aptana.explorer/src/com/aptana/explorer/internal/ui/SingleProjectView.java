@@ -695,25 +695,22 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 			@Override
 			public void open(WindowEvent event)
 			{
-				if (event.required)
+				try
 				{
-					try
-					{
-						int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-								| IWorkbenchBrowserSupport.STATUS;
-						WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
-						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-						IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-						WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-						Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-						f.setAccessible(true);
-						BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-						event.browser = viewer.getBrowser();
-					}
-					catch (Exception e)
-					{
-						ExplorerPlugin.logError(e.getMessage(), e);
-					}
+					int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+							| IWorkbenchBrowserSupport.STATUS;
+					WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+					WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
+					Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
+					f.setAccessible(true);
+					BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
+					event.browser = viewer.getBrowser();
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
 				}
 			}
 		});
