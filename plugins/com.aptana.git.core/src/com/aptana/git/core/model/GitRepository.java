@@ -29,8 +29,10 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -1131,11 +1133,11 @@ public class GitRepository
 			return false;
 
 		String workingDirectory = workingDirectory();
+		IPath resourcePath = new Path(new File(resource.getLocationURI()).getAbsolutePath());
 		for (ChangedFile changedFile : changedFiles)
 		{
 			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
-			if (fullPath.startsWith(resourcePath))
+			if (resourcePath.isPrefixOf(new Path(fullPath)))
 				return true;
 		}
 		return false;
