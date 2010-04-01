@@ -247,6 +247,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 	}
 
+	protected AbstractThemeableEditor getAbstractThemeableEditor()
+	{
+		return fTextEditor;
+	}
+
 	@Override
 	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
 	{

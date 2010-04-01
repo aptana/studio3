@@ -25,6 +25,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.index.core.IndexActivator;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -67,6 +68,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
+		// Activate indexing
+		IndexActivator.getDefault();
+		
 		new EditorFontOverride().schedule();
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.schedule();

@@ -93,6 +93,6 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new CSSContentAssistProcessor();
+		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
 	}
 }
