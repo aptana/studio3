@@ -102,5 +102,13 @@
          </actionSet>
       </perspectiveExtension>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.aptana.terminal.preferences.TerminalPreferencePage"
+            id="com.aptana.terminal.page"
+            name="Terminal">
+      </page>
+   </extension>
 
 </plugin>
