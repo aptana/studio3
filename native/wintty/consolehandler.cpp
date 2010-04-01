@@ -507,11 +507,13 @@ static void ReadConsoleBuffer()
 			for( SHORT y = 0; y < coordConsoleSize.Y; ++y)
 			{
 				BOOL bReplaceLine = FALSE;
-				if( bReplaceLine = HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 4) )
+				BOOL bErasedLine = FALSE;
+				if( bReplaceLine = HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 10) )
 				{
 					MoveCursor(0, y);
 					if( !IsLineEmpty(lpPrevCharInfo, coordConsoleSize.X) ) {
 						EraseLine();
+						bErasedLine = TRUE;
 					}
 				} else {
 					if(!HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 0) && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X) ) {
@@ -524,16 +526,19 @@ static void ReadConsoleBuffer()
 				{
 					if( bReplaceLine || (::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0) )
 					{
-						if( wCharAttributes != lpNextCharInfo->Attributes ) {
-							MoveCursor(x, y);
-							ChangeAttributes(lpNextCharInfo->Attributes);
-						} else if( bReplaceLine && (lpNextCharInfo->Char.AsciiChar == ' ') && !HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X - x, 0) ) {
+						if( bReplaceLine && !bErasedLine && !HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X - x, 0) ) {
 							lpPrevCharInfo += coordConsoleSize.X - x;
 							lpNextCharInfo += coordConsoleSize.X - x;
-							csbiConsole.dwCursorPosition.X += coordConsoleSize.X - x;
+							break;
+						} else if( bReplaceLine && bErasedLine && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X - x) ) {
+							lpPrevCharInfo += coordConsoleSize.X - x;
+							lpNextCharInfo += coordConsoleSize.X - x;
 							break;
 						} else {
 							MoveCursor(x, y);
+						}
+						if( wCharAttributes != lpNextCharInfo->Attributes ) {
+							ChangeAttributes(lpNextCharInfo->Attributes);
 						}
 						OutputChar(lpNextCharInfo->Char.AsciiChar);
 						++csbiConsole.dwCursorPosition.X;
@@ -543,9 +548,9 @@ static void ReadConsoleBuffer()
 				{
 					if( y !=  coordConsoleSize.Y -1 ) {
 						OutputString("\r\n");
+						csbiConsole.dwCursorPosition.X = 0;
+						++csbiConsole.dwCursorPosition.Y;
 					}
-					csbiConsole.dwCursorPosition.X = 0;
-					++csbiConsole.dwCursorPosition.Y;
 				}
 				TestAndFlushBuffer();
 			}
