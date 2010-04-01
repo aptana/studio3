@@ -105,6 +105,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="com.aptana.common"
             class="com.aptana.terminal.preferences.TerminalPreferencePage"
             id="com.aptana.terminal.page"
             name="%page.name">
