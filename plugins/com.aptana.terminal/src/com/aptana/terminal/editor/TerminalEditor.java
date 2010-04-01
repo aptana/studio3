@@ -12,21 +12,43 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableEditor;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Closeable;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.server.TerminalServer;
 
-public class TerminalEditor extends EditorPart implements IPersistableEditor
+public class TerminalEditor extends EditorPart implements IPersistableEditor, Closeable
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalBrowser _browser;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.terminal.Closeable#close()
+	 */
+	public void close()
+	{
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		
+		workbench.getDisplay().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
+				
+				page.closeEditor(TerminalEditor.this, false);
+			}
+		});
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
