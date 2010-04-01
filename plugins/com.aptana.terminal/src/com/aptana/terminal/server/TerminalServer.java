@@ -70,20 +70,25 @@ public class TerminalServer extends Thread
 	 * @param id
 	 * @param startingDirectory
 	 */
-	public void createProcess(String id, String startingDirectory)
+	public ProcessWrapper createProcess(String id, String startingDirectory)
 	{
+		ProcessWrapper wrapper;
+		
 		if (this.processById.containsKey(id) == false)
 		{
-			ProcessWrapper wrapper = new ProcessWrapper(startingDirectory);
-			
+			wrapper = new ProcessWrapper(startingDirectory);
 			wrapper.start();
 			
 			this.processById.put(id, wrapper);
 		}
 		else
 		{
+			wrapper = this.processById.get(id);
+			
 			Activator.logWarning(Messages.HttpServer_Process_ID_Already_In_Use + id);
 		}
+		
+		return wrapper;
 	}
 
 	/**

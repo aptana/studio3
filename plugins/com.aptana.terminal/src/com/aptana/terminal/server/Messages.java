@@ -16,6 +16,7 @@ public class Messages extends NLS
 	public static String HttpWorker_Not_Found4;
 	public static String HttpWorker_Unrecognized_POST_URL;
 	public static String ProcessReader_Error_Reading_From_Process;
+	public static String ProcessWatcher_Process_Watcher;
 	public static String ProcessWrapper_Error_Locating_Terminal_Executable;
 	public static String ProcessWrapper_Error_Starting_Process;
 	public static String ProcessWrapper_Malformed_Terminal_Executable_URI;
