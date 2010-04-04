@@ -1,7 +1,12 @@
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -9,12 +14,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -66,6 +73,8 @@ public class FilteringProjectView extends GitProjectView
 	private static final String TAG_ELEMENT = "element"; //$NON-NLS-1$
 	private static final String TAG_PATH = "path"; //$NON-NLS-1$
 	private static final String TAG_CURRENT_FRAME = "currentFrame"; //$NON-NLS-1$
+	private static final String TAG_PROJECT = "project"; //$NON-NLS-1$
+	private static final String KEY_NAME = "name"; //$NON-NLS-1$
 
 	/**
 	 * Maximum time spent expanding the tree after the filter text has been updated (this is only used if we were able
@@ -89,6 +98,21 @@ public class FilteringProjectView extends GitProjectView
 	private Composite customComposite;
 	private IResourceChangeListener fResourceListener;
 
+	// Since the IMemento model does not fit our 'live' project switching,
+	// we maintain the states of all the projects in these data structures and
+	// flush them into the IMemento when needed (in the saveState call).
+	private Map<IProject, List<String>> projectExpansions;
+	private Map<IProject, List<String>> projectSelections;
+
+	/**
+	 * Constructs a new FilteringProjectView.
+	 */
+	public FilteringProjectView()
+	{
+		projectExpansions = new HashMap<IProject, List<String>>();
+		projectSelections = new HashMap<IProject, List<String>>();
+	}
+
 	@Override
 	public void createPartControl(Composite aParent)
 	{
@@ -99,17 +123,11 @@ public class FilteringProjectView extends GitProjectView
 		customComposite.setLayout(gridLayout);
 
 		super.createPartControl(customComposite);
-
 		patternFilter = new PathFilter();
 		createRefreshJob();
 
 		// Add eyeball hover
 		addFocusHover();
-		if (memento != null)
-		{
-			restoreState(memento);
-		}
-		memento = null;
 		addResourceListener();
 	}
 
@@ -117,10 +135,99 @@ public class FilteringProjectView extends GitProjectView
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
 		this.memento = aMemento;
+		loadMementoCache();
 		super.init(aSite, aMemento);
 
 		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
+	}
 
+	/**
+	 * Load the memento's relevant data into this view's internal memento data structure.
+	 */
+	protected void loadMementoCache()
+	{
+		if (this.memento == null)
+		{
+			return;
+		}
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		IMemento[] projectMementoes = memento.getChildren(TAG_PROJECT);
+		for (IMemento projMemento : projectMementoes)
+		{
+			String projectName = projMemento.getString(KEY_NAME);
+			IProject project = workspaceRoot.getProject(projectName);
+			// Load only projects that exist and open in the workspace.
+			if (project != null && project.isAccessible())
+			{
+				List<String> expanded = new ArrayList<String>();
+				IMemento childMem = projMemento.getChild(TAG_EXPANDED);
+				if (childMem != null)
+				{
+					IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+					for (int i = 0; i < elementMem.length; i++)
+					{
+						expanded.add(elementMem[i].getString(TAG_PATH));
+					}
+				}
+				List<String> selected = new ArrayList<String>();
+				childMem = projMemento.getChild(TAG_SELECTION);
+				if (childMem != null)
+				{
+					IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
+					for (int i = 0; i < elementMem.length; i++)
+					{
+						selected.add(elementMem[i].getString(TAG_PATH));
+					}
+				}
+				// Cache the loaded mementoes
+				projectExpansions.put(project, expanded);
+				projectSelections.put(project, selected);
+			}
+		}
+	}
+
+	/**
+	 * Update the in-memory memento for a given project. This update method should be called before saving the memento
+	 * and before every project switch.
+	 * 
+	 * @param project
+	 */
+	protected void updateProjectMementoCache(IProject project)
+	{
+		TreeViewer viewer = getCommonViewer();
+		if (viewer == null || project == null)
+		{
+			return;
+		}
+		List<String> expanded = new ArrayList<String>();
+		List<String> selected = new ArrayList<String>();
+
+		// Save the expansion state
+		Object expandedElements[] = viewer.getVisibleExpandedElements();
+		if (expandedElements.length > 0)
+		{
+			for (int i = 0; i < expandedElements.length; i++)
+			{
+				if (expandedElements[i] instanceof IResource)
+				{
+					expanded.add(((IResource) expandedElements[i]).getFullPath().toString());
+				}
+			}
+		}
+		// Save the selection state
+		Object selectedElements[] = ((IStructuredSelection) viewer.getSelection()).toArray();
+		if (selectedElements.length > 0)
+		{
+			for (int i = 0; i < selectedElements.length; i++)
+			{
+				if (selectedElements[i] instanceof IResource)
+				{
+					selected.add(((IResource) selectedElements[i]).getFullPath().toString());
+				}
+			}
+		}
+		projectExpansions.put(project, expanded);
+		projectSelections.put(project, selected);
 	}
 
 	private void addFocusHover()
@@ -317,31 +424,55 @@ public class FilteringProjectView extends GitProjectView
 		}
 		else
 		{
-			// save visible expanded elements
-			Object expandedElements[] = viewer.getVisibleExpandedElements();
-			if (expandedElements.length > 0)
+			// Make sure we are up-to-date
+			updateProjectMementoCache(selectedProject);
+			// Collect all the projects in the cache
+			Set<IProject> projects = new TreeSet<IProject>(new Comparator<IProject>()
 			{
-				IMemento expandedMem = memento.createChild(TAG_EXPANDED);
-				for (int i = 0; i < expandedElements.length; i++)
+				public int compare(IProject o1, IProject o2)
 				{
-					if (expandedElements[i] instanceof IResource)
-					{
-						IMemento elementMem = expandedMem.createChild(TAG_ELEMENT);
-						elementMem.putString(TAG_PATH, ((IResource) expandedElements[i]).getFullPath().toString());
-					}
+					return o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
 				}
-			}
-			// save selection
-			Object elements[] = ((IStructuredSelection) viewer.getSelection()).toArray();
-			if (elements.length > 0)
+			});
+			projects.addAll(projectExpansions.keySet());
+			projects.addAll(projectSelections.keySet());
+
+			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+			// Create a memento for every accessible project that has expanded/selected paths.
+			for (IProject project : projects)
 			{
-				IMemento selectionMem = memento.createChild(TAG_SELECTION);
-				for (int i = 0; i < elements.length; i++)
+				if (project.isAccessible()
+						&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty()))
 				{
-					if (elements[i] instanceof IResource)
+					IMemento projectMemento = memento.createChild(TAG_PROJECT);
+					projectMemento.putString(KEY_NAME, project.getName());
+					// Create the expansions memento
+					List<String> expanded = projectExpansions.get(project);
+					if (!expanded.isEmpty())
 					{
-						IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
-						elementMem.putString(TAG_PATH, ((IResource) elements[i]).getFullPath().toString());
+						IMemento expansionMem = projectMemento.createChild(TAG_EXPANDED);
+						for (String expandedPath : expanded)
+						{
+							if (workspaceRoot.findMember(expandedPath) != null)
+							{
+								IMemento elementMem = expansionMem.createChild(TAG_ELEMENT);
+								elementMem.putString(TAG_PATH, expandedPath);
+							}
+						}
+					}
+					// Create the selection memento
+					List<String> selected = projectSelections.get(project);
+					if (!selected.isEmpty())
+					{
+						IMemento selectionMem = projectMemento.createChild(TAG_SELECTION);
+						for (String selectedPath : selected)
+						{
+							if (workspaceRoot.findMember(selectedPath) != null)
+							{
+								IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
+								elementMem.putString(TAG_PATH, selectedPath);
+							}
+						}
 					}
 				}
 			}
@@ -349,17 +480,42 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	/**
-	 * Restores the state of the receiver to the state described in the specified memento.
+	 * Restore the expansion and selection state in a job.
 	 * 
-	 * @param memento
-	 *            the memento
+	 * @param project
+	 */
+	protected void restoreStateJob(final IProject project)
+	{
+		Job job = new WorkbenchJob("Restoring State") {//$NON-NLS-1$
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				restoreState(project);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		// We have to delay it a bit, otherwise, the tree collapse back due
+		// to other jobs.
+		job.schedule(getRefreshJobDelay() * 2);
+	}
+
+	/**
+	 * Restores the expansion and selection state of given project.
+	 * 
+	 * @param project
+	 *            the {@link IProject}
+	 * @see #restoreStateJob(IProject)
+	 * @see #saveState(IMemento)
 	 * @since 2.0
 	 */
-	protected void restoreState(IMemento memento)
+	protected void restoreState(IProject project)
 	{
 		TreeViewer viewer = getCommonViewer();
-		IMemento frameMemento = memento.getChild(TAG_CURRENT_FRAME);
-
+		IMemento frameMemento = null;
+		if (memento != null)
+		{
+			frameMemento = memento.getChild(TAG_CURRENT_FRAME);
+		}
 		if (frameMemento != null)
 		{
 			TreeFrame frame = new TreeFrame(viewer);
@@ -372,14 +528,28 @@ public class FilteringProjectView extends GitProjectView
 		else
 		{
 			IContainer container = ResourcesPlugin.getWorkspace().getRoot();
-			IMemento childMem = memento.getChild(TAG_EXPANDED);
-			if (childMem != null)
+			List<String> expansions = projectExpansions.get(project);
+			List<String> selections = projectSelections.get(project);
+			viewer.getControl().setRedraw(false);
+			if (selections != null)
 			{
 				List<IResource> elements = new ArrayList<IResource>();
-				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-				for (int i = 0; i < elementMem.length; i++)
+				for (String selectionPath : selections)
 				{
-					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
+					IResource element = container.findMember(selectionPath);
+					if (element != null)
+					{
+						elements.add(element);
+					}
+				}
+				viewer.setSelection(new StructuredSelection(elements), true);
+			}
+			if (expansions != null)
+			{
+				List<IResource> elements = new ArrayList<IResource>();
+				for (String expansionPath : expansions)
+				{
+					IResource element = container.findMember(expansionPath);
 					if (element != null)
 					{
 						elements.add(element);
@@ -387,21 +557,7 @@ public class FilteringProjectView extends GitProjectView
 				}
 				viewer.setExpandedElements(elements.toArray());
 			}
-			childMem = memento.getChild(TAG_SELECTION);
-			if (childMem != null)
-			{
-				List<IResource> list = new ArrayList<IResource>();
-				IMemento[] elementMem = childMem.getChildren(TAG_ELEMENT);
-				for (int i = 0; i < elementMem.length; i++)
-				{
-					IResource element = container.findMember(elementMem[i].getString(TAG_PATH));
-					if (element != null)
-					{
-						list.add(element);
-					}
-				}
-				viewer.setSelection(new StructuredSelection(list));
-			}
+			viewer.getControl().setRedraw(true);
 		}
 	}
 
@@ -425,8 +581,12 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	protected void projectChanged(IProject oldProject, IProject newProject)
 	{
+		// Update the memento cache when the project is changed.
+		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
 		clearText();
+		// Restore the displayed project state.
+		restoreStateJob(newProject);
 	}
 
 	@Override
@@ -456,15 +616,15 @@ public class FilteringProjectView extends GitProjectView
 						continue;
 					if (resource.getProject().equals(selectedProject))
 					{
-						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() 
+						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 						{
-							
+
 							@Override
-							public void run() 
+							public void run()
 							{
 								getCommonViewer().refresh();
 							}
-						});						
+						});
 						return;
 					}
 				}
