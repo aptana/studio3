@@ -34,6 +34,90 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		super(contentType, configuration, sourceViewer);
 	}
 
+	public void customizeDocumentCommand(IDocument document, DocumentCommand command)
+	{
+		if (command.length == 0 && command.text != null)
+		{
+			if (shouldAutoIndent() && isLineDelimiter(document, command.text) && !autoIndent(document, command))
+			{
+				autoIndentAfterNewLine(document, command);
+			}
+			else if (shouldAutoDedent() && !isLineDelimiter(document, command.text))
+			{
+ 				autoDedent(document, command);
+			}
+		}
+	}
+
+	private void autoDedent(IDocument d, DocumentCommand c)
+	{
+		if (c.offset <= 0 || d.getLength() == 0 || c.text.length() > 1)
+			return;
+
+		try
+		{
+			// Get the line and run a regexp check against it
+			IRegion curLineRegion = d.getLineInformationOfOffset(c.offset);
+			// Only de-dent when at end of line!
+			int endOffset = curLineRegion.getOffset() + curLineRegion.getLength();
+			if (c.offset != endOffset)
+				return;
+
+			String scope = getScopeAtOffset(d, c.offset);
+			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
+			// what line will be after new char is inserted....
+			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
+			if (matchesRegexp(decreaseIndentRegexp, lineContent + c.text))
+			{
+				int lineNumber = d.getLineOfOffset(c.offset);
+				if (lineNumber == 0) // first line, should be no indent yet...
+				{
+					return;
+				}
+				int endIndex = findEndOfWhiteSpace(d, curLineRegion.getOffset(), curLineRegion.getOffset()
+						+ curLineRegion.getLength());
+				String currentLineIndent = d.get(curLineRegion.getOffset(), endIndex - curLineRegion.getOffset());
+				if (currentLineIndent.length() == 0)
+				{
+					return;
+				}
+				// Textmate just assumes we subtract one indent level
+				String decreasedIndent = ""; //$NON-NLS-1$
+
+				String indentString = getIndentString();
+				if (currentLineIndent.length() > indentString.length())
+				{
+					decreasedIndent = currentLineIndent
+							.substring(0, currentLineIndent.length() - indentString.length());
+				}
+				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and
+																// same indent level along
+				{
+					return;
+				}
+				// Shift the current line...
+				int i = 0;
+				while (i < lineContent.length() && Character.isWhitespace(lineContent.charAt(i)))
+				{
+					i++;
+				}
+				// Just shift the content beforehand
+				String newContent = decreasedIndent + lineContent.substring(i);
+				d.replace(curLineRegion.getOffset(), lineContent.length(), newContent);
+				c.doit = true;
+				int diff = currentLineIndent.length() - decreasedIndent.length();
+				c.offset -= diff;
+				return;
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+
+		return;
+	}
+
 	/**
 	 * @param d
 	 *            the document to work on
