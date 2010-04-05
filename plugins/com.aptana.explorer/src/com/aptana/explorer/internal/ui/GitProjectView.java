@@ -895,13 +895,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	{
 		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
 		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowGitHubNetwork);
+		final GithubNetworkAction action = new GithubNetworkAction();
+		action.selectionChanged(null, new StructuredSelection(selectedProject));
 		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				final GithubNetworkAction action = new GithubNetworkAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
+				
 				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
 				{
 					@Override
@@ -917,6 +918,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				job.schedule();
 			}
 		});
+		showGitHubNetwork.setEnabled(action.isEnabled());
 	}
 
 	protected boolean setNewBranch(String branchName)
