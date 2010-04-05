@@ -44,7 +44,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			}
 			else if (shouldAutoDedent() && !isLineDelimiter(document, command.text))
 			{
- 				autoDedent(document, command);
+				autoDedent(document, command);
 			}
 		}
 	}
@@ -81,8 +81,12 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				{
 					return;
 				}
-				// Textmate just assumes we subtract one indent level
+				// Textmate just assumes we subtract one indent level, unless the matching level it should be at is >=
+				// what we're at now!
 				String decreasedIndent = ""; //$NON-NLS-1$
+
+				// if we subtract one indent level and it is shorter than matching indent, then don't subtract!
+				String matchingIndent = findCorrectIndentString(d, lineNumber, currentLineIndent);
 
 				String indentString = getIndentString();
 				if (currentLineIndent.length() > indentString.length())
@@ -90,8 +94,8 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 					decreasedIndent = currentLineIndent
 							.substring(0, currentLineIndent.length() - indentString.length());
 				}
-				if (decreasedIndent.equals(currentLineIndent)) // indent level hasn't changed, just pass newline and
-																// same indent level along
+				// if indent level hasn't changed, or shouldn't be moved back, return early!
+				if (decreasedIndent.equals(currentLineIndent) || decreasedIndent.length() < matchingIndent.length())
 				{
 					return;
 				}

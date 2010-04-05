@@ -44,6 +44,33 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals(19, command.offset);
 	}
 	
+	public void testDedentWontPushPastMatchingIndentLevel()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected String getIndentString()
+			{
+				return "  ";
+			}
+			
+			@Override
+			protected String findCorrectIndentString(IDocument d, int lineNumber, String currentLineIndent)
+					throws BadLocationException
+			{
+				return " ";
+			}
+		};
+		IDocument document = new Document(" if a.nil?\n   a=1\n  els");
+		DocumentCommand command = createTextCommand(23, "e");
+		strategy.customizeDocumentCommand(document, command);
+
+		assertEquals(" if a.nil?\n   a=1\n  els", document.get());
+		assertTrue(command.doit);
+		assertEquals("e", command.text);
+		assertEquals(23, command.offset);
+	}
+	
 	public void testDoesntDedentWhenMultipleCharsArePasted()
 	{
 		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
