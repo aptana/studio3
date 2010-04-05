@@ -60,9 +60,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD
+				LinkIncremental="2"
+=======
 				AdditionalDependencies="LIBCMT.LIB CRYPT32.LIB"
 				LinkIncremental="2"
 				IgnoreAllDefaultLibraries="true"
+>>>>>>> development
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -135,9 +139,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+<<<<<<< HEAD
+				LinkIncremental="1"
+=======
 				AdditionalDependencies="LIBCMT.LIB CRYPT32.LIB"
 				LinkIncremental="1"
 				IgnoreAllDefaultLibraries="true"
+>>>>>>> development
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -231,6 +239,13 @@
 			RelativePath=".\ReadMe.txt"
 			>
 		</File>
+<<<<<<< HEAD
+		<File
+			RelativePath=".\resource"
+			>
+		</File>
+=======
+>>>>>>> development
 	</Files>
 	<Globals>
 	</Globals>
