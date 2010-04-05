@@ -291,7 +291,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		}
 		else if (getResource(input) != null)
 		{
-			String label = NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_workspace, new Object[] { input
+			String label = NLS.bind(Messages.GitCompareFileRevisionEditorInput_workspace, new Object[] { input
 					.getLeft().getName() });
 			cc.setLeftLabel(label);
 		}
@@ -307,10 +307,10 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		IFileRevision fileObject = element.getFileRevision();
 		if (fileObject instanceof LocalFileRevision)
 		{
-			return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_localRevision, new Object[] {
+			return NLS.bind(Messages.GitCompareFileRevisionEditorInput_localRevision, new Object[] {
 					element.getName(), element.getTimestamp() });
 		}
-		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_repository, new Object[] { element.getName(),
+		return NLS.bind(Messages.GitCompareFileRevisionEditorInput_repository, new Object[] { element.getName(),
 				element.getContentIdentifier() });
 	}
 
@@ -324,7 +324,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		titleObject[0] = getLongName(left);
 		titleObject[1] = getContentIdentifier(getLeftRevision());
 		titleObject[2] = getContentIdentifier(getRightRevision());
-		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
+		return NLS.bind(Messages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
 	}
 
 	/*
@@ -337,7 +337,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		titleObject[0] = getShortName(left);
 		titleObject[1] = getContentIdentifier(getLeftRevision());
 		titleObject[2] = getContentIdentifier(getRightRevision());
-		return NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
+		return NLS.bind(Messages.GitCompareFileRevisionEditorInput_CompareResourceAndVersion, titleObject);
 	}
 
 	/*
@@ -402,20 +402,17 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 					if (Utils.getAdapter(storage, IFileState.class) != null)
 					{
 						// local revision
-						return TeamUIMessages.GitCompareFileRevisionEditorInput_0;
+						return Messages.GitCompareFileRevisionEditorInput_0;
 					}
 					else if (Utils.getAdapter(storage, IFile.class) != null)
 					{
 						// current revision
-						return TeamUIMessages.GitCompareFileRevisionEditorInput_1;
+						return Messages.GitCompareFileRevisionEditorInput_1;
 					}
 				}
 				catch (CoreException e)
 				{
-					GitUIPlugin
-							.logError(
-									com.aptana.git.ui.internal.history.TeamUIMessages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error,
-									e);
+					GitUIPlugin.logError(Messages.GitCompareFileRevisionEditorInput_ProblemGettingContent_Error, e);
 				}
 			}
 			else
@@ -423,7 +420,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 				return fileRevisionElement.getContentIdentifier();
 			}
 		}
-		return TeamUIMessages.GitCompareFileRevisionEditorInput_2;
+		return Messages.GitCompareFileRevisionEditorInput_2;
 	}
 
 	@Override
@@ -469,7 +466,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		getCompareConfiguration().setRightEditable(isRightEditable(input));
 		ensureContentsCached(getLeftRevision(), getRightRevision(), monitor);
 		initLabels(input);
-		setTitle(NLS.bind(TeamUIMessages.GitCompareFileRevisionEditorInput_CompareInputTitle, new String[] { input
+		setTitle(NLS.bind(Messages.GitCompareFileRevisionEditorInput_CompareInputTitle, new String[] { input
 				.getName() }));
 
 		// The compare editor (Structure Compare) will show the diff filenames

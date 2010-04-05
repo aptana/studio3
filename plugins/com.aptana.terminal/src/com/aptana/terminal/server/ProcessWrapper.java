@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -25,13 +26,6 @@ public class ProcessWrapper
 	
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static Map<String,List<ProcessConfiguration>> configurationMap;
-	
-	private Process _process;
-	private ProcessReader _stdout;
-	private ProcessReader _stderr;
-	private ProcessWriter _stdin;
-	private StringBuffer _output;
-	private String _startingDirectory;
 	
 	/**
 	 * getCurrentConfiguration
@@ -85,6 +79,15 @@ public class ProcessWrapper
 		}
 	}
 	
+	private Process _process;
+	private ProcessReader _stdout;
+	private ProcessReader _stderr;
+	private ProcessWriter _stdin;
+	private StringBuffer _output;
+	private String _startingDirectory;
+	private List<ProcessEndedListener> _processEndedListeners;
+	private ProcessWatcher _watcher;
+	
 	/**
 	 * ProcessWrapper
 	 * 
@@ -103,6 +106,48 @@ public class ProcessWrapper
 	public ProcessWrapper(String startingDirectory)
 	{
 		this._startingDirectory = startingDirectory;
+	}
+	
+	/**
+	 * addProcessEndedListener
+	 * 
+	 * @param listener
+	 */
+	public void addProcessEndedListener(ProcessEndedListener listener)
+	{
+		if (listener != null)
+		{
+			if (this._processEndedListeners == null)
+			{
+				this._processEndedListeners = new LinkedList<ProcessEndedListener>();
+			}
+
+			this._processEndedListeners.add(listener);
+		}
+	}
+	
+	/**
+	 * fireProcessEnded
+	 */
+	void fireProcessEnded()
+	{
+		if (this._processEndedListeners != null)
+		{
+			for (ProcessEndedListener listener : this._processEndedListeners)
+			{
+				listener.processEnded();
+			}
+		}
+	}
+	
+	/**
+	 * getProcess
+	 * 
+	 * @return
+	 */
+	Process getProcess()
+	{
+		return this._process;
 	}
 	
 	/**
@@ -162,23 +207,16 @@ public class ProcessWrapper
 	}
 	
 	/**
-	 * setStandardErrorFilter
+	 * removeProcessEndedListener
 	 * 
-	 * @param pattern
+	 * @param listener
 	 */
-	public void setStandardErrorFilter(Pattern pattern)
+	public void removeProcessEndedListener(ProcessEndedListener listener)
 	{
-		this._stderr.setFilter(pattern);
-	}
-	
-	/**
-	 * setStandardOutputFilter
-	 * 
-	 * @param pattern
-	 */
-	public void setStandardOutputFilter(Pattern pattern)
-	{
-		this._stdout.setFilter(pattern);
+		if (this._processEndedListeners != null)
+		{
+			this._processEndedListeners.remove(listener);
+		}
 	}
 	
 	/**
@@ -200,7 +238,7 @@ public class ProcessWrapper
 	{
 		this.sendText(new String(chars));
 	}
-
+	
 	/**
 	 * sendText
 	 * 
@@ -212,6 +250,26 @@ public class ProcessWrapper
 		{
 			this._stdin.sendText(text);
 		}
+	}
+	
+	/**
+	 * setStandardErrorFilter
+	 * 
+	 * @param pattern
+	 */
+	public void setStandardErrorFilter(Pattern pattern)
+	{
+		this._stderr.setFilter(pattern);
+	}
+
+	/**
+	 * setStandardOutputFilter
+	 * 
+	 * @param pattern
+	 */
+	public void setStandardOutputFilter(Pattern pattern)
+	{
+		this._stdout.setFilter(pattern);
 	}
 	
 	/**
@@ -242,15 +300,24 @@ public class ProcessWrapper
 			{
 				// perform any last-minute configuration before we start the process
 				configuration.beforeStart(this, builder);
-				
-				this._process = builder.start();
+
+				// create buffer for all process output (STDERR and STDOUT)
 				this._output = new StringBuffer();
+				
+				// start the process
+				this._process = builder.start();
+				
+				// spin up threads to handle I/O
 				this._stdout = new ProcessReader("STDOUT", this._process.getInputStream(), this._output); //$NON-NLS-1$
 				this._stderr = new ProcessReader("STDERR", this._process.getErrorStream(), this._output); //$NON-NLS-1$
 				this._stdin = new ProcessWriter(this._process.getOutputStream());
 	
 				this._stdout.start();
 				this._stderr.start();
+				
+				// setup process watcher so we can cleanup when the process exists
+				this._watcher = new ProcessWatcher(this);
+				this._watcher.start();
 				
 				// perform any post-start configuration
 				configuration.afterStart(this);

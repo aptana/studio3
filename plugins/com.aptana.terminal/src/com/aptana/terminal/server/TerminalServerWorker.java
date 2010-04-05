@@ -136,7 +136,7 @@ public class TerminalServerWorker implements Runnable
 			
 			if (data != null)
 			{
-				String units = (Platform.getOS().equals(Platform.OS_WIN32)) ? "pt" : "px";
+				String units = (Platform.getOS().equals(Platform.OS_WIN32)) ? "pt" : "px"; //$NON-NLS-1$ //$NON-NLS-2$
 				
 				variables.put("\\{font-name\\}", data.getName()); //$NON-NLS-1$
 				variables.put("\\{font-size\\}", Integer.toString(data.getHeight()) + units); //$NON-NLS-1$

@@ -70,6 +70,10 @@ abstract class StagingAction extends ChangedFileAction
 	public boolean isEnabled()
 	{
 		IResource[] resources = getSelectedResources();
+		if (resources.length == 0)
+		{
+			return false;
+		}
 		for (IResource resource : resources)
 		{
 			if (!isEnabledForResource(resource))

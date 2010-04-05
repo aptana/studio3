@@ -24,7 +24,7 @@ public class WindowsCmdConfiguration extends WindowsCygwinConfiguration
 	{
 		// Turn on filtering
 		String marker = UUID.randomUUID().toString();
-		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE);
+		Pattern filter = Pattern.compile("^" + marker + "[\\r\\n]+", Pattern.MULTILINE); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		wrapper.setStandardOutputFilter(filter);
 		
@@ -37,13 +37,13 @@ public class WindowsCmdConfiguration extends WindowsCygwinConfiguration
 			
 			if (dir.exists())
 			{
-				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n");
+				wrapper.sendText("cd \"`cygpath \"" + dir.getAbsolutePath() + "\"`\"\n"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		
 		// startup cmd.exe and turn filtering off
-		String command = "cmd.exe /K '@echo " + marker + "'";
+		String command = "cmd.exe /K '@echo " + marker + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 		
-		wrapper.sendText(command + ";exit\n");
+		wrapper.sendText(command + ";exit\n"); //$NON-NLS-1$
 	}
 }

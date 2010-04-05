@@ -29,8 +29,10 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -212,18 +214,25 @@ public class GitRepository
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
 					// Remove branch in model!
-					branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
-					Job job = new Job("Fire branch removed event") //$NON-NLS-1$
+					GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
+					branches.remove(rev);
+					// the branch may in fact still exists
+					reloadRefs();
+					// only fires the event if the branch is indeed removed
+					if (!branches.contains(rev))
 					{
-						@Override
-						protected IStatus run(IProgressMonitor monitor)
+						Job job = new Job("Fire branch removed event") //$NON-NLS-1$
 						{
-							fireBranchRemovedEvent(name);
-							return Status.OK_STATUS;
-						}
-					};
-					job.setSystem(true);
-					job.schedule();
+							@Override
+							protected IStatus run(IProgressMonitor monitor)
+							{
+								fireBranchRemovedEvent(name);
+								return Status.OK_STATUS;
+							}
+						};
+						job.setSystem(true);
+						job.schedule();
+					}
 				}
 
 				@Override
@@ -1131,11 +1140,11 @@ public class GitRepository
 			return false;
 
 		String workingDirectory = workingDirectory();
+		IPath resourcePath = new Path(new File(resource.getLocationURI()).getAbsolutePath());
 		for (ChangedFile changedFile : changedFiles)
 		{
 			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
-			if (fullPath.startsWith(resourcePath))
+			if (resourcePath.isPrefixOf(new Path(fullPath)))
 				return true;
 		}
 		return false;

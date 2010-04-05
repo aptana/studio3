@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -22,49 +23,17 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Closeable;
 import com.aptana.terminal.TerminalBrowser;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.server.TerminalServer;
 
-public class TerminalView extends ViewPart
+public class TerminalView extends ViewPart implements Closeable
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
 	private static List<String> startDirectories = new ArrayList<String>(2);
-
-	/**
-	 * pullStartDirectory
-	 * 
-	 * @return
-	 */
-	private static String pullStartingDirectory()
-	{
-		String result = null;
-
-		synchronized (startDirectories)
-		{
-			if (startDirectories.isEmpty() == false)
-			{
-				result = startDirectories.remove(0);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * pushStartingDirectory
-	 * 
-	 * @param startingDirectory
-	 */
-	public static void pushStartingDirectory(String startingDirectory)
-	{
-		synchronized (startDirectories)
-		{
-			startDirectories.add(startingDirectory);
-		}
-	}
 
 	/**
 	 * @param id
@@ -115,8 +84,60 @@ public class TerminalView extends ViewPart
 		return term;
 	}
 
+	/**
+	 * pullStartDirectory
+	 * 
+	 * @return
+	 */
+	private static String pullStartingDirectory()
+	{
+		String result = null;
+
+		synchronized (startDirectories)
+		{
+			if (startDirectories.isEmpty() == false)
+			{
+				result = startDirectories.remove(0);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * pushStartingDirectory
+	 * 
+	 * @param startingDirectory
+	 */
+	public static void pushStartingDirectory(String startingDirectory)
+	{
+		synchronized (startDirectories)
+		{
+			startDirectories.add(startingDirectory);
+		}
+	}
+
 	private TerminalBrowser browser;
 	private Action openEditor;
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.terminal.Closeable#close()
+	 */
+	public void close()
+	{
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		
+		workbench.getDisplay().asyncExec(new Runnable()
+		{
+			public void run()
+			{
+				IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
+				
+				page.hideView(TerminalView.this);
+			}
+		});
+	}
 
 	/**
 	 * contributeToActionBars

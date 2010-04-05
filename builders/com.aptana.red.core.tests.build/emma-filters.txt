@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 -*Test*
 -*Application*
 -*Messages
 -net.contentobjects.*
+=======
+-*Test*
+-*Application*
+-*Messages
+-net.contentobjects.*
+-com.aptana.red.core.tests.all.*
+>>>>>>> development

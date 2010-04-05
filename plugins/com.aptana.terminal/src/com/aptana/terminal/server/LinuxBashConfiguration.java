@@ -17,7 +17,7 @@ import com.aptana.util.ResourceUtils;
  */
 public class LinuxBashConfiguration implements ProcessConfiguration
 {
-	private static final String REDTTY = "redtty." + Platform.getOS() + "." + Platform.getOSArch();
+	private static final String REDTTY = "redtty." + Platform.getOS() + "." + Platform.getOSArch(); //$NON-NLS-1$ //$NON-NLS-2$
 
 	/**
 	 * DefaultLinuxConfiguration

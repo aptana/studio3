@@ -81,7 +81,16 @@ public class CSSSimpleSelectorNode extends CSSNode
 		{
 			text.append(fTypeSelector);
 		}
-		text.append(super.toString());
+		CSSAttributeSelectorNode[] attributeSelectors = getAttributeSelectors();
+		int size = attributeSelectors.length;
+		for (int i = 0; i < size; ++i)
+		{
+			text.append(attributeSelectors[i]);
+			if (i < size - 1)
+			{
+				text.append(" "); //$NON-NLS-1$
+			}
+		}
 		return text.toString();
 	}
 }
