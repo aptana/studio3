@@ -44,14 +44,14 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			}
 			else if (shouldAutoDedent() && !isLineDelimiter(document, command.text))
 			{
-				autoDedent(document, command);
+ 				autoDedent(document, command);
 			}
 		}
 	}
 
 	private void autoDedent(IDocument d, DocumentCommand c)
 	{
-		if (c.offset <= 0 || d.getLength() == 0)
+		if (c.offset <= 0 || d.getLength() == 0 || c.text.length() > 1)
 			return;
 
 		try
@@ -66,9 +66,8 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 			String scope = getScopeAtOffset(d, c.offset);
 			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(scope);
 			// what line will be after new char is inserted....
-			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset()) + c.text;
-
-			if (matchesRegexp(decreaseIndentRegexp, lineContent))
+			String lineContent = d.get(curLineRegion.getOffset(), c.offset - curLineRegion.getOffset());
+			if (matchesRegexp(decreaseIndentRegexp, lineContent + c.text))
 			{
 				int lineNumber = d.getLineOfOffset(c.offset);
 				if (lineNumber == 0) // first line, should be no indent yet...
@@ -98,13 +97,13 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 				}
 				// Shift the current line...
 				int i = 0;
-				while (Character.isWhitespace(lineContent.charAt(i)))
+				while (i < lineContent.length() && Character.isWhitespace(lineContent.charAt(i)))
 				{
 					i++;
 				}
 				// Just shift the content beforehand
-				String newContent = decreasedIndent + lineContent.substring(i, lineContent.length() - 1);
-				d.replace(curLineRegion.getOffset(), lineContent.length() - 1, newContent);
+				String newContent = decreasedIndent + lineContent.substring(i);
+				d.replace(curLineRegion.getOffset(), lineContent.length(), newContent);
 				c.doit = true;
 				int diff = currentLineIndent.length() - decreasedIndent.length();
 				c.offset -= diff;
