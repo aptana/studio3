@@ -132,7 +132,7 @@ public class SnippetTemplateTranslator extends TemplateTranslator
 									{
 										buffer.append(","); //$NON-NLS-1$
 									}
-									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/").replaceAll("\\\\}", "\\}").replaceAll("'", "''") + SINGLE_QUOTE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+									buffer.append(SINGLE_QUOTE + value.replaceAll("\\\\/", "/").replaceAll("\\\\}", "\\}").replaceAll("'", "''").replaceAll("\\\\`", "`") + SINGLE_QUOTE); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 								}
 								buffer.append(")"); //$NON-NLS-1$
 							}
