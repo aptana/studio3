@@ -8,6 +8,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.tm.internal.terminal.control.ITerminalListener;
+import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
+import org.eclipse.tm.internal.terminal.control.TerminalViewControlFactory;
+import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
+import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
@@ -21,14 +27,14 @@ import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
-import com.aptana.terminal.TerminalBrowser;
-import com.aptana.terminal.server.TerminalServer;
+import com.aptana.terminal.connector.LocalTerminalConnector;
 
-public class TerminalEditor extends EditorPart implements IPersistableEditor, Closeable
+@SuppressWarnings("restriction")
+public class TerminalEditor extends EditorPart implements IPersistableEditor, Closeable, ITerminalListener
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
-	private TerminalBrowser _browser;
+	private ITerminalViewControl fCtlTerminal;
 
 	/*
 	 * (non-Javadoc)
@@ -56,34 +62,33 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	@Override
 	public void createPartControl(Composite parent)
 	{
-		// NOTE: This forces the terminal server to startup before we try to
-		// open the terminal editor. Apparently, on Windows, the editor will
-		// open the URL before the server has started resulting in a "page not found"
-		TerminalServer.getInstance();
-		
-		this._browser = new TerminalBrowser(this);
-		this._browser.createControl(parent);
+		fCtlTerminal = TerminalViewControlFactory.makeControl(this, parent, getTerminalConnectors());
+		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
+		fCtlTerminal.connectTerminal();
 
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this._browser.getControl(), ID);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(fCtlTerminal.getControl(), ID);
 		
 		hookContextMenu();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	private ITerminalConnector[] getTerminalConnectors() {
+		return new ITerminalConnector[] { TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID) };
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setState(org.eclipse.tm.internal.terminal.provisional.api.TerminalState)
 	 */
 	@Override
-	public void dispose()
-	{
-		if (this._browser != null)
-		{
-			this._browser.dispose();
-			this._browser = null;
-		}
+	public void setState(TerminalState state) {
+	}
 
-		super.dispose();
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setTerminalTitle(java.lang.String)
+	 */
+	@Override
+	public void setTerminalTitle(String title) {
+		setContentDescription(title);
 	}
 
 	/*
@@ -112,7 +117,7 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	private void fillContextMenu(IMenuManager manager)
 	{
 		// add browser's menus
-		this._browser.fillContextMenu(manager);
+		//fCtlTerminal.fillContextMenu(manager);
 		
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
@@ -133,9 +138,9 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 			}
 		});
 
-		Control browserControl = this._browser.getControl();
-		Menu menu = menuMgr.createContextMenu(browserControl);
-		browserControl.setMenu(menu);
+		Control control = fCtlTerminal.getControl();
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
 		// getSite().registerContextMenu(menuMgr, viewer);
 	}
 	
@@ -198,6 +203,6 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	@Override
 	public void setFocus()
 	{
-		_browser.setFocus();
+		fCtlTerminal.setFocus();
 	}
 }
