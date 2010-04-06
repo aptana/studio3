@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -331,8 +331,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						TerminalView.open(selectedProject.getName(), selectedProject.getName(), selectedProject
-								.getLocation().toOSString());
+						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject.getLocation());
 					}
 				});
 				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
