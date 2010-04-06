@@ -30,7 +30,7 @@ import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.server.TerminalServer;
 
-public class TerminalView extends ViewPart implements Closeable
+public class TerminalViewOld extends ViewPart implements Closeable
 {
 	public static final String ID = "com.aptana.terminal.views.TerminalView"; //$NON-NLS-1$
 	private static List<String> startDirectories = new ArrayList<String>(2);
@@ -44,9 +44,9 @@ public class TerminalView extends ViewPart implements Closeable
 	 *            The directory in which to set the view initially.
 	 * @return
 	 */
-	public static TerminalView open(String id, String title, String workingDirectory)
+	public static TerminalViewOld open1(String id, String title, String workingDirectory)
 	{
-		TerminalView term = null;
+		TerminalViewOld term = null;
 
 		try
 		{
@@ -57,7 +57,7 @@ public class TerminalView extends ViewPart implements Closeable
 				pushStartingDirectory(workingDirectory);
 			}
 			// FIXME What if view with same ids is already open? We need to close and re-open, or issue cd explcitiy or our starting dir stack is messed up
-			term = (TerminalView) page.showView(TerminalView.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
+			term = (TerminalViewOld) page.showView(TerminalViewOld.ID, id, org.eclipse.ui.IWorkbenchPage.VIEW_ACTIVATE);
 		}
 		catch (IllegalStateException e)
 		{
@@ -134,7 +134,7 @@ public class TerminalView extends ViewPart implements Closeable
 			{
 				IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
 				
-				page.hideView(TerminalView.this);
+				page.hideView(TerminalViewOld.this);
 			}
 		});
 	}

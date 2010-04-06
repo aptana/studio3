@@ -3,6 +3,8 @@ package com.aptana.util;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 /**
@@ -12,62 +14,75 @@ public abstract class ExecutableUtil
 {
 
 	/**
-	 * @param exeName
+	 * @param executableName
 	 *            name of the binary.
-	 * @param appendEXE
+	 * @param appendExtension
 	 *            ".exe" is appended for windows when searching the PATH.
-	 * @param prefPath
+	 * @param preferencesPath
 	 *            Path specified in user's preferences.
 	 * @param searchLocations
 	 *            Common locations to search.
 	 * @return
 	 */
-	public static String find(String exeName, boolean appendEXE, String prefPath, List<String> searchLocations)
+	public static IPath find(String executableName, boolean appendExtension, IPath preferencesPath, List<IPath> searchLocations)
 	{
-		if (prefPath != null && prefPath.length() > 0)
-		{
-			if (acceptBinary(prefPath))
-			{
-				return prefPath;
+		if (preferencesPath != null) {
+			if (isExecutable(preferencesPath)) {
+				return preferencesPath;
 			}
 		}
 
-		if (Platform.getOS().equals(Platform.OS_WIN32))
-		{
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
 			// Grab PATH and search it!
-			String path = System.getenv("PATH"); //$NON-NLS-1$
-			String[] paths = path.split(File.pathSeparator);
-			for (String pathString : paths)
-			{
-				String possiblePath = pathString + File.separator + exeName;
-				if (appendEXE)
-					possiblePath += ".exe"; //$NON-NLS-1$
-				if (acceptBinary(possiblePath))
-				{
-					return possiblePath;
+			String[] paths = System.getenv("PATH").split(File.pathSeparator); //$NON-NLS-1$
+			for (String pathString : paths) {
+				IPath path = Path.fromOSString(pathString).append(executableName);
+				if (appendExtension) {
+					IPath result = findExecutable(path);
+					if (result != null) {
+						return result;
+					}
+				} else if (isExecutable(path)) {
+					return path;
 				}
 			}
-		}
-		else
-		{
+		} else {
 			// No explicit path. Try it with "which"
-			String whichPath = ProcessUtil.outputForCommand("/usr/bin/which", null, exeName); //$NON-NLS-1$
-			if (acceptBinary(whichPath))
-				return whichPath;
+			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", null, executableName); //$NON-NLS-1$
+			if (whichResult != null && whichResult.trim().length() > 0) {
+				IPath whichPath = Path.fromOSString(whichResult.trim());
+				if (isExecutable(whichPath))
+					return whichPath;
+			}
 		}
 
 		// Still no path. Let's try some default locations.
-		for (String location : searchLocations)
-		{
-			if (acceptBinary(location))
-				return location;
+		for (IPath location : searchLocations) {
+			IPath result = findExecutable(location.append(executableName));
+			if (result != null)
+				return result;
+		}
+		return null;
+	}
+	
+	private static IPath findExecutable(IPath basename) {
+		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+			String[] extensions = System.getenv("PATHEXT").split(File.pathSeparator); //$NON-NLS-1$
+			for (String ext : extensions) {
+				IPath pathWithExt = basename.addFileExtension(ext);
+				if (isExecutable(pathWithExt)) {
+					return pathWithExt;
+				}
+			}
+			
+		} else if (isExecutable(basename)) {
+			return basename;
 		}
 		return null;
 	}
 
-	private static boolean acceptBinary(String prefPath)
-	{
-		File file = new File(prefPath);
+	private static boolean isExecutable(IPath path) {
+		File file = path.toFile();
 		return file.exists() && file.canExecute();
 	}
 
