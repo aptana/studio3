@@ -28,6 +28,7 @@
 
 Program
 	=	SourceElements.p {:return new ParseRootNode(IJSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());:}
+	| {:return new ParseRootNode(IJSParserConstants.LANGUAGE, new Symbol[0], 0, 0);:}
 	;
 
 SourceElements
