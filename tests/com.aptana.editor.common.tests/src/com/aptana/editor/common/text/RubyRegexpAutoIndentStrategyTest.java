@@ -106,26 +106,6 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 			return true;
 		}
 	}
-	
-	public void testDoesntDedentWhenMultipleCharsArePasted()
-	{
-		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
-		{
-			@Override
-			protected String getIndentString()
-			{
-				return "  ";
-			}
-		};
-		IDocument document = new Document("if a.nil?\n  a=1\n  el");
-		DocumentCommand command = createTextCommand(20, "se");
-		strategy.customizeDocumentCommand(document, command);
-
-		assertEquals("if a.nil?\n  a=1\n  el", document.get());
-		assertTrue(command.doit);
-		assertEquals("se", command.text);
-		assertEquals(20, command.offset);
-	}
 
 	public void testIndentAndPushTrailingContentAfterNewlineAndCursorForTagPair()
 	{
