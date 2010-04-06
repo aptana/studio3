@@ -100,7 +100,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 							// FIXME What if the parse failed! We don't really want to wipe the existing results! This
 							// is just a hack!
 							IParseNode node = editor.getFileService().getParseResult();
-							if (node.getChildrenCount() > 0)
+							if (node != null)
 							{
 								page.refresh();
 								page.expandToLevel(2);
