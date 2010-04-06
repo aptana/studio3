@@ -37,13 +37,9 @@ public abstract class ExecutableUtil
 			String[] paths = System.getenv("PATH").split(File.pathSeparator); //$NON-NLS-1$
 			for (String pathString : paths) {
 				IPath path = Path.fromOSString(pathString).append(executableName);
-				if (appendExtension) {
-					IPath result = findExecutable(path);
-					if (result != null) {
-						return result;
-					}
-				} else if (isExecutable(path)) {
-					return path;
+				IPath result = findExecutable(path, appendExtension);
+				if (result != null) {
+					return result;
 				}
 			}
 		} else {
@@ -58,15 +54,15 @@ public abstract class ExecutableUtil
 
 		// Still no path. Let's try some default locations.
 		for (IPath location : searchLocations) {
-			IPath result = findExecutable(location.append(executableName));
+			IPath result = findExecutable(location.append(executableName), appendExtension);
 			if (result != null)
 				return result;
 		}
 		return null;
 	}
 	
-	private static IPath findExecutable(IPath basename) {
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+	private static IPath findExecutable(IPath basename, boolean appendExtension) {
+		if (Platform.OS_WIN32.equals(Platform.getOS()) && appendExtension) {
 			String[] extensions = System.getenv("PATHEXT").split(File.pathSeparator); //$NON-NLS-1$
 			for (String ext : extensions) {
 				IPath pathWithExt = basename.addFileExtension(ext);
