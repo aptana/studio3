@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -138,6 +139,52 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.EraseItem, selectionOverride);
+		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
+		if (isWindows)
+		{
+			tree.addListener(SWT.PaintItem, new Listener() 
+			{
+				
+				@Override
+				public void handleEvent(Event event) 
+				{
+					GC gc = event.gc;
+					Widget item = event.item;
+					boolean isExpanded = false;
+					boolean draw = false;
+					if (item instanceof TreeItem)
+					{
+						TreeItem tItem = (TreeItem) item;
+						isExpanded = tItem.getExpanded();
+						draw = tItem.getItemCount() > 0;
+					}
+					if (!draw)
+						return;
+					final int width = 10;
+					final int height = 12;
+					final int x = event.x - 16;
+					final int y = event.y + 4;
+					Color oldBackground = gc.getBackground();
+					gc.setBackground(getBackground());
+					// wipe out the native control
+					gc.fillRectangle(x, y, width, height);
+					// draw a plus/minus based on expansion!
+					gc.setBackground(getForeground());
+					// draw surrounding box
+					gc.drawRectangle(x, y, width, width);
+					// draw '-'
+					gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
+					if (!isExpanded)
+					{
+						// draw '|' to make it a plus
+						gc.drawLine(x + (width / 2), y + 3, x + (width / 2), y + 7);
+					}
+					gc.setBackground(oldBackground);
+					
+					event.detail &= ~SWT.BACKGROUND;
+				}
+			});
+		}
 	}
 
 	private void addMeasureItemListener()
