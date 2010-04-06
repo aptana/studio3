@@ -8,7 +8,6 @@ import java.util.Set;
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -755,44 +754,10 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		builder.append("&id=");
 		builder.append(getGUID());
 
-		// deploy info
-		builder.append(getDeployParam());
-
 		// for debugging output
 		// builder.append("&debug=1");
 
 		return builder.toString();
-	}
-
-	/**
-	 * additional parameter &dep=VALUE where VALUE is one of (in decreasing order of precedence):
-	 * <ul>
-	 * <li>ch (deploy/default.rb at project root)</li>
-	 * <li>cs (chef solo - deploy/solo.rb at project root)</li>
-	 * <li>cap (Capfile or capfile at root)</li>
-	 * </ul>
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("nls")
-	private String getDeployParam()
-	{
-		if (selectedProject != null && selectedProject.exists())
-		{
-			IFile file = selectedProject.getFile("deploy/default.rb");
-			if (file.exists())
-				return "&dep=ch";
-			file = selectedProject.getFile("deploy/solo.rb");
-			if (file.exists())
-				return "&dep=cs";
-			file = selectedProject.getFile("Capfile");
-			if (file.exists())
-				return "&dep=cap";
-			file = selectedProject.getFile("capfile");
-			if (file.exists())
-				return "&dep=cap";
-		}
-		return "";
 	}
 
 	private String getGUID()

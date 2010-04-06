@@ -6,11 +6,8 @@
 static int create_ssh_process(_TCHAR* host, _TCHAR* cmd);
 static int ask_password(_TCHAR* message);
 
-<<<<<<< HEAD
-=======
 static WCHAR szEnvVariableName[] = L"SSHW_PID";
 
->>>>>>> development
 int _tmain(int argc, _TCHAR* argv[])
 {
 	if (argc == 3) {
@@ -30,32 +27,18 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
 	HANDLE hStdInR = NULL, hStdInW = NULL;
 	HANDLE hStdOutR = NULL, hStdOutW = NULL;
 	HANDLE hStdErrR = NULL, hStdErrW = NULL;
-<<<<<<< HEAD
-	HANDLE hParentStdIn = GetStdHandle(STD_INPUT_HANDLE);
-	HANDLE hParentStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	HANDLE hParentStdErr = GetStdHandle(STD_ERROR_HANDLE);
-=======
 	HANDLE hParentStdIn = ::GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hParentStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	HANDLE hParentStdErr = ::GetStdHandle(STD_ERROR_HANDLE);
->>>>>>> development
 	TCHAR szPath[MAX_PATH];
 	TCHAR szCmdline[1024];
 	CHAR chBuf[1024];
 
-<<<<<<< HEAD
-	if (!GetModuleFileName(NULL, szPath, MAX_PATH) ) {
-		printf("Cannot get program path (%d)\n", GetLastError());
-		return -1;
-	}
-	if( !GetEnvironmentVariable(_T("SSH_CMD"), szCmdline, sizeof(szCmdline)/sizeof(*szCmdline)) ) {
-=======
 	if (!::GetModuleFileName(NULL, szPath, MAX_PATH) ) {
 		printf("Cannot get program path (%d)\n", GetLastError());
 		return -1;
 	}
 	if( !::GetEnvironmentVariable(_T("SSH_CMD"), szCmdline, sizeof(szCmdline)/sizeof(*szCmdline)) ) {
->>>>>>> development
 		_tcscpy_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T("ssh"));
 	}
 	_tcscat_s(szCmdline, sizeof(szCmdline)/sizeof(*szCmdline), _T(" \""));
@@ -69,83 +52,45 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
 	sa.lpSecurityDescriptor = NULL;
 
 	// STDOUT
-<<<<<<< HEAD
-	if ( !CreatePipe(&hStdOutR, &hStdOutW, &sa, 0) ) {
-		printf("Cannot create pipe (%d)\n", GetLastError());
-		return -1;
-	}
-	if ( !SetHandleInformation(hStdOutR, HANDLE_FLAG_INHERIT, 0) ) {
-=======
 	if ( !::CreatePipe(&hStdOutR, &hStdOutW, &sa, 0) ) {
 		printf("Cannot create pipe (%d)\n", GetLastError());
 		return -1;
 	}
 	if ( !::SetHandleInformation(hStdOutR, HANDLE_FLAG_INHERIT, 0) ) {
->>>>>>> development
 		printf("Set inheritable for pipe failed (%d)\n", GetLastError());
 		return -1;
 	}
 	// STDERR
-<<<<<<< HEAD
-	if ( !CreatePipe(&hStdErrR, &hStdErrW, &sa, 0) ) {
-		printf("Cannot create pipe (%d)\n", GetLastError());
-		return -1;
-	}
-	if ( !SetHandleInformation(hStdErrR, HANDLE_FLAG_INHERIT, 0) ) {
-=======
 	if ( !::CreatePipe(&hStdErrR, &hStdErrW, &sa, 0) ) {
 		printf("Cannot create pipe (%d)\n", GetLastError());
 		return -1;
 	}
 	if ( !::SetHandleInformation(hStdErrR, HANDLE_FLAG_INHERIT, 0) ) {
->>>>>>> development
 		printf("Set inheritable for pipe failed (%d)\n", GetLastError());
 		return -1;
 	}
 	// STDIN
-<<<<<<< HEAD
-	if ( !CreatePipe(&hStdInR, &hStdInW, &sa, 0) ) {
-		printf("Cannot create pipe (%d)\n", GetLastError());
-		return -1;
-	}
-	if ( !SetHandleInformation(hStdInW, HANDLE_FLAG_INHERIT, 0) ) {
-=======
 	if ( !::CreatePipe(&hStdInR, &hStdInW, &sa, 0) ) {
 		printf("Cannot create pipe (%d)\n", GetLastError());
 		return -1;
 	}
 	if ( !::SetHandleInformation(hStdInW, HANDLE_FLAG_INHERIT, 0) ) {
->>>>>>> development
 		printf("Set inheritable for pipe failed (%d)\n", GetLastError());
 		return -1;
 	}
 
-<<<<<<< HEAD
-	ZeroMemory(&si, sizeof(si));
-=======
 	::ZeroMemory(&si, sizeof(si));
->>>>>>> development
 	si.cb = sizeof(si);
 	si.hStdError = hStdErrW;
 	si.hStdOutput = hStdOutW;
 	si.hStdInput = hStdInR;
 	si.dwFlags |= STARTF_USESTDHANDLES;
-<<<<<<< HEAD
-    ZeroMemory(&pi, sizeof(pi));
-=======
 	::ZeroMemory(&pi, sizeof(pi));
->>>>>>> development
 
 #ifdef UNICODE
     dwFlags = CREATE_UNICODE_ENVIRONMENT;
 #endif
 
-<<<<<<< HEAD
-	SetEnvironmentVariable(_T("SSH_ASKPASS"), szPath);
-	SetEnvironmentVariable(_T("DISPLAY"), _T(":9999"));
-
-	if( !CreateProcess(
-=======
 	::SetEnvironmentVariable(_T("SSH_ASKPASS"), szPath);
 	::SetEnvironmentVariable(_T("DISPLAY"), _T(":9999"));
 
@@ -158,7 +103,6 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
 	::SetEnvironmentVariableW(szEnvVariableName, szValue);
 
 	if( !::CreateProcess(
->>>>>>> development
 		NULL,		// No module name (use command line)
         szCmdline,	// Command line
         NULL,		// Process handle not inheritable
@@ -173,76 +117,43 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
         printf( "CreateProcess failed (%d).\n", GetLastError() );
         return -1;
 	}
-<<<<<<< HEAD
-	CloseHandle(hStdOutW);
-	CloseHandle(hStdErrW);
-	CloseHandle(hStdInR);
-=======
 	::CloseHandle(hStdOutW);
 	::CloseHandle(hStdErrW);
 	::CloseHandle(hStdInR);
->>>>>>> development
 
 	while( true ) {
 		DWORD dwRead = 0, dwWritten = 0;
 		DWORD dwExitCode = WaitForSingleObject(pi.hProcess, 100);
-<<<<<<< HEAD
-		FlushFileBuffers(hParentStdIn);
-		while ( PeekNamedPipe(hParentStdIn, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
-			if( !ReadFile(hParentStdIn, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
-				break;
-			}
-			if( !WriteFile(hStdInW, chBuf, dwRead, &dwWritten, NULL) ) {
-=======
 		::FlushFileBuffers(hParentStdIn);
 		while ( ::PeekNamedPipe(hParentStdIn, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
 			if( !::ReadFile(hParentStdIn, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
 				break;
 			}
 			if( !::WriteFile(hStdInW, chBuf, dwRead, &dwWritten, NULL) ) {
->>>>>>> development
 				break;
 			}
 		}
 		if ( dwWritten != 0 ) {
 			continue;
 		}
-<<<<<<< HEAD
-		FlushFileBuffers(hStdOutR);
-		while ( PeekNamedPipe(hStdOutR, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
-			if( !ReadFile(hStdOutR, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
-				break;
-			}
-			if( !WriteFile(hParentStdOut, chBuf, dwRead, &dwWritten, NULL) ) {
-=======
 		::FlushFileBuffers(hStdOutR);
 		while ( ::PeekNamedPipe(hStdOutR, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
 			if( !::ReadFile(hStdOutR, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
 				break;
 			}
 			if( !::WriteFile(hParentStdOut, chBuf, dwRead, &dwWritten, NULL) ) {
->>>>>>> development
 				break;
 			}
 		}
 		if ( dwWritten != 0 ) {
 			continue;
 		}
-<<<<<<< HEAD
-		FlushFileBuffers(hStdErrR);
-		while ( PeekNamedPipe(hStdErrR, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
-			if( !ReadFile(hStdErrR, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
-				break;
-			}
-			if( !WriteFile(hParentStdErr, chBuf, dwRead, &dwWritten, NULL) ) {
-=======
 		::FlushFileBuffers(hStdErrR);
 		while ( ::PeekNamedPipe(hStdErrR, NULL, 0L, NULL, &dwRead, NULL) && (dwRead != 0) ) {
 			if( !::ReadFile(hStdErrR, chBuf, sizeof(chBuf), &dwRead, NULL) ) {
 				break;
 			}
 			if( !::WriteFile(hParentStdErr, chBuf, dwRead, &dwWritten, NULL) ) {
->>>>>>> development
 				break;
 			}
 		}
@@ -253,16 +164,6 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
 			break;
 		}
 	}
-<<<<<<< HEAD
-	CloseHandle(hStdOutR);
-	CloseHandle(hStdErrR);
-
-	WaitForSingleObject(pi.hProcess, INFINITE);
-
-    // Close process and thread handles. 
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-=======
 	::CloseHandle(hStdOutR);
 	::CloseHandle(hStdErrR);
 
@@ -271,14 +172,10 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
     // Close process and thread handles. 
 	::CloseHandle(pi.hProcess);
 	::CloseHandle(pi.hThread);
->>>>>>> development
 	return 0;
 }
 
 static BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-<<<<<<< HEAD
-_TCHAR szPassword[80];
-=======
 static void SavePassword(LPCTSTR szKeyName);
 static BOOL LoadPassword(LPCTSTR szKeyName);
 
@@ -286,7 +183,6 @@ static _TCHAR szRegistrySubKey[] = _T("Software\\SSHW");
 static _TCHAR szPassword[80];
 static _TCHAR szKeyName[MAX_PATH+1];
 static BOOL bRememberPassword = FALSE;
->>>>>>> development
 
 int ask_password(_TCHAR* message)
 {
@@ -299,9 +195,6 @@ int ask_password(_TCHAR* message)
 			return 0;
 		}
 	} else {
-<<<<<<< HEAD
-		if( DialogBoxParam(GetModuleHandle(NULL),
-=======
 		::ZeroMemory(szKeyName, sizeof(szKeyName));
 		_TCHAR *lpszBegin = _tcschr(message, _T('\''));
 		if( lpszBegin != NULL ) {
@@ -320,19 +213,15 @@ int ask_password(_TCHAR* message)
 			return 0;
 		}
 		if( ::DialogBoxParam(GetModuleHandle(NULL),
->>>>>>> development
 			MAKEINTRESOURCE(IDD_DIALOG),
 			NULL,
 			DialogProc,
 			(LPARAM)message) ) {
 				_tprintf(szPassword);
-<<<<<<< HEAD
-=======
 				if( bRememberPassword && (_tcslen(szKeyName) != 0) ) {
 					SavePassword(szKeyName);
 				}
 				::SecureZeroMemory(szPassword, sizeof(szPassword));
->>>>>>> development
 				return 0;
 		}
 	}
@@ -343,25 +232,11 @@ BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch(message) {
 		case WM_INITDIALOG:
-<<<<<<< HEAD
-			SetDlgItemText(hDlg, IDC_MESSAGE, (LPCTSTR)lParam);
-=======
 			::SetDlgItemText(hDlg, IDC_MESSAGE, (LPCTSTR)lParam);
->>>>>>> development
 			break;
 		case WM_COMMAND:
 			switch(LOWORD(wParam)) {
 				case IDOK: {
-<<<<<<< HEAD
-						if( !GetDlgItemText(hDlg, IDC_PASSWORD, szPassword, sizeof(szPassword)) ) {
-							*szPassword = 0;
-						}
-						EndDialog(hDlg, IDOK);
-					}
-					return TRUE;
-				case IDCANCEL:
-					EndDialog(hDlg, IDCANCEL);
-=======
 						bRememberPassword = ::IsDlgButtonChecked(hDlg, IDC_REMEMBER) == BST_CHECKED;
 						if( !::GetDlgItemText(hDlg, IDC_PASSWORD, szPassword, sizeof(szPassword)) ) {
 							*szPassword = 0;
@@ -371,7 +246,6 @@ BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					return TRUE;
 				case IDCANCEL:
 					::EndDialog(hDlg, IDCANCEL);
->>>>>>> development
 					return TRUE;
 			}
 			break;
@@ -379,8 +253,6 @@ BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return FALSE;
 }
 
-<<<<<<< HEAD
-=======
 void SavePassword(LPCTSTR szKeyName)
 {
 	DATA_BLOB dbDataIn;
@@ -438,4 +310,3 @@ BOOL LoadPassword(LPCTSTR szKeyName)
 	return bResult;
 }
 
->>>>>>> development
