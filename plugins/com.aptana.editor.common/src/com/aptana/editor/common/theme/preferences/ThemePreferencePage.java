@@ -82,7 +82,7 @@ import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TextmateImporter;
 import com.aptana.editor.common.theme.Theme;
 
-public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener, IInputValidator, IPropertyChangeListener
 {
 
 	/**
@@ -142,7 +142,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	}
 
 	private static final int ROW_HEIGHT = 20;
+
 	protected String fSelectedTheme;
+
 	private ColorSelector fgSelector;
 	private ColorSelector bgSelector;
 	private ColorSelector lineHighlightSelector;
@@ -154,6 +156,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Button renameThemeButton;
 	private Button deleteThemeButton;
 	private HashMap<Integer, Font> fFonts;
+
+	private Button fInvasiveThemeCheckbox;
+	private Button fAddThemeButton;
+	private Button fImportButton;
+	private Button fAddTokenButton;
+	private Button fRemoveTokenButton;
+	private Text fScopeText;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -176,28 +185,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Composite themesComp = new Composite(composite, SWT.NONE);
 		themesComp.setLayout(new GridLayout(1, false));
 
-		final Button checkbox = new Button(themesComp, SWT.CHECK);
-		checkbox.setText(Messages.ThemePreferencePage_InvasiveThemesLBL);
-		checkbox.setSelection(Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
+		fInvasiveThemeCheckbox = new Button(themesComp, SWT.CHECK);
+		fInvasiveThemeCheckbox.setText(Messages.ThemePreferencePage_InvasiveThemesLBL);
+		fInvasiveThemeCheckbox.setSelection(Platform.getPreferencesService().getBoolean(CommonEditorPlugin.PLUGIN_ID,
 				IPreferenceConstants.INVASIVE_THEMES, false, null));
-		checkbox.addSelectionListener(new SelectionAdapter()
-		{
-
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-				prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, checkbox.getSelection());
-				try
-				{
-					prefs.flush();
-				}
-				catch (BackingStoreException e1)
-				{
-					CommonEditorPlugin.logError(e1);
-				}
-			}
-		});
+		fInvasiveThemeCheckbox.addSelectionListener(this);
 	}
 
 	protected IThemeManager getThemeManager()
@@ -212,130 +204,26 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		fThemeCombo = new Combo(themesComp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		loadThemeNames();
-		fThemeCombo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				setTheme(fThemeCombo.getText());
-				super.widgetSelected(e);
-			}
-		});
+		fThemeCombo.addSelectionListener(this);
 
-		final IInputValidator themeNameValidator = new IInputValidator()
-		{
-
-			public String isValid(String newText)
-			{
-				IStatus status = getThemeManager().validateThemeName(newText);
-				if (status.isOK())
-					return null;
-				return status.getMessage();
-			}
-		};
-
-		Button copyTheme = new Button(themesComp, SWT.PUSH | SWT.FLAT);
-		copyTheme.setText(Messages.ThemePreferencePage_AddTokenLabel);
-		copyTheme.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				// Pop a dialog to ask for new name
-				InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_NewThemeTitle,
-						Messages.ThemePreferencePage_NewThemeMsg, MessageFormat.format(
-								Messages.ThemePreferencePage_NewThemeDefaultName, fSelectedTheme), themeNameValidator);
-				if (dialog.open() == Window.OK)
-				{
-					Theme newTheme = getTheme().copy(dialog.getValue());
-					// Add theme to theme list, make current theme this one
-					getThemeManager().setCurrentTheme(newTheme);
-					loadThemeNames();
-					setTheme(newTheme.getName());
-				}
-			}
-		});
+		fAddThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		fAddThemeButton.setText(Messages.ThemePreferencePage_AddTokenLabel);
+		fAddThemeButton.addSelectionListener(this);
 
 		renameThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
 		renameThemeButton.setText(Messages.ThemePreferencePage_RenameButtonLabel);
 		renameThemeButton.setImage(CommonEditorPlugin.getDefault().getImageRegistry().get(
 				CommonEditorPlugin.PENCIL_ICON));
-		renameThemeButton.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				// Pop a dialog to ask for new name
-				InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_RenameThemeTitle,
-						Messages.ThemePreferencePage_RenameThemeMsg, fSelectedTheme, themeNameValidator);
-				if (dialog.open() == Window.OK)
-				{
-					Theme oldTheme = getTheme();
-					Theme newTheme = oldTheme.copy(dialog.getValue());
-					getThemeManager().setCurrentTheme(newTheme);
-					oldTheme.delete();
-					loadThemeNames();
-					setTheme(newTheme.getName());
-				}
-			}
-		});
+		renameThemeButton.addSelectionListener(this);
 
 		deleteThemeButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
 		deleteThemeButton.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
-		deleteThemeButton.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				boolean ok = MessageDialog.openConfirm(getShell(), MessageFormat.format(
-						Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme), MessageFormat.format(
-						Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
-				if (!ok)
-					return;
-
-				getTheme().delete();
-				loadThemeNames();
-				setTheme(getThemeManager().getCurrentTheme().getName());
-			}
-		});
+		deleteThemeButton.addSelectionListener(this);
 
 		// Textmate Import
-		Button importButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
-		importButton.setText(Messages.ThemePreferencePage_ImportLabel);
-		importButton.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
-				IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
-				String value = editorSettings.get(THEME_DIRECTORY);
-				if (value != null)
-				{
-					fileDialog.setFilterPath(value);
-				}
-				fileDialog.setFilterExtensions(new String[] { "*.tmTheme" }); //$NON-NLS-1$
-				String path = fileDialog.open();
-				if (path == null)
-					return;
-
-				File themeFile = new File(path);
-				editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
-
-				try
-				{
-					Theme theme = new TextmateImporter().convert(themeFile);
-					getThemeManager().addTheme(theme);
-					getThemeManager().setCurrentTheme(theme);
-					loadThemeNames();
-					setTheme(theme.getName());
-				}
-				catch (FileNotFoundException e1)
-				{
-					CommonEditorPlugin.logError(e1);
-				}
-			}
-		});
+		fImportButton = new Button(themesComp, SWT.PUSH | SWT.FLAT);
+		fImportButton.setText(Messages.ThemePreferencePage_ImportLabel);
+		fImportButton.addSelectionListener(this);
 	}
 
 	private void loadThemeNames()
@@ -364,91 +252,31 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_ForegroundLabel);
 		fgSelector = new ColorSelector(colors);
-		fgSelector.addListener(new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				RGB newColor = (RGB) event.getNewValue();
-				if (newColor == null)
-					return;
-				Theme theme = getTheme();
-				theme.updateFG(newColor);
-				setTheme(fSelectedTheme);
-			}
-		});
+		fgSelector.addListener(this);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_SelectionLabel);
 		selectionSelector = new ColorSelector(colors);
-		selectionSelector.addListener(new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				RGB newColor = (RGB) event.getNewValue();
-				if (newColor == null)
-					return;
-				Theme theme = getTheme();
-				theme.updateSelection(newColor);
-				setTheme(fSelectedTheme);
-			}
-		});
+		selectionSelector.addListener(this);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_BackgroundLabel);
 		bgSelector = new ColorSelector(colors);
-		bgSelector.addListener(new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				RGB newColor = (RGB) event.getNewValue();
-				if (newColor == null)
-					return;
-				Theme theme = getTheme();
-				theme.updateBG(newColor);
-				setTheme(fSelectedTheme);
-			}
-		});
+		bgSelector.addListener(this);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_LineHighlightLabel);
 		lineHighlightSelector = new ColorSelector(colors);
-		lineHighlightSelector.addListener(new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				RGB newColor = (RGB) event.getNewValue();
-				if (newColor == null)
-					return;
-				Theme theme = getTheme();
-				theme.updateLineHighlight(newColor);
-				setTheme(fSelectedTheme);
-			}
-		});
+		lineHighlightSelector.addListener(this);
 
 		label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_CaretLabel);
 		caretSelector = new ColorSelector(colors);
-		caretSelector.addListener(new IPropertyChangeListener()
-		{
-
-			public void propertyChange(PropertyChangeEvent event)
-			{
-				RGB newColor = (RGB) event.getNewValue();
-				if (newColor == null)
-					return;
-				Theme theme = getTheme();
-				theme.updateCaret(newColor);
-				setTheme(fSelectedTheme);
-			}
-		});
+		caretSelector.addListener(this);
 	}
 
 	private void createTokenEditTable(Composite composite)
@@ -645,9 +473,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					}
 				}
 				else
+				{
 					newName = cellEditor.getItems()[selection];
+				}
 				if (newName.equals(token.getKey()))
+				{
 					return;
+				}
 				Theme theme = getTheme();
 				theme.remove(token.getKey());
 				theme.update(newName, token.getValue());
@@ -722,64 +554,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		buttonsLayout.marginWidth = 0;
 		buttonsLayout.horizontalSpacing = 0;
 		buttons.setLayout(buttonsLayout);
-		Button addToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
-		addToken.setBounds(0, 0, 16, 16);
-		addToken.setLayoutData(new GridData(GridData.FILL_BOTH));
-		addToken.setText(Messages.ThemePreferencePage_AddTokenLabel);
-		addToken.addSelectionListener(new SelectionAdapter()
-		{
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				// Add a new row to the table by adding a basic token to the theme
-				Theme theme = getTheme();
-				String newName = "newToken"; //$NON-NLS-1$
-				theme.addNewDefaultToken(newName);
-				setTheme(fSelectedTheme);
-				// Select the new token!
-				TableItem[] items = table.getItems();
-				int i = 0;
-				for (TableItem tableItem : items)
-				{
-					Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
-					if (entry.getKey().equals(newName))
-					{
-						break;
-					}
-					i++;
-				}
-				// Have the new addition in an edit mode
-				Object newElement = tableViewer.getElementAt(i);
-				if (newElement != null)
-				{
-					tableViewer.editElement(newElement, 0);
-				}
-			}
-		});
-		Button removeToken = new Button(buttons, SWT.PUSH | SWT.FLAT);
-		removeToken.setLayoutData(new GridData(GridData.FILL_BOTH));
-		removeToken.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
-		removeToken.addSelectionListener(new SelectionAdapter()
-		{
-			@SuppressWarnings("unchecked")
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				TableItem[] items = table.getSelection();
-				if (items == null || items.length == 0)
-					return;
 
-				Theme theme = getTheme();
-				for (TableItem tableItem : items)
-				{
-					Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
-					theme.remove(entry.getKey());
-				}
-				theme.save();
-				setTheme(fSelectedTheme);
-			}
-		});
+		fAddTokenButton = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		fAddTokenButton.setBounds(0, 0, 16, 16);
+		fAddTokenButton.setLayoutData(new GridData(GridData.FILL_BOTH));
+		fAddTokenButton.setText(Messages.ThemePreferencePage_AddTokenLabel);
+		fAddTokenButton.addSelectionListener(this);
+		fRemoveTokenButton = new Button(buttons, SWT.PUSH | SWT.FLAT);
+		fRemoveTokenButton.setLayoutData(new GridData(GridData.FILL_BOTH));
+		fRemoveTokenButton.setText(Messages.ThemePreferencePage_RemoveTokenLabel);
+		fRemoveTokenButton.addSelectionListener(this);
 
 		Composite textField = new Composite(editTokenList, SWT.NONE);
 		textField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -787,25 +571,11 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Label addTokenLabel = new Label(textField, SWT.RIGHT);
 		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
 
-		final Text text = new Text(textField, SWT.SINGLE);
+		fScopeText = new Text(textField, SWT.SINGLE);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		text.setLayoutData(data);
-		text.setEditable(false);
-		table.addSelectionListener(new SelectionListener()
-		{
-
-			@SuppressWarnings("unchecked")
-			public void widgetSelected(SelectionEvent e)
-			{
-				TableItem item = (TableItem) e.item;
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
-				text.setText(token.getKey());
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
-			{
-			}
-		});
+		fScopeText.setLayoutData(data);
+		fScopeText.setEditable(false);
+		table.addSelectionListener(this);
 	}
 
 	protected Font lazyFont(Font font, int style)
@@ -1041,7 +811,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	public void init(IWorkbench workbench)
 	{
-
 	}
 
 	@Override
@@ -1087,4 +856,200 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		super.dispose();
 	}
 
+	@Override
+	public void widgetDefaultSelected(SelectionEvent e)
+	{
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void widgetSelected(SelectionEvent e)
+	{
+		Object source = e.getSource();
+		if (source == fInvasiveThemeCheckbox)
+		{
+			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+			prefs.putBoolean(IPreferenceConstants.INVASIVE_THEMES, fInvasiveThemeCheckbox.getSelection());
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e1)
+			{
+				CommonEditorPlugin.logError(e1);
+			}
+		}
+		else if (source == fThemeCombo)
+		{
+			setTheme(fThemeCombo.getText());
+		}
+		else if (source == fAddThemeButton)
+		{
+			// Pop a dialog to ask for new name
+			InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_NewThemeTitle,
+					Messages.ThemePreferencePage_NewThemeMsg, MessageFormat.format(
+							Messages.ThemePreferencePage_NewThemeDefaultName, fSelectedTheme), this);
+			if (dialog.open() == Window.OK)
+			{
+				Theme newTheme = getTheme().copy(dialog.getValue());
+				// Add theme to theme list, make current theme this one
+				getThemeManager().setCurrentTheme(newTheme);
+				loadThemeNames();
+				setTheme(newTheme.getName());
+			}
+		}
+		else if (source == renameThemeButton)
+		{
+			// Pop a dialog to ask for new name
+			InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_RenameThemeTitle,
+					Messages.ThemePreferencePage_RenameThemeMsg, fSelectedTheme, this);
+			if (dialog.open() == Window.OK)
+			{
+				Theme oldTheme = getTheme();
+				Theme newTheme = oldTheme.copy(dialog.getValue());
+				getThemeManager().setCurrentTheme(newTheme);
+				oldTheme.delete();
+				loadThemeNames();
+				setTheme(newTheme.getName());
+			}
+		}
+		else if (source == deleteThemeButton)
+		{
+			boolean ok = MessageDialog.openConfirm(getShell(), MessageFormat.format(
+					Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme), MessageFormat.format(
+					Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
+			if (ok)
+			{
+				getTheme().delete();
+				loadThemeNames();
+				setTheme(getThemeManager().getCurrentTheme().getName());
+			}
+		}
+		else if (source == fImportButton)
+		{
+			FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
+			IDialogSettings editorSettings = CommonEditorPlugin.getDefault().getDialogSettings();
+			String value = editorSettings.get(THEME_DIRECTORY);
+			if (value != null)
+			{
+				fileDialog.setFilterPath(value);
+			}
+			fileDialog.setFilterExtensions(new String[] { "*.tmTheme" }); //$NON-NLS-1$
+			String path = fileDialog.open();
+			if (path == null)
+			{
+				return;
+			}
+
+			File themeFile = new File(path);
+			editorSettings.put(THEME_DIRECTORY, themeFile.getParent());
+
+			try
+			{
+				Theme theme = new TextmateImporter().convert(themeFile);
+				getThemeManager().addTheme(theme);
+				getThemeManager().setCurrentTheme(theme);
+				loadThemeNames();
+				setTheme(theme.getName());
+			}
+			catch (FileNotFoundException e1)
+			{
+				CommonEditorPlugin.logError(e1);
+			}
+		}
+		else if (source == fAddTokenButton)
+		{
+			// Add a new row to the table by adding a basic token to the theme
+			Theme theme = getTheme();
+			String newName = "newToken"; //$NON-NLS-1$
+			theme.addNewDefaultToken(newName);
+			setTheme(fSelectedTheme);
+			// Select the new token!
+			TableItem[] items = tableViewer.getTable().getItems();
+			int i = 0;
+			for (TableItem tableItem : items)
+			{
+				Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				if (entry.getKey().equals(newName))
+				{
+					break;
+				}
+				i++;
+			}
+			// Have the new addition in an edit mode
+			Object newElement = tableViewer.getElementAt(i);
+			if (newElement != null)
+			{
+				tableViewer.editElement(newElement, 0);
+			}
+		}
+		else if (source == fRemoveTokenButton)
+		{
+			TableItem[] items = tableViewer.getTable().getSelection();
+			if (items == null || items.length == 0)
+			{
+				return;
+			}
+			Theme theme = getTheme();
+			for (TableItem tableItem : items)
+			{
+				Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
+				theme.remove(entry.getKey());
+			}
+			theme.save();
+			setTheme(fSelectedTheme);
+		}
+		else if (source == tableViewer.getTable())
+		{
+			TableItem item = (TableItem) e.item;
+			Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
+			fScopeText.setText(token.getKey());
+		}
+	}
+
+	@Override
+	public String isValid(String newText)
+	{
+		IStatus status = getThemeManager().validateThemeName(newText);
+		if (status.isOK())
+		{
+			return null;
+		}
+		return status.getMessage();
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
+	{
+		Object value = event.getNewValue();
+		if (value == null)
+		{
+			return;
+		}
+
+		RGB newColor = (RGB) value;
+		Theme theme = getTheme();
+		Object source = event.getSource();
+		if (source == fgSelector)
+		{
+			theme.updateFG(newColor);
+		}
+		else if (source == selectionSelector)
+		{
+			theme.updateSelection(newColor);
+		}
+		else if (source == bgSelector)
+		{
+			theme.updateBG(newColor);
+		}
+		else if (source == lineHighlightSelector)
+		{
+			theme.updateLineHighlight(newColor);
+		}
+		else if (source == caretSelector)
+		{
+			theme.updateCaret(newColor);
+		}
+		setTheme(fSelectedTheme);
+	}
 }
