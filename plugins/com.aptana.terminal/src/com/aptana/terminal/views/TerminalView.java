@@ -37,6 +37,7 @@ package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -52,7 +53,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
+import com.aptana.terminal.editor.TerminalEditor;
 
 /**
  * @author Max Stepanov
@@ -68,6 +71,8 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 
 	private ITerminalViewControl fCtlTerminal;
 	private IMemento savedState = null;
+	
+	private Action openEditorAction;
 
 	/**
 	 * @param id
@@ -113,6 +118,7 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 			}
 			fCtlTerminal.connectTerminal();
 		}
+		makeActions();
 	}
 	
 	/* (non-Javadoc)
@@ -190,5 +196,19 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 	public void sendInput(String text) {
 		fCtlTerminal.pasteString(text);
 	}
-	
+
+	/**
+	 * makeActions
+	 */
+	private void makeActions() {
+		// open editor action
+		openEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+			@Override
+			public void run() {
+				Utils.openTerminalEditor(TerminalEditor.ID, true);
+			}
+		};
+		openEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
+	}
+
 }

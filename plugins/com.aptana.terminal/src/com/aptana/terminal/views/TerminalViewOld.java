@@ -277,7 +277,7 @@ public class TerminalViewOld extends ViewPart implements Closeable
 		{
 			public void run()
 			{
-				Utils.openEditor(TerminalEditor.ID, true);
+				Utils.openTerminalEditor(TerminalEditor.ID, true);
 			}
 		};
 		this.openEditor.setText(Messages.TerminalView_Open_Terminal_Editor);
