@@ -6,8 +6,6 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -26,11 +24,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
 import com.aptana.terminal.connector.LocalTerminalConnector;
+import com.aptana.terminal.internal.TerminalThemer;
 
 @SuppressWarnings("restriction")
 public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener
@@ -63,19 +60,8 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent)
-	{
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		setColor(0, 0, 0, theme.getForeground()); // black		
-		setColor(255, 255, 255, theme.getBackground()); // white		
-		setColor(229, 229, 229, theme.getBackground()); // white fg
-//		setColor(255, 128, 128); // RED
-//		setColor(128, 255, 128); // GREEN
-//		setColor(128, 128, 255); // BLUE
-//		setColor(255, 255, 0); // YELLOW
-//		setColor(0, 255, 255); // CYAN
-//		setColor(255, 255, 0); // MAGENTA
-//		setColor(128, 128, 128); // GRAY		
+	public void createPartControl(Composite parent) {
+		TerminalThemer.apply();
 		
 		fCtlTerminal = TerminalViewControlFactory.makeControl(this, parent, getTerminalConnectors());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
@@ -95,11 +81,6 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		
 		hookContextMenu();
 		saveInputState();
-	}
-
-	private void setColor(int r, int g, int b, RGB rgb)
-	{
-		JFaceResources.getColorRegistry().put("org.eclipse.tm.internal." + r+ "-" + g + "-" + b, rgb);
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
