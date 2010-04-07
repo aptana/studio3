@@ -6,6 +6,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -16,10 +17,9 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
@@ -27,32 +27,14 @@ import org.eclipse.ui.part.EditorPart;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
 import com.aptana.terminal.connector.LocalTerminalConnector;
+import com.aptana.terminal.internal.IProcessListener;
+import com.aptana.terminal.preferences.IPreferenceConstants;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener
-{
+public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener, IProcessListener {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private ITerminalViewControl fCtlTerminal;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.terminal.Closeable#close()
-	 */
-	public void close()
-	{
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		
-		workbench.getDisplay().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
-				
-				page.closeEditor(TerminalEditor.this, false);
-			}
-		});
-	}
 	
 	/*
 	 * (non-Javadoc)
@@ -72,6 +54,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 			setWorkingDirectory(terminalEditorInput.getWorkingDirectory());
 		}
 		fCtlTerminal.connectTerminal();
+		hookProcessListener();
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(fCtlTerminal.getControl(), ID);
@@ -90,6 +73,33 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 			TerminalEditorInput terminalEditorInput = (TerminalEditorInput) input;
 			terminalEditorInput.setTitle(getPartName());
 			terminalEditorInput.setWorkingDirectory(getWorkingDirectory());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.terminal.Closeable#close()
+	 */
+	public void close() {
+		if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
+			fCtlTerminal.getControl().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					getSite().getPage().closeEditor((IEditorPart) getSite().getPart(), false);
+				}
+			});
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
+	 */
+	@Override
+	public void processCompleted() {
+		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
+		if (closeViewOnExit) {
+			close();
 		}
 	}
 
@@ -222,6 +232,13 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 			}
 		}
 		return null;
+	}
+
+	protected void hookProcessListener() {
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		if (localTerminalConnector != null) {
+			localTerminalConnector.addProcessListener(this);
+		}
 	}
 
 }

@@ -135,6 +135,22 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 	}
 	
+	/**
+	 * @param listener
+	 * @see com.aptana.terminal.internal.ProcessLauncher#addProcessListener(com.aptana.terminal.internal.IProcessListener)
+	 */
+	public void addProcessListener(IProcessListener listener) {
+		processLauncher.addProcessListener(listener);
+	}
+
+	/**
+	 * @param listener
+	 * @see com.aptana.terminal.internal.ProcessLauncher#removeProcessListener(com.aptana.terminal.internal.IProcessListener)
+	 */
+	public void removeProcessListener(IProcessListener listener) {
+		processLauncher.removeProcessListener(listener);
+	}
+
 	public void setWorkingDirectory(IPath workingDirectory) {
 		this.initialDirectory = workingDirectory;
 	}

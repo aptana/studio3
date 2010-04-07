@@ -38,6 +38,7 @@ package com.aptana.terminal.views;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -46,6 +47,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -53,16 +55,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.terminal.Activator;
+import com.aptana.terminal.Closeable;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.editor.TerminalEditor;
+import com.aptana.terminal.internal.IProcessListener;
+import com.aptana.terminal.preferences.IPreferenceConstants;
 
 /**
  * @author Max Stepanov
  *
  */
 @SuppressWarnings("restriction")
-public class TerminalView extends ViewPart implements ITerminalListener {
+public class TerminalView extends ViewPart implements Closeable, ITerminalListener, IProcessListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
@@ -117,10 +122,38 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 				loadState(savedState);
 			}
 			fCtlTerminal.connectTerminal();
+			hookProcessListener();
 		}
 		makeActions();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.Closeable#close()
+	 */
+	@Override
+	public void close() {
+		if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
+			fCtlTerminal.getControl().getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					getSite().getPage().hideView((IViewPart) getSite().getPart());
+				}
+			});
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.internal.IProcessListener#processCompleted()
+	 */
+	@Override
+	public void processCompleted() {
+		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+		boolean closeViewOnExit = prefs.getBoolean(IPreferenceConstants.CLOSE_VIEW_ON_EXIT);
+		if (closeViewOnExit) {
+			close();
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
 	 */
@@ -173,7 +206,8 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 	protected void initialize(String title, IPath workingDirectory) {
 		setPartName(title);
 		setWorkingDirectory(workingDirectory);
-		fCtlTerminal.connectTerminal();		
+		fCtlTerminal.connectTerminal();
+		hookProcessListener();
 	}
 	
 	protected void setWorkingDirectory(IPath workingDirectory) {
@@ -192,7 +226,14 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 		}
 		return null;
 	}
-	
+
+	protected void hookProcessListener() {
+		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+		if (localTerminalConnector != null) {
+			localTerminalConnector.addProcessListener(this);
+		}
+	}
+
 	public void sendInput(String text) {
 		fCtlTerminal.pasteString(text);
 	}
