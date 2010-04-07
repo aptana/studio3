@@ -17,8 +17,6 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 
-	private static ImageRegistry fImages = new ImageRegistry();
-
 	/**
 	 * The constructor
 	 */
@@ -54,7 +52,8 @@ public class Activator extends AbstractUIPlugin {
 
 	public static Image getImage(String path)
 	{
-		Image image = fImages.get(path);
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -62,8 +61,8 @@ public class Activator extends AbstractUIPlugin {
 			{
 				return null;
 			}
-			fImages.put(path, id);
-			image = fImages.get(path);
+			registry.put(path, id);
+			image = registry.get(path);
 		}
 		return image;
 	}

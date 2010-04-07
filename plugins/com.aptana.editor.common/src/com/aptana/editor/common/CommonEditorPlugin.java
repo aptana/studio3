@@ -47,7 +47,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private static CommonEditorPlugin plugin;
 
 	private ColorManager fColorManager;
-	private Map<String, Image> fImages = new HashMap<String, Image>();
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 	private InvasiveThemeHijacker themeHijacker;
 
@@ -169,7 +168,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	public Image getImage(String path)
 	{
-		Image image = fImages.get(path);
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -177,9 +177,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				return null;
 			}
-
-			image = id.createImage();
-			fImages.put(path, image);
+			registry.put(path, id);
+			image = registry.get(path);
 		}
 		return image;
 	}

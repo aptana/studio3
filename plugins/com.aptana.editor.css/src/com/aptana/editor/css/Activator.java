@@ -20,8 +20,6 @@ public class Activator extends AbstractUIPlugin
 	
 	private CSSCodeScanner _codeScanner;
 
-	private static ImageRegistry fImages = new ImageRegistry();
-
 	/**
 	 * The constructor
 	 */
@@ -72,7 +70,8 @@ public class Activator extends AbstractUIPlugin
 
 	public static Image getImage(String path)
 	{
-		Image image = fImages.get(path);
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -80,9 +79,8 @@ public class Activator extends AbstractUIPlugin
 			{
 				return null;
 			}
-
-			image = id.createImage();
-			fImages.put(path, image);
+			registry.put(path, id);
+			image = registry.get(path);
 		}
 		return image;
 	}
