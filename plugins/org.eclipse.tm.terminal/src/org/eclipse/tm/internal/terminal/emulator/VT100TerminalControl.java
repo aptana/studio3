@@ -67,6 +67,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+import org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer;
 import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
 import org.eclipse.tm.internal.terminal.textcanvas.PipedInputStream;
 import org.eclipse.tm.internal.terminal.textcanvas.PollingTextCanvasModel;
@@ -574,7 +575,7 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		// TODO how to get the initial size correctly!
 		snapshot.updateSnapshot(false);
 		ITextCanvasModel canvasModel=new PollingTextCanvasModel(snapshot);
-		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,new TextLineRenderer(fCtlText,canvasModel));
+		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,createLineRenderer(canvasModel));
 
 
 		fCtlText.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -590,6 +591,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		fClipboard = new Clipboard(fDisplay);
 //		fViewer.setDocument(new TerminalDocument());
 		setFont(JFaceResources.getTextFont());
+	}
+	
+	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {
+		return new TextLineRenderer(null,model);
 	}
 
 	protected void setupListeners() {

@@ -27,7 +27,7 @@ import org.eclipse.tm.terminal.model.Style;
  */
 public class TextLineRenderer implements ILinelRenderer {
 	private final ITextCanvasModel fModel;
-	StyleMap fStyleMap=new StyleMap();
+	protected StyleMap fStyleMap=new StyleMap();
 	Color fBackgroundColor;
 	public TextLineRenderer(TextCanvas c, ITextCanvasModel model) {
 		fModel=model;
