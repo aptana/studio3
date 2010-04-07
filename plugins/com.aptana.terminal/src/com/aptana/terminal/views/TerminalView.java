@@ -56,7 +56,6 @@ import com.aptana.terminal.Activator;
 import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.editor.TerminalEditor;
-import com.aptana.terminal.internal.TerminalThemer;
 
 /**
  * @author Max Stepanov
@@ -110,9 +109,7 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
-	public void createPartControl(Composite parent) {
-		TerminalThemer.apply();
-		
+	public void createPartControl(Composite parent) {		
 		fCtlTerminal = TerminalViewControlFactory.makeControl(this, parent, getTerminalConnectors());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
 		if (getViewSite().getSecondaryId() == null || savedState != null) {
