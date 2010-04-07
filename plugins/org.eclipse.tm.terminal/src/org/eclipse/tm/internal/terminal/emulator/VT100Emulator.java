@@ -331,6 +331,7 @@ public class VT100Emulator implements ControlListener {
 				case '=':
 				case '>':
 					terminal.setApplicationKeypad(character == '=');
+					ansiState = ANSISTATE_INITIAL;
 					break;
 					
 				case '7':
