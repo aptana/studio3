@@ -120,6 +120,8 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 
 	private volatile TerminalState fState;
 
+	private boolean isApplicationKeypad = false;
+
 	private final ITerminalTextData fTerminalModel;
 
 	/**
@@ -778,19 +780,19 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 
 				switch (event.keyCode) {
 				case 0x1000001: // Up arrow.
-					sendString("\u001b[A"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOA" : "\u001b[A"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x1000002: // Down arrow.
-					sendString("\u001b[B"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOB" : "\u001b[B"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x1000003: // Left arrow.
-					sendString("\u001b[D"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOD" : "\u001b[D"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x1000004: // Right arrow.
-					sendString("\u001b[C"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOC" : "\u001b[C"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x1000005: // PgUp key.
@@ -802,11 +804,11 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					break;
 
 				case 0x1000007: // Home key.
-					sendString("\u001b[H"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOH" : "\u001b[H"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x1000008: // End key.
-					sendString("\u001b[F"); //$NON-NLS-1$
+					sendString(isApplicationKeypad ? "\u001bOF" : "\u001b[F"); //$NON-NLS-1$ //$NON-NLS-2$
 					break;
 
 				case 0x100000a: // F1 key.
@@ -1023,5 +1025,9 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 
 	public void setInvertedColors(boolean invert) {
 		fCtlText.setInvertedColors(invert);
+	}
+
+	public void setApplicationKeypad(boolean mode) {
+		isApplicationKeypad = mode;
 	}
 }

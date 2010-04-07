@@ -27,6 +27,8 @@ public interface ITerminalControlForText {
 	void setState(TerminalState state);
 	void setTerminalTitle(String title);
 	
+	void setApplicationKeypad(boolean mode);
+	
 	ITerminalConnector getTerminalConnector();
 
 	OutputStream getOutputStream();

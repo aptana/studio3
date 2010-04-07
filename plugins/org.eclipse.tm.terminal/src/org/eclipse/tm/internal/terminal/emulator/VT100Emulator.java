@@ -328,6 +328,11 @@ public class VT100Emulator implements ControlListener {
 					ansiOsCommand.delete(0, ansiOsCommand.length());
 					break;
 
+				case '=':
+				case '>':
+					terminal.setApplicationKeypad(character == '=');
+					break;
+					
 				case '7':
 					// Save cursor position and character attributes
 
