@@ -1,5 +1,6 @@
 package com.aptana.terminal.editor;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -16,8 +17,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtensi
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -30,7 +29,7 @@ import com.aptana.terminal.Closeable;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements IPersistableEditor, Closeable, ITerminalListener
+public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener
 {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
@@ -64,16 +63,35 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	{
 		fCtlTerminal = TerminalViewControlFactory.makeControl(this, parent, getTerminalConnectors());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
+		IEditorInput input = getEditorInput();
+		if (input instanceof TerminalEditorInput) {
+			TerminalEditorInput terminalEditorInput = (TerminalEditorInput) input;
+			String title = terminalEditorInput.getTitle();
+			if (title != null && title.length() > 0) {
+				setPartName(title);
+			}
+			setWorkingDirectory(terminalEditorInput.getWorkingDirectory());
+		}
 		fCtlTerminal.connectTerminal();
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(fCtlTerminal.getControl(), ID);
 		
 		hookContextMenu();
+		saveInputState();
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
 		return new ITerminalConnector[] { TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID) };
+	}
+	
+	private void saveInputState() {
+		IEditorInput input = getEditorInput();
+		if (input instanceof TerminalEditorInput) {
+			TerminalEditorInput terminalEditorInput = (TerminalEditorInput) input;
+			terminalEditorInput.setTitle(getPartName());
+			terminalEditorInput.setWorkingDirectory(getWorkingDirectory());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -180,24 +198,6 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
-	 */
-	public void restoreState(IMemento memento)
-	{
-		// System.out.println("TerminalEditor: Restore State");
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
-	 */
-	public void saveState(IMemento memento)
-	{
-		// System.out.println("TerminalEditor: Save State");
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
@@ -205,4 +205,24 @@ public class TerminalEditor extends EditorPart implements IPersistableEditor, Cl
 	{
 		fCtlTerminal.setFocus();
 	}
+	
+	protected void setWorkingDirectory(IPath workingDirectory) {
+		if (workingDirectory != null && fCtlTerminal != null) {
+			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+			if (localTerminalConnector != null) {
+				localTerminalConnector.setWorkingDirectory(workingDirectory);
+			}		
+		}
+	}
+	
+	protected IPath getWorkingDirectory() {
+		if (fCtlTerminal != null) {
+			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+			if (localTerminalConnector != null) {
+				return localTerminalConnector.getWorkingDirectory();
+			}
+		}
+		return null;
+	}
+
 }
