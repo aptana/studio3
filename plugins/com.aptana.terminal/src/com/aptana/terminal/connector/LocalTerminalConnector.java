@@ -35,10 +35,14 @@
 package com.aptana.terminal.connector;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.internal.core.StreamsProxy;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
@@ -62,7 +66,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 	
 	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
+
+	// TODO: These shouldn't be in here. We're pulling the values from the explorer plugin
+	// so as not to create a dependency on the two projects.
+	private static final String ACTIVE_PROJECT_PROPERTY = "activeProject"; //$NON-NLS-1$
+	private static final String EXPLORER_PLUGIN_ID = "com.aptana.explorer"; //$NON-NLS-1$
 	
+	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
+
 	private ProcessLauncher processLauncher;
 	private StreamsProxy streamsProxy;
 	private OutputStream processInputStream;
@@ -70,7 +81,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	private int currentWidth = 0;
 	private int currentHeight = 0;
 	
-	private File initialDirectory;
+	private IPath initialDirectory;
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#getSettingsSummary()
@@ -124,14 +135,21 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 	}
 	
-	public void setInitialDirectory(File initialDirectory) {
-		this.initialDirectory = initialDirectory;
+	public void setWorkingDirectory(IPath workingDirectory) {
+		this.initialDirectory = workingDirectory;
+	}
+
+	/**
+	 * @return the initialDirectory
+	 */
+	public IPath getWorkingDirectory() {
+		return initialDirectory;
 	}
 
 	private void startProcess(ITerminalControl control) {
 		try {
 			
-			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory);
+			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory = getInitialDirectory());
 			processLauncher.addProcessListener(this);
 			processLauncher.launch();
 			
@@ -163,5 +181,29 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	private IProcessConfiguration getCurrentConfiguration() {
 		return ProcessConfigurations.getInstance().getProcessConfigurations()[0];
 	}
-	
+
+	private IPath getInitialDirectory() {
+		if (initialDirectory != null && initialDirectory.toFile().isDirectory()) {
+			return initialDirectory;
+		}
+		String activeProjeectName = Platform.getPreferencesService().getString(EXPLORER_PLUGIN_ID, ACTIVE_PROJECT_PROPERTY, null, null);
+		if (activeProjeectName != null) {
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
+			if (project != null) {
+				IPath location = project.getLocation();
+				if (location != null) {
+					return location;
+				}
+			}
+		}
+		String home = System.getProperty(USER_HOME_PROPERTY);
+		if (home != null) {
+			IPath homePath = Path.fromOSString(home);
+			if (homePath.toFile().isDirectory()) {
+				return homePath;
+			}
+		}
+		return null;
+	}
+
 }

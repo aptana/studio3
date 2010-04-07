@@ -36,6 +36,7 @@
 package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -43,6 +44,8 @@ import org.eclipse.tm.internal.terminal.control.TerminalViewControlFactory;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -60,7 +63,11 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
+	private static final String PROP_TITLE = "title"; //$NON-NLS-1$
+	private static final String PROP_WORKING_DIRECTORY = "workingDirectory"; //$NON-NLS-1$
+
 	private ITerminalViewControl fCtlTerminal;
+	private IMemento savedState = null;
 
 	/**
 	 * @param id
@@ -85,14 +92,54 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.ViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
+	 */
+	@Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+		super.init(site, memento);
+		savedState = memento;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		fCtlTerminal = TerminalViewControlFactory.makeControl(this, parent, getTerminalConnectors());
 		fCtlTerminal.setConnector(fCtlTerminal.getConnectors()[0]);
-		if (getViewSite().getSecondaryId() == null) {
+		if (getViewSite().getSecondaryId() == null || savedState != null) {
+			if (savedState != null) {
+				loadState(savedState);
+			}
 			fCtlTerminal.connectTerminal();
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
+	 */
+	@Override
+	public void saveState(IMemento memento) {
+		IMemento child = memento.createChild(PROP_TITLE);
+		child.putTextData(getPartName());
+		child = memento.createChild(PROP_WORKING_DIRECTORY);
+		IPath workingDirectory = getWorkingDirectory();
+		if (workingDirectory != null) {
+			child.putTextData(workingDirectory.toOSString());
+		}
+	}
+
+	private void loadState(IMemento memento) {
+		IMemento child = memento.getChild(PROP_TITLE);
+		if (child != null) {
+			setPartName(child.getTextData());
+		}
+		child = memento.getChild(PROP_WORKING_DIRECTORY);
+		if (child != null) {
+			String value = child.getTextData();
+			if (value != null) {
+				setWorkingDirectory(Path.fromOSString(value));
+			}
 		}
 	}
 
@@ -117,13 +164,27 @@ public class TerminalView extends ViewPart implements ITerminalListener {
 		setContentDescription(title);
 	}
 	
-	protected void initialize(String title, final IPath workingDirectory) {
+	protected void initialize(String title, IPath workingDirectory) {
 		setPartName(title);
+		setWorkingDirectory(workingDirectory);
+		fCtlTerminal.connectTerminal();		
+	}
+	
+	protected void setWorkingDirectory(IPath workingDirectory) {
+		if (workingDirectory != null) {
+			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
+			if (localTerminalConnector != null) {
+				localTerminalConnector.setWorkingDirectory(workingDirectory);
+			}		
+		}
+	}
+	
+	protected IPath getWorkingDirectory() {
 		LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);
 		if (localTerminalConnector != null) {
-			localTerminalConnector.setInitialDirectory(workingDirectory.toFile());
+			return localTerminalConnector.getWorkingDirectory();
 		}
-		fCtlTerminal.connectTerminal();		
+		return null;
 	}
 	
 	public void sendInput(String text) {
