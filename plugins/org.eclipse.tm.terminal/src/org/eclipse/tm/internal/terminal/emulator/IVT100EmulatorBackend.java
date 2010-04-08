@@ -169,4 +169,6 @@ public interface IVT100EmulatorBackend {
 
 	int getColumns();
 
+	void setScrollingRegion(int topLine, int bottomLine);
+
 }

@@ -517,6 +517,11 @@ public class VT100Emulator implements ControlListener {
 			processAnsiCommand_P();
 			break;
 
+		case 'r':
+			// Set Top and Bottom Margins.
+			processAnsiCommand_r();
+			break;
+
 		case 'S':
 			// Scroll up.
 			// Emacs, vi, and GNU readline don't seem to use this command, so we ignore
@@ -867,6 +872,13 @@ public class VT100Emulator implements ControlListener {
 	 */
 	private void processAnsiCommand_P() {
 		text.deleteCharacters(getAnsiParameter(0));
+	}
+	
+	/**
+	 * Set Top and Bottom Margins
+	 */
+	private void processAnsiCommand_r() {
+		text.setScrollingRegion(getAnsiParameter(0), getAnsiParameter(1));
 	}
 
 	/**

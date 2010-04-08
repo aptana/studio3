@@ -141,4 +141,9 @@ public class VT100BackendTraceDecorator implements IVT100EmulatorBackend {
 		fBackend.setStyle(style);
 	}
 
+	public void setScrollingRegion(int topLine, int bottomLine) {
+		fWriter.println("setScrollingRegion("+topLine+", "+bottomLine+")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		fBackend.setScrollingRegion(topLine, bottomLine);
+	}
+
 }

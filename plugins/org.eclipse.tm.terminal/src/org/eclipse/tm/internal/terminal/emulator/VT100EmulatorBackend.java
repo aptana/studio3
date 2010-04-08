@@ -50,6 +50,8 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	private Style fStyle;
 	int fLines;
 	int fColumns;
+	int fScrollingRegionTopLine;
+	int fScrollingRegionBottomLine;
 	final private ITerminalTextData fTerminal;
 	public VT100EmulatorBackend(ITerminalTextData terminal) {
 		fTerminal=terminal;
@@ -103,6 +105,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 			}
 			fLines=lines;
 			fColumns=cols;
+			setScrollingRegion(1, fLines);
 			// make the terminal at least as high as we need lines
 			fTerminal.setDimensions(newLines, fColumns);
 			setCursor(cl, cc);
@@ -206,7 +209,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				return;
 			assert n>0;
 			int line=toAbsoluteLine(fCursorLine);
-			int nLines=fTerminal.getHeight()-line;
+			int nLines=Math.min(fTerminal.getHeight()-line,fScrollingRegionBottomLine-fScrollingRegionTopLine+1);
 			fTerminal.scroll(line, nLines, n);
 		}
 	}
@@ -240,9 +243,9 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 			fTerminal.scroll(line, nLines, -n);
 		}
 	}
+	
 	private boolean isCusorInScrollingRegion() {
-		// TODO Auto-generated method stub
-		return true;
+		return (fScrollingRegionTopLine <= fCursorLine && fCursorLine <= fScrollingRegionBottomLine);
 	}
 
 	/* (non-Javadoc)
@@ -315,6 +318,8 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 			fTerminal.addLine();
 			if(h!=fTerminal.getHeight())
 				setCursorLine(fCursorLine+1);
+		} else if (fScrollingRegionTopLine != 0 || fScrollingRegionBottomLine != fLines-1) {
+			fTerminal.scroll(toAbsoluteLine(fScrollingRegionTopLine), fScrollingRegionBottomLine-fScrollingRegionTopLine+1, -1);
 		} else {
 			setCursorLine(fCursorLine+1);
 		}
@@ -403,5 +408,28 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 		synchronized (fTerminal) {
 			return fColumns;
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setScrollingRegion(int, int)
+	 */
+	public void setScrollingRegion(int topLine, int bottomLine) {
+		fScrollingRegionTopLine=topLine-1;
+		fScrollingRegionBottomLine=bottomLine-1;
+	}
+
+	private boolean hasNonEmptyCharacterAfterLine(int line) {
+		for (; line < fLines; ++line) {
+			if (String.copyValueOf(fTerminal.getChars(line)).trim().length() > 0) {
+				return true;
+			}
+			Style[] styles = fTerminal.getStyles(line);
+			for (int i = 0; i < styles.length; ++i) {
+				if (!styles[i].isBlink()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
