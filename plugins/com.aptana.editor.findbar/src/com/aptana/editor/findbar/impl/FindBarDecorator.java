@@ -418,6 +418,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 			composite.layout();
 			incrementalOffset = -1;
 			combo.removeModifyListener(modifyListener);
+			statusLineManager.setMessage(EMPTY);
 		}
 		textEditor.setFocus();
 	}
