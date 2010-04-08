@@ -299,6 +299,10 @@ public class VT100Emulator implements ControlListener {
 				case '\u001b':
 					ansiState = ANSISTATE_ESCAPE; // Escape.
 					break;
+					
+				case '\u000e':
+				case '\u000f':
+					break;
 
 				default:
 					processNonControlCharacters(character);
@@ -929,7 +933,8 @@ public class VT100Emulator implements ControlListener {
 			character=getNextChar();
 			if(character == '\u0000' || character == '\b' || character == '\t'
 				|| character == '\u0007' || character == '\n'
-				|| character == '\r' || character == '\u001b') {
+				|| character == '\r' || character == '\u001b'
+				|| character == '\u000e' || character == '\u000f') {
 				pushBackChar(character);
 				break;
 			}
