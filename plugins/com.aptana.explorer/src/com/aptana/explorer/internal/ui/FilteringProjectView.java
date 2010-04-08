@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -53,14 +52,12 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.util.EclipseUtils;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
  * 
  * @author cwilliams
  */
-@SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
 	/**
@@ -70,7 +67,6 @@ public class FilteringProjectView extends GitProjectView
 	private static final String TAG_EXPANDED = "expanded"; //$NON-NLS-1$
 	private static final String TAG_ELEMENT = "element"; //$NON-NLS-1$
 	private static final String TAG_PATH = "path"; //$NON-NLS-1$
-	private static final String TAG_CURRENT_FRAME = "currentFrame"; //$NON-NLS-1$
 	private static final String TAG_PROJECT = "project"; //$NON-NLS-1$
 	private static final String KEY_NAME = "name"; //$NON-NLS-1$
 
@@ -411,66 +407,53 @@ public class FilteringProjectView extends GitProjectView
 			return;
 		}
 
-		boolean hasFrame = false;
-		if (EclipseUtils.inEclipse35orHigher) {
-			hasFrame = getCommonViewer().getFrameList().getCurrentIndex() > 0;
-		}
-		if (hasFrame)
+		// Make sure we are up-to-date
+		updateProjectMementoCache(selectedProject);
+		// Collect all the projects in the cache
+		Set<IProject> projects = new TreeSet<IProject>(new Comparator<IProject>()
 		{
-			// save frame, it's not the "home"/workspace frame
-			IMemento frameMemento = memento.createChild(TAG_CURRENT_FRAME);
-			((org.eclipse.ui.internal.navigator.framelist.TreeFrame) getCommonViewer().getFrameList().getCurrentFrame()).saveState(frameMemento);
-		}
-		else
-		{
-			// Make sure we are up-to-date
-			updateProjectMementoCache(selectedProject);
-			// Collect all the projects in the cache
-			Set<IProject> projects = new TreeSet<IProject>(new Comparator<IProject>()
+			public int compare(IProject o1, IProject o2)
 			{
-				public int compare(IProject o1, IProject o2)
-				{
-					return o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
-				}
-			});
-			projects.addAll(projectExpansions.keySet());
-			projects.addAll(projectSelections.keySet());
+				return o1 == o2 ? 0 : o1.getName().compareTo(o2.getName());
+			}
+		});
+		projects.addAll(projectExpansions.keySet());
+		projects.addAll(projectSelections.keySet());
 
-			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-			// Create a memento for every accessible project that has expanded/selected paths.
-			for (IProject project : projects)
+		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// Create a memento for every accessible project that has expanded/selected paths.
+		for (IProject project : projects)
+		{
+			if (project.isAccessible()
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty()))
 			{
-				if (project.isAccessible()
-						&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty()))
+				IMemento projectMemento = memento.createChild(TAG_PROJECT);
+				projectMemento.putString(KEY_NAME, project.getName());
+				// Create the expansions memento
+				List<String> expanded = projectExpansions.get(project);
+				if (!expanded.isEmpty())
 				{
-					IMemento projectMemento = memento.createChild(TAG_PROJECT);
-					projectMemento.putString(KEY_NAME, project.getName());
-					// Create the expansions memento
-					List<String> expanded = projectExpansions.get(project);
-					if (!expanded.isEmpty())
+					IMemento expansionMem = projectMemento.createChild(TAG_EXPANDED);
+					for (String expandedPath : expanded)
 					{
-						IMemento expansionMem = projectMemento.createChild(TAG_EXPANDED);
-						for (String expandedPath : expanded)
+						if (workspaceRoot.findMember(expandedPath) != null)
 						{
-							if (workspaceRoot.findMember(expandedPath) != null)
-							{
-								IMemento elementMem = expansionMem.createChild(TAG_ELEMENT);
-								elementMem.putString(TAG_PATH, expandedPath);
-							}
+							IMemento elementMem = expansionMem.createChild(TAG_ELEMENT);
+							elementMem.putString(TAG_PATH, expandedPath);
 						}
 					}
-					// Create the selection memento
-					List<String> selected = projectSelections.get(project);
-					if (!selected.isEmpty())
+				}
+				// Create the selection memento
+				List<String> selected = projectSelections.get(project);
+				if (!selected.isEmpty())
+				{
+					IMemento selectionMem = projectMemento.createChild(TAG_SELECTION);
+					for (String selectedPath : selected)
 					{
-						IMemento selectionMem = projectMemento.createChild(TAG_SELECTION);
-						for (String selectedPath : selected)
+						if (workspaceRoot.findMember(selectedPath) != null)
 						{
-							if (workspaceRoot.findMember(selectedPath) != null)
-							{
-								IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
-								elementMem.putString(TAG_PATH, selectedPath);
-							}
+							IMemento elementMem = selectionMem.createChild(TAG_ELEMENT);
+							elementMem.putString(TAG_PATH, selectedPath);
 						}
 					}
 				}
@@ -510,71 +493,38 @@ public class FilteringProjectView extends GitProjectView
 	protected void restoreState(IProject project)
 	{
 		TreeViewer viewer = getCommonViewer();
-		IMemento frameMemento = null;
-		if (memento != null)
-		{
-			frameMemento = memento.getChild(TAG_CURRENT_FRAME);
-		}
-		if (frameMemento != null && EclipseUtils.inEclipse35orHigher)
-		{
-			org.eclipse.ui.internal.navigator.framelist.TreeFrame frame = new org.eclipse.ui.internal.navigator.framelist.TreeFrame(viewer);
-			frame.restoreState(frameMemento);
-			frame.setName(getFrameName(frame.getInput()));
-			frame.setToolTipText(getFrameToolTipText(frame.getInput()));
-			viewer.setSelection(new StructuredSelection(frame.getInput()));
-			getCommonViewer().getFrameList().gotoFrame(frame);
-		}
-		else
-		{
-			IContainer container = ResourcesPlugin.getWorkspace().getRoot();
-			List<String> expansions = projectExpansions.get(project);
-			List<String> selections = projectSelections.get(project);
-			viewer.getControl().setRedraw(false);
-			if (selections != null)
-			{
-				List<IResource> elements = new ArrayList<IResource>();
-				for (String selectionPath : selections)
-				{
-					IResource element = container.findMember(selectionPath);
-					if (element != null)
-					{
-						elements.add(element);
-					}
-				}
-				viewer.setSelection(new StructuredSelection(elements), true);
-			}
-			if (expansions != null)
-			{
-				List<IResource> elements = new ArrayList<IResource>();
-				for (String expansionPath : expansions)
-				{
-					IResource element = container.findMember(expansionPath);
-					if (element != null)
-					{
-						elements.add(element);
-					}
-				}
-				viewer.setExpandedElements(elements.toArray());
-			}
-			viewer.getControl().setRedraw(true);
-		}
-	}
 
-	/**
-	 * Returns the name for the given element. Used as the name for the current frame.
-	 */
-	private String getFrameName(Object element)
-	{
-		if (element instanceof IResource)
+		IContainer container = ResourcesPlugin.getWorkspace().getRoot();
+		List<String> expansions = projectExpansions.get(project);
+		List<String> selections = projectSelections.get(project);
+		viewer.getControl().setRedraw(false);
+		if (selections != null)
 		{
-			return ((IResource) element).getName();
+			List<IResource> elements = new ArrayList<IResource>();
+			for (String selectionPath : selections)
+			{
+				IResource element = container.findMember(selectionPath);
+				if (element != null)
+				{
+					elements.add(element);
+				}
+			}
+			viewer.setSelection(new StructuredSelection(elements), true);
 		}
-		String text = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(element);
-		if (text == null)
+		if (expansions != null)
 		{
-			return "";//$NON-NLS-1$
+			List<IResource> elements = new ArrayList<IResource>();
+			for (String expansionPath : expansions)
+			{
+				IResource element = container.findMember(expansionPath);
+				if (element != null)
+				{
+					elements.add(element);
+				}
+			}
+			viewer.setExpandedElements(elements.toArray());
 		}
-		return text;
+		viewer.getControl().setRedraw(true);
 	}
 
 	@Override
