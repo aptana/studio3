@@ -361,6 +361,11 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 					Menu projectsMenu = new Menu(menu);
 					for (IProject iProject : projects)
 					{
+						// hide closed projects
+						if (!iProject.isAccessible())
+						{
+							continue;
+						}
 						// Construct the menu to attach to the above button.
 						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 						projectNameMenuItem.setText(iProject.getName());
@@ -430,6 +435,11 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : projects)
 		{
+			// hide closed projects
+			if (!iProject.isAccessible()) {
+				continue;
+			}
+
 			// Construct the menu to attach to the above button.
 			final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 			projectNameMenuItem.setText(iProject.getName());
@@ -1205,7 +1215,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 						if (resource.getType() == IResource.PROJECT)
 						{
 							// a project was added, removed, or changed!
-							if (delta.getKind() == IResourceDelta.ADDED)
+							if (delta.getKind() == IResourceDelta.ADDED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
 								// Add to the projects menu and then switch to it!
 								final String projectName = resource.getName();
@@ -1244,7 +1254,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 									}
 								});
 							}
-							else if (delta.getKind() == IResourceDelta.REMOVED)
+							else if (delta.getKind() == IResourceDelta.REMOVED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource.isAccessible()))
 							{
 								// Remove from menu and if it was the active project, switch away from it!
 								final String projectName = resource.getName();
@@ -1268,7 +1278,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 											IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
 													.getProjects();
 											String newActiveProject = ""; //$NON-NLS-1$
-											if (projects.length > 0)
+											if (projects.length > 0 && projects[0].isAccessible())
 											{
 												newActiveProject = projects[0].getName();
 											}
