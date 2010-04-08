@@ -417,19 +417,4 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 		fScrollingRegionTopLine=topLine-1;
 		fScrollingRegionBottomLine=bottomLine-1;
 	}
-
-	private boolean hasNonEmptyCharacterAfterLine(int line) {
-		for (; line < fLines; ++line) {
-			if (String.copyValueOf(fTerminal.getChars(line)).trim().length() > 0) {
-				return true;
-			}
-			Style[] styles = fTerminal.getStyles(line);
-			for (int i = 0; i < styles.length; ++i) {
-				if (!styles[i].isBlink()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }
