@@ -87,7 +87,6 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
@@ -471,7 +470,14 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		search.setLayoutData(searchGridData);
 
-		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		if (EclipseUtils.inEclipse35orHigher)
+		{
+			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		}
+		else
+		{
+			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+		}
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -579,6 +585,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		viewer.setLayoutData(gridData);
 
 		super.createPartControl(viewer);
+		getCommonViewer().setInput(detectSelectedProject());
+		fixNavigatorManager();
 	}
 
 	@Override
@@ -609,14 +617,12 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		};
 	}
 
-	@Override
-	protected CommonNavigatorManager createCommonManager()
+	protected void fixNavigatorManager()
 	{
 		// HACK! This is to fix behavior that Eclipse bakes into CommonNavigatorManager.UpdateActionBarsJob where it
 		// forces the selection context for actions tied to the view to the view's input *even if it already has a
 		// perfectly fine and valid selection!* This forces the selection again in a delayed job which hopefully runs
 		// right after their %^$&^$!! job.
-		final CommonNavigatorManager navManager = super.createCommonManager();
 		UIJob job = new UIJob(getTitle())
 		{
 
@@ -647,13 +653,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 				// do nothing
 			}
 		});
-		return navManager;
-	}
-
-	@Override
-	protected Object getInitialInput()
-	{
-		return detectSelectedProject();
 	}
 
 	private Composite createFilterComposite(final Composite myComposite)
