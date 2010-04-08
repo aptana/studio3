@@ -48,6 +48,7 @@ import com.aptana.terminal.server.ProcessEndedListener;
 import com.aptana.terminal.server.ProcessWrapper;
 import com.aptana.terminal.server.TerminalServer;
 import com.aptana.util.ClipboardUtil;
+import com.aptana.util.EclipseUtils;
 
 public class TerminalBrowser
 {
@@ -356,7 +357,7 @@ public class TerminalBrowser
 	 */
 	public void copy()
 	{
-		if (this._browser != null)
+		if (this._browser != null && EclipseUtils.inEclipse35orHigher)
 		{
 			final Object result = this._browser.evaluate("return copy();"); //$NON-NLS-1$
 			
@@ -525,6 +526,10 @@ public class TerminalBrowser
 	 */
 	public boolean hasSelection()
 	{
+		if (!EclipseUtils.inEclipse35orHigher)
+		{
+			return false;
+		}
 		Object jsResult = this._browser.evaluate("return hasSelection();"); //$NON-NLS-1$
 		boolean result = false;
 		

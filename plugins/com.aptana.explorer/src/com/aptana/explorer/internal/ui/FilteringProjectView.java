@@ -49,7 +49,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.Theme;
@@ -420,7 +419,7 @@ public class FilteringProjectView extends GitProjectView
 		{
 			// save frame, it's not the "home"/workspace frame
 			IMemento frameMemento = memento.createChild(TAG_CURRENT_FRAME);
-			((TreeFrame) getCommonViewer().getFrameList().getCurrentFrame()).saveState(frameMemento);
+			((org.eclipse.ui.internal.navigator.framelist.TreeFrame) getCommonViewer().getFrameList().getCurrentFrame()).saveState(frameMemento);
 		}
 		else
 		{
@@ -518,7 +517,7 @@ public class FilteringProjectView extends GitProjectView
 		}
 		if (frameMemento != null && EclipseUtils.inEclipse35orHigher)
 		{
-			TreeFrame frame = new TreeFrame(viewer);
+			org.eclipse.ui.internal.navigator.framelist.TreeFrame frame = new org.eclipse.ui.internal.navigator.framelist.TreeFrame(viewer);
 			frame.restoreState(frameMemento);
 			frame.setName(getFrameName(frame.getInput()));
 			frame.setToolTipText(getFrameToolTipText(frame.getInput()));
