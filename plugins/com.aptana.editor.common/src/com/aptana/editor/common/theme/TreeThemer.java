@@ -43,7 +43,8 @@ public class TreeThemer
 
 	private static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	private static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	private static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
+	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 
 	private TreeViewer fTreeViewer;
 	private Tree fTree;

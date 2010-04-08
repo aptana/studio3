@@ -1278,7 +1278,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
 		super.init(aSite, aMemento);
-		memento = aMemento;
 		if (memento != null)
 		{
 			Integer gitFilterEnabled = memento.getInteger(GIT_CHANGED_FILES_FILTER);

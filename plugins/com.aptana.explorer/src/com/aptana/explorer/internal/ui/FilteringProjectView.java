@@ -49,13 +49,12 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.navigator.framelist.FrameList;
 import org.eclipse.ui.internal.navigator.framelist.TreeFrame;
 import org.eclipse.ui.progress.WorkbenchJob;
-
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.Theme;
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.util.EclipseUtils;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
@@ -134,9 +133,8 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
-		this.memento = aMemento;
-		loadMementoCache();
 		super.init(aSite, aMemento);
+		loadMementoCache();
 
 		eyeball = ExplorerPlugin.getImage("icons/full/obj16/eye.png"); //$NON-NLS-1$
 	}
@@ -414,13 +412,15 @@ public class FilteringProjectView extends GitProjectView
 			return;
 		}
 
-		FrameList frameList = getCommonViewer().getFrameList();
-		if (frameList.getCurrentIndex() > 0)
+		boolean hasFrame = false;
+		if (EclipseUtils.inEclipse35orHigher) {
+			hasFrame = getCommonViewer().getFrameList().getCurrentIndex() > 0;
+		}
+		if (hasFrame)
 		{
 			// save frame, it's not the "home"/workspace frame
-			TreeFrame currentFrame = (TreeFrame) frameList.getCurrentFrame();
 			IMemento frameMemento = memento.createChild(TAG_CURRENT_FRAME);
-			currentFrame.saveState(frameMemento);
+			((TreeFrame) getCommonViewer().getFrameList().getCurrentFrame()).saveState(frameMemento);
 		}
 		else
 		{
@@ -516,7 +516,7 @@ public class FilteringProjectView extends GitProjectView
 		{
 			frameMemento = memento.getChild(TAG_CURRENT_FRAME);
 		}
-		if (frameMemento != null)
+		if (frameMemento != null && EclipseUtils.inEclipse35orHigher)
 		{
 			TreeFrame frame = new TreeFrame(viewer);
 			frame.restoreState(frameMemento);

@@ -7,7 +7,7 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -40,7 +40,7 @@ public class ShowFindBarHandler extends AbstractHandler {
 				} else {
 					IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
 					try {
-						handlerService.executeCommand(IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE, null);
+						handlerService.executeCommand(ActionFactory.FIND.create(textEditor.getSite().getWorkbenchWindow()).getActionDefinitionId(), null);
 					} catch (NotDefinedException e) {
 					} catch (NotEnabledException e) {
 					} catch (NotHandledException e) {

@@ -42,8 +42,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
@@ -625,7 +625,7 @@ public class FindBarDecorator implements IFindBarDecorator {
 	private void showFindReplaceDialog() {
 		IWorkbenchPartSite site = textEditor.getSite();
 		ICommandService commandService = (ICommandService) site.getService(ICommandService.class);
-		Command findReplacecommand = commandService.getCommand(IWorkbenchCommandConstants.EDIT_FIND_AND_REPLACE);
+		Command findReplacecommand = commandService.getCommand(ActionFactory.FIND.create(site.getWorkbenchWindow()).getActionDefinitionId());
 		IHandlerService handlerService = (IHandlerService) site.getService(IHandlerService.class);
 		if (handlerService != null) {
 			try {

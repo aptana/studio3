@@ -71,7 +71,7 @@ class CommitGraphTable extends TableViewer
 		date.setWidth(250);
 		layout.addColumnData(new ColumnWeightData(5, true));
 
-		setContentProvider(ArrayContentProvider.getInstance());
+		setContentProvider(new ArrayContentProvider());
 		setLabelProvider(new CommitLabelProvider());
 
 		createPaintListener(table);

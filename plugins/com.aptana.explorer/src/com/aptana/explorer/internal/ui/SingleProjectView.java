@@ -72,9 +72,12 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.ISizeProvider;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -104,6 +107,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
 import com.aptana.usage.PingStartup;
+import com.aptana.util.EclipseUtils;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -167,9 +171,13 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 
 	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	// use the hard-coded constant since it is only defined in Eclipse 3.5
+	protected boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 
 	private TreeThemer treeThemer;
+
+	// memento wasn't declared protected until Eclipse 3.5, so store it ourselves
+	protected IMemento memento;
 
 	/**
 	 * Message area
@@ -299,6 +307,12 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
+	}
+
+	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
+	{
+		super.init(aSite, aMemento);
+		this.memento = aMemento;
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
@@ -567,12 +581,19 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		super.createPartControl(viewer);
 	}
 
+	@Override
+	protected CommonViewer createCommonViewer(Composite aParent) {
+		CommonViewer aViewer = createCommonViewerObject(aParent);
+		initListeners(aViewer);
+		aViewer.getNavigatorContentService().restoreState(memento);
+		return aViewer;
+	}
+
 	/**
 	 * Force us to return the active project as the implicit selection if there' an empty selection. This fixes the
 	 * issue where new file/Folder won't show in right click menu with no selection (like in a brand new generic
 	 * project).
 	 */
-	@Override
 	protected CommonViewer createCommonViewerObject(Composite aParent)
 	{
 		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
@@ -873,7 +894,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	private String getVersion()
 	{
 		// FIXME Do we want this plugin's version, or some other version?
-		return ExplorerPlugin.getDefault().getBundle().getVersion().toString();
+		return EclipseUtils.getPluginVersion(ExplorerPlugin.getDefault());
 	}
 
 	private String toHex(RGB rgb)

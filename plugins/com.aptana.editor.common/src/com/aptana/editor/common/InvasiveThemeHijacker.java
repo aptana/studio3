@@ -10,12 +10,12 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.jface.dialogs.IPageChangedListener;
-import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -46,7 +46,6 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.navigator.IResourceNavigator;
 import org.eclipse.ui.views.properties.PropertySheet;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -54,6 +53,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
+import com.aptana.util.EclipseUtils;
 
 /**
  * This is a UIJob that tries to expand the influence of our themes to the JDT Editor; all Outline pages; Problems,
@@ -66,7 +66,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 {
 
 	private Listener listener;
-	private IPageChangedListener pageListener;
+	private ISelectionChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
 	{
@@ -172,8 +172,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			Bundle b = Platform.getBundle("org.eclipse.ui.ide");
-			if (b.getVersion().compareTo(Version.parseVersion("3.6.0")) >= 0)
+			if (new Version(EclipseUtils.getPluginVersion("org.eclipse.ui.ide")).compareTo(Version
+					.parseVersion("3.6.0")) >= 0)
 			{
 				try
 				{
@@ -679,17 +679,17 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				MultiPageEditorPart multi = (MultiPageEditorPart) part;
 				if (pageListener == null)
 				{
-					pageListener = new IPageChangedListener()
+					pageListener = new ISelectionChangedListener()
 					{
 
 						@Override
-						public void pageChanged(PageChangedEvent event)
+						public void selectionChanged(SelectionChangedEvent event)
 						{
 							hijackOutline();
 						}
 					};
 				}
-				multi.addPageChangedListener(pageListener);
+				multi.getSite().getSelectionProvider().addSelectionChangedListener(pageListener);
 			}
 			return;
 		}
@@ -714,7 +714,7 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 			MultiPageEditorPart multi = (MultiPageEditorPart) part;
 			if (pageListener != null)
 			{
-				multi.removePageChangedListener(pageListener);
+				multi.getSite().getSelectionProvider().removeSelectionChangedListener(pageListener);
 			}
 		}
 	}
