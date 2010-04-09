@@ -214,25 +214,26 @@ public class GitRepository
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
 					// Remove branch in model!
-					GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
+					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
 					branches.remove(rev);
-					// the branch may in fact still exists
-					reloadRefs();
-					// only fires the event if the branch is indeed removed
-					if (!branches.contains(rev))
+					
+					Job job = new Job("Handle branch removal") //$NON-NLS-1$
 					{
-						Job job = new Job("Fire branch removed event") //$NON-NLS-1$
+						@Override
+						protected IStatus run(IProgressMonitor monitor)
 						{
-							@Override
-							protected IStatus run(IProgressMonitor monitor)
+							// the branch may in fact still exists
+							reloadRefs();
+							// only fires the event if the branch is indeed removed
+							if (!branches.contains(rev))
 							{
 								fireBranchRemovedEvent(name);
-								return Status.OK_STATUS;
 							}
-						};
-						job.setSystem(true);
-						job.schedule();
-					}
+							return Status.OK_STATUS;
+						}
+					};
+					job.setSystem(true);
+					job.schedule();					
 				}
 
 				@Override
