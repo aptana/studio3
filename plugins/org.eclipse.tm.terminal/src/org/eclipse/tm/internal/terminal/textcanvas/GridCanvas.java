@@ -34,7 +34,7 @@ abstract public class GridCanvas extends VirtualCanvas {
 		addListener(SWT.MouseWheel, new Listener() {
 			public void handleEvent(Event event) {
 				if(getVerticalBar().isVisible()) {
-					int delta=-fCellHeight;
+					int delta=-fCellHeight*5;
 					if(event.count<0)
 						delta=-delta;
 					scrollYDelta(delta);
