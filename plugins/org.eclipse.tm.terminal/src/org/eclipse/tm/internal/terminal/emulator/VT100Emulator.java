@@ -477,6 +477,11 @@ public class VT100Emulator implements ControlListener {
 			processAnsiCommand_G();
 			break;
 
+		case 'h':
+			// Set Mode.
+			processAnsiCommand_h();
+			break;
+
 		case 'H':
 			// Set cursor Position.
 			processAnsiCommand_H();
@@ -490,6 +495,11 @@ public class VT100Emulator implements ControlListener {
 		case 'K':
 			// Erase in line (cursor does not move).
 			processAnsiCommand_K();
+			break;
+
+		case 'l':
+			// Reset Mode.
+			processAnsiCommand_l();
 			break;
 
 		case 'L':
@@ -634,6 +644,58 @@ public class VT100Emulator implements ControlListener {
 	 */
 	private void processAnsiCommand_H() {
 		moveCursor(getAnsiParameter(0) - 1, getAnsiParameter(1) - 1);
+	}
+	
+	/**
+	 * This method sets terminal mode.
+	 */
+	private void processAnsiCommand_h() {
+		if (ansiParameters.length > 0 && ansiParameters[0].length() > 0) {
+			if (ansiParameters[0].charAt(0) == '?') {
+				ansiParameters[0].deleteCharAt(0);
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 1:
+					terminal.setApplicationKeypad(true);
+					break;
+				case 47:
+					text.setAlternativeScreenBuffer(true);
+					break;
+				case 1049:
+					// TODO: store position
+					text.setAlternativeScreenBuffer(true);
+					break;
+				}
+			} else {
+				
+			}
+		}
+	}
+
+	/**
+	 * This method resets terminal mode.
+	 */
+	private void processAnsiCommand_l() {
+		if (ansiParameters.length > 0 && ansiParameters[0].length() > 0) {
+			if (ansiParameters[0].charAt(0) == '?') {
+				ansiParameters[0].deleteCharAt(0);
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 1:
+					terminal.setApplicationKeypad(false);
+					break;
+				case 47:
+					text.setAlternativeScreenBuffer(false);
+					break;
+				case 1049:
+					// TODO: restore position
+					text.setAlternativeScreenBuffer(false);
+					break;
+				}
+			} else {
+				
+			}
+		}
 	}
 
 	/**

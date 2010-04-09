@@ -10,7 +10,11 @@
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.emulator;
 
+import java.util.Stack;
+
+import org.eclipse.tm.internal.terminal.model.TerminalTextDataStore;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
+import org.eclipse.tm.terminal.model.ITerminalTextDataSnapshot;
 import org.eclipse.tm.terminal.model.Style;
 
 /**
@@ -52,6 +56,8 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	int fColumns;
 	int fScrollingRegionTopLine;
 	int fScrollingRegionBottomLine;
+	Stack fBufferStack = new Stack();
+	
 	final private ITerminalTextData fTerminal;
 	public VT100EmulatorBackend(ITerminalTextData terminal) {
 		fTerminal=terminal;
@@ -416,5 +422,21 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	public void setScrollingRegion(int topLine, int bottomLine) {
 		fScrollingRegionTopLine=topLine-1;
 		fScrollingRegionBottomLine=bottomLine-1;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setAlternativeScreenBuffer(boolean)
+	 */
+	public void setAlternativeScreenBuffer(boolean enable) {
+		synchronized (fTerminal) {
+			if (enable) {
+				ITerminalTextData data = new TerminalTextDataStore();
+				data.copy(fTerminal);
+				fBufferStack.push(data);
+			} else if (!fBufferStack.isEmpty()) {
+				ITerminalTextData data = (ITerminalTextData) fBufferStack.pop();
+				fTerminal.copy(data);
+			}
+		}
 	}
 }

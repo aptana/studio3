@@ -222,8 +222,10 @@ public class TerminalTextData implements ITerminalTextData {
 
 	public void copy(ITerminalTextData source) {
 		fData.copy(source);
+		sendLinesChangedToSnapshot(0, getHeight());
 		fCursorLine=source.getCursorLine();
 		fCursorColumn=source.getCursorColumn();
+		sendCursorChanged();
 	}
 
 	public void copyLine(ITerminalTextData source, int sourceLine, int destLine) {
