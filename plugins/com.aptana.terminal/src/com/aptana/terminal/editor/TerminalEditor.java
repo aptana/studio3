@@ -2,6 +2,9 @@ package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -23,6 +26,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
 import com.aptana.terminal.connector.LocalTerminalConnector;
@@ -31,7 +36,7 @@ import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener, IProcessListener {
+public class TerminalEditor extends EditorPart implements Closeable, ITerminalListener, IProcessListener, IPreferenceChangeListener {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private ITerminalViewControl fCtlTerminal;
@@ -183,6 +188,16 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		this.setPartName(Messages.TerminalEditor_Part_Name);
 		this.setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
 		this.setTitleImage(Activator.getImage("icons/terminal.png")); //$NON-NLS-1$
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+		super.dispose();
 	}
 
 	/*
@@ -214,7 +229,19 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	{
 		fCtlTerminal.setFocus();
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 */
+	@Override
+	public void preferenceChange(PreferenceChangeEvent event) {
+		if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
+			if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
+				fCtlTerminal.getControl().redraw();
+			}
+		}
+	}
+
 	protected void setWorkingDirectory(IPath workingDirectory) {
 		if (workingDirectory != null && fCtlTerminal != null) {
 			LocalTerminalConnector localTerminalConnector = (LocalTerminalConnector) fCtlTerminal.getTerminalConnector().getAdapter(LocalTerminalConnector.class);

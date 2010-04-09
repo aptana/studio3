@@ -37,6 +37,9 @@ package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
@@ -53,6 +56,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
 import com.aptana.terminal.Utils;
@@ -67,7 +72,7 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
  *
  */
 @SuppressWarnings("restriction")
-public class TerminalView extends ViewPart implements Closeable, ITerminalListener, IProcessListener {
+public class TerminalView extends ViewPart implements Closeable, ITerminalListener, IProcessListener, IPreferenceChangeListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
@@ -108,6 +113,16 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		super.init(site, memento);
 		savedState = memento;
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+		super.dispose();
 	}
 
 	/* (non-Javadoc)
@@ -236,6 +251,18 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 
 	public void sendInput(String text) {
 		fCtlTerminal.pasteString(text);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 */
+	@Override
+	public void preferenceChange(PreferenceChangeEvent event) {
+		if (IThemeManager.THEME_CHANGED.equals(event.getKey())) {
+			if (fCtlTerminal != null && !fCtlTerminal.isDisposed()) {
+				fCtlTerminal.getControl().redraw();
+			}
+		}
 	}
 
 	/**
