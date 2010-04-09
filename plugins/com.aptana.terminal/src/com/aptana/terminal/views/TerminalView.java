@@ -41,16 +41,30 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionClearAll;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCopy;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCut;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionPaste;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionSelectAll;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -82,7 +96,12 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	private ITerminalViewControl fCtlTerminal;
 	private IMemento savedState = null;
 	
-	private Action openEditorAction;
+	private Action fOpenEditorAction;
+	private TerminalActionCopy fActionEditCopy;
+	private TerminalActionCut fActionEditCut;
+	private TerminalActionPaste fActionEditPaste;
+	private TerminalActionClearAll fActionEditClearAll;
+	private TerminalActionSelectAll fActionEditSelectAll;
 
 	/**
 	 * @param id
@@ -140,6 +159,8 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			hookProcessListener();
 		}
 		makeActions();
+		hookContextMenu();
+		contributeToActionBars();
 	}
 	
 	/* (non-Javadoc)
@@ -266,17 +287,78 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 
 	/**
+	 * hookContextMenu
+	 */
+	private void hookContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		Control control = fCtlTerminal.getControl();
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
+	}
+	
+	private void fillContextMenu(IMenuManager menuMgr) {
+		fActionEditCut.updateAction(true);
+		fActionEditCopy.updateAction(true);
+		fActionEditPaste.updateAction(true);
+		fActionEditSelectAll.updateAction(true);
+		fActionEditClearAll.updateAction(true);
+
+		menuMgr.add(fActionEditCopy);
+		menuMgr.add(fActionEditPaste);
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditClearAll);
+		menuMgr.add(fActionEditSelectAll);
+		menuMgr.add(new Separator());
+		menuMgr.add(fOpenEditorAction);
+
+		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	/**
+	 * contributeToActionBars
+	 */
+	private void contributeToActionBars() {
+		IActionBars bars = getViewSite().getActionBars();
+		fillLocalPullDown(bars.getMenuManager());
+		fillLocalToolBar(bars.getToolBarManager());
+	}
+
+	private void fillLocalPullDown(IMenuManager manager) {
+		manager.add(fOpenEditorAction);
+	}
+
+	private void fillLocalToolBar(IToolBarManager manager) {
+		manager.add(fOpenEditorAction);
+		manager.add(new Separator());
+		manager.add(fActionEditClearAll);
+		fActionEditClearAll.updateAction(true);
+	}
+
+	/**
 	 * makeActions
 	 */
 	private void makeActions() {
+		fActionEditCopy = new TerminalActionCopy(fCtlTerminal);
+		fActionEditCut = new TerminalActionCut(fCtlTerminal);
+		fActionEditPaste = new TerminalActionPaste(fCtlTerminal);
+		fActionEditClearAll = new TerminalActionClearAll(fCtlTerminal);
+		fActionEditSelectAll = new TerminalActionSelectAll(fCtlTerminal);
+
 		// open editor action
-		openEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				Utils.openTerminalEditor(TerminalEditor.ID, true);
 			}
 		};
-		openEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
+		fOpenEditorAction.setToolTipText(Messages.TerminalView_Create_Terminal_Editor_Tooltip);
 	}
 
 }

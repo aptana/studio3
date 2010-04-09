@@ -15,6 +15,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionClearAll;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCopy;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionCut;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionPaste;
+import org.eclipse.tm.internal.terminal.control.actions.TerminalActionSelectAll;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
@@ -40,6 +45,12 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private ITerminalViewControl fCtlTerminal;
+
+	private TerminalActionCopy fActionEditCopy;
+	private TerminalActionCut fActionEditCut;
+	private TerminalActionPaste fActionEditPaste;
+	private TerminalActionClearAll fActionEditClearAll;
+	private TerminalActionSelectAll fActionEditSelectAll;
 	
 	/*
 	 * (non-Javadoc)
@@ -64,6 +75,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(fCtlTerminal.getControl(), ID);
 		
+		makeActions();
 		hookContextMenu();
 		saveInputState();
 	}
@@ -144,28 +156,46 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	/**
 	 * fillContextMenu
 	 * 
-	 * @param manager
+	 * @param menuMgr
 	 */
-	private void fillContextMenu(IMenuManager manager)
+	private void fillContextMenu(IMenuManager menuMgr)
 	{
-		// add browser's menus
-		//fCtlTerminal.fillContextMenu(manager);
-		
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+		fActionEditCut.updateAction(true);
+		fActionEditCopy.updateAction(true);
+		fActionEditPaste.updateAction(true);
+		fActionEditSelectAll.updateAction(true);
+		fActionEditClearAll.updateAction(true);
+
+		menuMgr.add(fActionEditCopy);
+		menuMgr.add(fActionEditPaste);
+		menuMgr.add(new Separator());
+		menuMgr.add(fActionEditClearAll);
+		menuMgr.add(fActionEditSelectAll);
+		menuMgr.add(new Separator());
+
+		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	
+
+	/**
+	 * makeActions
+	 */
+	private void makeActions() {
+		fActionEditCopy = new TerminalActionCopy(fCtlTerminal);
+		fActionEditCut = new TerminalActionCut(fCtlTerminal);
+		fActionEditPaste = new TerminalActionPaste(fCtlTerminal);
+		fActionEditClearAll = new TerminalActionClearAll(fCtlTerminal);
+		fActionEditSelectAll = new TerminalActionSelectAll(fCtlTerminal);
+	}
+
 	/**
 	 * hookContextMenu
 	 */
 	private void hookContextMenu()
 	{
 		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-
 		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener()
-		{
-			public void menuAboutToShow(IMenuManager manager)
-			{
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
 				fillContextMenu(manager);
 			}
 		});
@@ -173,7 +203,6 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		Control control = fCtlTerminal.getControl();
 		Menu menu = menuMgr.createContextMenu(control);
 		control.setMenu(menu);
-		// getSite().registerContextMenu(menuMgr, viewer);
 	}
 	
 	/*
@@ -181,13 +210,12 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException
-	{
-		this.setSite(site);
-		this.setInput(input);
-		this.setPartName(Messages.TerminalEditor_Part_Name);
-		this.setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
-		this.setTitleImage(Activator.getImage("icons/terminal.png")); //$NON-NLS-1$
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException{
+		setSite(site);
+		setInput(input);
+		setPartName(Messages.TerminalEditor_Part_Name);
+		setTitleToolTip(Messages.TerminalEditor_Title_Tool_Tip);
+		setTitleImage(Activator.getImage("icons/terminal.png")); //$NON-NLS-1$
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 	}
 
@@ -205,8 +233,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
 	@Override
-	public boolean isDirty()
-	{
+	public boolean isDirty() {
 		return false;
 	}
 
@@ -215,8 +242,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
 	@Override
-	public boolean isSaveAsAllowed()
-	{
+	public boolean isSaveAsAllowed() {
 		return false;
 	}
 	
@@ -225,8 +251,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
-	public void setFocus()
-	{
+	public void setFocus() {
 		fCtlTerminal.setFocus();
 	}
 
