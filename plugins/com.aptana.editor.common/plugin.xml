@@ -201,7 +201,7 @@
                <with
                      variable="activePart">
                   <instanceof
-                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                        value="org.eclipse.ui.texteditor.ITextEditor">
                   </instanceof>
                </with>
             </visibleWhen>
@@ -217,7 +217,7 @@
                <with
                      variable="activePart">
                   <instanceof
-                        value="com.aptana.editor.common.AbstractThemeableEditor">
+                        value="org.eclipse.ui.texteditor.ITextEditor">
                   </instanceof>
                </with>
             </visibleWhen>
