@@ -225,6 +225,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	@Override
 	public void dispose() {
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+		fCtlTerminal.disposeTerminal();
 		super.dispose();
 	}
 

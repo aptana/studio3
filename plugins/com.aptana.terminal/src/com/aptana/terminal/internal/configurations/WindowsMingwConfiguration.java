@@ -82,7 +82,7 @@ public class WindowsMingwConfiguration implements IProcessConfiguration {
 		IPath shell = findShellExecutable();
 		String command = shell != null ? shell.toOSString() : "sh"; //$NON-NLS-1$
 		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
-		list.add("80x40"); //$NON-NLS-1$
+		list.add("120x40"); //$NON-NLS-1$
 		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
 			list.add("-show"); //$NON-NLS-1$
 		}

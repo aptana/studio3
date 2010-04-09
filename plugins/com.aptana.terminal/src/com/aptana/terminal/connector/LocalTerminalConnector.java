@@ -135,6 +135,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl#doDisconnect()
+	 */
+	@Override
+	protected void doDisconnect() {
+		processLauncher.destroy();
+	}
+
 	/**
 	 * @param listener
 	 * @see com.aptana.terminal.internal.ProcessLauncher#addProcessListener(com.aptana.terminal.internal.IProcessListener)

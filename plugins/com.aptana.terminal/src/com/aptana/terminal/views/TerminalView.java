@@ -141,6 +141,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	@Override
 	public void dispose() {
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(this);
+		fCtlTerminal.disposeTerminal();
 		super.dispose();
 	}
 
