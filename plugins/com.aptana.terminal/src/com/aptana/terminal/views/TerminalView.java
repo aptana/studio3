@@ -42,9 +42,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
-import org.eclipse.tm.internal.terminal.control.TerminalViewControlFactory;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.ui.IMemento;
@@ -61,7 +59,6 @@ import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.internal.IProcessListener;
-import com.aptana.terminal.internal.emulator.ThemedStyleMap;
 import com.aptana.terminal.internal.emulator.VT100TerminalControl;
 import com.aptana.terminal.preferences.IPreferenceConstants;
 
