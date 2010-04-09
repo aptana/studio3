@@ -14,7 +14,6 @@ import java.util.Stack;
 
 import org.eclipse.tm.internal.terminal.model.TerminalTextDataStore;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
-import org.eclipse.tm.terminal.model.ITerminalTextDataSnapshot;
 import org.eclipse.tm.terminal.model.Style;
 
 /**
