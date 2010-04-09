@@ -874,6 +874,17 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 				// It's ok to return here, because we never locally echo special keys.
 
 				return;
+			} else if (event.stateMask == 0) {
+				switch (event.keyCode) {
+				case 8:
+					sendString("\u007f"); //$NON-NLS-1$
+					return;
+				case 127:
+					sendString("\u001b[3~"); //$NON-NLS-1$
+					return;
+				default:
+					break;
+				}
 			}
 
 			// To fix SPR 110341, we consider the Alt key to be pressed only when the
