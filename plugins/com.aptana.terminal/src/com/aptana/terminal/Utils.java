@@ -28,11 +28,11 @@ public class Utils
 	 *            true if the editor should be activated, false otherwise
 	 * @return
 	 */
-	public static IEditorPart openEditor(String editorId, boolean activate)
+	public static IEditorPart openTerminalEditor(String editorId, boolean activate)
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		
-		return openEditor(window, editorId, activate);
+		return openTerminalEditor(window, editorId, activate);
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class Utils
 	 * @param activate
 	 * @return
 	 */
-	public static IEditorPart openEditor(IWorkbenchWindow window, String editorId, boolean activate)
+	public static IEditorPart openTerminalEditor(IWorkbenchWindow window, String editorId, boolean activate)
 	{
 		
 		if (window != null)

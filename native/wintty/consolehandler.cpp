@@ -6,6 +6,7 @@
 static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter);
 static void ReadConsoleBuffer(void);
 static void WriteConsole(void);
+static void SetConsoleSize(SHORT width, SHORT height);
 
 static HANDLE hParentProcess = NULL;
 static HANDLE hMonitorThread = NULL;
@@ -31,7 +32,6 @@ static DWORD dwScreenBufferSize = 0;
 
 #define COLOR_MASK (COMMON_LVB_REVERSE_VIDEO|COMMON_LVB_UNDERSCORE|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED|BACKGROUND_INTENSITY)
 #define DEFAULT_ATTRIBUTES (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)
-
 
 static WORD wCharAttributes = DEFAULT_ATTRIBUTES;
 
@@ -79,6 +79,15 @@ BOOL InitConsoleHandler(void)
 		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_HIGHEST);
 		::SwitchToThread();
 	}
+
+	STARTUPINFO si;
+	::ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	::GetStartupInfo(&si);
+	if( (si.dwXCountChars != 0) && (si.dwYCountChars != 0) ) {
+		SetConsoleSize((SHORT)si.dwXCountChars, (SHORT)si.dwYCountChars);
+	}
+
 	return TRUE;
 }
 
@@ -376,7 +385,7 @@ static void ReadConsoleBuffer()
 	
 	::ResetEvent(hConsoleOut);
 	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
-	coordConsoleSize.X = csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
+	coordConsoleSize.X = csbiNextConsole.dwSize.X; //csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
 	coordConsoleSize.Y = csbiNextConsole.srWindow.Bottom - csbiNextConsole.srWindow.Top + 1;
 
 	// make cursor positions relative to console window
@@ -397,6 +406,7 @@ static void ReadConsoleBuffer()
 		// refresh screen
 		if( lpPrevScreenBuffer != NULL ) {
 			EraseWindow();
+			MoveCursorAbs(0, 0);
 		}
 		csbiConsole = csbiNextConsole;
 		dwScreenBufferSize = dwNextScreenBufferSize;
@@ -461,7 +471,9 @@ static void ReadConsoleBuffer()
 					}
 					bHasNonEmptyChar = TRUE;
 				}
-				if( wCharAttributes != lpCharInfo->Attributes ) {
+				if( lpCharInfo->Char.AsciiChar == '\0' ) {
+					break;
+				} else if( wCharAttributes != lpCharInfo->Attributes ) {
 					ChangeAttributes(lpCharInfo->Attributes);
 				} else if( (lpCharInfo->Char.AsciiChar == ' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
 					lpCharInfo += coordConsoleSize.X - x;
@@ -537,7 +549,9 @@ static void ReadConsoleBuffer()
 						} else {
 							MoveCursor(x, y);
 						}
-						if( wCharAttributes != lpNextCharInfo->Attributes ) {
+						if( lpNextCharInfo->Char.AsciiChar == '\0' ) {
+							break;
+						} else if( wCharAttributes != lpNextCharInfo->Attributes ) {
 							ChangeAttributes(lpNextCharInfo->Attributes);
 						}
 						OutputChar(lpNextCharInfo->Char.AsciiChar);
@@ -587,9 +601,23 @@ static void WriteConsole(void)
 		BOOL hasEscSequence = FALSE;
 		CHAR chSeq[sizeof(chBuf)/sizeof(chBuf[0])];
 		DWORD dwSeqIndex = 0;
-		for( DWORD i = 0; i < dwRead; ++i )
+		for( DWORD i = 0; i < dwRead+1; ++i )
 		{
-			CHAR ch = chBuf[i];
+			CHAR ch;
+			BOOL bIgnoreEsc = FALSE;
+			if (i == dwRead)
+			{
+				if( hasEscSequence )
+				{
+					hasEscSequence = FALSE;
+					bIgnoreEsc = TRUE;
+					i -= dwSeqIndex + 1;
+					dwSeqIndex = 0;
+				} else {
+					break;
+				}
+			}
+			ch = chBuf[i];
 			if ( hasEscSequence ) {
 				chSeq[dwSeqIndex++] = ch;
 				if ( (ch != '\x1B') && !isalpha(ch) ) {
@@ -598,12 +626,14 @@ static void WriteConsole(void)
 				chSeq[dwSeqIndex] = '\0';
 				hasEscSequence = FALSE;
 				if( ProcessEscSequence(chSeq, dwSeqIndex) ) {
+					dwSeqIndex = 0;
 					continue;
 				} else {
 					i -= dwSeqIndex;
 					ch = chBuf[i];
+					dwSeqIndex = 0;
 				}
-			} else if( ch == '\x1B' ) {
+			} else if( (ch == '\x1B') && !bIgnoreEsc ) {
 				hasEscSequence = TRUE;
 				continue;
 			}
@@ -651,8 +681,10 @@ static void SendConsoleKey(WORD key)
 
 static void SetConsoleSize(SHORT width, SHORT height)
 {
+	HANDLE hConsole = ::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
+
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	::GetConsoleScreenBufferInfo(hConsoleOut, &csbi);
+	::GetConsoleScreenBufferInfo(hConsole, &csbi);
 	
 	COORD coordBufferSize;
 	coordBufferSize.X = width;
@@ -670,11 +702,11 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	finalConsoleRect.Bottom = srConsoleRect.Bottom;
 	if( coordBufferSize.Y > csbi.dwSize.Y ) {
 		// if new buffer size is > than old one, we need to resize the buffer first
-		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsole, TRUE, &finalConsoleRect);
 	} else {
-		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsole, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
 	}
 	// then, resize columns
 	finalCoordBufferSize.X  = coordBufferSize.X;
@@ -682,12 +714,13 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	finalConsoleRect.Right  = srConsoleRect.Right;
 	if( coordBufferSize.X > csbi.dwSize.X ) {
 		// if new buffer size is > than old one, we need to resize the buffer first
-		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
-		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsole, TRUE, &finalConsoleRect);
 	} else {
-		::SetConsoleWindowInfo(hConsoleOut, TRUE, &finalConsoleRect);
-		::SetConsoleScreenBufferSize(hConsoleOut, finalCoordBufferSize);
+		::SetConsoleWindowInfo(hConsole, TRUE, &finalConsoleRect);
+		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
 	}
+	::CloseHandle(hConsole);
 }
 
 static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
@@ -725,6 +758,9 @@ static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength)
 {
 	for( SHORT x = 0; x < sLength; ++x, ++lpCharInfo) {
+		if( (lpCharInfo->Char.AsciiChar == '\0') || (lpCharInfo->Attributes == 0) ) {
+			continue;
+		}
 		if( (lpCharInfo->Char.AsciiChar != ' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
 			return FALSE;
 		}
