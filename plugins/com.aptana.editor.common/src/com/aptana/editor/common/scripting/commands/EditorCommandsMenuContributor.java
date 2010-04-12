@@ -25,7 +25,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -84,110 +83,103 @@ public class EditorCommandsMenuContributor extends ContributionItem
 
 	public static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem)
 	{
-		// Is this an Aptana Editor
-		if (textEditor instanceof AbstractThemeableEditor)
+		String contentTypeAtOffset = null;
+		List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
+		MenuElement[] menusFromScope;
+		MenuElement[] menusFromOtherScopes = null;
+		try
 		{
-			AbstractThemeableEditor abstractThemeableEditor = (AbstractThemeableEditor) textEditor;
-			String contentTypeAtOffset = null;
-			List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
-			MenuElement[] menusFromScope;
-			MenuElement[] menusFromOtherScopes = null;
-			try
-			{
-				IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(
-						abstractThemeableEditor.getEditorInput());
-				int caretOffset = TextEditorUtils.getCaretOffset(abstractThemeableEditor);
-				// Get the scope at caret offset
-				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
-						document, caretOffset);
-			}
-			catch (BadLocationException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
+			IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+			int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
+			// Get the scope at caret offset
+			contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document,
+					caretOffset);
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 
-			// First pull all possible menus from the current caret position's scopes
-			if (contentTypeAtOffset != null)
+		// First pull all possible menus from the current caret position's scopes
+		if (contentTypeAtOffset != null)
+		{
+			ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+			menusFromScope = BundleManager.getInstance().getMenus(filter);
+			if (menusFromScope.length > 0)
 			{
-				ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
-				menusFromScope = BundleManager.getInstance().getMenus(filter);
+				menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+			}
+		}
+
+		// Next we get all possible scopes from the top level content type provider
+		SourceViewerConfiguration sourceViewerConfiguration = (SourceViewerConfiguration) textEditor
+				.getAdapter(SourceViewerConfiguration.class);
+		if (sourceViewerConfiguration instanceof ITopContentTypesProvider)
+		{
+			String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
+			List<String> topLevelContentTypesList = new LinkedList<String>();
+			for (String[] topContentType : topContentTypes)
+			{
+				QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
+				String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
+				topLevelContentTypesList.add(contentType);
+			}
+			if (topLevelContentTypesList.size() > 0)
+			{
+				String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
+				topLevelContentTypesList.toArray(topLevelContentTypes);
+
+				// Get menus
+				ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
+				menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
 				if (menusFromScope.length > 0)
 				{
+					// Collect
 					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 				}
-			}
 
-			// Next we get all possible scopes from the top level content type provider
-			SourceViewerConfiguration sourceViewerConfiguration = abstractThemeableEditor
-					.getSourceViewerConfigurationNonFinal();
-			if (sourceViewerConfiguration instanceof ITopContentTypesProvider)
+				// Next we use a negative filter to get menus that belong to scopes
+				// that do not match the top level scopes. We will use this
+				// later to build the "Other" menu.
+				NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
+				menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
+			}
+		}
+
+		// Do we have some menus?
+		if (menusFromScopeList.size() > 0)
+		{
+			// Remove duplicates and sort
+			CollectionsUtil.removeDuplicates(menusFromScopeList);
+			Collections.sort(menusFromScopeList, new Comparator<MenuElement>()
 			{
-				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration)
-						.getTopContentTypes();
-				List<String> topLevelContentTypesList = new LinkedList<String>();
-				for (String[] topContentType : topContentTypes)
+				@Override
+				public int compare(MenuElement menuElement1, MenuElement menuElement2)
 				{
-					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-					String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
-					topLevelContentTypesList.add(contentType);
+					return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
 				}
-				if (topLevelContentTypesList.size() > 0)
-				{
-					String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
-					topLevelContentTypesList.toArray(topLevelContentTypes);
+			});
+			menusFromScope = new MenuElement[menusFromScopeList.size()];
+			menusFromScopeList.toArray(menusFromScope);
 
-					// Get menus
-					ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
-					menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
-					if (menusFromScope.length > 0)
-					{
-						// Collect
-						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
-					}
+			// Now build the menu
+			buildMenu(menu, menusFromScope, textEditor, contentTypeAtOffset, contributionItem);
+		}
 
-					// Next we use a negative filter to get menus that belong to scopes
-					// that do not match the top level scopes. We will use this
-					// later to build the "Other" menu.
-					NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
-					menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
-				}
-			}
+		// Are there any menus that belong to scopes other than top level scopes
+		if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0)
+		{
+			// Build the "Other" menu
+			MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
+			separatorMenuItem.setData(contributionItem);
 
-			// Do we have some menus?
-			if (menusFromScopeList.size() > 0)
-			{
-				// Remove duplicates and sort
-				CollectionsUtil.removeDuplicates(menusFromScopeList);
-				Collections.sort(menusFromScopeList, new Comparator<MenuElement>()
-				{
-					@Override
-					public int compare(MenuElement menuElement1, MenuElement menuElement2)
-					{
-						return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
-					}
-				});
-				menusFromScope = new MenuElement[menusFromScopeList.size()];
-				menusFromScopeList.toArray(menusFromScope);
+			MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
+			menuItemForOtherScopes.setData(contributionItem);
+			menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
 
-				// Now build the menu
-				buildMenu(menu, menusFromScope, abstractThemeableEditor, contentTypeAtOffset, contributionItem);
-			}
-
-			// Are there any menus that belong to scopes other than top level scopes
-			if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0)
-			{
-				// Build the "Other" menu
-				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
-				separatorMenuItem.setData(contributionItem);
-
-				MenuItem menuItemForOtherScopes = new MenuItem(menu, SWT.CASCADE);
-				menuItemForOtherScopes.setData(contributionItem);
-				menuItemForOtherScopes.setText(Messages.EditorCommandsMenuContributor_CommandsForOtherScopes);
-
-				Menu menuForOtherScopes = new Menu(menu);
-				menuItemForOtherScopes.setMenu(menuForOtherScopes);
-				buildMenu(menuForOtherScopes, menusFromOtherScopes, abstractThemeableEditor, contentTypeAtOffset, contributionItem);
-			}
+			Menu menuForOtherScopes = new Menu(menu);
+			menuItemForOtherScopes.setMenu(menuForOtherScopes);
+			buildMenu(menuForOtherScopes, menusFromOtherScopes, textEditor, contentTypeAtOffset, contributionItem);
 		}
 	}
 
@@ -306,7 +298,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 
 				final MenuItem editBundleItem = new MenuItem(menu, SWT.PUSH);
 				editBundleItem.setData(contributionItem);
-				editBundleItem.setText("Edit this bundle");
+				editBundleItem.setText(Messages.EditorCommandsMenuContributor_LBL_EditBundle);
 				final BundleElement bundleElement = menuForScope.getOwningBundle();
 				editBundleItem.addSelectionListener(new SelectionListener()
 				{
