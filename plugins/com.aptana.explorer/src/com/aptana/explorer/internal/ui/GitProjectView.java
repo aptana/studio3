@@ -12,6 +12,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -95,6 +97,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
 class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
+	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
 	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
 	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
 	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
@@ -122,10 +125,16 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	private Menu branchesMenu;
 
 	private GitChangedFilesFilter fChangedFilesFilter;
-	private boolean filterOnInitially;
+	// keeps the list of projects which has turned on the changed files filter
+	private Set<IProject> fChangedFilesFilterProjects;
 	private Job pullCalc;
 	private HashMap<String, Boolean> branchToPullIndicator = new HashMap<String, Boolean>();
 	private UIJob refreshUIJob;
+
+	public GitProjectView()
+	{
+		fChangedFilesFilterProjects = new HashSet<IProject>();
+	}
 
 	@Override
 	public void createPartControl(Composite aParent)
@@ -134,7 +143,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 
 		getGitRepositoryManager().addListener(this);
 
-		if (filterOnInitially)
+		if (fChangedFilesFilterProjects.contains(selectedProject))
 		{
 			UIJob job = new UIJob("Turn on git filter initially") //$NON-NLS-1$
 			{
@@ -397,6 +406,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		{
 			getCommonViewer().removeFilter(fChangedFilesFilter);
 			fChangedFilesFilter = null;
+			fChangedFilesFilterProjects.remove(selectedProject);
 		}
 		super.removeFilter();
 	}
@@ -1007,10 +1017,14 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 
 		super.projectChanged(oldProject, newProject);
-		if (fChangedFilesFilter != null)
+		
+		if (fChangedFilesFilterProjects.contains(newProject))
+		{
+			addGitChangedFilesFilter();
+		}
+		else
 		{
 			removeFilter();
-			addGitChangedFilesFilter();
 		}
 		GitRepository repo = getGitRepositoryManager().getAttached(newProject);
 		refreshUI(repo);
@@ -1259,12 +1273,22 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		getCommonViewer().expandAll();
 		showFilterLabel(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH),
 				Messages.GitProjectView_ChangedFilesFilterTooltip);
+		fChangedFilesFilterProjects.add(selectedProject);
 	}
 
 	@Override
 	public void saveState(IMemento aMemento)
 	{
-		aMemento.putInteger(GIT_CHANGED_FILES_FILTER, (fChangedFilesFilter == null) ? 0 : 1);
+		StringBuilder text = new StringBuilder();
+		for (IProject project : fChangedFilesFilterProjects)
+		{
+			text.append(project.getName()).append(PROJECT_DELIMITER);
+		}
+		int length = text.length();
+		if (length > 0) {
+			text.delete(length - PROJECT_DELIMITER.length(), length);
+		}
+		aMemento.putString(GIT_CHANGED_FILES_FILTER, text.toString());
 		super.saveState(aMemento);
 	}
 
@@ -1278,12 +1302,23 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
 	{
 		super.init(aSite, aMemento);
+		memento = aMemento;
 		if (memento != null)
 		{
-			Integer gitFilterEnabled = memento.getInteger(GIT_CHANGED_FILES_FILTER);
-			if (gitFilterEnabled != null && gitFilterEnabled.intValue() == 1)
+			String filteredProjects = memento.getString(GIT_CHANGED_FILES_FILTER);
+			if (filteredProjects != null)
 			{
-				filterOnInitially = true;
+				String[] projectNames = filteredProjects.split(PROJECT_DELIMITER);
+				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+				IProject project;
+				for (String name : projectNames)
+				{
+					project = workspaceRoot.getProject(name);
+					if (project.exists())
+					{
+						fChangedFilesFilterProjects.add(project);
+					}
+				}
 			}
 		}
 	}
