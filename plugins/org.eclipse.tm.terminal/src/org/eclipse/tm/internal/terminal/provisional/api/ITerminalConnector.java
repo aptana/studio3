@@ -16,7 +16,6 @@ package org.eclipse.tm.internal.terminal.provisional.api;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
 /**
  * A contributed connection type to manage a single connection.
@@ -25,9 +24,9 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
  * <code>org.eclipse.tm.terminal.terminalConnectors</code> extension point. This
  * class gives access to the static markup of a terminal connector extension as
  * well as providing the lifecycle management for the dynamically loaded
- * {@link TerminalConnectorImpl} instance, which performs the actual
+ * {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} instance, which performs the actual
  * communications. This pattern allows for lazy initialization, bundle
- * activation and class loading of the actual {@link TerminalConnectorImpl}
+ * activation and class loading of the actual {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl}
  * instance.
  *
  * Clients can get terminal connector instances from the
@@ -68,7 +67,7 @@ public interface ITerminalConnector extends IAdaptable {
 	boolean isHidden();
 
 	/**
-	 * @return true if the {@link TerminalConnectorImpl} has been initialized.
+	 * @return true if the {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} has been initialized.
 	 * If there was an initialization error, {@link #getInitializationErrorMessage()}
 	 * returns the error message.
 	 * @since org.eclipse.tm.terminal 2.0
