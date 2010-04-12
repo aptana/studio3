@@ -29,7 +29,6 @@ import org.eclipse.tm.internal.terminal.control.impl.ITerminalControlForText;
 import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.Style;
 

@@ -16,7 +16,6 @@ package org.eclipse.tm.internal.terminal.provisional.api;
 import java.io.OutputStream;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
 /**
@@ -33,7 +32,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
  *
  * Clients can get terminal connector instances from the
  * {@link TerminalConnectorExtension} class, or from
- * {@link ITerminalViewControl#getTerminalConnector()} when running inside an
+ * {@link org.eclipse.tm.internal.terminal.control.ITerminalViewControl#getTerminalConnector()} when running inside an
  * active terminal widget.
  *
  * @noimplement This interface is not intended to be implemented by clients.
