@@ -48,6 +48,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	@Override
 	public IStatus runInUIThread(IProgressMonitor monitor)
 	{
+		// TODO Listen for window open/closes and page add/removal; then register for every window, for every page
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (window != null)
 			window.getActivePage().addPartListener(this);
