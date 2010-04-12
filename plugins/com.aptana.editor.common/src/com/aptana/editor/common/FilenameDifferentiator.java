@@ -23,7 +23,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
 
-public class FilenameDifferentiator extends UIJob implements IPartListener
+/**
+ * This is a special class that listens to editors and makes sure that the tab name is unique. If two tabs share same
+ * filename we append additional text to disambiguate them.
+ * 
+ * @author cwilliams
+ */
+class FilenameDifferentiator extends UIJob implements IPartListener
 {
 
 	/**
@@ -43,7 +49,8 @@ public class FilenameDifferentiator extends UIJob implements IPartListener
 	public IStatus runInUIThread(IProgressMonitor monitor)
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		window.getActivePage().addPartListener(this);
+		if (window != null)
+			window.getActivePage().addPartListener(this);
 		return Status.OK_STATUS;
 	}
 
@@ -159,6 +166,8 @@ public class FilenameDifferentiator extends UIJob implements IPartListener
 		for (IEditorPart part : list)
 		{
 			IPath path = getPath(part);
+			if (path == null)
+				continue;
 			min = Math.min(path.segmentCount(), min);
 			map.put(part, path);
 		}
@@ -205,7 +214,10 @@ public class FilenameDifferentiator extends UIJob implements IPartListener
 	public void dispose()
 	{
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		window.getActivePage().removePartListener(this);
+		if (window != null)
+		{
+			window.getActivePage().removePartListener(this);
+		}
 		baseNames.clear();
 		baseNames = null;
 	}
