@@ -49,6 +49,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private ColorManager fColorManager;
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 	private InvasiveThemeHijacker themeHijacker;
+	private FilenameDifferentiator differentiator;
 
 	/**
 	 * The constructor
@@ -69,6 +70,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		new EditorFontOverride().schedule();
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.schedule();
+		
+		differentiator = new FilenameDifferentiator();
+		differentiator.schedule();
 	}
 
 	/*
@@ -84,11 +88,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 			prefs.removePreferenceChangeListener(themeHijacker);
+			differentiator.dispose();
 		}
 		finally
 		{
 			themeHijacker = null;
 			fColorManager = null;
+			differentiator = null;
 			plugin = null;
 			super.stop(context);
 		}
