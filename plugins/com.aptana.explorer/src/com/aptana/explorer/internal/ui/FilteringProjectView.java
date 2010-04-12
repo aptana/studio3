@@ -68,6 +68,7 @@ public class FilteringProjectView extends GitProjectView
 	private static final String TAG_ELEMENT = "element"; //$NON-NLS-1$
 	private static final String TAG_PATH = "path"; //$NON-NLS-1$
 	private static final String TAG_PROJECT = "project"; //$NON-NLS-1$
+	private static final String TAG_FILTER = "filter"; //$NON-NLS-1$
 	private static final String KEY_NAME = "name"; //$NON-NLS-1$
 
 	/**
@@ -97,6 +98,7 @@ public class FilteringProjectView extends GitProjectView
 	// flush them into the IMemento when needed (in the saveState call).
 	private Map<IProject, List<String>> projectExpansions;
 	private Map<IProject, List<String>> projectSelections;
+	private Map<IProject, String> projectFilters;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -105,6 +107,7 @@ public class FilteringProjectView extends GitProjectView
 	{
 		projectExpansions = new HashMap<IProject, List<String>>();
 		projectSelections = new HashMap<IProject, List<String>>();
+		projectFilters = new HashMap<IProject, String>();
 	}
 
 	@Override
@@ -175,6 +178,12 @@ public class FilteringProjectView extends GitProjectView
 				// Cache the loaded mementoes
 				projectExpansions.put(project, expanded);
 				projectSelections.put(project, selected);
+
+				childMem = projMemento.getChild(TAG_FILTER);
+				if (childMem != null)
+				{
+					projectFilters.put(project, childMem.getString(TAG_PATH));
+				}
 			}
 		}
 	}
@@ -221,6 +230,12 @@ public class FilteringProjectView extends GitProjectView
 		}
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
+	
+		String filter = getFilterString();
+		if (filter != null)
+		{
+			projectFilters.put(project, filter);
+		}
 	}
 
 	private void addFocusHover()
@@ -425,7 +440,7 @@ public class FilteringProjectView extends GitProjectView
 		for (IProject project : projects)
 		{
 			if (project.isAccessible()
-					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty()))
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters.get(project) == null))
 			{
 				IMemento projectMemento = memento.createChild(TAG_PROJECT);
 				projectMemento.putString(KEY_NAME, project.getName());
@@ -456,6 +471,13 @@ public class FilteringProjectView extends GitProjectView
 							elementMem.putString(TAG_PATH, selectedPath);
 						}
 					}
+				}
+
+				String filter = projectFilters.get(project);
+				if (filter != null)
+				{
+					IMemento filterMem = projectMemento.createChild(TAG_FILTER);
+					filterMem.putString(TAG_PATH, filter);
 				}
 			}
 		}
@@ -498,6 +520,18 @@ public class FilteringProjectView extends GitProjectView
 		List<String> expansions = projectExpansions.get(project);
 		List<String> selections = projectSelections.get(project);
 		viewer.getControl().setRedraw(false);
+		String filter = projectFilters.get(project);
+		if (filter == null || filter.length() == 0)
+		{
+			if (currentFilterText != null && currentFilterText.length() > 0)
+			{
+				clearText();
+			}
+		}
+		else if (!filter.equals(currentFilterText))
+		{
+			setFilterText(filter);
+		}
 		if (selections != null)
 		{
 			List<IResource> elements = new ArrayList<IResource>();
