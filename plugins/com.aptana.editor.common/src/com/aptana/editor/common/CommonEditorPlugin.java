@@ -47,9 +47,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private static CommonEditorPlugin plugin;
 
 	private ColorManager fColorManager;
-	private Map<String, Image> fImages = new HashMap<String, Image>();
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
 	private InvasiveThemeHijacker themeHijacker;
+	private FilenameDifferentiator differentiator;
 
 	/**
 	 * The constructor
@@ -70,6 +70,9 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		new EditorFontOverride().schedule();
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.schedule();
+		
+		differentiator = new FilenameDifferentiator();
+		differentiator.schedule();
 	}
 
 	/*
@@ -85,11 +88,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 			prefs.removePreferenceChangeListener(themeHijacker);
+			differentiator.dispose();
 		}
 		finally
 		{
 			themeHijacker = null;
 			fColorManager = null;
+			differentiator = null;
 			plugin = null;
 			super.stop(context);
 		}
@@ -169,7 +174,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	public Image getImage(String path)
 	{
-		Image image = fImages.get(path);
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -177,9 +183,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				return null;
 			}
-
-			image = id.createImage();
-			fImages.put(path, image);
+			registry.put(path, id);
+			image = registry.get(path);
 		}
 		return image;
 	}

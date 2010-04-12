@@ -360,16 +360,19 @@ public class GitMoveDeleteHookTest extends TestCase
 				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project")));
 
-				// We're not forcing, so we need to check if file is synched
-				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
-				will(returnValue(true));
-
 				// Repo relative path
 				oneOf(repo).workingDirectory();
 				will(returnValue(File.separator + "some" + File.separator + "root"));
 				oneOf(project).getLocationURI();
 				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
 						+ "project").toURI()));
+
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
+				will(returnValue(true));
+
+				oneOf(project).isOpen();
+				will(returnValue(true));
 
 				// Now actually delete contents
 				oneOf(repo).deleteFolder("project");
@@ -378,8 +381,38 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(tree).deletedProject(project);
 			}
 		});
-		assertTrue(hook
-				.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT, new NullProgressMonitor()));
+		assertTrue(hook.deleteProject(tree, project, 0, new NullProgressMonitor()));
+		context.assertIsSatisfied();
+	}
+
+	public void testDeleteProjectUnforcedUnsynchedReturnsFalse()
+	{
+		context.checking(new Expectations()
+		{
+			{
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+
+				oneOf(project).getLocation();
+				will(returnValue(new Path(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project")));
+
+				// Repo relative path
+				oneOf(repo).workingDirectory();
+				will(returnValue(File.separator + "some" + File.separator + "root"));
+				oneOf(project).getLocationURI();
+				will(returnValue(new File(File.separator + "some" + File.separator + "root" + File.separator
+						+ "project").toURI()));
+
+				// We're not forcing, so we need to check if file is synched
+				oneOf(tree).isSynchronized(project, IResource.DEPTH_INFINITE);
+				will(returnValue(false));
+
+				// should never actually try to delete the project
+				never(repo).deleteFolder("project");
+			}
+		});
+		assertFalse(hook.deleteProject(tree, project, 0, new NullProgressMonitor()));
 		context.assertIsSatisfied();
 	}
 
@@ -446,6 +479,13 @@ public class GitMoveDeleteHookTest extends TestCase
 
 				oneOf(project).getLocation();
 				will(returnValue(new Path(File.separator + "some" + File.separator + "root")));
+
+				oneOf(project).getFolder(GitRepository.GIT_DIR);
+				will(returnValue(folder));
+
+				oneOf(tree).standardDeleteFolder(with(equal(folder)),
+						with(equal(IResource.ALWAYS_DELETE_PROJECT_CONTENT | IResource.FORCE)),
+						with(any(NullProgressMonitor.class)));
 			}
 		});
 		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,

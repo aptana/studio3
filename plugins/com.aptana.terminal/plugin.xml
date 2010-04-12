@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="processConfigurations" name="Process Configurations" schema="schema/processConfigurations.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
@@ -13,7 +14,7 @@
             category="com.aptana"
             class="com.aptana.terminal.views.TerminalView"
             icon="icons/terminal.png"
-            id="com.aptana.terminal.views.TerminalView"
+            id="com.aptana.terminal.views.terminal"
             name="%view.name">
       </view>
    </extension>
@@ -101,6 +102,45 @@
                id="com.aptana.terminal.actionSet">
          </actionSet>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.common"
+            class="com.aptana.terminal.preferences.TerminalPreferencePage"
+            id="com.aptana.terminal.page"
+            name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.tm.terminal.terminalConnectors">
+      <connector
+            class="com.aptana.terminal.connector.LocalTerminalConnector"
+            hidden="false"
+            id="com.aptana.terminal.connector.local"
+            name="Local Connection">
+      </connector>
+   </extension>
+   <extension
+         point="com.aptana.terminal.processConfigurations">
+      <configuration
+            class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
+            id="com.aptana.terminal.configurations.macosx"
+            name="MacOSX Bash"
+            platform="macosx">
+      </configuration>
+      <configuration
+            class="com.aptana.terminal.internal.configurations.NixBashConfiguration"
+            id="com.aptana.terminal.configurations.linux"
+            name="Linux Bash"
+            platform="linux">
+      </configuration>
+      <configuration
+            class="com.aptana.terminal.internal.configurations.WindowsMingwConfiguration"
+            id="com.aptana.terminal.configurations.win32"
+            name="Windows MINGW"
+            platform="win32">
+      </configuration>
    </extension>
 
 </plugin>

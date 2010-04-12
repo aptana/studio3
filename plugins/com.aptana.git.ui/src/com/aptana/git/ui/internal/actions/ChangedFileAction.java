@@ -13,7 +13,7 @@ public abstract class ChangedFileAction extends GitAction
 	{
 		if (!(resource instanceof IFile))
 			return null;
-		GitRepository repo = GitRepository.getAttached(resource.getProject());
+		GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
 			return null;
 		return getChangedFile(repo, resource);

@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile.Status;
 
 @SuppressWarnings("nls")
@@ -67,10 +68,15 @@ public class GitRepositoryTest extends TestCase
 	{
 		IPath path = repoToGenerate();
 		// Doesn't yet exist
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNull(repo);
 		// Create it now and assert that it was created
 		createRepo(path);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public void testAddFileStageUnstageAndCommit() throws Throwable
@@ -207,18 +213,6 @@ public class GitRepositoryTest extends TestCase
 		IGitRepositoryListener listener = new IGitRepositoryListener()
 		{
 			@Override
-			public void repositoryRemoved(RepositoryRemovedEvent e)
-			{
-				eventsReceived.add(e);
-			}
-
-			@Override
-			public void repositoryAdded(RepositoryAddedEvent e)
-			{
-				eventsReceived.add(e);
-			}
-
-			@Override
 			public void indexChanged(IndexChangedEvent e)
 			{
 				eventsReceived.add(e);
@@ -254,7 +248,7 @@ public class GitRepositoryTest extends TestCase
 				eventsReceived.add(e);
 			}
 		};
-		GitRepository.addListener(listener);
+		getRepo().addListener(listener);
 		// TODO Attach and unattach repo with the RepositoryProvider and check those events
 
 		testSwitchBranch();
@@ -264,10 +258,17 @@ public class GitRepositoryTest extends TestCase
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "master", "my_new_branch");
 		assertBranchChangedEvent(new ArrayList<RepositoryEvent>(eventsReceived), "my_new_branch", "master");
 
-		GitRepository.removeListener(listener);
+		fRepo.removeListener(listener);
 		// Do some things that should send events and make sure we don't get any more.
 		assertSwitchBranch("my_new_branch");
 		assertEquals(size, eventsReceived.size());
+	}
+
+	protected GitRepository getRepo()
+	{
+		if (fRepo == null)
+			createRepo();
+		return fRepo;
 	}
 
 	protected void assertBranchChangedEvent(List<RepositoryEvent> events, String oldName, String newName)
@@ -386,7 +387,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		GitRepository repo = createRepo();
 		final List<PullEvent> pullEvents = new ArrayList<PullEvent>();
-		GitRepository.addListener(new AbstractGitRepositoryListener()
+		repo.addListener(new AbstractGitRepositoryListener()
 		{
 			@Override
 			public void pulled(PullEvent e)
@@ -404,7 +405,7 @@ public class GitRepositoryTest extends TestCase
 	{
 		GitRepository repo = createRepo();
 		final List<PushEvent> pushEvents = new ArrayList<PushEvent>();
-		GitRepository.addListener(new AbstractGitRepositoryListener()
+		repo.addListener(new AbstractGitRepositoryListener()
 		{
 			@Override
 			public void pushed(PushEvent e)
@@ -413,7 +414,7 @@ public class GitRepositoryTest extends TestCase
 			}
 		});
 		assertTrue(pushEvents.isEmpty());
-		repo.firePullEvent();
+		repo.firePushEvent();
 		assertEquals(1, pushEvents.size());
 		assertSame(repo, pushEvents.get(0).getRepository());
 	}
@@ -448,8 +449,8 @@ public class GitRepositoryTest extends TestCase
 	protected GitRepository createRepo(IPath path)
 	{
 		// FIXME Turn off a pref flag so we don't hook up the file watchers to git repo!
-		GitRepository.create(path.toOSString());
-		GitRepository repo = GitRepository.getUnattachedExisting(path.toFile().toURI());
+		getGitRepositoryManager().create(path.toOSString());
+		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;
 		return repo;

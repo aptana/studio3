@@ -8,6 +8,7 @@ import java.util.Set;
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -22,9 +23,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -71,8 +72,12 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.ISizeProvider;
+import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -82,7 +87,6 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonNavigatorManager;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
@@ -97,9 +101,12 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
 import com.aptana.usage.PingStartup;
+import com.aptana.util.EclipseUtils;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -107,7 +114,7 @@ import com.aptana.usage.PingStartup;
  * @author cwilliams
  */
 @SuppressWarnings("restriction")
-public abstract class SingleProjectView extends CommonNavigator
+public abstract class SingleProjectView extends CommonNavigator implements ISizeProvider
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
@@ -163,9 +170,13 @@ public abstract class SingleProjectView extends CommonNavigator
 
 	protected boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	protected boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	protected boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	// use the hard-coded constant since it is only defined in Eclipse 3.5
+	protected boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 
 	private TreeThemer treeThemer;
+
+	// memento wasn't declared protected until Eclipse 3.5, so store it ourselves
+	protected IMemento memento;
 
 	/**
 	 * Message area
@@ -173,6 +184,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private Browser browser;
 	private IPreferenceChangeListener fThemeChangeListener;
 	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
+	// private static final String BASE_MESSAGE_URL = "http://localhost:3000/tools/content/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 150;
 	private static final int MINIMUM_BROWSER_WIDTH = 310;
 	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
@@ -265,6 +277,8 @@ public abstract class SingleProjectView extends CommonNavigator
 		browserData.bottom = new FormAttachment(100, 0);
 		browserComposite.setLayoutData(browserData);
 
+		updateMessageArea();
+
 		// Force relayout on resize of view so that splitter gets resized.
 		parent.addListener(SWT.Resize, new Listener()
 		{
@@ -292,6 +306,12 @@ public abstract class SingleProjectView extends CommonNavigator
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
+	}
+
+	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
+	{
+		super.init(aSite, aMemento);
+		this.memento = aMemento;
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
@@ -324,8 +344,7 @@ public abstract class SingleProjectView extends CommonNavigator
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						TerminalView.open(selectedProject.getName(), selectedProject.getName(), selectedProject
-								.getLocation().toOSString());
+						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject.getLocation());
 					}
 				});
 				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
@@ -341,6 +360,11 @@ public abstract class SingleProjectView extends CommonNavigator
 					Menu projectsMenu = new Menu(menu);
 					for (IProject iProject : projects)
 					{
+						// hide closed projects
+						if (!iProject.isAccessible())
+						{
+							continue;
+						}
 						// Construct the menu to attach to the above button.
 						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 						projectNameMenuItem.setText(iProject.getName());
@@ -410,6 +434,11 @@ public abstract class SingleProjectView extends CommonNavigator
 		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : projects)
 		{
+			// hide closed projects
+			if (!iProject.isAccessible()) {
+				continue;
+			}
+
 			// Construct the menu to attach to the above button.
 			final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 			projectNameMenuItem.setText(iProject.getName());
@@ -450,7 +479,14 @@ public abstract class SingleProjectView extends CommonNavigator
 		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		search.setLayoutData(searchGridData);
 
-		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		if (EclipseUtils.inEclipse35orHigher)
+		{
+			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
+		}
+		else
+		{
+			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+		}
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -558,6 +594,16 @@ public abstract class SingleProjectView extends CommonNavigator
 		viewer.setLayoutData(gridData);
 
 		super.createPartControl(viewer);
+		getCommonViewer().setInput(detectSelectedProject());
+		fixNavigatorManager();
+	}
+
+	@Override
+	protected CommonViewer createCommonViewer(Composite aParent) {
+		CommonViewer aViewer = createCommonViewerObject(aParent);
+		initListeners(aViewer);
+		aViewer.getNavigatorContentService().restoreState(memento);
+		return aViewer;
 	}
 
 	/**
@@ -565,7 +611,6 @@ public abstract class SingleProjectView extends CommonNavigator
 	 * issue where new file/Folder won't show in right click menu with no selection (like in a brand new generic
 	 * project).
 	 */
-	@Override
 	protected CommonViewer createCommonViewerObject(Composite aParent)
 	{
 		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
@@ -581,14 +626,12 @@ public abstract class SingleProjectView extends CommonNavigator
 		};
 	}
 
-	@Override
-	protected CommonNavigatorManager createCommonManager()
+	protected void fixNavigatorManager()
 	{
 		// HACK! This is to fix behavior that Eclipse bakes into CommonNavigatorManager.UpdateActionBarsJob where it
 		// forces the selection context for actions tied to the view to the view's input *even if it already has a
 		// perfectly fine and valid selection!* This forces the selection again in a delayed job which hopefully runs
 		// right after their %^$&^$!! job.
-		final CommonNavigatorManager navManager = super.createCommonManager();
 		UIJob job = new UIJob(getTitle())
 		{
 
@@ -619,13 +662,6 @@ public abstract class SingleProjectView extends CommonNavigator
 				// do nothing
 			}
 		});
-		return navManager;
-	}
-
-	@Override
-	protected Object getInitialInput()
-	{
-		return detectSelectedProject();
 	}
 
 	private Composite createFilterComposite(final Composite myComposite)
@@ -689,25 +725,22 @@ public abstract class SingleProjectView extends CommonNavigator
 			@Override
 			public void open(WindowEvent event)
 			{
-				if (event.required)
+				try
 				{
-					try
-					{
-						int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-								| IWorkbenchBrowserSupport.STATUS;
-						WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
-						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-						IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
-						WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
-						Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
-						f.setAccessible(true);
-						BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
-						event.browser = viewer.getBrowser();
-					}
-					catch (Exception e)
-					{
-						ExplorerPlugin.logError(e.getMessage(), e);
-					}
+					int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
+							| IWorkbenchBrowserSupport.STATUS;
+					WebBrowserEditorInput input = new WebBrowserEditorInput(null, style, BROWSER_ID);
+					IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+					IEditorPart editorPart = page.openEditor(input, WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
+					WebBrowserEditor webBrowserEditor = (WebBrowserEditor) editorPart;
+					Field f = WebBrowserEditor.class.getDeclaredField("webBrowser"); //$NON-NLS-1$
+					f.setAccessible(true);
+					BrowserViewer viewer = (BrowserViewer) f.get(webBrowserEditor);
+					event.browser = viewer.getBrowser();
+				}
+				catch (Exception e)
+				{
+					ExplorerPlugin.logError(e.getMessage(), e);
 				}
 			}
 		});
@@ -751,10 +784,44 @@ public abstract class SingleProjectView extends CommonNavigator
 		builder.append("&id=");
 		builder.append(getGUID());
 
+		// deploy info
+		builder.append(getDeployParam());
+
 		// for debugging output
 		// builder.append("&debug=1");
 
 		return builder.toString();
+	}
+
+	/**
+	 * additional parameter &dep=VALUE where VALUE is one of (in decreasing order of precedence):
+	 * <ul>
+	 * <li>ch (deploy/default.rb at project root)</li>
+	 * <li>cs (chef solo - deploy/solo.rb at project root)</li>
+	 * <li>cap (Capfile or capfile at root)</li>
+	 * </ul>
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("nls")
+	private String getDeployParam()
+	{
+		if (selectedProject != null && selectedProject.exists())
+		{
+			IFile file = selectedProject.getFile("deploy/default.rb");
+			if (file.exists())
+				return "&dep=ch";
+			file = selectedProject.getFile("deploy/solo.rb");
+			if (file.exists())
+				return "&dep=cs";
+			file = selectedProject.getFile("Capfile");
+			if (file.exists())
+				return "&dep=cap";
+			file = selectedProject.getFile("capfile");
+			if (file.exists())
+				return "&dep=cap";
+		}
+		return "";
 	}
 
 	private String getGUID()
@@ -766,7 +833,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	{
 		if (selectedProject == null)
 			return false;
-		final GitRepository repo = GitRepository.getAttached(selectedProject);
+		final GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 		if (repo == null)
 			return false;
 		Set<String> remoteURLs = repo.remoteURLs();
@@ -786,7 +853,7 @@ public abstract class SingleProjectView extends CommonNavigator
 		// G for git, S for SVN, H for Mercurial, N for none, O for other
 		if (selectedProject == null)
 			return 'N';
-		if (GitRepository.getAttached(selectedProject) != null)
+		if (getGitRepositoryManager().getAttached(selectedProject) != null)
 			return 'G';
 		RepositoryProvider provider = RepositoryProvider.getProvider(selectedProject);
 		if (provider == null)
@@ -807,18 +874,26 @@ public abstract class SingleProjectView extends CommonNavigator
 		return 'O';
 	}
 
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
 	private char getProjectType()
 	{
-		// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
-		try
+		if (selectedProject != null)
 		{
-			// FIXME This id is a constant in the rails plugins...
-			if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
-				return 'R';
-		}
-		catch (CoreException e)
-		{
-			ExplorerPlugin.logError(e);
+			// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+			try
+			{
+				// FIXME This id is a constant in the rails plugins...
+				if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+					return 'R';
+			}
+			catch (CoreException e)
+			{
+				ExplorerPlugin.logError(e);
+			}
 		}
 		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
 		return 'O';
@@ -827,7 +902,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	private String getVersion()
 	{
 		// FIXME Do we want this plugin's version, or some other version?
-		return ExplorerPlugin.getDefault().getBundle().getVersion().toString();
+		return EclipseUtils.getPluginVersion(ExplorerPlugin.getDefault());
 	}
 
 	private String toHex(RGB rgb)
@@ -1139,7 +1214,7 @@ public abstract class SingleProjectView extends CommonNavigator
 						if (resource.getType() == IResource.PROJECT)
 						{
 							// a project was added, removed, or changed!
-							if (delta.getKind() == IResourceDelta.ADDED)
+							if (delta.getKind() == IResourceDelta.ADDED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
 								// Add to the projects menu and then switch to it!
 								final String projectName = resource.getName();
@@ -1178,7 +1253,7 @@ public abstract class SingleProjectView extends CommonNavigator
 									}
 								});
 							}
-							else if (delta.getKind() == IResourceDelta.REMOVED)
+							else if (delta.getKind() == IResourceDelta.REMOVED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource.isAccessible()))
 							{
 								// Remove from menu and if it was the active project, switch away from it!
 								final String projectName = resource.getName();
@@ -1202,7 +1277,7 @@ public abstract class SingleProjectView extends CommonNavigator
 											IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
 													.getProjects();
 											String newActiveProject = ""; //$NON-NLS-1$
-											if (projects.length > 0)
+											if (projects.length > 0 && projects[0].isAccessible())
 											{
 												newActiveProject = projects[0].getName();
 											}
@@ -1287,6 +1362,7 @@ public abstract class SingleProjectView extends CommonNavigator
 	 */
 	protected void mangleContextMenu(Menu menu)
 	{
+		// TODO If the selected project isn't accessible, remove new file/folder, debug as
 		forceOurNewFileWizard(menu);
 
 		// Remove a whole bunch of the contributed items that we don't want
@@ -1391,4 +1467,20 @@ public abstract class SingleProjectView extends CommonNavigator
 		}
 	}
 
+	public int computePreferredSize(boolean width, int availableParallel, int availablePerpendicular,
+			int preferredResult)
+	{
+		if (width)
+		{
+			return Math.max(MINIMUM_BROWSER_WIDTH, preferredResult);
+		}
+		return preferredResult;
+	}
+
+	public int getSizeFlags(boolean width)
+	{
+		if (width)
+			return SWT.MIN;
+		return SWT.NONE;
+	}
 }

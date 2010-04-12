@@ -9,8 +9,12 @@
 #define _WIN32_WINNT 0x0501	// Change this to the appropriate value to target other versions of Windows.
 #endif						
 
+#undef _DLL
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <tchar.h>
+#include <time.h>
 #include <windows.h>
 #include "resource.h"
 

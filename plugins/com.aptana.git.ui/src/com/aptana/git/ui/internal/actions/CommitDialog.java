@@ -42,6 +42,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -752,7 +753,7 @@ public class CommitDialog extends StatusDialog
 	/*
 	 * This class will create buttons next to the tables in order to allow staging and un-staging operations.
 	 */
-	private class StagingButtons extends SelectionAdapter
+	private class StagingButtons implements SelectionListener
 	{
 		private String doAllLabel;
 		private String doAllTooltip;
@@ -761,6 +762,7 @@ public class CommitDialog extends StatusDialog
 		private Table table;
 		private boolean staged;
 		private Button doSelectionBt;
+		private Button doAllBt;
 
 		/**
 		 * Constructs a new StagingButtons instance.
@@ -802,17 +804,17 @@ public class CommitDialog extends StatusDialog
 			layout.horizontalSpacing = 0;
 			layout.marginWidth = 1;
 			comp.setLayout(layout);
-			Button doAllBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+
+			doAllBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doAllBt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			doAllBt.setText(doAllLabel);
 			doAllBt.setToolTipText(doAllTooltip);
+			doAllBt.addSelectionListener(this);
 			doSelectionBt = new Button(comp, SWT.PUSH | SWT.FLAT);
+			doSelectionBt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			doSelectionBt.setText(doSelectionLabel);
 			doSelectionBt.setToolTipText(doSelectionTooltip);
-
-			GridData data = new GridData(GridData.FILL_HORIZONTAL);
-			doAllBt.setLayoutData(data);
-			data = new GridData(GridData.FILL_HORIZONTAL);
-			doSelectionBt.setLayoutData(data);
+			doSelectionBt.addSelectionListener(this);
 
 			// minimize the width of this component
 			Point doAllSize = doAllBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -822,44 +824,44 @@ public class CommitDialog extends StatusDialog
 				bigger = doAllSize;
 			else
 				bigger = doSelectionSize;
-			data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+			GridData data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
 			data.widthHint = bigger.x + 10;
 			comp.setLayoutData(data);
+		}
 
-			// Hook the actions
-
-			doAllBt.addSelectionListener(new SelectionAdapter()
-			{
-				public void widgetSelected(SelectionEvent e)
-				{
-					if (table != null)
-					{
-						moveItems(staged, table.getItems());
-						updateSelectionDiff(-1);
-						updateSelectionButton();
-					}
-				}
-			});
-			doSelectionBt.addSelectionListener(new SelectionAdapter()
-			{
-				public void widgetSelected(SelectionEvent e)
-				{
-					if (table != null)
-					{
-						int selectionIndex = table.getSelectionIndex();
-						TableItem[] selection = table.getSelection();
-						moveItems(staged, selection);
-						updateSelectionDiff(selectionIndex);
-						updateSelectionButton();
-					}
-				}
-			});
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e)
+		{
 		}
 
 		@Override
 		public void widgetSelected(SelectionEvent e)
 		{
-			updateSelectionButton();
+			Object source = e.getSource();
+			if (source instanceof Table)
+			{
+				updateSelectionButton();
+			}
+			else if (source == doAllBt)
+			{
+				if (table != null)
+				{
+					moveItems(staged, table.getItems());
+					updateSelectionDiff(-1);
+					updateSelectionButton();
+				}
+			}
+			else if (source == doSelectionBt)
+			{
+				if (table != null)
+				{
+					int selectionIndex = table.getSelectionIndex();
+					TableItem[] selection = table.getSelection();
+					moveItems(staged, selection);
+					updateSelectionDiff(selectionIndex);
+					updateSelectionButton();
+				}
+			}
 		}
 
 		// Enable the doSelectionBt when the table has a selection

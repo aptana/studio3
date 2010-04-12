@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -525,7 +527,7 @@ public class BundleManager
 	 * @param script
 	 * @return
 	 */
-	protected File getBundleDirectory(File script)
+	public File getBundleDirectory(File script)
 	{
 		String scriptPath = script.getAbsolutePath();
 		
@@ -771,10 +773,11 @@ public class BundleManager
 
 		return result;
 	}
-
+	
 	/**
 	 * getBundleScripts
 	 * 
+	 * @param bundleDirectory
 	 * @return
 	 */
 	protected File[] getBundleScripts(File bundleDirectory)
@@ -1113,24 +1116,33 @@ public class BundleManager
 	}
 
 	/**
-	 * isValidBundleDirectory
+	 * hasBndleAtPath
 	 * 
 	 * @param bundleDirectory
 	 * @return
 	 */
-	protected boolean isValidBundleDirectory(File bundleDirectory)
+	public boolean hasBundleAtPath(File bundleDirectory)
 	{
-		return this.isValidBundleDirectory(bundleDirectory, true);
+		boolean result = false;
+
+		synchronized (bundlePathsLock)
+		{
+			if (this._bundlesByPath != null)
+			{
+				result = this._bundlesByPath.containsKey(bundleDirectory);
+			}
+		}
+		
+		return result;
 	}
 
 	/**
 	 * isValidBundleDirectory
 	 * 
 	 * @param bundleDirectory
-	 * @param logErrors
 	 * @return
 	 */
-	protected boolean isValidBundleDirectory(File bundleDirectory, boolean logErrors)
+	protected boolean isValidBundleDirectory(File bundleDirectory)
 	{
 		String message = null;
 		boolean result = false;
@@ -1173,7 +1185,7 @@ public class BundleManager
 					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false && logErrors && message != null && message.length() > 0)
+		if (result == false  && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
@@ -1344,15 +1356,10 @@ public class BundleManager
 	 */
 	public void reloadBundle(BundleElement bundle)
 	{
-		File[] scripts = this.getBundleScripts(bundle.getBundleDirectory());
+		File bundleDirectory = bundle.getBundleDirectory();
 		
-		if (scripts != null)
-		{
-			for (File script : scripts)
-			{
-				this.reloadScript(script);
-			}
-		}
+		this.unloadBundle(bundleDirectory);
+		this.loadBundle(bundleDirectory);
 	}
 	
 	/**
@@ -1496,6 +1503,30 @@ public class BundleManager
 	}
 
 	/**
+	 * unloadBundle
+	 * 
+	 * @param bundleDirectory
+	 */
+	public void unloadBundle(File bundleDirectory)
+	{
+		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
+		Set<File> scripts = new HashSet<File>();
+		
+		if (elements != null)
+		{
+			for (AbstractElement element : elements)
+			{
+				scripts.add(new File(element.getPath()));
+			}
+		}
+		
+		for (File script : scripts)
+		{
+			this.unloadScript(script);
+		}
+	}
+	
+	/**
 	 * unloadScript
 	 * 
 	 * @param script
@@ -1516,7 +1547,7 @@ public class BundleManager
 		if (script != null)
 		{
 			String scriptPath = script.getAbsolutePath();
-			AbstractElement[] elements = AbstractElement.getRegisteredElements(scriptPath);
+			AbstractElement[] elements = AbstractElement.getElementsByPath(scriptPath);
 
 			// remove bundle members in pass 1
 			for (AbstractElement element : elements)

@@ -10,10 +10,12 @@ import org.eclipse.team.core.history.IFileHistoryProvider;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.provider.FileHistory;
 
+import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.GitRevList;
 import com.aptana.git.core.model.GitRevSpecifier;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitFileHistory extends FileHistory
 {
@@ -34,7 +36,7 @@ public class GitFileHistory extends FileHistory
 		{
 			if (resource == null || resource.getProject() == null)
 				return new CommitFileRevision[0];
-			GitRepository repo = GitRepository.getAttached(this.resource.getProject());
+			GitRepository repo = getGitRepositoryManager().getAttached(this.resource.getProject());
 			if (repo == null)
 				return new CommitFileRevision[0];
 			// Need the repo relative path
@@ -58,6 +60,11 @@ public class GitFileHistory extends FileHistory
 		{
 			subMonitor.done();
 		}
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	public IFileRevision[] getContributors(IFileRevision revision)

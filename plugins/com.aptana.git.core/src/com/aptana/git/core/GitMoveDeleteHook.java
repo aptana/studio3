@@ -15,11 +15,13 @@ import org.eclipse.core.resources.team.IResourceTree;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 
 class GitMoveDeleteHook implements IMoveDeleteHook
 {
@@ -83,7 +85,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
-		
+
 		// Honor the KEEP LOCAL HISTORY update flag!
 		if ((updateFlags & IResource.KEEP_HISTORY) == IResource.KEEP_HISTORY)
 		{
@@ -103,7 +105,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
-	public boolean deleteProject(final IResourceTree tree, final IProject project, final int updateFlags,
+	public boolean deleteProject(final IResourceTree tree, final IProject project, int updateFlags,
 			final IProgressMonitor monitor)
 	{
 		final GitRepository repo = getAttachedGitRepository(project);
@@ -114,20 +116,30 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// so filesystem takes care of it
 		if (new File(repo.workingDirectory()).getAbsolutePath()
 				.equals(project.getLocation().toFile().getAbsolutePath()))
+		{
+			// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
+			tree.standardDeleteFolder(project.getFolder(GitRepository.GIT_DIR), updateFlags | IResource.FORCE,
+					new NullProgressMonitor()); // TODO Use a submonitor here?
 			return false;
+		}
 
 		String source = getRepoRelativePath(project, repo);
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
 
-		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
+		// force is implied by always delete...
+		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
+		boolean force = alwaysDeleteContent || (updateFlags & IResource.FORCE) == IResource.FORCE;
+		if (force)
+		{
+			updateFlags |= IResource.FORCE;
+		}
 		if (!force && !tree.isSynchronized(project, IResource.DEPTH_INFINITE))
 			return false;
 		// FIXME Should we return true, but call tree.failed if unsynched?
 
 		// We may not actually need to delete the contents....
-		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
 		boolean neverDeleteContent = (updateFlags & IResource.NEVER_DELETE_PROJECT_CONTENT) != 0;
 		boolean deleteContents = alwaysDeleteContent || (project.isOpen() && !neverDeleteContent);
 
@@ -259,7 +271,12 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	protected GitRepository getAttachedGitRepository(IProject project)
 	{
-		return GitRepository.getAttached(project);
+		return getGitRepositoryManager().getAttached(project);
+	}
+
+	protected IGitRepositoryManager getGitRepositoryManager()
+	{
+		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
 	/**

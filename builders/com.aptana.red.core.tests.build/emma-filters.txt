@@ -2,3 +2,4 @@
 -*Application*
 -*Messages
 -net.contentobjects.*
+-com.aptana.red.core.tests.all.*

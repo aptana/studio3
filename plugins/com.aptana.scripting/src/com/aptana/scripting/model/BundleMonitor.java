@@ -135,13 +135,39 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileCreated(int wd, String rootPath, String name)
+	synchronized public void fileCreated(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		fileCreatedHelper(rootPath, name);
+		
+		// used by unit tests
+		this.notifyAll();
+	}
+
+	/**
+	 * fileCreatedHelper
+	 * 
+	 * @param rootPath
+	 * @param name
+	 */
+	private void fileCreatedHelper(String rootPath, String name)
+	{
+		if (isUserBundleFile(rootPath, name))
 		{
+			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
-			BundleManager.getInstance().loadScript(file);
+			if (USER_BUNDLE_PATTERN.matcher(name).matches())
+			{
+				// load the entire bundle now that we have a bundle.rb file
+				manager.loadBundle(file.getParentFile());
+			}
+			else
+			{
+				// load the script. isUserBundleFile only returns true if this
+				// is part of an existing bundle; otherwise, it will get loaded
+				// later once its bundle.rb file has been created
+				manager.loadScript(file);
+			}
 		}
 	}
 
@@ -152,13 +178,41 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileDeleted(int wd, String rootPath, String name)
+	synchronized public void fileDeleted(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		fileDeletedHelper(rootPath, name);
+		
+		// used by unit tests
+		this.notifyAll();
+	}
+
+	/**
+	 * fileDeletedHelper
+	 * 
+	 * @param rootPath
+	 * @param name
+	 */
+	private void fileDeletedHelper(String rootPath, String name)
+	{
+		if (isUserBundleFile(rootPath, name))
 		{
+			BundleManager manager = BundleManager.getInstance();
 			File file = new File(rootPath, name);
 
-			BundleManager.getInstance().unloadScript(file);
+			if (USER_BUNDLE_PATTERN.matcher(name).matches())
+			{
+				// unload entire bundle now that we don't have bundle.rb file
+				// anymore
+				manager.unloadBundle(file.getParentFile());
+			}
+			else
+			{
+				manager.unloadScript(file);
+			}
+		}
+		else
+		{
+			reloadDependentScripts(new File(rootPath, name));
 		}
 	}
 
@@ -169,9 +223,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param rootPath
 	 * @param name
 	 */
-	public void fileModified(int wd, String rootPath, String name)
+	synchronized public void fileModified(int wd, String rootPath, String name)
 	{
-		if (isUserBundleFile(name))
+		if (isUserBundleFile(rootPath, name))
 		{
 			File file = new File(rootPath, name);
 
@@ -181,6 +235,9 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			reloadDependentScripts(new File(rootPath, name));
 		}
+		
+		// used by unit tests
+		this.notifyAll();
 	}
 
 	/**
@@ -191,43 +248,81 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 * @param oldName
 	 * @param newName
 	 */
-	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+	synchronized public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
-		if (isUserBundleFile(oldName))
-		{
-			File oldFile = new File(rootPath, oldName);
-
-			BundleManager.getInstance().unloadScript(oldFile);
-		}
-
-		if (isUserBundleFile(newName))
-		{
-			File newFile = new File(rootPath, newName);
-
-			BundleManager.getInstance().loadScript(newFile);
-		}
+		this.fileDeletedHelper(rootPath, oldName);
+		this.fileCreatedHelper(rootPath, newName);
+		
+		// used by unit tests
+		this.notifyAll();
 	}
 
 	/**
 	 * isProjectBundleFile
 	 * 
-	 * @param fullProjectPath
+	 * @param delta
 	 * @return
 	 */
-	private boolean isProjectBundleFile(String fullProjectPath)
+	private boolean isProjectBundleFile(IResourceDelta delta)
 	{
-		return BUNDLE_PATTERN.matcher(fullProjectPath).matches() || FILE_PATTERN.matcher(fullProjectPath).matches();
+		String fullProjectPath = delta.getFullPath().toString();
+		boolean result = false;
+		
+		if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// always return true for bundle.rb files
+			result = true;
+		}
+		else if (FILE_PATTERN.matcher(fullProjectPath).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			File script = delta.getResource().getLocation().toFile();
+			
+			result = this.isScriptInExistingBundle(script);
+		}
+		
+		return result;
 	}
 
 	/**
-	 * isUserbundlesFile
+	 * isScriptInExistingBundle
 	 * 
-	 * @param name
+	 * @param script
 	 * @return
 	 */
-	private boolean isUserBundleFile(String name)
+	private boolean isScriptInExistingBundle(File script)
 	{
-		return USER_BUNDLE_PATTERN.matcher(name).matches() || USER_FILE_PATTERN.matcher(name).matches();
+		BundleManager manager = BundleManager.getInstance();
+		File bundleDirectory = manager.getBundleDirectory(script);
+		
+		return manager.hasBundleAtPath(bundleDirectory);
+	}
+	
+	/**
+	 * isUserbundlesFile
+	 * @param rootPath
+	 * @param name
+	 * 
+	 * @return
+	 */
+	private boolean isUserBundleFile(String rootPath, String name)
+	{
+		boolean result = false;
+		
+		if (USER_BUNDLE_PATTERN.matcher(name).matches())
+		{
+			// always return true for bundle.rb files
+			result = true;
+		}
+		else if (USER_FILE_PATTERN.matcher(name).matches())
+		{
+			// only return true if the script is part of an existing bundle.
+			File script = new File(rootPath, name);
+			
+			result = this.isScriptInExistingBundle(script);
+		}
+		
+		return result;
 	}
 
 	/**
@@ -243,6 +338,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		{
 			BundleManager manager = BundleManager.getInstance();
 			File file = resource.getLocation().toFile();
+			String fullProjectPath = delta.getFullPath().toString();
 
 			BundlePrecedence scope = manager.getBundlePrecedence(file);
 
@@ -252,10 +348,25 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				switch (delta.getKind())
 				{
 					case IResourceDelta.ADDED:
-						manager.loadScript(file);
+						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+						{
+							manager.loadBundle(file.getParentFile());
+						}
+						else
+						{
+							manager.loadScript(file);
+						}
 						break;
 
 					case IResourceDelta.REMOVED:
+						if (BUNDLE_PATTERN.matcher(fullProjectPath).matches())
+						{
+							// NOTE: we have to both unload all scripts associated with this bundle
+							// and the bundle file itself. Technically, the bundle file doesn't
+							// exist any more so it won't get unloaded
+							manager.unloadBundle(file.getParentFile());
+						}
+						
 						manager.unloadScript(file);
 						break;
 
@@ -342,10 +453,8 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 	 */
 	public boolean visit(IResourceDelta delta) throws CoreException
 	{
-		String fullProjectPath = delta.getFullPath().toString();
-
-		// project project bundle files, but ignore user bundles since file watcher will take care of those
-		if (isProjectBundleFile(fullProjectPath))
+		// process project bundle files, but ignore user bundles since file watcher will take care of those
+		if (isProjectBundleFile(delta))
 		{
 			this.processFile(delta);
 		}
@@ -356,7 +465,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				IResource resource = delta.getResource();
 				File file = resource.getLocation().toFile();
 				
-				reloadDependentScripts(file);
+				this.reloadDependentScripts(file);
 			}
 		}
 

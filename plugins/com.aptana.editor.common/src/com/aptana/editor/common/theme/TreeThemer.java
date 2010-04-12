@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 
@@ -42,7 +43,8 @@ public class TreeThemer
 
 	private static final boolean isWindows = Platform.getOS().equals(Platform.OS_WIN32);
 	private static final boolean isMacOSX = Platform.getOS().equals(Platform.OS_MACOSX);
-	private static final boolean isCocoa = Platform.getWS().equals(Platform.WS_COCOA);
+	// use the hard-coded value for cocoa since the constant is not defined until Eclipse 3.5
+	private static final boolean isCocoa = Platform.getWS().equals("cocoa"); //$NON-NLS-1$
 
 	private TreeViewer fTreeViewer;
 	private Tree fTree;
@@ -50,6 +52,7 @@ public class TreeThemer
 	private IPreferenceChangeListener fThemeChangeListener;
 	private Listener measureItemListener;
 	private Listener selectionOverride;
+	private Listener customDrawingListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -67,6 +70,7 @@ public class TreeThemer
 		getTree().setBackground(getBackground());
 		getTree().setForeground(getForeground());
 		addSelectionColorOverride();
+		addCustomTreeControlDrawing();
 		addMeasureItemListener();
 		addFontListener();
 		addThemeChangeListener();
@@ -138,6 +142,57 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.EraseItem, selectionOverride);
+	}
+
+	private void addCustomTreeControlDrawing()
+	{
+		// Hack to overdraw the native tree expand/collapse controls and use custom plus/minus box.
+		if (!isWindows)
+			return;
+		final Tree tree = getTree();
+		customDrawingListener = new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				GC gc = event.gc;
+				Widget item = event.item;
+				boolean isExpanded = false;
+				boolean draw = false;
+				if (item instanceof TreeItem)
+				{
+					TreeItem tItem = (TreeItem) item;
+					isExpanded = tItem.getExpanded();
+					draw = tItem.getItemCount() > 0;
+				}
+				if (!draw)
+					return;
+				final int width = 10;
+				final int height = 12;
+				final int x = event.x - 16;
+				final int y = event.y + 4;
+				Color oldBackground = gc.getBackground();
+				gc.setBackground(getBackground());
+				// wipe out the native control
+				gc.fillRectangle(x, y, width, height);
+				// draw a plus/minus based on expansion!
+				gc.setBackground(getForeground());
+				// draw surrounding box
+				gc.drawRectangle(x, y, width, width);
+				// draw '-'
+				gc.drawLine(x + 3, y + (width / 2), x + 7, y + (width / 2));
+				if (!isExpanded)
+				{
+					// draw '|' to make it a plus
+					gc.drawLine(x + (width / 2), y + 3, x + (width / 2), y + 7);
+				}
+				gc.setBackground(oldBackground);
+
+				event.detail &= ~SWT.BACKGROUND;
+			}
+		};
+		tree.addListener(SWT.PaintItem, customDrawingListener);
 	}
 
 	private void addMeasureItemListener()
@@ -287,9 +342,19 @@ public class TreeThemer
 	public void dispose()
 	{
 		removeSelectionOverride();
+		removeCustomTreeControlDrawing();
 		removeMeasureItemListener();
 		removeFontListener();
 		removeThemeListener();
+	}
+
+	private void removeCustomTreeControlDrawing()
+	{
+		if (customDrawingListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.PaintItem, customDrawingListener);
+		}
+		customDrawingListener = null;
 	}
 
 	private void removeSelectionOverride()

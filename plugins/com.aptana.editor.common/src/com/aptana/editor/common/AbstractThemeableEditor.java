@@ -189,6 +189,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	@Override
 	public Object getAdapter(Class adapter)
 	{
+		if (SourceViewerConfiguration.class.equals(adapter))
+		{
+			return getSourceViewerConfiguration();
+		}
 		// returns our custom adapter for the content outline page
 		if (IContentOutlinePage.class.equals(adapter))
 		{
@@ -619,16 +623,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 				overrideSelectionColor();
 			}
 		}
-	}
-
-	public SourceViewerConfiguration getSourceViewerConfigurationNonFinal()
-	{
-		return getSourceViewerConfiguration();
-	}
-
-	public ISourceViewer getSourceViewerNonFinal()
-	{
-		return getSourceViewer();
 	}
 
 	public FileService getFileService()

@@ -125,8 +125,12 @@ module Ruble
     end
     
     def document
+      if editor_part.respond_to? :document_provider
       # TODO Wrap in a proxy class/object so we can use array notation for getting/replacing portions of the text
-      editor_part.document_provider.getDocument(editor_input)
+        editor_part.document_provider.getDocument(editor_input)
+      else
+        nil
+      end
     end
     
     def document=(src)
@@ -187,15 +191,15 @@ module Ruble
     end
     
     def caret_line
-      styled_text.line_at_offset(caret_offset)
+      styled_text.nil? ? 0 : styled_text.line_at_offset(caret_offset)
     end
     
     def caret_offset
-      styled_text.caret_offset
+      styled_text.nil? ? 0 : styled_text.caret_offset
     end
     
     def current_line
-      styled_text.line(caret_line)
+      styled_text.nil? ? 0 : styled_text.line(caret_line)
     end    
     
     def insert_as_text(text)
@@ -220,7 +224,7 @@ module Ruble
         result['TM_TAB_SIZE'] = 4
       end
       
-      if input
+      if input.respond_to? :file
         ifile = input.file
         file = ifile.location.to_file
         
@@ -275,11 +279,11 @@ module Ruble
         
         result["TM_CURRENT_SCOPE"] = current_scope
         result["TM_SCOPE"] = result["TM_CURRENT_SCOPE"]
-        end
-                
-      # Allow each bundle to modify env vars based on scope, in order.
-      scopes = current_scope.split(' ')
-      scopes.each { |scope| result = modify_env(scope, result) } 
+        # Allow each bundle to modify env vars based on scope, in order.
+        scopes = current_scope.split(' ')
+        scopes.each { |scope| result = modify_env(scope, result) } 
+      end           
+      
       result
     end
     

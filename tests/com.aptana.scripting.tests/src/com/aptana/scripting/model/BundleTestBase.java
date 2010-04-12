@@ -1,55 +1,18 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.TestUtils;
 
 public abstract class BundleTestBase extends TestCase
 {
-	private static final String APPLICATION_BUNDLES = getFile(new Path("application-bundles")).getAbsolutePath();
-	private static final String USER_BUNDLES = getFile(new Path("user-bundles")).getAbsolutePath();
-	private static final String PROJECT_BUNDLES = getFile(new Path("project-bundles")).getAbsolutePath();
-
-	/**
-	 * getFile
-	 * 
-	 * @param path
-	 * @return
-	 */
-	private static File getFile(IPath path)
-	{
-		File bundleFile = null;
-
-		try
-		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
-
-			url = FileLocator.toFileURL(url);
-			bundleFile = new File(url.toURI());
-		}
-		catch (IOException e)
-		{
-			fail(e.getMessage());
-		}
-		catch (URISyntaxException e)
-		{
-			fail(e.getMessage());
-		}
-
-		assertNotNull(bundleFile);
-		assertTrue(bundleFile.exists());
-
-		return bundleFile;
-	}
+	private static final String APPLICATION_BUNDLES = TestUtils.getFile(new Path("application-bundles")).getAbsolutePath();
+	private static final String USER_BUNDLES = TestUtils.getFile(new Path("user-bundles")).getAbsolutePath();
+	private static final String PROJECT_BUNDLES = TestUtils.getFile(new Path("project-bundles")).getAbsolutePath();
 
 	/**
 	 * getBundleEntry

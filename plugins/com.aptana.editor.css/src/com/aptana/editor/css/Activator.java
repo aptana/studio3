@@ -9,7 +9,8 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.css"; //$NON-NLS-1$
@@ -18,8 +19,6 @@ public class Activator extends AbstractUIPlugin {
 	private static Activator plugin;
 	
 	private CSSCodeScanner _codeScanner;
-
-	private static ImageRegistry fImages = new ImageRegistry();
 
 	/**
 	 * The constructor
@@ -71,7 +70,8 @@ public class Activator extends AbstractUIPlugin {
 
 	public static Image getImage(String path)
 	{
-		Image image = fImages.get(path);
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
@@ -79,9 +79,8 @@ public class Activator extends AbstractUIPlugin {
 			{
 				return null;
 			}
-
-			image = id.createImage();
-			fImages.put(path, image);
+			registry.put(path, id);
+			image = registry.get(path);
 		}
 		return image;
 	}

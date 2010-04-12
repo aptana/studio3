@@ -1,7 +1,9 @@
 package com.aptana.scripting.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,35 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
 	}
+	
+	/**
+	 * getElementsByDirectory
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static AbstractElement[] getElementsByDirectory(String path)
+	{
+		List<AbstractElement> result = new LinkedList<AbstractElement>();
+		
+		if (path.endsWith(File.separator) == false)
+		{
+			path += File.separator;
+		}
+		
+		synchronized (ELEMENTS_BY_PATH)
+		{
+			 for (String key : ELEMENTS_BY_PATH.keySet())
+			 {
+				 if (key.startsWith(path))
+				 {
+					 result.addAll(ELEMENTS_BY_PATH.get(key));
+				 }
+			 }
+		}
+		
+		return result.toArray(new AbstractElement[result.size()]);
+	}
 
 	/**
 	 * getRegisteredElements
@@ -32,7 +63,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * @param path
 	 * @return
 	 */
-	public static AbstractElement[] getRegisteredElements(String path)
+	public static AbstractElement[] getElementsByPath(String path)
 	{
 		AbstractElement[] result = NO_ELEMENTS;
 

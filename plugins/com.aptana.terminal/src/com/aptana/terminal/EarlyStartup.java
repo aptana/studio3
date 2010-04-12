@@ -163,6 +163,6 @@ public class EarlyStartup implements IStartup
 	 */
 	private void openTerminalEditor(IWorkbenchWindow workbenchWindow)
 	{
-		Utils.openEditor(workbenchWindow, TerminalEditor.ID, true);
+		Utils.openTerminalEditor(workbenchWindow, TerminalEditor.ID, true);
 	}
 }

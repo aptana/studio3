@@ -12,6 +12,7 @@ public class AllTests
 		//$JUnit-BEGIN$
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(CollectionsUtilTest.class);
 		//$JUnit-END$
 		return suite;
 	}
