@@ -6,10 +6,10 @@ module Ruble
     class << self
       def open(command, working_dir = nil)
         # TODO Clean up the command string for display purposes here. Drop '"'? Drop ruby vm args?
-        term = com.aptana.terminal.views.TerminalView.open(command.gsub(/:/, '_'), command, working_dir)
+        working_dir_path = org.eclipse.core.runtime.Path.new(working_dir) if working_dir
+        term = com.aptana.terminal.views.TerminalView.openView(command.gsub(/:/, '_'), command, working_dir_path)
         return nil unless term
-        wrapper = com.aptana.terminal.server.TerminalServer.instance.getProcess(term.getId())
-        wrapper.sendText("#{command}\n")
+        term.sendInput("#{command}\n")
         nil
       end
     end
