@@ -643,6 +643,10 @@ static void WriteConsole(void)
 			key = LOBYTE(key);
 			ir.Event.KeyEvent.wVirtualKeyCode = key;
 			ir.Event.KeyEvent.dwControlKeyState = 0;
+			if( (key == VK_CANCEL) ) {
+				::GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
+				continue;
+			}
 			if( (key == VK_BACK) )
 			{
 				ir.Event.KeyEvent.uChar.UnicodeChar = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 2/*MAPVK_VK_TO_CHAR*/);
