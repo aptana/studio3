@@ -72,6 +72,9 @@ public abstract class VirtualCanvas extends Canvas {
 		updateViewRectangle();
 	}
 	protected void scrollX(ScrollBar hBar) {
+		if (!hBar.isVisible()) {
+			return;
+		}
 		int hSelection = hBar.getSelection ();
 		int destX = -hSelection - fVirtualBounds.x;
 		fVirtualBounds.x = -hSelection;
@@ -311,7 +314,7 @@ public abstract class VirtualCanvas extends Canvas {
 		// returns false if its parent is not visible. 
 		if(!isVisible() || horizontal.isVisible()) {
 			horizontal.setPageIncrement(clientArea.width - horizontal.getIncrement());
-			int max= fVirtualBounds.width + (size.x - clientArea.width);
+			int max= fVirtualBounds.width + (size.x - clientArea.width - getVerticalBar().getSize().x);
 			horizontal.setMaximum(max);
 			horizontal.setThumb(size.x > max ? max : size.x);
 		}
