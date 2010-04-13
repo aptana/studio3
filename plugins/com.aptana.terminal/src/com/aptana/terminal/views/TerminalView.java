@@ -47,8 +47,13 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -68,6 +73,10 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.internal.keys.BindingService;
+import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -162,6 +171,38 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		makeActions();
 		hookContextMenu();
 		contributeToActionBars();
+		
+		fCtlTerminal.getControl().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				updateActions();
+			}
+		});
+		fCtlTerminal.getControl().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.doit) {
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+					Event event = new Event();
+					event.character = e.character;
+					event.keyCode = e.keyCode;
+					event.stateMask = e.stateMask;
+					event.doit = e.doit;
+					event.display = e.display;
+					event.widget = e.widget;
+					event.time = e.time;
+					event.data = e.data;
+					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
+					boolean enabled = keyDownFilter.isEnabled();
+					try {
+						keyDownFilter.setEnabled(true);
+						keyDownFilter.handleEvent(event);
+					} finally {
+						keyDownFilter.setEnabled(enabled);
+					}
+				}
+			}
+		});
 	}
 	
 	/* (non-Javadoc)
@@ -305,12 +346,6 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 	
 	private void fillContextMenu(IMenuManager menuMgr) {
-		fActionEditCut.updateAction(true);
-		fActionEditCopy.updateAction(true);
-		fActionEditPaste.updateAction(true);
-		fActionEditSelectAll.updateAction(true);
-		fActionEditClearAll.updateAction(true);
-
 		menuMgr.add(fActionEditCopy);
 		menuMgr.add(fActionEditPaste);
 		menuMgr.add(new Separator());
@@ -326,9 +361,14 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	 * contributeToActionBars
 	 */
 	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
+		IActionBars actionBars = getViewSite().getActionBars();
+		fillLocalPullDown(actionBars.getMenuManager());
+		fillLocalToolBar(actionBars.getToolBarManager());
+		
+		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), fActionEditCopy);
+		actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(), fActionEditPaste);
+		actionBars.setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), fActionEditSelectAll);
+
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
@@ -339,6 +379,13 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		manager.add(fOpenEditorAction);
 		manager.add(new Separator());
 		manager.add(fActionEditClearAll);
+	}
+	
+	private void updateActions() {
+		fActionEditCut.updateAction(true);
+		fActionEditCopy.updateAction(true);
+		fActionEditPaste.updateAction(true);
+		fActionEditSelectAll.updateAction(true);
 		fActionEditClearAll.updateAction(true);
 	}
 

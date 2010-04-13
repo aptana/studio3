@@ -10,6 +10,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
@@ -78,6 +80,14 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		makeActions();
 		hookContextMenu();
 		saveInputState();
+		
+		fCtlTerminal.getControl().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				updateActions();
+			}
+		});
+
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
@@ -160,12 +170,6 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 */
 	private void fillContextMenu(IMenuManager menuMgr)
 	{
-		fActionEditCut.updateAction(true);
-		fActionEditCopy.updateAction(true);
-		fActionEditPaste.updateAction(true);
-		fActionEditSelectAll.updateAction(true);
-		fActionEditClearAll.updateAction(true);
-
 		menuMgr.add(fActionEditCopy);
 		menuMgr.add(fActionEditPaste);
 		menuMgr.add(new Separator());
@@ -174,6 +178,14 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 		menuMgr.add(new Separator());
 
 		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+	
+	private void updateActions() {
+		fActionEditCut.updateAction(true);
+		fActionEditCopy.updateAction(true);
+		fActionEditPaste.updateAction(true);
+		fActionEditSelectAll.updateAction(true);
+		fActionEditClearAll.updateAction(true);		
 	}
 
 	/**
