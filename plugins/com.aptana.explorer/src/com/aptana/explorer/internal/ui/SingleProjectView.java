@@ -1229,12 +1229,22 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 										MenuItem[] items = projectsMenu.getItems();
 										for (int i = 0; i < items.length; i++)
 										{
-											if (items[i].getText().compareTo(projectName) > 0)
+											String otherName = items[i].getText();
+											int comparison = otherName.compareTo(projectName);
+											if (comparison == 0)
+											{
+												// Don't add dupes!
+												index = -1;
+												break;
+											}
+											else if (comparison > 0)
 											{
 												index = i;
 												break;
 											}
 										}
+										if (index == -1)
+											return;
 										final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO,
 												index);
 										projectNameMenuItem.setText(projectName);

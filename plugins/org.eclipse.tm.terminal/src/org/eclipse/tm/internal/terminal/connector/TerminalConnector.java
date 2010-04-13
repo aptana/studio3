@@ -23,7 +23,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ISettingsStore;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
@@ -44,7 +43,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
  * @noextend This class is not intended to be subclassed by clients.
  * @noinstantiate This class is not intended to be instantiated by clients.
  *                Clients can get terminal connector instances through the
- *                {@link TerminalConnectorExtension} class.
+ *                {@link org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension} class.
  * @since org.eclipse.tm.terminal 2.0
  */
 public class TerminalConnector implements ITerminalConnector {

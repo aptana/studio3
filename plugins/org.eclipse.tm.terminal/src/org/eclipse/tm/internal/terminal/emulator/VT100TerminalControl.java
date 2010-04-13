@@ -38,6 +38,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -94,6 +96,12 @@ import org.eclipse.ui.keys.IBindingService;
 public class VT100TerminalControl implements ITerminalControlForText, ITerminalControl, ITerminalViewControl
 {
     protected final static String[] LINE_DELIMITERS = { "\n" }; //$NON-NLS-1$
+    
+    protected final static int[] BYPASS_ACCELERATORS = new int[] {
+    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'C')),
+    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'V')),
+    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'A'))
+    };
 
     /**
      * This field holds a reference to a TerminalText object that performs all ANSI
@@ -736,6 +744,13 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		public void keyPressed(KeyEvent event) {
 			if (getState()==TerminalState.CONNECTING)
 				return;
+			
+			int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(event);
+			for (int i = 0; i < BYPASS_ACCELERATORS.length; ++i) {
+				if (BYPASS_ACCELERATORS[i] == accelerator) {
+					return;
+				}
+			}
 
 			// We set the event.doit to false to prevent any further processing of this
 			// key event.  The only reason this is here is because I was seeing the F10

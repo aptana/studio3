@@ -18,6 +18,10 @@ module Ruble
       exit_with_message(message, :show_as_tooltip)
     end
     
+    def exit_replace_document(message)
+      exit_with_message(message, :replace_document)
+    end
+    
     def exit_insert_snippet(snippet)
       exit_with_message(snippet, :insert_as_snippet)
     end
