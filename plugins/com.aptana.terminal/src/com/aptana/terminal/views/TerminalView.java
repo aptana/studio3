@@ -282,6 +282,9 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 	
 	protected void initialize(String title, IPath workingDirectory) {
+		if (fCtlTerminal.isConnected()) {
+			return;
+		}
 		setPartName(title);
 		setWorkingDirectory(workingDirectory);
 		fCtlTerminal.connectTerminal();
