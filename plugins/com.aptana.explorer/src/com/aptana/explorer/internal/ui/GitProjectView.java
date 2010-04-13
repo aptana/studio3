@@ -912,7 +912,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				
+
 				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
 				{
 					@Override
@@ -1017,7 +1017,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 
 		super.projectChanged(oldProject, newProject);
-		
+
 		if (fChangedFilesFilterProjects.contains(newProject))
 		{
 			addGitChangedFilesFilter();
@@ -1285,7 +1285,8 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			text.append(project.getName()).append(PROJECT_DELIMITER);
 		}
 		int length = text.length();
-		if (length > 0) {
+		if (length > 0)
+		{
 			text.delete(length - PROJECT_DELIMITER.length(), length);
 		}
 		aMemento.putString(GIT_CHANGED_FILES_FILTER, text.toString());
@@ -1306,17 +1307,24 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (memento != null)
 		{
 			String filteredProjects = memento.getString(GIT_CHANGED_FILES_FILTER);
-			if (filteredProjects != null)
+			if (filteredProjects != null && filteredProjects.length() > 0)
 			{
 				String[] projectNames = filteredProjects.split(PROJECT_DELIMITER);
 				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 				IProject project;
 				for (String name : projectNames)
 				{
-					project = workspaceRoot.getProject(name);
-					if (project.exists())
+					try
 					{
-						fChangedFilesFilterProjects.add(project);
+						project = workspaceRoot.getProject(name);
+						if (project.exists())
+						{
+							fChangedFilesFilterProjects.add(project);
+						}
+					}
+					catch (Exception e)
+					{
+						ExplorerPlugin.logError(e.getMessage(), e);
 					}
 				}
 			}
