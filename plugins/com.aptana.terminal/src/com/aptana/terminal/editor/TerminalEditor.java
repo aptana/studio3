@@ -10,10 +10,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -31,6 +34,9 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.keys.BindingService;
+import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.EditorPart;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -87,7 +93,31 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 				updateActions();
 			}
 		});
-
+		fCtlTerminal.getControl().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.doit) {
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+					Event event = new Event();
+					event.character = e.character;
+					event.keyCode = e.keyCode;
+					event.stateMask = e.stateMask;
+					event.doit = e.doit;
+					event.display = e.display;
+					event.widget = e.widget;
+					event.time = e.time;
+					event.data = e.data;
+					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
+					boolean enabled = keyDownFilter.isEnabled();
+					try {
+						keyDownFilter.setEnabled(true);
+						keyDownFilter.handleEvent(event);
+					} finally {
+						keyDownFilter.setEnabled(enabled);
+					}
+				}
+			}
+		});
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
