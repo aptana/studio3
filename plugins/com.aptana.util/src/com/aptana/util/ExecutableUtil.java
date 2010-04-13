@@ -26,23 +26,30 @@ public abstract class ExecutableUtil
 	 */
 	public static IPath find(String executableName, boolean appendExtension, IPath preferencesPath, List<IPath> searchLocations)
 	{
-		if (preferencesPath != null) {
-			if (isExecutable(preferencesPath)) {
+		if (preferencesPath != null) 
+		{
+			if (isExecutable(preferencesPath)) 
+			{
 				return preferencesPath;
 			}
 		}
 
-		if (Platform.OS_WIN32.equals(Platform.getOS())) {
+		if (Platform.OS_WIN32.equals(Platform.getOS())) 
+		{
 			// Grab PATH and search it!
 			String[] paths = System.getenv("PATH").split(File.pathSeparator); //$NON-NLS-1$
-			for (String pathString : paths) {
+			for (String pathString : paths) 
+			{
 				IPath path = Path.fromOSString(pathString).append(executableName);
 				IPath result = findExecutable(path, appendExtension);
-				if (result != null) {
+				if (result != null) 
+				{
 					return result;
 				}
 			}
-		} else {
+		} 
+		else 
+		{
 			// No explicit path. Try it with "which"
 			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", null, executableName); //$NON-NLS-1$
 			if (whichResult != null && whichResult.trim().length() > 0) {
@@ -53,7 +60,8 @@ public abstract class ExecutableUtil
 		}
 
 		// Still no path. Let's try some default locations.
-		for (IPath location : searchLocations) {
+		for (IPath location : searchLocations) 
+		{
 			IPath result = findExecutable(location.append(executableName), appendExtension);
 			if (result != null)
 				return result;
@@ -61,23 +69,32 @@ public abstract class ExecutableUtil
 		return null;
 	}
 	
-	private static IPath findExecutable(IPath basename, boolean appendExtension) {
-		if (Platform.OS_WIN32.equals(Platform.getOS()) && appendExtension) {
+	private static IPath findExecutable(IPath basename, boolean appendExtension) 
+	{
+		if (Platform.OS_WIN32.equals(Platform.getOS()) && appendExtension) 
+		{
 			String[] extensions = System.getenv("PATHEXT").split(File.pathSeparator); //$NON-NLS-1$
-			for (String ext : extensions) {
+			for (String ext : extensions) 
+			{
+				if (ext.startsWith("."))
+					ext = ext.substring(1);
 				IPath pathWithExt = basename.addFileExtension(ext);
-				if (isExecutable(pathWithExt)) {
+				if (isExecutable(pathWithExt)) 
+				{
 					return pathWithExt;
 				}
 			}
 			
-		} else if (isExecutable(basename)) {
+		} 
+		else if (isExecutable(basename)) 
+		{
 			return basename;
 		}
 		return null;
 	}
 
-	private static boolean isExecutable(IPath path) {
+	private static boolean isExecutable(IPath path) 
+	{
 		File file = path.toFile();
 		return file.exists() && file.canExecute();
 	}
