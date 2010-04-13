@@ -567,7 +567,6 @@ public class FilteringProjectView extends GitProjectView
 		// Update the memento cache when the project is changed.
 		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
-		removeFilter();
 		// Restore the displayed project state.
 		restoreStateJob(newProject);		
 	}
