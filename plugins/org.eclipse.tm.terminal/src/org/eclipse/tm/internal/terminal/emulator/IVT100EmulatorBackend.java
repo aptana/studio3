@@ -171,6 +171,9 @@ public interface IVT100EmulatorBackend {
 
 	void setScrollingRegion(int topLine, int bottomLine);
 	
+	int getScrollingRegionTopLine();
+	int getScrollingRegionBottomLine();
+	
 	void setAlternativeScreenBuffer(boolean enable);
 
 }

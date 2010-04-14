@@ -424,6 +424,20 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionBottomLine()
+	 */
+	public int getScrollingRegionBottomLine() {
+		return fScrollingRegionBottomLine;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionTopLine()
+	 */
+	public int getScrollingRegionTopLine() {
+		return fScrollingRegionTopLine;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setAlternativeScreenBuffer(boolean)
 	 */
 	public void setAlternativeScreenBuffer(boolean enable) {

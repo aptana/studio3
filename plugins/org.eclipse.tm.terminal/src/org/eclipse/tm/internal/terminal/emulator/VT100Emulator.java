@@ -363,6 +363,12 @@ public class VT100Emulator implements ControlListener {
 					resetTerminal();
 					break;
 
+				case 'M':
+					// Reverse index
+					ansiState = ANSISTATE_INITIAL;
+					reverseIndex();
+					break;
+
 				default:
 					Logger
 							.log("Unsupported escape sequence: escape '" + character + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -411,6 +417,17 @@ public class VT100Emulator implements ControlListener {
 		text.setCursor(0, 0);
 		text.setStyle(text.getDefaultStyle());
 	}
+	
+	private void reverseIndex() {
+		int line = text.getCursorLine() - 1;
+		int topMargin = text.getScrollingRegionTopLine();
+		if (line < topMargin) {
+			text.insertLines(1);
+			line = topMargin;
+		}
+		text.setCursorLine(line);
+	}
+		
 	/**
 	 * This method is called when we have parsed an OS Command escape sequence.
 	 * The only one we support is "\e]0;...\u0007", which sets the terminal
