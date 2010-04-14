@@ -49,7 +49,7 @@ import com.aptana.editor.common.theme.Theme;
  *
  */
 @SuppressWarnings("restriction")
-public class ThemedStyleMap extends StyleMap {
+/* package */ class ThemedStyleMap extends StyleMap {
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
@@ -57,28 +57,34 @@ public class ThemedStyleMap extends StyleMap {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Color getColor(Map map, StyleColor color) {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		if (color.getName().equalsIgnoreCase(StyleMap.BLACK))
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		if (color.getName().equalsIgnoreCase(StyleMap.BLACK)) {
+			return getForegroundColor();
 		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE))
-		{
-			return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getBackground());
+		if (color.getName().equalsIgnoreCase(StyleMap.WHITE)) {
+			return getBackgroundColor();
 		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE_FOREGROUND))
-		{
+		if (color.getName().equalsIgnoreCase(StyleMap.WHITE_FOREGROUND)) {
 			// FIXME turn to "ansi.white"
 		}
 
 		// Just grab colors straight from theme!
 		String ansiName = "ansi." + color.getName().toLowerCase();
-		if (theme.hasEntry(ansiName))
-		{
+		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);
 		}
 		// fall back to defaults...
 		return super.getColor(map, color);
+	}
+
+	protected Color getBackgroundColor() {
+		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getBackground());
+	}
+
+	protected Color getForegroundColor() {
+		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getForeground());
 	}
 
 
