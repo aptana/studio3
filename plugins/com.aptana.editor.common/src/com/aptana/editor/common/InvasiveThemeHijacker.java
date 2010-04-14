@@ -1,15 +1,17 @@
 package com.aptana.editor.common;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
@@ -19,12 +21,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -53,6 +51,7 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.Theme;
+import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.util.EclipseUtils;
 
 /**
@@ -65,7 +64,7 @@ import com.aptana.util.EclipseUtils;
 class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceChangeListener
 {
 
-	private Listener listener;
+	private Map<Tree, TreeThemer> themers = new HashMap<Tree, TreeThemer>();
 	private ISelectionChangedListener pageListener;
 
 	public InvasiveThemeHijacker()
@@ -272,24 +271,26 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	protected void hookTheme(Control tree, boolean revert)
 	{
-		// TODO Use TreeThemer?
-		if (revert)
-		{
-			tree.setBackground(null);
-			tree.setForeground(null);
-			tree.setFont(null);
-		}
-		else
-		{
-			tree.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-					getCurrentTheme().getBackground()));
-			tree.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-					getCurrentTheme().getForeground()));
-			tree.setFont(JFaceResources.getTextFont());
-		}
 		if (tree instanceof Tree)
 		{
 			overrideTreeDrawing((Tree) tree, revert);
+		}
+		else
+		{
+			if (revert)
+			{
+				tree.setBackground(null);
+				tree.setForeground(null);
+				tree.setFont(null);
+			}
+			else
+			{
+				tree.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getCurrentTheme().getBackground()));
+				tree.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
+						getCurrentTheme().getForeground()));
+				tree.setFont(JFaceResources.getTextFont());
+			}
 		}
 	}
 
@@ -300,39 +301,17 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 
 	private void overrideTreeDrawing(final Tree tree, boolean revertToDefaults)
 	{
-		if (listener == null)
-		{
-			listener = new Listener()
-			{
-				public void handleEvent(Event event)
-				{
-					// Override selection color to match what is set in theme
-					if ((event.detail & SWT.SELECTED) != 0)
-					{
-						Tree tree = (Tree) event.widget;
-						int clientWidth = tree.getClientArea().width;
-
-						GC gc = event.gc;
-						Color oldBackground = gc.getBackground();
-
-						gc.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-								getCurrentTheme().getSelection()));
-						gc.fillRectangle(0, event.y, clientWidth, event.height);
-						gc.setBackground(oldBackground);
-
-						event.detail &= ~SWT.SELECTED;
-						event.detail &= ~SWT.BACKGROUND;
-					}
-				}
-			};
-		}
 		if (revertToDefaults)
 		{
-			tree.removeListener(SWT.EraseItem, listener);
+			TreeThemer themer = themers.remove(tree);
+			if (themer != null)
+				themer.dispose();
 		}
 		else
 		{
-			tree.addListener(SWT.EraseItem, listener);
+			TreeThemer themer = new TreeThemer(tree);
+			themers.put(tree, themer);
+			themer.apply();
 		}
 	}
 
