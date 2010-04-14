@@ -115,6 +115,9 @@ public class VT100Emulator implements ControlListener {
 	 * in field {@link #ansiParameters}.
 	 */
 	private int nextAnsiParameter = 0;
+	
+	private int lastCursorLine = -1;
+	private int lastCursorColumn = -1;
 
 	Reader fReader;
 
@@ -650,6 +653,8 @@ public class VT100Emulator implements ControlListener {
 	 * sequence parameters (default is the upper left corner of the screen).
 	 */
 	private void processAnsiCommand_H() {
+		lastCursorLine = text.getCursorLine();
+		lastCursorColumn = text.getCursorColumn();
 		moveCursor(getAnsiParameter(0) - 1, getAnsiParameter(1) - 1);
 	}
 	
@@ -729,7 +734,18 @@ public class VT100Emulator implements ControlListener {
 
 		case 2:
 			// Erase entire display.
-
+			
+			if (text.getCursorLine() == 0 && text.getCursorColumn() == 0
+					&& lastCursorLine != -1 && lastCursorColumn != -1) {
+				moveCursor(lastCursorLine, lastCursorColumn);
+				for (int i = text.getLines(); i > 0; --i) {
+					text.processNewline();
+				}
+				moveCursor(0, 0);
+				lastCursorLine = -1;
+				lastCursorColumn = -1;
+				
+			}
 			text.eraseAll();
 			break;
 
