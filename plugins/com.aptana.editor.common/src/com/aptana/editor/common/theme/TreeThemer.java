@@ -53,6 +53,7 @@ public class TreeThemer
 	private Listener measureItemListener;
 	private Listener selectionOverride;
 	private Listener customDrawingListener;
+	private Listener resizeListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -138,6 +139,11 @@ public class TreeThemer
 
 					event.detail &= ~SWT.SELECTED;
 					event.detail &= ~SWT.BACKGROUND;
+					// force foreground color for Windows. Otherwise on dark themes we get black fg
+					if (isWindows)
+					{
+						gc.setForeground(getForeground());
+					}
 				}
 			}
 		};
@@ -226,11 +232,50 @@ public class TreeThemer
 					}
 					event.height = height;
 					if (width > event.width)
-						event.width = width;
+						event.width = width;					
 				}
 			}
 		};
 		tree.addListener(SWT.MeasureItem, measureItemListener);
+		if (isWindows)
+		{
+			// FIXME this is pretty hacky and causes the scrollbar to be visible and then go away as user resizes.
+			resizeListener = new Listener() 
+			{
+				
+				@Override
+				public void handleEvent(Event event) 
+				{
+					try 
+					{
+						Method m = Tree.class.getDeclaredMethod("setScrollWidth", Integer.TYPE);
+						m.setAccessible(true);
+						int width = maxWidth(tree.getClientArea().width, tree.getItems());
+						m.invoke(tree, width);
+					} 
+					catch (Exception e) 
+					{
+						CommonEditorPlugin.logError(e);
+					}
+				}
+			};
+			tree.addListener(SWT.Resize, resizeListener);
+		}
+	}
+	
+	private int maxWidth(int width, TreeItem[] items)
+	{
+		for (TreeItem item : items)
+		{
+			Rectangle rect = item.getBounds();
+			int itemWidth = rect.x + rect.width;
+			width = Math.max(width, itemWidth);
+			if (item.getExpanded())
+			{
+				width = maxWidth(width, item.getItems());
+			}
+		}
+		return width;
 	}
 
 	private void addFontListener()
@@ -373,6 +418,12 @@ public class TreeThemer
 			getTree().removeListener(SWT.MeasureItem, measureItemListener);
 		}
 		measureItemListener = null;
+		
+		if (resizeListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.Resize, resizeListener);
+		}
+		resizeListener = null;
 	}
 
 	private Tree getTree()

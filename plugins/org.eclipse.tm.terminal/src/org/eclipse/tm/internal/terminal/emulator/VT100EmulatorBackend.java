@@ -434,6 +434,9 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				fBufferStack.push(data);
 			} else if (!fBufferStack.isEmpty()) {
 				ITerminalTextData data = (ITerminalTextData) fBufferStack.pop();
+				if (fTerminal.getWidth() != data.getWidth()) {
+					data.setDimensions(data.getHeight(), fTerminal.getWidth());
+				}
 				fTerminal.copy(data);
 			}
 		}

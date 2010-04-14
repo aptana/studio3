@@ -90,9 +90,13 @@ public class TerminalTextDataFastScroll implements ITerminalTextData {
 
 	public void copy(ITerminalTextData source) {
 		int n=source.getHeight();
+		int oldn = getHeight();
 		setDimensions(source.getHeight(),source.getWidth());
 		for (int i = 0; i < n; i++) {
 			fData.copyLine(source, i, getPositionOfLine(i));
+		}
+		for (int i = n; i < oldn; ++i) {
+			fData.cleanLine(getPositionOfLine(i));
 		}
 	}
 
