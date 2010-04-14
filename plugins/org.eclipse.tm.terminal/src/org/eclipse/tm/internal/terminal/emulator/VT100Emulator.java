@@ -31,7 +31,6 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.Style;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * This class processes character data received from the remote host and
@@ -422,14 +421,7 @@ public class VT100Emulator implements ControlListener {
 					.log("Ignoring unsupported ANSI OSC sequence: '" + ansiOsCommand + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-		{
-			
-			public void run()
-			{
-				terminal.setTerminalTitle(ansiOsCommand.substring(2));
-			}
-		});		
+		terminal.setTerminalTitle(ansiOsCommand.substring(2));
 	}
 
 	/**
