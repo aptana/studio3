@@ -25,6 +25,7 @@ import java.io.Reader;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tm.internal.terminal.control.impl.ITerminalControlForText;
 import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
@@ -1056,8 +1057,11 @@ public class VT100Emulator implements ControlListener {
 	 * Process a BEL (Control-G) character.
 	 */
 	private void processBEL() {
-		// TODO
-		//Display.getDefault().beep();
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				Display.getCurrent().beep();
+			}
+		});
 	}
 
 	/**
