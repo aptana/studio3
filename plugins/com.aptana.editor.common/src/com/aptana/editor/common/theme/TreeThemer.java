@@ -53,6 +53,7 @@ public class TreeThemer
 	private Listener measureItemListener;
 	private Listener selectionOverride;
 	private Listener customDrawingListener;
+	private Listener resizeListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -233,9 +234,8 @@ public class TreeThemer
 		tree.addListener(SWT.MeasureItem, measureItemListener);
 		if (isWindows)
 		{
-			// TODO Add ability to unregister listener!
 			// FIXME this is pretty hacky and causes the scrollbar to be visible and then go away as user resizes.
-			tree.addListener(SWT.Resize, new Listener() 
+			resizeListener = new Listener() 
 			{
 				
 				@Override
@@ -253,7 +253,8 @@ public class TreeThemer
 						CommonEditorPlugin.logError(e);
 					}
 				}
-			});
+			};
+			tree.addListener(SWT.Resize, resizeListener);
 		}
 	}
 	
@@ -412,6 +413,12 @@ public class TreeThemer
 			getTree().removeListener(SWT.MeasureItem, measureItemListener);
 		}
 		measureItemListener = null;
+		
+		if (resizeListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.Resize, resizeListener);
+		}
+		resizeListener = null;
 	}
 
 	private Tree getTree()
