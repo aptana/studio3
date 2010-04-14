@@ -226,11 +226,50 @@ public class TreeThemer
 					}
 					event.height = height;
 					if (width > event.width)
-						event.width = width;
+						event.width = width;					
 				}
 			}
 		};
 		tree.addListener(SWT.MeasureItem, measureItemListener);
+		if (isWindows)
+		{
+			// TODO Add ability to unregister listener!
+			// FIXME this is pretty hacky and causes the scrollbar to be visible and then go away as user resizes.
+			tree.addListener(SWT.Resize, new Listener() 
+			{
+				
+				@Override
+				public void handleEvent(Event event) 
+				{
+					try 
+					{
+						Method m = Tree.class.getDeclaredMethod("setScrollWidth", Integer.TYPE);
+						m.setAccessible(true);
+						int width = maxWidth(tree.getClientArea().width, tree.getItems());
+						m.invoke(tree, width);
+					} 
+					catch (Exception e) 
+					{
+						CommonEditorPlugin.logError(e);
+					}
+				}
+			});
+		}
+	}
+	
+	private int maxWidth(int width, TreeItem[] items)
+	{
+		for (TreeItem item : items)
+		{
+			Rectangle rect = item.getBounds();
+			int itemWidth = rect.x + rect.width;
+			width = Math.max(width, itemWidth);
+			if (item.getExpanded())
+			{
+				width = maxWidth(width, item.getItems());
+			}
+		}
+		return width;
 	}
 
 	private void addFontListener()
