@@ -277,8 +277,13 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 
 	@Override
-	public void setTerminalTitle(String title) {
-		setContentDescription(title);
+	public void setTerminalTitle(final String title) {
+		Utils.runInDisplayThread(new Runnable() {
+			@Override
+			public void run() {
+				setContentDescription(title);
+			}
+		});
 	}
 	
 	protected void initialize(String title, IPath workingDirectory) {

@@ -2,6 +2,7 @@ package com.aptana.terminal;
 
 import java.text.MessageFormat;
 
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -99,4 +100,16 @@ public class Utils
 		
 		return buffer.toString();
 	}
+	
+	/**
+	 * @param runnable run in display thread
+	 */
+	public static void runInDisplayThread(Runnable runnable) {
+		if (Display.findDisplay(Thread.currentThread()) != null) {
+			runnable.run();
+		} else if( PlatformUI.isWorkbenchRunning() ) {
+			PlatformUI.getWorkbench().getDisplay().syncExec(runnable);
+		}
+	}
+
 }
