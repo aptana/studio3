@@ -369,7 +369,7 @@ public class CommandExecutionUtils
 		if (filterInputProvider == null)
 		{
 			filterInputProvider = CommandExecutionUtils.EOF;
-			selected = InputType.UNDEFINED;
+			selected = inputTypes[0];
 		}
 
 		// Create command context

@@ -145,7 +145,17 @@ module Ruble
     # Replace a portion of the editor's contents
     # Assumes that the args in the brackets are offset and length, and that the value is a string
     def []=(offset, length, src)    
-      Ruble::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
+      Ruble::UI.run("Replacing Editor Contents") do
+        # Send along verify event so this is treated like user actually inserted text live, since events don't get sent when replacing programmatically
+        event = org.eclipse.swt.widgets.Event.new
+        event.type = org.eclipse.swt.SWT::Verify
+        event.keyCode = 0
+        event.text = src
+        event.start = offset
+        event.end = offset + length
+        styled_text.notifyListeners(event.type, event) # Send Verify, for auto-indent
+        document.replace(offset, length, src) if event.doit
+      end
     end
     
     # TODO Just forward missing methods over to editor_part?
