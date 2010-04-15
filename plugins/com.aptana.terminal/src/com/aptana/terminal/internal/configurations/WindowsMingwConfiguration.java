@@ -36,81 +36,68 @@
 package com.aptana.terminal.internal.configurations;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.terminal.Activator;
-import com.aptana.terminal.IProcessConfiguration;
 import com.aptana.util.ExecutableUtil;
-import com.aptana.util.ResourceUtils;
 
 /**
  * @author Max Stepanov
- *
  */
-public class WindowsMingwConfiguration implements IProcessConfiguration {
+public class WindowsMingwConfiguration extends AbstractProcessConfiguration
+{
 
 	private static final String EXECUTABLE = "$os$/redttyw.exe"; //$NON-NLS-1$
-	
+
 	private IPath shellExecutable = null;
 
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.terminal.IProcessConfiguration#getExecutable()
-	 */
 	@Override
-	public File getExecutable() {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(EXECUTABLE), null);
-		return ResourceUtils.resourcePathToFile(url);
+	protected IPath getExecutablePath()
+	{
+		return new Path(EXECUTABLE);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.terminal.IProcessConfiguration#getCommandLine()
 	 */
 	@Override
-	public List<String> getCommandLine() {
+	public List<String> getCommandLine()
+	{
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
 		IPath shell = findShellExecutable();
 		String command = shell != null ? shell.toOSString() : "sh"; //$NON-NLS-1$
 		list.add("\"\\\"" + command + "\\\"  --login -i\""); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
-		if (Platform.inDevelopmentMode() || Platform.inDebugMode()) {
+		if (Platform.inDevelopmentMode() || Platform.inDebugMode())
+		{
 			list.add("-show"); //$NON-NLS-1$
 		}
 		return list;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.terminal.IProcessConfiguration#getEnvironment()
-	 */
-	@Override
-	public Map<String, String> getEnvironment() {
-		Map<String, String> env = new HashMap<String, String>();
-		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
-		return env;
-	}
-	
-	private IPath findShellExecutable() {
-		if (shellExecutable != null) {
+	private IPath findShellExecutable()
+	{
+		if (shellExecutable != null)
+		{
 			return shellExecutable;
 		}
 		return shellExecutable = ExecutableUtil.find("sh.exe", false, null, getPossibleShellLocations());
 	}
-	
-	private static List<IPath> getPossibleShellLocations() {
+
+	private static List<IPath> getPossibleShellLocations()
+	{
 		List<IPath> list = new ArrayList<IPath>();
-		for (File root : File.listRoots()) {
+		for (File root : File.listRoots())
+		{
 			list.add(Path.fromOSString(root.getAbsolutePath()).append(Path.fromOSString("Program Files\\Git\\bin"))); //$NON-NLS-1$
-			list.add(Path.fromOSString(root.getAbsolutePath()).append(Path.fromOSString("Program Files (x86)\\Git\\bin"))); //$NON-NLS-1$
+			list.add(Path.fromOSString(root.getAbsolutePath()).append(
+					Path.fromOSString("Program Files (x86)\\Git\\bin"))); //$NON-NLS-1$
 		}
 		return list;
 	}
