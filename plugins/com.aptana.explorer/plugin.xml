@@ -7,7 +7,7 @@
             allowMultiple="false"
             category="org.eclipse.ui"
             class="com.aptana.explorer.internal.ui.FilteringProjectView"
-            icon="icons/full/cview16/filenav_nav.gif"
+            icon="icons/full/cview16/filenav_nav.png"
             id="com.aptana.explorer.view"
             name="%view.name"
             restorable="true">

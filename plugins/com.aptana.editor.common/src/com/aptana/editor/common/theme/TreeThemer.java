@@ -12,6 +12,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -103,6 +105,7 @@ public class TreeThemer
 			// wrap
 			final CellLabelProvider cellProvider = (CellLabelProvider) provider;
 			DelegatingCellLabelProvider duh = new DelegatingCellLabelProvider(cellProvider);
+			// FIXME This is ending up calling dispose on the wrapped provider, which makes it broken!
 			colViewer.setLabelProvider(duh);
 		}
 		else if (provider instanceof ThemedDelegatingLabelProvider)
@@ -145,6 +148,26 @@ public class TreeThemer
 		DelegatingCellLabelProvider(CellLabelProvider cellProvider)
 		{
 			this.cellProvider = cellProvider;
+			// HACK Very ugly hack because when we set this wrapping label provider, dispose is called on the old one, which disposes all the images for working sets in JDT but holds onto them!
+			if (cellProvider instanceof DelegatingStyledCellLabelProvider)
+			{
+				DelegatingStyledCellLabelProvider delegating = (DelegatingStyledCellLabelProvider) cellProvider;
+				IStyledLabelProvider styled = delegating.getStyledStringProvider();
+				if (styled.getClass().getName().equals(
+						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider"))
+				{
+					try
+					{
+						Field f = styled.getClass().getDeclaredField("fWorkingSetImages");
+						f.setAccessible(true);
+						f.set(styled, null);
+					}
+					catch (Exception e)
+					{
+						CommonEditorPlugin.logError(e);
+					}
+				}
+			}
 		}
 
 		@Override
