@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.MessageFormat;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptUtils;
 import com.aptana.util.IOUtil;
 import com.aptana.util.ProcessUtil;
 
@@ -98,19 +101,12 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	protected String getShell()
 	{
-		String OS = org.eclipse.core.runtime.Platform.getOS();
-		String result;
-
-		// create the shell to execute
-		if (OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32))
+		IPath path = ScriptUtils.getShellPath();
+		String result = null;
+		
+		if (path != null)
 		{
-			// FIXME: we should allow use of other shells on Windows: PowerShell, cygwin, etc.
-			result = "cmd"; //$NON-NLS-1$
-		}
-		else
-		{
-			// FIXME: should we be using the user's preferred shell instead of hardcoding?
-			result = "/bin/bash"; //$NON-NLS-1$
+			result = path.toOSString();
 		}
 		
 		return result;
@@ -127,20 +123,35 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		String[] commandLine = this.getCommandLineArguments();
 		String resultText = null;
 		
-		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-		Map<Integer, String> result = ProcessUtil.runInBackground(shell, this.getCommand().getWorkingDirectory(),
-				input, this.getContributedEnvironment(), commandLine);
-		
-		if (result == null)
+		if (shell != null)
 		{
-			this._exitValue = 1;
-			this.setExecutedSuccessfully(false);
+			String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
+			Map<Integer, String> result = ProcessUtil.runInBackground(shell, this.getCommand().getWorkingDirectory(), input, this.getContributedEnvironment(), commandLine);
+			
+			if (result == null)
+			{
+				this._exitValue = 1;
+				this.setExecutedSuccessfully(false);
+			}
+			else
+			{
+				this._exitValue = result.keySet().iterator().next();
+				resultText = result.values().iterator().next();
+				this.setExecutedSuccessfully(this._exitValue == 0);
+			}
 		}
 		else
 		{
-			this._exitValue = result.keySet().iterator().next();
-			resultText = result.values().iterator().next();
-			this.setExecutedSuccessfully(this._exitValue == 0);
+			resultText = MessageFormat.format(
+				"Unable to locate a shell with which to execute this command: {0}",
+				new Object[]
+				{
+					this.getCommand().getPath()
+				}
+			);
+			
+			this._exitValue = 1;
+			this.setExecutedSuccessfully(false);
 		}
 
 		return resultText;
