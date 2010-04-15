@@ -197,7 +197,7 @@ module Ruble
     end
     
     def caret_column
-      selection.offset - styled_text.offset_at_line(selection.start_line)
+      selection.offset - offset_at_line(selection.start_line)
     end
     
     def caret_line
@@ -214,7 +214,11 @@ module Ruble
     
     def insert_as_text(text)
       self[caret_offset, 0] = snippet
-    end    
+    end
+    
+    def offset_at_line(line)
+      styled_text.nil? ? 0 : styled_text.offset_at_line(line)
+    end
 
     def insert_as_snippet(snippet)
       region = org.eclipse.jface.text.Region.new(caret_offset, 0)
