@@ -44,9 +44,22 @@ abstract class AbstractProcessConfiguration implements IProcessConfiguration
 
 	private String getVersion()
 	{
-		String version = EclipseUtils.getPluginVersion("com.aptana.red.core"); //$NON-NLS-1$
+		// Grab RED RCP plugin version
+		String version = EclipseUtils.getPluginVersion("com.aptana.radrails.rcp"); //$NON-NLS-1$
 		if (version == null)
 		{
+			// Grab Product version
+			version = EclipseUtils.getProductVersion();
+		}
+		// FIXME This doesn't work for features.
+//		if (version == null)
+//		{
+//			// Try Red Core feature
+//			version = EclipseUtils.getPluginVersion("com.aptana.red.core"); //$NON-NLS-1$
+//		}
+		if (version == null)
+		{
+			// Fallback to Terminal plugin version
 			version = EclipseUtils.getPluginVersion(Activator.PLUGIN_ID);
 		}
 		return version;
