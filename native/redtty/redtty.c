@@ -17,6 +17,7 @@
 
 #define ESC '\033'
 #define MAX_ESC_SEQUENCE_LENGTH	16
+#define MIN(a,b)	((a) < (b) ? (a) : (b))
 
 int 
 main (void) 
@@ -97,10 +98,20 @@ main (void)
 								if (i > 0) {
 									write(pty, buffer, i);
 									buffer_index -= i;
-									memmove(buffer, ch, buffer_index);
+									memmove(buffer, &buffer[i], buffer_index+1);
 									
 								}
-								for( i = 1; (i < buffer_index) && (buffer[i] != ESC) && !isalpha(buffer[i]); ++i)
+								if ((buffer_index < 2) || (buffer[0] != ESC) || (buffer[1] != '[')) {
+									i =	MIN(buffer_index, 2);
+									write(pty, buffer, i);
+									buffer_index -= i;
+									memmove(buffer, &buffer[i], buffer_index+1);
+									if (buffer_index == 0)
+									{
+										break;
+									}
+								}
+								for( i = 2; (i < buffer_index) && !((buffer[i] >= 64) && (buffer[i] <= 126)); ++i)
 								{
 									/* noop */
 								}
@@ -114,7 +125,7 @@ main (void)
 											--i;
 											break;
 										case 't':
-											if ((sscanf(&buffer[1], "[%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8))
+											if ((sscanf(&buffer[2], "%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8))
 											{
 												struct winsize size;
 												size.ws_row = param[1];
@@ -128,7 +139,7 @@ main (void)
 									}
 									buffer_index -= i + 1;
 									if (buffer_index > 0) {
-										memmove(buffer, &buffer[i+1], buffer_index);
+										memmove(buffer, &buffer[i+1], buffer_index+1);
 										continue;
 									}
 								} else {
