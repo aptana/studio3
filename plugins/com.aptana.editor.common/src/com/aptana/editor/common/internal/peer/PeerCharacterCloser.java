@@ -19,10 +19,10 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.link.ILinkedModeListener;
 import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
-import org.eclipse.jface.text.link.LinkedPosition;
-import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.jface.text.link.LinkedModeUI.ExitFlags;
 import org.eclipse.jface.text.link.LinkedModeUI.IExitPolicy;
+import org.eclipse.jface.text.link.LinkedPosition;
+import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
@@ -193,7 +193,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		try
 		{
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for comment scope matching
+			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for
+														// comment scope matching
 			int stackLevel = 0;
 			for (int i = 0; i < before.length(); i++)
 			{
@@ -223,7 +224,9 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				}
 			}
 
-			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need offsets to match for comment scope matching
+			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need
+																				// offsets to match for comment scope
+																				// matching
 			for (int i = 0; i < after.length(); i++)
 			{
 				char c = after.charAt(i);
@@ -414,9 +417,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		 */
 		public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
 		{
-			if (event.character == 10 || event.character == 13) // \n // \r
+			if (!isStringPair())
 			{
-				return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
+				if (event.character == 10 || event.character == 13) // \n // \r
+				{
+					return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
+				}
 			}
 
 			if (event.character != fExitCharacter)
@@ -433,6 +439,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			}
 
 			return null;
+		}
+
+		private boolean isStringPair()
+		{
+			return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`' || fExitCharacter == 'Ó';
 		}
 
 		/**
