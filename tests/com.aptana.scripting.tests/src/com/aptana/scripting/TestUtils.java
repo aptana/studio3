@@ -3,6 +3,7 @@ package com.aptana.scripting;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -12,6 +13,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.util.IOUtil;
+import com.aptana.util.ResourceUtils;
 
 public class TestUtils extends TestCase
 {
@@ -55,9 +57,10 @@ public class TestUtils extends TestCase
 		try
 		{
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
-
-			url = FileLocator.toFileURL(url);
-			result = new File(url.toURI());
+			URL fileURL = FileLocator.toFileURL(url);
+			URI fileURI = ResourceUtils.toURI(fileURL);
+			
+			result = new File(fileURI);
 		}
 		catch (IOException e)
 		{
