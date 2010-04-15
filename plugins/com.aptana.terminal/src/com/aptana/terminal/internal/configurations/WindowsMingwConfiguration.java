@@ -35,7 +35,6 @@
 
 package com.aptana.terminal.internal.configurations;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.util.ExecutableUtil;
+import com.aptana.scripting.ScriptUtils;
 
 /**
  * @author Max Stepanov
@@ -81,25 +80,18 @@ public class WindowsMingwConfiguration extends AbstractProcessConfiguration
 		return list;
 	}
 
+	/**
+	 * findShellExecutable
+	 * 
+	 * @return
+	 */
 	private IPath findShellExecutable()
 	{
 		if (shellExecutable != null)
 		{
 			return shellExecutable;
 		}
-		return shellExecutable = ExecutableUtil.find("sh.exe", false, null, getPossibleShellLocations());
+		
+		return shellExecutable = ScriptUtils.getShellPath();
 	}
-
-	private static List<IPath> getPossibleShellLocations()
-	{
-		List<IPath> list = new ArrayList<IPath>();
-		for (File root : File.listRoots())
-		{
-			list.add(Path.fromOSString(root.getAbsolutePath()).append(Path.fromOSString("Program Files\\Git\\bin"))); //$NON-NLS-1$
-			list.add(Path.fromOSString(root.getAbsolutePath()).append(
-					Path.fromOSString("Program Files (x86)\\Git\\bin"))); //$NON-NLS-1$
-		}
-		return list;
-	}
-
 }
