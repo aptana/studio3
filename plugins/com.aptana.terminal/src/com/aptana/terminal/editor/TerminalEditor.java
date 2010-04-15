@@ -109,11 +109,14 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 					event.data = e.data;
 					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
 					boolean enabled = keyDownFilter.isEnabled();
+					Control focusControl = e.display.getFocusControl();
 					try {
 						keyDownFilter.setEnabled(true);
 						keyDownFilter.handleEvent(event);
 					} finally {
-						keyDownFilter.setEnabled(enabled);
+						if (focusControl == e.display.getFocusControl()) {
+							keyDownFilter.setEnabled(enabled);
+						}
 					}
 				}
 			}
