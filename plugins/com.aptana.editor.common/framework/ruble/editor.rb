@@ -145,7 +145,17 @@ module Ruble
     # Replace a portion of the editor's contents
     # Assumes that the args in the brackets are offset and length, and that the value is a string
     def []=(offset, length, src)    
-      Ruble::UI.run("Replacing Editor Contents") { document.replace(offset, length, src) }
+      Ruble::UI.run("Replacing Editor Contents") do
+        # Send along verify event so this is treated like user actually inserted text live, since events don't get sent when replacing programmatically
+        event = org.eclipse.swt.widgets.Event.new
+        event.type = org.eclipse.swt.SWT::Verify
+        event.keyCode = 0
+        event.text = src
+        event.start = offset
+        event.end = offset + length
+        styled_text.notifyListeners(event.type, event) # Send Verify, for auto-indent
+        document.replace(offset, length, src) if event.doit
+      end
     end
     
     # TODO Just forward missing methods over to editor_part?
@@ -187,7 +197,7 @@ module Ruble
     end
     
     def caret_column
-      selection.offset - styled_text.offset_at_line(selection.start_line)
+      selection.offset - offset_at_line(selection.start_line)
     end
     
     def caret_line
@@ -204,7 +214,11 @@ module Ruble
     
     def insert_as_text(text)
       self[caret_offset, 0] = snippet
-    end    
+    end
+    
+    def offset_at_line(line)
+      styled_text.nil? ? 0 : styled_text.offset_at_line(line)
+    end
 
     def insert_as_snippet(snippet)
       region = org.eclipse.jface.text.Region.new(caret_offset, 0)
