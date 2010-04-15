@@ -89,6 +89,9 @@
          <actionSet
                id="org.eclipse.ui.NavigateActionSet">
          </actionSet>
+         <actionSet
+               id="org.eclipse.ui.edit.text.actionSet.presentation">
+         </actionSet>
       </perspectiveExtension>
    </extension>
 
