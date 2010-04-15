@@ -60,12 +60,16 @@ public abstract class ExecutableUtil
 		}
 
 		// Still no path. Let's try some default locations.
-		for (IPath location : searchLocations) 
+		if (searchLocations != null)
 		{
-			IPath result = findExecutable(location.append(executableName), appendExtension);
-			if (result != null)
-				return result;
+			for (IPath location : searchLocations) 
+			{
+				IPath result = findExecutable(location.append(executableName), appendExtension);
+				if (result != null)
+					return result;
+			}
 		}
+		
 		return null;
 	}
 	
