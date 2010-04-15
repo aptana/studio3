@@ -53,7 +53,7 @@ class ExitPolicy implements IExitPolicy
 	{
 		if (!isStringPair())
 		{
-			if (event.character == 10 || event.character == 13) // \n // \r
+			if (event.character == '\n' || event.character == '\r')
 			{
 				return new ExitFlags(ILinkedModeListener.EXIT_ALL, true);
 			}
@@ -65,10 +65,10 @@ class ExitPolicy implements IExitPolicy
 		if (fSize == fStack.size() && !isEscaped(offset))
 		{
 			BracketLevel level = fStack.peek();
-			if (level.fFirstPosition.offset > offset || level.fSecondPosition.offset < offset)
+			if (offset < level.fFirstPosition.offset || level.fSecondPosition.offset < offset)
 				return null;
 			if (level.fSecondPosition.offset == offset && length == 0)
-				// don't enter the character if if its the closing peer
+				// don't enter the character if it is the closing peer
 				return new ExitFlags(ILinkedModeListener.UPDATE_CARET, false);
 		}
 
