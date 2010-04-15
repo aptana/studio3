@@ -85,3 +85,4 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=ignore
 org.eclipse.jdt.core.compiler.problem.unusedWarningToken=ignore
 org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=ignore
 org.eclipse.jdt.core.compiler.source=1.4
+org.eclipse.jdt.core.incompatibleJDKLevel=ignore
