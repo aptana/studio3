@@ -63,9 +63,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		String OS = org.eclipse.core.runtime.Platform.getOS();
 
 		// create temporary file for execution
-		this._tempFile = File.createTempFile("command_temp_", //$NON-NLS-1$
-				(OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32) ? ".bat" : ".sh") //$NON-NLS-1$ //$NON-NLS-2$
-				);
+		this._tempFile = File.createTempFile("command_temp_", ".sh"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// dump "invoke" content into temp file
 		PrintWriter pw = new PrintWriter(this._tempFile);
@@ -81,19 +79,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 	 */
 	protected String[] getCommandLineArguments()
 	{
-		String OS = org.eclipse.core.runtime.Platform.getOS();
-		String[] result;
-		
-		if (OS.equals(org.eclipse.core.runtime.Platform.OS_WIN32))
-		{
-			result = new String[] { "/Q", "/C", this._tempFile.getAbsolutePath() };
-		}
-		else
-		{
-			result = new String[] { "-l", this._tempFile.getAbsolutePath() };
-		}
-		
-		return result;
+		return new String[] { "-l", this._tempFile.getAbsolutePath() };
 	}
 	
 	/**
