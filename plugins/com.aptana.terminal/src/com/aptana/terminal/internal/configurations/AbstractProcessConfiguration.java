@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.IProcessConfiguration;
+import com.aptana.util.EclipseUtils;
 import com.aptana.util.ResourceUtils;
 
 abstract class AbstractProcessConfiguration implements IProcessConfiguration
@@ -37,9 +38,17 @@ abstract class AbstractProcessConfiguration implements IProcessConfiguration
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
-		// TODO Grab the version of the RED feature?
-		env.put("APTANA_VERSION", "3.0.0"); //$NON-NLS-1$ //$NON-NLS-2$
+		env.put("APTANA_VERSION", getVersion()); //$NON-NLS-1$
 		return env;
 	}
 
+	private String getVersion()
+	{
+		String version = EclipseUtils.getPluginVersion("com.aptana.red.core"); //$NON-NLS-1$
+		if (version == null)
+		{
+			version = EclipseUtils.getPluginVersion(Activator.PLUGIN_ID);
+		}
+		return version;
+	}
 }
