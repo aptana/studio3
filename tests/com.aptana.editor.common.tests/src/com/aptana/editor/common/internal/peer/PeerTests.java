@@ -15,6 +15,7 @@ public class PeerTests
 		// They have no pass/fail and just slow down the build!
 //		suite.addTestSuite(PeerCharacterCloserPerfTest.class);
 		suite.addTestSuite(CharacterPairMatcherTest.class);
+		suite.addTestSuite(ExitPolicyTest.class);
 		// $JUnit-END$
 		return suite;
 	}
