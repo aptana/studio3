@@ -303,7 +303,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				int col=fCursorColumn+n;
 				i+=n;
 				// wrap needed?
-				if(col>fColumns) {
+				if(col>=fColumns) {
 					doNewline();
 					line=toAbsoluteLine(fCursorLine);
 					setCursorColumn(0);

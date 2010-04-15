@@ -591,19 +591,10 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		if (event.getKey().equals(IThemeManager.THEME_CHANGED))
-		{
-			// Theme has changed, need to apply new theme to editor and views
-			if (invasiveThemesEnabled())
-			{
-				applyThemeToJDTEditor(getCurrentTheme(), false);
-				applyThemeToConsole(getCurrentTheme(), false);
-				hijackCurrentViews(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), false);
-			}
-		}
-		else if (event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+		if (event.getKey().equals(IThemeManager.THEME_CHANGED) || event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
 		{
 			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
+			cancel();
 			schedule();
 		}
 	}
