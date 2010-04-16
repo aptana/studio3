@@ -47,9 +47,9 @@ import com.aptana.util.StringUtil;
 public class GitRepository
 {
 
+	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	private static final String INDEX = "index"; //$NON-NLS-1$
 	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
-	private static final String COMMIT_MSG_FILENAME = "COMMIT_EDITMSG"; //$NON-NLS-1$
 	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
 
@@ -82,6 +82,7 @@ public class GitRepository
 					{
 
 						private Set<String> filesToWatch;
+						private Job indexRefreshJob;
 
 						@Override
 						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
@@ -90,7 +91,7 @@ public class GitRepository
 								return;
 							if (newName.equals(HEAD))
 								checkForBranchChange();
-							else if (newName.equals(INDEX))
+							else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
 								refreshIndex();
 						}
 
@@ -101,6 +102,7 @@ public class GitRepository
 								filesToWatch = new HashSet<String>();
 								filesToWatch.add(HEAD);
 								filesToWatch.add(INDEX);
+								filesToWatch.add(COMMIT_EDITMSG);
 							}
 							return filesToWatch;
 						}
@@ -112,24 +114,33 @@ public class GitRepository
 								return;
 							if (name.equals(HEAD))
 								checkForBranchChange();
-							else if (name.equals(INDEX))
+							else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
 								refreshIndex();
 						}
 
 						// Do long running work in another thread/job so we don't tie up the jnotify locks!
 						private void refreshIndex()
 						{
-							Job job = new Job("Refreshing git index") //$NON-NLS-1$
+							if (indexRefreshJob == null)
 							{
-								@Override
-								protected IStatus run(IProgressMonitor monitor)
+								indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
 								{
-									index().refresh();
-									return Status.OK_STATUS;
-								}
-							};
-							job.setSystem(true);
-							job.schedule();
+									@Override
+									protected IStatus run(IProgressMonitor monitor)
+									{
+										if (monitor != null && monitor.isCanceled())
+											return Status.CANCEL_STATUS;
+										index().refresh();
+										return Status.OK_STATUS;
+									}
+								};
+								indexRefreshJob.setSystem(true);
+							}
+							else
+							{
+								indexRefreshJob.cancel();
+							}
+							indexRefreshJob.schedule(50);
 						}
 
 						protected void checkForBranchChange()
@@ -216,7 +227,7 @@ public class GitRepository
 					// Remove branch in model!
 					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
 					branches.remove(rev);
-					
+
 					Job job = new Job("Handle branch removal") //$NON-NLS-1$
 					{
 						@Override
@@ -233,7 +244,7 @@ public class GitRepository
 						}
 					};
 					job.setSystem(true);
-					job.schedule();					
+					job.schedule();
 				}
 
 				@Override
@@ -683,7 +694,7 @@ public class GitRepository
 
 	String commitMessageFile()
 	{
-		return gitFile(COMMIT_MSG_FILENAME).getAbsolutePath();
+		return gitFile(COMMIT_EDITMSG).getAbsolutePath();
 	}
 
 	void writetoCommitFile(String commitMessage)

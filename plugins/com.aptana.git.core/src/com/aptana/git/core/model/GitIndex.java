@@ -58,6 +58,7 @@ public class GitIndex
 		this.files = new Vector<ChangedFile>();
 	}
 
+	// TODO Pass in an IProgressMonitor so we can try and cancel and/or show progress!
 	public void refresh()
 	{
 		refresh(true);
