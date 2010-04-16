@@ -77,7 +77,7 @@ public class GitRepository
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
 			// index appears to change on commit/stage/unstage/pull
 			// Add listener for changes in HEAD (i.e. switched branches), and index
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_RENAMED | IJNotify.FILE_MODIFIED,
+			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_ANY,
 					false, new JNotifyAdapter()
 					{
 
@@ -92,6 +92,20 @@ public class GitRepository
 							if (newName.equals(HEAD))
 								checkForBranchChange();
 							else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
+								refreshIndex();
+						}
+						
+						@Override
+						public void fileCreated(int wd, String rootPath, String name)
+						{
+							if (name != null && name.equals(INDEX))
+								refreshIndex();
+						}
+						
+						@Override
+						public void fileDeleted(int wd, String rootPath, String name)
+						{
+							if (name != null && name.equals(INDEX))
 								refreshIndex();
 						}
 
