@@ -25,6 +25,7 @@ main (void)
 	/* Read char */
 	char buffer[1024+1];
 	int buffer_index = 0;
+	int buffer_offset;
 	int read_count;
 		
 	/* Descriptor set for select */
@@ -82,11 +83,12 @@ main (void)
 						default:
 							buffer_index += read_count;
 							buffer[buffer_index] = '\0';
+							buffer_offset = 0;
 							do {
 								char *ch;
 								int i = 0;
 								
-								ch = strchr(buffer, ESC);
+								ch = strchr(&buffer[buffer_offset], ESC);
 								if (ch == NULL)
 								{
 									write(pty, &buffer, buffer_index);
@@ -95,21 +97,16 @@ main (void)
 								}
 
 								i = ch - buffer;
+								if ((buffer_index - i < 2) || (buffer[i+1] != '['))
+								{
+									buffer_offset = i+1;
+									continue;
+								}
 								if (i > 0) {
 									write(pty, buffer, i);
 									buffer_index -= i;
 									memmove(buffer, &buffer[i], buffer_index+1);
 									
-								}
-								if ((buffer_index < 2) || (buffer[0] != ESC) || (buffer[1] != '[')) {
-									i =	MIN(buffer_index, 2);
-									write(pty, buffer, i);
-									buffer_index -= i;
-									memmove(buffer, &buffer[i], buffer_index+1);
-									if (buffer_index == 0)
-									{
-										break;
-									}
 								}
 								for( i = 2; (i < buffer_index) && !((buffer[i] >= 64) && (buffer[i] <= 126)); ++i)
 								{
@@ -148,8 +145,8 @@ main (void)
 										buffer_index = 0;
 									}
 								}
-
-							} while (0);
+								break;
+							} while (1);
 							break;
 					}
 				} 
