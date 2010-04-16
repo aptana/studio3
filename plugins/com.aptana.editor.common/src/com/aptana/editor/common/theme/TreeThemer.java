@@ -88,25 +88,24 @@ public class TreeThemer
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
 		if (viewer == null)
 			return;
-
 		ColumnViewer colViewer = viewer.getViewer();
 		if (colViewer == null)
 			return;
-		IBaseLabelProvider provider = colViewer.getLabelProvider();
-		if (provider instanceof DelegatingCellLabelProvider)
+		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
+		if (existing != null)
 		{
-			// re-enable
-			DelegatingCellLabelProvider delegating = (DelegatingCellLabelProvider) provider;
-			delegating.enable();
+			existing.enable();
 			colViewer.refresh();
+			return;
 		}
-		else if (provider instanceof CellLabelProvider)
+
+		IBaseLabelProvider provider = colViewer.getLabelProvider();
+		if (provider instanceof CellLabelProvider)
 		{
 			// wrap
 			final CellLabelProvider cellProvider = (CellLabelProvider) provider;
 			DelegatingCellLabelProvider duh = new DelegatingCellLabelProvider(cellProvider);
-			// FIXME This is ending up calling dispose on the wrapped provider, which makes it broken!
-			colViewer.setLabelProvider(duh);
+			viewer.setLabelProvider(duh);
 		}
 		else if (provider instanceof ThemedDelegatingLabelProvider)
 		{
