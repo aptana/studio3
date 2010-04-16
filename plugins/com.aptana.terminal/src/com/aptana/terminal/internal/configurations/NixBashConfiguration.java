@@ -37,6 +37,7 @@ package com.aptana.terminal.internal.configurations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -63,6 +64,16 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
 		return list;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.terminal.internal.configurations.AbstractProcessConfiguration#getEnvironment()
+	 */
+	@Override
+	public Map<String, String> getEnvironment() {
+		Map<String, String> env = super.getEnvironment();
+		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
+		return env;
 	}
 
 }

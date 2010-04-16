@@ -37,7 +37,6 @@ abstract class AbstractProcessConfiguration implements IProcessConfiguration
 	public Map<String, String> getEnvironment()
 	{
 		Map<String, String> env = new HashMap<String, String>();
-		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 		env.put("APTANA_VERSION", getVersion()); //$NON-NLS-1$
 		return env;
 	}
