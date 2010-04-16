@@ -51,7 +51,7 @@ class ExitPolicy implements IExitPolicy
 	 */
 	public ExitFlags doExit(LinkedModeModel model, VerifyEvent event, int offset, int length)
 	{
-		if (!isStringPair())
+		if (shouldInsertNewline())
 		{
 			if (event.character == '\n' || event.character == '\r')
 			{
@@ -75,6 +75,15 @@ class ExitPolicy implements IExitPolicy
 		return null;
 	}
 
+	/**
+	 * Don't insert newline when we're in auto-paired string chars or pipes
+	 * @return
+	 */
+	private boolean shouldInsertNewline()
+	{
+		return !isStringPair() && fExitCharacter != '|';
+	}
+	
 	private boolean isStringPair()
 	{
 		return fExitCharacter == '"' || fExitCharacter == '\'' || fExitCharacter == '`' || fExitCharacter == 'Ó';
