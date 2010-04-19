@@ -175,7 +175,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 */
 	@Override
 	public void setTerminalTitle(String title) {
-		setContentDescription(title);
+		setPartName(title);
 	}
 
 	/*
