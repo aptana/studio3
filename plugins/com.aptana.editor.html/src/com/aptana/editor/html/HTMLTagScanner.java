@@ -55,12 +55,16 @@ import com.aptana.editor.common.theme.IThemeManager;
 
 public class HTMLTagScanner extends RuleBasedScanner
 {
+	// as per the html5 spec, these are elements that define "sections", but we've added
+	// the <html> tag itself to the list.
+	// see http://dev.w3.org/html5/spec/Overview.html#sections
 	@SuppressWarnings("nls")
-	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body" };
+	private static String[] STRUCTURE_DOT_ANY = { "html", "head", "body", "header", "address",
+	        "nav", "section", "article", "footer", "aside", "hgroup", "h1", "h2", "h3", "h4", "h5", "h6" };
 
 	@SuppressWarnings("nls")
-	private static String[] BLOCK_DOT_ANY = { "address", "blockquote", "dd", "div", "dl", "dt", "fieldset", "form",
-			"frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "iframe", "noframes", "object", "ol", "p", "ul",
+	private static String[] BLOCK_DOT_ANY = { "blockquote", "dd", "div", "dl", "dt", "fieldset", "form",
+			"frame", "frameset", "iframe", "noframes", "object", "ol", "p", "ul",
 			"applet", "center", "dir", "hr", "menu", "pre" };
 
 	@SuppressWarnings("nls")
@@ -68,7 +72,8 @@ public class HTMLTagScanner extends RuleBasedScanner
 			"br", "button", "caption", "cite", "code", "col", "colgroup", "del", "dfn", "em", "font", "i", "img",
 			"input", "ins", "isindex", "kbd", "label", "legend", "li", "link", "map", "meta", "noscript", "optgroup",
 			"option", "param", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "style",
-			"sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "u", "var" };
+			"sub", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "title", "tr", "tt", "u", "var",
+			"canvas", "audio", "video" };
 
 	public HTMLTagScanner()
 	{
