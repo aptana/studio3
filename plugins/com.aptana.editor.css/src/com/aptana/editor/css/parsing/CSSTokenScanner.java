@@ -62,7 +62,8 @@ public class CSSTokenScanner extends BufferedRuleBasedScanner
 			"h4", "h5", "h6", "i", "iframe", "img", "input", "ins", "kbd", "label", "legend", "li", "link", "map",
 			"meta", "noframes", "noscript", "object", "ol", "optgroup", "option", "p", "param", "pre", "q", "samp",
 			"script", "select", "small", "span", "strike", "strong", "style", "sub", "sup", "tbody", "td", "textarea",
-			"tfoot", "th", "thead", "title", "tr", "tt", "ul", "var" };
+			"tfoot", "th", "thead", "title", "tr", "tt", "ul", "var",
+			"header", "nav", "section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
 	private static final String[] MEDIAS = { "all", "aural", "braille", "embossed", "handheld", "print", "projection",
