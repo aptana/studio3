@@ -198,7 +198,7 @@ public class TerminalConnector implements ITerminalConnector {
 	}
 	public Object getAdapter(Class adapter) {
 		TerminalConnectorImpl connector=null;
-		if(isInitialized())
+		if(!isInitialized())
 			connector=getConnectorImpl();
 		// if we cannot create the connector then we cannot adapt...
 		if(connector!=null) {
