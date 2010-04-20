@@ -856,9 +856,17 @@ public class DiskIndex
 		if (memoryIndex == null)
 		{
 			if (result == null)
-				results.put(word, new QueryResult(word, wordsToDocNumbers));
-			else
-				result.addDocumentTable(wordsToDocNumbers);
+			{
+				result = new QueryResult(word, null);
+				results.put(word, result);
+			}
+			result.addDocumentTable(wordsToDocNumbers);
+
+			List<Integer> docNumbers = readDocumentNumbers(wordsToDocNumbers.get(word));
+			for (Integer docNumber : docNumbers)
+			{
+				result.addDocumentName(readDocumentName(docNumber));
+			}
 		}
 		else
 		{
