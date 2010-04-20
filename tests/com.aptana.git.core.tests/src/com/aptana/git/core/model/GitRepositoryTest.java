@@ -140,6 +140,7 @@ public class GitRepositoryTest extends TestCase
 
 		// Check the changed files and make sure it shows up as changed: DELETED, unstaged
 		GitIndex index = fRepo.index();
+		index.refresh(new NullProgressMonitor());
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changedFiles = index.changedFiles();
