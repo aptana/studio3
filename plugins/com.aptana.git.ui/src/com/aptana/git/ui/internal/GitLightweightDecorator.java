@@ -12,7 +12,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -26,6 +29,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.ui.ISharedImages;
 import org.eclipse.team.ui.TeamImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -80,6 +84,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	private static ImageDescriptor untrackedImage;
 	private static ImageDescriptor stagedAddedImage;
 	private static ImageDescriptor stagedRemovedImage;
+	private static UIJob refreshJob;
 
 	static
 	{
@@ -219,9 +224,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		GitRepository repo = getRepo(resource);
 		if (repo == null)
 			return;
-		
+
 		String branch = repo.currentBranch();
-		// Adds a temporal cache per repo/branch for this data so we 
+		// Adds a temporal cache per repo/branch for this data so we
 		// don't recalculate for a ton of projects, Just store it for like a second...?
 		RepoBranch repoBranch = new RepoBranch(repo, branch);
 		TimestampedString result = cache.get(repoBranch);
@@ -231,8 +236,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			return;
 		}
 		cache.remove(repoBranch);
-		
-		
+
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ["); //$NON-NLS-1$
 		builder.append(branch);
@@ -254,8 +258,6 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		cache.put(repoBranch, new TimestampedString(value));
 		decoration.addSuffix(value);
 	}
-
-	
 
 	@Override
 	public void dispose()
@@ -322,12 +324,13 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	{
 		// TODO Force a total refresh if the number of changed files is over some maximum?
 		Set<IResource> resources = e.getFilesWithChanges();
-		
+
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
 		resources.addAll(getAllAncestors(resources));
 		// TODO On a commit clear the cache?
-		// FIXME Only add projects if this was a commit (so the plus/minus changes), not just a file edited/staged/unstaged
+		// FIXME Only add projects if this was a commit (so the plus/minus changes), not just a file
+		// edited/staged/unstaged
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
@@ -387,18 +390,29 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	}
 
 	/**
-	 * Perform a blanket refresh of all decorations this is very bad performance wise. Need to avoid using this and
+	 * Perform a blanket refresh of all decorations. This is very bad performance wise. Need to avoid using this and
 	 * always just use deltas if possible!
 	 */
 	private static void refresh()
 	{
-		Display.getDefault().asyncExec(new Runnable()
+		if (refreshJob == null)
 		{
-			public void run()
+			refreshJob = new UIJob("Refresh Git labels") //$NON-NLS-1$
 			{
-				GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
-			}
-		});
+
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					GitUIPlugin.getDefault().getWorkbench().getDecoratorManager().update(DECORATOR_ID);
+					return Status.OK_STATUS;
+				}
+			};
+			refreshJob.setSystem(true);
+		}
+		refreshJob.cancel();
+		refreshJob.schedule(50);
 	}
 
 	public void branchChanged(BranchChangedEvent e)
@@ -411,22 +425,23 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			if (repo.equals(getGitRepositoryManager().getAttached(project)))
 				resources.add(project);
 		}
-		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with staged/unstaged changes, dirty carry over).
+		// Project labels need to change, but the dirty/stage/unstaged flags should stay same (can't change branch with
+		// staged/unstaged changes, dirty carry over).
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	@Override
 	public void pulled(PullEvent e)
 	{
-		// FIXME do nothing? Call refresh?
 		cache.clear();
+		refresh();
 	}
 
 	@Override
 	public void pushed(PushEvent e)
 	{
-		// FIXME do nothing? Call refresh?
 		cache.clear();
+		refresh();
 	}
 
 	@Override
@@ -440,14 +455,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	{
 		// do nothing
 	}
-	
+
 	// Simple classes used for a time-based cache on the project decorations
-	
+
 	private static class TimestampedString
 	{
 		String string;
 		Long timestamp;
-		
+
 		public TimestampedString(String value)
 		{
 			this.string = value;
@@ -458,7 +473,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		{
 			return (timestamp + millis) < System.currentTimeMillis();
 		}
-		
+
 		@Override
 		public boolean equals(Object obj)
 		{
@@ -467,25 +482,25 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			TimestampedString other = (TimestampedString) obj;
 			return other.string.equals(string) && other.timestamp.equals(timestamp);
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
 			return (31 + string.hashCode()) * (31 + timestamp.hashCode());
 		}
 	}
-	
+
 	private static class RepoBranch
 	{
 		GitRepository repo;
 		String branch;
-		
+
 		RepoBranch(GitRepository repo, String branch)
 		{
 			this.repo = repo;
 			this.branch = branch;
 		}
-		
+
 		@Override
 		public boolean equals(Object obj)
 		{
@@ -494,7 +509,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			RepoBranch other = (RepoBranch) obj;
 			return other.repo.equals(repo) && other.branch.equals(branch);
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
