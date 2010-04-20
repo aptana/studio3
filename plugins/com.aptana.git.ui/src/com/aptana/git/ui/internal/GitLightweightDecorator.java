@@ -15,9 +15,9 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.BaseLabelProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
@@ -43,7 +43,7 @@ import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
 import com.aptana.git.ui.GitUIPlugin;
 
-public class GitLightweightDecorator extends LabelProvider implements ILightweightLabelDecorator,
+public class GitLightweightDecorator extends BaseLabelProvider implements ILightweightLabelDecorator,
 		IGitRepositoryListener, IGitRepositoriesListener
 {
 
@@ -306,6 +306,7 @@ public class GitLightweightDecorator extends LabelProvider implements ILightweig
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
 		resources.addAll(getAllAncestors(resources));
+		// FIXME Only add projects if this was a commit (so the plus/minus changes), not just a file edited/staged/unstaged
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
