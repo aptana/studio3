@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.internal.misc.StringMatcher;
 
-import com.aptana.editor.css.index.IIndexConstants;
+import com.aptana.editor.html.index.IHTMLIndexConstants;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -105,22 +105,26 @@ class PathFilter extends ViewerFilter
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getFullPath().toPortableString());
 			try
 			{
-				queryResults = index.query(new String[] { IIndexConstants.CSS_FILE }, null, 0);
+				queryResults = index.query(new String[] { IHTMLIndexConstants.RESOURCE_CSS,
+						IHTMLIndexConstants.RESOURCE_JS }, null, 0);
 			}
 			catch (IOException e)
 			{
 				return false;
 			}
 		}
-		for (QueryResult result : queryResults)
+		if (queryResults != null)
 		{
-			String[] documents = result.getDocuments();
-			for (String document : documents)
+			for (QueryResult result : queryResults)
 			{
-				if ((match(document) && rawPath.equals(result.getWord()))
-						|| (match(result.getWord()) && rawPath.equals(document)))
+				String[] documents = result.getDocuments();
+				for (String document : documents)
 				{
-					return true;
+					if ((match(document) && rawPath.equals(result.getWord()))
+							|| (match(result.getWord()) && rawPath.equals(document)))
+					{
+						return true;
+					}
 				}
 			}
 		}

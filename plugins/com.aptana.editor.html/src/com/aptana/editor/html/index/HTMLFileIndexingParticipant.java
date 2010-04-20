@@ -25,7 +25,9 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 	private static final String[] HTML_EXTENSIONS = { "html", "htm" }; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final String ELEMENT_LINK = "link"; //$NON-NLS-1$
+	private static final String ELEMENT_SCRIPT = "script"; //$NON-NLS-1$
 	private static final String ATTRIBUTE_HREF = "href"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_SRC = "src"; //$NON-NLS-1$
 
 	public HTMLFileIndexingParticipant()
 	{
@@ -84,6 +86,19 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					CSSFileIndexingParticipant.walkNode(index, file, child);
 				}
 			}
+			if (htmlSpecialNode.getName().equals(ELEMENT_SCRIPT))
+			{
+				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
+				if (jsSource != null)
+				{
+					IFile jsFile = file.getParent().getFile(new Path(jsSource));
+					if (jsFile.exists())
+					{
+						addIndex(index, file, IHTMLIndexConstants.RESOURCE_JS, jsFile.getProjectRelativePath()
+								.toPortableString());
+					}
+				}
+			}
 		}
 		else if (parent instanceof HTMLElementNode)
 		{
@@ -108,7 +123,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					IFile cssFile = file.getParent().getFile(new Path(cssLink));
 					if (cssFile.exists())
 					{
-						addIndex(index, file, IIndexConstants.CSS_FILE, cssFile.getProjectRelativePath()
+						addIndex(index, file, IHTMLIndexConstants.RESOURCE_CSS, cssFile.getProjectRelativePath()
 								.toPortableString());
 					}
 				}
