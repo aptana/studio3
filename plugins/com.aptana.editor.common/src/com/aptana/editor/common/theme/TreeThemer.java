@@ -70,11 +70,7 @@ public class TreeThemer
 
 	public void apply()
 	{
-		if (getTree() != null && !getTree().isDisposed())
-		{
-			getTree().setBackground(getBackground());
-			getTree().setForeground(getForeground());
-		}
+		applyTheme();
 		addSelectionColorOverride();
 		addCustomTreeControlDrawing();
 		addMeasureItemListener();
@@ -507,12 +503,24 @@ public class TreeThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					if (fTreeViewer != null)
-						fTreeViewer.refresh();
+					applyTheme();
 				}
 			}
 		};
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	private void applyTheme()
+	{
+		if (getTree() != null && !getTree().isDisposed())
+		{
+			getTree().setBackground(getBackground());
+			getTree().setForeground(getForeground());
+			if (fTreeViewer != null)
+			{
+				fTreeViewer.refresh(true);
+			}
+		}
 	}
 
 	public void dispose()
