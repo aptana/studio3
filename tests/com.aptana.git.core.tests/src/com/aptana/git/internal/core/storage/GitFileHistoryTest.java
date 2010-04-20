@@ -55,7 +55,7 @@ public class GitFileHistoryTest extends TestCase
 						new NullProgressMonitor());
 			}
 			// refresh the index
-			index.refresh();
+			index.refresh(new NullProgressMonitor());
 
 			// Stage the new file
 			int tries = 100;
@@ -72,7 +72,7 @@ public class GitFileHistoryTest extends TestCase
 			assertNotNull(toStage);
 			assertTrue(toStage.size() > 0);
 			assertTrue(index.stageFiles(toStage));
-			index.refresh();
+			index.refresh(new NullProgressMonitor());
 			assertTrue(index.commit(contents));
 		}
 

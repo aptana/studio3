@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.git.core.GitPlugin;
@@ -90,7 +91,7 @@ public class GitRepositoryTest extends TestCase
 		writer.write("Hello World!");
 		writer.close();
 		// refresh the index
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
@@ -176,7 +177,7 @@ public class GitRepositoryTest extends TestCase
 		writer.write("\nHello second line!");
 		writer.close();
 		// refresh the index
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changed = index.changedFiles();
@@ -351,7 +352,7 @@ public class GitRepositoryTest extends TestCase
 		writer.write("Hello Branched World!");
 		writer.close();
 		// refresh the index
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 
 		// Now there should be a single file that's been changed!
 		List<ChangedFile> changedFiles = index.changedFiles();

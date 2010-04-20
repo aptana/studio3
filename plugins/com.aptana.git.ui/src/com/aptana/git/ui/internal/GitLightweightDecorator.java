@@ -216,7 +216,8 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		GitRepository repo = getRepo(resource);
 		if (repo == null)
 			return;
-
+		// TODO Add a temporal cache per repo/branch for this data so we don't recalculate for a ton of projects, Just store it for like a second...?
+		
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ["); //$NON-NLS-1$
 		String branch = repo.currentBranch();
@@ -302,7 +303,8 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	public void indexChanged(IndexChangedEvent e)
 	{
 		// FIXME Force a total refresh if the number of changed files is over some maximum!
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.changedFiles());
+		Set<IResource> resources = e.getFilesWithChanges();
+		
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
 		resources.addAll(getAllAncestors(resources));

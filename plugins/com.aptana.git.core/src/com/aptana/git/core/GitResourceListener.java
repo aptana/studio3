@@ -98,8 +98,9 @@ class GitResourceListener implements IResourceChangeListener
 							return false;
 					}
 
-					// All seems good, schedule the repo for update. 
-					// TODO We force a refresh of the whole index for this repo. Maybe we should see if there's a way to refresh the status of just this file?
+					// All seems good, schedule the repo for update.
+					// TODO We force a refresh of the whole index for this repo. Maybe we should see if there's a way to
+					// refresh the status of just this file?
 					resourcesToUpdate.add(mapping);
 
 					if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) > 1)
@@ -150,22 +151,9 @@ class GitResourceListener implements IResourceChangeListener
 		{
 			if (repo == null)
 				continue;
-			Job job = new Job("Updating Git repo index") //$NON-NLS-1$
-			{
-				@Override
-				protected IStatus run(IProgressMonitor monitor)
-				{
-					// FIXME This seems to be getting triggered even when we're staging/unstaging files through the
-					// model. This is probably due to refresh calls we're sending...
-					GitIndex index = repo.index();
-					if (index != null)
-						index.refresh();
-					return Status.OK_STATUS;
-				}
-			};
-			job.setSystem(true);
-			job.setPriority(Job.SHORT);
-			job.schedule();
+			GitIndex index = repo.index();
+			if (index != null)
+				index.refreshAsync(); // queue up a refresh
 		}
 	}
 

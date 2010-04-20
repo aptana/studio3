@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -77,107 +78,86 @@ public class GitRepository
 			// FIXME When actions are taken through our model/UI we end up causing multiple refreshes for index changes
 			// index appears to change on commit/stage/unstage/pull
 			// Add listener for changes in HEAD (i.e. switched branches), and index
-			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_ANY,
-					false, new JNotifyAdapter()
+			fileWatcherIds.add(FileWatcher.addWatch(gitDirPath(), IJNotify.FILE_ANY, false, new JNotifyAdapter()
+			{
+
+				private Set<String> filesToWatch;
+
+				@Override
+				public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+				{
+					if (newName == null || !filesToWatch().contains(newName))
+						return;
+					if (newName.equals(HEAD))
+						checkForBranchChange();
+					else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
+						refreshIndex();
+				}
+
+				@Override
+				public void fileCreated(int wd, String rootPath, String name)
+				{
+					if (name != null && name.equals(INDEX))
+						refreshIndex();
+				}
+
+				@Override
+				public void fileDeleted(int wd, String rootPath, String name)
+				{
+					if (name != null && name.equals(INDEX))
+						refreshIndex();
+				}
+
+				private Set<String> filesToWatch()
+				{
+					if (filesToWatch == null)
 					{
+						filesToWatch = new HashSet<String>();
+						filesToWatch.add(HEAD);
+						filesToWatch.add(INDEX);
+						filesToWatch.add(COMMIT_EDITMSG);
+					}
+					return filesToWatch;
+				}
 
-						private Set<String> filesToWatch;
-						private Job indexRefreshJob;
+				@Override
+				public void fileModified(int wd, String rootPath, String name)
+				{
+					if (name == null || !filesToWatch().contains(name))
+						return;
+					if (name.equals(HEAD))
+						checkForBranchChange();
+					else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
+						refreshIndex();
+				}
 
+				// Do long running work in another thread/job so we don't tie up the jnotify locks!
+				private void refreshIndex()
+				{
+					index().refreshAsync();
+				}
+
+				protected void checkForBranchChange()
+				{
+					Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
+					{
 						@Override
-						public void fileRenamed(int wd, String rootPath, String oldName, String newName)
+						protected IStatus run(IProgressMonitor monitor)
 						{
-							if (newName == null || !filesToWatch().contains(newName))
-								return;
-							if (newName.equals(HEAD))
-								checkForBranchChange();
-							else if (newName.equals(INDEX) || newName.equals(COMMIT_EDITMSG))
-								refreshIndex();
+							String oldBranchName = currentBranch.simpleRef().shortName();
+							_headRef = null;
+							readCurrentBranch();
+							String newBranchName = currentBranch.simpleRef().shortName();
+							if (oldBranchName.equals(newBranchName))
+								return Status.OK_STATUS;
+							fireBranchChangeEvent(oldBranchName, newBranchName);
+							return Status.OK_STATUS;
 						}
-						
-						@Override
-						public void fileCreated(int wd, String rootPath, String name)
-						{
-							if (name != null && name.equals(INDEX))
-								refreshIndex();
-						}
-						
-						@Override
-						public void fileDeleted(int wd, String rootPath, String name)
-						{
-							if (name != null && name.equals(INDEX))
-								refreshIndex();
-						}
-
-						private Set<String> filesToWatch()
-						{
-							if (filesToWatch == null)
-							{
-								filesToWatch = new HashSet<String>();
-								filesToWatch.add(HEAD);
-								filesToWatch.add(INDEX);
-								filesToWatch.add(COMMIT_EDITMSG);
-							}
-							return filesToWatch;
-						}
-
-						@Override
-						public void fileModified(int wd, String rootPath, String name)
-						{
-							if (name == null || !filesToWatch().contains(name))
-								return;
-							if (name.equals(HEAD))
-								checkForBranchChange();
-							else if (name.equals(INDEX) || name.equals(COMMIT_EDITMSG))
-								refreshIndex();
-						}
-
-						// Do long running work in another thread/job so we don't tie up the jnotify locks!
-						private void refreshIndex()
-						{
-							if (indexRefreshJob == null)
-							{
-								indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
-								{
-									@Override
-									protected IStatus run(IProgressMonitor monitor)
-									{
-										if (monitor != null && monitor.isCanceled())
-											return Status.CANCEL_STATUS;
-										index().refresh();
-										return Status.OK_STATUS;
-									}
-								};
-								indexRefreshJob.setSystem(true);
-							}
-							else
-							{
-								indexRefreshJob.cancel();
-							}
-							indexRefreshJob.schedule(50);
-						}
-
-						protected void checkForBranchChange()
-						{
-							Job job = new Job("Checking for current branch switch") //$NON-NLS-1$
-							{
-								@Override
-								protected IStatus run(IProgressMonitor monitor)
-								{
-									String oldBranchName = currentBranch.simpleRef().shortName();
-									_headRef = null;
-									readCurrentBranch();
-									String newBranchName = currentBranch.simpleRef().shortName();
-									if (oldBranchName.equals(newBranchName))
-										return Status.OK_STATUS;
-									fireBranchChangeEvent(oldBranchName, newBranchName);
-									return Status.OK_STATUS;
-								}
-							};
-							job.setSystem(true);
-							job.schedule();
-						}
-					}));
+					};
+					job.setSystem(true);
+					job.schedule();
+				}
+			}));
 
 			// Add listener for remotes
 			if (gitFile(GitRef.REFS_REMOTES).isDirectory())
@@ -620,7 +600,7 @@ public class GitRepository
 		if (index == null)
 		{
 			index = new GitIndex(this, workingDirectory());
-			index.refresh(false); // Don't want to call back to fireIndexChangeEvent yet!
+			index.refresh(false, new NullProgressMonitor()); // Don't want to call back to fireIndexChangeEvent yet!
 		}
 		return index;
 	}
@@ -652,11 +632,15 @@ public class GitRepository
 			listener.branchAdded(e);
 	}
 
-	void fireIndexChangeEvent(Collection<ChangedFile> changedFiles)
+	void fireIndexChangeEvent(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> changedFiles)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
-		IndexChangedEvent e = new IndexChangedEvent(this, changedFiles);
+
+		IndexChangedEvent e = new IndexChangedEvent(this, preChangeFiles, changedFiles);
+		// If there's no diff, don't even fire the event
+		if (!e.hasDiff())
+			return;
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
 	}
@@ -982,7 +966,7 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
-		index().refresh();
+		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 
@@ -994,7 +978,7 @@ public class GitRepository
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
 		if (result.keySet().iterator().next() != 0)
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
-		index().refresh();
+		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 
@@ -1007,7 +991,7 @@ public class GitRepository
 			String message = result.values().iterator().next();
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, message, null);
 		}
-		index().refresh();
+		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
 

@@ -16,6 +16,16 @@ public class ChangedFile
 		this.path = path;
 	}
 	
+	ChangedFile(ChangedFile other)
+	{
+		this.path = other.path;
+		this.status = other.status;
+		this.hasStagedChanges = other.hasStagedChanges;
+		this.hasUnstagedChanges = other.hasUnstagedChanges;
+		this.commitBlobMode = other.commitBlobMode;
+		this.commitBlobSHA = other.commitBlobSHA;
+	}
+	
 	// Used for unit tests!
 	public ChangedFile(String path, Status status)
 	{
@@ -79,5 +89,12 @@ public class ChangedFile
 	public boolean hasUnmergedChanges()
 	{
 		return getStatus().equals(Status.UNMERGED);
+	}
+	
+	@Override
+	protected Object clone() throws CloneNotSupportedException
+	{
+		// TODO Auto-generated method stub
+		return super.clone();
 	}
 }
