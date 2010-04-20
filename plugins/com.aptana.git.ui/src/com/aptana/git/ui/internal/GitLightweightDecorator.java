@@ -1,7 +1,9 @@
 package com.aptana.git.ui.internal;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
@@ -91,6 +93,7 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	}
 
 	private IPreferenceChangeListener fThemeChangeListener;
+	private Map<RepoBranch, TimestampedString> cache = new HashMap<RepoBranch, TimestampedString>();
 
 	public GitLightweightDecorator()
 	{
@@ -216,11 +219,22 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		GitRepository repo = getRepo(resource);
 		if (repo == null)
 			return;
-		// TODO Add a temporal cache per repo/branch for this data so we don't recalculate for a ton of projects, Just store it for like a second...?
+		
+		String branch = repo.currentBranch();
+		// Adds a temporal cache per repo/branch for this data so we 
+		// don't recalculate for a ton of projects, Just store it for like a second...?
+		RepoBranch repoBranch = new RepoBranch(repo, branch);
+		TimestampedString result = cache.get(repoBranch);
+		if (result != null && !result.isOlderThan(1000))
+		{
+			decoration.addSuffix(result.string);
+			return;
+		}
+		cache.remove(repoBranch);
+		
 		
 		StringBuilder builder = new StringBuilder();
 		builder.append(" ["); //$NON-NLS-1$
-		String branch = repo.currentBranch();
 		builder.append(branch);
 		String[] commits = repo.commitsAhead(branch);
 		if (commits != null && commits.length > 0)
@@ -236,7 +250,9 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 				builder.append("-").append(commits.length); //$NON-NLS-1$
 		}
 		builder.append("]"); //$NON-NLS-1$
-		decoration.addSuffix(builder.toString());
+		String value = builder.toString();
+		cache.put(repoBranch, new TimestampedString(value));
+		decoration.addSuffix(value);
 	}
 
 	
@@ -250,6 +266,8 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 			getGitRepositoryManager().removeListenerFromEachRepository(this);
 			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fThemeChangeListener);
+			cache.clear();
+			cache = null;
 		}
 		finally
 		{
@@ -302,12 +320,13 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 
 	public void indexChanged(IndexChangedEvent e)
 	{
-		// FIXME Force a total refresh if the number of changed files is over some maximum!
+		// TODO Force a total refresh if the number of changed files is over some maximum?
 		Set<IResource> resources = e.getFilesWithChanges();
 		
 		// Need to mark all parents up to project for refresh so the dirty flag can get recomputed for these
 		// ancestor folders!
 		resources.addAll(getAllAncestors(resources));
+		// TODO On a commit clear the cache?
 		// FIXME Only add projects if this was a commit (so the plus/minus changes), not just a file edited/staged/unstaged
 		// Also refresh any project sharing this repo (so the +/- commits ahead can be refreshed)
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
@@ -400,12 +419,14 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	public void pulled(PullEvent e)
 	{
 		// FIXME do nothing? Call refresh?
+		cache.clear();
 	}
 
 	@Override
 	public void pushed(PushEvent e)
 	{
 		// FIXME do nothing? Call refresh?
+		cache.clear();
 	}
 
 	@Override
@@ -418,5 +439,66 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	public void branchRemoved(BranchRemovedEvent e)
 	{
 		// do nothing
+	}
+	
+	// Simple classes used for a time-based cache on the project decorations
+	
+	private static class TimestampedString
+	{
+		String string;
+		Long timestamp;
+		
+		public TimestampedString(String value)
+		{
+			this.string = value;
+			this.timestamp = System.currentTimeMillis();
+		}
+
+		public boolean isOlderThan(int millis)
+		{
+			return (timestamp + millis) < System.currentTimeMillis();
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (!(obj instanceof TimestampedString))
+				return false;
+			TimestampedString other = (TimestampedString) obj;
+			return other.string.equals(string) && other.timestamp.equals(timestamp);
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return (31 + string.hashCode()) * (31 + timestamp.hashCode());
+		}
+	}
+	
+	private static class RepoBranch
+	{
+		GitRepository repo;
+		String branch;
+		
+		RepoBranch(GitRepository repo, String branch)
+		{
+			this.repo = repo;
+			this.branch = branch;
+		}
+		
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (!(obj instanceof RepoBranch))
+				return false;
+			RepoBranch other = (RepoBranch) obj;
+			return other.repo.equals(repo) && other.branch.equals(branch);
+		}
+		
+		@Override
+		public int hashCode()
+		{
+			return (31 + repo.hashCode()) * (31 + branch.hashCode());
+		}
 	}
 }
