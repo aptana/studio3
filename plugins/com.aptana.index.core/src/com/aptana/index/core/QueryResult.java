@@ -36,6 +36,11 @@ public class QueryResult
 		return word;
 	}
 
+	public String[] getDocuments()
+	{
+		return documentNames.toArray(new String[documentNames.size()]);
+	}
+
 	public boolean isEmpty()
 	{
 		return this.documentTables.isEmpty() && this.documentNames.isEmpty();

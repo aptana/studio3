@@ -23,7 +23,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide;bundle-version="3.4.0",
  org.eclipse.team.core;bundle-version="3.4.0",
  org.eclipse.ui.browser,
- com.aptana.usage;bundle-version="3.0.0"
+ com.aptana.usage;bundle-version="3.0.0",
+ com.aptana.index.core,
+ com.aptana.editor.css
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

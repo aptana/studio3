@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.css.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.index.IIndexConstants;
@@ -22,6 +23,9 @@ import com.aptana.util.IOUtil;
 public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 {
 	private static final String[] HTML_EXTENSIONS = { "html", "htm" }; //$NON-NLS-1$ //$NON-NLS-2$
+
+	private static final String ELEMENT_LINK = "link"; //$NON-NLS-1$
+	private static final String ATTRIBUTE_HREF = "href"; //$NON-NLS-1$
 
 	public HTMLFileIndexingParticipant()
 	{
@@ -83,17 +87,31 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 		}
 		else if (parent instanceof HTMLElementNode)
 		{
-			String cssClass = ((HTMLElementNode) parent).getCSSClass();
+			HTMLElementNode element = (HTMLElementNode) parent;
+			String cssClass = element.getCSSClass();
 			if (cssClass != null && cssClass.trim().length() > 0)
 			{
 				StringTokenizer tokenizer = new StringTokenizer(cssClass);
 				while (tokenizer.hasMoreTokens())
 					addIndex(index, file, IIndexConstants.CSS_CLASS, tokenizer.nextToken());
 			}
-			String id = ((HTMLElementNode) parent).getID();
+			String id = element.getID();
 			if (id != null && id.trim().length() > 0)
 			{
 				addIndex(index, file, IIndexConstants.CSS_IDENTIFIER, id);
+			}
+			if (element.getName().equals(ELEMENT_LINK))
+			{
+				String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
+				if (cssLink != null)
+				{
+					IFile cssFile = file.getParent().getFile(new Path(cssLink));
+					if (cssFile.exists())
+					{
+						addIndex(index, file, IIndexConstants.CSS_FILE, cssFile.getProjectRelativePath()
+								.toPortableString());
+					}
+				}
 			}
 		}
 
