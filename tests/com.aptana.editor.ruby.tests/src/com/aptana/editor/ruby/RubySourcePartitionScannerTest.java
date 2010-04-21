@@ -768,6 +768,30 @@ public class RubySourcePartitionScannerTest extends TestCase
 		assertToken(scanner, RubySourceConfiguration.DEFAULT, 23, 1);
 		assertToken(scanner, RubySourceConfiguration.DEFAULT, 24, 8);
 	}
+	
+	/*
+	 * https://aptana.lighthouseapp.com/projects/45260/tickets/372-color-syntax-when-dividing-inline-ruby
+	 */
+	public void testBug372()
+	{
+		String code = "\"#{@mem / 100.0}\", @test_object\n\"#{@mem / 100.0}\", @test_object";
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 0);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 2);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 3);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 14);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 15);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 16);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 17);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 31);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 32);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 34);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 35);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 46);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 47);
+		assertContentType(RubySourceConfiguration.STRING_DOUBLE, code, 48);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 49);
+		assertContentType(RubySourceConfiguration.DEFAULT, code, 62);
+	}
 
 	private void assertToken(IPartitionTokenScanner scanner, String contentType, int offset, int length)
 	{

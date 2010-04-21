@@ -815,7 +815,7 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 
 	/**
 	 * Used to find the end of string interpolation (the '}'). Uses a stack to maintain nesting of strings/regexp, and
-	 * knowledge of esacape chars.
+	 * knowledge of escape chars.
 	 * 
 	 * @author cwilliams
 	 */
@@ -859,6 +859,11 @@ public class RubySourcePartitionScanner implements IPartitionTokenScanner
 						}
 						else
 						{
+							// if we hit an '"' with an open '/' we assume we're done. Ticket #372
+							if (stack.contains("/") && !stack.contains("\"") && lastEndBrace != -1) //$NON-NLS-1$ //$NON-NLS-2$
+							{
+								return lastEndBrace;
+							}
 							if (!topEquals("'")) //$NON-NLS-1$
 								push("\""); //$NON-NLS-1$
 						}
