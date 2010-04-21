@@ -1358,13 +1358,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		}
 	}
 
-	protected void themeChanged()
-	{
-		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getBackground()));
-	}
-
 	/**
 	 * Here we dynamically remove a large number of the right-click context menu's items for the App Explorer.
 	 * 
