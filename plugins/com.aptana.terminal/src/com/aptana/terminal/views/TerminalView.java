@@ -37,9 +37,9 @@ package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -47,6 +47,12 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -129,7 +135,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			view = (TerminalView) page.showView(TerminalView.ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 			view.initialize(title, workingDirectory);
 		} catch (PartInitException e) {
-			Activator.logError("Terminal view creation failed.", e);
+			Activator.logError("Terminal view creation failed.", e); //$NON-NLS-1$
 		}
 		return view;
 	}
@@ -202,6 +208,30 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 						if (focusControl == e.display.getFocusControl()) {
 							keyDownFilter.setEnabled(enabled);
 						}
+					}
+				}
+			}
+		});
+		
+		// Add drag and drop support for file paths		
+		DropTarget dt = new DropTarget(fCtlTerminal.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
+		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dt.addDropListener(new DropTargetAdapter()
+		{
+			public void drop(DropTargetEvent event)
+			{
+				FileTransfer ft = FileTransfer.getInstance();
+				if (ft.isSupportedType(event.currentDataType))
+				{
+					String fileList[] = (String[]) event.data;
+					if (fileList != null && fileList.length > 0)
+					{
+						StringBuilder builder = new StringBuilder();
+						for (String file : fileList)
+						{
+							builder.append(file).append(" "); //$NON-NLS-1$
+						}				
+						fCtlTerminal.pasteString(builder.toString());
 					}
 				}
 			}
