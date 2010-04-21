@@ -17,6 +17,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
+import com.aptana.console.process.ConsoleProcessFactory;
 import com.aptana.git.core.GitPlugin;
 
 /**
@@ -87,6 +88,7 @@ public abstract class Launcher
 		config.setAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT, true);
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
+		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
 		Map<String, String> env = new HashMap<String, String>();
 		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
 		if (git_ssh != null)
