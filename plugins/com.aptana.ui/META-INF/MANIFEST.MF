@@ -6,6 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.ui.UIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.ui.workbench
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
