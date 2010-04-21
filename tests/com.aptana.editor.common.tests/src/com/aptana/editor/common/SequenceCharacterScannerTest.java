@@ -23,7 +23,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		ruleBasedScanner = new RuleBasedScanner();
 		IPartitionScannerSwitchStrategy switchStrategy = new PartitionScannerSwitchStrategy(
 				new String[] { "</script>" }, new String[][] {});
-		scanner = new SequenceCharacterScanner(ruleBasedScanner, switchStrategy);
+		scanner = new SequenceCharacterScanner(ruleBasedScanner, switchStrategy, true);
 	}
 
 	@Override
@@ -86,4 +86,15 @@ public class SequenceCharacterScannerTest extends TestCase
 		assertEquals(ICharacterScanner.EOF, scanner.read());
 	}
 
+	public void testIgnoreCase()
+	{
+		setSource("<SCRIPT>'hi'</SCRIPT>");
+		for (int i = 0; i < 13; i++)
+		{
+			scanner.read();
+		}
+		assertTrue(scanner.foundSequence());
+		scanner.unread();
+		assertFalse(scanner.foundSequence());
+	}
 }
