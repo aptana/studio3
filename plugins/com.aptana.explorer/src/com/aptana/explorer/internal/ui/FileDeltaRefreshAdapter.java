@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.util.EclipseUtils;
 
 class FileDeltaRefreshAdapter extends JNotifyAdapter
 {
@@ -79,12 +78,7 @@ class FileDeltaRefreshAdapter extends JNotifyAdapter
 		if (resource == null)
 			return;
 		// Don't refresh stuff we don't want/can't access/can't see (i.e. .git and it's sub-tree)
-		boolean notToRefresh = resource.isPhantom() || resource.isHidden();
-		if (EclipseUtils.inEclipse35orHigher)
-		{
-			notToRefresh = resource.isTeamPrivateMember(IResource.CHECK_ANCESTORS) || notToRefresh;
-		}
-		if (notToRefresh)
+		if (resource.isPhantom() || resource.isHidden() || resource.isTeamPrivateMember(IResource.CHECK_ANCESTORS))
 		{
 			return;
 		}

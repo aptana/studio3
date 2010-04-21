@@ -479,14 +479,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		search.setLayoutData(searchGridData);
 
-		if (EclipseUtils.inEclipse35orHigher)
-		{
-			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		}
-		else
-		{
-			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		}
+		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
