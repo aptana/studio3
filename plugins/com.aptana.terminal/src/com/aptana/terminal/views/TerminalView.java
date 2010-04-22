@@ -36,7 +36,11 @@
 package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -84,6 +88,7 @@ import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -171,8 +176,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			if (savedState != null) {
 				loadState(savedState);
 			}
-			fCtlTerminal.connectTerminal();
-			hookProcessListener();
+			connectTerminal();
 		}
 		makeActions();
 		hookContextMenu();
@@ -237,7 +241,20 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			}
 		});
 	}
-	
+
+	private void connectTerminal() {
+		Job job = new UIJob("Terminal connect") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				fCtlTerminal.connectTerminal();
+				hookProcessListener();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.schedule(100);
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.Closeable#close()
 	 */
@@ -325,8 +342,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 		}
 		setPartName(title);
 		setWorkingDirectory(workingDirectory);
-		fCtlTerminal.connectTerminal();
-		hookProcessListener();
+		connectTerminal();
 	}
 	
 	protected void setWorkingDirectory(IPath workingDirectory) {

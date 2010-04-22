@@ -594,10 +594,10 @@ static void WriteConsole(void)
 	}
 	if( ::ReadFile(hParentHandles[0], chBuf, sizeof(chBuf), &dwRead, NULL) && (dwRead > 0) )
 	{
-		INPUT_RECORD ir;
-		ir.EventType = KEY_EVENT;
-		ir.Event.KeyEvent.bKeyDown = TRUE;
-		ir.Event.KeyEvent.wRepeatCount = 1;
+		INPUT_RECORD ir[2];
+		ir[0].EventType = KEY_EVENT;
+		ir[0].Event.KeyEvent.bKeyDown = TRUE;
+		ir[0].Event.KeyEvent.wRepeatCount = 1;
 		BOOL hasEscSequence = FALSE;
 		CHAR chSeq[sizeof(chBuf)/sizeof(chBuf[0])];
 		DWORD dwSeqIndex = 0;
@@ -637,33 +637,35 @@ static void WriteConsole(void)
 				hasEscSequence = TRUE;
 				continue;
 			}
-			ir.Event.KeyEvent.uChar.UnicodeChar = ch;
+			ir[0].Event.KeyEvent.uChar.UnicodeChar = ch;
 			SHORT key = ::VkKeyScan(ch);
 			SHORT state = HIBYTE(key);
 			key = LOBYTE(key);
-			ir.Event.KeyEvent.wVirtualKeyCode = key;
-			ir.Event.KeyEvent.dwControlKeyState = 0;
+			ir[0].Event.KeyEvent.wVirtualKeyCode = key;
+			ir[0].Event.KeyEvent.dwControlKeyState = 0;
 			if( (key == VK_CANCEL) ) {
 				::GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
 				continue;
 			}
 			if( (key == VK_BACK) )
 			{
-				ir.Event.KeyEvent.uChar.UnicodeChar = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 2/*MAPVK_VK_TO_CHAR*/);
+				ir[0].Event.KeyEvent.uChar.UnicodeChar = ::MapVirtualKey(ir[0].Event.KeyEvent.wVirtualKeyCode, 2/*MAPVK_VK_TO_CHAR*/);
 			} else
 			{
 				if ((state & 1) == 1) {
-					ir.Event.KeyEvent.dwControlKeyState = SHIFT_PRESSED;
+					ir[0].Event.KeyEvent.dwControlKeyState = SHIFT_PRESSED;
 				}
 				if ((state & 2) == 2) {
-					ir.Event.KeyEvent.dwControlKeyState = LEFT_CTRL_PRESSED;
+					ir[0].Event.KeyEvent.dwControlKeyState = LEFT_CTRL_PRESSED;
 				}
 				if ((state & 4) == 4) {
-					ir.Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
+					ir[0].Event.KeyEvent.dwControlKeyState = LEFT_ALT_PRESSED;
 				}
 			}
-			ir.Event.KeyEvent.wVirtualScanCode = ::MapVirtualKey(ir.Event.KeyEvent.wVirtualKeyCode, 0/*MAPVK_VK_TO_VSC*/);
-			::WriteConsoleInput(hConsoleIn, &ir, 1, &dwWritten);
+			ir[0].Event.KeyEvent.wVirtualScanCode = ::MapVirtualKey(ir[0].Event.KeyEvent.wVirtualKeyCode, 0/*MAPVK_VK_TO_VSC*/);
+			::CopyMemory(&ir[1], &ir[0], sizeof(INPUT_RECORD));
+			ir[1].Event.KeyEvent.bKeyDown = FALSE;
+			::WriteConsoleInput(hConsoleIn, ir, 2, &dwWritten);
 		}
 	}
 }
