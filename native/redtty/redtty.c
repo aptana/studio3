@@ -20,7 +20,7 @@
 #define MIN(a,b)	((a) < (b) ? (a) : (b))
 
 int 
-main (void) 
+main (int argc, char** argv) 
 {
 	/* Read char */
 	char buffer[1024+1];
@@ -45,6 +45,15 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
+			if( argc > 1 ) {
+				unsigned int width, height;
+				if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+					struct winsize size;
+					size.ws_col = width;
+					size.ws_row = height;
+					ioctl(STDOUT_FILENO, TIOCSWINSZ, &size);
+				}
+			}
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
