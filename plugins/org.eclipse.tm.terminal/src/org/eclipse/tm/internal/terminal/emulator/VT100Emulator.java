@@ -118,6 +118,8 @@ public class VT100Emulator implements ControlListener {
 	
 	private int lastCursorLine = -1;
 	private int lastCursorColumn = -1;
+	
+	private boolean insertMode = false;
 
 	Reader fReader;
 
@@ -689,7 +691,12 @@ public class VT100Emulator implements ControlListener {
 					break;
 				}
 			} else {
-				
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 4:
+					insertMode = true;
+					break;
+				}				
 			}
 		}
 	}
@@ -715,7 +722,12 @@ public class VT100Emulator implements ControlListener {
 					break;
 				}
 			} else {
-				
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 4:
+					insertMode = false;
+					break;
+				}								
 			}
 		}
 	}
@@ -1066,6 +1078,9 @@ public class VT100Emulator implements ControlListener {
 	 * <p>
 	 */
 	private void displayNewText(String buffer) {
+		if (insertMode) {
+			text.insertCharacters(buffer.length());
+		}
 		text.appendString(buffer);
 	}
 
