@@ -30,6 +30,7 @@ public class AllTests
 //		suite.addTestSuite(JSParserPerformanceTest.class);
 		suite.addTestSuite(JSEditorTest.class);
 		suite.addTest(com.aptana.editor.js.outline.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.index.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}
