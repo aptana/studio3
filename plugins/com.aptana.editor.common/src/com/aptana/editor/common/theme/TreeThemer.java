@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -55,6 +56,7 @@ public class TreeThemer
 	private Listener measureItemListener;
 	private Listener selectionOverride;
 	private Listener customDrawingListener;
+	private Listener selectionPaintListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -260,6 +262,7 @@ public class TreeThemer
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
+					// FIXME This isn't drawing whole width on windows...
 					gc.setBackground(getSelection());
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
@@ -275,6 +278,37 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.EraseItem, selectionOverride);
+		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
+		selectionPaintListener = new Listener() 
+		{
+			
+			@Override
+			public void handleEvent(Event event) 
+			{
+				TreeItem[] items = tree.getSelection();
+				if (items == null || items.length == 0)
+					return;
+				int clientWidth = tree.getClientArea().width;
+
+				GC gc = event.gc;
+				Color oldBackground = gc.getBackground();
+
+				gc.setBackground(getSelection());
+				for (TreeItem item : items)
+				{
+					Rectangle bounds = item.getBounds();
+					int x = bounds.x + bounds.width;
+					gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+				}
+				gc.setBackground(oldBackground);
+				// force foreground color for Windows. Otherwise on dark themes we get black fg
+				if (isWindows)
+				{
+					gc.setForeground(getForeground());
+				}
+			}
+		};
+		tree.addListener(SWT.Paint, selectionPaintListener);
 	}
 
 	private void addCustomTreeControlDrawing()
@@ -505,6 +539,12 @@ public class TreeThemer
 			getTree().removeListener(SWT.EraseItem, selectionOverride);
 		}
 		selectionOverride = null;
+		
+		if (selectionPaintListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.Paint, selectionPaintListener);
+		}
+		selectionPaintListener = null;
 	}
 
 	private void removeMeasureItemListener()
