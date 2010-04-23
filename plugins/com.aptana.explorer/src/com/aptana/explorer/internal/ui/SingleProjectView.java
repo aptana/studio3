@@ -479,14 +479,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		GridData searchGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		search.setLayoutData(searchGridData);
 
-		if (EclipseUtils.inEclipse35orHigher)
-		{
-			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
-		}
-		else
-		{
-			searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
-		}
+		searchText = new Text(search, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL | SWT.ICON_SEARCH);
 		searchText.setText(initialText);
 		searchText.setToolTipText(Messages.SingleProjectView_Wildcard);
 		searchText.setForeground(searchText.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -613,7 +606,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	 */
 	protected CommonViewer createCommonViewerObject(Composite aParent)
 	{
-		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
+		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION)
 		{
 			@Override
 			public ISelection getSelection()
@@ -1356,13 +1349,6 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		{
 			ExplorerPlugin.logError(e);
 		}
-	}
-
-	protected void themeChanged()
-	{
-		getCommonViewer().getTree().setBackground(
-				CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getThemeManager().getCurrentTheme().getBackground()));
 	}
 
 	/**

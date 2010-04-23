@@ -16,6 +16,16 @@ public class ChangedFile
 		this.path = path;
 	}
 	
+	ChangedFile(ChangedFile other)
+	{
+		this.path = other.path;
+		this.status = other.status;
+		this.hasStagedChanges = other.hasStagedChanges;
+		this.hasUnstagedChanges = other.hasUnstagedChanges;
+		this.commitBlobMode = other.commitBlobMode;
+		this.commitBlobSHA = other.commitBlobSHA;
+	}
+	
 	// Used for unit tests!
 	public ChangedFile(String path, Status status)
 	{

@@ -12,35 +12,6 @@ public class EclipseUtils
 {
 
 	/**
-	 * Are we in Eclipse 3.5 or higher?
-	 */
-	public static boolean inEclipse35orHigher = false;
-
-	static
-	{
-		String version = System.getProperty("osgi.framework.version"); //$NON-NLS-1$
-
-		if (version != null && version.startsWith("3.")) //$NON-NLS-1$
-		{
-			String[] parts = version.split("\\."); //$NON-NLS-1$
-			if (parts.length > 1)
-			{
-				try
-				{
-					int minorVersion = Integer.parseInt(parts[1]);
-					if (minorVersion > 4)
-					{
-						inEclipse35orHigher = true;
-					}
-				}
-				catch (Exception e)
-				{
-				}
-			}
-		}
-	}
-
-	/**
 	 * Retrieves the bundle version of a plugin based on its id.
 	 * 
 	 * @param pluginId

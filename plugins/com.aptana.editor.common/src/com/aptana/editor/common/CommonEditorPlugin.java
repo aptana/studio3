@@ -13,6 +13,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -25,6 +32,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.theme.ColorManager;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.usage.EventLogger;
 import com.aptana.index.core.IndexActivator;
 
 /**
@@ -52,6 +60,75 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private InvasiveThemeHijacker themeHijacker;
 	private FilenameDifferentiator differentiator;
 
+	private final IPartListener fPartListener = new IPartListener()
+	{
+
+		@Override
+		public void partActivated(IWorkbenchPart part)
+		{
+		}
+
+		@Override
+		public void partBroughtToTop(IWorkbenchPart part)
+		{
+		}
+
+		@Override
+		public void partClosed(IWorkbenchPart part)
+		{
+			if (part instanceof IEditorPart)
+			{
+				IEditorPart editorPart = (IEditorPart) part;
+				EventLogger.getInstance().logEvent("editor.closed", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+			}
+		}
+
+		@Override
+		public void partDeactivated(IWorkbenchPart part)
+		{
+		}
+
+		@Override
+		public void partOpened(IWorkbenchPart part)
+		{
+			if (part instanceof IEditorPart)
+			{
+				IEditorPart editorPart = (IEditorPart) part;
+				EventLogger.getInstance().logEvent("editor.opened", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+			}
+		}
+	};
+
+	private final IWindowListener fWindowListener = new IWindowListener()
+	{
+
+		public void windowActivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowClosed(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(fPartListener);
+			}
+		}
+
+		public void windowDeactivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowOpened(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.addPartListener(fPartListener);
+			}
+		}
+	};
+
 	/**
 	 * The constructor
 	 */
@@ -77,6 +154,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
+
+		addPartListener();
 	}
 
 	/*
@@ -93,6 +172,8 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 			prefs.removePreferenceChangeListener(themeHijacker);
 			differentiator.dispose();
+
+			removePartListener();
 		}
 		finally
 		{
@@ -244,5 +325,37 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public IContentTypeTranslator getContentTypeTranslator()
 	{
 		return ContentTypeTranslation.getDefault();
+	}
+
+	private void addPartListener()
+	{
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
+		{
+			partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.addPartListener(fPartListener);
+			}
+		}
+
+		// Listen on any future windows
+		PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+	}
+
+	private void removePartListener()
+	{
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
+		{
+			partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(fPartListener);
+			}
+		}
+		PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 	}
 }

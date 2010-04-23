@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.action.IAction;
@@ -68,13 +69,14 @@ public class MergeBranchAction extends MenuAction
 			{
 				try
 				{
-					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), "merge", //$NON-NLS-1$
+					SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+					ILaunch launch = Launcher.launch(GitExecutable.instance().path(), repo.workingDirectory(), subMonitor.newChild(75), "merge", //$NON-NLS-1$
 							branchName);
 					while (!launch.isTerminated())
 					{
-						Thread.yield();
+						Thread.sleep(50);
 					}
-					repo.index().refresh();
+					repo.index().refresh(subMonitor.newChild(25));
 				}
 				catch (CoreException e)
 				{

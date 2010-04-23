@@ -37,7 +37,7 @@
          </viewShortcut>
          <view
                id="org.eclipse.ui.views.ContentOutline"
-               ratio="0.5"
+               ratio="0.75"
                relationship="bottom"
                relative="com.aptana.explorer.view"
                visible="true">
@@ -88,6 +88,9 @@
          </newWizardShortcut>
          <actionSet
                id="org.eclipse.ui.NavigateActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.ui.edit.text.actionSet.presentation">
          </actionSet>
       </perspectiveExtension>
    </extension>

@@ -93,6 +93,12 @@ public class HTMLParserTest extends TestCase
 		parseTest(source);
 	}
 
+	public void testHTML5() throws Exception
+	{
+		String source = "<HTML><HEAD><STYLE>html {color: red;}</STYLE><SCRIPT>var one = 1;</SCRIPT></HEAD></HTML>\n";
+		parseTest(source);
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);

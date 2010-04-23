@@ -1,13 +1,9 @@
 package com.aptana.git.core;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -15,14 +11,12 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
-import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -54,19 +48,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 	{
 		// We get a list of the files whose status just changed. We need to refresh those and any
 		// parents/ancestors of those.
-		GitRepository repo = e.getRepository();
-		String workingDirectory = repo.workingDirectory();
-		Collection<ChangedFile> changedFiles = e.changedFiles();
-		List<IResource> files = new ArrayList<IResource>();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String path = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
-			if (file == null)
-				continue;
-			files.add(file);
-		}
-		refreshResources(files, IResource.DEPTH_ZERO);
+		refreshResources(e.getFilesWithChanges(), IResource.DEPTH_ZERO);
 	}
 
 	protected void refreshAffectedProjects(GitRepository repo)

@@ -8,4 +8,10 @@ public interface IRubyMethod extends IRubyMember
 	}
 
 	public Visibility getVisibility();
+
+	public String[] getParameters();
+
+	public String[] getBlockVars();
+
+	public boolean isSingleton();
 }

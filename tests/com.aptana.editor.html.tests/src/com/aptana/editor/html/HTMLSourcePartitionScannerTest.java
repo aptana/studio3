@@ -128,4 +128,29 @@ public class HTMLSourcePartitionScannerTest extends TestCase
 		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 222); // Text'<'/p>
 	}
 
+	public void testHTML5()
+	{
+		String source = "<!DOCTYPE html>\n"
+				+ "<HTML><HEAD>\n"
+				+ "<STYLE>html {color: red;}</STYLE>\n"
+				+ "<SCRIPT>var one = 1;</SCRIPT>\n"
+				+ "</HEAD><BODY>\n"
+				+ "</BODY></HTML>";
+		// DOCTYPE
+		assertContentType(HTMLSourceConfiguration.HTML_DOCTYPE, source, 0);
+		// html tag
+		assertContentType(HTMLSourceConfiguration.HTML_TAG, source, 16); // '<'html
+		// Style tag
+		assertContentType(HTMLSourceConfiguration.HTML_STYLE, source, 29); // '<'style>
+		assertContentType(HTMLSourceConfiguration.HTML_STYLE, source, 35); // style'>'html
+		// Inlined CSS
+		assertContentType(CSSSourceConfiguration.DEFAULT, source, 36); // style>'h'tml
+		assertContentType(CSSSourceConfiguration.DEFAULT, source, 53); // '}'
+		// script tag
+		assertContentType(HTMLSourceConfiguration.HTML_SCRIPT, source, 63); // '<'script>
+		assertContentType(HTMLSourceConfiguration.HTML_SCRIPT, source, 70); // <script'>'
+		// Inlined JS
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 71); // <script>'v'
+		assertContentType(JSSourceConfiguration.DEFAULT, source, 82); // ';'</script>
+	}
 }

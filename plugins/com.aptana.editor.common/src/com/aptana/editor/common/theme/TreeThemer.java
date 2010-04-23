@@ -56,7 +56,7 @@ public class TreeThemer
 	private Listener measureItemListener;
 	private Listener selectionOverride;
 	private Listener customDrawingListener;
-	private Listener resizeListener;
+	private Listener selectionPaintListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -70,11 +70,7 @@ public class TreeThemer
 
 	public void apply()
 	{
-		if (getTree() != null && !getTree().isDisposed())
-		{
-			getTree().setBackground(getBackground());
-			getTree().setForeground(getForeground());
-		}
+		applyTheme();
 		addSelectionColorOverride();
 		addCustomTreeControlDrawing();
 		addMeasureItemListener();
@@ -88,25 +84,24 @@ public class TreeThemer
 		ViewerColumn viewer = (ViewerColumn) getTree().getData("org.eclipse.jface.columnViewer"); //$NON-NLS-1$
 		if (viewer == null)
 			return;
-
 		ColumnViewer colViewer = viewer.getViewer();
 		if (colViewer == null)
 			return;
-		IBaseLabelProvider provider = colViewer.getLabelProvider();
-		if (provider instanceof DelegatingCellLabelProvider)
+		DelegatingCellLabelProvider existing = getExistingDelegator(viewer);
+		if (existing != null)
 		{
-			// re-enable
-			DelegatingCellLabelProvider delegating = (DelegatingCellLabelProvider) provider;
-			delegating.enable();
+			existing.enable();
 			colViewer.refresh();
+			return;
 		}
-		else if (provider instanceof CellLabelProvider)
+
+		IBaseLabelProvider provider = colViewer.getLabelProvider();
+		if (provider instanceof CellLabelProvider)
 		{
 			// wrap
 			final CellLabelProvider cellProvider = (CellLabelProvider) provider;
 			DelegatingCellLabelProvider duh = new DelegatingCellLabelProvider(cellProvider);
-			// FIXME This is ending up calling dispose on the wrapped provider, which makes it broken!
-			colViewer.setLabelProvider(duh);
+			viewer.setLabelProvider(duh);
 		}
 		else if (provider instanceof ThemedDelegatingLabelProvider)
 		{
@@ -267,6 +262,7 @@ public class TreeThemer
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
+					// FIXME This isn't drawing whole width on windows...
 					gc.setBackground(getSelection());
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
@@ -282,6 +278,37 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.EraseItem, selectionOverride);
+		// This draws from right end of item to full width of tree, needed on windows so selection is full width of view
+		selectionPaintListener = new Listener() 
+		{
+			
+			@Override
+			public void handleEvent(Event event) 
+			{
+				TreeItem[] items = tree.getSelection();
+				if (items == null || items.length == 0)
+					return;
+				int clientWidth = tree.getClientArea().width;
+
+				GC gc = event.gc;
+				Color oldBackground = gc.getBackground();
+
+				gc.setBackground(getSelection());
+				for (TreeItem item : items)
+				{
+					Rectangle bounds = item.getBounds();
+					int x = bounds.x + bounds.width;
+					gc.fillRectangle(x, bounds.y, clientWidth - x, bounds.height);
+				}
+				gc.setBackground(oldBackground);
+				// force foreground color for Windows. Otherwise on dark themes we get black fg
+				if (isWindows)
+				{
+					gc.setForeground(getForeground());
+				}
+			}
+		};
+		tree.addListener(SWT.Paint, selectionPaintListener);
 	}
 
 	private void addCustomTreeControlDrawing()
@@ -355,15 +382,6 @@ public class TreeThemer
 					int height = metrics.getHeight() + 2;
 					TreeItem item = (TreeItem) event.item;
 					int width = event.gc.stringExtent(item.getText()).x + 24; // minimum width we need for text plus eye
-					// FIX For RR3 #200, Tree items aren't expanding to full width of view, breaking our hover code
-					if (isWindows)
-					{
-						int clientWidth = item.getParent().getClientArea().width; // width of view area
-						Rectangle bounds = item.getBounds(); // bounds of the actual item
-						clientWidth -= bounds.x; // subtract where this item starts on left from width of client area
-						clientWidth += 19; // width of tree control arrows
-						width = Math.max(width, clientWidth);
-					}
 					event.height = height;
 					if (width > event.width)
 						event.width = width;
@@ -371,45 +389,6 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.MeasureItem, measureItemListener);
-		if (isWindows)
-		{
-			// FIXME this is pretty hacky and causes the scrollbar to be visible and then go away as user resizes.
-			resizeListener = new Listener()
-			{
-
-				@Override
-				public void handleEvent(Event event)
-				{
-					try
-					{
-						Method m = Tree.class.getDeclaredMethod("setScrollWidth", Integer.TYPE); //$NON-NLS-1$
-						m.setAccessible(true);
-						int width = maxWidth(tree.getClientArea().width, tree.getItems());
-						m.invoke(tree, width);
-					}
-					catch (Exception e)
-					{
-						CommonEditorPlugin.logError(e);
-					}
-				}
-			};
-			tree.addListener(SWT.Resize, resizeListener);
-		}
-	}
-
-	private int maxWidth(int width, TreeItem[] items)
-	{
-		for (TreeItem item : items)
-		{
-			Rectangle rect = item.getBounds();
-			int itemWidth = rect.x + rect.width;
-			width = Math.max(width, itemWidth);
-			if (item.getExpanded())
-			{
-				width = maxWidth(width, item.getItems());
-			}
-		}
-		return width;
 	}
 
 	private void addFontListener()
@@ -508,12 +487,24 @@ public class TreeThemer
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					if (fTreeViewer != null)
-						fTreeViewer.refresh();
+					applyTheme();
 				}
 			}
 		};
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
+	}
+
+	private void applyTheme()
+	{
+		if (getTree() != null && !getTree().isDisposed())
+		{
+			getTree().setBackground(getBackground());
+			getTree().setForeground(getForeground());
+			if (fTreeViewer != null)
+			{
+				fTreeViewer.refresh(true);
+			}
+		}
 	}
 
 	public void dispose()
@@ -548,6 +539,12 @@ public class TreeThemer
 			getTree().removeListener(SWT.EraseItem, selectionOverride);
 		}
 		selectionOverride = null;
+		
+		if (selectionPaintListener != null && getTree() != null && !getTree().isDisposed())
+		{
+			getTree().removeListener(SWT.Paint, selectionPaintListener);
+		}
+		selectionPaintListener = null;
 	}
 
 	private void removeMeasureItemListener()
@@ -557,12 +554,6 @@ public class TreeThemer
 			getTree().removeListener(SWT.MeasureItem, measureItemListener);
 		}
 		measureItemListener = null;
-
-		if (resizeListener != null && getTree() != null && !getTree().isDisposed())
-		{
-			getTree().removeListener(SWT.Resize, resizeListener);
-		}
-		resizeListener = null;
 	}
 
 	private Tree getTree()

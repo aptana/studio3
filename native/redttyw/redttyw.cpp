@@ -97,8 +97,6 @@ int _tmain(int argc, _TCHAR* argv[])
     dwFlags = CREATE_UNICODE_ENVIRONMENT;
 #endif
 
-	::SetEnvironmentVariable(_T("TERM"), _T("xterm-color"));
-
 	if( !::CreateProcess(
 		NULL,		// No module name (use command line)
         szCmdline,	// Command line

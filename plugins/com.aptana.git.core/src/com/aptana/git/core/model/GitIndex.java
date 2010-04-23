@@ -13,15 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.osgi.util.NLS;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.util.ProcessUtil;
@@ -45,6 +43,8 @@ public class GitIndex
 	private int refreshStatus = 0;
 	private boolean notify;
 	private Map<String, String> amendEnvironment;
+	
+	private Job indexRefreshJob;
 
 	GitIndex(GitRepository repository, String workingDirectory)
 	{
@@ -58,23 +58,57 @@ public class GitIndex
 		this.files = new Vector<ChangedFile>();
 	}
 
-	public void refresh()
+	/**
+	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come rapid-fire.
+	 */
+	public void refreshAsync()
 	{
-		refresh(true);
+		if (indexRefreshJob == null)
+		{
+			indexRefreshJob = new Job("Refreshing git index") //$NON-NLS-1$
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					refresh(monitor);
+					return Status.OK_STATUS;
+				}
+			};
+			indexRefreshJob.setSystem(true);
+		}
+		else
+		{
+			indexRefreshJob.cancel();
+		}
+		indexRefreshJob.schedule(250);
+	}
+	
+	/**
+	 * Run a refresh synchronously.
+	 * @param monitor
+	 * @return
+	 */
+	public IStatus refresh(IProgressMonitor monitor)
+	{
+		return refresh(true, monitor);
 	}
 
-	synchronized void refresh(boolean notify)
+	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
 	{
+		if (monitor != null && monitor.isCanceled())
+			return Status.CANCEL_STATUS;
 		this.notify = notify;
 		refreshStatus = 0;
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null) // couldn't even execute!
-			return;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git update-index"); //$NON-NLS-1$
 		int exitValue = result.keySet().iterator().next();
 		if (exitValue != 0)
-			return;
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
 
 		Set<Job> jobs = new HashSet<Job>();
 		jobs.add(new Job("other files") //$NON-NLS-1$
@@ -123,9 +157,17 @@ public class GitIndex
 						return Status.OK_STATUS;
 					}
 				});
-
-		this.files.clear(); // FIXME Is this right? Seems like after we commit we leave some files in memory that
-		// shouldn't be there anymore (especially unstaged ones)
+		// Last chance to cancel...
+		if (monitor != null && monitor.isCanceled())
+			return Status.CANCEL_STATUS;
+		
+		// We need to hold onto this list so we can send along a before/after diff for the index change event!
+		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.files.size());
+		for (ChangedFile file : this.files)
+		{
+			preRefreshFiles.add(new ChangedFile(file));
+		}		
+		this.files.clear();
 
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
@@ -147,6 +189,27 @@ public class GitIndex
 				// ignore
 			}
 		}
+		
+		// At this point, all index operations have finished.
+		// We need to find all files that don't have either
+		// staged or unstaged files, and delete them
+		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
+		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
+		for (ChangedFile file : this.files)
+		{
+			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
+				deleteFiles.add(file);
+		}
+
+		if (!deleteFiles.isEmpty())
+		{
+			for (ChangedFile file : deleteFiles)
+				files.remove(file);
+		}
+		
+		postIndexChange(preRefreshFiles, toRefresh);
+		
+		return Status.OK_STATUS;
 	}
 
 	private String getParentTree()
@@ -158,32 +221,6 @@ public class GitIndex
 			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904"; //$NON-NLS-1$
 
 		return parent;
-	}
-
-	void setAmend(boolean amend)
-	{
-		if (this.amend == amend)
-			return;
-		this.amend = amend;
-		this.amendEnvironment = null;
-
-		refresh();
-		if (!amend)
-			return;
-
-		// If we amend, we want to keep the author information for the previous commit
-		// We do this by reading in the previous commit, and storing the information
-		// in a dictionary. This dictionary will then later be read by commit()
-		String message = GitExecutable.instance().outputForCommand("cat-file commit HEAD"); //$NON-NLS-1$
-		Pattern p = Pattern.compile("\nauthor ([^\n]*) <([^\n>]*)> ([0-9]+[^\n]*)\n"); //$NON-NLS-1$
-		Matcher m = p.matcher(message);
-		if (m.find())
-		{
-			amendEnvironment = new HashMap<String, String>();
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_NAME, m.group(1));
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_EMAIL, m.group(2));
-			amendEnvironment.put(GitEnv.GIT_AUTHOR_DATE, m.group(3));
-		}
 	}
 
 	private void readOtherFiles(String string)
@@ -207,7 +244,6 @@ public class GitIndex
 		}
 
 		addFilesFromDictionary(dictionary, false, false);
-		indexStepComplete();
 	}
 
 	private void readStagedFiles(String string)
@@ -215,7 +251,6 @@ public class GitIndex
 		List<String> lines = linesFromNotification(string);
 		Map<String, List<String>> dic = dictionaryForLines(lines);
 		addFilesFromDictionary(dic, true, true);
-		indexStepComplete();
 	}
 
 	private void readUnstagedFiles(String string)
@@ -223,7 +258,6 @@ public class GitIndex
 		List<String> lines = linesFromNotification(string);
 		Map<String, List<String>> dic = dictionaryForLines(lines);
 		addFilesFromDictionary(dic, false, true);
-		indexStepComplete();
 	}
 
 	List<String> linesFromNotification(String string)
@@ -361,42 +395,10 @@ public class GitIndex
 		}
 	}
 
-	/**
-	 * This method is called for each of the three processes from above. If all three are finished (self.busy == 0),
-	 * then we can delete all files previously marked as deletable
-	 */
-	private void indexStepComplete()
-	{
-		// if we're still busy, do nothing :)
-		if (--refreshStatus > 0)
-		{
-			return;
-		}
-
-		// At this point, all index operations have finished.
-		// We need to find all files that don't have either
-		// staged or unstaged files, and delete them
-
-		Collection<ChangedFile> toRefresh = new ArrayList<ChangedFile>(this.files);
-		List<ChangedFile> deleteFiles = new ArrayList<ChangedFile>();
-		for (ChangedFile file : this.files)
-		{
-			if (!file.hasStagedChanges && !file.hasUnstagedChanges)
-				deleteFiles.add(file);
-		}
-
-		if (!deleteFiles.isEmpty())
-		{
-			for (ChangedFile file : deleteFiles)
-				files.remove(file);
-		}
-		postIndexChange(toRefresh);
-	}
-
-	private void postIndexChange(Collection<ChangedFile> changedFiles)
+	private void postIndexChange(Collection<ChangedFile> preChangeFiles, Collection<ChangedFile> postChangeFiles)
 	{
 		if (this.notify)
-			this.repository.fireIndexChangeEvent(changedFiles);
+			this.repository.fireIndexChangeEvent(preChangeFiles, postChangeFiles);
 		else
 			this.notify = true;
 	}
@@ -432,14 +434,18 @@ public class GitIndex
 			GitPlugin.logError("Failed to stage files: " + result.values().iterator().next(), null); //$NON-NLS-1$
 			return false;
 		}
-
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(stageFiles.size());
+		for (ChangedFile file : stageFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : stageFiles)
 		{
 			file.hasUnstagedChanges = false;
 			file.hasStagedChanges = true;
 		}
 
-		postIndexChange(stageFiles);
+		postIndexChange(preFiles, stageFiles);
 		return true;
 	}
 
@@ -466,13 +472,18 @@ public class GitIndex
 			return false;
 		}
 
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(unstageFiles.size());
+		for (ChangedFile file : unstageFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : unstageFiles)
 		{
 			file.hasUnstagedChanges = true;
 			file.hasStagedChanges = false;
 		}
 
-		postIndexChange(unstageFiles);
+		postIndexChange(preFiles, unstageFiles);
 		return true;
 	}
 
@@ -496,11 +507,15 @@ public class GitIndex
 			// postOperationFailed("Discarding changes failed with return value " + ret);
 			return;
 		}
-
+		Collection<ChangedFile> preFiles = new ArrayList<ChangedFile>(discardFiles.size());
+		for (ChangedFile file : discardFiles)
+		{
+			preFiles.add(new ChangedFile(file));
+		}
 		for (ChangedFile file : discardFiles)
 			file.hasUnstagedChanges = false;
-
-		postIndexChange(discardFiles);
+		
+		postIndexChange(preFiles, discardFiles);
 	}
 
 	public boolean commit(String commitMessage)
@@ -509,15 +524,13 @@ public class GitIndex
 		if (!success)
 			return false;
 
-		// Need to explicitly fire off changes for the files that were staged and got committed
-		postIndexChange(getStagedFiles());
 		repository.hasChanged();
 
 		amendEnvironment = null;
 		if (amend)
 			this.amend = false;
 		else
-			refresh();
+			refresh(new NullProgressMonitor()); // TODO Run async if we can!
 		return true;
 	}
 
@@ -669,20 +682,6 @@ public class GitIndex
 		return gitFile.delete();
 	}
 
-	private Collection<ChangedFile> getStagedFiles()
-	{
-		Collection<ChangedFile> staged = new ArrayList<ChangedFile>();
-		synchronized (this.files)
-		{
-			for (ChangedFile file : this.files)
-			{
-				if (file.hasStagedChanges())
-					staged.add(file);
-			}
-		}
-		return staged;
-	}
-
 	private void postCommitFailure(String string)
 	{
 		GitPlugin.logError(string, null);
@@ -772,38 +771,5 @@ public class GitIndex
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Used to stage/unstage/discard 'hunks' on files with changes. See http://tomayko.com/writings/the-thing-about-git
-	 * 
-	 * @param hunk
-	 * @param stage
-	 * @param reverse
-	 * @return
-	 */
-	public boolean applyPatch(String hunk, boolean stage, boolean reverse)
-	{
-		List<String> array = new ArrayList<String>();
-		array.add("apply"); //$NON-NLS-1$
-		if (stage)
-			array.add("--cached"); //$NON-NLS-1$
-		if (reverse)
-			array.add("--reverse"); //$NON-NLS-1$
-
-		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, hunk, null,
-				array.toArray(new String[array.size()]));
-
-		if (ret != 0)
-		{
-			GitPlugin.logError(NLS.bind("Applying patch failed with return value {0}. Error: {1}", ret, result.values() //$NON-NLS-1$
-					.iterator().next()), null);
-			return false;
-		}
-
-		// TODO: Try to be smarter about what to refresh
-		refresh();
-		return true;
 	}
 }
