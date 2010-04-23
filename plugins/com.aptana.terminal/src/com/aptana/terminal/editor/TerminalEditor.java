@@ -170,7 +170,11 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
-		return new ITerminalConnector[] { TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID) };
+		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
+		if (connector != null) {
+			connector.getInitializationErrorMessage();
+		}
+		return new ITerminalConnector[] { connector };
 	}
 	
 	private void saveInputState() {
