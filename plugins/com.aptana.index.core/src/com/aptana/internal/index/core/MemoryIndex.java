@@ -86,16 +86,19 @@ public class MemoryIndex
 				}
 				else
 				{
-					// Otherwise we need to check each word individually
-					for (String word : words)
+					if (words != null)
 					{
-						if (Index.isMatch(key, word, matchRules))
+						// Otherwise we need to check each word individually
+						for (String word : words)
 						{
-							QueryResult result = results.get(word);
-							if (result == null)
-								result = new QueryResult(word);
-							result.addDocumentName(entry.getKey());
-							results.put(key, result);
+							if (Index.isMatch(key, word, matchRules))
+							{
+								QueryResult result = results.get(word);
+								if (result == null)
+									result = new QueryResult(word);
+								result.addDocumentName(entry.getKey());
+								results.put(key, result);
+							}
 						}
 					}
 				}
