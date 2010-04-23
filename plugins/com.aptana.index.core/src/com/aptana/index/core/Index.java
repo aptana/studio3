@@ -14,7 +14,6 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 
 public class Index
 {
-
 	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
 			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE;
 	// Separator to use after the container path
@@ -25,6 +24,12 @@ public class Index
 	private DiskIndex diskIndex;
 	public ReadWriteMonitor monitor;
 
+	/**
+	 * Index
+	 * 
+	 * @param path
+	 * @throws IOException
+	 */
 	public Index(String path) throws IOException
 	{
 		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
@@ -37,15 +42,37 @@ public class Index
 		this.diskIndex.initialize();
 	}
 
-	public File getIndexFile() {
+	/**
+	 * getIndexFile
+	 * 
+	 * @return
+	 */
+	public File getIndexFile()
+	{
 		return this.diskIndex == null ? null : this.diskIndex.indexFile;
 	}
-	
+
+	/**
+	 * addEntry
+	 * 
+	 * @param category
+	 * @param key
+	 * @param documentPath
+	 */
 	public void addEntry(String category, String key, String documentPath)
 	{
 		this.memoryIndex.addEntry(category, key, documentPath);
 	}
 
+	/**
+	 * query
+	 * 
+	 * @param categories
+	 * @param key
+	 * @param matchRule
+	 * @return
+	 * @throws IOException
+	 */
 	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
 	{
 		if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
@@ -77,6 +104,14 @@ public class Index
 		return new ArrayList<QueryResult>(results.values());
 	}
 
+	/**
+	 * isMatch
+	 * 
+	 * @param pattern
+	 * @param word
+	 * @param matchRule
+	 * @return
+	 */
 	public static boolean isMatch(String pattern, String word, int matchRule)
 	{
 		if (pattern == null)
@@ -103,6 +138,13 @@ public class Index
 		return false;
 	}
 
+	/**
+	 * patternMatch
+	 * 
+	 * @param pattern
+	 * @param word
+	 * @return
+	 */
 	private static boolean patternMatch(String pattern, String word)
 	{
 		// TODO Sort of like a regexp match, just handle * and ? wildcards in the pattern
@@ -111,6 +153,11 @@ public class Index
 		return false;
 	}
 
+	/**
+	 * save
+	 * 
+	 * @throws IOException
+	 */
 	public void save() throws IOException
 	{
 		// must own the write lock of the monitor
@@ -124,6 +171,11 @@ public class Index
 			System.gc(); // reclaim space if the MemoryIndex was very BIG
 	}
 
+	/**
+	 * hasChanged
+	 * 
+	 * @return
+	 */
 	private boolean hasChanged()
 	{
 		return memoryIndex.hasChanged();
@@ -131,6 +183,7 @@ public class Index
 
 	/**
 	 * Remove all indices for a given document
+	 * 
 	 * @param containerRelativePath
 	 */
 	public void remove(String containerRelativePath)
@@ -138,6 +191,11 @@ public class Index
 		this.memoryIndex.remove(containerRelativePath);
 	}
 
+	/**
+	 * removeCategories
+	 * 
+	 * @param categoryNames
+	 */
 	public void removeCategories(String... categoryNames)
 	{
 		try
@@ -151,5 +209,4 @@ public class Index
 			e.printStackTrace();
 		}
 	}
-
 }
