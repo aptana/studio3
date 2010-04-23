@@ -25,7 +25,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -56,7 +55,6 @@ public class TreeThemer
 	private Listener measureItemListener;
 	private Listener selectionOverride;
 	private Listener customDrawingListener;
-	private Listener resizeListener;
 
 	public TreeThemer(TreeViewer treeViewer)
 	{
@@ -350,15 +348,6 @@ public class TreeThemer
 					int height = metrics.getHeight() + 2;
 					TreeItem item = (TreeItem) event.item;
 					int width = event.gc.stringExtent(item.getText()).x + 24; // minimum width we need for text plus eye
-					// FIX For RR3 #200, Tree items aren't expanding to full width of view, breaking our hover code
-					if (isWindows)
-					{
-						int clientWidth = item.getParent().getClientArea().width; // width of view area
-						Rectangle bounds = item.getBounds(); // bounds of the actual item
-						clientWidth -= bounds.x; // subtract where this item starts on left from width of client area
-						clientWidth += 19; // width of tree control arrows
-						width = Math.max(width, clientWidth);
-					}
 					event.height = height;
 					if (width > event.width)
 						event.width = width;
@@ -366,45 +355,6 @@ public class TreeThemer
 			}
 		};
 		tree.addListener(SWT.MeasureItem, measureItemListener);
-		if (isWindows)
-		{
-			// FIXME this is pretty hacky and causes the scrollbar to be visible and then go away as user resizes.
-			resizeListener = new Listener()
-			{
-
-				@Override
-				public void handleEvent(Event event)
-				{
-					try
-					{
-						Method m = Tree.class.getDeclaredMethod("setScrollWidth", Integer.TYPE); //$NON-NLS-1$
-						m.setAccessible(true);
-						int width = maxWidth(tree.getClientArea().width, tree.getItems());
-						m.invoke(tree, width);
-					}
-					catch (Exception e)
-					{
-						CommonEditorPlugin.logError(e);
-					}
-				}
-			};
-			tree.addListener(SWT.Resize, resizeListener);
-		}
-	}
-
-	private int maxWidth(int width, TreeItem[] items)
-	{
-		for (TreeItem item : items)
-		{
-			Rectangle rect = item.getBounds();
-			int itemWidth = rect.x + rect.width;
-			width = Math.max(width, itemWidth);
-			if (item.getExpanded())
-			{
-				width = maxWidth(width, item.getItems());
-			}
-		}
-		return width;
 	}
 
 	private void addFontListener()
@@ -564,12 +514,6 @@ public class TreeThemer
 			getTree().removeListener(SWT.MeasureItem, measureItemListener);
 		}
 		measureItemListener = null;
-
-		if (resizeListener != null && getTree() != null && !getTree().isDisposed())
-		{
-			getTree().removeListener(SWT.Resize, resizeListener);
-		}
-		resizeListener = null;
 	}
 
 	private Tree getTree()

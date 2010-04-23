@@ -606,7 +606,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	 */
 	protected CommonViewer createCommonViewerObject(Composite aParent)
 	{
-		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL)
+		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION)
 		{
 			@Override
 			public ISelection getSelection()
