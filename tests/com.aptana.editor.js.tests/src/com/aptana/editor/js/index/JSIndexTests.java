@@ -115,4 +115,40 @@ public class JSIndexTests extends TestCase
 		FunctionElement retrievedMethod = (FunctionElement) property;
 		assertEquals(methodName, retrievedMethod.getName());
 	}
+	
+	/**
+	 * testProperty
+	 */
+	public void testProperty()
+	{
+		String typeName = "MyClass";
+		String propertyName = "myProperty";
+		
+		// create type
+		TypeElement type = new TypeElement();
+		type.setName(typeName);
+		
+		// create property within type
+		PropertyElement property = new PropertyElement();
+		property.setName(propertyName);
+		type.addProperty(property);
+		
+		// write type to index
+		this.writeType(type);
+		
+		// then retrieve it
+		TypeElement retrievedType = this.getType(typeName);
+		
+		assertNotNull(retrievedType);
+		assertEquals(typeName, retrievedType.getName());
+		
+		// make sure we have one property
+		PropertyElement[] properties = retrievedType.getProperties();
+		assertNotNull(properties);
+		assertTrue(properties.length == 1);
+		
+		// make sure it is a function
+		PropertyElement retrievedProperty = properties[0];
+		assertEquals(propertyName, retrievedProperty.getName());
+	}
 }

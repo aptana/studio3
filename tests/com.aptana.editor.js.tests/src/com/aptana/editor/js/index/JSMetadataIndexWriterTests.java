@@ -18,6 +18,17 @@ import com.aptana.index.core.IndexManager;
 
 public class JSMetadataIndexWriterTests extends TestCase
 {
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception
+	{
+		IndexManager.getInstance().removeIndex(IndexConstants.METADATA);
+		
+		super.tearDown();
+	}
+	
 	/**
 	 * getIndex
 	 * 
@@ -132,5 +143,32 @@ public class JSMetadataIndexWriterTests extends TestCase
 		// make sure it is the function we added earlier
 		FunctionElement retrievedMethod = (FunctionElement) property;
 		assertEquals(methodName, retrievedMethod.getName());
+	}
+	
+	/**
+	 * testProperty
+	 * 
+	 * @throws ScriptDocException
+	 */
+	public void testProperty() throws ScriptDocException
+	{
+		String typeName = "MyClass";
+		String propertyName = "myProperty";
+		
+		// transfer XML to index and grab our class of interest
+		this.writeMetadataResource("/metadata/typeWithProperty.xml");
+		TypeElement retrievedType = this.getType(typeName);
+		
+		assertNotNull(retrievedType);
+		assertEquals(typeName, retrievedType.getName());
+		
+		// make sure we have one property
+		PropertyElement[] properties = retrievedType.getProperties();
+		assertNotNull(properties);
+		assertTrue(properties.length == 1);
+		
+		// make sure it is a function
+		PropertyElement property = properties[0];
+		assertEquals(propertyName, property.getName());
 	}
 }
