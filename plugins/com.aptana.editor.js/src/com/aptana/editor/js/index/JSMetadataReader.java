@@ -628,7 +628,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitMethod(String ns, String name, String qname)
 	{
-		this._currentType.addFunctionProperty(this._currentFunction);
+		this._currentType.addProperty(this._currentFunction);
 		this._currentFunction = null;
 	}
 

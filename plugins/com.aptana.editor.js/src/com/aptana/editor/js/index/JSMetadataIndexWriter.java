@@ -54,7 +54,7 @@ public class JSMetadataIndexWriter
 			function.getOwningType().getName()
 		);
 
-		index.addEntry("js.function", value, documentPath);
+		index.addEntry(IndexConstants.FUNCTION, value, documentPath);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class JSMetadataIndexWriter
 			propertyTypes
 		);
 
-		index.addEntry("js.property", value, documentPath);
+		index.addEntry(IndexConstants.PROPERTY, value, documentPath);
 	}
 
 	/**
@@ -125,15 +125,16 @@ public class JSMetadataIndexWriter
 		index.addEntry(IndexConstants.TYPE, value, documentPath);
 
 		// write type properties (that are not functions)
-		for (PropertyElement property : type.getNonFunctionProperties())
+		for (PropertyElement property : type.getProperties())
 		{
-			this.writeProperty(index, property);
-		}
-
-		// write function properties
-		for (FunctionElement function : type.getFunctionProperties())
-		{
-			this.writeFunction(index, function);
+			if (property instanceof FunctionElement)
+			{
+				this.writeFunction(index, (FunctionElement) property);
+			}
+			else
+			{
+				this.writeProperty(index, property);
+			}
 		}
 	}
 }

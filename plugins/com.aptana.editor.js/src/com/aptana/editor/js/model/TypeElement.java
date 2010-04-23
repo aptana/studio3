@@ -6,7 +6,6 @@ import java.util.List;
 public class TypeElement extends BaseElement
 {
 	private List<String> _parentTypes = new LinkedList<String>();
-	private List<FunctionElement> _functions = new LinkedList<FunctionElement>();
 	private List<PropertyElement> _properties = new LinkedList<PropertyElement>();
 
 	/**
@@ -14,18 +13,6 @@ public class TypeElement extends BaseElement
 	 */
 	public TypeElement()
 	{
-	}
-
-	/**
-	 * addFunctionProperty
-	 * 
-	 * @param function
-	 */
-	public void addFunctionProperty(FunctionElement function)
-	{
-		this._functions.add(function);
-		
-		function.setOwningType(this);
 	}
 
 	/**
@@ -51,21 +38,11 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
-	 * getFunctionProperties
+	 * getProperties
 	 * 
 	 * @return
 	 */
-	public FunctionElement[] getFunctionProperties()
-	{
-		return this._functions.toArray(new FunctionElement[this._functions.size()]);
-	}
-
-	/**
-	 * getNonFunctionProperties
-	 * 
-	 * @return
-	 */
-	public PropertyElement[] getNonFunctionProperties()
+	public PropertyElement[] getProperties()
 	{
 		return this._properties.toArray(new PropertyElement[this._properties.size()]);
 	}
