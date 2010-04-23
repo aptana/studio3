@@ -3,8 +3,11 @@ package com.aptana.index.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.runtime.IPath;
 
@@ -15,7 +18,10 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 public class Index
 {
 	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
-			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE;
+			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
+	
+	private static final Map<String,Pattern> PATTERNS = new HashMap<String,Pattern>();
+	
 	// Separator to use after the container path
 	public static final char DEFAULT_SEPARATOR = '/';
 	public char separator = DEFAULT_SEPARATOR;
@@ -89,6 +95,7 @@ public class Index
 
 		Map<String, QueryResult> results;
 		int rule = matchRule & MATCH_RULE_INDEX_MASK;
+		
 		if (this.memoryIndex.hasChanged())
 		{
 			results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
@@ -98,10 +105,13 @@ public class Index
 		{
 			results = this.diskIndex.addQueryResults(categories, key, rule, null);
 		}
-		if (results == null)
-			return null;
+		
+		if ((matchRule & SearchPattern.REGEX_MATCH) == SearchPattern.REGEX_MATCH)
+		{
+			PATTERNS.clear();
+		}
 
-		return new ArrayList<QueryResult>(results.values());
+		return (results == null) ? null : new ArrayList<QueryResult>(results.values());
 	}
 
 	/**
@@ -128,12 +138,16 @@ public class Index
 				return patternLength <= wordLength && word.toLowerCase().startsWith(pattern.toLowerCase());
 			case SearchPattern.PATTERN_MATCH:
 				return patternMatch(pattern.toLowerCase(), word.toLowerCase());
+			case SearchPattern.REGEX_MATCH:
+				return regexPatternMatch(pattern, word, false);
 			case SearchPattern.EXACT_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength == wordLength && pattern.equals(word);
 			case SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternLength <= wordLength && word.startsWith(pattern);
 			case SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE:
 				return patternMatch(pattern, word);
+			case SearchPattern.REGEX_MATCH | SearchPattern.CASE_SENSITIVE:
+				return regexPatternMatch(pattern, word, true);
 		}
 		return false;
 	}
@@ -151,6 +165,36 @@ public class Index
 		if (pattern.equals("*")) //$NON-NLS-1$
 			return true;
 		return false;
+	}
+	
+	/**
+	 * regexPatternMatch
+	 * 
+	 * @param regex
+	 * @param word
+	 * @return
+	 */
+	private static boolean regexPatternMatch(String regex, String word, boolean caseSensitive)
+	{
+		Pattern pattern = PATTERNS.get(regex);
+		
+		if (pattern == null)
+		{
+			try
+			{
+				// compile the pattern
+				pattern = (caseSensitive) ? Pattern.compile(regex) : Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+				
+				// cache for later
+				PATTERNS.put(regex, pattern);
+			}
+			catch (PatternSyntaxException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return (pattern != null) ? pattern.matcher(word).find() : false;
 	}
 
 	/**
