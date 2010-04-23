@@ -628,10 +628,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitMethod(String ns, String name, String qname)
 	{
-		System.out.println(this._currentType.getName() + "#" + this._currentFunction.getName() + "()");
-		
 		this._currentType.addFunctionProperty(this._currentFunction);
-		
 		this._currentFunction = null;
 	}
 
@@ -660,8 +657,6 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitProperty(String ns, String name, String qname)
 	{
-		System.out.println(this._currentType.getName() + "." + this._currentProperty.getName());
-		
 		if (this._currentType != null)
 		{
 			this._currentType.addProperty(this._currentProperty);
