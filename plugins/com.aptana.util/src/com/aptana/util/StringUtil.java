@@ -108,4 +108,28 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 != null) : (s2 == null) ? true : !s1.equals(s2);
 	}
+	
+	/**
+	 * join
+	 * @param delimiter
+	 * @param items
+	 * 
+	 * @return
+	 */
+	public static String join(String delimiter, String ... items)
+	{
+		StringBuffer buffer = new StringBuffer();
+		
+		if (items != null && items.length > 0)
+		{
+			buffer.append(items[0]);
+			
+			for (int i = 1; i < items.length; i++)
+			{
+				buffer.append(delimiter).append(items[i]);
+			}
+		}
+		
+		return buffer.toString();
+	}
 }
