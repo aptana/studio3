@@ -43,8 +43,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.IndexContentAssistProcessor;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.css.internal.CSSContentAssistProcessor;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -93,6 +93,6 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
+		return new CSSIndexContentAssistProcessor(getAbstractThemeableEditor());
 	}
 }
