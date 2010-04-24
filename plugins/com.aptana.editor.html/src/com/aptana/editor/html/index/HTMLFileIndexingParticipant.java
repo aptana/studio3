@@ -86,7 +86,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					CSSFileIndexingParticipant.walkNode(index, file, child);
 				}
 			}
-			if (htmlSpecialNode.getName().equals(ELEMENT_SCRIPT))
+			if (htmlSpecialNode.getName().equalsIgnoreCase(ELEMENT_SCRIPT))
 			{
 				String jsSource = htmlSpecialNode.getAttributeValue(ATTRIBUTE_SRC);
 				if (jsSource != null)
@@ -115,7 +115,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 			{
 				addIndex(index, file, IIndexConstants.CSS_IDENTIFIER, id);
 			}
-			if (element.getName().equals(ELEMENT_LINK))
+			if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
 			{
 				String cssLink = element.getAttributeValue(ATTRIBUTE_HREF);
 				if (cssLink != null)

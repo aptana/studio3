@@ -232,7 +232,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return null;
+		return new IndexContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
 	private IInformationControlCreator getInformationPresenterControlCreator(ISourceViewer sourceViewer)
