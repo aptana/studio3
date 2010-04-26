@@ -254,7 +254,7 @@ public class JSMetadataReader extends ValidatingReader
 
 		// determine and set method name
 		String mname = attributes.getValue("name"); //$NON-NLS-1$
-		function.setName((mname == null) ? "#ctor" : mname); //$NON-NLS-1$
+		function.setName((mname == null) ? this._currentType.getName() : mname); //$NON-NLS-1$
 
 		// set scope
 		String scope = attributes.getValue("scope"); //$NON-NLS-1$
