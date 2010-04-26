@@ -11,6 +11,7 @@ import com.aptana.util.StringUtil;
 public class JSMetadataIndexWriter
 {
 	private JSMetadataReader _reader;
+	private int _descriptionCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -20,6 +21,16 @@ public class JSMetadataIndexWriter
 		this._reader = new JSMetadataReader();
 	}
 
+	/**
+	 * getDocumentPath
+	 * 
+	 * @return
+	 */
+	protected String getDocumentPath()
+	{
+		return "";
+	}
+	
 	/**
 	 * loadXML
 	 * 
@@ -32,6 +43,21 @@ public class JSMetadataIndexWriter
 	}
 
 	/**
+	 * writeDescription
+	 * 
+	 * @param description
+	 */
+	protected String writeDescription(Index index, String description)
+	{
+		String indexString = Integer.toString(this._descriptionCount);
+		String value = indexString + IndexConstants.DELIMITER + description;
+		
+		index.addEntry(IndexConstants.DESCRIPTION, value, this.getDocumentPath());
+		
+		return indexString;
+	}
+	
+	/**
 	 * writeFunction
 	 * 
 	 * @param index
@@ -40,21 +66,20 @@ public class JSMetadataIndexWriter
 	 */
 	protected void writeFunction(Index index, FunctionElement function)
 	{
-		String documentPath = "";
-
 		// ParameterElement[] parameters = function.getParameters();
 		// ReturnTypeElement[] returnTypes = function.getReturnTypes();
-		// String description = function.getDescription();
+		String descriptionKey = this.writeDescription(index, function.getDescription());
 		// SinceElement[] sinceList = function.getSinceList();
 		// UserAgentElement[] userAgents = function.getUserAgents();
 		
 		String value = StringUtil.join(
 			IndexConstants.DELIMITER,
 			function.getName(),
-			function.getOwningType().getName()
+			function.getOwningType().getName(),
+			descriptionKey
 		);
 
-		index.addEntry(IndexConstants.FUNCTION, value, documentPath);
+		index.addEntry(IndexConstants.FUNCTION, value, this.getDocumentPath());
 	}
 
 	/**
@@ -66,8 +91,6 @@ public class JSMetadataIndexWriter
 	 */
 	protected void writeProperty(Index index, PropertyElement property)
 	{
-		String documentPath = "";
-
 		String propertyTypes = StringUtil.join(",", property.getTypeNames());
 		// String description = property.getDescription();
 		// SinceElement[] sinceList = property.getSinceList();
@@ -80,7 +103,7 @@ public class JSMetadataIndexWriter
 			propertyTypes
 		);
 
-		index.addEntry(IndexConstants.PROPERTY, value, documentPath);
+		index.addEntry(IndexConstants.PROPERTY, value, this.getDocumentPath());
 	}
 
 	/**
@@ -109,17 +132,17 @@ public class JSMetadataIndexWriter
 		String documentPath = "";
 
 		// write type entry
-		String typeName = type.getName();
 		String[] parentTypes = type.getParentTypes();
-		// String description = type.getDescription();
+		String descriptionKey = this.writeDescription(index, type.getDescription());
 		// SinceElement[] sinceList = type.getSinceList();
 		// UserAgentElement[] userAgents = type.getUserAgents();
 
 		// calculate key value and add to index
 		String value = StringUtil.join(
 			IndexConstants.DELIMITER,
-			typeName,
-			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object"
+			type.getName(),
+			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object",
+			descriptionKey
 		);
 
 		index.addEntry(IndexConstants.TYPE, value, documentPath);
