@@ -1,0 +1,216 @@
+package com.aptana.configurations.processor;
+
+import java.util.Set;
+
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ListenerList;
+
+import com.aptana.scripting.ScriptUtils;
+
+/**
+ * A base class that should be used for all {@link IConfigurationProcessor} implementations.
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
+ */
+public abstract class AbstractConfigurationProcessor implements IConfigurationProcessor
+{
+	protected ConfigurationStatus configurationStatus;
+	protected ListenerList listeners;
+
+	private String processorID;
+	private String processorName;
+	private String[] categories;
+
+	/**
+	 * Constructs a new configuration processor.<br>
+	 * Since this is done through an extension point, make sure that the processor ID is set right after initialization.
+	 */
+	public AbstractConfigurationProcessor()
+	{
+		listeners = new ListenerList(ListenerList.IDENTITY);
+	}
+
+	/**
+	 * Set the configuration processor ID. This call should be made immediately after initializing an instance of this
+	 * class.
+	 * 
+	 * @param processorID
+	 * @throws IllegalStateException
+	 *             In case the processor ID was already set once
+	 */
+	public void setID(String processorID)
+	{
+		if (this.processorID != null)
+		{
+			throw new IllegalStateException("The processor id was already set for this processor!"); //$NON-NLS-1$
+		}
+		this.processorID = processorID;
+		// Make sure that we load or create the status right when we have the id
+		loadStatus();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessor#getID()
+	 */
+	public String getID()
+	{
+		return processorID;
+	}
+
+	/**
+	 * Set the configuration processor name. This call should be made immediately after initializing an instance of this
+	 * class.
+	 * 
+	 * @param processorName
+	 * @throws IllegalStateException
+	 *             In case the processor name was already set once
+	 */
+	public void setName(String processorName)
+	{
+		if (this.processorName != null)
+		{
+			throw new IllegalStateException("The processor name was already set for this processor!"); //$NON-NLS-1$
+		}
+		this.processorName = processorName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessor#getName()
+	 */
+	public String getName()
+	{
+		return processorName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.configurations.processor.IConfigurationProcessor#getStatus(org.eclipse.core.runtime.IProgressMonitor,
+	 * boolean)
+	 */
+	public ConfigurationStatus getStatus(IProgressMonitor progressMonitor, boolean refresh)
+	{
+		if (!refresh)
+		{
+			// just return the status that we have
+			return configurationStatus;
+		}
+		configurationStatus = computeStatus(progressMonitor);
+		return configurationStatus;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessor#addConfigurationProcessorListener(com.aptana.
+	 * configurations.processor.IConfigurationProcessorListener)
+	 */
+	public void addConfigurationProcessorListener(IConfigurationProcessorListener listener)
+	{
+		listeners.add(listener);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.IConfigurationProcessor#removeConfigurationProcessorListener(com.aptana.
+	 * configurations.processor.IConfigurationProcessorListener)
+	 */
+	public void removeConfigurationProcessorListener(IConfigurationProcessorListener listener)
+	{
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Notify the configuration processor listeners about changes with the configuration state.
+	 * 
+	 * @param attributes
+	 *            A Set of attributes
+	 */
+	protected void notifyListeners(Set<String> attributes)
+	{
+		Object[] processorListeners = listeners.getListeners();
+		for (Object obj : processorListeners)
+		{
+			((IConfigurationProcessorListener) obj).configurationStateChanged(configurationStatus, attributes);
+		}
+	}
+
+	/**
+	 * Set a categories list that this processor can be associated with.
+	 * 
+	 * @param categories
+	 */
+	public void setCategories(String[] categories)
+	{
+		this.categories = categories;
+	}
+
+	/**
+	 * Returns the categories that this processor can be associated with.
+	 * 
+	 * @return An array of categories, or an empty array.
+	 */
+	public String[] getCategories()
+	{
+		if (categories == null)
+		{
+			categories = new String[0];
+		}
+		return categories;
+	}
+
+	/**
+	 * Compute the status of this configuration and return an updated ConfigurationStatus.<br>
+	 * This computation is already done in a job and should not start other jobs/threads without joining them.
+	 * 
+	 * @param progressMonitor
+	 *            An optional progress monitor.
+	 * @return An updated ConfigurationStatus after recomputing its status.
+	 */
+	public abstract ConfigurationStatus computeStatus(IProgressMonitor progressMonitor);
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.configurations.processor.IConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
+	 * java.lang.Object)
+	 */
+	public abstract void configure(IProgressMonitor progressMonitor, Object attributes);
+
+	/**
+	 * Returns the Shell command path.
+	 * 
+	 * @return The shell command path.
+	 */
+	public static String getShellPath()
+	{
+		IPath path = ScriptUtils.getShellPath();
+		if (path != null)
+		{
+			return path.toOSString();
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a new UNKNOWN status instance, or load it from the cache in case exists.
+	 * 
+	 * @throws IllegalStateException
+	 *             In case this method was called before setting the processor id.
+	 * @see #setID(String)
+	 */
+	protected void loadStatus()
+	{
+		if (getID() == null)
+		{
+			throw new IllegalStateException(
+					"Could not create/load a configuration status before setting the configuration processor id!"); //$NON-NLS-1$
+		}
+		// Initializing this configuration status will try to load previously saved status if exists.
+		// If not, the status will just be ConfigurationStatus.UNKNOWN.
+		// Pass this instance to the status constructor to be notified when the status changed.
+		configurationStatus = new ConfigurationStatus(getID(), this);
+	}
+}

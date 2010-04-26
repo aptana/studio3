@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="browserInteractions" name="Browser Interactions" schema="schema/browserInteractions.exsd"/>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.portal.ui.browser.PortalBrowserEditor"
+            default="false"
+            icon="icons/obj16/radrails16.png"
+            id="com.aptana.portal.ui.browser.portal"
+            name="Aptana Portal Browser">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.portal.ui.internal.startup.PortalStartup">
+      </startup>
+   </extension>
+   <extension
+         point="com.aptana.configurations.configurationProcessors">
+      <processor
+            category="gems"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.GemsConfigurationProcessor"
+            id="com.aptana.portal.gems.processor"
+            name="Gems">
+      </processor>
+   </extension>
+   <extension
+         point="com.aptana.portal.ui.browserInteractions">
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.RecentFilesActionController"
+            id="portal.recentFiles"
+            name="Recent Files Action Controller">
+      </actionController>
+      <browserNotification
+            class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
+            id="com.aptana.portal.recentFilesNotification"
+            name="Recent Files Notifier"
+            notificationTarget="com.aptana.portal.ui.browser.portal">
+      </browserNotification>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.GemsActionController"
+            configurationProcessor="com.aptana.portal.gems.processor"
+            id="portal.gems"
+            name="Ruby Gems Actions">
+      </actionController>
+   </extension>
+</plugin>

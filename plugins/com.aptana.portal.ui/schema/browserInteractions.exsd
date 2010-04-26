@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.portal" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.portal" id="browserInteractions" name="Browser Interactions"/>
+      </appinfo>
+      <documentation>
+         The browser interactions provides a two-way interaction between the eclipse environment and the BrowserEditor.
+The action controllers extensions are used to provide the Studio API for any JavaScript call from the browser.
+The browser notifiers extensions are used to resister listeners into the eclipse/studio and to notify the browser-editor of some changes in the environment.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="actionController" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="browserNotification" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="actionController">
+      <annotation>
+         <documentation>
+            An action controller is a class that implements IActionController and it&apos;s used by various BrowserFunctions when requested from the browser JavaScript side.
+A browser can trigger a JSON request that will ask for a specific action in a controller. This request is mapped by a DispatcherBrowserFunction to a method inside a registered action controller.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of this action controller is the same id that will be used in the Broswer JavaScript side.
+The JavaScript will create a JSON object with {controller : controller-id}. The extension point registry will then try to locate and instanciate this action controller to invoke one of its actions.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A class that extends the basic AbstractActionController implementation.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="com.aptana.portal.ui.dispatch.actionControllers.AbstractActionController:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="configurationProcessor" type="string">
+            <annotation>
+               <documentation>
+                  In case this action controller is designed to interact with an IConfigurationProcessor, pass the id of that processor.
+The configuration processor will be invoked when needed, and the action controller will interact with the browser through the BrowserNotifier when needed.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.configurations.configurationProcessors/processor/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="browserNotification">
+      <annotation>
+         <documentation>
+            A browser notification extends AbstractBrowserNotification. The browser notification class will register some listeners in the eclipse/studio environment and will notify the browser on specific events.
+This notification is done, and managed, by the BrowserNotifier class. The browser notification extension just need to know about the id of the browser editor that was opened and the notification will be sent to this browser when needed.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An AbstractBrowserNotification implementation that will trigger notification events through the BrowserNotifier when needed.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="com.aptana.portal.ui.dispatch.browserNotifications.AbstractBrowserNotification:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="notificationTarget" type="string" use="default" value="*">
+            <annotation>
+               <documentation>
+                  A comma-separated list of notification targets (browser-editors ids) that will be notified (it opened) when the brower-notification is triggered.
+Use &apos;*&apos; (or leave it empty) to specify a notification for all the registered browser-editors. 
+Note that a BrowserEditor should be registered into the BrowserNotifier class when loaded and should be unregistered when disposed.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>
