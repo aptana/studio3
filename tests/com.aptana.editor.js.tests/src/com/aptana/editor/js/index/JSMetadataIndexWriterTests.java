@@ -49,7 +49,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 */
 	private TypeElement getType(String typeName)
 	{
-		JSMetadataIndexReader reader = new JSMetadataIndexReader();
+		JSIndexReader reader = new JSIndexReader();
 		
 		return reader.readType(this.getIndex(), typeName);
 	}
@@ -91,7 +91,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 		InputStream stream = this.loadResource(resource);
 		assertNotNull(stream);
 		
-		JSMetadataIndexWriter writer = new JSMetadataIndexWriter();
+		JSIndexWriter writer = new JSIndexWriter();
 		writer.loadXML(stream);
 		
 		writer.writeToIndex(this.getIndex());

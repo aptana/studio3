@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.editor.js.index.JSMetadataIndexWriter;
+import com.aptana.editor.js.index.JSIndexWriter;
 import com.aptana.editor.js.index.ScriptDocException;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -47,7 +47,7 @@ public class Activator extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
-		JSMetadataIndexWriter indexer = new JSMetadataIndexWriter();
+		JSIndexWriter indexer = new JSIndexWriter();
 		
 		this.loadJSMetadata(indexer, "/src/com/aptana/editor/js/resources/js_core.xml",
 				"/src/com/aptana/editor/js/resources/dom_0.xml",
@@ -66,7 +66,7 @@ public class Activator extends AbstractUIPlugin
 	 * 
 	 * @param resources
 	 */
-	private void loadJSMetadata(JSMetadataIndexWriter indexer, String... resources)
+	private void loadJSMetadata(JSIndexWriter indexer, String... resources)
 	{
 		for (String resource : resources)
 		{

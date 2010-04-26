@@ -8,7 +8,7 @@ import com.aptana.editor.js.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.util.StringUtil;
 
-public class JSMetadataIndexWriter
+public class JSIndexWriter
 {
 	private JSMetadataReader _reader;
 	private int _descriptionCount;
@@ -16,7 +16,7 @@ public class JSMetadataIndexWriter
 	/**
 	 * JSMetadataIndexer
 	 */
-	public JSMetadataIndexWriter()
+	public JSIndexWriter()
 	{
 		this._reader = new JSMetadataReader();
 	}

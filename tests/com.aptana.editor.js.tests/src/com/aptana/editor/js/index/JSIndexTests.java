@@ -42,7 +42,7 @@ public class JSIndexTests extends TestCase
 	 */
 	private TypeElement getType(String typeName)
 	{
-		JSMetadataIndexReader reader = new JSMetadataIndexReader();
+		JSIndexReader reader = new JSIndexReader();
 		
 		return reader.readType(this.getIndex(), typeName);
 	}
@@ -54,7 +54,7 @@ public class JSIndexTests extends TestCase
 	 */
 	private void writeType(TypeElement type)
 	{
-		JSMetadataIndexWriter writer = new JSMetadataIndexWriter();
+		JSIndexWriter writer = new JSIndexWriter();
 		
 		writer.writeType(this.getIndex(), type);
 	}

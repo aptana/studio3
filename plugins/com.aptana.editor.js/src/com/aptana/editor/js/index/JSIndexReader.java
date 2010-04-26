@@ -11,7 +11,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class JSMetadataIndexReader
+public class JSIndexReader
 {
 	public String getDescription(Index index, String descriptionKey) throws IOException
 	{
