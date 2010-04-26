@@ -196,15 +196,6 @@
          <dynamic
                class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
                id="com.aptana.editor.common.dynamic">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <instanceof
-                        value="org.eclipse.ui.texteditor.ITextEditor">
-                  </instanceof>
-               </with>
-            </visibleWhen>
          </dynamic>
       </menuContribution>
       <menuContribution

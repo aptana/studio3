@@ -336,11 +336,15 @@ public class CommandExecutionUtils
 			ITextEditor textEditor)
 	{
 		ITextViewer textViewer = null;
-		// FIXME This is pretty bad here. What we want is the ISourceViewer of the editor (which is a subinterface of ITextViewer). It just happens that sourceViewer.getTextOperationTarget returns self in this case.
-		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
-		if (adapter instanceof ITextViewer)
+		if (textEditor != null)
 		{
-			textViewer = (ITextViewer) adapter;
+			// FIXME This is pretty bad here. What we want is the ISourceViewer of the editor (which is a subinterface
+			// of ITextViewer). It just happens that sourceViewer.getTextOperationTarget returns self in this case.
+			Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+			if (adapter instanceof ITextViewer)
+			{
+				textViewer = (ITextViewer) adapter;
+			}
 		}
 		return executeCommand(command, invocationType, textViewer, textEditor);
 	}
@@ -348,22 +352,25 @@ public class CommandExecutionUtils
 	public static CommandResult executeCommand(CommandElement command, InvocationType invocationType,
 			ITextViewer textViewer, ITextEditor textEditor)
 	{
-		StyledText textWidget = textViewer.getTextWidget();
-		FilterInputProvider filterInputProvider = null;
-
 		InputType selected = InputType.UNDEFINED;
 		InputType[] inputTypes = command.getInputTypes();
 		if (inputTypes == null || inputTypes.length == 0)
 		{
 			inputTypes = new InputType[] { InputType.UNDEFINED };
 		}
-		for (InputType inputType : inputTypes)
+		
+		FilterInputProvider filterInputProvider = null;
+		if (textViewer != null)
 		{
-			filterInputProvider = getInputProvider(textWidget, command, inputType);
-			if (filterInputProvider != null)
+			StyledText textWidget = textViewer.getTextWidget();
+			for (InputType inputType : inputTypes)
 			{
-				selected = inputType;
-				break;
+				filterInputProvider = getInputProvider(textWidget, command, inputType);
+				if (filterInputProvider != null)
+				{
+					selected = inputType;
+					break;
+				}
 			}
 		}
 		if (filterInputProvider == null)
@@ -445,11 +452,16 @@ public class CommandExecutionUtils
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextEditor textEditor)
 	{
-		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
-		if (adapter instanceof ITextViewer)
+		ITextViewer textViewer = null;
+		if (textEditor != null)
 		{
-			processCommandResult(command, commandResult, (ITextViewer) adapter);
+			Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+			if (adapter instanceof ITextViewer)
+			{
+				textViewer = (ITextViewer) adapter;
+			}
 		}
+		processCommandResult(command, commandResult, textViewer);
 	}
 
 	public static void processCommandResult(CommandElement command, CommandResult commandResult, ITextViewer textViewer)
@@ -460,14 +472,38 @@ public class CommandExecutionUtils
 			return;
 		}
 
-		StyledText textWidget = textViewer.getTextWidget();
-		final int caretOffset = textWidget.getCaretOffset();
+		// separate out the commands that require a text editor and the ones that do not
 		switch (commandResult.getOutputType())
 		{
 			// TODO Move this logic into the enum itself!
 			case DISCARD:
 			case UNDEFINED:
 				break;
+			case SHOW_AS_HTML:
+				showAsHTML(command, commandResult);
+				break;
+			case CREATE_NEW_DOCUMENT:
+				createNewDocument(commandResult);
+				break;
+			case COPY_TO_CLIPBOARD:
+				copyToClipboard(commandResult);
+				break;
+			case OUTPUT_TO_CONSOLE:
+				outputToConsole(commandResult);
+				break;
+			case OUTPUT_TO_FILE:
+				outputToFile(commandResult);
+				break;
+		}
+
+		if (textViewer == null)
+		{
+			return;
+		}
+		StyledText textWidget = textViewer.getTextWidget();
+		final int caretOffset = textWidget.getCaretOffset();
+		switch (commandResult.getOutputType())
+		{
 			case REPLACE_SELECTION:
 				if (commandResult.getInputType() == InputType.DOCUMENT)
 				{
@@ -581,23 +617,8 @@ public class CommandExecutionUtils
 				}
 				SnippetsCompletionProcessor.insertAsTemplate(textViewer, region, commandResult.getOutputString(), commandResult.getCommand());
 				break;
-			case SHOW_AS_HTML:
-				showAsHTML(command, commandResult);
-				break;
 			case SHOW_AS_TOOLTIP:
 				showAsTooltip(commandResult, textWidget, caretOffset);
-				break;
-			case CREATE_NEW_DOCUMENT:
-				createNewDocument(commandResult);
-				break;
-			case COPY_TO_CLIPBOARD:
-				copyToClipboard(commandResult);
-				break;
-			case OUTPUT_TO_CONSOLE:
-				outputToConsole(commandResult);
-				break;
-			case OUTPUT_TO_FILE:
-				outputToFile(commandResult);
 				break;
 		}
 	}
