@@ -171,4 +171,25 @@ public class JSMetadataIndexWriterTests extends TestCase
 		PropertyElement property = properties[0];
 		assertEquals(propertyName, property.getName());
 	}
+	
+	/**
+	 * testTypeDescription
+	 * 
+	 * @throws ScriptDocException
+	 */
+	public void testTypeDescription() throws ScriptDocException
+	{
+		String typeName = "MyClass";
+		
+		// transfer XML to index and grab our class of interest
+		this.writeMetadataResource("/metadata/typeWithDescription.xml");
+		TypeElement retrievedType = this.getType(typeName);
+		
+		assertNotNull(retrievedType);
+		assertEquals(typeName, retrievedType.getName());
+		
+		// make sure we have one property
+		String description = retrievedType.getDescription();
+		assertEquals("This is a description of MyClass", description);
+	}
 }
