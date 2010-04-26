@@ -7,6 +7,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -16,6 +18,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.theme.Theme;
 import com.aptana.git.ui.internal.GitColors;
 
 /**
@@ -51,7 +54,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		themeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@SuppressWarnings("nls")
+			@SuppressWarnings("restriction")
 			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
@@ -59,9 +62,10 @@ public class GitUIPlugin extends AbstractUIPlugin
 				{
 					IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 					// Quick Diff colors
-					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB()));
-					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB()));
-					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB()));
+					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+
 					try
 					{
 						prefs.flush();
@@ -70,6 +74,11 @@ public class GitUIPlugin extends AbstractUIPlugin
 					{
 						GitUIPlugin.logError(e.getMessage(), e);
 					}
+
+					Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+					IPreferenceStore prefStore = org.eclipse.debug.internal.ui.DebugUIPlugin.getDefault().getPreferenceStore();
+					PreferenceConverter.setDefault(prefStore, org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR, theme.getBackground());
+					PreferenceConverter.setDefault(prefStore, org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR, theme.getForeground());
 				}
 			}
 

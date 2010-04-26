@@ -250,7 +250,7 @@ public class FilteringProjectView extends GitProjectView
 		// Do our hover bg coloring
 		tree.addListener(SWT.EraseItem, createHoverBGColorer());
 		// Paint Eyeball
-		tree.addListener(SWT.PaintItem, createEyeballPainter(eyeball, IMAGE_MARGIN, tree));
+		tree.addListener(SWT.Paint, createEyeballPainter(eyeball, IMAGE_MARGIN, tree));
 		// Track hovered item and force it's coloring
 		getCommonViewer().getControl().addMouseMoveListener(createHoverTracker());
 		// Remove hover on exit of tree
@@ -358,16 +358,15 @@ public class FilteringProjectView extends GitProjectView
 		{
 			public void handleEvent(Event event)
 			{
-				TreeItem item = (TreeItem) event.item;
-				if (hoveredItem == null || !hoveredItem.equals(item))
+				if (hoveredItem == null)
 					return;
 				if (eyeball != null)
 				{
-					int itemWidth = item.getParent().getClientArea().width;
+					int itemWidth = tree.getClientArea().width;
 					lastDrawnX = itemWidth - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;
-					int y = event.y + (itemHeight - imageHeight) / 2;
+					int imageHeight = eyeball.getBounds().height;					
+					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
 					event.gc.drawImage(eyeball, lastDrawnX, y);
 				}
 			}

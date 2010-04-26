@@ -3,6 +3,7 @@
 #include <unistd.h> 
 #include <errno.h> 
 #include <string.h>
+#include <ctype.h>
 #include <sys/ioctl.h>
 
 #ifdef LINUX 
@@ -14,13 +15,17 @@
 #include <util.h> 
 #endif
 
-#define SET_SIZE "\033[8;"
+#define ESC '\033'
+#define MAX_ESC_SEQUENCE_LENGTH	16
+#define MIN(a,b)	((a) < (b) ? (a) : (b))
 
 int 
-main (void) 
+main (int argc, char** argv) 
 {
 	/* Read char */
 	char buffer[1024+1];
+	int buffer_index = 0;
+	int buffer_offset;
 	int read_count;
 		
 	/* Descriptor set for select */
@@ -40,6 +45,15 @@ main (void)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
+			if( argc > 1 ) {
+				unsigned int width, height;
+				if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+					struct winsize size;
+					size.ws_col = width;
+					size.ws_row = height;
+					ioctl(STDOUT_FILENO, TIOCSWINSZ, &size);
+				}
+			}
 			execl("/bin/bash", "-bash", "-li", NULL); 
 			
 			perror("exec()"); /* Since exec* never return */ 
@@ -61,7 +75,7 @@ main (void)
 				/* User typed something at STDIN */
 				if (FD_ISSET (STDIN_FILENO, &descriptor_set)) 
 				{
-					read_count = read(STDIN_FILENO, &buffer, sizeof(buffer)-1);
+					read_count = read(STDIN_FILENO, &buffer[buffer_index], sizeof(buffer)-buffer_index-1);
 					
 					switch (read_count)
 					{
@@ -76,35 +90,72 @@ main (void)
 							break;
 							
 						default:
-							buffer[read_count] = '\0';
-							
-							if (!strncmp(buffer, SET_SIZE, strlen(SET_SIZE)))
-							{
-								char *start = buffer + strlen(SET_SIZE);
-								char *semi = strstr(start, ";");
-								char *t = (semi != NULL) ? strstr(semi + 1, "t") : NULL;
+							buffer_index += read_count;
+							buffer[buffer_index] = '\0';
+							buffer_offset = 0;
+							do {
+								char *ch;
+								int i = 0;
 								
-								if (semi != NULL && t != NULL)
+								ch = strchr(&buffer[buffer_offset], ESC);
+								if (ch == NULL)
 								{
-									int height = strtol(start, &semi, 0);
-									int width = strtol(semi + 1, &t, 0);
-									
-									struct winsize size;
-									size.ws_row = height;
-									size.ws_col = width;
-									ioctl(pty, TIOCSWINSZ, &size);
-									
-									write(pty, t + 1, read_count - (t - buffer) - 1);
+									write(pty, &buffer, buffer_index);
+									buffer_index = 0;
+									break;
 								}
-								else
+
+								i = ch - buffer;
+								if ((buffer_index - i < 2) || (buffer[i+1] != '['))
 								{
-									write(pty, &buffer, read_count);
+									buffer_offset = i+1;
+									continue;
 								}
-							}
-							else
-							{
-								write(pty, &buffer, read_count);
-							}
+								if (i > 0) {
+									write(pty, buffer, i);
+									buffer_index -= i;
+									memmove(buffer, &buffer[i], buffer_index+1);
+									
+								}
+								for( i = 2; (i < buffer_index) && !((buffer[i] >= 64) && (buffer[i] <= 126)); ++i)
+								{
+									/* noop */
+								}
+								if (i < buffer_index)
+								{
+									int param[4];
+									switch (buffer[i])
+									{
+										case ESC:
+											write(pty, buffer, i);
+											--i;
+											break;
+										case 't':
+											if ((sscanf(&buffer[2], "%d;%d;%dt", &param[0], &param[1], &param[2]) == 3) && (param[0] == 8))
+											{
+												struct winsize size;
+												size.ws_row = param[1];
+												size.ws_col = param[2];
+												ioctl(pty, TIOCSWINSZ, &size);
+												break;
+											}
+										default:
+											write(pty, buffer, i+1);
+											break;
+									}
+									buffer_index -= i + 1;
+									if (buffer_index > 0) {
+										memmove(buffer, &buffer[i+1], buffer_index+1);
+										continue;
+									}
+								} else {
+									if (buffer_index > MAX_ESC_SEQUENCE_LENGTH) {
+										write(pty, &buffer, buffer_index);
+										buffer_index = 0;
+									}
+								}
+								break;
+							} while (1);
 							break;
 					}
 				} 

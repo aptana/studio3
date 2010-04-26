@@ -25,13 +25,13 @@ import java.io.Reader;
 
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.tm.internal.terminal.control.impl.ITerminalControlForText;
 import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
 import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
 import org.eclipse.tm.internal.terminal.provisional.api.Logger;
 import org.eclipse.tm.terminal.model.ITerminalTextData;
 import org.eclipse.tm.terminal.model.Style;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * This class processes character data received from the remote host and
@@ -115,6 +115,11 @@ public class VT100Emulator implements ControlListener {
 	 * in field {@link #ansiParameters}.
 	 */
 	private int nextAnsiParameter = 0;
+	
+	private int lastCursorLine = -1;
+	private int lastCursorColumn = -1;
+	
+	private boolean insertMode = false;
 
 	Reader fReader;
 
@@ -360,6 +365,12 @@ public class VT100Emulator implements ControlListener {
 					resetTerminal();
 					break;
 
+				case 'M':
+					// Reverse index
+					ansiState = ANSISTATE_INITIAL;
+					reverseIndex();
+					break;
+
 				default:
 					Logger
 							.log("Unsupported escape sequence: escape '" + character + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -408,6 +419,17 @@ public class VT100Emulator implements ControlListener {
 		text.setCursor(0, 0);
 		text.setStyle(text.getDefaultStyle());
 	}
+	
+	private void reverseIndex() {
+		int line = text.getCursorLine() - 1;
+		int topMargin = text.getScrollingRegionTopLine();
+		if (line < topMargin) {
+			text.insertLines(1);
+			line = topMargin;
+		}
+		text.setCursorLine(line);
+	}
+		
 	/**
 	 * This method is called when we have parsed an OS Command escape sequence.
 	 * The only one we support is "\e]0;...\u0007", which sets the terminal
@@ -419,14 +441,7 @@ public class VT100Emulator implements ControlListener {
 					.log("Ignoring unsupported ANSI OSC sequence: '" + ansiOsCommand + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			return;
 		}
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-		{
-			
-			public void run()
-			{
-				terminal.setTerminalTitle(ansiOsCommand.substring(2));
-			}
-		});		
+		terminal.setTerminalTitle(ansiOsCommand.substring(2));
 	}
 
 	/**
@@ -650,6 +665,8 @@ public class VT100Emulator implements ControlListener {
 	 * sequence parameters (default is the upper left corner of the screen).
 	 */
 	private void processAnsiCommand_H() {
+		lastCursorLine = text.getCursorLine();
+		lastCursorColumn = text.getCursorColumn();
 		moveCursor(getAnsiParameter(0) - 1, getAnsiParameter(1) - 1);
 	}
 	
@@ -674,7 +691,12 @@ public class VT100Emulator implements ControlListener {
 					break;
 				}
 			} else {
-				
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 4:
+					insertMode = true;
+					break;
+				}				
 			}
 		}
 	}
@@ -700,7 +722,12 @@ public class VT100Emulator implements ControlListener {
 					break;
 				}
 			} else {
-				
+				int ansiParameter = getAnsiParameter(0);
+				switch (ansiParameter) {
+				case 4:
+					insertMode = false;
+					break;
+				}								
 			}
 		}
 	}
@@ -729,7 +756,18 @@ public class VT100Emulator implements ControlListener {
 
 		case 2:
 			// Erase entire display.
-
+			
+			if (text.getCursorLine() == 0 && text.getCursorColumn() == 0
+					&& lastCursorLine != -1 && lastCursorColumn != -1) {
+				moveCursor(lastCursorLine, lastCursorColumn);
+				for (int i = text.getLines(); i > 0; --i) {
+					text.processNewline();
+				}
+				moveCursor(0, 0);
+				lastCursorLine = -1;
+				lastCursorColumn = -1;
+				
+			}
 			text.eraseAll();
 			break;
 
@@ -1040,6 +1078,9 @@ public class VT100Emulator implements ControlListener {
 	 * <p>
 	 */
 	private void displayNewText(String buffer) {
+		if (insertMode) {
+			text.insertCharacters(buffer.length());
+		}
 		text.appendString(buffer);
 	}
 
@@ -1048,8 +1089,11 @@ public class VT100Emulator implements ControlListener {
 	 * Process a BEL (Control-G) character.
 	 */
 	private void processBEL() {
-		// TODO
-		//Display.getDefault().beep();
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				Display.getCurrent().beep();
+			}
+		});
 	}
 
 	/**

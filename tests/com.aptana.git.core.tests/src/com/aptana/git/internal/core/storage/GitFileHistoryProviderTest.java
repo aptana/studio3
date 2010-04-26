@@ -105,6 +105,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
+			@SuppressWarnings("unused")
 			public void setDerived(boolean isDerived, IProgressMonitor monitor) throws CoreException
 			{
 			}
@@ -147,6 +148,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
+			@SuppressWarnings("unused")
 			public boolean isVirtual()
 			{
 				return false;
@@ -213,6 +215,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
+			@SuppressWarnings("unused")
 			public boolean isFiltered()
 			{
 				return false;
@@ -305,6 +308,7 @@ public class GitFileHistoryProviderTest extends TestCase
 			}
 
 			
+			@SuppressWarnings("unused")
 			public IPathVariableManager getPathVariableManager()
 			{
 				return null;

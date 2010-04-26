@@ -73,7 +73,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
 		GitIndex index = repo.index();
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 		List<ChangedFile> changedFiles = index.changedFiles();
 		assertEquals(2, changedFiles.size());
 		repo.index().stageFiles(changedFiles);
@@ -89,7 +89,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
 		GitIndex index = repo.index();
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 		List<ChangedFile> changedFiles = index.changedFiles();
 		assertEquals(2, changedFiles.size());
 		repo.index().stageFiles(changedFiles);
@@ -107,7 +107,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		file.create(new ByteArrayInputStream("Initial contents".getBytes()), true, new NullProgressMonitor());
 
 		GitIndex index = repo.index();
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 		List<ChangedFile> changedFiles = index.changedFiles();
 		assertEquals(2, changedFiles.size());
 		repo.index().stageFiles(changedFiles);
@@ -116,7 +116,7 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 
 		file.setContents(new ByteArrayInputStream("Modified contents".getBytes()), IResource.FORCE,
 				new NullProgressMonitor());
-		repo.index().refresh();
+		repo.index().refresh(new NullProgressMonitor());
 
 		file.delete(IResource.NONE, new NullProgressMonitor());
 		assertFalse(file.exists());

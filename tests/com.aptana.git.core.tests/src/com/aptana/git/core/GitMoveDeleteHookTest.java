@@ -480,12 +480,19 @@ public class GitMoveDeleteHookTest extends TestCase
 				oneOf(project).getLocation();
 				will(returnValue(new Path(File.separator + "some" + File.separator + "root")));
 
+				oneOf(project).getLocationURI();
+				
 				oneOf(project).getFolder(GitRepository.GIT_DIR);
 				will(returnValue(folder));
+				
+				oneOf(folder).exists();
+				will(returnValue(true));
 
 				oneOf(tree).standardDeleteFolder(with(equal(folder)),
 						with(equal(IResource.ALWAYS_DELETE_PROJECT_CONTENT | IResource.FORCE)),
 						with(any(NullProgressMonitor.class)));
+				
+				oneOf(tree).deletedFolder(folder);
 			}
 		});
 		assertFalse(hook.deleteProject(tree, project, IResource.ALWAYS_DELETE_PROJECT_CONTENT,

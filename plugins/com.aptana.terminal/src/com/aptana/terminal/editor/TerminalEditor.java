@@ -2,18 +2,30 @@ package com.aptana.terminal.editor;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.tm.internal.terminal.control.ITerminalListener;
 import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
@@ -31,7 +43,11 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.keys.BindingService;
+import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -71,8 +87,6 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 			}
 			setWorkingDirectory(terminalEditorInput.getWorkingDirectory());
 		}
-		fCtlTerminal.connectTerminal();
-		hookProcessListener();
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(fCtlTerminal.getControl(), ID);
@@ -87,11 +101,80 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 				updateActions();
 			}
 		});
-
+		fCtlTerminal.getControl().addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.doit) {
+					IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+					Event event = new Event();
+					event.character = e.character;
+					event.keyCode = e.keyCode;
+					event.stateMask = e.stateMask;
+					event.doit = e.doit;
+					event.display = e.display;
+					event.widget = e.widget;
+					event.time = e.time;
+					event.data = e.data;
+					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
+					boolean enabled = keyDownFilter.isEnabled();
+					Control focusControl = e.display.getFocusControl();
+					try {
+						keyDownFilter.setEnabled(true);
+						keyDownFilter.handleEvent(event);
+					} finally {
+						if (focusControl == e.display.getFocusControl()) {
+							keyDownFilter.setEnabled(enabled);
+						}
+					}
+				}
+			}
+		});
+		
+		// Add drag and drop support for file paths		
+		DropTarget dt = new DropTarget(fCtlTerminal.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
+		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dt.addDropListener(new DropTargetAdapter()
+		{
+			public void drop(DropTargetEvent event)
+			{
+				FileTransfer ft = FileTransfer.getInstance();
+				if (ft.isSupportedType(event.currentDataType))
+				{
+					String fileList[] = (String[]) event.data;
+					if (fileList != null && fileList.length > 0)
+					{
+						StringBuilder builder = new StringBuilder();
+						for (String file : fileList)
+						{
+							builder.append(file).append(" "); //$NON-NLS-1$
+						}				
+						fCtlTerminal.pasteString(builder.toString());
+					}
+				}
+			}
+		});
+		connectTerminal();
+	}
+	
+	private void connectTerminal() {
+		Job job = new UIJob("Terminal connect") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				fCtlTerminal.connectTerminal();
+				hookProcessListener();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.schedule(100);
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
-		return new ITerminalConnector[] { TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID) };
+		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
+		if (connector != null) {
+			connector.getInitializationErrorMessage();
+		}
+		return new ITerminalConnector[] { connector };
 	}
 	
 	private void saveInputState() {
@@ -142,7 +225,7 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 */
 	@Override
 	public void setTerminalTitle(String title) {
-		setContentDescription(title);
+		setPartName(title);
 	}
 
 	/*

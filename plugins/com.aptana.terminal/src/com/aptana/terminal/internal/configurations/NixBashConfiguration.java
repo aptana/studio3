@@ -35,35 +35,25 @@
 
 package com.aptana.terminal.internal.configurations;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
-import com.aptana.terminal.Activator;
-import com.aptana.terminal.IProcessConfiguration;
-import com.aptana.util.ResourceUtils;
 
 /**
  * @author Max Stepanov
  *
  */
-public class NixBashConfiguration implements IProcessConfiguration {
+public class NixBashConfiguration extends AbstractProcessConfiguration {
 
 	private static final String EXECUTABLE = "$os$/redtty"; //$NON-NLS-1$
 	
-	/* (non-Javadoc)
-	 * @see com.aptana.terminal.IProcessConfiguration#getExecutable()
-	 */
 	@Override
-	public File getExecutable() {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(EXECUTABLE), null);
-		return ResourceUtils.resourcePathToFile(url);
+	protected IPath getExecutablePath()
+	{
+		return new Path(EXECUTABLE);
 	}
 
 	/* (non-Javadoc)
@@ -73,15 +63,16 @@ public class NixBashConfiguration implements IProcessConfiguration {
 	public List<String> getCommandLine() {
 		List<String> list = new ArrayList<String>();
 		list.add(getExecutable().getAbsolutePath());
+		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.terminal.IProcessConfiguration#getEnvironment()
+	 * @see com.aptana.terminal.internal.configurations.AbstractProcessConfiguration#getEnvironment()
 	 */
 	@Override
 	public Map<String, String> getEnvironment() {
-		Map<String, String> env = new HashMap<String, String>();
+		Map<String, String> env = super.getEnvironment();
 		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 		return env;
 	}

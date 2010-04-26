@@ -117,11 +117,18 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		}
 		currentWidth = newWidth;
 		currentHeight = newHeight;
+		sendTerminalSize();
+	}
+	
+	private void sendTerminalSize() {
+		if (streamsProxy == null) {
+			return;
+		}
 		try {
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
 			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
-		}
+		}		
 	}
 	
 	/* (non-Javadoc)
@@ -178,6 +185,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			processLauncher.launch();
 			
 			streamsProxy = new StreamsProxy(processLauncher.getProcess(), ENCODING);
+			sendTerminalSize();
 			
 			// Hook up standard input:
 			//

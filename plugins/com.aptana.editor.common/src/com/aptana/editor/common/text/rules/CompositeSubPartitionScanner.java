@@ -69,11 +69,11 @@ public abstract class CompositeSubPartitionScanner implements ISubPartitionScann
 	 * @see com.aptana.editor.common.ISubPartitionScanner#initCharacterScanner(org.eclipse.jface.text.rules.ICharacterScanner, com.aptana.editor.common.IPartitionScannerSwitchStrategy)
 	 */
 	public void initCharacterScanner(ICharacterScanner baseCharacterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
-		parentSequenceCharacterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy);
+		parentSequenceCharacterScanner = new SequenceCharacterScanner(baseCharacterScanner, switchStrategy, true);
 		sequenceCharacterScanners = new SequenceCharacterScanner[subPartitionScanners.length];
 		sequenceCharacterScanners[0] = parentSequenceCharacterScanner;
 		for (int i = 0; i < switchStrategies.length; ++i) {
-			sequenceCharacterScanners[1+i] = new SequenceCharacterScanner(parentSequenceCharacterScanner, switchStrategies[i]);
+			sequenceCharacterScanners[1+i] = new SequenceCharacterScanner(parentSequenceCharacterScanner, switchStrategies[i], true);
 		}
 	}
 

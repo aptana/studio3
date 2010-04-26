@@ -118,12 +118,12 @@ public class CommitFileRevisionTest extends TestCase
 		writer.write(contents);
 		writer.close();
 		// refresh the index
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 
 		// Stage the new file
 		List<ChangedFile> toStage = index.changedFiles();
 		index.stageFiles(toStage);
-		index.refresh();
+		index.refresh(new NullProgressMonitor());
 		index.commit("Initial commit");
 
 		GitCommit gitCommit = new GitCommit(repo, "HEAD");
@@ -155,12 +155,12 @@ public class CommitFileRevisionTest extends TestCase
 			writer.write(entry.getValue());
 			writer.close();
 			// refresh the index
-			index.refresh();
+			index.refresh(new NullProgressMonitor());
 
 			// Stage the new file
 			List<ChangedFile> toStage = index.changedFiles();
 			index.stageFiles(toStage);
-			index.refresh();
+			index.refresh(new NullProgressMonitor());
 			index.commit(entry.getKey());
 		}
 

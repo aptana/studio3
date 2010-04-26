@@ -151,4 +151,14 @@ public class VT100BackendTraceDecorator implements IVT100EmulatorBackend {
 		fBackend.setAlternativeScreenBuffer(enable);
 	}
 
+	public int getScrollingRegionBottomLine() {
+		fWriter.println("getScrollingRegionBottomLine()"); //$NON-NLS-1$
+		return fBackend.getScrollingRegionBottomLine();
+	}
+
+	public int getScrollingRegionTopLine() {
+		fWriter.println("getScrollingRegionTopLine()"); //$NON-NLS-1$
+		return fBackend.getScrollingRegionTopLine();
+	}
+
 }

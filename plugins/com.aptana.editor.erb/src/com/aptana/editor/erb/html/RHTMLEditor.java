@@ -69,4 +69,15 @@ public class RHTMLEditor extends HTMLEditor {
 
 		return outline;
 	}
+	
+	@Override
+	protected char[] getPairMatchingCharacters()
+	{
+		char[] orig = super.getPairMatchingCharacters();
+		char[] modified = new char[orig.length + 2];
+		System.arraycopy(orig, 0, modified, 0, orig.length);
+		modified[orig.length] ='%';
+		modified[orig.length + 1] ='%';
+		return modified;
+	}
 }

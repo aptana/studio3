@@ -36,10 +36,14 @@
 package com.aptana.terminal.views;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -47,6 +51,12 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
@@ -78,6 +88,7 @@ import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.keys.WorkbenchKeyboard.KeyDownFilter;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
@@ -129,7 +140,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			view = (TerminalView) page.showView(TerminalView.ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 			view.initialize(title, workingDirectory);
 		} catch (PartInitException e) {
-			Activator.logError("Terminal view creation failed.", e);
+			Activator.logError("Terminal view creation failed.", e); //$NON-NLS-1$
 		}
 		return view;
 	}
@@ -165,8 +176,7 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 			if (savedState != null) {
 				loadState(savedState);
 			}
-			fCtlTerminal.connectTerminal();
-			hookProcessListener();
+			connectTerminal();
 		}
 		makeActions();
 		hookContextMenu();
@@ -194,17 +204,57 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 					event.data = e.data;
 					KeyDownFilter keyDownFilter = ((BindingService) bindingService).getKeyboard().getKeyDownFilter();
 					boolean enabled = keyDownFilter.isEnabled();
+					Control focusControl = e.display.getFocusControl();
 					try {
 						keyDownFilter.setEnabled(true);
 						keyDownFilter.handleEvent(event);
 					} finally {
-						keyDownFilter.setEnabled(enabled);
+						if (focusControl == e.display.getFocusControl()) {
+							keyDownFilter.setEnabled(enabled);
+						}
+					}
+				}
+			}
+		});
+		
+		// Add drag and drop support for file paths		
+		DropTarget dt = new DropTarget(fCtlTerminal.getRootControl(), DND.DROP_DEFAULT | DND.DROP_MOVE);
+		dt.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+		dt.addDropListener(new DropTargetAdapter()
+		{
+			public void drop(DropTargetEvent event)
+			{
+				FileTransfer ft = FileTransfer.getInstance();
+				if (ft.isSupportedType(event.currentDataType))
+				{
+					String fileList[] = (String[]) event.data;
+					if (fileList != null && fileList.length > 0)
+					{
+						StringBuilder builder = new StringBuilder();
+						for (String file : fileList)
+						{
+							builder.append(file).append(" "); //$NON-NLS-1$
+						}				
+						fCtlTerminal.pasteString(builder.toString());
 					}
 				}
 			}
 		});
 	}
-	
+
+	private void connectTerminal() {
+		Job job = new UIJob("Terminal connect") {
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				fCtlTerminal.connectTerminal();
+				hookProcessListener();
+				return Status.OK_STATUS;
+			}
+		};
+		job.setSystem(true);
+		job.schedule(100);
+	}
+
 	/* (non-Javadoc)
 	 * @see com.aptana.terminal.Closeable#close()
 	 */
@@ -269,7 +319,11 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 	
 	private ITerminalConnector[] getTerminalConnectors() {
-		return new ITerminalConnector[] { TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID) };
+		ITerminalConnector connector = TerminalConnectorExtension.makeTerminalConnector(LocalTerminalConnector.ID);
+		if (connector != null) {
+			connector.getInitializationErrorMessage();
+		}
+		return new ITerminalConnector[] { connector };
 	}
 
 	@Override
@@ -277,15 +331,22 @@ public class TerminalView extends ViewPart implements Closeable, ITerminalListen
 	}
 
 	@Override
-	public void setTerminalTitle(String title) {
-		setContentDescription(title);
+	public void setTerminalTitle(final String title) {
+		Utils.runInDisplayThread(new Runnable() {
+			@Override
+			public void run() {
+				setPartName(title);
+			}
+		});
 	}
 	
 	protected void initialize(String title, IPath workingDirectory) {
+		if (fCtlTerminal.isConnected()) {
+			return;
+		}
 		setPartName(title);
 		setWorkingDirectory(workingDirectory);
-		fCtlTerminal.connectTerminal();
-		hookProcessListener();
+		connectTerminal();
 	}
 	
 	protected void setWorkingDirectory(IPath workingDirectory) {

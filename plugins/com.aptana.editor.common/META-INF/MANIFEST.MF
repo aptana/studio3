@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui,
  plistreader;bundle-version="1.0.0",
  com.aptana.parsing,
  org.jruby;bundle-version="1.4.0",
- com.aptana.git.core;bundle-version="1.0.0"
+ com.aptana.git.core;bundle-version="1.0.0",
+ com.aptana.usage
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

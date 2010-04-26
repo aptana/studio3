@@ -99,8 +99,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
     
     protected final static int[] BYPASS_ACCELERATORS = new int[] {
     	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'C')),
-    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'V')),
-    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'A'))
+		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'V')),
+		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'A')),
+		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.CONTROL, SWT.TAB)),
+		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.CONTROL | SWT.SHIFT, SWT.TAB))
     };
 
     /**
@@ -587,8 +589,6 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		ITextCanvasModel canvasModel=new PollingTextCanvasModel(snapshot);
 		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,createLineRenderer(canvasModel));
 
-
-		fCtlText.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fCtlText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		fCtlText.addResizeHandler(new TextCanvas.ResizeListener() {
 			public void sizeChanged(int lines, int columns) {
@@ -751,6 +751,12 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					return;
 				}
 			}
+			char character = event.character;
+			if (character == '\u0000') {
+				if ((event.stateMask & SWT.MOD1) !=0 && event.keyCode >= SWT.F1 && event.keyCode <= SWT.F15) {
+					return;
+				}
+			}
 
 			// We set the event.doit to false to prevent any further processing of this
 			// key event.  The only reason this is here is because I was seeing the F10
@@ -759,8 +765,6 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 			// view again to continue entering text).  This fixes that.
 
 			event.doit = false;
-
-			char character = event.character;
 
 			//if (!isConnected()) {
 			if (fState==TerminalState.CLOSED) {

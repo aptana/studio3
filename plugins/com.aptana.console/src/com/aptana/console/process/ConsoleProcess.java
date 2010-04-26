@@ -32,21 +32,42 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.internal;
 
-import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
+package com.aptana.console.process;
+
+import java.util.Map;
+
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.RuntimeProcess;
 
 /**
- * @deprecated
- * @author cwilliams
+ * @author Max Stepanov
  *
  */
-//TODO Remove now that it's not used
-public class JSDocIndentStrategy extends JSCommentIndentStrategy {
+/* package */ class ConsoleProcess extends RuntimeProcess {
+	
+	private Process proxyProcess = null;
+	
+	/**
+	 * @param launch
+	 * @param process
+	 * @param name
+	 * @param attributes
+	 */
+	@SuppressWarnings("unchecked")
+	public ConsoleProcess(ILaunch launch, Process process, String name, Map attributes) {
+		super(launch, process, name, attributes);
+	}
 
-    public JSDocIndentStrategy(String partitioning, String contentType,
-            SourceViewerConfiguration configuration, ISourceViewer sourceViewer) {
-        super(partitioning, contentType, configuration, sourceViewer);
-    }
+	/* (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.RuntimeProcess#getSystemProcess()
+	 */
+	@Override
+	protected Process getSystemProcess() {
+		if (proxyProcess == null) {
+			proxyProcess = new ProxyProcess(super.getSystemProcess());
+		}
+		return proxyProcess;
+	}
+
 }

@@ -50,13 +50,20 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	private boolean found = false;
 	private boolean eof = false;
 	private boolean ignored;
-	
+
+	private boolean ignoreCase;
+
 	/**
 	 * @param baseCharacterScanner
 	 */
 	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy) {
+		this(characterScanner, switchStrategy, false);
+	}
+
+	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy, boolean ignoreCase) {
 		this.characterScanner = characterScanner;
 		this.sequences = switchStrategy.getSwitchSequences();
+		this.ignoreCase = ignoreCase;
 	}
 
 	/* (non-Javadoc)
@@ -120,7 +127,8 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 	private boolean sequenceDetected(char[] sequence) {
 		for (int i = 1; i < sequence.length; ++i) {
 			int c = characterScanner.read();
-			if (c != sequence[i]) {
+			if ((ignoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
+					|| (!ignoreCase && c != sequence[i])) {
 				// Non-matching character detected, rewind the scanner back to the start.
 				// Do not unread the first character.
 				characterScanner.unread();

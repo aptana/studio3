@@ -18,7 +18,7 @@ public class RubyImport extends RubyElement
 	{
 		return IRubyElement.IMPORT_DECLARATION;
 	}
-	
+
 	@Override
 	public String getName()
 	{
@@ -28,6 +28,6 @@ public class RubyImport extends RubyElement
 	@Override
 	public String toString()
 	{
-		return fValue;
+		return getName();
 	}
 }

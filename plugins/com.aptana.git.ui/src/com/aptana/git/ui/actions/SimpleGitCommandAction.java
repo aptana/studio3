@@ -107,6 +107,6 @@ public abstract class SimpleGitCommandAction extends GitAction
 	{
 		GitRepository repo = getSelectedRepository();
 		if (repo != null)
-			repo.index().refresh();
+			repo.index().refreshAsync(); // queue up a refresh
 	}
 }

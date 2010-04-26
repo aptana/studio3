@@ -303,7 +303,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				int col=fCursorColumn+n;
 				i+=n;
 				// wrap needed?
-				if(col>fColumns) {
+				if(col>=fColumns) {
 					doNewline();
 					line=toAbsoluteLine(fCursorLine);
 					setCursorColumn(0);
@@ -424,6 +424,20 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionBottomLine()
+	 */
+	public int getScrollingRegionBottomLine() {
+		return fScrollingRegionBottomLine;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionTopLine()
+	 */
+	public int getScrollingRegionTopLine() {
+		return fScrollingRegionTopLine;
+	}
+
+	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setAlternativeScreenBuffer(boolean)
 	 */
 	public void setAlternativeScreenBuffer(boolean enable) {
@@ -434,6 +448,9 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				fBufferStack.push(data);
 			} else if (!fBufferStack.isEmpty()) {
 				ITerminalTextData data = (ITerminalTextData) fBufferStack.pop();
+				if (fTerminal.getWidth() != data.getWidth()) {
+					data.setDimensions(data.getHeight(), fTerminal.getWidth());
+				}
 				fTerminal.copy(data);
 			}
 		}

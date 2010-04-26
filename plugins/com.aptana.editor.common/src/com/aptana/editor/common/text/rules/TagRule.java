@@ -53,6 +53,8 @@ public class TagRule extends MultiLineRule
 	private static final IPredicateRule doubleQuoteStringRule = new MultiLineRule("\"", "\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 	private static final IPredicateRule doubleQuoteStringEOLRule = new EndOfLineRule("\"", doubleQuoteStringTOKEN, '\\'); //$NON-NLS-1$
 
+	private boolean fIgnoreCase;
+
 	public TagRule(IToken token)
 	{
 		this("", token); //$NON-NLS-1$
@@ -60,13 +62,41 @@ public class TagRule extends MultiLineRule
 
 	public TagRule(String tag, IToken token)
 	{
-		super("<" + tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$        
+		this(tag, token, false);
+	}
+
+	public TagRule(String tag, IToken token, boolean ignoreCase)
+	{
+		super("<" + tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+		fIgnoreCase = ignoreCase;
 	}
 
 	@Override
 	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed)
 	{
-		boolean detected = super.sequenceDetected(scanner, sequence, eofAllowed);
+		boolean detected = true;
+		for (int i = 1; i < sequence.length; ++i)
+		{
+			int c = scanner.read();
+			if (c == ICharacterScanner.EOF && eofAllowed)
+			{
+				break;
+			}
+			if ((fIgnoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
+					|| (!fIgnoreCase && c != sequence[i]))
+			{
+				// Non-matching character detected, rewind the scanner back to the start.
+				// Do not unread the first character.
+				scanner.unread();
+				for (int j = i - 1; j > 0; --j)
+				{
+					scanner.unread();
+				}
+				detected = false;
+				break;
+			}
+		}
+
 		if (!detected)
 		{
 			return detected;

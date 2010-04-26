@@ -21,10 +21,16 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 {
 
 	private ILabelProvider wrapped;
+	private boolean disabled;
 
 	public ThemedDelegatingLabelProvider(ILabelProvider wrapped)
 	{
 		this.wrapped = wrapped;
+	}
+
+	public void disable()
+	{
+		disabled = true;
 	}
 
 	@Override
@@ -42,6 +48,14 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 	@Override
 	public Color getForeground(Object element)
 	{
+		if (disabled)
+		{
+			if (wrapped instanceof IColorProvider)
+			{
+				return ((IColorProvider) wrapped).getForeground(element);
+			}
+			return null;
+		}
 		return CommonEditorPlugin.getDefault().getColorManager().getColor(
 				getThemeManager().getCurrentTheme().getForeground());
 	}
@@ -60,6 +74,14 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 	@Override
 	public Font getFont(Object element)
 	{
+		if (disabled)
+		{
+			if (wrapped instanceof IFontProvider)
+			{
+				return ((IFontProvider) wrapped).getFont(element);
+			}
+			return null;
+		}
 		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
 		if (font == null)
 		{
@@ -90,6 +112,11 @@ public class ThemedDelegatingLabelProvider implements ILabelProvider, IColorProv
 	public void removeListener(ILabelProviderListener listener)
 	{
 		wrapped.removeListener(listener);
+	}
+
+	public void enable()
+	{
+		disabled = false;
 	}
 
 }

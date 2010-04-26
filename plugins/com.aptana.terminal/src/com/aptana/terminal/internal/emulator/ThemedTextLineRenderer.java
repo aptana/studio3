@@ -43,14 +43,24 @@ import org.eclipse.tm.internal.terminal.textcanvas.TextLineRenderer;
  *
  */
 @SuppressWarnings("restriction")
-public class ThemedTextLineRenderer extends TextLineRenderer {
+/* package */ class ThemedTextLineRenderer extends TextLineRenderer {
 
+	private static ThemedStyleMap sThemedStyleMap = null;
+	
 	/**
 	 * @param model
 	 */
 	public ThemedTextLineRenderer(ITextCanvasModel model) {
 		super(null, model);
-		fStyleMap = new ThemedStyleMap();
+		fStyleMap = getStyleMap();
 	}
+	
+	static ThemedStyleMap getStyleMap() {
+		if (sThemedStyleMap == null) {
+			sThemedStyleMap = new ThemedStyleMap();
+		}
+		return sThemedStyleMap;
+	}
+	
 
 }
