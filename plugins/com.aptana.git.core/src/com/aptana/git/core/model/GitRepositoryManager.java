@@ -130,7 +130,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	@Override
 	public synchronized GitRepository getUnattachedExisting(URI path)
 	{
-		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
+		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
 			return null;
 
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
