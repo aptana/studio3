@@ -699,7 +699,12 @@ public class CommandExecutionUtils
 
 	private static void copyToClipboard(CommandResult commandResult)
 	{
-		getClipboard().setContents(new Object[] { commandResult.getOutputString() },
+		copyToClipboard(commandResult.getOutputString());
+	}
+	
+	public static void copyToClipboard(String contents)
+	{
+		getClipboard().setContents(new Object[] { contents },
 				new Transfer[] { TextTransfer.getInstance() });
 	}
 
