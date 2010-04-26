@@ -36,6 +36,7 @@ package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -43,9 +44,12 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 
 public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
+
+	private RubyDoubleClickStrategy fDoubleClickStrategy;
 
 	public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
@@ -86,5 +90,15 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
+	}
+	
+	@Override
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
+	{
+		if (fDoubleClickStrategy == null)
+		{
+			fDoubleClickStrategy = new RubyDoubleClickStrategy();
+		}
+		return fDoubleClickStrategy;
 	}
 }

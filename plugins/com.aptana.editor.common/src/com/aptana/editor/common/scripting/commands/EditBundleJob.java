@@ -16,6 +16,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.git.core.model.GitExecutable;
@@ -92,7 +95,8 @@ class EditBundleJob extends Job
 		File destRuble = new File(destinationDir, bundle.getBundleDirectory().getName());
 		if (destRuble.isDirectory())
 		{
-			CommonEditorPlugin.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.getAbsolutePath()); //$NON-NLS-1$
+			CommonEditorPlugin
+					.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.getAbsolutePath()); //$NON-NLS-1$
 			return destRuble; // Already exists, just return it.
 		}
 
@@ -142,6 +146,21 @@ class EditBundleJob extends Job
 			theProject.create(description, subMonitor.newChild(50));
 			theProject.open(subMonitor.newChild(50));
 		}
+		else
+		{
+			// FIXME These refer to IDs/prefs in a plugin that depends on this one!
+			try
+			{
+				IEclipsePreferences prefs = new InstanceScope().getNode("com.aptana.explorer"); // ExplorerPlugin.PLUGIN_ID //$NON-NLS-1$
+				prefs.put("activeProject", theProject.getName()); // com.aptana.explorer.IPreferenceConstants.ACTIVE_PROJECT //$NON-NLS-1$
+				prefs.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				CommonEditorPlugin.logError(e);
+			}
+		}
+
 		subMonitor.done();
 	}
 
