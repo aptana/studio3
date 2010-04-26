@@ -147,7 +147,7 @@ public class JSIndexTests extends TestCase
 		assertNotNull(properties);
 		assertTrue(properties.length == 1);
 		
-		// make sure it is a function
+		// make sure the name is correct
 		PropertyElement retrievedProperty = properties[0];
 		assertEquals(propertyName, retrievedProperty.getName());
 	}
