@@ -117,9 +117,15 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		if (new File(repo.workingDirectory()).getAbsolutePath()
 				.equals(project.getLocation().toFile().getAbsolutePath()))
 		{
+			GitPlugin.getDefault().getGitRepositoryManager().removeRepository(project);
 			// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
-			tree.standardDeleteFolder(project.getFolder(GitRepository.GIT_DIR), updateFlags | IResource.FORCE,
+			IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
+			if (gitDir.exists())
+			{
+				tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
 					new NullProgressMonitor()); // TODO Use a submonitor here?
+				tree.deletedFolder(gitDir);
+			}
 			return false;
 		}
 
