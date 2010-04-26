@@ -97,7 +97,7 @@ public class MemoryIndex
 								if (result == null)
 									result = new QueryResult(word);
 								result.addDocumentName(entry.getKey());
-								results.put(key, result);
+								results.put(word, result);
 							}
 						}
 					}
