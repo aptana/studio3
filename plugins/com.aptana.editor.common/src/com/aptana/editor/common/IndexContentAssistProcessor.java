@@ -1,6 +1,8 @@
 package com.aptana.editor.common;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,6 +44,16 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 			IProject project = file.getProject();
 			Index index = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
 			computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
+			
+			// sort by display name, ignoring case
+			Collections.sort(completionProposals, new Comparator<ICompletionProposal>()
+			{
+				@Override
+				public int compare(ICompletionProposal o1, ICompletionProposal o2)
+				{
+					return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				}
+			});
 		}
 
 		return completionProposals.toArray(new ICompletionProposal[0]);
