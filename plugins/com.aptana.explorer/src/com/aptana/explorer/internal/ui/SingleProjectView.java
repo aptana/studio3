@@ -948,16 +948,24 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 			{
 				if (!event.getKey().equals(IPreferenceConstants.ACTIVE_PROJECT))
 					return;
-				IProject oldActiveProject = selectedProject;
+				final IProject oldActiveProject = selectedProject;
 				Object obj = event.getNewValue();
 				if (obj == null)
 					return;
 				String newProjectName = (String) obj;
 				if (oldActiveProject != null && newProjectName.equals(oldActiveProject.getName()))
 					return;
-				IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
+				final IProject newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(newProjectName);
 				selectedProject = newSelectedProject;
-				projectChanged(oldActiveProject, newSelectedProject);
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						projectChanged(oldActiveProject, newSelectedProject);
+					}
+				});				
 			}
 		};
 		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
