@@ -1051,6 +1051,14 @@ public class GitRepository
 			}
 		}
 		fileWatcherIds = null;
+		if (listeners != null)
+		{
+			synchronized (listeners)
+			{
+				listeners.clear();
+				listeners = null;
+			}
+		}
 		_headRef = null;
 		hasChanged = false;
 		index = null;
@@ -1196,18 +1204,25 @@ public class GitRepository
 	{
 		if (listener == null)
 			return;
+
 		if (listeners == null)
 		{
 			listeners = new HashSet<IGitRepositoryListener>(3);
 		}
-		listeners.add(listener);
+		synchronized (listeners)
+		{
+			listeners.add(listener);
+		}
 	}
 
 	public void removeListener(IGitRepositoryListener listener)
 	{
 		if (listener == null || listeners == null)
 			return;
-		listeners.remove(listener);
+		synchronized (listeners)
+		{
+			listeners.remove(listener);
+		}
 	}
 
 }
