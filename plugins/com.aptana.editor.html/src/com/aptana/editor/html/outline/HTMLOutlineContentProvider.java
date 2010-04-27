@@ -82,6 +82,55 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return super.getChildren(parentElement);
 	}
 
+	/**
+	 * Override hasChildren so for external stylesheets and JS we just assume there's content and don't fetch it one
+	 * layer too early (on expansion of the tag's parent).
+	 */
+	@Override
+	public boolean hasChildren(Object element)
+	{
+		if (element instanceof CommonOutlineItem)
+		{
+			// delegates to the parse node it references to
+			return hasChildren(((CommonOutlineItem) element).getReferenceNode());
+		}	
+		
+		// Handle expansion of link tags pointing to stylesheets
+		if (element instanceof HTMLElementNode)
+		{
+			HTMLElementNode item = (HTMLElementNode) element;
+			if (item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+			{
+				String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
+				if (rel.equals("stylesheet")) //$NON-NLS-1$
+				{
+					String attribute = item.getAttributeValue("href"); //$NON-NLS-1$
+					if (attribute.length() > 0)
+					{
+						return true;
+					}
+				}
+			}
+		}
+		// Handle embedded languages (JS and CSS)
+		if (element instanceof HTMLSpecialNode)
+		{
+			// HTMLSpecialNode always has the root node of the nested language as its child; we want to skip that and
+			// get the content below
+			HTMLSpecialNode item = (HTMLSpecialNode) element;
+
+			// Special case of external JS file
+			if (item.getName().equalsIgnoreCase("script")) { //$NON-NLS-1$
+				String attribute = item.getAttributeValue("src"); //$NON-NLS-1$
+				if (attribute.length() > 0)
+				{
+					return true;
+				}
+			}
+		}
+		return super.hasChildren(element);
+	}
+
 	private Object[] parse(String source, String language) throws Exception
 	{
 		if (source == null)
