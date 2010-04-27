@@ -61,7 +61,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.HTMLTextPresenter;
-import com.aptana.editor.common.contentassist.UnifiedInformationControl;
+import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
@@ -251,7 +251,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			public IInformationControl createInformationControl(Shell parent)
 			{
 				//return new DefaultInformationControl(parent, false);
-				return new UnifiedInformationControl(parent, SWT.NONE, new HTMLTextPresenter(false));
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false));
 			}
 		};
 	}

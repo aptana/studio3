@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * 
  */
-public class UnifiedInformationControl implements IInformationControl, IInformationControlExtension, IInformationControlExtension3,  DisposeListener {
+public class InformationControl implements IInformationControl, IInformationControlExtension, IInformationControlExtension3,  DisposeListener {
 
 	/**
 	 * Outer border thickness in pixels.
@@ -81,7 +81,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 * @param style the additional styles for the styled text widget
 	 * @param presenter the presenter to be used
 	 */
-	public UnifiedInformationControl(Shell parent, int shellStyle, int style, IInformationPresenter presenter) {
+	public InformationControl(Shell parent, int shellStyle, int style, IInformationPresenter presenter) {
 		this(parent, shellStyle, style, presenter, null);
 	}
 
@@ -98,7 +98,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 *                         or <code>null</code> if the status field should be hidden
 	 * @since 3.0
 	 */
-	public UnifiedInformationControl(Shell parent, int shellStyle, int style, IInformationPresenter presenter, String statusFieldText) {
+	public InformationControl(Shell parent, int shellStyle, int style, IInformationPresenter presenter, String statusFieldText) {
 		GridLayout layout;
 		GridData gd;
 
@@ -191,7 +191,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 * @param style the additional styles for the styled text widget
 	 * @param presenter the presenter to be used
 	 */
-	public UnifiedInformationControl(Shell parent,int style, IInformationPresenter presenter) {
+	public InformationControl(Shell parent,int style, IInformationPresenter presenter) {
 		this(parent, SWT.TOOL | SWT.NO_TRIM, style, presenter);
 	}
 
@@ -207,7 +207,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 *                         or <code>null</code> if the status field should be hidden
 	 * @since 3.0
 	 */
-	public UnifiedInformationControl(Shell parent, int style, IInformationPresenter presenter, String statusFieldText) {
+	public InformationControl(Shell parent, int style, IInformationPresenter presenter, String statusFieldText) {
 		this(parent, SWT.TOOL | SWT.NO_TRIM, style, presenter, statusFieldText);
 	}
 
@@ -218,7 +218,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 *
 	 * @param parent the parent shell
 	 */
-	public UnifiedInformationControl(Shell parent) {
+	public InformationControl(Shell parent) {
 		this(parent, SWT.NONE, null);
 	}
 
@@ -230,7 +230,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 * @param parent the parent shell
 	 * @param presenter the presenter to be used
 	 */
-	public UnifiedInformationControl(Shell parent, IInformationPresenter presenter) {
+	public InformationControl(Shell parent, IInformationPresenter presenter) {
 		this(parent, SWT.NONE, presenter);
 	}
 
@@ -240,7 +240,7 @@ public class UnifiedInformationControl implements IInformationControl, IInformat
 	 * @param presenter
 	 * @param status
 	 */
-	public UnifiedInformationControl(Shell parent, IInformationPresenter presenter, String status) {
+	public InformationControl(Shell parent, IInformationPresenter presenter, String status) {
 		this(parent, SWT.NONE, presenter, status);
 	}
 
