@@ -11,4 +11,5 @@ public interface IndexConstants
 	static final String FUNCTION = "js.function";
 	static final String PROPERTY = "js.property";
 	static final String DESCRIPTION = "js.description";
+	static final String PARAMETERS = "js.parameters";
 }
