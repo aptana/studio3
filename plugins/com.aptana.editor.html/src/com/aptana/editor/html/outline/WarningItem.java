@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -42,24 +42,24 @@ class WarningItem
 {
 
 	private String message;
-	private boolean isError;
+	private int status;
 
 	/**
 	 * @param message
 	 */
-	public WarningItem(boolean isError, String message)
+	public WarningItem(int status, String message)
 	{
 		super();
-		this.isError = isError;
+		this.status = status;
 		this.message = message;
 	}
 
 	/**
 	 * @return
 	 */
-	public boolean isError()
+	public int status()
 	{
-		return isError;
+		return status;
 	}
 
 	@Override

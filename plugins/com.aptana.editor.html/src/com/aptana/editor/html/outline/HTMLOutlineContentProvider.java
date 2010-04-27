@@ -195,7 +195,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					IParser parser = getParser(language);
 					if (parser == null)
 					{
-						throw new Exception(MessageFormat.format(Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
+						throw new Exception(MessageFormat.format(
+								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
 					}
 					IParseNode node = parse(parser, source);
 					elements = getChildren(node);
@@ -210,14 +211,14 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				{
 					Activator.getDefault().getLog().log(
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-					elements = new Object[] { new WarningItem(true, MessageFormat.format(
+					elements = new Object[] { new WarningItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
 					Activator.getDefault().getLog().log(
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-					elements = new Object[] { new WarningItem(true, e.getMessage()) };
+					elements = new Object[] { new WarningItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
@@ -234,7 +235,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		};
 		job.setPriority(Job.LONG);
 		job.schedule();
-		final WarningItem placeholder = new WarningItem(false, Messages.HTMLOutlineContentProvider_PlaceholderItemLabel);
+		final WarningItem placeholder = new WarningItem(IStatus.INFO,
+				Messages.HTMLOutlineContentProvider_PlaceholderItemLabel);
 		// Listen for update, when we have it, remove the placeholder
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
