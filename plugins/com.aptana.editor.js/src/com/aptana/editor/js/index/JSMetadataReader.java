@@ -180,10 +180,7 @@ public class JSMetadataReader extends ValidatingReader
 	public void enterClass(String ns, String name, String qname, Attributes attributes)
 	{
 		// create a new class documentation object
-		TypeElement type = new TypeElement();
-
-		// set type
-		type.setName(attributes.getValue("type"));
+		TypeElement type = this.getType(attributes.getValue("type"));
 
 		// set optional superclass
 		String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
@@ -321,6 +318,7 @@ public class JSMetadataReader extends ValidatingReader
 		// grab and set properties
 		parameter.setName(attributes.getValue("name"));
 		parameter.addType(attributes.getValue("type"));
+		parameter.setUsage(attributes.getValue("usage"));
 
 		// store parameter
 		this._currentParameter = parameter;
@@ -722,6 +720,28 @@ public class JSMetadataReader extends ValidatingReader
 	public String getTextBuffer()
 	{
 		return this._textBuffer.toString();
+	}
+	
+	/**
+	 * getType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	private TypeElement getType(String typeName)
+	{
+		TypeElement result = this._typesByName.get(typeName);
+		
+		if (result == null)
+		{
+			result = new TypeElement();
+			
+			result.setName(typeName);
+			
+			// NOTE: type will be added in exitClass
+		}
+		
+		return result;
 	}
 	
 	/**
