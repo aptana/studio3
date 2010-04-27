@@ -34,8 +34,6 @@
  */
 package com.aptana.editor.common.outline;
 
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.ui.IEditorInput;
 
 /**
  * @author Pavel Petrochenko
@@ -50,25 +48,4 @@ public interface IPathResolver
 	 * @throws Exception 
 	 */
 	String resolveSource(String path) throws Exception;
-	
-	/**
-	 * @param path
-	 * @param listener
-	 * adds listener on changing content of source
-	 */
-	void addChangeListener(String path,IPropertyChangeListener listener);
-	
-	/**
-	 * removes listener on changing content of source
-	 * @param path
-	 * @param listener
-	 */
-	void removeChangeListener(String path,IPropertyChangeListener listener);
-
-	/**
-	 * @param path 
-	 * @return editor input
-	 * should be very cheap
-	 */
-	IEditorInput resolveEditorInput(String path);
 }

@@ -39,33 +39,16 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileSystem;
-import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
-import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.util.IOUtil;
 
 /**
@@ -74,34 +57,10 @@ import com.aptana.util.IOUtil;
 public final class PathResolverProvider
 {
 	/**
-	 * 
-	 * @author Pavel Petrochenko
-	 * resolver which is not able to resolve anything 
+	 * @author Pavel Petrochenko resolver which is not able to resolve anything
 	 */
 	private static final class NullResolver implements IPathResolver
 	{
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#addChangeListener(java.lang.String, org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public void addChangeListener(String path, IPropertyChangeListener listener)
-		{
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#removeChangeListener(java.lang.String, org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public void removeChangeListener(String path, IPropertyChangeListener listener)
-		{
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveEditorInput(java.lang.String)
-		 */
-		public IEditorInput resolveEditorInput(String attribute)
-		{
-			return null;
-		}
-
 		/**
 		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
 		 */
@@ -113,6 +72,7 @@ public final class PathResolverProvider
 
 	/**
 	 * resolver doing resolving basing on current directory in the file system
+	 * 
 	 * @author Pavel Petrochenko
 	 */
 	private static final class FilePathResolver implements IPathResolver
@@ -127,24 +87,6 @@ public final class PathResolverProvider
 		{
 			this.file = path.toFile();
 			// TODO Auto-generated constructor stub
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#addChangeListener(java.lang.String,
-		 *      org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public void addChangeListener(String path, IPropertyChangeListener listener)
-		{
-			// do nothing here
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#removeChangeListener(java.lang.String,
-		 *      org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public void removeChangeListener(String path, IPropertyChangeListener listener)
-		{
-			// do nothing here
 		}
 
 		private File resolveToFile(String path)
@@ -186,117 +128,18 @@ public final class PathResolverProvider
 			FileInputStream fs = new FileInputStream(file);
 			return IOUtil.read(fs, Charset.defaultCharset().name());
 		}
-
-		/**
-		 * @param path
-		 * @return path
-		 * @throws Exception
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolvePath(java.lang.String)
-		 */
-		public IPath resolvePath(String path) throws Exception
-		{
-			return new Path(resolveToFile(path).getAbsolutePath());
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveEditorInput(java.lang.String)
-		 */
-		public IEditorInput resolveEditorInput(String attribute)
-		{
-			File resolveToFile = resolveToFile(attribute);
-			if (resolveToFile != null)
-			{
-				return createJavaFileEditorInput(resolveToFile);
-			}
-			return null;
-		}
-	}
-	
-	/**
-	 * Creates a new JavaFileEditorInput
-	 * 
-	 * @param file
-	 * @return IEditorInput
-	 */
-	public static IEditorInput createJavaFileEditorInput(File file)
-	{
-		IEditorInput input = null;
-		try
-		{
-			IFileStore localFile = new LocalFile(file);
-			input = new FileStoreEditorInput(localFile);
-		}
-		catch (Exception e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
-		return input;
 	}
 
 	/**
 	 * resolver for resources in the workspace
+	 * 
 	 * @author Pavel Petrochenko
 	 */
 	private static final class IFilePathResolver implements IPathResolver
 	{
 
 		private IProject project;
-
 		private IPath path;
-
-		static HashMap listeners = new HashMap();
-
-		//listening to the workspace delta here
-		static
-		{
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener()
-			{
-
-				public void resourceChanged(IResourceChangeEvent event)
-				{
-					IResourceDelta delta = event.getDelta();
-					if (delta != null)
-					{
-						processDelta(delta);
-					}
-				}
-
-				private void processDelta(IResourceDelta delta)
-				{
-					IResourceDelta[] affectedChildren = delta.getAffectedChildren();
-					for (int a = 0; a < affectedChildren.length; a++)
-					{
-						IResource resource = affectedChildren[a].getResource();
-						if (resource instanceof IFile)
-						{
-							IPath fullPath = resource.getFullPath();
-							fireChange(fullPath);
-						}
-						processDelta(affectedChildren[a]);
-					}
-				}
-
-			});
-		}
-
-		/**
-		 * fires change in the resource on a given path
-		 * @param fullPath
-		 */
-		private static synchronized void fireChange(IPath fullPath)
-		{
-			List object = (List) listeners.get(fullPath);
-			if (object == null)
-			{
-				return;
-			}
-			for (int i = 0; i < object.size(); i++)
-			{
-				IPropertyChangeListener listener = (IPropertyChangeListener) object.get(i);
-				listener.propertyChange(new PropertyChangeEvent(IFilePathResolver.class, "content", null, fullPath //$NON-NLS-1$
-						.toOSString()));
-			}
-		}
 
 		/**
 		 * @param project
@@ -309,64 +152,21 @@ public final class PathResolverProvider
 		}
 
 		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#addChangeListener(java.lang.String,
-		 *      org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public synchronized void addChangeListener(String path, IPropertyChangeListener listener)
-		{
-			IFile resolveToIFile = resolveToIFile(path);
-			if (resolveToIFile == null)
-			{
-				return;
-			}
-			IPath fullPath = resolveToIFile.getFullPath();
-			List object = (List) listeners.get(fullPath);
-			if (object == null)
-			{
-				object = new ArrayList();
-				listeners.put(fullPath, object);
-			}
-			object.add(listener);
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#removeChangeListener(java.lang.String,
-		 *      org.eclipse.jface.util.IPropertyChangeListener)
-		 */
-		public synchronized void removeChangeListener(String path, IPropertyChangeListener listener)
-		{
-			IFile resolveToIFile = resolveToIFile(path);
-			if (resolveToIFile == null)
-			{
-				return;
-			}
-			IPath fullPath = resolveToIFile.getFullPath();
-			List object = (List) listeners.get(fullPath);
-			if (object == null)
-			{
-				return;
-			}
-			object.remove(listener);
-			if (object.isEmpty())
-			{
-				listeners.remove(fullPath);
-			}
-		}
-
-		/**
 		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
 		 */
 		public String resolveSource(String path) throws Exception
 		{
-			// TODO If starts with http, grab from URI to local filesystem!
-			if (path != null && path.startsWith("http"))
+			if (path != null && path.startsWith("http")) //$NON-NLS-1$
 			{
 				URI uri = URI.create(path);
 				return IOUtil.read(uri.toURL().openStream());
-//				IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
-//				IFileStore store = fileSystem.getStore(uri);
-//				File aFile = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-//				return IOUtil.read(new FileInputStream(aFile));
+				// TODO Use EFS filesystem to resolve files to a local cached copy!
+				// We'd probably need an http/https implementation first
+
+				// IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
+				// IFileStore store = fileSystem.getStore(uri);
+				// File aFile = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+				// return IOUtil.read(new FileInputStream(aFile));
 			}
 			IFile file = resolveToIFile(path);
 			if (file == null)
@@ -473,35 +273,6 @@ public final class PathResolverProvider
 			}
 			return true;
 		}
-
-		/**
-		 * @param path
-		 * @return
-		 * @throws Exception
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolvePath(java.lang.String)
-		 */
-		public IPath resolvePath(String path) throws Exception
-		{
-			IFile resolveToIFile = resolveToIFile(path);
-			if (resolveToIFile != null)
-			{
-				return resolveToIFile.getFullPath();
-			}
-			return null;
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveEditorInput(java.lang.String)
-		 */
-		public IEditorInput resolveEditorInput(String attribute)
-		{
-			IFile resolveToIFile = resolveToIFile(attribute);
-			if (resolveToIFile != null)
-			{
-				return new FileEditorInput(resolveToIFile);
-			}
-			return null;
-		}
 	}
 
 	private PathResolverProvider()
@@ -511,6 +282,7 @@ public final class PathResolverProvider
 
 	/**
 	 * returns path resolver for a given editor input
+	 * 
 	 * @param input
 	 * @return path resolver for a given editor input
 	 */
@@ -526,9 +298,11 @@ public final class PathResolverProvider
 			IPathEditorInput fInput = (IPathEditorInput) (input);
 			return new FilePathResolver(fInput.getPath());
 		}
-		if (input instanceof IURIEditorInput) {
+		if (input instanceof IURIEditorInput)
+		{
 			URI uri = ((IURIEditorInput) input).getURI();
-			if ("file".equals(uri.getScheme())) {
+			if ("file".equals(uri.getScheme())) //$NON-NLS-1$
+			{
 				return new FilePathResolver(Path.fromOSString(new File(uri).getAbsolutePath()));
 			}
 		}
