@@ -1,8 +1,11 @@
 package com.aptana.editor.js.index;
 
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.aptana.editor.js.model.FunctionElement;
+import com.aptana.editor.js.model.ParameterElement;
 import com.aptana.editor.js.model.PropertyElement;
 import com.aptana.editor.js.model.TypeElement;
 import com.aptana.index.core.Index;
@@ -12,6 +15,7 @@ public class JSIndexWriter
 {
 	private JSMetadataReader _reader;
 	private int _descriptionCount;
+	private int _parameterCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -49,7 +53,7 @@ public class JSIndexWriter
 	 */
 	protected String writeDescription(Index index, String description)
 	{
-		String indexString = Integer.toString(this._descriptionCount);
+		String indexString = Integer.toString(this._descriptionCount++);
 		String value = indexString + IndexConstants.DELIMITER + description;
 		
 		index.addEntry(IndexConstants.DESCRIPTION, value, this.getDocumentPath());
@@ -66,7 +70,7 @@ public class JSIndexWriter
 	 */
 	protected void writeFunction(Index index, FunctionElement function)
 	{
-		// ParameterElement[] parameters = function.getParameters();
+		String parametersKey = this.writeParameters(index, function.getParameters());
 		// ReturnTypeElement[] returnTypes = function.getReturnTypes();
 		String descriptionKey = this.writeDescription(index, function.getDescription());
 		// SinceElement[] sinceList = function.getSinceList();
@@ -76,12 +80,44 @@ public class JSIndexWriter
 			IndexConstants.DELIMITER,
 			function.getName(),
 			function.getOwningType().getName(),
-			descriptionKey
+			descriptionKey,
+			parametersKey
 		);
 
 		index.addEntry(IndexConstants.FUNCTION, value, this.getDocumentPath());
 	}
 
+	/**
+	 * writeParameters
+	 * 
+	 * @param index
+	 * @param parameters
+	 * @return
+	 */
+	protected String writeParameters(Index index, ParameterElement[] parameters)
+	{
+		List<String> keyList = new LinkedList<String>();
+		String indexString = Integer.toString(this._parameterCount++);
+		
+		keyList.add(indexString);
+		
+		for (int i = 0; i < parameters.length; i++)
+		{
+			ParameterElement parameter = parameters[i];
+			String name = parameter.getName();
+			String usage = parameter.getUsage();
+			String types = StringUtil.join(",", parameter.getTypes());
+			
+			keyList.add(name + "," + usage + "," + types);
+		}
+		
+		String value = StringUtil.join(IndexConstants.DELIMITER, keyList);
+		
+		index.addEntry(IndexConstants.PARAMETERS, value, this.getDocumentPath());
+		
+		return indexString;
+	}
+	
 	/**
 	 * writeProperty
 	 * 
@@ -92,7 +128,7 @@ public class JSIndexWriter
 	protected void writeProperty(Index index, PropertyElement property)
 	{
 		String propertyTypes = StringUtil.join(",", property.getTypeNames());
-		// String description = property.getDescription();
+		String descriptionKey = this.writeDescription(index, property.getDescription());
 		// SinceElement[] sinceList = property.getSinceList();
 		// UserAgentElement[] userAgents = property.getUserAgents();
 		
@@ -100,6 +136,7 @@ public class JSIndexWriter
 			IndexConstants.DELIMITER,
 			property.getName(),
 			property.getOwningType().getName(),
+			descriptionKey,
 			propertyTypes
 		);
 
