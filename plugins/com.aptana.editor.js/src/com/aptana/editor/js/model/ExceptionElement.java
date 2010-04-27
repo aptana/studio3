@@ -1,7 +1,10 @@
 package com.aptana.editor.js.model;
 
-public class ExceptionElement extends BaseElement
+public class ExceptionElement
 {
+	private String _type;
+	private String _description;
+
 	/**
 	 * ExceptionElement
 	 */
@@ -10,11 +13,27 @@ public class ExceptionElement extends BaseElement
 	}
 
 	/**
+	 * getDescription
+	 */
+	public String getDescription()
+	{
+		return this._description;
+	}
+
+	/**
 	 * getType
 	 */
 	public String getType()
 	{
-		return this.getName();
+		return this._type;
+	}
+
+	/**
+	 * setDescription
+	 */
+	public void setDescription(String description)
+	{
+		this._description = description;
 	}
 
 	/**
@@ -24,6 +43,6 @@ public class ExceptionElement extends BaseElement
 	 */
 	public void setType(String type)
 	{
-		this.setName(type);
+		this._type = type;
 	}
 }

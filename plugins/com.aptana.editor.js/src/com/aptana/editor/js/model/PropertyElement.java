@@ -3,8 +3,9 @@ package com.aptana.editor.js.model;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PropertyElement extends TypeMemberBaseElement
+public class PropertyElement extends BaseElement
 {
+	private TypeElement _owningType;
 	private boolean _isInstance;
 	private boolean _isInvocationOnly;
 	private boolean _isInternal;
@@ -28,15 +29,15 @@ public class PropertyElement extends TypeMemberBaseElement
 	}
 
 	/**
-	 * getTypes
+	 * getOwningType
 	 * 
 	 * @return
 	 */
-	public ReturnTypeElement[] getTypes()
+	public TypeElement getOwningType()
 	{
-		return this._types.toArray(new ReturnTypeElement[this._types.size()]);
+		return this._owningType;
 	}
-	
+
 	/**
 	 * getTypeNames
 	 * 
@@ -45,15 +46,25 @@ public class PropertyElement extends TypeMemberBaseElement
 	public String[] getTypeNames()
 	{
 		String[] result = new String[this._types.size()];
-		
+
 		for (int i = 0; i < result.length; i++)
 		{
 			result[i] = this._types.get(i).getType();
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * getTypes
+	 * 
+	 * @return
+	 */
+	public ReturnTypeElement[] getTypes()
+	{
+		return this._types.toArray(new ReturnTypeElement[this._types.size()]);
+	}
+
 	/**
 	 * isInstance
 	 * 
@@ -73,7 +84,7 @@ public class PropertyElement extends TypeMemberBaseElement
 	{
 		return this._isInternal;
 	}
-	
+
 	/**
 	 * isInvocationOnly
 	 * 
@@ -103,7 +114,7 @@ public class PropertyElement extends TypeMemberBaseElement
 	{
 		this._isInternal = value;
 	}
-	
+
 	/**
 	 * setIsInvocationOnly
 	 * 
@@ -112,5 +123,23 @@ public class PropertyElement extends TypeMemberBaseElement
 	public void setIsInvocationOnly(boolean value)
 	{
 		this._isInvocationOnly = value;
+	}
+
+	/**
+	 * setOwningType
+	 * 
+	 * @param type
+	 */
+	void setOwningType(TypeElement type)
+	{
+		this._owningType = type;
+	}
+	
+	/**
+	 * toString
+	 */
+	public String toString()
+	{
+		return this.getName();
 	}
 }
