@@ -1,5 +1,8 @@
 package com.aptana.terminal.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -69,6 +72,8 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	private TerminalActionPaste fActionEditPaste;
 	private TerminalActionClearAll fActionEditClearAll;
 	private TerminalActionSelectAll fActionEditSelectAll;
+	
+	private List<String> inputs = new ArrayList<String>();
 	
 	/*
 	 * (non-Javadoc)
@@ -162,11 +167,31 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fCtlTerminal.connectTerminal();
 				hookProcessListener();
+				sendInputs();
 				return Status.OK_STATUS;
 			}
 		};
 		job.setSystem(true);
 		job.schedule(100);
+	}
+
+	private void sendInputs() {
+		synchronized (inputs) {
+			if (!fCtlTerminal.isConnected()) {
+				return;
+			}
+			while (!inputs.isEmpty()) {
+				String text = inputs.remove(0);
+				fCtlTerminal.pasteString(text);
+			}
+		}
+	}
+
+	public void sendInput(String text) {
+		synchronized (inputs) {
+			inputs.add(text);
+			sendInputs();
+		}
 	}
 
 	private ITerminalConnector[] getTerminalConnectors() {
