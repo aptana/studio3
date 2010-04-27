@@ -5,7 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = Messages.class.getPackage().getName();
+	private static final String BUNDLE_NAME = Messages.class.getPackage().getName() + ".messages"; //$NON-NLS-1$
 	
 	public static String HTMLOutlineContentProvider_PlaceholderItemLabel;
 	public static String HTMLOutlineContentProvider_FetchingExternalFilesJobName;
