@@ -111,6 +111,7 @@ public abstract class StringUtil
 	
 	/**
 	 * join
+	 * 
 	 * @param delimiter
 	 * @param items
 	 * 
@@ -127,6 +128,30 @@ public abstract class StringUtil
 			for (int i = 1; i < items.length; i++)
 			{
 				buffer.append(delimiter).append(items[i]);
+			}
+		}
+		
+		return buffer.toString();
+	}
+	
+	/**
+	 * join
+	 * 
+	 * @param delimiter
+	 * @param items
+	 * @return
+	 */
+	public static String join(String delimiter, List<String> items)
+	{
+		StringBuffer buffer = new StringBuffer();
+		
+		if (items != null && items.size() > 0)
+		{
+			buffer.append(items.get(0));
+			
+			for (int i = 1; i < items.size(); i++)
+			{
+				buffer.append(delimiter).append(items.get(i));
 			}
 		}
 		
