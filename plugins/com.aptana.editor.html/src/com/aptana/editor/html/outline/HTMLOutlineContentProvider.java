@@ -1,6 +1,7 @@
 package com.aptana.editor.html.outline;
 
 import java.io.FileNotFoundException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -174,8 +175,9 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			return EMPTY;
 		}
 
-		// schedule job to get file, parse and get children and then add to parent. In the meantime return a placeholder.
-		Job job = new Job("Fetching children...")
+		// schedule job to get file, parse and get children and then add to parent. In the meantime return a
+		// placeholder.
+		Job job = new Job(Messages.HTMLOutlineContentProvider_FetchingExternalFilesJobName)
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
@@ -188,12 +190,12 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					String source = resolver.resolveSource(srcPathOrURL);
 					if (source == null)
 					{
-						throw new Exception("Unable to resolve file");
+						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
 					IParser parser = getParser(language);
 					if (parser == null)
 					{
-						throw new Exception("Unable to grab parser for language: " + language);
+						throw new Exception(MessageFormat.format(Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
 					}
 					IParseNode node = parse(parser, source);
 					elements = getChildren(node);
@@ -208,7 +210,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				{
 					Activator.getDefault().getLog().log(
 							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-					elements = new Object[] { new WarningItem(true, "File not found: " + e.getMessage()) };
+					elements = new Object[] { new WarningItem(true, MessageFormat.format(
+							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
@@ -231,17 +234,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		};
 		job.setPriority(Job.LONG);
 		job.schedule();
-		final WarningItem placeholder = new WarningItem(false, "Pending...");
+		final WarningItem placeholder = new WarningItem(false, Messages.HTMLOutlineContentProvider_PlaceholderItemLabel);
 		// Listen for update, when we have it, remove the placeholder
 		job.addJobChangeListener(new JobChangeAdapter()
-		{			
-			
+		{
+
 			@Override
 			public void done(IJobChangeEvent event)
 			{
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
-					
+
 					@Override
 					public void run()
 					{
@@ -250,7 +253,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				});
 			}
 		});
-		
+
 		return new Object[] { placeholder };
 	}
 
