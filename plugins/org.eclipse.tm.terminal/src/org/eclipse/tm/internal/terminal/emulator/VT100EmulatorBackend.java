@@ -294,12 +294,6 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 	 */
 	public void appendString(String buffer) {
 		synchronized (fTerminal) {
-			boolean hasCRLF = false;
-			char ch = buffer.charAt(buffer.length()-1);
-			if ( ch == '\r' || ch == '\n') {
-				hasCRLF = true;
-				buffer = buffer.substring(0, buffer.length() - 1);
-			}
 			char[] chars=buffer.toCharArray();
 			int line=toAbsoluteLine(fCursorLine);
 			int i=0;
@@ -309,7 +303,7 @@ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 				int col=fCursorColumn+n;
 				i+=n;
 				// wrap needed?
-				if(col>fColumns || (!hasCRLF && col>=fColumns)) {
+				if(col>=fColumns) {
 					doNewline();
 					line=toAbsoluteLine(fCursorLine);
 					setCursorColumn(0);
