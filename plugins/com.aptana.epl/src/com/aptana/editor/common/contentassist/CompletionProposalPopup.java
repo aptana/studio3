@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -38,14 +37,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -64,8 +59,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-
-import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
  * This class is used to present proposals to the user. If additional information exists for a proposal, then selecting
@@ -372,7 +365,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		};
 		fProposalTable.addListener(SWT.SetData, listener);
 
-		final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
+		//final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = false; //store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
@@ -482,12 +475,13 @@ public class CompletionProposalPopup implements IContentAssistListener
 		});
 
 		fPopupCloser.install(fContentAssistant, fProposalTable);
+		
+		/*
 		final IPropertyChangeListener propListener = new IPropertyChangeListener()
 		{
 
 			public void propertyChange(PropertyChangeEvent event)
 			{
-				/*
 				if (event.getProperty().equals(IPreferenceConstants.USER_AGENT_PREFERENCE))
 				{
 					if (Helper.okToUse(fProposalShell))
@@ -503,10 +497,10 @@ public class CompletionProposalPopup implements IContentAssistListener
 						}
 					}
 				}
-				*/
 			}
 
 		};
+		
 		store.addPropertyChangeListener(propListener);
 		fProposalShell.addDisposeListener(new DisposeListener()
 		{
@@ -520,6 +514,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				// disposal event!
 			}
 		});
+		*/
 
 		fProposalTable.setHeaderVisible(false);
 	}

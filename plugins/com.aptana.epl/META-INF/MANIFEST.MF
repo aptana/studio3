@@ -10,5 +10,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
-Export-Package: com.aptana.editor.common.scripting.snippets
+Export-Package: com.aptana.editor.common.contentassist,
+ com.aptana.editor.common.scripting.snippets
 Eclipse-ExtensibleAPI: true
