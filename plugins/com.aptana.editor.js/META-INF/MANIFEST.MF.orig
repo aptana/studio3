@@ -19,6 +19,11 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.js,
+<<<<<<< HEAD
+ com.aptana.editor.js.index;x-friends:="com.aptana.editor.html,com.aptana.editor.erb",
+ com.aptana.editor.js.internal;x-friends:="com.aptana.editor.erb,com.aptana.editor.html",
+=======
+>>>>>>> development
  com.aptana.editor.js.outline,
  com.aptana.editor.js.parsing
 Eclipse-ExtensibleAPI: true

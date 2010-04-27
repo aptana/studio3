@@ -384,9 +384,6 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 	public void repositoryRemoved(RepositoryRemovedEvent e)
 	{
 		e.getRepository().removeListener(this);
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
-		resources.add(e.getProject());
-		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}
 
 	/**

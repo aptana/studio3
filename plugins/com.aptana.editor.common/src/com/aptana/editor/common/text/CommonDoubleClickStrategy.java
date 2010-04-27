@@ -126,7 +126,7 @@ public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy
 			while (pos >= 0)
 			{
 				c = doc.getChar(pos);
-				if (!Character.isJavaIdentifierPart(c))
+				if (!isIdentifierPart(c))
 					break;
 				--pos;
 			}
@@ -137,7 +137,7 @@ public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy
 			while (pos < length)
 			{
 				c = doc.getChar(pos);
-				if (!Character.isJavaIdentifierPart(c))
+				if (!isIdentifierPart(c))
 					break;
 				++pos;
 			}
@@ -150,6 +150,11 @@ public class CommonDoubleClickStrategy implements ITextDoubleClickStrategy
 		{
 		}
 		return false;
+	}
+
+	protected boolean isIdentifierPart(char c)
+	{
+		return Character.isJavaIdentifierPart(c);
 	}
 
 	private void selectRange(int startPos, int stopPos)

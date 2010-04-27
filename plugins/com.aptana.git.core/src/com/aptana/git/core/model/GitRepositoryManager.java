@@ -85,12 +85,10 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		GitRepository repo = getUnattachedExisting(p.getLocationURI());
 		if (repo == null)
 			return;
+
 		cachedRepos.remove(p.getLocationURI().getPath());
-
-		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
-		for (IGitRepositoriesListener listener : listeners)
-			listener.repositoryRemoved(e);
-
+		boolean dispose = true;
+		
 		// Only dispose if there's no other projects attached to same repo!
 		for (SoftReference<GitRepository> ref : cachedRepos.values())
 		{
@@ -98,10 +96,22 @@ public class GitRepositoryManager implements IGitRepositoryManager
 				continue;
 			GitRepository other = ref.get();
 			if (other.equals(repo))
-				return;
+			{
+				dispose = false;
+				break;
+			}
 		}
-		repo.dispose();
-		repo = null;
+		
+		// Notify listeners
+		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
+		for (IGitRepositoriesListener listener : listeners)
+			listener.repositoryRemoved(e);
+		
+		if (dispose)
+		{			
+			repo.dispose();
+			repo = null;
+		}
 	}
 
 	@Override
@@ -120,7 +130,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	@Override
 	public synchronized GitRepository getUnattachedExisting(URI path)
 	{
-		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null)
+		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
 			return null;
 
 		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
