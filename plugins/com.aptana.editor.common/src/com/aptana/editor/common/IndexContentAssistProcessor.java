@@ -24,27 +24,71 @@ import com.aptana.index.core.SearchPattern;
 
 public class IndexContentAssistProcessor implements IContentAssistProcessor
 {
-
 	private final AbstractThemeableEditor abstractThemeableEditor;
 
+	/**
+	 * IndexContentAssistProcessor
+	 * 
+	 * @param abstractThemeableEditor
+	 */
 	public IndexContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		this.abstractThemeableEditor = abstractThemeableEditor;
 	}
 
+	/**
+	 * addCompletionProposalsForCategory
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @param index
+	 * @param completionProposals
+	 * @param category
+	 */
+	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals, String category)
+	{
+		try
+		{
+			List<QueryResult> queryResults = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
+			
+			if (queryResults != null)
+			{
+				for (QueryResult queryResult : queryResults)
+				{
+					String text = queryResult.getWord();
+					int length = text.length();
+					String info = category + " : " + text;
+					
+					completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
+				}
+			}
+		}
+		catch (IOException e)
+		{
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text
+	 * .ITextViewer, int)
+	 */
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		IEditorInput editorInput = abstractThemeableEditor.getEditorInput();
 		List<ICompletionProposal> completionProposals = new LinkedList<ICompletionProposal>();
+
 		if (editorInput instanceof IFileEditorInput)
 		{
 			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 			IFile file = fileEditorInput.getFile();
 			IProject project = file.getProject();
 			Index index = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
+
 			computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
-			
+
 			// sort by display name, ignoring case
 			Collections.sort(completionProposals, new Comparator<ICompletionProposal>()
 			{
@@ -59,11 +103,24 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 		return completionProposals.toArray(new ICompletionProposal[0]);
 	}
 
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
-			List<ICompletionProposal> completionProposals)
+	/**
+	 * computeCompletionProposalsUsingIndex
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @param index
+	 * @param completionProposals
+	 */
+	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals)
 	{
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text
+	 * .ITextViewer, int)
+	 */
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
@@ -71,6 +128,10 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
+	 */
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
@@ -85,6 +146,10 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
+	 */
 	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
@@ -92,30 +157,14 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
+	 */
 	@Override
 	public String getErrorMessage()
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals, String category)
-	{
-		try
-		{
-			List<QueryResult> queryResults;
-			queryResults = index.query(new String[] {category}, "", SearchPattern.PREFIX_MATCH); //$NON-NLS-1$
-			if (queryResults != null)
-			{
-				for (QueryResult queryResult : queryResults)
-				{
-					completionProposals.add(new CompletionProposal(queryResult.getWord(), offset, 0, 0, null, category + ":" + queryResult.getWord(), null, category));
-				}
-			}
-		}
-		catch (IOException e)
-		{
-		}
-	}
-
 }
