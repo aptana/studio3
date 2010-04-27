@@ -11,21 +11,23 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
+import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.editor.js.parsing.JSParser;
+import com.aptana.editor.js.parsing.JSParserFactory;
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
-	
+
 	private Map<String, Object[]> cache = new HashMap<String, Object[]>();
 
 	public HTMLOutlineContentProvider()
@@ -42,32 +44,76 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			// delegates to the parse node it references to
 			return getChildren(((CommonOutlineItem) parentElement).getReferenceNode());
 		}
+		// Handle expansion of link tags pointing to stylesheets
+		if (parentElement instanceof HTMLElementNode)
+		{
+			HTMLElementNode item = (HTMLElementNode) parentElement;
+			if (item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+			{
+				String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
+				if (rel.equals("stylesheet")) //$NON-NLS-1$
+				{
+					String attribute = item.getAttributeValue("href"); //$NON-NLS-1$
+					if (attribute.length() > 0)
+					{
+						return getExternalChildren(attribute, ICSSParserConstants.LANGUAGE);
+					}
+				}
+			}
+		}
+		// Handle embedded languages (JS and CSS)
 		if (parentElement instanceof HTMLSpecialNode)
 		{
 			// HTMLSpecialNode always has the root node of the nested language as its child; we want to skip that and
 			// get the content below
 			HTMLSpecialNode item = (HTMLSpecialNode) parentElement;
 
-			// addition to allow expansion of script tags with src attribute;
-			if (item.getName().equals("script")) { //$NON-NLS-1$
+			// Special case of external JS file
+			if (item.getName().equalsIgnoreCase("script")) { //$NON-NLS-1$
 				String attribute = item.getAttributeValue("src"); //$NON-NLS-1$
 				if (attribute.length() > 0)
 				{
-					return getExternalScriptChildren(attribute,item);
+					return getExternalChildren(attribute, IJSParserConstants.LANGUAGE);
 				}
-			}			
-			
+			}
+
 			return getChildren(item.getChild(0));
 		}
 		return super.getChildren(parentElement);
 	}
-	
-	private Object[] getExternalScriptChildren(final String attribute, HTMLSpecialNode parent)
+
+	private Object[] parse(String source, String language) throws Exception
 	{
-		Object[] cached = cache.get(attribute);
+		if (source == null)
+		{
+			return EMPTY;
+		}
+		IParser parser = getParser(language);
+		if (parser == null)
+		{
+			return EMPTY;
+		}
+		IParseState pState = new ParseState();
+		pState.setEditState(source, source, 0, 0);
+		IParseNode parse = parser.parse(pState);
+		return getChildren(parse);
+	}
+
+	private IParser getParser(String language)
+	{
+		if (language.equals(IJSParserConstants.LANGUAGE))
+			return JSParserFactory.getInstance().getParser();
+		if (language.equals(ICSSParserConstants.LANGUAGE))
+			return CSSParserFactory.getInstance().getParser();
+		return null;
+	}
+
+	private Object[] getExternalChildren(final String srcPathOrURL, String language)
+	{
+		Object[] cached = cache.get(srcPathOrURL);
 		if (cached != null)
 		{
-			//we have a cached result
+			// we have a cached result
 			return cached;
 		}
 
@@ -77,78 +123,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		}
 		try
 		{
-			//registering listener
-//			IPropertyChangeListener propertyChangeListener = listeners.get(attribute);
-//			if (propertyChangeListener == null)
-//			{
-//				propertyChangeListener = new IPropertyChangeListener()
-//				{
-//
-//					public void propertyChange(PropertyChangeEvent event)
-//					{
-//						cache.remove(attribute);
-//					}
-//
-//				};
-//				resolver.addChangeListener(attribute, propertyChangeListener);
-//			}
-//			listeners.put(attribute, propertyChangeListener);
-			
-			//resolving source and editor input
-			String source = resolver.resolveSource(attribute);
-//			IEditorInput input = resolver.resolveEditorInput(attribute);
-			if (source == null)
-			{
-				return EMPTY;
-//				return new Object[] { new WarningItem(StringUtils.format(
-//						HTMLContentProviderMessages.HTMLContentProvider_NOT_RESOLVABLE, attribute)) };
-			}
-			JSParser ps;
-//			try
-//			{
-				//parsing
-				ps = new JSParser();
-				IParseState pState = new ParseState();
-				pState.setEditState(source, source, 0, 0);
-				IParseNode parse = ps.parse(pState);
-//				JSOutlineContentProvider provider = new JSOutlineContentProvider();
-				
-				Object[] elements = new Object[] { parse.getChild(0) };
-				//acquiring items
-//				Object[] elements = provider.getElements(parse.getChildren());
-//				for (int a = 0; a < elements.length; a++)
-//				{
-//					if (elements[a] instanceof JSOutlineItem)
-//					{
-//						JSOutlineItem item = (JSOutlineItem) elements[a];
-//						item.setResolveInformation(input);
-//						item.setParent(parent);
-//						parent.addChild(item);
-//					}
-//				}
-				
-				//caching result
-				cache.put(attribute, elements);
-				return elements;
-//			}
-//			catch (ParserInitializationException e)
-//			{
-//				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage());
-//				return NO_OBJECTS;
-//			}
-//			catch (LexerException e)
-//			{
-//				IdeLog.logError(HTMLPlugin.getDefault(), e.getMessage());
-//				return NO_OBJECTS;
-//			}
+			// resolving source and editor input
+			String source = resolver.resolveSource(srcPathOrURL);
+			Object[] elements = parse(source, language);
 
+			// caching result
+			cache.put(srcPathOrURL, elements);
+			return elements;
 		}
 		catch (Exception e)
 		{
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-//			WarningItem warningItem = new WarningItem(e.getMessage());
-//			warningItem.setError(true);
-//			return new Object[] { warningItem };
 			return EMPTY;
 		}
 
