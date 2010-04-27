@@ -35,10 +35,12 @@
 package com.aptana.editor.html.outline;
 
 /**
- * @author Pavel Petrochenko
- *
+ * This class is a simple little stub to be inserted into the outline for status updates, placeholders, or
+ * errors/warnings. Uses IStatus integer values for status severity to determine what icon to show.
+ * 
+ * @author Chris Williams
  */
-class WarningItem
+class OutlinePlaceholderItem
 {
 
 	private String message;
@@ -47,7 +49,7 @@ class WarningItem
 	/**
 	 * @param message
 	 */
-	public WarningItem(int status, String message)
+	public OutlinePlaceholderItem(int status, String message)
 	{
 		super();
 		this.status = status;

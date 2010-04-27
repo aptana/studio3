@@ -33,9 +33,9 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 		{
 			return getDefaultImage(((CommonOutlineItem) element).getReferenceNode());
 		}
-		if (element instanceof WarningItem)
+		if (element instanceof OutlinePlaceholderItem)
 		{
-			WarningItem item = (WarningItem) element;
+			OutlinePlaceholderItem item = (OutlinePlaceholderItem) element;
 			if (item.status() == IStatus.ERROR)
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
 			if (item.status() == IStatus.INFO)
