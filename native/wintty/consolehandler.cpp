@@ -35,6 +35,8 @@ static DWORD dwScreenBufferSize = 0;
 
 static WORD wCharAttributes = DEFAULT_ATTRIBUTES;
 
+#define SCREEN_BUFFER_HEIGHT 10000
+
 BOOL InitConsoleHandler(void)
 {
 	hParentProcess = GetParentProcess();
@@ -373,12 +375,93 @@ static void ChangeAttributes(WORD attrs)
 static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength);
 static BOOL HasChanges(CHAR_INFO *lpPrevCharInfo, CHAR_INFO *lpNextCharInfo, SHORT sLength, SHORT sMinCount);
 
+static void SnapshotBuffer(COORD& coordConsoleSize, COORD  coordBufferSize, SMALL_RECT& srWindow, SMALL_RECT& srBuffer, CHAR_INFO* lpBuffer)
+{
+	COORD coordStart = {0, 0};
+	DWORD dwScreenBufferOffset = 0;
+	SHORT i;
+	for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
+		::ReadConsoleOutput(hConsoleOut, lpBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
+		srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
+		dwScreenBufferOffset += coordBufferSize.X * coordBufferSize.Y;
+	}
+	coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
+	srBuffer.Bottom = srWindow.Bottom;
+	if( coordBufferSize.Y != 0 ) { 
+		::ReadConsoleOutput(hConsoleOut, lpBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+	}
+}
+
+static bool ProcessSnapshotDiff(CHAR_INFO* lpPrevBuffer, CHAR_INFO* lpNextBuffer, COORD& coordConsoleSize)
+{
+	if( ::memcmp(lpPrevBuffer, lpNextBuffer, dwScreenBufferSize*sizeof(CHAR_INFO)) != 0 )
+	{
+		// partial changes
+		CHAR_INFO* lpPrevCharInfo = lpPrevBuffer;
+		CHAR_INFO* lpNextCharInfo = lpNextBuffer;
+		for( SHORT y = 0; y < coordConsoleSize.Y; ++y)
+		{
+			BOOL bReplaceLine = FALSE;
+			BOOL bErasedLine = FALSE;
+			if( bReplaceLine = HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 10) )
+			{
+				MoveCursor(0, y);
+				if( !IsLineEmpty(lpPrevCharInfo, coordConsoleSize.X) ) {
+					EraseLine();
+					bErasedLine = TRUE;
+				}
+			} else {
+				if(!HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 0) && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X) ) {
+					lpPrevCharInfo += coordConsoleSize.X;
+					lpNextCharInfo += coordConsoleSize.X;
+					continue;
+				}
+			}
+			for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpPrevCharInfo, ++lpNextCharInfo)
+			{
+				if( bReplaceLine || (::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0) )
+				{
+					if( bReplaceLine && !bErasedLine && !HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X - x, 0) ) {
+						lpPrevCharInfo += coordConsoleSize.X - x;
+						lpNextCharInfo += coordConsoleSize.X - x;
+						break;
+					} else if( bReplaceLine && bErasedLine && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X - x) ) {
+						lpPrevCharInfo += coordConsoleSize.X - x;
+						lpNextCharInfo += coordConsoleSize.X - x;
+						break;
+					} else {
+						MoveCursor(x, y);
+					}
+					if( lpNextCharInfo->Char.AsciiChar == '\0' ) {
+						break;
+					} else if( wCharAttributes != lpNextCharInfo->Attributes ) {
+						ChangeAttributes(lpNextCharInfo->Attributes);
+					}
+					OutputChar(lpNextCharInfo->Char.AsciiChar);
+					++csbiConsole.dwCursorPosition.X;
+				}
+			}
+			if( bReplaceLine)
+			{
+				if( y !=  coordConsoleSize.Y -1 ) {
+					OutputString("\r\n");
+					csbiConsole.dwCursorPosition.X = 0;
+					++csbiConsole.dwCursorPosition.Y;
+				}
+			}
+			TestAndFlushBuffer();
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
 static void ReadConsoleBuffer()
 {
 	CONSOLE_SCREEN_BUFFER_INFO csbiNextConsole;
 	//CONSOLE_CURSOR_INFO cciNextCursor;
 	COORD coordConsoleSize;
-	COORD coordStart = {0, 0};
 	COORD coordBufferSize;
 	SMALL_RECT srBuffer;
 	
@@ -420,20 +503,7 @@ static void ReadConsoleBuffer()
 			lpPrevScreenBuffer = (CHAR_INFO*) ::HeapAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, dwBufferMemorySize);
 			lpNextScreenBuffer = (CHAR_INFO*) ::HeapAlloc(hHeap, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, dwBufferMemorySize);
 		}
-		DWORD dwScreenBufferOffset = 0;
-		SHORT i;
-		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
-			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
-			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
-			coordStart.Y += coordBufferSize.Y;
-			dwScreenBufferOffset += coordBufferSize.X * coordBufferSize.Y;
-		}
-		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
-		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
-		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut, lpPrevScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
-		}
+		SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srBuffer, lpPrevScreenBuffer);
 
 		CHAR_INFO* lpCharInfo = lpPrevScreenBuffer;
 		BOOL bHasNonEmptyChar = FALSE;
@@ -488,92 +558,51 @@ static void ReadConsoleBuffer()
 				if ( y != coordConsoleSize.Y-1) {
 					OutputString("\r\n");
 					csbiConsole.dwCursorPosition.X = 0;
-					++csbiConsole.dwCursorPosition.Y;
+					++csbiConsole.dwCursorPosition.Y; 
 				}
 			}
 			TestAndFlushBuffer();
 		}
 	} else
 	{
-		DWORD dwScreenBufferOffset = 0;
-		SHORT i;
-		for( i = 0; i < coordConsoleSize.Y / coordBufferSize.Y; ++i ) {
-			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
-			srBuffer.Top = srBuffer.Top + coordBufferSize.Y;
-			srBuffer.Bottom = srBuffer.Bottom + coordBufferSize.Y;
-			coordStart.Y += coordBufferSize.Y;
-			dwScreenBufferOffset += coordBufferSize.X * coordBufferSize.Y;
-		}
-		coordBufferSize.Y = coordConsoleSize.Y - i * coordBufferSize.Y;
-		srBuffer.Bottom = csbiConsole.srWindow.Bottom;
-		if( coordBufferSize.Y != 0 ) { 
-			::ReadConsoleOutput(hConsoleOut, lpNextScreenBuffer+dwScreenBufferOffset, coordBufferSize, coordStart, &srBuffer);
+		if( csbiConsole.srWindow.Top < csbiNextConsole.srWindow.Top )
+		{
+			SMALL_RECT srPrevBuffer;
+			srPrevBuffer.Top = csbiConsole.srWindow.Top;
+			srPrevBuffer.Bottom = csbiConsole.srWindow.Top + coordBufferSize.Y - 1;
+			srPrevBuffer.Left = csbiConsole.srWindow.Left;
+			srPrevBuffer.Right = csbiConsole.srWindow.Right;
+			SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srPrevBuffer, lpNextScreenBuffer);
+			ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize);
+			MoveCursor(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+			SHORT nRows = csbiNextConsole.srWindow.Top - csbiConsole.srWindow.Top;
+			for( SHORT i = 0; i < nRows; ++i) {
+				OutputString("\r\n");
+			}
+			csbiConsole.dwCursorPosition.X = 0;
+			DWORD dwShift = nRows*coordConsoleSize.X;
+			if( dwShift <= dwScreenBufferSize )
+			{
+				::MoveMemory(lpPrevScreenBuffer, lpNextScreenBuffer + dwShift, (dwScreenBufferSize-dwShift)*sizeof(CHAR_INFO));
+				CHAR_INFO* lpCharInfo = lpPrevScreenBuffer + (dwScreenBufferSize-dwShift);
+				for( DWORD i = 0; i < dwShift; ++i, ++lpCharInfo) {
+					lpCharInfo->Char.AsciiChar = ' ';
+					lpCharInfo->Attributes = DEFAULT_ATTRIBUTES;
+				}
+			}
+			csbiConsole.srWindow = csbiNextConsole.srWindow;
 		}
 
-		if( ::memcmp(lpPrevScreenBuffer, lpNextScreenBuffer, dwScreenBufferSize*sizeof(CHAR_INFO)) != 0 )
+		SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srBuffer, lpNextScreenBuffer);
+		if( ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize) )
 		{
-			// partial changes
-			CHAR_INFO* lpPrevCharInfo = lpPrevScreenBuffer;
-			CHAR_INFO* lpNextCharInfo = lpNextScreenBuffer;
-			for( SHORT y = 0; y < coordConsoleSize.Y; ++y)
-			{
-				BOOL bReplaceLine = FALSE;
-				BOOL bErasedLine = FALSE;
-				if( bReplaceLine = HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 10) )
-				{
-					MoveCursor(0, y);
-					if( !IsLineEmpty(lpPrevCharInfo, coordConsoleSize.X) ) {
-						EraseLine();
-						bErasedLine = TRUE;
-					}
-				} else {
-					if(!HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X, 0) && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X) ) {
-						lpPrevCharInfo += coordConsoleSize.X;
-						lpNextCharInfo += coordConsoleSize.X;
-						continue;
-					}
-				}
-				for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpPrevCharInfo, ++lpNextCharInfo)
-				{
-					if( bReplaceLine || (::memcmp(lpPrevCharInfo, lpNextCharInfo, sizeof(CHAR_INFO)) != 0) )
-					{
-						if( bReplaceLine && !bErasedLine && !HasChanges(lpPrevCharInfo, lpNextCharInfo, coordConsoleSize.X - x, 0) ) {
-							lpPrevCharInfo += coordConsoleSize.X - x;
-							lpNextCharInfo += coordConsoleSize.X - x;
-							break;
-						} else if( bReplaceLine && bErasedLine && IsLineEmpty(lpNextCharInfo, coordConsoleSize.X - x) ) {
-							lpPrevCharInfo += coordConsoleSize.X - x;
-							lpNextCharInfo += coordConsoleSize.X - x;
-							break;
-						} else {
-							MoveCursor(x, y);
-						}
-						if( lpNextCharInfo->Char.AsciiChar == '\0' ) {
-							break;
-						} else if( wCharAttributes != lpNextCharInfo->Attributes ) {
-							ChangeAttributes(lpNextCharInfo->Attributes);
-						}
-						OutputChar(lpNextCharInfo->Char.AsciiChar);
-						++csbiConsole.dwCursorPosition.X;
-					}
-				}
-				if( bReplaceLine)
-				{
-					if( y !=  coordConsoleSize.Y -1 ) {
-						OutputString("\r\n");
-						csbiConsole.dwCursorPosition.X = 0;
-						++csbiConsole.dwCursorPosition.Y;
-					}
-				}
-				TestAndFlushBuffer();
-			}
 			CHAR_INFO* tmpNext = lpPrevScreenBuffer;
 			lpPrevScreenBuffer = lpNextScreenBuffer;
 			lpNextScreenBuffer = tmpNext;
 		}
 	}
 	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
-	MoveCursor(csbiNextConsole.dwCursorPosition.X, csbiNextConsole.dwCursorPosition.Y);
+	MoveCursor(csbiNextConsole.dwCursorPosition.X - csbiNextConsole.srWindow.Left, csbiNextConsole.dwCursorPosition.Y - csbiNextConsole.srWindow.Top);
 	/*if( ::GetConsoleCursorInfo(hConsoleOut, &cciNextCursor) && (::memcmp(&cciCursor, &cciNextCursor, sizeof(CONSOLE_CURSOR_INFO)) != 0)) {
 		cciCursor = cciNextCursor;
 	}*/
@@ -705,13 +734,19 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	coordBufferSize.Y = height;
 
 	SMALL_RECT srConsoleRect = csbi.srWindow;
-	srConsoleRect.Right = srConsoleRect.Left + coordBufferSize.X - 1;
-	srConsoleRect.Bottom = srConsoleRect.Top + coordBufferSize.Y - 1;
+	srConsoleRect.Right = srConsoleRect.Left + width - 1;
+	if( (srConsoleRect.Bottom - srConsoleRect.Top + 1 < height)
+		|| (srConsoleRect.Top == 0)
+		|| (srConsoleRect.Bottom + 1 < height) ) {
+		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // increase bottom
+	} else {
+		srConsoleRect.Top = srConsoleRect.Bottom - height + 1; // move top
+	}
 
 	COORD finalCoordBufferSize = csbi.dwSize;
 	SMALL_RECT finalConsoleRect = csbi.srWindow;
 	// first, resize rows
-	finalCoordBufferSize.Y  = coordBufferSize.Y;
+	finalCoordBufferSize.Y = SCREEN_BUFFER_HEIGHT;
 	finalConsoleRect.Top    = srConsoleRect.Top;
 	finalConsoleRect.Bottom = srConsoleRect.Bottom;
 	if( coordBufferSize.Y > csbi.dwSize.Y ) {
