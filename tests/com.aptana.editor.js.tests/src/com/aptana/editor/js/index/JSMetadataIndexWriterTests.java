@@ -51,7 +51,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.readType(this.getIndex(), typeName);
+		return reader.loadType(this.getIndex(), typeName);
 	}
 	
 	/**
