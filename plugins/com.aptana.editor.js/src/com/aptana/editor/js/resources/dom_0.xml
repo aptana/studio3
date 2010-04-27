@@ -6032,7 +6032,7 @@
 					<parameter name="interval" type="Number" usage="required">
 						<description>Number of milliseconds to wait.</description>
 					</parameter>
-					<parameter name="args..." type="Array" usage="zero-or-more">
+					<parameter name="args" type="Array" usage="zero-or-more">
 						<description>Arguments (if any) to be taken by the function.</description>
 					</parameter>
 				</parameters>
