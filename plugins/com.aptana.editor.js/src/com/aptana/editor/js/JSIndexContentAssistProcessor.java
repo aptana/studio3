@@ -1,67 +1,63 @@
 package com.aptana.editor.js;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.IndexContentAssistProcessor;
-import com.aptana.editor.js.index.IndexConstants;
+import com.aptana.editor.js.index.JSContentAssistHelper;
+import com.aptana.editor.js.model.FunctionElement;
+import com.aptana.editor.js.model.PropertyElement;
 import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.QueryResult;
-import com.aptana.index.core.SearchPattern;
 
 public class JSIndexContentAssistProcessor extends IndexContentAssistProcessor
 {
-
+	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif");
+	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif");
+	
+	private JSContentAssistHelper _helper;
+	
+	/**
+	 * JSIndexContentAssitProcessor
+	 * 
+	 * @param abstractThemeableEditor
+	 */
 	public JSIndexContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		super(abstractThemeableEditor);
-	}
-
-	@Override
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
-			List<ICompletionProposal> completionProposals)
-	{
-		Index metadataIndex = IndexManager.getInstance().getIndex(IndexConstants.METADATA);
 		
-//		addCompletionProposalsForCategory(viewer, offset, metadataIndex, completionProposals, IndexConstants.TYPE);
-		addCompletionProposalsForCategory(viewer, offset, metadataIndex, completionProposals, IndexConstants.FUNCTION);
+		this._helper = new JSContentAssistHelper();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.IndexContentAssistProcessor#addCompletionProposalsForCategory(org.eclipse.jface.text.ITextViewer, int, com.aptana.index.core.Index, java.util.List, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.IndexContentAssistProcessor#computeCompletionProposalsUsingIndex(org.eclipse.jface.text.ITextViewer, int, com.aptana.index.core.Index, java.util.List)
 	 */
 	@Override
-	protected void addCompletionProposalsForCategory(ITextViewer viewer, int offset, Index index,
-			List<ICompletionProposal> completionProposals, String category)
+	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index, List<ICompletionProposal> completionProposals)
 	{
-		try
+		List<PropertyElement> globals = this._helper.getGlobals();
+		
+		for (PropertyElement property : globals)
 		{
-			List<QueryResult> types = index.query(new String[] { category }, "", SearchPattern.PREFIX_MATCH);
+			// slightly change behavior if this is a function
+			boolean isFunction = (property instanceof FunctionElement);
 			
-			if (types != null)
-			{
-				for (QueryResult result : types)
-				{
-					String rawValue = result.getWord();
-					String word = rawValue.substring(0, rawValue.indexOf(IndexConstants.DELIMITER));
-					String description = rawValue.substring(rawValue.lastIndexOf(IndexConstants.DELIMITER) + 1);
-					String info = category + ":" + rawValue + "\n" + description;
-					CompletionProposal proposal = new CompletionProposal(word, offset, 0, word.length(), null, word, null, info);
-					
-					completionProposals.add(proposal);
-				}
-			}
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// grab the interesting parts
+			String name = property.toString();
+			int length = isFunction ? name.length() - 1 : name.length();
+			String description = property.getDescription();
+			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
+			
+			// build a proposal
+			CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, null, description);
+			
+			// add it to the list
+			completionProposals.add(proposal);
 		}
 	}
 }
