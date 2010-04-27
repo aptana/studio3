@@ -1,5 +1,6 @@
 package com.aptana.editor.html.outline;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,8 +95,8 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		{
 			// delegates to the parse node it references to
 			return hasChildren(((CommonOutlineItem) element).getReferenceNode());
-		}	
-		
+		}
+
 		// Handle expansion of link tags pointing to stylesheets
 		if (element instanceof HTMLElementNode)
 		{
@@ -136,12 +137,12 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	{
 		if (source == null)
 		{
-			return EMPTY;
+			return new Object[] { new WarningItem(true, "Unable to resolve file") };
 		}
 		IParser parser = getParser(language);
 		if (parser == null)
 		{
-			return EMPTY;
+			return new Object[] { new WarningItem(true, "Unable to grab parser for language: " + language) };
 		}
 		IParseState pState = new ParseState();
 		pState.setEditState(source, source, 0, 0);
@@ -171,6 +172,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		{
 			return EMPTY;
 		}
+		// TODO return a placeholder, then schedule job to get file, parse and get children and then add to parent
 		try
 		{
 			// resolving source and editor input
@@ -181,10 +183,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			cache.put(srcPathOrURL, elements);
 			return elements;
 		}
+		catch (FileNotFoundException e)
+		{
+			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			return new Object[] { new WarningItem(true, "File not found: " + e.getMessage()) };
+		}
 		catch (Exception e)
 		{
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-			return EMPTY;
+			return new Object[] { new WarningItem(true, e.getMessage()) };
 		}
 
 	}

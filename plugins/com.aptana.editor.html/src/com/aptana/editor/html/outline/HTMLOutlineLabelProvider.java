@@ -1,6 +1,8 @@
 package com.aptana.editor.html.outline;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
@@ -29,6 +31,13 @@ public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 		if (element instanceof CommonOutlineItem)
 		{
 			return getDefaultImage(((CommonOutlineItem) element).getReferenceNode());
+		}
+		if (element instanceof WarningItem)
+		{
+			WarningItem item = (WarningItem) element;
+			if (item.isError())
+				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
 		}
 		if (element instanceof HTMLNode)
 		{
