@@ -6,8 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
@@ -30,6 +37,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
 
 	private Map<String, Object[]> cache = new HashMap<String, Object[]>();
+	private TreeViewer treeViewer;
 
 	public HTMLOutlineContentProvider()
 	{
@@ -37,7 +45,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
 	}
 
-	// TODO Expand the external items lazily/asynch somehow
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
@@ -58,7 +65,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 					String attribute = item.getAttributeValue("href"); //$NON-NLS-1$
 					if (attribute.length() > 0)
 					{
-						return getExternalChildren(attribute, ICSSParserConstants.LANGUAGE);
+						return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
 					}
 				}
 			}
@@ -75,7 +82,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				String attribute = item.getAttributeValue("src"); //$NON-NLS-1$
 				if (attribute.length() > 0)
 				{
-					return getExternalChildren(attribute, IJSParserConstants.LANGUAGE);
+					return getExternalChildren(parentElement, attribute, IJSParserConstants.LANGUAGE);
 				}
 			}
 
@@ -133,21 +140,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return super.hasChildren(element);
 	}
 
-	private Object[] parse(String source, String language) throws Exception
+	private IParseNode parse(IParser parser, String source) throws Exception
 	{
-		if (source == null)
-		{
-			return new Object[] { new WarningItem(true, "Unable to resolve file") };
-		}
-		IParser parser = getParser(language);
-		if (parser == null)
-		{
-			return new Object[] { new WarningItem(true, "Unable to grab parser for language: " + language) };
-		}
 		IParseState pState = new ParseState();
 		pState.setEditState(source, source, 0, 0);
-		IParseNode parse = parser.parse(pState);
-		return getChildren(parse);
+		return parser.parse(pState);
 	}
 
 	private IParser getParser(String language)
@@ -159,9 +156,13 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return null;
 	}
 
-	private Object[] getExternalChildren(final String srcPathOrURL, String language)
+	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
 	{
-		Object[] cached = cache.get(srcPathOrURL);
+		Object[] cached;
+		synchronized (cache)
+		{
+			cached = cache.get(srcPathOrURL);
+		}
 		if (cached != null)
 		{
 			// we have a cached result
@@ -172,28 +173,85 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		{
 			return EMPTY;
 		}
-		// TODO return a placeholder, then schedule job to get file, parse and get children and then add to parent
-		try
-		{
-			// resolving source and editor input
-			String source = resolver.resolveSource(srcPathOrURL);
-			Object[] elements = parse(source, language);
 
-			// caching result
-			cache.put(srcPathOrURL, elements);
-			return elements;
-		}
-		catch (FileNotFoundException e)
+		// schedule job to get file, parse and get children and then add to parent. In the meantime return a placeholder.
+		Job job = new Job("Fetching children...")
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-			return new Object[] { new WarningItem(true, "File not found: " + e.getMessage()) };
-		}
-		catch (Exception e)
-		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-			return new Object[] { new WarningItem(true, e.getMessage()) };
-		}
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				// TODO Add progress for fetch/parse
+				Object[] elements;
+				try
+				{
+					// resolving source and editor input
+					String source = resolver.resolveSource(srcPathOrURL);
+					if (source == null)
+					{
+						throw new Exception("Unable to resolve file");
+					}
+					IParser parser = getParser(language);
+					if (parser == null)
+					{
+						throw new Exception("Unable to grab parser for language: " + language);
+					}
+					IParseNode node = parse(parser, source);
+					elements = getChildren(node);
 
+					// caching result
+					synchronized (cache)
+					{
+						cache.put(srcPathOrURL, elements);
+					}
+				}
+				catch (FileNotFoundException e)
+				{
+					Activator.getDefault().getLog().log(
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					elements = new Object[] { new WarningItem(true, "File not found: " + e.getMessage()) };
+				}
+				catch (Exception e)
+				{
+					Activator.getDefault().getLog().log(
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					elements = new Object[] { new WarningItem(true, e.getMessage()) };
+				}
+				final Object[] finalElements = elements;
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
+					}
+				});
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.LONG);
+		job.schedule();
+		final WarningItem placeholder = new WarningItem(false, "Pending...");
+		// Listen for update, when we have it, remove the placeholder
+		job.addJobChangeListener(new JobChangeAdapter()
+		{			
+			
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						treeViewer.remove(placeholder);
+					}
+				});
+			}
+		});
+		
+		return new Object[] { placeholder };
 	}
 
 	@Override
@@ -236,5 +294,12 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			}
 		}
 		return items.toArray(new CommonOutlineItem[items.size()]);
+	}
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
+	{
+		this.treeViewer = (TreeViewer) viewer;
+		super.inputChanged(viewer, oldInput, newInput);
 	}
 }
