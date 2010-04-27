@@ -36,6 +36,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineContentProvider());
 	}
 
+	// TODO Expand the external items lazily/asynch somehow
 	@Override
 	public Object[] getChildren(Object parentElement)
 	{
