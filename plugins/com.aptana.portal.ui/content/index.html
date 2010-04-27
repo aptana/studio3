@@ -1,38 +1,50 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Configuration Portal</title>
-<link href="css/style.css" rel="stylesheet" type="text/css" /><!--[if IE]>
-<style type="text/css"> 
-/* place css fixes for all versions of IE in this conditional comment */
-.twoColElsLt #sidebar1 { padding-top: 30px; }
-.twoColElsLt #mainContent { zoom: 1; padding-top: 15px; }
-/* the above proprietary zoom property gives IE the hasLayout it needs to avoid several bugs */
-</style>
-<![endif]-->
-<script type="text/javascript" src="javascript/framework/prototype.js"></script>
-<script type="text/javascript" src="javascript/framework/array_list.js"></script>
-<script type="text/javascript" src="javascript/framework/events.js"></script>
-<script type="text/javascript" src="javascript/framework/elements.js"></script>
-<script type="text/javascript" src="javascript/portal/portal.js"></script>
-</head>
-<body class="twoColElsLt" onload="loadConfigurationPortal()">
-
-<div id="container">
-  <div id="sidebar1">
-    <div><b>Configurations</b></div>
-    <div id="configurableItems"></div>
-    <div><b>Recently Opened Files</b></div>
-    <div id="recentFiles"></div>
-    <div><b>Gems</b></div>
-    <div id="gems"></div>
-    <!-- p><input id=button type="button" value="Configure my Git" onclick="invokeGitConfig();"></p -->
-  </div>
-  <div id="mainContent">
-    <h1> Main Content </h1>
-  </div>
-  <div class="clearfloat"/>
-</div>
-</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>
+      Aptana
+    </title>
+    <link href="stylesheets/main.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="javascripts/framework/prototype.js">
+</script>
+    <script type="text/javascript" src="javascripts/framework/array_list.js">
+</script>
+    <script type="text/javascript" src="javascripts/framework/events.js">
+</script>
+    <script type="text/javascript" src="javascripts/framework/elements.js">
+</script>
+    <script type="text/javascript" src="javascripts/portal/portal.js">
+</script>
+  </head>
+  <body onload="loadConfigurationPortal()">
+    <div id="container">
+      <div id="header">
+        <a id="logo" href="/" name="logo"></a>
+      </div>
+      <div id="main">
+        <div id="top"></div>
+        <div id="sidebar"></div>
+        <div id="content">
+          <div>
+            <b>Configurations</b>
+          </div>
+          <div id="configurableItems"></div>
+          <div>
+            <b>Recently Opened Files</b>
+          </div>
+          <div id="recentFiles"></div>
+          <div>
+            <b>Gems</b>
+          </div>
+          <div id="gems"></div>
+        </div>
+      </div>
+      <div id="footer">
+        <p>
+          Copyright 2005-2010 Aptana, Inc. | <a href="http://www.aptana.com/about">About Us</a> | <a href="http://www.aptana.com/privacy_policy">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </body>
 </html>

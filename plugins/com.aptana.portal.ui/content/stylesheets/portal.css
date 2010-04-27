@@ -1,0 +1,20 @@
+.rails .description {
+  font-size: 13px;
+  height: auto !important;
+  min-height: 125px; }
+.rails .thumbnail {
+  float: left;
+  margin-right: 10px; }
+  .rails .thumbnail a {
+    color: #ea6815; }
+    .rails .thumbnail a img {
+      border: medium none;
+      text-decoration: none; }
+
+p.highlighted {
+  color: #ea6815; }
+
+.itemdesc {
+  border-bottom: 1px dotted #bdc2ca;
+  margin-top: 1em;
+  padding-bottom: 1em; }

@@ -129,7 +129,7 @@ function showGems(parentElement, data) {
 			} else {
 				// Read the result from the given JSON and list the gems in a table
 				if (gems.data && gems.data.gems) {
-					var gemNames = gems.data.gems.split(',');
+					var gemNames = gems.data.gems.split(';');
 					var gemsCount = gemNames.size();
 					for( var i = 0; i < gemsCount; i++ ) {
 						var itemRow = tr(

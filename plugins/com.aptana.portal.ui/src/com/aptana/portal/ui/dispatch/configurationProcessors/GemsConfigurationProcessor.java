@@ -36,7 +36,7 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 			String gems = ProcessUtil.outputForCommand(shellCommandPath, null, new String[] { "-c", GEM_LIST }); //$NON-NLS-1$
 			if (gems != null)
 			{
-				gems = gems.replaceAll(EditorUtils.getLineSeparatorValue(null), ","); //$NON-NLS-1$
+				gems = gems.replaceAll(EditorUtils.getLineSeparatorValue(null), ";"); //$NON-NLS-1$
 				configurationStatus.setAttribute(GEMS_ATTR, gems);
 				configurationStatus.setStatus(ConfigurationStatus.OK);
 			}
