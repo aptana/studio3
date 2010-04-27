@@ -840,8 +840,15 @@ public class CommandElement extends AbstractBundleElement
 			{
 				this._keyBindings = new HashMap<Platform, String[]>();
 			}
-
-			this._keyBindings.put(bindingOS, keyBindings);
+			
+			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
+			int i = 0;
+			String[] uppercase = new String[keyBindings.length];
+			for(String binding : keyBindings)
+			{
+				uppercase[i++] = binding.toUpperCase();
+			}
+			this._keyBindings.put(bindingOS, uppercase);
 		}
 		else
 		{

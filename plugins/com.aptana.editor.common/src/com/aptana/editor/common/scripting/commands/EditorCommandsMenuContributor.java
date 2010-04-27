@@ -29,6 +29,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
@@ -36,6 +37,7 @@ import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.NotFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
 import com.aptana.util.CollectionsUtil;
@@ -73,6 +75,10 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			{
 				fill(menu, (ITextEditor) activePart, this);
 			}
+			else
+			{
+				fill(menu, null, this);
+			}
 		}
 	}
 
@@ -87,62 +93,82 @@ public class EditorCommandsMenuContributor extends ContributionItem
 		List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
 		MenuElement[] menusFromScope;
 		MenuElement[] menusFromOtherScopes = null;
-		try
+		if (textEditor == null)
 		{
-			IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
-			int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
-			// Get the scope at caret offset
-			contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document,
-					caretOffset);
-		}
-		catch (BadLocationException e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
+			menusFromScope = BundleManager.getInstance().getMenus(new IModelFilter()
+			{
 
-		// First pull all possible menus from the current caret position's scopes
-		if (contentTypeAtOffset != null)
-		{
-			ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
-			menusFromScope = BundleManager.getInstance().getMenus(filter);
+				@Override
+				public boolean include(AbstractElement element)
+				{
+					return true;
+				}
+			});
 			if (menusFromScope.length > 0)
 			{
 				menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 			}
 		}
-
-		// Next we get all possible scopes from the top level content type provider
-		SourceViewerConfiguration sourceViewerConfiguration = (SourceViewerConfiguration) textEditor
-				.getAdapter(SourceViewerConfiguration.class);
-		if (sourceViewerConfiguration instanceof ITopContentTypesProvider)
+		else
 		{
-			String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration).getTopContentTypes();
-			List<String> topLevelContentTypesList = new LinkedList<String>();
-			for (String[] topContentType : topContentTypes)
+			try
 			{
-				QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
-				String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
-				topLevelContentTypesList.add(contentType);
+				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+				int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
+				// Get the scope at caret offset
+				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
+						document, caretOffset);
 			}
-			if (topLevelContentTypesList.size() > 0)
+			catch (BadLocationException e)
 			{
-				String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
-				topLevelContentTypesList.toArray(topLevelContentTypes);
+				CommonEditorPlugin.logError(e);
+			}
 
-				// Get menus
-				ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
-				menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
+			// First pull all possible menus from the current caret position's scopes
+			if (contentTypeAtOffset != null)
+			{
+				ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+				menusFromScope = BundleManager.getInstance().getMenus(filter);
 				if (menusFromScope.length > 0)
 				{
-					// Collect
 					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
 				}
+			}
 
-				// Next we use a negative filter to get menus that belong to scopes
-				// that do not match the top level scopes. We will use this
-				// later to build the "Other" menu.
-				NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
-				menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
+			// Next we get all possible scopes from the top level content type provider
+			SourceViewerConfiguration sourceViewerConfiguration = (SourceViewerConfiguration) textEditor
+					.getAdapter(SourceViewerConfiguration.class);
+			if (sourceViewerConfiguration instanceof ITopContentTypesProvider)
+			{
+				String[][] topContentTypes = ((ITopContentTypesProvider) sourceViewerConfiguration)
+						.getTopContentTypes();
+				List<String> topLevelContentTypesList = new LinkedList<String>();
+				for (String[] topContentType : topContentTypes)
+				{
+					QualifiedContentType qualifiedContentType = new QualifiedContentType(topContentType);
+					String contentType = getContentTypeTranslator().translate(qualifiedContentType).toString();
+					topLevelContentTypesList.add(contentType);
+				}
+				if (topLevelContentTypesList.size() > 0)
+				{
+					String[] topLevelContentTypes = new String[topLevelContentTypesList.size()];
+					topLevelContentTypesList.toArray(topLevelContentTypes);
+
+					// Get menus
+					ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
+					menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
+					if (menusFromScope.length > 0)
+					{
+						// Collect
+						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+					}
+
+					// Next we use a negative filter to get menus that belong to scopes
+					// that do not match the top level scopes. We will use this
+					// later to build the "Other" menu.
+					NotFilter notFilter = new NotFilter(topLevelContentTypesFilter);
+					menusFromOtherScopes = BundleManager.getInstance().getMenus(notFilter);
+				}
 			}
 		}
 
@@ -201,15 +227,14 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	{
 		for (MenuElement menuForScope : menusFromScope)
 		{
-			String displayName = menuForScope.getDisplayName();
 			if (menuForScope.isHierarchicalMenu())
 			{
-				MenuItem menuItemForMenuForScope = new MenuItem(menu, SWT.CASCADE);
-				menuItemForMenuForScope.setData(contributionItem);
-				menuItemForMenuForScope.setText(displayName);
+				MenuItem menuItem = new MenuItem(menu, SWT.CASCADE);
+				menuItem.setData(contributionItem);
+				menuItem.setText(menuForScope.getDisplayName());
 
 				Menu menuForMenuForScope = new Menu(menu);
-				menuItemForMenuForScope.setMenu(menuForMenuForScope);
+				menuItem.setMenu(menuForMenuForScope);
 
 				// Recursive
 				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset, contributionItem);
@@ -232,6 +257,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);
 				menuItem.setData(contributionItem);
 
+				String displayName = menuForScope.getDisplayName();
 				String acceleratorText = ""; //$NON-NLS-1$
 				if (command != null)
 				{
