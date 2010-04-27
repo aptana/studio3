@@ -6,6 +6,7 @@
       Aptana
     </title>
     <link href="stylesheets/main.css" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/portal.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="javascripts/framework/prototype.js">
 </script>
     <script type="text/javascript" src="javascripts/framework/array_list.js">
@@ -26,18 +27,58 @@
         <div id="top"></div>
         <div id="sidebar"></div>
         <div id="content">
-          <div>
-            <b>Configurations</b>
+          <div class="colmask threecol">
+            <div class="colmid">
+              <div class="colleft">
+                <div class="col1">
+                  <!-- Main column -->
+                  <div>
+                    <b>Configurations</b>
+                  </div>
+                  <div id="configurableItems"></div>
+                  <!-- Main column end -->
+                </div>
+                <div class="col2">
+                  <!-- Left column start -->
+                  <div>
+                    <b>Recently Opened Files</b>
+                  </div>
+                  <div id="recentFiles"></div>
+                  <!-- Left column end -->
+                </div>
+                <div class="col3">
+                  <!-- Right column start -->
+                  <div>
+                    <b>Installed Gems</b>
+                  </div>
+                  <div id="gems"></div>
+                  <!-- Right column end -->
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="configurableItems"></div>
-          <div>
-            <b>Recently Opened Files</b>
-          </div>
-          <div id="recentFiles"></div>
-          <div>
-            <b>Gems</b>
-          </div>
-          <div id="gems"></div>
+
+<!--
+          <span class="left-column">
+            <div>
+              <b>Recently Opened Files</b>
+            </div>
+            <div id="recentFiles"></div>
+          </span>
+          <span class="right-column">
+            <span class="left-column">
+              <div>
+                <b>Configurations</b>
+              </div>
+              <div id="configurableItems"></div>
+            </span>
+            <span class="right-column">
+              <div>
+                <b>Installed Gems</b>
+              </div>
+              <div id="gems"></div>
+            </span>
+          </span> -->
         </div>
       </div>
       <div id="footer">

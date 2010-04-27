@@ -1,0 +1,93 @@
+#ads img {
+  display: block;
+  padding-top: 10px; }
+
+#col-header {
+  clear: both;
+  float: left;
+  width: 100%;
+  border-bottom: 1px solid black; }
+  #col-header p, #col-header h1, #col-header h2 {
+    padding: 0.4em 15px 0 15px;
+    margin: 0; }
+  #col-header ul {
+    clear: left;
+    float: left;
+    width: 100%;
+    list-style: none;
+    margin: 10px 0 0 0;
+    padding: 0; }
+    #col-header ul li {
+      display: inline;
+      list-style: none;
+      margin: 0;
+      padding: 0; }
+      #col-header ul li a {
+        display: block;
+        float: left;
+        margin: 0 0 0 1px;
+        padding: 3px 10px;
+        text-align: center;
+        background: #eeeeee;
+        color: black;
+        text-decoration: none;
+        position: relative;
+        left: 15px;
+        line-height: 1.3em; }
+        #col-header ul li a:hover {
+          background: #336699;
+          color: white; }
+        #col-header ul li a.active {
+          color: white;
+          background: black;
+          font-weight: bold; }
+          #col-header ul li a.active:hover {
+            color: white;
+            background: black;
+            font-weight: bold; }
+        #col-header ul li a span {
+          display: block; }
+
+#layoutdims {
+  clear: both;
+  background: #eeeeee;
+  border-top: 4px solid black;
+  margin: 0;
+  padding: 6px 15px !important;
+  text-align: right; }
+
+.colmask {
+  position: relative;
+  clear: both;
+  float: left;
+  width: 100%;
+  overflow: hidden; }
+
+.colright, .colmid, .colleft {
+  float: left;
+  width: 100%;
+  position: relative; }
+
+.col1, .col2, .col3 {
+  float: left;
+  position: relative;
+  padding: 0 0 1em 0;
+  overflow: hidden; }
+
+.threecol {
+  background: #eeeeee; }
+  .threecol .colmid {
+    right: 25%;
+    background: white; }
+  .threecol .colleft {
+    right: 50%;
+    background: #f4f4f4; }
+  .threecol .col1 {
+    width: 46%;
+    left: 102%; }
+  .threecol .col2 {
+    width: 21%;
+    left: 31%; }
+  .threecol .col3 {
+    width: 21%;
+    left: 85%; }

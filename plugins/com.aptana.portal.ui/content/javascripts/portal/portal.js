@@ -27,9 +27,9 @@ function customErrorHandler(desc,page,line) {
 }
 
 function loadConfigurationPortal() {
-	showRecentlyOpenedFiles($('recentFiles'));
-	showGems($('gems'));
-	showConfigurableItems($('configurableItems'));
+    showRecentlyOpenedFiles($('recentFiles'));
+    showGems($('gems'));
+    showConfigurableItems($('configurableItems'));
 }
 
 function showRecentlyOpenedFiles(parentElement) {
