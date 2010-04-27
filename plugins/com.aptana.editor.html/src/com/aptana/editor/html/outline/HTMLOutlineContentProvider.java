@@ -58,16 +58,13 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		if (parentElement instanceof HTMLElementNode)
 		{
 			HTMLElementNode item = (HTMLElementNode) parentElement;
-			if (item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+
+			if (isStylesheetLinkTag(item))
 			{
-				String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
-				if (rel.equals("stylesheet")) //$NON-NLS-1$
+				String attribute = getExternalCSSReference(item);
+				if (attribute != null && attribute.length() > 0)
 				{
-					String attribute = item.getAttributeValue("href"); //$NON-NLS-1$
-					if (attribute.length() > 0)
-					{
-						return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
-					}
+					return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
 				}
 			}
 		}
@@ -79,17 +76,57 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			HTMLSpecialNode item = (HTMLSpecialNode) parentElement;
 
 			// Special case of external JS file
-			if (item.getName().equalsIgnoreCase("script")) { //$NON-NLS-1$
-				String attribute = item.getAttributeValue("src"); //$NON-NLS-1$
-				if (attribute.length() > 0)
-				{
-					return getExternalChildren(parentElement, attribute, IJSParserConstants.LANGUAGE);
-				}
+			String attribute = getExternalJSReference(item);
+			if (attribute != null && attribute.length() > 0)
+			{
+				return getExternalChildren(parentElement, attribute, IJSParserConstants.LANGUAGE);
 			}
-
 			return getChildren(item.getChild(0));
 		}
 		return super.getChildren(parentElement);
+	}
+
+	private String getExternalJSReference(HTMLSpecialNode item)
+	{
+		if (!isJavascriptTag(item))
+			return null;
+
+		return item.getAttributeValue("src"); //$NON-NLS-1$
+	}
+
+	private boolean isJavascriptTag(HTMLSpecialNode item)
+	{
+		if (item == null)
+			return false;
+		if (!item.getName().equalsIgnoreCase("script")) //$NON-NLS-1$
+			return false;
+		if (item.getChild(0) == null || !item.getChild(0).getLanguage().equals(IJSParserConstants.LANGUAGE))
+			return false;
+
+		return true;
+	}
+
+	private boolean isStylesheetLinkTag(HTMLElementNode item)
+	{
+		if (item == null)
+			return false;
+
+		if (!item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+			return false;
+
+		String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
+		if (!rel.equals("stylesheet")) //$NON-NLS-1$
+			return false;
+
+		return true;
+	}
+
+	private String getExternalCSSReference(HTMLElementNode item)
+	{
+		if (!isStylesheetLinkTag(item))
+			return null;
+
+		return item.getAttributeValue("href"); //$NON-NLS-1$
 	}
 
 	/**
@@ -109,17 +146,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		if (element instanceof HTMLElementNode)
 		{
 			HTMLElementNode item = (HTMLElementNode) element;
-			if (item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+			if (isStylesheetLinkTag(item))
 			{
-				String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
-				if (rel.equals("stylesheet")) //$NON-NLS-1$
-				{
-					String attribute = item.getAttributeValue("href"); //$NON-NLS-1$
-					if (attribute.length() > 0)
-					{
-						return true;
-					}
-				}
+				String attribute = getExternalCSSReference(item);
+				return attribute != null && attribute.length() > 0;
 			}
 		}
 		// Handle embedded languages (JS and CSS)
@@ -130,12 +160,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			HTMLSpecialNode item = (HTMLSpecialNode) element;
 
 			// Special case of external JS file
-			if (item.getName().equalsIgnoreCase("script")) { //$NON-NLS-1$
-				String attribute = item.getAttributeValue("src"); //$NON-NLS-1$
-				if (attribute.length() > 0)
-				{
-					return true;
-				}
+			if (isJavascriptTag(item))
+			{
+				String attribute = getExternalJSReference(item);
+				return attribute != null && attribute.length() > 0;
 			}
 		}
 		return super.hasChildren(element);
