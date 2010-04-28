@@ -10,8 +10,9 @@ import com.aptana.parsing.ast.IParseNode;
 public class CommonOutlineContentProvider implements ITreeContentProvider
 {
 
-	private static final Object[] EMPTY = new Object[0];
+	protected static final Object[] EMPTY = new Object[0];
 	private IParseListener fListener;
+	protected IPathResolver resolver;
 
 	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
@@ -110,12 +111,14 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 				}
 			};
 			editor.getFileService().addListener(fListener);
+			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
 		else if (!isCU && fListener != null)
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
 			editor.getFileService().removeListener(fListener);
 			fListener = null;
+			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}
 	}
 

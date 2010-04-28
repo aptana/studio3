@@ -38,12 +38,24 @@ public class GitIndex
 	private GitRepository repository;
 	private boolean amend;
 	private String workingDirectory;
+
+	/**
+	 * Temporary list of changed files that we build up on refreshes. TODO Don't make this a field here that is
+	 * redundant with the next list, instead make it a local var to refresh and pass it along to the jobs/methods that
+	 * need it.
+	 */
 	private List<ChangedFile> files;
+
+	/**
+	 * The list of changed files that is a copy of the above list. Only copied at the very end of the refresh, so it
+	 * always contains the full listing from last finished refresh call.
+	 */
+	private List<ChangedFile> changedFiles;
 
 	private int refreshStatus = 0;
 	private boolean notify;
 	private Map<String, String> amendEnvironment;
-	
+
 	private Job indexRefreshJob;
 
 	GitIndex(GitRepository repository, String workingDirectory)
@@ -55,11 +67,12 @@ public class GitIndex
 
 		this.repository = repository;
 		this.workingDirectory = workingDirectory;
-		this.files = new Vector<ChangedFile>();
+		this.changedFiles = new ArrayList<ChangedFile>();
 	}
 
 	/**
-	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come rapid-fire.
+	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come
+	 * rapid-fire.
 	 */
 	public void refreshAsync()
 	{
@@ -84,9 +97,10 @@ public class GitIndex
 		}
 		indexRefreshJob.schedule(250);
 	}
-	
+
 	/**
 	 * Run a refresh synchronously.
+	 * 
 	 * @param monitor
 	 * @return
 	 */
@@ -133,7 +147,8 @@ public class GitIndex
 					@Override
 					protected IStatus run(IProgressMonitor monitor)
 					{
-						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+								"diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 						if (result != null && result.keySet().iterator().next() == 0)
 						{
 							readUnstagedFiles(result.values().iterator().next());
@@ -160,14 +175,15 @@ public class GitIndex
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
 			return Status.CANCEL_STATUS;
-		
-		// We need to hold onto this list so we can send along a before/after diff for the index change event!
-		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.files.size());
-		for (ChangedFile file : this.files)
+
+		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
+		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
+		for (ChangedFile file : this.changedFiles)
 		{
 			preRefreshFiles.add(new ChangedFile(file));
-		}		
-		this.files.clear();
+		}
+		// Now create a new temporary list so we can built it up...
+		this.files = new Vector<ChangedFile>();
 
 		// Schedule all the jobs
 		for (Job toSchedule : jobs)
@@ -189,7 +205,7 @@ public class GitIndex
 				// ignore
 			}
 		}
-		
+
 		// At this point, all index operations have finished.
 		// We need to find all files that don't have either
 		// staged or unstaged files, and delete them
@@ -206,9 +222,21 @@ public class GitIndex
 			for (ChangedFile file : deleteFiles)
 				files.remove(file);
 		}
-		
+
+		// Now make the "final" list a copy of the temporary one we were just building up
+		synchronized (changedFiles)
+		{
+			changedFiles.clear();
+			for (ChangedFile file : this.files)
+			{
+				changedFiles.add(new ChangedFile(file));
+			}
+		}
+		// Don't hold onto temp list in memory!
+		this.files = null;
+
 		postIndexChange(preRefreshFiles, toRefresh);
-		
+
 		return Status.OK_STATUS;
 	}
 
@@ -405,15 +433,17 @@ public class GitIndex
 
 	public List<ChangedFile> changedFiles()
 	{
-		// FIXME If we're in the middle of refreshing the index, this list could be wrong/incomplete
-		return new ArrayList<ChangedFile>(files);
+		synchronized (changedFiles)
+		{
+			return changedFiles;
+		}
 	}
 
 	public boolean stageFiles(Collection<ChangedFile> stageFiles)
 	{
 		if (stageFiles == null || stageFiles.isEmpty())
 			return false;
-		
+
 		List<String> args = new ArrayList<String>();
 		args.add("update-index"); //$NON-NLS-1$
 		args.add("--add"); //$NON-NLS-1$
@@ -427,7 +457,7 @@ public class GitIndex
 				args.toArray(new String[args.size()]));
 		if (result == null)
 			return false;
-		
+
 		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
@@ -453,7 +483,7 @@ public class GitIndex
 	{
 		if (unstageFiles == null || unstageFiles.isEmpty())
 			return false;
-		
+
 		StringBuilder input = new StringBuilder();
 		for (ChangedFile file : unstageFiles)
 		{
@@ -464,7 +494,7 @@ public class GitIndex
 				null, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 			return false;
-		
+
 		int ret = result.keySet().iterator().next();
 		if (ret != 0)
 		{
@@ -514,7 +544,7 @@ public class GitIndex
 		}
 		for (ChangedFile file : discardFiles)
 			file.hasUnstagedChanges = false;
-		
+
 		postIndexChange(preFiles, discardFiles);
 	}
 
