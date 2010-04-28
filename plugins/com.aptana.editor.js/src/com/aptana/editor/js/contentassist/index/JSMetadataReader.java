@@ -772,7 +772,7 @@ public class JSMetadataReader extends ValidatingReader
 		{
 			// get schema for our documentation XML format
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(
-					"/src/com/aptana/editor/js/resources/JSMetadataSchema.xml"), null);
+					"/metadata/JSMetadataSchema.xml"), null);
 			InputStream schemaStream = null;
 
 			try

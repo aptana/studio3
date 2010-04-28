@@ -62,7 +62,7 @@ import com.aptana.sax.ValidatingReader;
  */
 public class CSSMetadataReader extends ValidatingReader
 {
-	private static final String METADATA_SCHEMA_XML = "/com/aptana/editor/css/resources/CSSMetadataSchema.xml"; //$NON-NLS-1$
+	private static final String METADATA_SCHEMA_XML = "/metadata/CSSMetadataSchema.xml"; //$NON-NLS-1$
 	
 	private boolean _bufferText;
 	private StringBuffer _textBuffer = new StringBuffer();

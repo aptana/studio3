@@ -47,7 +47,7 @@ public class Activator extends AbstractUIPlugin
 		
 		CSSIndexWriter indexer = new CSSIndexWriter();
 		
-		this.loadMetadata(indexer, "/src/com/aptana/editor/css/resources/css_metadata.xml");
+		this.loadMetadata(indexer, "/metadata/css_metadata.xml");
 		
 		IndexManager manager = IndexManager.getInstance();
 		Index index = manager.getIndex(CSSIndexConstants.METADATA);

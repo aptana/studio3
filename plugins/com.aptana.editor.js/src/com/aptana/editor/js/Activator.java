@@ -50,11 +50,14 @@ public class Activator extends AbstractUIPlugin
 
 		JSIndexWriter indexer = new JSIndexWriter();
 		
-		this.loadMetadata(indexer, "/src/com/aptana/editor/js/resources/js_core.xml",
-				"/src/com/aptana/editor/js/resources/dom_0.xml",
-				"/src/com/aptana/editor/js/resources/dom_2.xml",
-				"/src/com/aptana/editor/js/resources/dom_3.xml",
-				"/src/com/aptana/editor/js/resources/dom_5.xml");
+		this.loadMetadata(
+			indexer,
+			"/metadata/js_core.xml",
+			"/metadata/dom_0.xml",
+			"/metadata/dom_2.xml",
+			"/metadata/dom_3.xml",
+			"/metadata/dom_5.xml"
+		);
 		
 		IndexManager manager = IndexManager.getInstance();
 		Index index = manager.getIndex(JSIndexConstants.METADATA);
