@@ -203,7 +203,12 @@ final class ContentAssistSubjectControlAdapter implements IContentAssistSubjectC
 		}
 		else
 		{
-			fViewer.getTextWidget().removeKeyListener(keyListener);
+			StyledText textWidget = fViewer.getTextWidget();
+			
+			if (Helper.okToUse(textWidget))
+			{
+				textWidget.removeKeyListener(keyListener);
+			}
 		}
 	}
 
