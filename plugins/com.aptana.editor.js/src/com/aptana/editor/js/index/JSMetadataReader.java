@@ -317,7 +317,12 @@ public class JSMetadataReader extends ValidatingReader
 
 		// grab and set properties
 		parameter.setName(attributes.getValue("name"));
-		parameter.addType(attributes.getValue("type"));
+		
+		for (String type : attributes.getValue("type").split("\\s*[,|]\\s*"))
+		{
+			parameter.addType(type);
+		}
+		
 		parameter.setUsage(attributes.getValue("usage"));
 
 		// store parameter
