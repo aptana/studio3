@@ -15,7 +15,7 @@ import com.aptana.editor.js.model.FunctionElement;
 import com.aptana.editor.js.model.PropertyElement;
 import com.aptana.index.core.Index;
 
-public class JSIndexContentAssistProcessor extends IndexContentAssistProcessor
+public class JSContentAssistProcessor extends IndexContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif");
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif");
@@ -27,7 +27,7 @@ public class JSIndexContentAssistProcessor extends IndexContentAssistProcessor
 	 * 
 	 * @param abstractThemeableEditor
 	 */
-	public JSIndexContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	public JSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		super(abstractThemeableEditor);
 		
