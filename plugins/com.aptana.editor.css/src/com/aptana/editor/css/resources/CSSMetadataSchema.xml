@@ -45,6 +45,7 @@
 	<element name="property" onEnter="enterProperty" onExit="exitProperty">
 		<attribute name="name" />	
 		<attribute name="type" usage="optional" />	
+		<attribute name="allow-multiple-values" usage="optional" />	
 		<child-element name="availability" />			
 		<child-element name="description" />
         <child-element name="example" />
