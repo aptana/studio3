@@ -69,8 +69,7 @@ public class ExitPolicyTest extends TestCase
 	public void testNewLineInsertsInsideGreaterAndLessThanPair()
 	{
 		ExitFlags flags = send('>', '\n');
-		assertTrue(flags.doit);
-		assertEquals(ILinkedModeListener.EXIT_ALL, flags.flags);
+		assertNull(flags);
 	}
 
 	protected ExitFlags send(char closeChar, char toSend)
