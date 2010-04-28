@@ -34,24 +34,20 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.css.CSSScopeScanner;
+import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.parsing.lexer.TokenLexeme;
-import com.aptana.parsing.metadata.MetadataEnvironment;
 
 public class CSSContentAssistProcessor implements IContentAssistProcessor
 {
@@ -63,27 +59,9 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
 	};
 
-	private IContextInformationValidator fValidator;
-	private static MetadataEnvironment metadataEnvironment;
-	private final AbstractThemeableEditor abstractThemeableEditor;
-	
-	/**
-	 * getMetadataEnvironment
-	 * 
-	 * @return
-	 */
-	private static MetadataEnvironment getMetadataEnvironment()
-	{
-		if (metadataEnvironment == null)
-		{
-			InputStream input = CSSContentAssistProcessor.class.getResourceAsStream("CSSMetadata.bin"); //$NON-NLS-1$
-			
-			metadataEnvironment = new MetadataEnvironment();
-			metadataEnvironment = MetadataEnvironment.getMetadataFromResource(input, metadataEnvironment);
-		}
-
-		return metadataEnvironment;
-	}
+	private IContextInformationValidator _validator;
+	private final AbstractThemeableEditor _editor;
+	private CSSContentAssistHelper _helper;
 
 	/**
 	 * getTokenLexemeAtOffset
@@ -141,14 +119,11 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 	 */
 	public CSSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
-		this.abstractThemeableEditor = abstractThemeableEditor;
+		this._editor = abstractThemeableEditor;
+		this._helper = new CSSContentAssistHelper();
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
-	 */
-	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
@@ -188,7 +163,33 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 		// proposals
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		Location location = getLocation(tokenLexemes, offset);
-		MetadataEnvironment metadataEnvironment = getMetadataEnvironment();
+		
+		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+	}
+	*/
+	
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
+	{
+		List<ICompletionProposal> proposals = new LinkedList<ICompletionProposal>();
+		List<ElementElement> elements = this._helper.getElements();
+		
+		if (elements != null)
+		{
+			for (ElementElement element : elements)
+			{
+				String name = element.getName();
+				int length = name.length();
+				String description = element.getDescription();
+				Image image = null;
+				IContextInformation contextInfo = null;
+				
+				// build a proposal
+				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				
+				// add it to the list
+				proposals.add(proposal);
+			}
+		}
 		
 		return proposals.toArray(new ICompletionProposal[proposals.size()]);
 	}
@@ -230,12 +231,12 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
-		if (fValidator == null)
+		if (_validator == null)
 		{
-			fValidator = new CSSContextInformationValidator();
+			_validator = new CSSContextInformationValidator();
 		}
 		
-		return fValidator;
+		return _validator;
 	}
 
 	/*
