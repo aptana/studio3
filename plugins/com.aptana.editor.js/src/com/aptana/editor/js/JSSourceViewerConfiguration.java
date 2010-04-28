@@ -44,6 +44,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.js.contentassist.JSIndexContentAssistProcessor;
 
 public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {

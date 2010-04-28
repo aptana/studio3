@@ -1,8 +1,10 @@
-package com.aptana.editor.js.index;
+package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
 import java.util.List;
 
+import com.aptana.editor.js.index.IndexConstants;
+import com.aptana.editor.js.index.JSIndexReader;
 import com.aptana.editor.js.model.PropertyElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
