@@ -9,14 +9,21 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
@@ -114,6 +121,36 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 				if (!isLinkedWithEditor())
 				{
 					setEditorSelection(selection, true);
+				}
+			}
+		});
+		viewer.getTree().addKeyListener(new KeyListener()
+		{
+
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				if (e.keyCode == '\r' && isLinkedWithEditor())
+				{
+					ISelection selection = viewer.getSelection();
+					if (!selection.isEmpty() && selection instanceof IStructuredSelection)
+					{
+						IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+						if (page != null)
+						{
+							// brings editor to focus
+							page.activate(fEditor);
+							// deselects the current selection but keeps the cursor position
+							Object widget = fEditor.getAdapter(Control.class);
+							if (widget instanceof StyledText)
+								fEditor.selectAndReveal(((StyledText) widget).getCaretOffset(), 0);
+						}
+					}
 				}
 			}
 		});

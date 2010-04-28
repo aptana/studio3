@@ -18,7 +18,7 @@
    </license>
 
    <includes
-         id="com.aptana.red.core"
+         id="com.aptana.feature"
          version="0.0.0"/>
 
    <requires>
@@ -28,7 +28,7 @@
       <import plugin="com.aptana.util" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
-      <import feature="com.aptana.red.core" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="com.aptana.feature" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>

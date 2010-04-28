@@ -1,21 +1,44 @@
 package com.aptana.editor.html.outline;
 
+import java.io.FileNotFoundException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
+import com.aptana.editor.css.parsing.CSSParserFactory;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.parsing.JSParserFactory;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 {
+
+	private Map<String, Object[]> cache = new HashMap<String, Object[]>();
+	private TreeViewer treeViewer;
 
 	public HTMLOutlineContentProvider()
 	{
@@ -31,13 +54,237 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			// delegates to the parse node it references to
 			return getChildren(((CommonOutlineItem) parentElement).getReferenceNode());
 		}
+		// Handle expansion of link tags pointing to stylesheets
+		if (parentElement instanceof HTMLElementNode)
+		{
+			HTMLElementNode item = (HTMLElementNode) parentElement;
+
+			if (isStylesheetLinkTag(item))
+			{
+				String attribute = getExternalCSSReference(item);
+				if (attribute != null && attribute.length() > 0)
+				{
+					return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
+				}
+			}
+		}
+		// Handle embedded languages (JS and CSS)
 		if (parentElement instanceof HTMLSpecialNode)
 		{
 			// HTMLSpecialNode always has the root node of the nested language as its child; we want to skip that and
 			// get the content below
-			return getChildren(((HTMLSpecialNode) parentElement).getChild(0));
+			HTMLSpecialNode item = (HTMLSpecialNode) parentElement;
+
+			// Special case of external JS file
+			String attribute = getExternalJSReference(item);
+			if (attribute != null && attribute.length() > 0)
+			{
+				return getExternalChildren(parentElement, attribute, IJSParserConstants.LANGUAGE);
+			}
+			return getChildren(item.getChild(0));
 		}
 		return super.getChildren(parentElement);
+	}
+
+	private String getExternalJSReference(HTMLSpecialNode item)
+	{
+		if (!isJavascriptTag(item))
+			return null;
+
+		return item.getAttributeValue("src"); //$NON-NLS-1$
+	}
+
+	private boolean isJavascriptTag(HTMLSpecialNode item)
+	{
+		if (item == null)
+			return false;
+		if (!item.getName().equalsIgnoreCase("script")) //$NON-NLS-1$
+			return false;
+		if (item.getChild(0) == null || !item.getChild(0).getLanguage().equals(IJSParserConstants.LANGUAGE))
+			return false;
+
+		return true;
+	}
+
+	private boolean isStylesheetLinkTag(HTMLElementNode item)
+	{
+		if (item == null)
+			return false;
+
+		if (!item.getName().equalsIgnoreCase("link")) //$NON-NLS-1$
+			return false;
+
+		String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
+		if (rel == null || !rel.equals("stylesheet")) //$NON-NLS-1$
+			return false;
+
+		return true;
+	}
+
+	private String getExternalCSSReference(HTMLElementNode item)
+	{
+		if (!isStylesheetLinkTag(item))
+			return null;
+
+		return item.getAttributeValue("href"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Override hasChildren so for external stylesheets and JS we just assume there's content and don't fetch it one
+	 * layer too early (on expansion of the tag's parent).
+	 */
+	@Override
+	public boolean hasChildren(Object element)
+	{
+		if (element instanceof CommonOutlineItem)
+		{
+			// delegates to the parse node it references to
+			return hasChildren(((CommonOutlineItem) element).getReferenceNode());
+		}
+
+		// Handle expansion of link tags pointing to stylesheets
+		if (element instanceof HTMLElementNode)
+		{
+			HTMLElementNode item = (HTMLElementNode) element;
+			if (isStylesheetLinkTag(item))
+			{
+				String attribute = getExternalCSSReference(item);
+				return attribute != null && attribute.length() > 0;
+			}
+		}
+		// Handle embedded languages (JS and CSS)
+		if (element instanceof HTMLSpecialNode)
+		{
+			// HTMLSpecialNode always has the root node of the nested language as its child; we want to skip that and
+			// get the content below
+			HTMLSpecialNode item = (HTMLSpecialNode) element;
+
+			// Special case of external JS file
+			if (isJavascriptTag(item))
+			{
+				String attribute = getExternalJSReference(item);
+				return attribute != null && attribute.length() > 0;
+			}
+		}
+		return super.hasChildren(element);
+	}
+
+	private IParseNode parse(IParser parser, String source) throws Exception
+	{
+		IParseState pState = new ParseState();
+		pState.setEditState(source, source, 0, 0);
+		return parser.parse(pState);
+	}
+
+	private IParser getParser(String language)
+	{
+		if (language.equals(IJSParserConstants.LANGUAGE))
+			return JSParserFactory.getInstance().getParser();
+		if (language.equals(ICSSParserConstants.LANGUAGE))
+			return CSSParserFactory.getInstance().getParser();
+		return null;
+	}
+
+	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
+	{
+		Object[] cached;
+		synchronized (cache)
+		{
+			cached = cache.get(srcPathOrURL);
+		}
+		if (cached != null)
+		{
+			// we have a cached result
+			return cached;
+		}
+
+		if (resolver == null)
+		{
+			return EMPTY;
+		}
+
+		// schedule job to get file, parse and get children and then add to parent. In the meantime return a
+		// placeholder.
+		Job job = new Job(Messages.HTMLOutlineContentProvider_FetchingExternalFilesJobName)
+		{
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				// TODO Add progress for fetch/parse
+				Object[] elements;
+				try
+				{
+					// resolving source and editor input
+					String source = resolver.resolveSource(srcPathOrURL);
+					if (source == null)
+					{
+						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
+					}
+					IParser parser = getParser(language);
+					if (parser == null)
+					{
+						throw new Exception(MessageFormat.format(
+								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
+					}
+					IParseNode node = parse(parser, source);
+					elements = getChildren(node);
+
+					// caching result
+					synchronized (cache)
+					{
+						cache.put(srcPathOrURL, elements);
+					}
+				}
+				catch (FileNotFoundException e)
+				{
+					Activator.getDefault().getLog().log(
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
+							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
+				}
+				catch (Exception e)
+				{
+					Activator.getDefault().getLog().log(
+							new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
+				}
+				final Object[] finalElements = elements;
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
+					}
+				});
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.LONG);
+		job.schedule();
+		final OutlinePlaceholderItem placeholder = new OutlinePlaceholderItem(IStatus.INFO,
+				Messages.HTMLOutlineContentProvider_PlaceholderItemLabel);
+		// Listen for update, when we have it, remove the placeholder
+		job.addJobChangeListener(new JobChangeAdapter()
+		{
+
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						treeViewer.remove(placeholder);
+					}
+				});
+			}
+		});
+
+		return new Object[] { placeholder };
 	}
 
 	@Override
@@ -80,5 +327,12 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			}
 		}
 		return items.toArray(new CommonOutlineItem[items.size()]);
+	}
+
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
+	{
+		this.treeViewer = (TreeViewer) viewer;
+		super.inputChanged(viewer, oldInput, newInput);
 	}
 }
