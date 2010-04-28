@@ -8,6 +8,7 @@ import java.util.List;
 import com.aptana.editor.js.model.FunctionElement;
 import com.aptana.editor.js.model.ParameterElement;
 import com.aptana.editor.js.model.PropertyElement;
+import com.aptana.editor.js.model.ReturnTypeElement;
 import com.aptana.editor.js.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
@@ -27,15 +28,18 @@ public class JSIndexReader
 	{
 		String result = "";
 
-		// grab description
-		String descriptionPattern = descriptionKey + IndexConstants.DELIMITER;
-		List<QueryResult> descriptions = index.query(new String[] { IndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH);
-
-		if (descriptions != null)
+		if (descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(IndexConstants.NO_ENTRY))
 		{
-			String descriptionValue = descriptions.get(0).getWord();
-
-			result = descriptionValue.substring(descriptionValue.indexOf(IndexConstants.DELIMITER) + 1);
+			// grab description
+			String descriptionPattern = descriptionKey + IndexConstants.DELIMITER;
+			List<QueryResult> descriptions = index.query(new String[] { IndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+	
+			if (descriptions != null)
+			{
+				String descriptionValue = descriptions.get(0).getWord();
+	
+				result = descriptionValue.substring(descriptionValue.indexOf(IndexConstants.DELIMITER) + 1);
+			}
 		}
 
 		return result;
@@ -62,7 +66,10 @@ public class JSIndexReader
 				String[] columns = function.getWord().split(IndexConstants.DELIMITER);
 				String functionName = columns[0];
 				String descriptionKey = columns[2];
-				List<ParameterElement> parameters = this.getParameters(index, columns[3]);
+				String parametersKey = columns[3];
+				String returnTypesKey = columns[4];
+				List<ParameterElement> parameters = this.getParameters(index, parametersKey);
+				List<ReturnTypeElement> returnTypes = this.getReturnTypes(index, returnTypesKey);
 				
 				FunctionElement f = new FunctionElement();
 
@@ -74,6 +81,11 @@ public class JSIndexReader
 					f.addParameter(parameter);
 				}
 
+				for (ReturnTypeElement returnType : returnTypes)
+				{
+					f.addReturnType(returnType);
+				}
+				
 				result.add(f);
 			}
 		}
@@ -113,10 +125,18 @@ public class JSIndexReader
 				String[] columns = property.getWord().split(IndexConstants.DELIMITER);
 				String propertyName = columns[0];
 				String descriptionKey = columns[2];
+				String returnTypesKey = columns[3];
+				List<ReturnTypeElement> returnTypes = this.getReturnTypes(index, returnTypesKey);
+				
 				PropertyElement p = new PropertyElement();
 
 				p.setName(propertyName);
 				p.setDescription(this.getDescription(index, descriptionKey));
+				
+				for (ReturnTypeElement returnType : returnTypes)
+				{
+					p.addType(returnType);
+				}
 
 				result.add(p);
 			}
@@ -165,6 +185,41 @@ public class JSIndexReader
 		return result;
 	}
 
+	/**
+	 * getReturnTypes
+	 * 
+	 * @param index
+	 * @param returnTypesKey
+	 * @return
+	 * @throws IOException 
+	 */
+	public List<ReturnTypeElement> getReturnTypes(Index index, String returnTypesKey) throws IOException
+	{
+		String descriptionPattern = returnTypesKey + IndexConstants.DELIMITER;
+		List<QueryResult> returnTypes = index.query(new String[] { IndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+		List<ReturnTypeElement> result = new LinkedList<ReturnTypeElement>();
+
+		if (returnTypes != null && returnTypes.size() > 0)
+		{
+			String word = returnTypes.get(0).getWord();
+			String[] returnTypesValues = word.split(IndexConstants.DELIMITER);
+
+			for (int i = 1; i < returnTypesValues.length; i++)
+			{
+				String returnTypeValue = returnTypesValues[i];
+				String[] columns = returnTypeValue.split(",");
+				ReturnTypeElement returnType = new ReturnTypeElement();
+
+				returnType.setType(columns[0]);
+				returnType.setDescription(this.getDescription(index, columns[1]));
+
+				result.add(returnType);
+			}
+		}
+
+		return result;
+	}
+	
 	/**
 	 * getTypeProperties
 	 * 

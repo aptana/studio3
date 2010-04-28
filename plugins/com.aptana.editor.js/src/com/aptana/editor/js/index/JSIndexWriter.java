@@ -7,6 +7,7 @@ import java.util.List;
 import com.aptana.editor.js.model.FunctionElement;
 import com.aptana.editor.js.model.ParameterElement;
 import com.aptana.editor.js.model.PropertyElement;
+import com.aptana.editor.js.model.ReturnTypeElement;
 import com.aptana.editor.js.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.util.StringUtil;
@@ -16,6 +17,7 @@ public class JSIndexWriter
 	private JSMetadataReader _reader;
 	private int _descriptionCount;
 	private int _parameterCount;
+	private int _returnTypeCount;
 
 	/**
 	 * JSMetadataIndexer
@@ -53,10 +55,20 @@ public class JSIndexWriter
 	 */
 	protected String writeDescription(Index index, String description)
 	{
-		String indexString = Integer.toString(this._descriptionCount++);
-		String value = indexString + IndexConstants.DELIMITER + description;
+		String indexString;
 		
-		index.addEntry(IndexConstants.DESCRIPTION, value, this.getDocumentPath());
+		if (description != null && description.length() > 0)
+		{
+			indexString = Integer.toString(this._descriptionCount++);
+			
+			String value = indexString + IndexConstants.DELIMITER + description;
+			
+			index.addEntry(IndexConstants.DESCRIPTION, value, this.getDocumentPath());
+		}
+		else
+		{
+			indexString = IndexConstants.NO_ENTRY;
+		}
 		
 		return indexString;
 	}
@@ -71,7 +83,7 @@ public class JSIndexWriter
 	protected void writeFunction(Index index, FunctionElement function)
 	{
 		String parametersKey = this.writeParameters(index, function.getParameters());
-		// ReturnTypeElement[] returnTypes = function.getReturnTypes();
+		String returnTypesKey = this.writeReturnTypes(index, function.getReturnTypes());
 		String descriptionKey = this.writeDescription(index, function.getDescription());
 		// SinceElement[] sinceList = function.getSinceList();
 		// UserAgentElement[] userAgents = function.getUserAgents();
@@ -81,7 +93,8 @@ public class JSIndexWriter
 			function.getName(),
 			function.getOwningType().getName(),
 			descriptionKey,
-			parametersKey
+			parametersKey,
+			returnTypesKey
 		);
 
 		index.addEntry(IndexConstants.FUNCTION, value, this.getDocumentPath());
@@ -127,7 +140,7 @@ public class JSIndexWriter
 	 */
 	protected void writeProperty(Index index, PropertyElement property)
 	{
-		String propertyTypes = StringUtil.join(",", property.getTypeNames());
+		String propertyTypesKey = this.writeReturnTypes(index, property.getTypes());
 		String descriptionKey = this.writeDescription(index, property.getDescription());
 		// SinceElement[] sinceList = property.getSinceList();
 		// UserAgentElement[] userAgents = property.getUserAgents();
@@ -137,12 +150,41 @@ public class JSIndexWriter
 			property.getName(),
 			property.getOwningType().getName(),
 			descriptionKey,
-			propertyTypes
+			propertyTypesKey
 		);
 
 		index.addEntry(IndexConstants.PROPERTY, value, this.getDocumentPath());
 	}
 
+	/**
+	 * writeReturnTypes
+	 * 
+	 * @param index
+	 * @param returnTypes
+	 * @return
+	 */
+	protected String writeReturnTypes(Index index, ReturnTypeElement[] returnTypes)
+	{
+		List<String> keyList = new LinkedList<String>();
+		String indexString = Integer.toString(this._returnTypeCount++);
+		
+		keyList.add(indexString);
+		
+		for (ReturnTypeElement returnType : returnTypes)
+		{
+			String type = returnType.getType();
+			String descriptionKey = this.writeDescription(index, returnType.getDescription());
+			
+			keyList.add(type + "," + descriptionKey);
+		}
+		
+		String value = StringUtil.join(IndexConstants.DELIMITER, keyList);
+		
+		index.addEntry(IndexConstants.RETURN_TYPES, value, this.getDocumentPath());
+		
+		return indexString;
+	}
+	
 	/**
 	 * writeToIndex
 	 * 
