@@ -3,7 +3,8 @@
       id="com.aptana.red.core"
       label="%featureName"
       version="3.0.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="com.aptana.branding">
 
    <description url="http://www.aptana.com">
       %description
@@ -209,5 +210,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="com.aptana.branding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
