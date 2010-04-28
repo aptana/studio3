@@ -10,5 +10,13 @@
          </run>
       </filesystem>
    </extension>
-
+   <extension
+         point="org.eclipse.core.filesystem.filesystems">
+      <filesystem
+            scheme="https">
+         <run
+               class="com.aptana.filesystem.http.HttpFileSystem">
+         </run>
+      </filesystem>
+   </extension>
 </plugin>
