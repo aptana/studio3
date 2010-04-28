@@ -75,7 +75,8 @@ body {
     margin-top: 5px;
     margin-left: 35px !important;
     overflow: hidden;
-    width: 950px; }
+    width: 950px;
+    min-height: 600px; }
 
 #footer {
   background-image: url(../images/background_footer.png);
@@ -179,7 +180,8 @@ p.highlighted {
   clear: both;
   float: left;
   width: 100%;
-  overflow: hidden; }
+  overflow: hidden;
+  min-height: 600px; }
 
 .colright, .colmid, .colleft {
   float: left;
@@ -193,13 +195,15 @@ p.highlighted {
   overflow: hidden; }
 
 .threecol {
-  background: #eeeeee; }
+  background: #f7f7f7; }
   .threecol .colmid {
     right: 25%;
-    background: white; }
+    background: white;
+    min-height: 600px; }
   .threecol .colleft {
     right: 50%;
-    background: #f4f4f4; }
+    background: #f7f7f7;
+    min-height: 600px; }
   .threecol .col1 {
     width: 46%;
     left: 102%; }

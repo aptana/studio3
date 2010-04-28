@@ -33,12 +33,15 @@ public interface IConfigurationProcessor
 	 * 
 	 * @param progressMonitor
 	 *            A progress monitor. Can be null if the caller is not interested in a progress update.
+	 * @param attributes
+	 *            An arbitrary attribute object that can be used in the status computation, mainly when the refresh
+	 *            argument is true (can be null).
 	 * @param refresh
 	 *            True, when the caller wants this processor to re-check its state; False, to just return the known
 	 *            state of the configuration.
 	 * @return A {@link ConfigurationStatus} which holds the complete state details of this processor
 	 */
-	public ConfigurationStatus getStatus(IProgressMonitor progressMonitor, boolean refresh);
+	public ConfigurationStatus getStatus(IProgressMonitor progressMonitor, Object attributes, boolean refresh);
 
 	/**
 	 * Run the configuration process that this processor is designed to do. During this configuration, the registered
@@ -50,8 +53,10 @@ public interface IConfigurationProcessor
 	 *            An optional instance that can provide extra data that is needed for this processor. It can be anything
 	 *            that the processor expects to get, and it can also be null.
 	 * @see IConfigurationProcessor#addConfigurationProcessorListener(IConfigurationProcessorListener)
+	 * @return A {@link ConfigurationStatus} which holds the complete state details of this processor <b>after</b> the
+	 *         completion of this call.
 	 */
-	public void configure(IProgressMonitor progressMonitor, Object attributes);
+	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes);
 
 	/**
 	 * Add an IConfigurationProcessorListener to be notified when there are changes in the configuration state. This

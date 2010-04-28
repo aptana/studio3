@@ -26,6 +26,12 @@
             id="com.aptana.portal.gems.processor"
             name="Gems">
       </processor>
+      <processor
+            category="plugins"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.PluginsConfigurationProcessor"
+            id="com.aptana.portal.plugins.processor"
+            name="Plugins">
+      </processor>
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
@@ -45,6 +51,12 @@
             configurationProcessor="com.aptana.portal.gems.processor"
             id="portal.gems"
             name="Ruby Gems Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.PluginsActionController"
+            configurationProcessor="com.aptana.portal.plugins.processor"
+            id="portal.plugins"
+            name="Plugins Actions">
       </actionController>
    </extension>
 </plugin>

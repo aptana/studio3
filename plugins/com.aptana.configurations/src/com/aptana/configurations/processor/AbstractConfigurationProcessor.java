@@ -85,20 +85,21 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 		return processorName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.configurations.processor.IConfigurationProcessor#getStatus(org.eclipse.core.runtime.IProgressMonitor,
-	 * boolean)
+	/**
+	 * By default, the AbstractConfigurationProcessor uses the given attributes only when the refresh is true and
+	 * passing it to the {@link #computeStatus(IProgressMonitor, Object)} method.<br>
+	 * Clients may override this behavior.
+	 * 
+	 * @see IConfigurationProcessor#getStatus(IProgressMonitor, Object, boolean)
 	 */
-	public ConfigurationStatus getStatus(IProgressMonitor progressMonitor, boolean refresh)
+	public ConfigurationStatus getStatus(IProgressMonitor progressMonitor, Object attributes, boolean refresh)
 	{
 		if (!refresh)
 		{
 			// just return the status that we have
 			return configurationStatus;
 		}
-		configurationStatus = computeStatus(progressMonitor);
+		configurationStatus = computeStatus(progressMonitor, attributes);
 		return configurationStatus;
 	}
 
@@ -167,9 +168,12 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	 * 
 	 * @param progressMonitor
 	 *            An optional progress monitor.
+	 * @param attributes
+	 *            An arbitrary attributes object that may contain some data needed for the computation. For example, a
+	 *            list of plug-in names. This argument can be null
 	 * @return An updated ConfigurationStatus after recomputing its status.
 	 */
-	public abstract ConfigurationStatus computeStatus(IProgressMonitor progressMonitor);
+	public abstract ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes);
 
 	/*
 	 * (non-Javadoc)
@@ -177,7 +181,7 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	 * com.aptana.configurations.processor.IConfigurationProcessor#configure(org.eclipse.core.runtime.IProgressMonitor,
 	 * java.lang.Object)
 	 */
-	public abstract void configure(IProgressMonitor progressMonitor, Object attributes);
+	public abstract ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes);
 
 	/**
 	 * Returns the Shell command path.
@@ -212,5 +216,21 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 		// If not, the status will just be ConfigurationStatus.UNKNOWN.
 		// Pass this instance to the status constructor to be notified when the status changed.
 		configurationStatus = new ConfigurationStatus(getID(), this);
+	}
+
+	/**
+	 * Set the given ConfigurationStatus to indicate an error and set an error attribute to contain the message.
+	 * 
+	 * @param configurationStatus
+	 * @param msg
+	 *            The error message attribute (can be null)
+	 */
+	protected void applyErrorAttributes(ConfigurationStatus configurationStatus, String msg)
+	{
+		if (msg != null)
+		{
+			configurationStatus.setAttribute(ConfigurationStatus.ERROR, msg);
+		}
+		configurationStatus.setStatus(ConfigurationStatus.ERROR);
 	}
 }

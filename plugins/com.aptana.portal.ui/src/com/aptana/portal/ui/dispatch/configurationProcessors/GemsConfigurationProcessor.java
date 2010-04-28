@@ -18,7 +18,7 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 	private static final String GEM_LIST = "gem list"; //$NON-NLS-1$
 
 	@Override
-	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor)
+	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes)
 	{
 		configurationStatus.removeAttribute(GEMS_ATTR);
 		configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
@@ -48,21 +48,10 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 		return configurationStatus;
 	}
 
-	/**
-	 * @param configurationStatus
-	 * @return
-	 */
-	private void applyErrorAttributes(ConfigurationStatus configurationStatus, String msg)
-	{
-		configurationStatus.setAttribute(ConfigurationStatus.ERROR, msg);
-		configurationStatus.setStatus(ConfigurationStatus.ERROR);
-	}
-
 	@Override
-	public void configure(IProgressMonitor progressMonitor, Object attributes)
+	public ConfigurationStatus configure(IProgressMonitor progressMonitor, Object attributes)
 	{
 		// TODO Shalom: Parse the attributes and figure out what are the gems that the remote browser asks us to install
-
+		return configurationStatus;
 	}
-
 }

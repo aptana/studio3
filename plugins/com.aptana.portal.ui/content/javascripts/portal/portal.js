@@ -2,12 +2,19 @@
  * This script manages the portal observer-observable event mechanism.
  */
 // Constants
-var Events = {ERROR : 'error', RECENT_FILES : 'recentFiles', CONFIGURATION : 'configuration', GEMS : 'gemList'};
+var Events = {ERROR : 'error', RECENT_FILES : 'recentFiles', PLUGINS : 'plugins', GEMS : 'gemList'};
 var ConfigurationStatus = {UNKNOWN : 'unknown', OK : 'ok', PROCESSING : 'processing', ERROR : 'error'};
+
+// A list of plugins that we display and query for
+var pluginList  = $H({'Aptana Git': ['com.aptana.git.core', '1.0.0'],
+    'Aptana JavaScript': ['com.aptana.editor.js', '1.0.0'], 
+    'Eclipse PHP Developer Tools' : ['org.eclipse.php', '2.0.0']
+});
 
 // Add observers to the dispatcher
 eventsDispatcher.addObserver(Events.RECENT_FILES, function(e) { showRecentlyOpenedFiles($('recentFiles')); });
 eventsDispatcher.addObserver(Events.GEMS, function(e) { showGems($('gems'), e); });
+eventsDispatcher.addObserver(Events.PLUGINS, function(e) { showPlugins($('plugins'), e); });
 
 /**
  * This custom error handler is needed when the Portal is viewed in the 
@@ -29,7 +36,7 @@ function customErrorHandler(desc,page,line) {
 function loadConfigurationPortal() {
     showRecentlyOpenedFiles($('recentFiles'));
     showGems($('gems'));
-    showConfigurableItems($('configurableItems'));
+    showPlugins($('plugins'));
 }
 
 function showRecentlyOpenedFiles(parentElement) {
@@ -149,7 +156,7 @@ function showGems(parentElement, data) {
 				dispatch($H({controller:"portal.gems", action:"computeInstalledGems"}).toJSON());
 				// Stop the event, otherwise we loose the eclipse BroswerFunctions!
 				event.stop();
-  		    });
+  		  });
 		}
 		// Clear anything that we had under this parent element before and put there the new elements
 		_clearDescendants(parentElement);
@@ -158,13 +165,19 @@ function showGems(parentElement, data) {
 }
 
 /**
- * Load the configuratble items into the given elementID, replacing ay items existing there.
+ * Show the plugins section
  */
-function showConfigurableItems(parentElement) {
-	// TODO: Make a call to browser function to get the configurable elements
+function showPlugins(parentElement) {
+	// TODO: Make a call to browser function to get the installed plugins
 	// This is a temp for debug
-	var configurableItems = ['aaaa', 'bbbb', 'cccc'];
+	var configurableItems = ['Aptana Plugin A...', 'Aptana Plugin B...', 'Aptana Plugin C...'];
+	// We ask for a list of all the installed plugin. This list will then be checked for some specific IDs to verify 
+	// if the Studio has a specific plugin.
+	var allPlugins = dispatch($H({controller:"portal.plugins", action:"getInstalledPlugins"}).toJSON());
 	var items;
+	var links;
+	var installLink;
+	var checkLink;
 	with(Elements.Builder) {
 		// We have to wrap the rows in a tbody, otherwise, the internal browser
 		// fails to display the rows.
@@ -175,8 +188,26 @@ function showConfigurableItems(parentElement) {
 		  var itemRow = tr(td(configurableItems[i]));
 		  tbodyItem.appendChild(itemRow);
 		}
-	} 
+		
+		links = div(
+		  div(installLink = a({'href':'#'}, "Install a new plug-in")),
+		  div(checkLink = a({'href':'#'}, "Check for installed plug-ins"))
+		);
+		
+		installLink.observe('click', function(event) {
+        dispatch($H({controller:"portal.plugins", action:"openPluginsDialog"}).toJSON());
+        // Stop the event, otherwise we loose the eclipse BroswerFunctions!
+        event.stop();
+    });
+    checkLink.observe('click', function(event) {
+        dispatch($H({controller:"portal.plugins", action:"computeInstalledPlugins", args : pluginList.values().toJSON()}).toJSON());
+        // Stop the event, otherwise we loose the eclipse BroswerFunctions!
+        event.stop();
+    });
+	}
+	_clearDescendants(parentElement);
 	parentElement.appendChild(items);
+	parentElement.appendChild(links);
 }
 
 // Returns an element that contains informative text about running this portal outside the studio

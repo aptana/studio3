@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
+import com.aptana.configurations.processor.IConfigurationProcessor;
 import com.aptana.configurations.processor.IConfigurationProcessorListener;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
@@ -74,6 +76,23 @@ public abstract class AbstractActionController implements IActionController, ICo
 				{
 					params = new Object[] { args };
 				}
+				// Make a generic check for the configuration processor, if exists. In case there is a problem, return
+				// an error result even before invoking the method. This ease up the error detection for all the
+				// ControllerAction methods that use a processor.
+				String processorId = getConfigurationProcessorId();
+				if (processorId != null)
+				{
+					// Get the configuration processor and make sure it's valid before we invoke the method
+					final IConfigurationProcessor processor = getProcessor();
+					if (processor == null)
+					{
+						PortalUIPlugin.logError(new Exception(
+								"The configuration process for " + this.getClass().getName() //$NON-NLS-1$
+										+ " was null")); //$NON-NLS-1$
+						return createInternalErrorNotification();
+					}
+				}
+				// Make the invoke call
 				Object result = method.invoke(this, params);
 				if (result == null)
 				{
@@ -151,5 +170,28 @@ public abstract class AbstractActionController implements IActionController, ICo
 				}
 			}
 		}
+	}
+
+	/**
+	 * Return a JSON error message indicating an internal error.
+	 * 
+	 * @return A JSON notification string indicating an internal error.
+	 * @see BrowserNotifier#toJSONErrorNotification(String, String)
+	 */
+	protected Object createInternalErrorNotification()
+	{
+		return BrowserNotifier.toJSONErrorNotification(IBrowserNotificationConstants.JSON_ERROR,
+				Messages.ActionController_internalError);
+	}
+
+	/**
+	 * Returns the IConfigurationProcessor attached to this action controller. Null, if none was defined in the
+	 * extension.
+	 * 
+	 * @return An IConfigurationProcessor instance, or null.
+	 */
+	protected IConfigurationProcessor getProcessor()
+	{
+		return ConfigurationProcessorsRegistry.getInstance().getConfigurationProcessor(getConfigurationProcessorId());
 	}
 }

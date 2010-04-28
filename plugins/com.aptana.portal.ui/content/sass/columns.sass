@@ -63,6 +63,7 @@
   float: left
   width: 100%
   overflow: hidden
+  min-height = !col-min-height
 
 .colright, .colmid, .colleft
   float: left
@@ -76,13 +77,15 @@
   overflow: hidden
 
 .threecol
-  background: #eee
+  background: #F7F7F7
   .colmid
     right: 25%
-    background: #fff
+    background: #FFFFFF
+    min-height = !col-min-height
   .colleft
     right: 50%
-    background: #f4f4f4
+    background: #F7F7F7
+    min-height = !col-min-height
   .col1
     width: 46%
     left: 102%
