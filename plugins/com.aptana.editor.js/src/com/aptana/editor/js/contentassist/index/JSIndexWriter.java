@@ -34,7 +34,7 @@ public class JSIndexWriter
 	 */
 	protected String getDocumentPath()
 	{
-		return "";
+		return JSIndexConstants.METADATA;
 	}
 	
 	/**
