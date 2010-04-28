@@ -482,8 +482,16 @@ public class SchemaElement
 
 			if (this._attributes.containsKey(name) == false)
 			{
+				String message = MessageFormat.format(
+					Messages.SchemaElement_Invalid_attribute_on_tag,
+					new Object[] {
+						name,
+						this._name
+					}
+				);
 				SourceWriter writer = new SourceWriter();
-				writer.println(MessageFormat.format(Messages.SchemaElement_Invalid_attribute_on_tag, name, this._name));
+				
+				writer.println(message);
 				this._owningSchema.buildErrorMessage(writer, this._name, attributes);
 
 				throw new SAXException(writer.toString());
