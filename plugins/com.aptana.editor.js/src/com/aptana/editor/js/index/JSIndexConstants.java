@@ -1,6 +1,6 @@
 package com.aptana.editor.js.index;
 
-public interface IndexConstants
+public interface JSIndexConstants
 {
 	// general constants
 	static final String METADATA = "js.metadata";
