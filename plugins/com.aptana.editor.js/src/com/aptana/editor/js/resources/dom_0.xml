@@ -6023,11 +6023,8 @@
 			
 			<method name="setInterval" scope="instance" visibility="basic">
 				<parameters>
-					<parameter name="code" type="String" usage="required">
-						<description>Expression to be evaluated (not required if func is used).</description>
-					</parameter>
-					<parameter name="func" type="Function" usage="required">
-						<description>Function to be called (not required if code is used).</description>
+					<parameter name="code" type="String|Function" usage="required">
+						<description>Expression to be evaluated, if value is a string. Otherwise, the function to call</description>
 					</parameter>
 					<parameter name="interval" type="Number" usage="required">
 						<description>Number of milliseconds to wait.</description>
