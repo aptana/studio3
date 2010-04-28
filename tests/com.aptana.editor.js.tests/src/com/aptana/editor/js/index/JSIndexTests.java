@@ -2,9 +2,12 @@ package com.aptana.editor.js.index;
 
 import junit.framework.TestCase;
 
-import com.aptana.editor.js.model.FunctionElement;
-import com.aptana.editor.js.model.PropertyElement;
-import com.aptana.editor.js.model.TypeElement;
+import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.JSIndexReader;
+import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 

@@ -11,8 +11,8 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.IndexContentAssistProcessor;
 import com.aptana.editor.js.Activator;
-import com.aptana.editor.js.model.FunctionElement;
-import com.aptana.editor.js.model.PropertyElement;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.index.core.Index;
 
 public class JSContentAssistProcessor extends IndexContentAssistProcessor

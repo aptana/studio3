@@ -35,7 +35,7 @@
    <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
-            class="com.aptana.editor.css.index.CSSFileIndexingParticipant">
+            class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant">
       </fileIndexingParticipant>
    </extension>
 

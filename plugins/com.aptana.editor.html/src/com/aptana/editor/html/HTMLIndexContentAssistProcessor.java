@@ -7,9 +7,9 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.IndexContentAssistProcessor;
-import com.aptana.editor.css.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.index.IHTMLIndexConstants;
-import com.aptana.editor.js.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.index.core.Index;
 
 public class HTMLIndexContentAssistProcessor extends IndexContentAssistProcessor

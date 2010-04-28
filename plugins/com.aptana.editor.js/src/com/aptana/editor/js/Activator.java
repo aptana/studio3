@@ -14,9 +14,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.editor.js.index.JSIndexConstants;
-import com.aptana.editor.js.index.JSIndexWriter;
-import com.aptana.editor.js.index.ScriptDocException;
+import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.index.JSIndexWriter;
+import com.aptana.editor.js.contentassist.index.ScriptDocException;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 

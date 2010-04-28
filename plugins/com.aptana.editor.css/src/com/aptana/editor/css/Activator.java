@@ -12,8 +12,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.editor.css.index.CSSIndexWriter;
-import com.aptana.editor.css.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.CSSIndexWriter;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 

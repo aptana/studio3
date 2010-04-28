@@ -8,8 +8,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.css.index.CSSFileIndexingParticipant;
-import com.aptana.editor.css.index.CSSIndexConstants;
+import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
+import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
