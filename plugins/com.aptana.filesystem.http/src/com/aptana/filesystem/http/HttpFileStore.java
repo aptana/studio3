@@ -69,8 +69,7 @@ public class HttpFileStore extends FileStore
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			HttpFilesystemPlugin.log(e);
 			result.setExists(false);
 		}
 		return result;
@@ -106,14 +105,14 @@ public class HttpFileStore extends FileStore
 			String path = uri.getPath();
 			IPath aPath = new Path(path);
 			aPath = aPath.removeLastSegments(1);
+			// FIXME What about fragments/query params?
 			URI parentURI = new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), aPath
 					.toPortableString(), uri.getQuery(), uri.getFragment());
 			return new HttpFileStore(parentURI);
 		}
 		catch (URISyntaxException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			HttpFilesystemPlugin.log(e);
 		}
 		return null;
 	}
@@ -159,13 +158,19 @@ public class HttpFileStore extends FileStore
 
 	private String getPath()
 	{
+		// FIXME What about fragments/query params?
 		StringBuilder builder = new StringBuilder();
 		builder.append(uri.getScheme());
 		builder.append(File.separator);
 		builder.append(uri.getHost());
 		builder.append(File.separator);
 		int port = uri.getPort();
-		if (port != -1 && port != 80) // TODO check for default port for scheme (this assumes always http, not https)!
+		int defaultPort = 80;
+		if ("https".equalsIgnoreCase(uri.getScheme())) //$NON-NLS-1$
+		{
+			defaultPort = 443;
+		}
+		if (port != -1 && port != defaultPort)
 		{
 			builder.append(uri.getPort());
 			builder.append(File.separator);
@@ -180,16 +185,15 @@ public class HttpFileStore extends FileStore
 		try
 		{
 			return uri.toURL().openStream();
+			// TODO Wrap exceptions and throw CoreException when it makes sense (like when this URL doesn't exist)
 		}
 		catch (MalformedURLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			HttpFilesystemPlugin.log(e);
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			HttpFilesystemPlugin.log(e);
 		}
 		return null;
 	}
