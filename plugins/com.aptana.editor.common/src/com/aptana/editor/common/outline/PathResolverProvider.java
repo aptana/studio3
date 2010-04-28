@@ -40,9 +40,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPathEditorInput;
@@ -158,15 +162,12 @@ public final class PathResolverProvider
 		{
 			if (path != null && path.startsWith("http")) //$NON-NLS-1$
 			{
+				// TODO Always use the EFS IFilesystem API if parses correctly as URI, not just if the path starts with http?
 				URI uri = URI.create(path);
-				return IOUtil.read(uri.toURL().openStream());
-				// TODO Use EFS filesystem to resolve files to a local cached copy!
-				// We'd probably need an http/https implementation first
-
-				// IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
-				// IFileStore store = fileSystem.getStore(uri);
-				// File aFile = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-				// return IOUtil.read(new FileInputStream(aFile));
+				IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
+				IFileStore store = fileSystem.getStore(uri);
+				File aFile = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+				return IOUtil.read(new FileInputStream(aFile));
 			}
 			IFile file = resolveToIFile(path);
 			if (file == null)
