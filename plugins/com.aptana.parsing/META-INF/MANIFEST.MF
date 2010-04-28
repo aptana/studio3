@@ -21,8 +21,6 @@ Export-Package: beaver,
  com.aptana.parsing.ast,
  com.aptana.parsing.io,
  com.aptana.parsing.lexer,
- com.aptana.parsing.metadata,
- com.aptana.parsing.metadata.reader,
  com.aptana.sax,
  com.aptana.xml
 Bundle-ClassPath: libs/beaver.jar,
