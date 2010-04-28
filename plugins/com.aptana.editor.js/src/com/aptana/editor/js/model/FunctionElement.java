@@ -138,13 +138,4 @@ public class FunctionElement extends PropertyElement
 	{
 		this._isMethod = value;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString()
-	{
-		return this.getName() + "()";
-	}
 }

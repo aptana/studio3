@@ -134,12 +134,4 @@ public class PropertyElement extends BaseElement
 	{
 		this._owningType = type;
 	}
-	
-	/**
-	 * toString
-	 */
-	public String toString()
-	{
-		return this.getName();
-	}
 }
