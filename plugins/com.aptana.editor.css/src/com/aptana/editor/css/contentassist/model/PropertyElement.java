@@ -15,6 +15,7 @@ public class PropertyElement
 	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private List<ValueElement> _values = new LinkedList<ValueElement>();
 	private String _hint;
+	private boolean _allowMultipleValues;
 
 	/**
 	 * PropertyElement
@@ -51,6 +52,16 @@ public class PropertyElement
 	public void addValue(ValueElement value)
 	{
 		this._values.add(value);
+	}
+
+	/**
+	 * allowMultipleValues
+	 * 
+	 * @return
+	 */
+	public boolean allowMultipleValues()
+	{
+		return this._allowMultipleValues;
 	}
 
 	/**
@@ -142,6 +153,16 @@ public class PropertyElement
 	}
 
 	/**
+	 * setAllowMultipleValues
+	 * 
+	 * @param value
+	 */
+	public void setAllowMultipleValues(String value)
+	{
+		this._allowMultipleValues = "true".equals(value);
+	}
+
+	/**
 	 * setDescription
 	 * 
 	 * @param description
@@ -180,7 +201,7 @@ public class PropertyElement
 	{
 		this._name = name;
 	}
-
+	
 	/**
 	 * setRemark
 	 * 
@@ -190,7 +211,7 @@ public class PropertyElement
 	{
 		this._remark = remark;
 	}
-
+	
 	/**
 	 * setType
 	 * 
