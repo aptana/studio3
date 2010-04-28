@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.aptana.red.core"
+      id="com.aptana.feature"
       label="%featureName"
       version="3.0.0.qualifier"
       provider-name="%providerName"
@@ -17,6 +17,31 @@
    <license url="%licenseURL">
       %license
    </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.jface.text" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.core" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.console" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.team.core"/>
+      <import plugin="org.eclipse.core.filesystem"/>
+      <import plugin="org.eclipse.ui.ide" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.team.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.externaltools"/>
+      <import plugin="org.eclipse.compare" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.browser" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.osgi" version="3.1.0" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="com.aptana.util"
