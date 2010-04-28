@@ -1,6 +1,7 @@
 package com.aptana.explorer.internal.ui;
 
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,9 +24,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -183,6 +184,12 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	 */
 	private Browser browser;
 	private IPreferenceChangeListener fThemeChangeListener;
+
+	private Composite normal;
+
+	private Composite browserComposite;
+
+	private Job updateMessageAreaJob;
 	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
 	// private static final String BASE_MESSAGE_URL = "http://localhost:3000/tools/content/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 150;
@@ -250,7 +257,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		master.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// Normal contents, wraps the search, filter and navigator areas
-		Composite normal = new Composite(master, SWT.NONE);
+		normal = new Composite(master, SWT.NONE);
 		normal.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		normal.setLayout(gridLayout);
 
@@ -258,7 +265,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		filterComp = createFilterComposite(normal);
 		createNavigator(normal);
 
-		Composite browserComposite = createBrowserComposite(master);
+		browserComposite = createBrowserComposite(master);
 
 		master.setLayout(new FormLayout());
 
@@ -344,7 +351,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject.getLocation());
+						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject
+								.getLocation());
 					}
 				});
 				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
@@ -435,7 +443,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		for (IProject iProject : projects)
 		{
 			// hide closed projects
-			if (!iProject.isAccessible()) {
+			if (!iProject.isAccessible())
+			{
 				continue;
 			}
 
@@ -592,7 +601,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	}
 
 	@Override
-	protected CommonViewer createCommonViewer(Composite aParent) {
+	protected CommonViewer createCommonViewer(Composite aParent)
+	{
 		CommonViewer aViewer = createCommonViewerObject(aParent);
 		initListeners(aViewer);
 		aViewer.getNavigatorContentService().restoreState(memento);
@@ -606,7 +616,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	 */
 	protected CommonViewer createCommonViewerObject(Composite aParent)
 	{
-		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION)
+		return new CommonViewer(getViewSite().getId(), aParent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.FULL_SELECTION)
 		{
 			@Override
 			public ISelection getSelection()
@@ -959,13 +970,13 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 				selectedProject = newSelectedProject;
 				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 				{
-					
+
 					@Override
 					public void run()
 					{
 						projectChanged(oldActiveProject, newSelectedProject);
 					}
-				});				
+				});
 			}
 		};
 		new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).addPreferenceChangeListener(
@@ -1106,8 +1117,69 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 
 	private void updateMessageArea()
 	{
-		// TODO If we're offline, point to some static tooltip content, otherwise we do...
-		browser.setUrl(getURLForProject());
+		if (updateMessageAreaJob == null)
+		{
+			updateMessageAreaJob = new Job("Updating App Explorer message area")
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+					boolean connected = false;
+					try
+					{
+						new URL(BASE_MESSAGE_URL).openConnection().connect();
+						connected = true;
+					}
+					catch (Exception e)
+					{
+						connected = false;
+					}
+					final boolean wasConnected = connected;
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+					{
+
+						@Override
+						public void run()
+						{
+							if (wasConnected)
+							{
+								browser.setUrl(getURLForProject());
+								// Show the message area
+								FormData fd = (FormData) normal.getLayoutData();
+								fd.bottom.control = browserComposite;
+								fd.bottom.numerator = 0;
+
+								FormData fd2 = (FormData) browserComposite.getLayoutData();
+								fd2.top.offset = -MINIMUM_BROWSER_HEIGHT;
+							}
+							else
+							{
+								// Hide the message area!
+								FormData fd = (FormData) normal.getLayoutData();
+								fd.bottom.control = null;
+								fd.bottom.numerator = 100;
+
+								FormData fd2 = (FormData) browserComposite.getLayoutData();
+								fd2.top.offset = 0;
+							}
+						}
+					});
+					return Status.OK_STATUS;
+				}
+			};
+			updateMessageAreaJob.setSystem(true);
+			updateMessageAreaJob.setPriority(Job.SHORT);
+		}
+		else
+		{
+			updateMessageAreaJob.cancel();
+		}
+		updateMessageAreaJob.schedule(25);
 	}
 
 	private void removeFileWatcher()
@@ -1215,7 +1287,9 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 						if (resource.getType() == IResource.PROJECT)
 						{
 							// a project was added, removed, or changed!
-							if (delta.getKind() == IResourceDelta.ADDED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
+							if (delta.getKind() == IResourceDelta.ADDED
+									|| (delta.getKind() == IResourceDelta.CHANGED
+											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource.isAccessible()))
 							{
 								// Add to the projects menu and then switch to it!
 								final String projectName = resource.getName();
@@ -1264,7 +1338,10 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 									}
 								});
 							}
-							else if (delta.getKind() == IResourceDelta.REMOVED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource.isAccessible()))
+							else if (delta.getKind() == IResourceDelta.REMOVED
+									|| (delta.getKind() == IResourceDelta.CHANGED
+											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
+											.isAccessible()))
 							{
 								// Remove from menu and if it was the active project, switch away from it!
 								final String projectName = resource.getName();

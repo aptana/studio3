@@ -1055,9 +1055,6 @@ public class VT100Emulator implements ControlListener {
 				|| character == '\r' || character == '\u001b'
 				|| character == '\u000e' || character == '\u000f') {
 				pushBackChar(character);
-				if(character == '\r' || character == '\n') {
-					buffer.append(character);
-				}
 				break;
 			}
 			buffer.append(character);
