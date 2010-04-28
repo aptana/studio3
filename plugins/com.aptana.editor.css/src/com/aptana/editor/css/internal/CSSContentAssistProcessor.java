@@ -53,126 +53,198 @@ import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.parsing.lexer.TokenLexeme;
 import com.aptana.parsing.metadata.MetadataEnvironment;
 
-public class CSSContentAssistProcessor implements IContentAssistProcessor {
+public class CSSContentAssistProcessor implements IContentAssistProcessor
+{
+	/**
+	 * Location
+	 */
+	private static enum Location
+	{
+		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
+	};
 
-	private static enum LOCATION {OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR};
-
-    private IContextInformationValidator fValidator;
-
-    private static MetadataEnvironment metadataEnvironment;
-
+	private IContextInformationValidator fValidator;
+	private static MetadataEnvironment metadataEnvironment;
 	private final AbstractThemeableEditor abstractThemeableEditor;
-
-    public CSSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	
+	/**
+	 * getMetadataEnvironment
+	 * 
+	 * @return
+	 */
+	private static MetadataEnvironment getMetadataEnvironment()
 	{
-		this.abstractThemeableEditor = abstractThemeableEditor;
-	}
-
-	@Override
-    public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
-	{
-		IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
-		CSSScopeScanner scanner = new CSSScopeScanner();
-		scanner.setRange(viewer.getDocument(), 0, viewer.getDocument().getLength());
-		List<TokenLexeme> tokenLexems = new ArrayList<TokenLexeme>();
-		IToken nextToken;
-
-		// Build the TokenLexeme
-		while (true)
+		if (metadataEnvironment == null)
 		{
-			nextToken = scanner.nextToken();
-			if (nextToken == Token.EOF)
-			{
-				break;
-			}
-			int tokenOffset = scanner.getTokenOffset();
-			int tokenLength = scanner.getTokenLength();
-
-			try
-			{
-				tokenLexems.add(new TokenLexeme(document.get(tokenOffset, tokenLength), tokenOffset, tokenOffset+tokenLength, nextToken));
-			}
-			catch (BadLocationException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			InputStream input = CSSContentAssistProcessor.class.getResourceAsStream("CSSMetadata.bin"); //$NON-NLS-1$
+			
+			metadataEnvironment = new MetadataEnvironment();
+			metadataEnvironment = MetadataEnvironment.getMetadataFromResource(input, metadataEnvironment);
 		}
 
-		LOCATION location = getLocation(tokenLexems, offset);
+		return metadataEnvironment;
+	}
 
-        List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-        MetadataEnvironment metadataEnvironment = getMetadataEnvironment();
-        // Use the language metadata and location and indexing information to build the
-        // proposals
-        return proposals.toArray(new ICompletionProposal[proposals.size()]);
-    }
+	/**
+	 * getTokenLexemeAtOffset
+	 * 
+	 * @param tokenLexems
+	 * @param offset
+	 * @return
+	 */
+	private static TokenLexeme getTokenLexemeAtOffset(List<TokenLexeme> tokenLexems, int offset)
+	{
+		int size = tokenLexems.size();
+		
+		if (size > 0)
+		{
+			for (TokenLexeme tokenLexeme : tokenLexems)
+			{
+				if (offset >= tokenLexeme.getStartingOffset() && offset <= tokenLexeme.getEndingOffset())
+				{
+					return tokenLexeme;
+				}
+			}
+		}
+		
+		return null;
+	}
 
-	private static LOCATION getLocation(List<TokenLexeme> tokenLexems, int offset)
+	/**
+	 * getLocation
+	 * 
+	 * @param tokenLexems
+	 * @param offset
+	 * @return
+	 */
+	private static Location getLocation(List<TokenLexeme> tokenLexems, int offset)
 	{
 		if (offset == 0)
 		{
-			return LOCATION.OUTSIDE_RULE;
+			return Location.OUTSIDE_RULE;
 		}
+		
 		TokenLexeme tokenLexemeAtOffset = getTokenLexemeAtOffset(tokenLexems, offset);
+		
 		if (tokenLexemeAtOffset != null)
 		{
 			// Compute the location
 		}
-		return LOCATION.ERROR;
+		
+		return Location.ERROR;
 	}
 
-    private static TokenLexeme getTokenLexemeAtOffset(List<TokenLexeme> tokenLexems, int offset)
+	/**
+	 * CSSContentAssistProcessor
+	 * 
+	 * @param abstractThemeableEditor
+	 */
+	public CSSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
-    	int size = tokenLexems.size();
-		if (size > 0) {
-    		for (TokenLexeme tokenLexeme : tokenLexems)
+		this.abstractThemeableEditor = abstractThemeableEditor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
+	 */
+	@Override
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
+	{
+		IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
+		CSSScopeScanner scanner = new CSSScopeScanner();
+
+		scanner.setRange(viewer.getDocument(), 0, viewer.getDocument().getLength());
+
+		List<TokenLexeme> tokenLexemes = new ArrayList<TokenLexeme>();
+		IToken token;
+
+		// Build the TokenLexeme
+		while (true)
+		{
+			token = scanner.nextToken();
+
+			if (token == Token.EOF)
 			{
-    			if (offset >= tokenLexeme.getStartingOffset() && offset <= tokenLexeme.getEndingOffset()) {
-					return tokenLexeme;
-				}
+				break;
 			}
-    	}
+
+			try
+			{
+				int tokenOffset = scanner.getTokenOffset();
+				int tokenLength = scanner.getTokenLength();
+				int endingOffset = tokenOffset + tokenLength;
+				String text = document.get(tokenOffset, tokenLength);
+
+				tokenLexemes.add(new TokenLexeme(text, tokenOffset, endingOffset, token));
+			}
+			catch (BadLocationException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		// Use the language metadata and location and indexing information to build the
+		// proposals
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		Location location = getLocation(tokenLexemes, offset);
+		MetadataEnvironment metadataEnvironment = getMetadataEnvironment();
+		
+		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer, int)
+	 */
+	@Override
+	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
+	{
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
+	 */
 	@Override
-    public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
-        return null;
-    }
+	public char[] getCompletionProposalAutoActivationCharacters()
+	{
+		return new char[] { ':', '\t', '{', ';' };
+	}
 
-    @Override
-    public char[] getCompletionProposalAutoActivationCharacters() {
-        return new char[] { ':', '\t', '{', ';' };
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
+	@Override
+	public char[] getContextInformationAutoActivationCharacters()
+	{
+		return null;
+	}
 
-    @Override
-    public char[] getContextInformationAutoActivationCharacters() {
-        return null;
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
+	 */
+	@Override
+	public IContextInformationValidator getContextInformationValidator()
+	{
+		if (fValidator == null)
+		{
+			fValidator = new CSSContextInformationValidator();
+		}
+		
+		return fValidator;
+	}
 
-    @Override
-    public IContextInformationValidator getContextInformationValidator() {
-        if (fValidator == null) {
-            fValidator = new CSSContextInformationValidator();
-        }
-        return fValidator;
-    }
-
-    @Override
-    public String getErrorMessage() {
-        return null;
-    }
-
-    private static MetadataEnvironment getMetadataEnvironment()
-    {
-    	if (metadataEnvironment == null)
-    	{
-    		InputStream input = CSSContentAssistProcessor.class.getResourceAsStream("CSSMetadata.bin"); //$NON-NLS-1$
-    		metadataEnvironment = new MetadataEnvironment();
-    		metadataEnvironment = MetadataEnvironment.getMetadataFromResource(input, metadataEnvironment);
-    	}
-
-    	return metadataEnvironment;
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
+	 */
+	@Override
+	public String getErrorMessage()
+	{
+		return null;
+	}
 }
