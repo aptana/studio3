@@ -826,7 +826,6 @@ public class JSMetadataReader extends ValidatingReader
 
 			// clear properties
 			this.stopTextBuffer();
-
 			SAXParser saxParser = null;
 
 			// parse the XML file
