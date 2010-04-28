@@ -14,4 +14,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin
 Export-Package: com.aptana.console.process

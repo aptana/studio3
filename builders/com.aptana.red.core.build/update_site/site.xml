@@ -3,10 +3,10 @@
    <description url="http://download.aptana.org/tools/studio/plugin/update/studio">
       Aptana Update Central. Version {version.full}
    </description>
-   <feature url="features/com.aptana.red.core_{version.full}.jar" id="com.aptana.red.core" version="{version.full}">
-      <category name="Aptana RED"/>
+   <feature url="features/com.aptana.feature_{version.full}.jar" id="com.aptana.feature" version="{version.full}">
+      <category name="Aptana Studio 3 Core"/>
    </feature>   
-   <category-def name="Aptana RED" label="Aptana RED">
+   <category-def name="Aptana Studio 3 Core" label="Aptana Studio 3 Core">
       <description>
          Updates for Aptana in an existing Eclipse installation.
       </description>
