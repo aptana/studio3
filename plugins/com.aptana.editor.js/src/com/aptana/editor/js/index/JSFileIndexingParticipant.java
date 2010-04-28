@@ -102,7 +102,7 @@ public class JSFileIndexingParticipant implements IFileIndexingParticipant
 				
 				if (name != null && name.length() > 0)
 				{
-					index.addEntry(IndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
+					index.addEntry(JSIndexConstants.FUNCTION, name, file.getProjectRelativePath().toPortableString());
 				}
 				
 			}

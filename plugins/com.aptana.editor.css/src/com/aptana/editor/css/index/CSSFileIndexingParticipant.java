@@ -68,11 +68,11 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 			String text = cssAttributeSelectorNode.getText();
 			if (text != null && text.startsWith(".")) //$NON-NLS-1$
 			{
-				addIndex(index, file, IIndexConstants.CSS_CLASS, text.substring(1));
+				addIndex(index, file, CSSIndexConstants.CLASS, text.substring(1));
 			}
 			else if (text != null && text.startsWith("#")) //$NON-NLS-1$
 			{
-				addIndex(index, file, IIndexConstants.CSS_IDENTIFIER, text.substring(1));
+				addIndex(index, file, CSSIndexConstants.IDENTIFIER, text.substring(1));
 			}
 		}
 
@@ -82,7 +82,7 @@ public class CSSFileIndexingParticipant implements IFileIndexingParticipant
 			String value = term.getText();
 			if (isColor(value))
 			{
-				addIndex(index, file, IIndexConstants.CSS_COLOR, CSSColors.to6CharHexWithLeadingHash(value.trim()));
+				addIndex(index, file, CSSIndexConstants.COLOR, CSSColors.to6CharHexWithLeadingHash(value.trim()));
 			}
 		}
 

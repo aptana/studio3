@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.css.index.CSSFileIndexingParticipant;
-import com.aptana.editor.css.index.IIndexConstants;
+import com.aptana.editor.css.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
@@ -108,12 +108,12 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 			{
 				StringTokenizer tokenizer = new StringTokenizer(cssClass);
 				while (tokenizer.hasMoreTokens())
-					addIndex(index, file, IIndexConstants.CSS_CLASS, tokenizer.nextToken());
+					addIndex(index, file, CSSIndexConstants.CLASS, tokenizer.nextToken());
 			}
 			String id = element.getID();
 			if (id != null && id.trim().length() > 0)
 			{
-				addIndex(index, file, IIndexConstants.CSS_IDENTIFIER, id);
+				addIndex(index, file, CSSIndexConstants.IDENTIFIER, id);
 			}
 			if (element.getName().equalsIgnoreCase(ELEMENT_LINK))
 			{

@@ -28,17 +28,17 @@ public class JSIndexReader
 	{
 		String result = "";
 
-		if (descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(IndexConstants.NO_ENTRY))
+		if (descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(JSIndexConstants.NO_ENTRY))
 		{
 			// grab description
-			String descriptionPattern = descriptionKey + IndexConstants.DELIMITER;
-			List<QueryResult> descriptions = index.query(new String[] { IndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+			String descriptionPattern = descriptionKey + JSIndexConstants.DELIMITER;
+			List<QueryResult> descriptions = index.query(new String[] { JSIndexConstants.DESCRIPTION }, descriptionPattern, SearchPattern.PREFIX_MATCH);
 	
 			if (descriptions != null)
 			{
 				String descriptionValue = descriptions.get(0).getWord();
 	
-				result = descriptionValue.substring(descriptionValue.indexOf(IndexConstants.DELIMITER) + 1);
+				result = descriptionValue.substring(descriptionValue.indexOf(JSIndexConstants.DELIMITER) + 1);
 			}
 		}
 
@@ -56,14 +56,14 @@ public class JSIndexReader
 	public List<FunctionElement> getFunctions(Index index, String owningType) throws IOException
 	{
 		// read properties
-		List<QueryResult> functions = index.query(new String[] { IndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+		List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
 		List<FunctionElement> result = new LinkedList<FunctionElement>();
 
 		if (functions != null)
 		{
 			for (QueryResult function : functions)
 			{
-				String[] columns = function.getWord().split(IndexConstants.DELIMITER);
+				String[] columns = function.getWord().split(JSIndexConstants.DELIMITER);
 				String functionName = columns[0];
 				String descriptionKey = columns[2];
 				String parametersKey = columns[3];
@@ -101,7 +101,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName)
 	{
-		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { IndexConstants.DELIMITER, typeName });
+		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName });
 	}
 
 	/**
@@ -115,14 +115,14 @@ public class JSIndexReader
 	public List<PropertyElement> getProperties(Index index, String owningType) throws IOException
 	{
 		// read properties
-		List<QueryResult> properties = index.query(new String[] { IndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
+		List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType), SearchPattern.REGEX_MATCH);
 		List<PropertyElement> result = new LinkedList<PropertyElement>();
 
 		if (properties != null)
 		{
 			for (QueryResult property : properties)
 			{
-				String[] columns = property.getWord().split(IndexConstants.DELIMITER);
+				String[] columns = property.getWord().split(JSIndexConstants.DELIMITER);
 				String propertyName = columns[0];
 				String descriptionKey = columns[2];
 				String returnTypesKey = columns[3];
@@ -155,14 +155,14 @@ public class JSIndexReader
 	 */
 	public List<ParameterElement> getParameters(Index index, String parametersKey) throws IOException
 	{
-		String descriptionPattern = parametersKey + IndexConstants.DELIMITER;
-		List<QueryResult> parameters = index.query(new String[] { IndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+		String descriptionPattern = parametersKey + JSIndexConstants.DELIMITER;
+		List<QueryResult> parameters = index.query(new String[] { JSIndexConstants.PARAMETERS }, descriptionPattern, SearchPattern.PREFIX_MATCH);
 		List<ParameterElement> result = new LinkedList<ParameterElement>();
 
 		if (parameters != null && parameters.size() > 0)
 		{
 			String parametersValue = parameters.get(0).getWord();
-			String[] parameterValues = parametersValue.split(IndexConstants.DELIMITER);
+			String[] parameterValues = parametersValue.split(JSIndexConstants.DELIMITER);
 
 			for (int i = 1; i < parameterValues.length; i++)
 			{
@@ -195,14 +195,14 @@ public class JSIndexReader
 	 */
 	public List<ReturnTypeElement> getReturnTypes(Index index, String returnTypesKey) throws IOException
 	{
-		String descriptionPattern = returnTypesKey + IndexConstants.DELIMITER;
-		List<QueryResult> returnTypes = index.query(new String[] { IndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
+		String descriptionPattern = returnTypesKey + JSIndexConstants.DELIMITER;
+		List<QueryResult> returnTypes = index.query(new String[] { JSIndexConstants.RETURN_TYPES }, descriptionPattern, SearchPattern.PREFIX_MATCH);
 		List<ReturnTypeElement> result = new LinkedList<ReturnTypeElement>();
 
 		if (returnTypes != null && returnTypes.size() > 0)
 		{
 			String word = returnTypes.get(0).getWord();
-			String[] returnTypesValues = word.split(IndexConstants.DELIMITER);
+			String[] returnTypesValues = word.split(JSIndexConstants.DELIMITER);
 
 			for (int i = 1; i < returnTypesValues.length; i++)
 			{
@@ -248,12 +248,12 @@ public class JSIndexReader
 
 		try
 		{
-			String pattern = typeName + IndexConstants.DELIMITER;
-			List<QueryResult> types = index.query(new String[] { IndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
+			String pattern = typeName + JSIndexConstants.DELIMITER;
+			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
 
 			if (types != null && types.size() > 0)
 			{
-				String[] columns = types.get(0).getWord().split(IndexConstants.DELIMITER);
+				String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
 				String retrievedName = columns[0];
 				String[] parentTypes = columns[1].split(",");
 				String descriptionKey = columns[2];

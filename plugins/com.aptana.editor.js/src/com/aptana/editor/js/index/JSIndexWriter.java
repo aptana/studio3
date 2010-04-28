@@ -61,13 +61,13 @@ public class JSIndexWriter
 		{
 			indexString = Integer.toString(this._descriptionCount++);
 			
-			String value = indexString + IndexConstants.DELIMITER + description;
+			String value = indexString + JSIndexConstants.DELIMITER + description;
 			
-			index.addEntry(IndexConstants.DESCRIPTION, value, this.getDocumentPath());
+			index.addEntry(JSIndexConstants.DESCRIPTION, value, this.getDocumentPath());
 		}
 		else
 		{
-			indexString = IndexConstants.NO_ENTRY;
+			indexString = JSIndexConstants.NO_ENTRY;
 		}
 		
 		return indexString;
@@ -89,7 +89,7 @@ public class JSIndexWriter
 		// UserAgentElement[] userAgents = function.getUserAgents();
 		
 		String value = StringUtil.join(
-			IndexConstants.DELIMITER,
+			JSIndexConstants.DELIMITER,
 			function.getName(),
 			function.getOwningType().getName(),
 			descriptionKey,
@@ -97,7 +97,7 @@ public class JSIndexWriter
 			returnTypesKey
 		);
 
-		index.addEntry(IndexConstants.FUNCTION, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.FUNCTION, value, this.getDocumentPath());
 	}
 
 	/**
@@ -124,9 +124,9 @@ public class JSIndexWriter
 			keyList.add(name + "," + usage + "," + types);
 		}
 		
-		String value = StringUtil.join(IndexConstants.DELIMITER, keyList);
+		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
 		
-		index.addEntry(IndexConstants.PARAMETERS, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.PARAMETERS, value, this.getDocumentPath());
 		
 		return indexString;
 	}
@@ -146,14 +146,14 @@ public class JSIndexWriter
 		// UserAgentElement[] userAgents = property.getUserAgents();
 		
 		String value = StringUtil.join(
-			IndexConstants.DELIMITER,
+			JSIndexConstants.DELIMITER,
 			property.getName(),
 			property.getOwningType().getName(),
 			descriptionKey,
 			propertyTypesKey
 		);
 
-		index.addEntry(IndexConstants.PROPERTY, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.PROPERTY, value, this.getDocumentPath());
 	}
 
 	/**
@@ -178,9 +178,9 @@ public class JSIndexWriter
 			keyList.add(type + "," + descriptionKey);
 		}
 		
-		String value = StringUtil.join(IndexConstants.DELIMITER, keyList);
+		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
 		
-		index.addEntry(IndexConstants.RETURN_TYPES, value, this.getDocumentPath());
+		index.addEntry(JSIndexConstants.RETURN_TYPES, value, this.getDocumentPath());
 		
 		return indexString;
 	}
@@ -218,13 +218,13 @@ public class JSIndexWriter
 
 		// calculate key value and add to index
 		String value = StringUtil.join(
-			IndexConstants.DELIMITER,
+			JSIndexConstants.DELIMITER,
 			type.getName(),
 			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object",
 			descriptionKey
 		);
 
-		index.addEntry(IndexConstants.TYPE, value, documentPath);
+		index.addEntry(JSIndexConstants.TYPE, value, documentPath);
 
 		// write type properties (that are not functions)
 		for (PropertyElement property : type.getProperties())

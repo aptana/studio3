@@ -17,7 +17,7 @@ public class JSIndexTests extends TestCase
 	@Override
 	protected void tearDown() throws Exception
 	{
-		IndexManager.getInstance().removeIndex(IndexConstants.METADATA);
+		IndexManager.getInstance().removeIndex(JSIndexConstants.METADATA);
 		
 		super.tearDown();
 	}
@@ -31,7 +31,7 @@ public class JSIndexTests extends TestCase
 	{
 		IndexManager manager = IndexManager.getInstance();
 
-		return manager.getIndex(IndexConstants.METADATA);
+		return manager.getIndex(JSIndexConstants.METADATA);
 	}
 	
 	/**
