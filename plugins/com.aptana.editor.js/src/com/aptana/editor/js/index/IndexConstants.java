@@ -12,4 +12,8 @@ public interface IndexConstants
 	static final String PROPERTY = "js.property";
 	static final String DESCRIPTION = "js.description";
 	static final String PARAMETERS = "js.parameters";
+	static final String RETURN_TYPES = "js.return_types";
+	
+	// special values
+	static final String NO_ENTRY = "-1";
 }
