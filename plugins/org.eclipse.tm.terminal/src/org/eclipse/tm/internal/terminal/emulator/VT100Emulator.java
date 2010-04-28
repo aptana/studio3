@@ -1251,6 +1251,7 @@ public class VT100Emulator implements ControlListener {
 	public void resetState() {
 		ansiState=ANSISTATE_INITIAL;
 		text.setStyle(text.getDefaultStyle());
+		text.setCursorColumn(0);
 	}
 
 //	public OutputStream getOutputStream() {
