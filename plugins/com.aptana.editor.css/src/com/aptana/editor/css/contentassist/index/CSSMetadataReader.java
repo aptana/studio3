@@ -52,6 +52,7 @@ import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.SpecificationElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
+import com.aptana.sax.Schema;
 import com.aptana.sax.SchemaBuilder;
 import com.aptana.sax.SchemaInitializationException;
 import com.aptana.sax.ValidatingReader;
@@ -64,14 +65,14 @@ public class CSSMetadataReader extends ValidatingReader
 	private static final String METADATA_SCHEMA_XML = "/com/aptana/editor/css/resources/CSSMetadataSchema.xml"; //$NON-NLS-1$
 	
 	private boolean _bufferText;
-	private StringBuffer _textBuffer;
+	private StringBuffer _textBuffer = new StringBuffer();
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
 	private ElementElement _currentElement;
 	private PropertyElement _currentProperty;
 	private ValueElement _currentValue;
 	private UserAgentElement _currentUserAgent;
 	private List<PropertyElement> _properties = new LinkedList<PropertyElement>();
-	private Object _metadataSchema;
+	private Schema _metadataSchema;
 
 	/**
 	 * CSSMetadataReader
@@ -171,6 +172,7 @@ public class CSSMetadataReader extends ValidatingReader
 		// grab and set property values
 		property.setName(attributes.getValue("name"));
 		property.setType(attributes.getValue("type"));
+		property.setAllowMultipleValues(attributes.getValue("allow-multipe-values"));
 
 		// set current item
 		this._currentProperty = property;
@@ -404,6 +406,26 @@ public class CSSMetadataReader extends ValidatingReader
 	}
 
 	/**
+	 * getElements
+	 * 
+	 * @return
+	 */
+	public List<ElementElement> getElements()
+	{
+		return this._elements;
+	}
+	
+	/**
+	 * getProperties
+	 * 
+	 * @return
+	 */
+	public List<PropertyElement> getProperties()
+	{
+		return this._properties;
+	}
+	
+	/**
 	 * loadMetadataSchema
 	 * 
 	 * @throws Exception
@@ -418,7 +440,7 @@ public class CSSMetadataReader extends ValidatingReader
 			try
 			{
 				// create the schema
-				this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
+				this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
 			}
 			catch (SchemaInitializationException e)
 			{
