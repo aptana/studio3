@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,29 +34,18 @@
  */
 package com.aptana.editor.common.outline;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.Charset;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
-import com.aptana.util.IOUtil;
-
 /**
  * @author Pavel Petrochenko
+ * @author Chris Williams
  */
 public final class PathResolverProvider
 {
@@ -68,217 +57,14 @@ public final class PathResolverProvider
 		/**
 		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
 		 */
-		public String resolveSource(String path) throws Exception
+		public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 		{
 			return null;
 		}
 	}
 
-	/**
-	 * resolver doing resolving basing on current directory in the file system
-	 * 
-	 * @author Pavel Petrochenko
-	 */
-	private static final class FilePathResolver implements IPathResolver
-	{
-
-		private File file;
-
-		/**
-		 * @param path
-		 */
-		public FilePathResolver(IPath path)
-		{
-			this.file = path.toFile();
-			// TODO Auto-generated constructor stub
-		}
-
-		private File resolveToFile(String path)
-		{
-			if (path.charAt(0) == '/')
-			{
-				// absolute path (project relative);
-				return null;
-			}
-			Path p = new Path(path);
-			File append = file.getParentFile();
-			for (int a = 0; a < p.segmentCount(); a++)
-			{
-				String segment = p.segment(a).trim();
-				if (segment.equals(".")) { //$NON-NLS-1$
-					continue;
-				}
-				else if (segment.equals("..")) { //$NON-NLS-1$
-					append = file.getParentFile();
-				}
-				else
-				{
-					append = new File(append, segment);
-				}
-			}
-			return append;
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
-		 */
-		public String resolveSource(String path) throws Exception
-		{
-			File file = resolveToFile(path);
-			if (!file.exists())
-			{
-				return null;
-			}
-			FileInputStream fs = new FileInputStream(file);
-			return IOUtil.read(fs, Charset.defaultCharset().name());
-		}
-	}
-
-	/**
-	 * resolver for resources in the workspace
-	 * 
-	 * @author Pavel Petrochenko
-	 */
-	private static final class IFilePathResolver implements IPathResolver
-	{
-
-		private IProject project;
-		private IPath path;
-
-		/**
-		 * @param project
-		 * @param path
-		 */
-		public IFilePathResolver(IProject project, IPath path)
-		{
-			this.project = project;
-			this.path = path;
-		}
-
-		/**
-		 * @see com.aptana.ide.views.outline.IPathResolver#resolveSource(java.lang.String)
-		 */
-		public String resolveSource(String path) throws Exception
-		{
-			if (path != null && path.startsWith("http")) //$NON-NLS-1$
-			{
-				// TODO Always use the EFS IFilesystem API if parses correctly as URI, not just if the path starts with http?
-				URI uri = URI.create(path);
-				IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
-				IFileStore store = fileSystem.getStore(uri);
-				File aFile = store.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-				return IOUtil.read(new FileInputStream(aFile));
-			}
-			IFile file = resolveToIFile(path);
-			if (file == null)
-			{
-				return null;
-			}
-			if (!file.exists())
-			{
-				return null;
-			}
-			InputStream contents = file.getContents(true);
-			try
-			{
-				String charset = file.getCharset(true);
-				return IOUtil.read(contents, charset);
-			}
-			finally
-			{
-				contents.close();
-			}
-		}
-
-		private IFile resolveToIFile(String path)
-		{
-			if (path.charAt(0) == '/')
-			{
-				// absolute path (project relative);
-				return project.getFile(path);
-			}
-			Path p = new Path(path);
-			IPath append = this.path.removeLastSegments(1);
-			for (int a = 0; a < p.segmentCount(); a++)
-			{
-				String segment = p.segment(a).trim();
-				if (segment.equals(".")) { //$NON-NLS-1$
-					continue;
-				}
-				else if (segment.equals("..")) { //$NON-NLS-1$
-					if (append.segmentCount() == 0)
-					{
-						return null;
-					}
-					append = append.removeLastSegments(1);
-				}
-				else
-				{
-					append = append.append(segment);
-				}
-			}
-			return project.getFile(append);
-		}
-
-		/**
-		 * @see java.lang.Object#hashCode()
-		 */
-		public int hashCode()
-		{
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((path == null) ? 0 : path.hashCode());
-			result = prime * result + ((project == null) ? 0 : project.hashCode());
-			return result;
-		}
-
-		/**
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		public boolean equals(Object obj)
-		{
-			if (this == obj)
-			{
-				return true;
-			}
-			if (obj == null)
-			{
-				return false;
-			}
-			if (getClass() != obj.getClass())
-			{
-				return false;
-			}
-			final IFilePathResolver other = (IFilePathResolver) obj;
-			if (path == null)
-			{
-				if (other.path != null)
-				{
-					return false;
-				}
-			}
-			else if (!path.equals(other.path))
-			{
-				return false;
-			}
-			if (project == null)
-			{
-				if (other.project != null)
-				{
-					return false;
-				}
-			}
-			else if (!project.equals(other.project))
-			{
-				return false;
-			}
-			return true;
-		}
-	}
-
 	private PathResolverProvider()
 	{
-
 	}
 
 	/**
@@ -292,25 +78,23 @@ public final class PathResolverProvider
 		if (input instanceof FileEditorInput)
 		{
 			FileEditorInput fi = (FileEditorInput) input;
-			return new IFilePathResolver(fi.getFile().getProject(), fi.getFile().getProjectRelativePath());
+			IFile file = fi.getFile();
+			return new URIResolver(file.getLocationURI());
 		}
 		if (input instanceof IPathEditorInput)
 		{
 			IPathEditorInput fInput = (IPathEditorInput) (input);
-			return new FilePathResolver(fInput.getPath());
+			return new URIResolver(fInput.getPath().toFile().toURI());
 		}
 		if (input instanceof IURIEditorInput)
 		{
 			URI uri = ((IURIEditorInput) input).getURI();
-			if ("file".equals(uri.getScheme())) //$NON-NLS-1$
-			{
-				return new FilePathResolver(Path.fromOSString(new File(uri).getAbsolutePath()));
-			}
+			return new URIResolver(uri);
 		}
 		IPathEditorInput adapter = (IPathEditorInput) input.getAdapter(IPathEditorInput.class);
 		if (adapter != null)
 		{
-			return new FilePathResolver(adapter.getPath());
+			return new URIResolver(adapter.getPath().toFile().toURI());
 		}
 		return new NullResolver();
 	}

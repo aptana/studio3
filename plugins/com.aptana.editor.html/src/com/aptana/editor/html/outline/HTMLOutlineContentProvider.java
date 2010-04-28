@@ -10,6 +10,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -210,12 +211,12 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				// TODO Add progress for fetch/parse
+				SubMonitor sub = SubMonitor.convert(monitor, 100);
 				Object[] elements;
 				try
 				{
 					// resolving source and editor input
-					String source = resolver.resolveSource(srcPathOrURL);
+					String source = resolver.resolveSource(srcPathOrURL, sub.newChild(50));
 					if (source == null)
 					{
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
@@ -227,6 +228,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
 					}
 					IParseNode node = parse(parser, source);
+					sub.worked(90);
 					elements = getChildren(node);
 
 					// caching result
@@ -258,6 +260,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 						treeViewer.add(getOutlineItem((IParseNode) parent), finalElements);
 					}
 				});
+				sub.done();
 				return Status.OK_STATUS;
 			}
 		};
