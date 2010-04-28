@@ -21,8 +21,7 @@ Export-Package: beaver,
  com.aptana.parsing.ast,
  com.aptana.parsing.io,
  com.aptana.parsing.lexer,
- com.aptana.sax,
- com.aptana.xml
+ com.aptana.sax
 Bundle-ClassPath: libs/beaver.jar,
  .
 Eclipse-ExtensibleAPI: true
