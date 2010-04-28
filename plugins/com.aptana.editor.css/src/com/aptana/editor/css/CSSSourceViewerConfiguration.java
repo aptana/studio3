@@ -43,7 +43,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.IndexContentAssistProcessor;
 import com.aptana.editor.common.TextUtils;
 
 public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
