@@ -68,7 +68,7 @@ public class HTMLParser implements IParser
 	}
 
 	@Override
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fParseState = (HTMLParseState) parseState;
 		String source = new String(parseState.getSource());
