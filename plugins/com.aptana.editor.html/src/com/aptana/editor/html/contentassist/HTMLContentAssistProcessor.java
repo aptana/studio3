@@ -1,6 +1,5 @@
 package com.aptana.editor.html.contentassist;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
@@ -44,14 +43,17 @@ public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 		{
 			for (ElementElement element : elements)
 			{
-				String name = element.getName();
-				int length = name.length();
+				String openTag = "<" + element.getName() + ">";
+				String closeTag = "</" + element.getName() + ">";
+				String insertText = openTag + closeTag;
+				int length = openTag.length();
+				String displayName = element.getName();
 				String description = element.getDescription();
 				Image image = null;
 				IContextInformation contextInfo = null;
 				
 				// build proposal
-				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CompletionProposal proposal = new CompletionProposal(insertText, offset, 0, length, image, displayName, contextInfo, description);
 				
 				// add it to the list
 				completionProposals.add(proposal);
