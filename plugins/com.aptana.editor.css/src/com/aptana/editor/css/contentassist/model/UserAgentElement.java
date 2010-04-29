@@ -2,11 +2,10 @@ package com.aptana.editor.css.contentassist.model;
 
 public class UserAgentElement
 {
+	private String _description;
+	private String _os;
 	private String _platform;
 	private String _version;
-	private String _os;
-	private String _osVersion;
-	private String _description;
 
 	/**
 	 * UserAgentElement
@@ -31,16 +30,6 @@ public class UserAgentElement
 	public String getOS()
 	{
 		return this._os;
-	}
-
-	/**
-	 * getOSVersion
-	 * 
-	 * @return
-	 */
-	public String getOSVersion()
-	{
-		return this._osVersion;
 	}
 
 	/**
@@ -73,21 +62,31 @@ public class UserAgentElement
 		this._description = description;
 	}
 
+	/**
+	 * setOS
+	 * 
+	 * @param os
+	 */
 	public void setOS(String os)
 	{
 		this._os = os;
 	}
 
-	public void setOSVersion(String version)
-	{
-		this._osVersion = version;
-	}
-
+	/**
+	 * setPlatform
+	 * 
+	 * @param platform
+	 */
 	public void setPlatform(String platform)
 	{
 		this._platform = platform;
 	}
 
+	/**
+	 * setVersion
+	 * 
+	 * @param version
+	 */
 	public void setVersion(String version)
 	{
 		this._version = version;

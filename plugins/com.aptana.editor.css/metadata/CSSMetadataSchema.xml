@@ -10,10 +10,9 @@
 	</element>
 
 	<element name="browser" onEnter="enterBrowser" onExit="exitBrowser">
-		<attribute name="platform" />	
-		<attribute name="version" usage="optional" />	
-		<attribute name="os" usage="optional" />	
-		<attribute name="osVersion" usage="optional" />	
+		<attribute name="platform" />
+		<attribute name="version" usage="optional" />
+		<attribute name="os" usage="optional" />
         <child-element name="description" />
     </element>
 	
@@ -29,13 +28,13 @@
 	</element>
 
 	<element name="element" onEnter="enterElement" onExit="exitElement">
-		<attribute name="name" />	
-		<attribute name="display-name" usage="optional" />	
+		<attribute name="name" />
+		<attribute name="display-name" usage="optional" />
+		<child-element name="browsers" />
         <child-element name="description" />
         <child-element name="example" />
-        <child-element name="remarks" />
-		<child-element name="browsers" />
 		<child-element name="property-references" />
+        <child-element name="remarks" />
 	</element>
 	
 	<element name="example" onEnter="startTextBuffer" onExit="exitExample" hasText="yes" />
@@ -43,16 +42,16 @@
 	<element name="hint" onEnter="startTextBuffer" onExit="exitHint" hasText="yes" />
 
 	<element name="property" onEnter="enterProperty" onExit="exitProperty">
-		<attribute name="name" />	
-		<attribute name="type" usage="optional" />	
-		<attribute name="allow-multiple-values" usage="optional" />	
-		<child-element name="availability" />			
+		<attribute name="name" />
+		<attribute name="allow-multiple-values" usage="optional" />
+		<attribute name="type" usage="optional" />
+		<child-element name="availability" />
+		<child-element name="browsers" />
 		<child-element name="description" />
         <child-element name="example" />
-		<child-element name="remarks" />
-		<child-element name="browsers" />
-		<child-element name="values" />
         <child-element name="hint" />
+		<child-element name="remarks" />
+		<child-element name="values" />
 	</element>
     
 	<element name="properties">
@@ -64,14 +63,14 @@
 	</element>
 
 	<element name="property-reference" onEnter="enterPropertyReference">
-		<attribute name="name" />	
+		<attribute name="name" />
 	</element>
 
 	<element name="remarks" onEnter="startTextBuffer" onExit="exitRemarks" hasText="yes"/>
 	
 	<element name="specification" onEnter="enterSpecification">
 		<attribute name="name" />
-		<attribute name="version" usage="optional" />	
+		<attribute name="version" usage="optional" />
 	</element>
 	
 	<element name="values">
@@ -79,8 +78,8 @@
 	</element>
 
 	<element name="value" onEnter="enterValue" onExit="exitValue">
-		<attribute name="name" />	
-		<attribute name="description" usage="optional" />	
+		<attribute name="name" />
+		<attribute name="description" usage="optional" />
 		<child-element name="browsers" />
 	</element>
 </schema>

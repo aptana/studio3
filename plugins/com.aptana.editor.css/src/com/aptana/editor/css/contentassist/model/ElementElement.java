@@ -5,13 +5,13 @@ import java.util.List;
 
 public class ElementElement
 {
-	private String _name;
 	private String _displayName;
+	private String _name;
+	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _description;
 	private String _example;
-	private String _remark;
 	private List<String> _properties = new LinkedList<String>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private String _remark;
 
 	/**
 	 * ElementElement

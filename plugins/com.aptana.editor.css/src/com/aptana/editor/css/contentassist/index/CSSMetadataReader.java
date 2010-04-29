@@ -84,7 +84,6 @@ public class CSSMetadataReader extends MetadataReader
 		userAgent.setPlatform(attributes.getValue("platform"));
 		userAgent.setVersion(attributes.getValue("version"));
 		userAgent.setOS(attributes.getValue("os"));
-		userAgent.setOSVersion(attributes.getValue("osVersion"));
 
 		this._currentUserAgent = userAgent;
 	}

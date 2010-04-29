@@ -6,16 +6,16 @@ import java.util.List;
 
 public class PropertyElement
 {
+	private boolean _allowMultipleValues;
 	private String _name;
 	private String _type;
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _description;
 	private String _example;
-	private String _remark;
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
-	private List<ValueElement> _values = new LinkedList<ValueElement>();
 	private String _hint;
-	private boolean _allowMultipleValues;
+	private String _remark;
+	private List<ValueElement> _values = new LinkedList<ValueElement>();
 
 	/**
 	 * PropertyElement
