@@ -1,29 +1,15 @@
 package com.aptana.editor.html.contentassist.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class ValueElement
 {
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 
 	/**
 	 * ValueElement
 	 */
 	public ValueElement()
 	{
-	}
-
-	/**
-	 * addUserAgent
-	 * 
-	 * @param userAgent
-	 */
-	public void addUserAgent(UserAgentElement userAgent)
-	{
-		this._userAgents.add(userAgent);
 	}
 
 	/**
@@ -44,16 +30,6 @@ public class ValueElement
 	public String getName()
 	{
 		return this._name;
-	}
-
-	/**
-	 * getUserAgents
-	 * 
-	 * @return
-	 */
-	public UserAgentElement[] getUserAgents()
-	{
-		return this._userAgents.toArray(new UserAgentElement[this._userAgents.size()]);
 	}
 
 	/**

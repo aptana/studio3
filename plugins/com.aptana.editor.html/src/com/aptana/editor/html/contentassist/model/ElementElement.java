@@ -5,17 +5,18 @@ import java.util.List;
 
 public class ElementElement
 {
+	private String _displayName;
 	private String _name;
 	private String _relatedClass;
-	private String _displayName;
+	private List<String> _attributes = new LinkedList<String>(); // TODO:
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _deprecated;
 	private String _description;
+	private List<String> _events = new LinkedList<String>(); // TODO
 	private String _example;
-	private String _remark;
 	private List<String> _references = new LinkedList<String>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
-	private List<String> _attributes = new LinkedList<String>(); // TODO:
+	private String _remark;
 
 	/**
 	 * ElementElement
@@ -33,6 +34,17 @@ public class ElementElement
 	public void addAttribute(String attribute)
 	{
 		this._attributes.add(attribute);
+	}
+	
+	/**
+	 * addEvent
+	 * 
+	 * @param event
+	 *            the event to add
+	 */
+	public void addEvent(String event)
+	{
+		this._events.add(event);
 	}
 
 	/**
@@ -104,6 +116,16 @@ public class ElementElement
 		return this._displayName;
 	}
 
+	/**
+	 * getEvents
+	 * 
+	 * @return the events
+	 */
+	public List<String> getEvents()
+	{
+		return this._events;
+	}
+	
 	/**
 	 * getExample
 	 * 

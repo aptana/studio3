@@ -86,8 +86,6 @@ public class HTMLMetadataReader extends MetadataReader
 
 		userAgent.setPlatform(attributes.getValue("platform"));
 		userAgent.setVersion(attributes.getValue("version"));
-		userAgent.setOS(attributes.getValue("os"));
-		userAgent.setOSVersion(attributes.getValue("osVersion"));
 
 		this._currentUserAgent = userAgent;
 	}
@@ -125,17 +123,9 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		String text = this.getText();
 		
-		if (this._currentAttribute != null)
-		{
-			this._currentAttribute.setExample(this.decodeHtml(text));
-		}
-		else if (this._currentElement != null)
+		if (this._currentElement != null)
 		{
 			this._currentElement.setExample(this.decodeHtml(text));
-		}
-		else if (this._currentEvent != null)
-		{
-			this._currentEvent.setExample(this.decodeHtml(text));
 		}
 	}
 	
@@ -155,11 +145,22 @@ public class HTMLMetadataReader extends MetadataReader
 		// grab and set property values
 		event.setName(attributes.getValue("name"));
 		event.setType(attributes.getValue("type"));
-		event.setRelatedClass(attributes.getValue("related-class"));
-		event.setDisplayName(attributes.getValue("display-name"));
 
 		// set current item
 		this._currentEvent = event;
+	}
+	
+	/**
+	 * start processing an attribute-reference element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterEventReference(String ns, String name, String qname, Attributes attributes)
+	{
+		this._currentElement.addEvent(attributes.getValue("name"));
 	}
 
 	/**
@@ -215,10 +216,6 @@ public class HTMLMetadataReader extends MetadataReader
 		else if (this._currentElement != null)	
 		{
 			this._currentElement.addReference(reference);
-		}
-		else if (this._currentEvent != null)	
-		{
-			this._currentEvent.addReference(reference);
 		}
 	}
 
@@ -327,10 +324,6 @@ public class HTMLMetadataReader extends MetadataReader
 		{
 			this._currentElement.setDeprecated(this.decodeHtml(text));
 		}
-		else if (this._currentEvent != null)
-		{
-			this._currentEvent.setDeprecated(this.decodeHtml(text));
-		}
 	}
 
 	/**
@@ -355,10 +348,6 @@ public class HTMLMetadataReader extends MetadataReader
 		else if (this._currentEvent != null)
 		{
 			this._currentEvent.setDescription(this.decodeHtml(text));
-		}
-		else if (this._currentUserAgent != null)
-		{
-			this._currentUserAgent.setDescription(this.decodeHtml(text));
 		}
 	}
 

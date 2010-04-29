@@ -8,14 +8,13 @@ public class AttributeElement
 	private String _name;
 	private String _type;
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _deprecated;
 	private String _description;
 	private String _hint;
-	private String _example;
-	private String _remark;
 	private List<String> _references = new LinkedList<String>();
+	private String _remark;
 	private List<ValueElement> _values = new LinkedList<ValueElement>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 
 	/**
 	 * AttributeElement
@@ -86,16 +85,6 @@ public class AttributeElement
 	public String getDescription()
 	{
 		return this._description;
-	}
-
-	/**
-	 * getExample
-	 * 
-	 * @return the example
-	 */
-	public String getExample()
-	{
-		return this._example;
 	}
 
 	/**
@@ -196,17 +185,6 @@ public class AttributeElement
 	public void setDescription(String description)
 	{
 		this._description = description;
-	}
-
-	/**
-	 * setExample
-	 * 
-	 * @param example
-	 *            the example to set
-	 */
-	public void setExample(String example)
-	{
-		this._example = example;
 	}
 
 	/**

@@ -7,30 +7,16 @@ public class EventElement
 {
 	private String _name;
 	private String _type;
-	private String _relatedClass;
-	private String _displayName;
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private String _deprecated;
-	private String _description;
-	private String _example;
-	private String _remark;
-	private List<String> _references = new LinkedList<String>();
 	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private String _description;
+	private String _remark;
 
 	/**
 	 * ElementElement
 	 */
 	public EventElement()
 	{
-	}
-
-	/**
-	 * @param reference
-	 *            the reference to add
-	 */
-	public void addReference(String reference)
-	{
-		this._references.add(reference);
 	}
 
 	/**
@@ -54,16 +40,6 @@ public class EventElement
 	}
 
 	/**
-	 * getDeprecated
-	 * 
-	 * @return the deprecated
-	 */
-	public String getDeprecated()
-	{
-		return this._deprecated;
-	}
-
-	/**
 	 * getDescription
 	 * 
 	 * @return the description
@@ -74,26 +50,6 @@ public class EventElement
 	}
 
 	/**
-	 * getDisplayName
-	 * 
-	 * @return the displayName
-	 */
-	public String getDisplayName()
-	{
-		return this._displayName;
-	}
-
-	/**
-	 * getExample
-	 * 
-	 * @return the example
-	 */
-	public String getExample()
-	{
-		return this._example;
-	}
-
-	/**
 	 * getName
 	 * 
 	 * @return the name
@@ -101,26 +57,6 @@ public class EventElement
 	public String getName()
 	{
 		return this._name;
-	}
-
-	/**
-	 * getReferences
-	 * 
-	 * @return the references
-	 */
-	public List<String> getReferences()
-	{
-		return this._references;
-	}
-
-	/**
-	 * getRelatedClass
-	 * 
-	 * @return the relatedClass
-	 */
-	public String getRelatedClass()
-	{
-		return this._relatedClass;
 	}
 
 	/**
@@ -162,17 +98,6 @@ public class EventElement
 	}
 
 	/**
-	 * setDeprecated
-	 * 
-	 * @param deprecated
-	 *            the deprecated to set
-	 */
-	public void setDeprecated(String deprecated)
-	{
-		this._deprecated = deprecated;
-	}
-
-	/**
 	 * setDescription
 	 * 
 	 * @param description
@@ -184,28 +109,6 @@ public class EventElement
 	}
 
 	/**
-	 * setDisplayName
-	 * 
-	 * @param displayName
-	 *            the displayName to set
-	 */
-	public void setDisplayName(String displayName)
-	{
-		this._displayName = displayName;
-	}
-
-	/**
-	 * setExample
-	 * 
-	 * @param example
-	 *            the example to set
-	 */
-	public void setExample(String example)
-	{
-		this._example = example;
-	}
-
-	/**
 	 * setName
 	 * 
 	 * @param name
@@ -214,17 +117,6 @@ public class EventElement
 	public void setName(String name)
 	{
 		this._name = name;
-	}
-
-	/**
-	 * setRelatedClass
-	 * 
-	 * @param relatedClass
-	 *            the relatedClass to set
-	 */
-	public void setRelatedClass(String relatedClass)
-	{
-		this._relatedClass = relatedClass;
 	}
 
 	/**

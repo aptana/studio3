@@ -8,22 +8,22 @@
 	<element name="attribute" onEnter="enterAttribute" onExit="exitAttribute">
 		<attribute name="name" />	
 		<attribute name="type" usage="optional" />	
-		<child-element name="availability" />			
+		<child-element name="availability" />
+		<child-element name="browsers" />
         <child-element name="deprecated" />
 		<child-element name="description" />
         <child-element name="hint" />
-        <child-element name="example" />
-		<child-element name="remarks" />
 		<child-element name="references" />
+		<child-element name="remarks" />
 		<child-element name="values" />
-		<child-element name="browsers" />
+        <child-element name="example" />
 	</element>
 	
-	<element name="attribute-references">
-		<child-element name="attribute-reference"/>
+	<element name="attribute-refs">
+		<child-element name="attribute-ref"/>
 	</element>
 	
-	<element name="attribute-reference" onEnter="enterAttributeReference">
+	<element name="attribute-ref" onEnter="enterAttributeReference">
 		<attribute name="name" />
 	</element>
 	
@@ -38,14 +38,11 @@
 	<element name="browser" onEnter="enterBrowser" onExit="exitBrowser">
 		<attribute name="platform" />	
 		<attribute name="version" usage="optional" />	
-		<attribute name="os" usage="optional" />	
-		<attribute name="osVersion" usage="optional" />	
-        <child-element name="description" />
     </element>
 	
 	<element name="html" type="root">
 		<child-element name="elements" />
-		<child-element name="fields" />
+		<child-element name="attributes" />
 		<child-element name="events" />
 	</element>
 	
@@ -54,19 +51,18 @@
 	</element>
 
 	<element name="element" onEnter="enterElement" onExit="exitElement">
+		<attribute name="display-name" usage="optional" />	
 		<attribute name="name" />	
 		<attribute name="related-class" usage="optional" />	
-		<attribute name="display-name" usage="optional" />	
+		<child-element name="attribute-refs" />
 		<child-element name="availability" />			
+		<child-element name="browsers" />
         <child-element name="deprecated" />
         <child-element name="description" />
+		<child-element name="event-refs" />
         <child-element name="example" />
-        <child-element name="remarks" />
-		<child-element name="fields" />
-		<child-element name="events" />
-		<child-element name="browsers" />
 		<child-element name="references" />
-		<child-element name="attribute-references" />
+        <child-element name="remarks" />
 	</element>
 
 	<element name="events">
@@ -76,15 +72,18 @@
 	<element name="event" onEnter="enterEvent" onExit="exitEvent">
 		<attribute name="name" />	
 		<attribute name="type" usage="optional" />	
-		<attribute name="related-class" usage="optional" />	
-		<attribute name="display-name" usage="optional" />	
 		<child-element name="availability" />		
-        <child-element name="deprecated" />
-        <child-element name="description" />
-        <child-element name="example" />
-        <child-element name="remarks" />
 		<child-element name="browsers" />
-		<child-element name="references" />
+        <child-element name="description" />
+        <child-element name="remarks" />
+	</element>
+	
+	<element name="event-refs">
+		<child-element name="event-ref"/>
+	</element>
+	
+	<element name="event-ref" onEnter="enterEventReference">
+		<attribute name="name" />
 	</element>
 
 	<element name="example" onEnter="startTextBuffer" onExit="exitExample" hasText="yes" />
@@ -96,7 +95,6 @@
 	<element name="value" onEnter="enterValue" onExit="exitValue">
 		<attribute name="name" />	
 		<attribute name="description" usage="optional" />	
-		<child-element name="browsers" />
 	</element>
 
 	<element name="references">
