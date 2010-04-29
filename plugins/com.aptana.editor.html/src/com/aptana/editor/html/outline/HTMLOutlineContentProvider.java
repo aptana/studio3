@@ -115,7 +115,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			return false;
 
 		String rel = item.getAttributeValue("rel"); //$NON-NLS-1$
-		if (!rel.equals("stylesheet")) //$NON-NLS-1$
+		if (rel == null || !rel.equals("stylesheet")) //$NON-NLS-1$
 			return false;
 
 		return true;
