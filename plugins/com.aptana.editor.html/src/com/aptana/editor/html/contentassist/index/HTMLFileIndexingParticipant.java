@@ -1,4 +1,4 @@
-package com.aptana.editor.html.index;
+package com.aptana.editor.html.contentassist.index;
 
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -94,7 +94,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					IFile jsFile = file.getParent().getFile(new Path(jsSource));
 					if (jsFile.exists())
 					{
-						addIndex(index, file, IHTMLIndexConstants.RESOURCE_JS, jsFile.getProjectRelativePath()
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, jsFile.getProjectRelativePath()
 								.toPortableString());
 					}
 				}
@@ -123,7 +123,7 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 					IFile cssFile = file.getParent().getFile(new Path(cssLink));
 					if (cssFile.exists())
 					{
-						addIndex(index, file, IHTMLIndexConstants.RESOURCE_CSS, cssFile.getProjectRelativePath()
+						addIndex(index, file, HTMLIndexConstants.RESOURCE_CSS, cssFile.getProjectRelativePath()
 								.toPortableString());
 					}
 				}

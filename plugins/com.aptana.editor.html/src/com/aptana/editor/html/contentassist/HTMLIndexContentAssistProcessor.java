@@ -1,4 +1,4 @@
-package com.aptana.editor.html;
+package com.aptana.editor.html.contentassist;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.IndexContentAssistProcessor;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
-import com.aptana.editor.html.index.IHTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.index.core.Index;
 
@@ -32,8 +32,8 @@ public class HTMLIndexContentAssistProcessor extends IndexContentAssistProcessor
 	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
 			List<ICompletionProposal> completionProposals)
 	{
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, IHTMLIndexConstants.RESOURCE_CSS);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, IHTMLIndexConstants.RESOURCE_JS);
+		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, HTMLIndexConstants.RESOURCE_CSS);
+		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, HTMLIndexConstants.RESOURCE_JS);
 		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.CLASS);
 		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.IDENTIFIER);
 		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.COLOR);
