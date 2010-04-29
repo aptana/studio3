@@ -8,12 +8,12 @@ public class ElementElement
 	private String _displayName;
 	private String _name;
 	private String _relatedClass;
-	private List<String> _attributes = new LinkedList<String>(); // TODO:
+	private List<String> _attributes = new LinkedList<String>();
 	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
 	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
 	private String _deprecated;
 	private String _description;
-	private List<String> _events = new LinkedList<String>(); // TODO
+	private List<String> _events = new LinkedList<String>();
 	private String _example;
 	private List<String> _references = new LinkedList<String>();
 	private String _remark;
