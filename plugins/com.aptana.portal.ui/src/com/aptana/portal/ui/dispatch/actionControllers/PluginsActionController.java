@@ -28,11 +28,12 @@ public class PluginsActionController extends AbstractActionController
 	 * When the dialog is closed, in case we have valid list of plugins to work with, the method will call
 	 * {@link #computeInstalledPlugins(Object)} and return its result.
 	 * 
-	 * @param pluginsToCheck
-	 *            An object that contains a list of plugins to check at the end of the install process.
+	 * @param attributes
+	 *            A multi-dimensional array of size 2 which contains an optional update-site URL and an optional plugins
+	 *            to check (just as passed to {@link #computeStatus(IProgressMonitor, Object)})
 	 */
 	@ControllerAction
-	public Object openPluginsDialog(final Object pluginsToCheck)
+	public Object openPluginsDialog(final Object attributes)
 	{
 		// Get the configuration processor (the method invocation in the AbstractActionController already checked that
 		// it's valid)
@@ -44,8 +45,30 @@ public class PluginsActionController extends AbstractActionController
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				processor.addConfigurationProcessorListener(PluginsActionController.this);
-				processor.configure(monitor, pluginsToCheck);
+				final ConfigurationStatus statusResult = processor.configure(monitor, attributes);
 				processor.removeConfigurationProcessorListener(PluginsActionController.this);
+
+				// The following is specifically for the Plugin action of opening the install dialog.
+				// In case that action trigger an error status event to the browser, we don't want to cache it.
+				// Caching it will cause the browser to display the same error on every refresh, so we need to set the
+				// status to back to Ok.
+				// This nested job will fire another notification that will prevent any recurring error notifications.
+				Job sendOkJob = new UIJob("Send OK Job") //$NON-NLS-1$
+				{
+					@SuppressWarnings("unchecked")
+					@Override
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						statusResult.setStatus(ConfigurationStatus.OK);
+						String jsonStatus = JSON.toString(statusResult);
+						BrowserNotifier.getInstance().notifyBrowserInUIThread(Collections.EMPTY_LIST,
+								IBrowserNotificationConstants.EVENT_ID_PLUGINS,
+								IBrowserNotificationConstants.EVENT_TYPE_CHANGED, jsonStatus);
+						return Status.OK_STATUS;
+					}
+				};
+				sendOkJob.setSystem(true);
+				sendOkJob.schedule();
 				return Status.OK_STATUS;
 			}
 		};

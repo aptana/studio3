@@ -206,6 +206,14 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		return configurationStatus;
 	}
 
+	/**
+	 * Open the plugin installation dialog for the given feature on the given update site.
+	 * 
+	 * @param updateSite
+	 * @param featureID
+	 * @param monitor
+	 * @throws InvocationTargetException
+	 */
 	public void openInstallDialog(final String updateSite, final String featureID, final IProgressMonitor monitor)
 			throws InvocationTargetException
 	{
