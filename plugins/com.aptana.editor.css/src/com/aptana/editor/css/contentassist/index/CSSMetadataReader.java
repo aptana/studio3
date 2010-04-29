@@ -34,84 +34,38 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
+import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.SpecificationElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
-import com.aptana.sax.Schema;
-import com.aptana.sax.SchemaBuilder;
-import com.aptana.sax.SchemaInitializationException;
-import com.aptana.sax.ValidatingReader;
 
 /**
  * @author Kevin Lindsey
  */
-public class CSSMetadataReader extends ValidatingReader
+public class CSSMetadataReader extends MetadataReader
 {
 	private static final String METADATA_SCHEMA_XML = "/metadata/CSSMetadataSchema.xml"; //$NON-NLS-1$
 	
-	private boolean _bufferText;
-	private StringBuffer _textBuffer = new StringBuffer();
 	private List<ElementElement> _elements = new LinkedList<ElementElement>();
 	private ElementElement _currentElement;
 	private PropertyElement _currentProperty;
 	private ValueElement _currentValue;
 	private UserAgentElement _currentUserAgent;
 	private List<PropertyElement> _properties = new LinkedList<PropertyElement>();
-	private Schema _metadataSchema;
 
 	/**
 	 * CSSMetadataReader
 	 */
 	public CSSMetadataReader()
 	{
-	}
-
-	/**
-	 * Process character data
-	 * 
-	 * @param buffer
-	 * @param offset
-	 * @param length
-	 */
-	public void characters(char[] buffer, int offset, int length)
-	{
-		if (this._bufferText)
-		{
-			this._textBuffer.append(new String(buffer, offset, length));
-		}
-	}
-
-	/**
-	 * decodes HTML encoded strings
-	 * 
-	 * @param text
-	 *            The text to decode
-	 * @return The decoded text
-	 */
-	public String decodeHtml(String text)
-	{
-		String textTemp = text.replaceAll("&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		textTemp = textTemp.replaceAll("&quot;", "\""); //$NON-NLS-1$//$NON-NLS-2$
-		textTemp = textTemp.replaceAll("&lt;", "<"); //$NON-NLS-1$ //$NON-NLS-2$
-		textTemp = textTemp.replaceAll("&gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		return textTemp;
 	}
 
 	/**
@@ -267,7 +221,7 @@ public class CSSMetadataReader extends ValidatingReader
 	 */
 	public void exitDescription(String ns, String name, String qname)
 	{
-		String text = this._textBuffer.toString();
+		String text = this.getText();
 		
 		if (this._currentProperty != null)
 		{
@@ -284,9 +238,6 @@ public class CSSMetadataReader extends ValidatingReader
 			// add example to the current parameter
 			this._currentUserAgent.setDescription(this.decodeHtml(text));
 		}
-
-		// clear buffer and reset text buffering state
-		this.stopTextBuffer();
 	}
 
 	/**
@@ -312,7 +263,7 @@ public class CSSMetadataReader extends ValidatingReader
 	 */
 	public void exitExample(String ns, String name, String qname)
 	{
-		String text = this._textBuffer.toString();
+		String text = this.getText();
 		
 		if (this._currentProperty != null)
 		{
@@ -322,10 +273,31 @@ public class CSSMetadataReader extends ValidatingReader
 		{
 			this._currentElement.setExample(this.decodeHtml(text));
 		}
-		
-		this.stopTextBuffer();
 	}
 	
+	/**
+	 * Exit a hint element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 */
+	public void exitHint(String ns, String name, String qname)
+	{
+		String text = this.getText();
+		
+		if (this._currentProperty != null)
+		{
+			// add hint to the current property
+			this._currentProperty.setHint(this.decodeHtml(text));
+		}
+		else if (this._currentElement != null)
+		{
+			// add hint to the current element
+			this._currentElement.setDescription(this.decodeHtml(text));
+		}
+	}
+
 	/**
 	 * Exit a property element
 	 * 
@@ -339,7 +311,7 @@ public class CSSMetadataReader extends ValidatingReader
 		
 		this._currentProperty = null;
 	}
-
+	
 	/**
 	 * exit a remarks element
 	 * 
@@ -349,7 +321,7 @@ public class CSSMetadataReader extends ValidatingReader
 	 */
 	public void exitRemarks(String ns, String name, String qname)
 	{
-		String text = this._textBuffer.toString();
+		String text = this.getText();
 		
 		if (this._currentProperty != null)
 		{
@@ -359,34 +331,6 @@ public class CSSMetadataReader extends ValidatingReader
 		{
 			this._currentElement.setRemark(text);
 		}
-		
-		this.stopTextBuffer();
-	}
-	
-	/**
-	 * Exit a hint element
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 */
-	public void exitHint(String ns, String name, String qname)
-	{
-		String text = this._textBuffer.toString();
-		
-		if (this._currentProperty != null)
-		{
-			// add hint to the current property
-			this._currentProperty.setHint(this.decodeHtml(text));
-		}
-		else if (this._currentElement != null)
-		{
-			// add hint to the current element
-			this._currentElement.setDescription(this.decodeHtml(text));
-		}
-
-		// clear buffer and reset text buffering state
-		this.stopTextBuffer();
 	}
 
 	/**
@@ -425,132 +369,13 @@ public class CSSMetadataReader extends ValidatingReader
 		return this._properties;
 	}
 	
-	/**
-	 * loadMetadataSchema
-	 * 
-	 * @throws Exception
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataReader#getSchemaStream()
 	 */
-	private void loadMetadataSchema() throws Exception
+	@Override
+	protected InputStream getSchemaStream()
 	{
-		if (this._metadataSchema == null)
-		{
-			// get schema for our documentation XML format
-			InputStream schemaStream = CSSMetadataReader.class.getResourceAsStream(METADATA_SCHEMA_XML);
-
-			try
-			{
-				// create the schema
-				this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
-			}
-			catch (SchemaInitializationException e)
-			{
-				String msg = Messages.MetadataReader_ErrorLoadingDocumentationXML;
-				Exception ie = new Exception(msg, e);
-
-				throw ie;
-			}
-			finally
-			{
-				// close the input stream
-				try
-				{
-					schemaStream.close();
-				}
-				catch (IOException e)
-				{
-					String msg = Messages.MetadataReader_IOErrorProcessingDocumentationXML;
-					Exception ie = new Exception(msg, e);
-
-					throw ie;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Load the CSS metadata from the specified stream
-	 * 
-	 * @param stream
-	 *            The input stream for the source XML
-	 * @throws Exception
-	 */
-	public void loadXML(InputStream stream) throws Exception
-	{
-		this.loadMetadataSchema();
-
-		if (this._metadataSchema != null)
-		{
-			// create a new SAX factory class
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setNamespaceAware(true);
-
-			// clear properties
-			this.stopTextBuffer();
-			SAXParser saxParser = null;
-
-			// parse the XML file
-			try
-			{
-				saxParser = factory.newSAXParser();
-				saxParser.parse(stream, this);
-			}
-			catch (ParserConfigurationException e)
-			{
-				String msg = Messages.MetadataReader_SAXParserConfiguredIncorrectly;
-				Exception de = new Exception(msg, e);
-
-				throw de;
-			}
-			catch (SAXException e)
-			{
-				Exception ex = e.getException();
-				String msg = null;
-
-				if (ex != null)
-				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML, new Object[] { ex
-							.getMessage() });
-				}
-				else
-				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML, new Object[] { e
-							.getMessage() });
-				}
-
-				Exception de = new Exception(msg, e);
-
-				throw de;
-			}
-			catch (IOException e)
-			{
-				String msg = Messages.MetadataObjectsReader_IOErrorOccurredProcessingDocumentationXML;
-				Exception de = new Exception(msg, e);
-
-				throw de;
-			}
-		}
-	}
-
-	/**
-	 * start buffering text
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 * @param attributes
-	 */
-	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
-	{
-		this._bufferText = true;
-	}
-	
-	/**
-	 * stop buffering text
-	 */
-	protected void stopTextBuffer()
-	{
-		// clear buffer and reset text buffering state
-		this._textBuffer.setLength(0);
-		this._bufferText = false;
+		return this.getClass().getResourceAsStream(METADATA_SCHEMA_XML);
 	}
 }
