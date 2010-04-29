@@ -44,14 +44,14 @@ public class ConfigurationStatus implements Convertible
 	 * Represents a configuration error status.
 	 */
 	public static final String ERROR = "error"; //$NON-NLS-1$
-	
+
 	/**
 	 * The STATUS attribute key.
 	 */
 	public static final String STATUS = "status"; //$NON-NLS-1$
 
 	private static final String PREF_PREFIX = "configuration.status."; //$NON-NLS-1$
-	
+
 	private Map<String, String> attributes;
 	private String configurationProcessorId;
 	private AbstractConfigurationProcessor processor;
@@ -256,7 +256,16 @@ public class ConfigurationStatus implements Convertible
 	{
 		for (String key : attributes.keySet())
 		{
-			out.add(key, attributes.get(key));
+			String value = attributes.get(key);
+			try
+			{
+				Object outputObject = JSON.parse(value);
+				out.add(key, outputObject);
+			}
+			catch (Exception e)
+			{
+				out.add(key, value);
+			}
 		}
 	}
 }

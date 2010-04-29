@@ -224,13 +224,25 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	 * @param configurationStatus
 	 * @param msg
 	 *            The error message attribute (can be null)
+	 * @see #clearErrorAttributes()
 	 */
-	protected void applyErrorAttributes(ConfigurationStatus configurationStatus, String msg)
+	protected void applyErrorAttributes(String msg)
 	{
 		if (msg != null)
 		{
 			configurationStatus.setAttribute(ConfigurationStatus.ERROR, msg);
 		}
 		configurationStatus.setStatus(ConfigurationStatus.ERROR);
+	}
+
+	/**
+	 * Clear the error attribute from the current configuration status.<br>
+	 * Note: this does not change the actual status of the configuration-status. Just the Error message attribute.
+	 * 
+	 * @see #applyErrorAttributes(String)
+	 */
+	protected void clearErrorAttributes()
+	{
+		configurationStatus.removeAttribute(ConfigurationStatus.ERROR);
 	}
 }

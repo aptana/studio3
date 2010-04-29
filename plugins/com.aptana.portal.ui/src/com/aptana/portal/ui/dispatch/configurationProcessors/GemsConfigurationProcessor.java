@@ -26,7 +26,7 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 		String shellCommandPath = getShellPath();
 		if (shellCommandPath == null)
 		{
-			applyErrorAttributes(configurationStatus, Messages.GemsConfigurationProcessor_missingShellError);
+			applyErrorAttributes(Messages.GemsConfigurationProcessor_missingShellError);
 		}
 		else
 		{
@@ -42,7 +42,7 @@ public class GemsConfigurationProcessor extends AbstractConfigurationProcessor
 			}
 			else
 			{
-				applyErrorAttributes(configurationStatus, Messages.GemsConfigurationProcessor_errorInvokingGemList);
+				applyErrorAttributes(Messages.GemsConfigurationProcessor_errorInvokingGemList);
 			}
 		}
 		return configurationStatus;

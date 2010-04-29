@@ -1,20 +1,21 @@
-.rails .description {
-  font-size: 13px;
-  height: auto !important;
-  min-height: 125px; }
-.rails .thumbnail {
-  float: left;
-  margin-right: 10px; }
-  .rails .thumbnail a {
-    color: #ea6815; }
-    .rails .thumbnail a img {
-      border: medium none;
-      text-decoration: none; }
-
-p.highlighted {
-  color: #ea6815; }
-
-.itemdesc {
-  border-bottom: 1px dotted #bdc2ca;
-  margin-top: 1em;
-  padding-bottom: 1em; }
+table#plugins {
+  border-collapse: collapse; }
+  table#plugins tbody tr td {
+    height: 18px; }
+    table#plugins tbody tr td span {
+      padding-left: 22px;
+      background-position: 0 50%;
+      background-repeat: no-repeat; }
+      table#plugins tbody tr td span.processing {
+        background-image: url(../images/small_circle.gif); }
+      table#plugins tbody tr td span.ok {
+        background-image: url(../images/tick.png); }
+      table#plugins tbody tr td span.notice {
+        background-image: url(../images/information.png); }
+      table#plugins tbody tr td span.missing {
+        background-image: url(../images/cross.png); }
+      table#plugins tbody tr td span.unknown {
+        background-image: url(../images/help.png); }
+      table#plugins tbody tr td span.action.install, table#plugins tbody tr td span.action.update {
+        padding: 0;
+        margin: 0; }

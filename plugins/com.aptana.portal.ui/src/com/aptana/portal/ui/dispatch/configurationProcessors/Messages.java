@@ -7,6 +7,13 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.portal.ui.dispatch.configurationProcessors.messages"; //$NON-NLS-1$
 	public static String GemsConfigurationProcessor_errorInvokingGemList;
 	public static String GemsConfigurationProcessor_missingShellError;
+	public static String PluginsConfigurationProcessor_artifactRepoNotFound;
+	public static String PluginsConfigurationProcessor_cannotFindInstallationUnits;
+	public static String PluginsConfigurationProcessor_locatingFeatures;
+	public static String PluginsConfigurationProcessor_metadataRepoNotFound;
+	public static String PluginsConfigurationProcessor_missingPluginNames;
+	public static String PluginsConfigurationProcessor_wrongAttributesForConfigure;
+	public static String PluginsConfigurationProcessor_wrongPluginDefinitionRequest;
 	static
 	{
 		// initialize resource bundle

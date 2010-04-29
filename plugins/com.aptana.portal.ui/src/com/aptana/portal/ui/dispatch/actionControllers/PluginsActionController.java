@@ -24,10 +24,15 @@ public class PluginsActionController extends AbstractActionController
 {
 
 	/**
-	 * Opens the Eclipse P2 Plug-ins dialog.
+	 * Opens the Eclipse P2 Plug-ins dialog.<br>
+	 * When the dialog is closed, in case we have valid list of plugins to work with, the method will call
+	 * {@link #computeInstalledPlugins(Object)} and return its result.
+	 * 
+	 * @param pluginsToCheck
+	 *            An object that contains a list of plugins to check at the end of the install process.
 	 */
 	@ControllerAction
-	public Object openPluginsDialog()
+	public Object openPluginsDialog(final Object pluginsToCheck)
 	{
 		// Get the configuration processor (the method invocation in the AbstractActionController already checked that
 		// it's valid)
@@ -39,7 +44,7 @@ public class PluginsActionController extends AbstractActionController
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				processor.addConfigurationProcessorListener(PluginsActionController.this);
-				processor.configure(monitor, null);
+				processor.configure(monitor, pluginsToCheck);
 				processor.removeConfigurationProcessorListener(PluginsActionController.this);
 				return Status.OK_STATUS;
 			}

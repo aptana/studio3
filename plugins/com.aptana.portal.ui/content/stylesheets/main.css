@@ -214,23 +214,49 @@ p.highlighted {
     width: 21%;
     left: 85%; }
 
-.rails .description {
-  font-size: 13px;
-  height: auto !important;
-  min-height: 125px; }
-.rails .thumbnail {
-  float: left;
-  margin-right: 10px; }
-  .rails .thumbnail a {
-    color: #ea6815; }
-    .rails .thumbnail a img {
-      border: medium none;
-      text-decoration: none; }
+#tt {
+  position: absolute;
+  display: block;
+  background: url(../images/tt_left.gif) top left no-repeat; }
 
-p.highlighted {
-  color: #ea6815; }
+#tttop {
+  display: block;
+  height: 5px;
+  margin-left: 5px;
+  background: url(../images/tt_top.gif) top right no-repeat;
+  overflow: hidden; }
 
-.itemdesc {
-  border-bottom: 1px dotted #bdc2ca;
-  margin-top: 1em;
-  padding-bottom: 1em; }
+#ttcont {
+  display: block;
+  padding: 2px 12px 3px 7px;
+  margin-left: 5px;
+  background: #666666;
+  color: white;
+  text-align: left; }
+
+#ttbot {
+  display: block;
+  height: 5px;
+  margin-left: 5px;
+  background: url(../images/tt_bottom.gif) top right no-repeat;
+  overflow: hidden; }
+
+table#plugins {
+  border-collapse: collapse; }
+  table#plugins tbody tr td {
+    height: 18px; }
+    table#plugins tbody tr td span {
+      padding-left: 22px;
+      background-position: 0 50%;
+      background-repeat: no-repeat; }
+      table#plugins tbody tr td span.processing {
+        background-image: url(../images/small_circle.gif); }
+      table#plugins tbody tr td span.ok {
+        background-image: url(../images/tick.png); }
+      table#plugins tbody tr td span.notice {
+        background-image: url(../images/information.png); }
+      table#plugins tbody tr td span.missing {
+        background-image: url(../images/cross.png); }
+      table#plugins tbody tr td span.action.install, table#plugins tbody tr td span.action.update {
+        padding: 0;
+        margin: 0; }

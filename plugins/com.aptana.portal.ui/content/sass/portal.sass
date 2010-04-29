@@ -1,26 +1,24 @@
-.rails
-  .description
-    font-size: 13px
-    height: auto !important
-    min-height: 125px
-
-  .thumbnail
-    float: left
-    margin-right: 10px
-
-    a
-      color: #EA6815
-
-      img
-        border: medium none
-        text-decoration: none
-
-
-p.highlighted
-  color: #EA6815
-
-
-.itemdesc
-  border-bottom: 1px dotted #BDC2CA
-  margin-top: 1em
-  padding-bottom: 1em
+table#plugins
+  :border-collapse collapse
+  tbody
+    tr
+      td
+        :height 18px
+        span
+          :padding-left 22px
+          :background-position 0 50%
+          :background-repeat no-repeat
+          &.processing
+            :background-image url(../images/small_circle.gif)
+          &.ok
+            :background-image url(../images/tick.png)
+          &.notice
+            :background-image url(../images/information.png)
+          &.missing
+            :background-image url(../images/cross.png)
+          &.unknown
+            :background-image url(../images/help.png)
+          &.action
+            &.install, &.update
+              :padding 0
+              :margin 0

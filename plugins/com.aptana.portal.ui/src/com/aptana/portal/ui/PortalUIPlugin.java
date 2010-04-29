@@ -40,6 +40,11 @@ public class PortalUIPlugin extends AbstractUIPlugin
 		super.stop(context);
 	}
 
+	public static BundleContext getContext()
+	{
+		return getDefault().getBundle().getBundleContext();
+	}
+
 	/**
 	 * Returns the shared instance
 	 * 
