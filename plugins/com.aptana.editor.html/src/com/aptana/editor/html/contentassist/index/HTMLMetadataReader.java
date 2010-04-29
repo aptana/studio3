@@ -63,12 +63,46 @@ public class HTMLMetadataReader extends MetadataReader
 	private ValueElement _currentValue;
 	private List<EventElement> _events = new LinkedList<EventElement>();
 	private EventElement _currentEvent;
-	
+
 	/**
 	 * Create a new instance of CoreLoader
 	 */
 	public HTMLMetadataReader()
 	{
+	}
+
+	/**
+	 * start processing a class element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterAttribute(String ns, String name, String qname, Attributes attributes)
+	{
+		// create a new item documentation object
+		AttributeElement attribute = new AttributeElement();
+
+		// grab and set property values
+		attribute.setName(attributes.getValue("name"));
+		attribute.setType(attributes.getValue("type"));
+
+		// set current item
+		this._currentAttribute = attribute;
+	}
+
+	/**
+	 * start processing an attribute-reference element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterAttributeReference(String ns, String name, String qname, Attributes attributes)
+	{
+		this._currentElement.addAttribute(attributes.getValue("name"));
 	}
 
 	/**
@@ -113,23 +147,6 @@ public class HTMLMetadataReader extends MetadataReader
 	}
 
 	/**
-	 * exit an example element
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 */
-	public void exitExample(String ns, String name, String qname)
-	{
-		String text = this.getText();
-		
-		if (this._currentElement != null)
-		{
-			this._currentElement.setExample(this.decodeHtml(text));
-		}
-	}
-	
-	/**
 	 * start processing a event
 	 * 
 	 * @param ns
@@ -149,7 +166,7 @@ public class HTMLMetadataReader extends MetadataReader
 		// set current item
 		this._currentEvent = event;
 	}
-	
+
 	/**
 	 * start processing an attribute-reference element
 	 * 
@@ -164,40 +181,6 @@ public class HTMLMetadataReader extends MetadataReader
 	}
 
 	/**
-	 * start processing a class element
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 * @param attributes
-	 */
-	public void enterAttribute(String ns, String name, String qname, Attributes attributes)
-	{
-		// create a new item documentation object
-		AttributeElement attribute = new AttributeElement();
-
-		// grab and set property values
-		attribute.setName(attributes.getValue("name"));
-		attribute.setType(attributes.getValue("type"));
-
-		// set current item
-		this._currentAttribute = attribute;
-	}
-	
-	/**
-	 * start processing an attribute-reference element
-	 * 
-	 * @param ns
-	 * @param name
-	 * @param qname
-	 * @param attributes
-	 */
-	public void enterAttributeReference(String ns, String name, String qname, Attributes attributes)
-	{
-		this._currentElement.addAttribute(attributes.getValue("name"));
-	}
-	
-	/**
 	 * Enter a reference element
 	 * 
 	 * @param ns
@@ -208,12 +191,12 @@ public class HTMLMetadataReader extends MetadataReader
 	public void enterReference(String ns, String name, String qname, Attributes attributes)
 	{
 		String reference = attributes.getValue("name");
-		
+
 		if (this._currentAttribute != null)
 		{
 			this._currentAttribute.addReference(reference);
 		}
-		else if (this._currentElement != null)	
+		else if (this._currentElement != null)
 		{
 			this._currentElement.addReference(reference);
 		}
@@ -230,10 +213,10 @@ public class HTMLMetadataReader extends MetadataReader
 	public void enterSpecification(String ns, String name, String qname, Attributes attributes)
 	{
 		SpecificationElement specification = new SpecificationElement();
-		
+
 		specification.setName(attributes.getValue("name"));
 		specification.setVersion(attributes.getValue("version"));
-		
+
 		if (this._currentAttribute != null)
 		{
 			this._currentAttribute.addSpecification(specification);
@@ -266,6 +249,19 @@ public class HTMLMetadataReader extends MetadataReader
 		value.setDescription(attributes.getValue("description"));
 
 		this._currentValue = value;
+	}
+
+	/**
+	 * Exit a field element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 */
+	public void exitAttribute(String ns, String name, String qname)
+	{
+		this._attributes.add(this._currentAttribute);
+		this._currentAttribute = null;
 	}
 
 	/**
@@ -315,7 +311,7 @@ public class HTMLMetadataReader extends MetadataReader
 	public void exitDeprecated(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentAttribute != null)
 		{
 			this._currentAttribute.setDeprecated(this.decodeHtml(text));
@@ -336,7 +332,7 @@ public class HTMLMetadataReader extends MetadataReader
 	public void exitDescription(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentAttribute != null)
 		{
 			this._currentAttribute.setDescription(this.decodeHtml(text));
@@ -378,16 +374,20 @@ public class HTMLMetadataReader extends MetadataReader
 	}
 
 	/**
-	 * Exit a field element
+	 * exit an example element
 	 * 
 	 * @param ns
 	 * @param name
 	 * @param qname
 	 */
-	public void exitAttribute(String ns, String name, String qname)
+	public void exitExample(String ns, String name, String qname)
 	{
-		this._attributes.add(this._currentAttribute);
-		this._currentAttribute = null;
+		String text = this.getText();
+
+		if (this._currentElement != null)
+		{
+			this._currentElement.setExample(this.decodeHtml(text));
+		}
 	}
 
 	/**
@@ -400,7 +400,7 @@ public class HTMLMetadataReader extends MetadataReader
 	public void exitHint(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		this._currentAttribute.setHint(text);
 	}
 
@@ -414,7 +414,7 @@ public class HTMLMetadataReader extends MetadataReader
 	public void exitRemarks(String ns, String name, String qname)
 	{
 		String text = this.getText();
-		
+
 		if (this._currentAttribute != null)
 		{
 			this._currentAttribute.setRemark(text);
@@ -428,7 +428,7 @@ public class HTMLMetadataReader extends MetadataReader
 			this._currentEvent.setRemark(text);
 		}
 	}
-	
+
 	/**
 	 * Exit a field element
 	 * 
@@ -440,6 +440,36 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		this._currentAttribute.addValue(this._currentValue);
 		this._currentValue = null;
+	}
+
+	/**
+	 * getAttributes
+	 * 
+	 * @return
+	 */
+	public List<AttributeElement> getAttributes()
+	{
+		return this._attributes;
+	}
+
+	/**
+	 * getElements
+	 * 
+	 * @return
+	 */
+	public List<ElementElement> getElements()
+	{
+		return this._elements;
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @return
+	 */
+	public List<EventElement> getEvents()
+	{
+		return this._events;
 	}
 
 	/*
