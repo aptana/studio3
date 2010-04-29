@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -190,7 +192,18 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 			}
 		}
 		
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
+		ICompletionProposal[] result = proposals.toArray(new ICompletionProposal[proposals.size()]);
+		
+		Arrays.sort(result, new Comparator<ICompletionProposal>()
+		{
+			@Override
+			public int compare(ICompletionProposal o1, ICompletionProposal o2)
+			{
+				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+			}
+		});
+		
+		return result;
 	}
 
 	/*
