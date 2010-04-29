@@ -67,7 +67,7 @@
 		<attribute name="name" />	
 	</element>
 
-	<element name="remarks" onEnter="startTextBuffer" onExit="exitRemarks" hasText="yes"/> 
+	<element name="remarks" onEnter="startTextBuffer" onExit="exitRemarks" hasText="yes"/>
 	
 	<element name="specification" onEnter="enterSpecification">
 		<attribute name="name" />
