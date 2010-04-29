@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+
+	<element name="attributes">
+		<child-element name="attribute" />
+	</element>
+
+	<element name="attribute" onEnter="enterAttribute" onExit="exitAttribute">
+		<attribute name="name" />	
+		<attribute name="type" usage="optional" />	
+		<child-element name="availability" />			
+        <child-element name="deprecated" />
+		<child-element name="description" />
+        <child-element name="hint" />
+        <child-element name="example" />
+		<child-element name="remarks" />
+		<child-element name="references" />
+		<child-element name="values" />
+		<child-element name="browsers" />
+	</element>
+	
+	<element name="attribute-references">
+		<child-element name="attribute-reference"/>
+	</element>
+	
+	<element name="attribute-reference" onEnter="enterAttributeReference">
+		<attribute name="name" />
+	</element>
+	
+	<element name="availability" onExit="exitAvailability">
+		<child-element name="specification" />
+	</element>
+	
+	<element name="browsers">
+		<child-element name="browser" />
+	</element>
+
+	<element name="browser" onEnter="enterBrowser" onExit="exitBrowser">
+		<attribute name="platform" />	
+		<attribute name="version" usage="optional" />	
+		<attribute name="os" usage="optional" />	
+		<attribute name="osVersion" usage="optional" />	
+        <child-element name="description" />
+    </element>
+	
+	<element name="html" type="root">
+		<child-element name="elements" />
+		<child-element name="fields" />
+		<child-element name="events" />
+	</element>
+	
+	<element name="elements">
+		<child-element name="element" />
+	</element>
+
+	<element name="element" onEnter="enterElement" onExit="exitElement">
+		<attribute name="name" />	
+		<attribute name="related-class" usage="optional" />	
+		<attribute name="display-name" usage="optional" />	
+		<child-element name="availability" />			
+        <child-element name="deprecated" />
+        <child-element name="description" />
+        <child-element name="example" />
+        <child-element name="remarks" />
+		<child-element name="fields" />
+		<child-element name="events" />
+		<child-element name="browsers" />
+		<child-element name="references" />
+		<child-element name="attribute-references" />
+	</element>
+
+	<element name="events">
+		<child-element name="event" />
+	</element>
+
+	<element name="event" onEnter="enterEvent" onExit="exitEvent">
+		<attribute name="name" />	
+		<attribute name="type" usage="optional" />	
+		<attribute name="related-class" usage="optional" />	
+		<attribute name="display-name" usage="optional" />	
+		<child-element name="availability" />		
+        <child-element name="deprecated" />
+        <child-element name="description" />
+        <child-element name="example" />
+        <child-element name="remarks" />
+		<child-element name="browsers" />
+		<child-element name="references" />
+	</element>
+
+	<element name="example" onEnter="startTextBuffer" onExit="exitExample" hasText="yes" />
+	
+	<element name="values">
+		<child-element name="value" />
+	</element>
+
+	<element name="value" onEnter="enterValue" onExit="exitValue">
+		<attribute name="name" />	
+		<attribute name="description" usage="optional" />	
+		<child-element name="browsers" />
+	</element>
+
+	<element name="references">
+		<child-element name="reference" />
+	</element>
+
+	<element name="reference" onEnter="enterReference">
+		<attribute name="name" />	
+	</element>
+
+	<element name="remarks" onEnter="startTextBuffer" onExit="exitRemarks" hasText="yes"/>
+	
+	<element name="specification" onEnter="enterSpecification">
+		<attribute name="name" />
+		<attribute name="version" usage="optional" />	
+	</element>
+	
+	<element name="description" onEnter="startTextBuffer" onExit="exitDescription" />
+
+	<element name="deprecated" onEnter="startTextBuffer" onExit="exitDeprecated" />
+		
+	<element name="hint" onEnter="startTextBuffer" onExit="exitHint" />
+</schema>
