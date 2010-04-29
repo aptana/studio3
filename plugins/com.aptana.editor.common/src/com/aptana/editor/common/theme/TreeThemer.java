@@ -149,11 +149,11 @@ public class TreeThemer
 				DelegatingStyledCellLabelProvider delegating = (DelegatingStyledCellLabelProvider) cellProvider;
 				IStyledLabelProvider styled = delegating.getStyledStringProvider();
 				if (styled.getClass().getName().equals(
-						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider"))
+						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider")) //$NON-NLS-1$
 				{
 					try
 					{
-						Field f = styled.getClass().getDeclaredField("fWorkingSetImages");
+						Field f = styled.getClass().getDeclaredField("fWorkingSetImages"); //$NON-NLS-1$
 						f.setAccessible(true);
 						f.set(styled, null);
 					}
