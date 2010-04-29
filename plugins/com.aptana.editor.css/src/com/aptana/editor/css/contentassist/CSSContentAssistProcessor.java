@@ -47,70 +47,69 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.css.contentassist.model.ElementElement;
-import com.aptana.parsing.lexer.TokenLexeme;
 
 public class CSSContentAssistProcessor implements IContentAssistProcessor
 {
-	/**
-	 * Location
-	 */
-	private static enum Location
-	{
-		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
-	};
+//	/**
+//	 * Location
+//	 */
+//	private static enum Location
+//	{
+//		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
+//	};
 
 	private IContextInformationValidator _validator;
-	private final AbstractThemeableEditor _editor;
+	//private final AbstractThemeableEditor _editor;
 	private CSSContentAssistHelper _helper;
 
-	/**
-	 * getTokenLexemeAtOffset
-	 * 
-	 * @param tokenLexems
-	 * @param offset
-	 * @return
-	 */
-	private static TokenLexeme getTokenLexemeAtOffset(List<TokenLexeme> tokenLexems, int offset)
-	{
-		int size = tokenLexems.size();
-		
-		if (size > 0)
-		{
-			for (TokenLexeme tokenLexeme : tokenLexems)
-			{
-				if (offset >= tokenLexeme.getStartingOffset() && offset <= tokenLexeme.getEndingOffset())
-				{
-					return tokenLexeme;
-				}
-			}
-		}
-		
-		return null;
-	}
-
-	/**
-	 * getLocation
-	 * 
-	 * @param tokenLexems
-	 * @param offset
-	 * @return
-	 */
-	private static Location getLocation(List<TokenLexeme> tokenLexems, int offset)
-	{
-		if (offset == 0)
-		{
-			return Location.OUTSIDE_RULE;
-		}
-		
-		TokenLexeme tokenLexemeAtOffset = getTokenLexemeAtOffset(tokenLexems, offset);
-		
-		if (tokenLexemeAtOffset != null)
-		{
-			// Compute the location
-		}
-		
-		return Location.ERROR;
-	}
+//	/**
+//	 * getTokenLexemeAtOffset
+//	 * 
+//	 * @param tokenLexems
+//	 * @param offset
+//	 * @return
+//	 */
+//	private static TokenLexeme getTokenLexemeAtOffset(List<TokenLexeme> tokenLexems, int offset)
+//	{
+//		int size = tokenLexems.size();
+//		
+//		if (size > 0)
+//		{
+//			for (TokenLexeme tokenLexeme : tokenLexems)
+//			{
+//				if (offset >= tokenLexeme.getStartingOffset() && offset <= tokenLexeme.getEndingOffset())
+//				{
+//					return tokenLexeme;
+//				}
+//			}
+//		}
+//		
+//		return null;
+//	}
+//
+//	/**
+//	 * getLocation
+//	 * 
+//	 * @param tokenLexems
+//	 * @param offset
+//	 * @return
+//	 */
+//	private static Location getLocation(List<TokenLexeme> tokenLexems, int offset)
+//	{
+//		if (offset == 0)
+//		{
+//			return Location.OUTSIDE_RULE;
+//		}
+//		
+//		TokenLexeme tokenLexemeAtOffset = getTokenLexemeAtOffset(tokenLexems, offset);
+//		
+//		if (tokenLexemeAtOffset != null)
+//		{
+//			// Compute the location
+//		}
+//		
+//		return Location.ERROR;
+//	}
 
 	/**
 	 * CSSContentAssistProcessor
@@ -119,7 +118,7 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 	 */
 	public CSSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
-		this._editor = abstractThemeableEditor;
+//		this._editor = abstractThemeableEditor;
 		this._helper = new CSSContentAssistHelper();
 	}
 
