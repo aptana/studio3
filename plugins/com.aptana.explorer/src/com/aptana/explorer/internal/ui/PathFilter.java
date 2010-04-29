@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.internal.misc.StringMatcher;
 
-import com.aptana.editor.html.index.IHTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.index.core.Index;
@@ -106,8 +106,8 @@ class PathFilter extends ViewerFilter
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getFullPath().toPortableString());
 			try
 			{
-				queryResults = index.query(new String[] { IHTMLIndexConstants.RESOURCE_CSS,
-						IHTMLIndexConstants.RESOURCE_JS, IRubyIndexConstants.REQUIRE }, null, 0);
+				queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
+						HTMLIndexConstants.RESOURCE_JS, IRubyIndexConstants.REQUIRE }, null, 0);
 			}
 			catch (IOException e)
 			{
