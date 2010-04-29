@@ -33,7 +33,7 @@
 		<child-element name="browsers" />
         <child-element name="description" />
         <child-element name="example" />
-		<child-element name="property-references" />
+		<child-element name="property-refs" />
         <child-element name="remarks" />
 	</element>
 	
@@ -58,11 +58,11 @@
 		<child-element name="property" />
 	</element>
 
-	<element name="property-references">
-		<child-element name="property-reference" />
+	<element name="property-refs">
+		<child-element name="property-ref" />
 	</element>
 
-	<element name="property-reference" onEnter="enterPropertyReference">
+	<element name="property-ref" onEnter="enterPropertyReference">
 		<attribute name="name" />
 	</element>
 
