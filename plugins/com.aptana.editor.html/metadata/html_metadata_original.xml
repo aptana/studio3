@@ -3889,7 +3889,7 @@ This sentence is on the second line.
 			&lt;/code&gt;&lt;/pre&gt;
 			</example>
 			<remarks>&amp;lt;!DOCTYPE /&amp;gt; is actually an XML element. Use this element as the first element in all XHTML documents.</remarks>
-			<attributes>
+			<!-- attributes>
 				<attribute name="*" description="Specify a value for !DOCTYPE that is not on this list."/>
 				<attribute name="html PUBLIC &quot;-//W3C//DTD HTML 4.01//EN&quot;    &quot;http://www.w3.org/TR/html4/strict.dtd&quot;" description="HTML 4.01 strict DTD."/>
 				<attribute name="html PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;    &quot;http://www.w3.org/TR/html4/loose.dtd&quot;" description="HTML 4.01 transitional DTD."/>
@@ -3898,7 +3898,7 @@ This sentence is on the second line.
 				<attribute name="html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;    &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;" description="XHTML 1.0 transitional DTD."/>
 				<attribute name="html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Frameset//EN&quot;    &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd" description="XHTML 1.0 frameset DTD."/>
 				<attribute name="html PUBLIC &quot;-//W3C//DTD XHTML 1.1//EN&quot;     &quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;" description="XHTML 1.1 DTD."/>
-			</attributes>
+			</attributes -->
 			<fields/>
 			<events/>
 			<browsers>
