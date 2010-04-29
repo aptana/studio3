@@ -16,7 +16,9 @@ import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 public class HttpFileStore extends FileStore
@@ -67,8 +69,10 @@ public class HttpFileStore extends FileStore
 				result.setLength(length);
 			}
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
+			// throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_READ,
+			// e.getMessage(), e));
 			HttpFilesystemPlugin.log(e);
 			result.setExists(false);
 		}
@@ -147,7 +151,11 @@ public class HttpFileStore extends FileStore
 		}
 		sub.worked(25);
 		// make directory structure for our copy
-		cached.getParentFile().mkdirs();
+		if (!cached.getParentFile().mkdirs())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_INTERNAL,
+					"Unable to create directory structure for local cached copy", null));
+		}
 
 		// Download to some filename we can associate and pull back up based on URL! (used above)
 		IFileStore resultStore = EFS.getLocalFileSystem().fromLocalFile(cached);
@@ -184,17 +192,24 @@ public class HttpFileStore extends FileStore
 	{
 		try
 		{
+			monitor.beginTask("", 1); //$NON-NLS-1$
 			return uri.toURL().openStream();
-			// TODO Wrap exceptions and throw CoreException when it makes sense (like when this URL doesn't exist)
 		}
 		catch (MalformedURLException e)
 		{
 			HttpFilesystemPlugin.log(e);
+			throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_NO_LOCATION, e
+					.getMessage(), e));
 		}
 		catch (IOException e)
 		{
 			HttpFilesystemPlugin.log(e);
+			throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_READ, e
+					.getMessage(), e));
 		}
-		return null;
+		finally
+		{
+			monitor.done();
+		}
 	}
 }
