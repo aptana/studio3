@@ -6,6 +6,7 @@ import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
+import com.aptana.util.StringUtil;
 
 public class HTMLIndexWriter
 {
@@ -19,6 +20,16 @@ public class HTMLIndexWriter
 		this._reader = new HTMLMetadataReader();
 	}
 
+	/**
+	 * getDocumentPath
+	 * 
+	 * @return
+	 */
+	protected String getDocumentPath()
+	{
+		return HTMLIndexConstants.METADATA;
+	}
+	
 	/**
 	 * loadXML
 	 * 
@@ -48,6 +59,23 @@ public class HTMLIndexWriter
 	 */
 	protected void writeElement(Index index, ElementElement element)
 	{
+		String[] columns = new String[] {
+			element.getName(),
+			element.getDisplayName(),
+			element.getRelatedClass(),
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
+			// specifications,
+			// user agents
+			element.getDeprecated(),
+			element.getDescription(),
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getEvents()),
+			element.getExample(),
+			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getReferences()),
+			element.getRemark()
+		};
+		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+		
+		index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
 	}
 
 	/**
