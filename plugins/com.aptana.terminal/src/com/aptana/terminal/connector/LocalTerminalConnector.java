@@ -136,6 +136,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	 */
 	@Override
 	public void processCompleted() {
+		fControl.setState(TerminalState.CLOSED);
 		if (streamsProxy != null) {
 			streamsProxy.close();
 			streamsProxy = null;
