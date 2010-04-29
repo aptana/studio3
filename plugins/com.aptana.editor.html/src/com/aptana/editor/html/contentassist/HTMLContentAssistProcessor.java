@@ -1,19 +1,23 @@
 package com.aptana.editor.html.contentassist;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.IndexContentAssistProcessor;
-import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 
 public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 {
+	private HTMLContentAssistHelper _helper;
+	
 	/**
 	 * HTMLIndexContentAssistProcessor
 	 * 
@@ -22,6 +26,8 @@ public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 	public HTMLContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		super(abstractThemeableEditor);
+		
+		this._helper = new HTMLContentAssistHelper();
 	}
 
 	/*
@@ -32,14 +38,24 @@ public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
 			List<ICompletionProposal> completionProposals)
 	{
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, HTMLIndexConstants.RESOURCE_CSS);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, HTMLIndexConstants.RESOURCE_JS);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.CLASS);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.IDENTIFIER);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.COLOR);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.ELEMENT);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, CSSIndexConstants.PROPERTY);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, JSIndexConstants.TYPE);
-		addCompletionProposalsForCategory(viewer, offset, index, completionProposals, JSIndexConstants.FUNCTION);
+		List<ElementElement> elements = this._helper.getElements();
+		
+		if (elements != null)
+		{
+			for (ElementElement element : elements)
+			{
+				String name = element.getName();
+				int length = name.length();
+				String description = element.getDescription();
+				Image image = null;
+				IContextInformation contextInfo = null;
+				
+				// build proposal
+				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				
+				// add it to the list
+				completionProposals.add(proposal);
+			}
+		}
 	}
 }
