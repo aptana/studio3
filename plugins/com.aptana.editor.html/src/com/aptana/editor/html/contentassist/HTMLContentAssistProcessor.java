@@ -12,14 +12,14 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.index.core.Index;
 
-public class HTMLIndexContentAssistProcessor extends IndexContentAssistProcessor
+public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 {
 	/**
 	 * HTMLIndexContentAssistProcessor
 	 * 
 	 * @param abstractThemeableEditor
 	 */
-	public HTMLIndexContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	public HTMLContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		super(abstractThemeableEditor);
 	}
