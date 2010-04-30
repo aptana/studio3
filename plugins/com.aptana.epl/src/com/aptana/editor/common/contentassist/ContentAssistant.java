@@ -2111,19 +2111,22 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		fLastErrorMessage = null;
 
 		ICompletionProposal[] result = null;
-
-		IContentAssistProcessor p = getProcessor(viewer, offset);
-		if (p != null)
+		IContentAssistProcessor processor = this.getProcessor(viewer, offset);
+		
+		if (processor != null)
 		{
-//			if (p instanceof IUnifiedContentAssistProcessor)
-//			{				
-//				result = ((IUnifiedContentAssistProcessor) p).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
-//			}
-//			else
-//			{
-				result = p.computeCompletionProposals(viewer, offset);
-//			}
-			fLastErrorMessage = p.getErrorMessage();
+			if (processor instanceof ICommonContentAssistProcessor)
+			{
+				ICommonContentAssistProcessor commonProcessor = (ICommonContentAssistProcessor) processor;
+				
+				result = commonProcessor.computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+			}
+			else
+			{
+				result = processor.computeCompletionProposals(viewer, offset);
+			}
+				
+			fLastErrorMessage = processor.getErrorMessage();
 		}
 
 		return result;
