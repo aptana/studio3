@@ -2,16 +2,16 @@ var Plugins = Class.create({
     initialize: function() {
       // A list of plugins that we display and query for.
       // Every item has a display name and an array that contains: plug-in id for existance check, min version, update site url, feature id on the update site.
-      this.pluginList = $H({'Aptana Git': ['com.aptana.git.core', '2.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studios', 'com.aptana.ide.feature.studio'],
+      this.pluginList = $H({'Aptana Git': ['com.aptana.git.core', '2.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studio', 'com.aptana.ide.feature.studio'],
           'Aptana JavaScript': ['com.aptana.editor.js', '1.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studio', 'com.aptana.ide.feature.studio'], 
           'Eclipse PHP Developer Tools' : ['org.eclipse.php', '2.0.0', 'http://download.eclipse.org/tools/pdt/updates/2.0/', 'org.eclipse.php']
       });
     },
 
     /**
-     * Show the plugins section
+     * Render the plugins section
      */
-    show: function(parentElement) {
+    render: function(parentElement, data) {
       if (!dispatch) {
         parentElement.appendChild(_studioOnlyContent());
         return;
