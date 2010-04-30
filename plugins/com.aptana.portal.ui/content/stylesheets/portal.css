@@ -7,7 +7,7 @@ table#plugins {
       background-position: 0 50%;
       background-repeat: no-repeat; }
       table#plugins tbody tr td span.processing {
-        background-image: url(../images/small_circle.gif); }
+        background-image: url(../images/activity/small_circle.gif); }
       table#plugins tbody tr td span.ok {
         background-image: url(../images/tick.png); }
       table#plugins tbody tr td span.notice {

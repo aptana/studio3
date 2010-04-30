@@ -2,7 +2,7 @@ var Plugins = Class.create({
     initialize: function() {
       // A list of plugins that we display and query for.
       // Every item has a display name and an array that contains: plug-in id for existance check, min version, update site url, feature id on the update site.
-      this.pluginList = $H({'Aptana Git': ['com.aptana.git.core', '2.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studio', 'com.aptana.ide.feature.studio'],
+      this.pluginList = $H({'Aptana Git': ['com.aptana.git.core', '2.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studiso', 'com.aptana.ide.feature.studio'],
           'Aptana JavaScript': ['com.aptana.editor.js', '1.0.0', 'http://download.aptana.org/tools/studio/plugin/install/studio', 'com.aptana.ide.feature.studio'], 
           'Eclipse PHP Developer Tools' : ['org.eclipse.php', '2.0.0', 'http://download.eclipse.org/tools/pdt/updates/2.0/', 'org.eclipse.php']
       });
@@ -12,7 +12,7 @@ var Plugins = Class.create({
      * Render the plugins section
      */
     render: function(parentElement, data) {
-      if (!dispatch) {
+      if (typeof(dispatch) === 'undefined') {
         parentElement.appendChild(_studioOnlyContent());
         return;
       }
@@ -55,7 +55,7 @@ var Plugins = Class.create({
                 // We need this to give the page a chance to get the OK notification 
                 // after the initial error notification.
                 window.setTimeout(function() { 
-                  alert('There was an error updating/installing this plug-in. \nMore information can be found in the Aptana Studio error log.'); 
+                  showError("Plugin Installation Problem", "There was an problem updating / installing this plug-in. You can find more information about this problem at the Aptana Studio error log."); 
                   }, 1000);
                 errorShown = true;
               }
@@ -110,13 +110,12 @@ var Plugins = Class.create({
         );
         
         installLink.observe('click', this._dispatchInstallDialog.bind(this));
-        checkLink.observe('click', this._dispatchCheck.bind(this));
+        checkLink.observe('click', this.dispatchCheck.bind(this));
       }
       _clearDescendants(parentElement);
       parentElement.appendChild(items);
       parentElement.appendChild(links);
     },
-
     /**
      * Dispatch an install request to open the install dialog
      */
@@ -131,10 +130,14 @@ var Plugins = Class.create({
     /**
      * Dispatch an plugin check request
      */
-    _dispatchCheck: function(event) {
-      dispatch($H({controller:"portal.plugins", action:"computeInstalledPlugins", args : this.pluginList.values().toJSON()}).toJSON());
-      // Stop the event, otherwise we loose the eclipse BroswerFunctions!
-      event.stop();
+    dispatchCheck: function(event) {
+      if (typeof(dispatch) !== 'undefined') {
+        dispatch($H({controller:"portal.plugins", action:"computeInstalledPlugins", args : this.pluginList.values().toJSON()}).toJSON());
+        if (event) {
+          // Stop the event, otherwise we loose the eclipse BroswerFunctions!
+          event.stop();
+        }
+      }
     }, 
 
     /**
@@ -147,7 +150,7 @@ var Plugins = Class.create({
        var siteURL = event.target.getAttribute('update-site');
        var featureId = event.target.getAttribute('feature-id');
        if (!siteURL || !featureId) {
-         alert("There was a problem retrieving the update site for this plugin. Please try to refresh the page.\nIf that did not resolve the issue, contact Aptana's support.");
+         showError("Plugin Installation Problem", "There was a problem retrieving the update site for this plugin. Please try to refresh the page.\nIf that did not resolve the issue, contact Aptana's support.");
          return false;
        }
        // We pass the plugins list to this function as well. The function will re-compute the installed plugins right after the 

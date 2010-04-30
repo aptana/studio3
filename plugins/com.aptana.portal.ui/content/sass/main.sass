@@ -1,7 +1,7 @@
 // clear browser default styles
 // @import reset.sass
 
-!col-min-height = 600px
+$col-min-height = 600px
 
 #main:after
   content: "."
@@ -86,7 +86,7 @@ body
     margin-left: 35px !important
     overflow: hidden
     width: 950px
-    min-height = !col-min-height
+    min-height: $col-min-height
 #footer
   background-image: url(../images/background_footer.png)
   background-position: 0 0
@@ -131,4 +131,5 @@ p.highlighted
 
 @import columns.sass
 @import tooltip.sass
+@import lightbox.sass
 @import portal.sass

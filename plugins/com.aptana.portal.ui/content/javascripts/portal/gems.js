@@ -15,7 +15,7 @@ var Gems = Class.create({
      * @param data - A JSON object, or null
      */
     render: function(parentElement, data) {
-      if (!dispatch) {
+      if (typeof(dispatch) === 'undefined') {
         parentElement.appendChild(_studioOnlyContent());
         return;
       }
@@ -68,15 +68,24 @@ var Gems = Class.create({
             gemsContent.appendChild(checkDiv);
           }
           // Dispatch a check for gems when the user clicks the link
-          checkLink.observe('click', function(event) {
-            dispatch($H({controller:"portal.gems", action:"computeInstalledGems"}).toJSON());
-            // Stop the event, otherwise we loose the eclipse BroswerFunctions!
-            event.stop();
-            });
+          checkLink.observe('click', this.dispatchCheck.bind(this));
         }
         // Clear anything that we had under this parent element before and put there the new elements
         _clearDescendants(parentElement);
         parentElement.appendChild(gemsContent);
+      }
+    }, 
+    
+    /**
+     * Dispatch a request to check for gems
+     */
+    dispatchCheck: function(event) {
+      if (typeof(dispatch) !== 'undefined') {
+        dispatch($H({controller:"portal.gems", action:"computeInstalledGems"}).toJSON());
+        if (event) {
+          // Stop the event, otherwise we loose the eclipse BroswerFunctions!
+          event.stop();
+        }
       }
     }
 });

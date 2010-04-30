@@ -1,7 +1,7 @@
 var Files = Class.create({
   render: function(parentElement, data) {
     // Make sure that the Studio dispatch call is available
-    if (!dispatch) {
+    if (typeof(dispatch) === 'undefined') {
       parentElement.appendChild(_studioOnlyContent());
       return;
     }

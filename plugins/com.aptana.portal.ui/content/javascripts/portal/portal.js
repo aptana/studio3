@@ -16,6 +16,10 @@ var Portal = Class.create({
     this.plugins.render($('plugins'));
     this.files.render($('recentFiles'));
     this.gems.render($('gems'));
+  }, 
+  refreshAll: function() {
+    this.plugins.dispatchCheck();
+    this.gems.dispatchCheck();
   }
 });
 
@@ -46,12 +50,32 @@ function customErrorHandler(desc,page,line) {
 function loadPortal() {
   if (!portal) {
     portal = new Portal();
+    portal.refreshAll();
   }
+}
+
+/**
+ * Open a light-box error notification with the given message and title.
+ */
+function showError(title, msg) {
+    DialogHelper.createInfoBox(title, msg, "back to portal");
 }
 
 // Returns an element that contains informative text about running this portal outside the studio
 function _studioOnlyContent() {
-	return Elements.Builder.div({'class' : 'unavailable'}, 'Content only available inside Aptana Studio');
+	var resultDiv;
+	with(Elements.Builder) {
+	   var showInfo;
+	   resultDiv = div(
+	     div({'class' : 'unavailable'}, 'Content Unavailable'),
+	     div(showInfo = a({'href' : '#'}, 'about'))
+	   );
+	   showInfo.observe('click', function(event) {
+	     DialogHelper.createInfoBox("Content Unavailable", "This portal element interacts with Aptana Studio and only available when running within the Studio", "back to portal");
+	     event.stop();
+	   });
+	}
+	return resultDiv;
 }
 
 // Remove all the descendants from the parent element
