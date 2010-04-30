@@ -71,6 +71,7 @@ import org.eclipse.swt.widgets.Widget;
  * The standard implementation of the <code>IContentAssistant</code> interface. Usually, clients instantiate this
  * class and configure it before using it.
  */
+@SuppressWarnings("deprecation")
 public class ContentAssistant implements IContentAssistant, IContentAssistantExtension, IWidgetTokenKeeper,
 		IWidgetTokenKeeperExtension//, IUnifiedContentAssistant
 {
@@ -1114,7 +1115,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	private boolean fIsAutoInserting = false;
 	private int fProposalPopupOrientation = PROPOSAL_OVERLAY;
 	private int fContextInfoPopupOrientation = CONTEXT_INFO_ABOVE;
-	private Map fProcessors;
+	private Map<String,IContentAssistProcessor> fProcessors;
 
 	/**
 	 * The partitioning.
@@ -1218,7 +1219,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	{
 		if (fProcessors == null)
 		{
-			fProcessors = new HashMap();
+			fProcessors = new HashMap<String,IContentAssistProcessor>();
 		}
 
 		if (processor == null)
@@ -1258,22 +1259,27 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		}
 
 		StringBuffer buf = new StringBuffer(5);
-		Iterator iter = fProcessors.entrySet().iterator();
+		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+		
 		while (iter.hasNext())
 		{
-			Entry entry = (Entry) iter.next();
-			IContentAssistProcessor processor = (IContentAssistProcessor) entry.getValue();
+			Entry<String,IContentAssistProcessor> entry = iter.next();
+			IContentAssistProcessor processor = entry.getValue();
 			char[] triggers = processor.getCompletionProposalAutoActivationCharacters();
+			
 			if (triggers != null)
 			{
 				buf.append(triggers);
 			}
+			
 			triggers = processor.getContextInformationAutoActivationCharacters();
+			
 			if (triggers != null)
 			{
 				buf.append(triggers);
 			}
 		}
+		
 		return buf.toString();
 	}
 
