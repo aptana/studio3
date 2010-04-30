@@ -480,4 +480,12 @@
              name="Safari">
        </user-agent>
     </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.common"
+            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
+            name="Browsers/User Agents"/>            
+   </extension>
 </plugin>
