@@ -83,9 +83,9 @@ public class ElementElement
 	 * 
 	 * @return
 	 */
-	public String[] getProperties()
+	public List<String> getProperties()
 	{
-		return this._properties.toArray(new String[this._properties.size()]);
+		return this._properties;
 	}
 
 	/**
@@ -103,9 +103,9 @@ public class ElementElement
 	 * 
 	 * @return
 	 */
-	public UserAgentElement[] getUserAgents()
+	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents.toArray(new UserAgentElement[this._userAgents.size()]);
+		return this._userAgents;
 	}
 
 	/**

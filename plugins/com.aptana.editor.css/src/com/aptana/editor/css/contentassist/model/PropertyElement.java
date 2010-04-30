@@ -117,9 +117,9 @@ public class PropertyElement
 	 * 
 	 * @return
 	 */
-	public SpecificationElement[] getSpecifications()
+	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications.toArray(new SpecificationElement[this._specifications.size()]);
+		return this._specifications;
 	}
 
 	/**
@@ -137,9 +137,9 @@ public class PropertyElement
 	 * 
 	 * @return
 	 */
-	public UserAgentElement[] getUserAgents()
+	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents.toArray(new UserAgentElement[this._userAgents.size()]);
+		return this._userAgents;
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class PropertyElement
 	 * 
 	 * @return
 	 */
-	public ValueElement[] getValues()
+	public List<ValueElement> getValues()
 	{
-		return this._values.toArray(new ValueElement[this._values.size()]);
+		return this._values;
 	}
 
 	/**
