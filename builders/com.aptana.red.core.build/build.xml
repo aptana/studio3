@@ -109,6 +109,10 @@
 				<include name="org.eclipse.equinox.p2.*.repository.prefs" />
 			</fileset>
 		</delete>
+		<antcall target="run.director">
+			<param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+			<param name="p2.repo" value="${libraries-com.p2.repo}" />
+		</antcall>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
