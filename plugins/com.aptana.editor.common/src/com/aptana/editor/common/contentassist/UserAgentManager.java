@@ -1,6 +1,8 @@
 package com.aptana.editor.common.contentassist;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,15 +13,17 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.util.SWTUtils;
 
 public class UserAgentManager
 {
-	class UserAgent
+	public class UserAgent
 	{
 		public final String ID;
 		public final String name;
@@ -41,40 +45,9 @@ public class UserAgentManager
 	private static final String ATTR_USER_AGENT_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_ICON_DISABLED = "icon-disabled"; //$NON-NLS-1$
-	private static final Map<String,UserAgent> userAgentsByName = new HashMap<String,UserAgent>();
+	private static final Map<String,UserAgent> userAgentsByID = new HashMap<String,UserAgent>();
 
 	private static UserAgentManager INSTANCE;
-	
-	/**
-	 * UserAgentManager
-	 */
-	private UserAgentManager()
-	{
-		this.loadExtension();
-	}
-	
-	/**
-	 * getUserAgentImages
-	 */
-	public Image[] getUserAgentImages(String[] userAgents)
-	{
-		Set<String> nameSet = userAgentsByName.keySet();
-		String[] allNames = nameSet.toArray(new String[nameSet.size()]);
-		Set<String> enabledAgents = new HashSet<String>(Arrays.asList(userAgents));
-		Image[] result = new Image[allNames.length];
-		
-		Arrays.sort(allNames);
-		
-		for (int i = 0; i < allNames.length; i++)
-		{
-			String name = allNames[i];
-			UserAgent userAgent = userAgentsByName.get(name);
-			
-			result[i] = (enabledAgents.contains(name)) ? userAgent.enabledIcon : userAgent.disabledIcon;
-		}
-		
-		return result;
-	}
 	
 	/**
 	 * getInstance
@@ -90,6 +63,123 @@ public class UserAgentManager
 		
 		return INSTANCE;
 	}
+	
+	/**
+	 * UserAgentManager
+	 */
+	private UserAgentManager()
+	{
+		this.loadExtension();
+	}
+	
+	/**
+	 * Returns the string array of user agents
+	 * 
+	 * @return String[]
+	 */
+	public UserAgent[] getActiveUserAgents()
+	{
+		IPreferenceStore prefs = CommonEditorPlugin.getDefault().getPreferenceStore();
+		String agentsValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
+		
+		return this.getUserAgentsByID(agentsValue.split(","));
+	}
+	
+	/**
+	 * getDefaultActiveUserAgents
+	 * 
+	 * @return
+	 */
+	public UserAgent[] getDefaultActiveUserAgents()
+	{
+		IPreferenceStore prefs = CommonEditorPlugin.getDefault().getPreferenceStore();
+		String agentsValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
+		
+		return this.getUserAgentsByID(agentsValue.split(","));
+	}
+	
+	/**
+	 * getUserAgentsByID
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	public UserAgent[] getUserAgentsByID(String ... ids)
+	{
+		UserAgent[] result = new UserAgent[ids.length];
+		
+		for (int i = 0; i < result.length; i++)
+		{
+			result[i] = userAgentsByID.get(ids[i]);
+		}
+		
+		return result;
+	}
+
+	/**
+	 * getUserAgentImages
+	 */
+	public Image[] getUserAgentImages(String[] userAgents)
+	{
+		Set<String> nameSet = userAgentsByID.keySet();
+		String[] allNames = nameSet.toArray(new String[nameSet.size()]);
+		Set<String> enabledAgents = new HashSet<String>(Arrays.asList(userAgents));
+		Image[] result = new Image[allNames.length];
+		
+		Arrays.sort(allNames);
+		
+		for (int i = 0; i < allNames.length; i++)
+		{
+			String name = allNames[i];
+			UserAgent userAgent = userAgentsByID.get(name);
+			
+			result[i] = (enabledAgents.contains(name)) ? userAgent.enabledIcon : userAgent.disabledIcon;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getUserAgents
+	 * 
+	 * @return
+	 */
+	public UserAgent[] getUserAgents()
+	{
+		Collection<UserAgent> userAgents = userAgentsByID.values();
+		UserAgent[] result = userAgents.toArray(new UserAgent[userAgents.size()]);
+		
+		Arrays.sort(result, new Comparator<UserAgent>()
+		{
+			@Override
+			public int compare(UserAgent o1, UserAgent o2)
+			{
+				return o1.name.compareToIgnoreCase(o2.name);
+			}
+		});
+		
+		return result;
+	}
+	
+	/**
+	 * getUserAgentNames
+	 * 
+	 * @return
+	 *
+	public String[] getUserAgentNames()
+	{
+		Collection<UserAgent> userAgents = userAgentsByID.values();
+		List<UserAgent> userAgentList = new ArrayList<UserAgent>(userAgents);
+		String[] result = new String[userAgents.size()];
+		
+		for (int i = 0; i < result.length; i++)
+		{
+			result[i] = userAgentList.get(i).name;
+		}
+		
+		return result;
+	}
+	*/
 
 	/**
 	 * loadExtension
@@ -136,7 +226,7 @@ public class UserAgentManager
 									
 									if (agentIcon != null && agentIconDisabled != null)
 									{
-										userAgentsByName.put(agentID, new UserAgent(agentID, agentName, agentIcon, agentIconDisabled));
+										userAgentsByID.put(agentID, new UserAgent(agentID, agentName, agentIcon, agentIconDisabled));
 									}
 								}
 							}
