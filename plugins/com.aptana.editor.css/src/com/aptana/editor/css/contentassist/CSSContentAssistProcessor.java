@@ -35,10 +35,12 @@
 package com.aptana.editor.css.contentassist;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -48,18 +50,26 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
+import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.contentassist.model.ElementElement;
+import com.aptana.editor.css.contentassist.model.PropertyElement;
 
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
-//	/**
-//	 * Location
-//	 */
-//	private static enum Location
-//	{
-//		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
-//	};
+	/**
+	 * Location
+	 */
+	private static enum Location
+	{
+		OUTSIDE_RULE,
+		INSIDE_RULE,
+		ARG_ASSIST,
+		ERROR
+	};
 
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif");
+	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif");
+	
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
 
@@ -87,30 +97,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 //		
 //		return null;
 //	}
-//
-//	/**
-//	 * getLocation
-//	 * 
-//	 * @param tokenLexems
-//	 * @param offset
-//	 * @return
-//	 */
-//	private static Location getLocation(List<TokenLexeme> tokenLexems, int offset)
-//	{
-//		if (offset == 0)
-//		{
-//			return Location.OUTSIDE_RULE;
-//		}
-//		
-//		TokenLexeme tokenLexemeAtOffset = getTokenLexemeAtOffset(tokenLexems, offset);
-//		
-//		if (tokenLexemeAtOffset != null)
-//		{
-//			// Compute the location
-//		}
-//		
-//		return Location.ERROR;
-//	}
 
 	/**
 	 * CSSContentAssistProcessor
@@ -124,59 +110,15 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		this._queryHelper = new CSSIndexQueryHelper();
 	}
 
-	/*
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
-	{
-		IDocument document = abstractThemeableEditor.getDocumentProvider().getDocument(abstractThemeableEditor.getEditorInput());
-		CSSScopeScanner scanner = new CSSScopeScanner();
-
-		scanner.setRange(viewer.getDocument(), 0, viewer.getDocument().getLength());
-
-		List<TokenLexeme> tokenLexemes = new ArrayList<TokenLexeme>();
-		IToken token;
-
-		// Build the TokenLexeme
-		while (true)
-		{
-			token = scanner.nextToken();
-
-			if (token == Token.EOF)
-			{
-				break;
-			}
-
-			try
-			{
-				int tokenOffset = scanner.getTokenOffset();
-				int tokenLength = scanner.getTokenLength();
-				int endingOffset = tokenOffset + tokenLength;
-				String text = document.get(tokenOffset, tokenLength);
-
-				tokenLexemes.add(new TokenLexeme(text, tokenOffset, endingOffset, token));
-			}
-			catch (BadLocationException e)
-			{
-				e.printStackTrace();
-			}
-		}
-
-		// Use the language metadata and location and indexing information to build the
-		// proposals
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-		Location location = getLocation(tokenLexemes, offset);
-		
-		return proposals.toArray(new ICompletionProposal[proposals.size()]);
-	}
-	*/
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	/**
+	 * getElementProposals
+	 * 
+	 * @param proposals
+	 * @param offset
 	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected void addAllElementProposals(List<ICompletionProposal> proposals, int offset)
 	{
 		List<ElementElement> elements = this._queryHelper.getElements();
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		
 		if (elements != null)
 		{
@@ -185,7 +127,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String name = element.getName();
 				int length = name.length();
 				String description = element.getDescription();
-				Image image = null;
+				Image image = ELEMENT_ICON;
 				IContextInformation contextInfo = null;
 				
 				// build a proposal
@@ -195,10 +137,65 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				proposals.add(proposal);
 			}
 		}
+	}
+
+	/**
+	 * getAllPropertyProposals
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addAllPropertyProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		List<PropertyElement> properties = this._queryHelper.getProperties();
 		
-		ICompletionProposal[] result = proposals.toArray(new ICompletionProposal[proposals.size()]);
+		if (properties != null)
+		{
+			for (PropertyElement property : properties)
+			{
+				String name = property.getName();
+				int length = name.length();
+				String description = property.getDescription();
+				Image image = PROPERTY_ICON;
+				IContextInformation contextInfo = null;
+				
+				// build a proposal
+				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				
+				// add it to the list
+				proposals.add(proposal);
+			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 */
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	{
+		Location location = this.getLocation(viewer.getDocument(), offset);
+		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
-		Arrays.sort(result, new Comparator<ICompletionProposal>()
+		switch (location)
+		{
+			case OUTSIDE_RULE:
+				this.addAllElementProposals(result, offset);
+				break;
+				
+			case INSIDE_RULE:
+				this.addAllPropertyProposals(result, offset);
+				break;
+				
+			case ARG_ASSIST:
+				// TODO: lookup specific property and shows its values
+				break;
+			
+			default:
+				break;
+		}
+		
+		Collections.sort(result, new Comparator<ICompletionProposal>()
 		{
 			@Override
 			public int compare(ICompletionProposal o1, ICompletionProposal o2)
@@ -207,7 +204,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 		
-		return result;
+		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
 	/*
@@ -233,5 +230,59 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		
 		return _validator;
+	}
+	
+	/**
+	 * getLocation
+	 * 
+	 * @param tokenLexems
+	 * @param offset
+	 * @return
+	 */
+	private Location getLocation(IDocument document, int offset)
+	{
+		Location result = Location.ERROR;
+		
+		if (offset == 0)
+		{
+			result = Location.OUTSIDE_RULE;
+		}
+		else
+		{
+			LOOP:
+			for (int i = offset; i >= 0; i--)
+			{
+				try
+				{
+					char c = document.getChar(i);
+					
+					// TODO: cover args case
+					switch (c)
+					{
+						case '{':
+						case ')':
+							result = Location.INSIDE_RULE;
+							break LOOP;
+							
+						case '}':
+							result = Location.OUTSIDE_RULE;
+							break LOOP;
+							
+						case '(':
+							result = Location.ARG_ASSIST;
+							break LOOP;
+							
+						default:
+							break;
+					}
+				}
+				catch (BadLocationException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return result;
 	}
 }
