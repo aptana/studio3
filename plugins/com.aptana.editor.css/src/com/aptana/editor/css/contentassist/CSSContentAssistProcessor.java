@@ -34,23 +34,23 @@
  */
 package com.aptana.editor.css.contentassist;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 
-public class CSSContentAssistProcessor implements IContentAssistProcessor
+public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
 //	/**
 //	 * Location
@@ -61,8 +61,7 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 //	};
 
 	private IContextInformationValidator _validator;
-	//private final AbstractThemeableEditor _editor;
-	private CSSContentAssistHelper _helper;
+	private CSSIndexQueryHelper _queryHelper;
 
 //	/**
 //	 * getTokenLexemeAtOffset
@@ -116,12 +115,13 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 	/**
 	 * CSSContentAssistProcessor
 	 * 
-	 * @param abstractThemeableEditor
+	 * @param editor
 	 */
-	public CSSContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	public CSSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
-//		this._editor = abstractThemeableEditor;
-		this._helper = new CSSContentAssistHelper();
+		super(editor);
+		
+		this._queryHelper = new CSSIndexQueryHelper();
 	}
 
 	/*
@@ -169,10 +169,14 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 	}
 	*/
 	
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 */
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
-		List<ICompletionProposal> proposals = new LinkedList<ICompletionProposal>();
-		List<ElementElement> elements = this._helper.getElements();
+		List<ElementElement> elements = this._queryHelper.getElements();
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		
 		if (elements != null)
 		{
@@ -208,32 +212,12 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer, int)
-	 */
-	@Override
-	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
-	{
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
 	 */
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		return new char[] { ':', '\t', '{', ';' };
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getContextInformationAutoActivationCharacters()
-	{
-		return null;
 	}
 
 	/*
@@ -249,15 +233,5 @@ public class CSSContentAssistProcessor implements IContentAssistProcessor
 		}
 		
 		return _validator;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getErrorMessage()
-	 */
-	@Override
-	public String getErrorMessage()
-	{
-		return null;
 	}
 }

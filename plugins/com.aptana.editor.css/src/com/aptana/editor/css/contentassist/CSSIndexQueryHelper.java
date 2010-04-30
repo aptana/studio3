@@ -9,14 +9,14 @@ import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class CSSContentAssistHelper
+public class CSSIndexQueryHelper
 {
 	private CSSIndexReader _reader;
 	
 	/**
 	 * CSSContentAssistHelper
 	 */
-	public CSSContentAssistHelper()
+	public CSSIndexQueryHelper()
 	{
 		this._reader = new CSSIndexReader();
 	}
