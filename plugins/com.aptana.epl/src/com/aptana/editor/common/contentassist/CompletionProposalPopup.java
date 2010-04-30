@@ -48,6 +48,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -365,9 +366,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 		};
 		fProposalTable.addListener(SWT.SetData, listener);
 
+		// TODO: grab value from preferences
 		//final IPreferenceStore store = CommonEditorPlugin.getDefault().getPreferenceStore();
 		_insertOnTab = false; //store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
+		// TODO: grab list from preferences
 		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		if (agents != null && !agents.equals(""))
 		{
@@ -375,7 +378,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		else
 		{
-			fUserAgents = 0;
+			//fUserAgents = 0;
+			fUserAgents = 5; // TEMP: hard-coding for testing purposes
 		}
 
 		TableColumn initialInfo = new TableColumn(fProposalTable, SWT.LEFT);
@@ -541,12 +545,12 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			item.setData(current);
 			
-			/*
-			if (current instanceof IUnifiedCompletionProposal)
+			if (current instanceof ICommonCompletionProposal)
 			{
-				IUnifiedCompletionProposal prop = (IUnifiedCompletionProposal) current;
-				String loc = prop.getFileLocation();
-				Image[] images = prop.getUserAgentImages();
+				ICommonCompletionProposal proposal = (ICommonCompletionProposal) current;
+				String location = proposal.getFileLocation();
+				Image[] images = proposal.getUserAgentImages();
+				
 				if (images != null)
 				{
 					for (int j = 0; j < images.length; j++)
@@ -565,21 +569,18 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 				if (fUserAgents > 0)
 				{
-					item.setText(fUserAgents + 1, " " + loc); //$NON-NLS-1$
+					item.setText(fUserAgents + 1, " " + location); //$NON-NLS-1$
 				}
 				else
 				{
-					item.setText(fUserAgents + 1, loc);
+					item.setText(fUserAgents + 1, location);
 				}
 
-				// TODO:
-				if (current instanceof IUnifiedCompletionProposal
-						&& ((IUnifiedCompletionProposal) current).isDefaultSelection())
+				if (proposal.isDefaultSelection())
 				{
 					defaultIndex = index;
 				}
 			}
-			*/
 		}
 		else
 		{
