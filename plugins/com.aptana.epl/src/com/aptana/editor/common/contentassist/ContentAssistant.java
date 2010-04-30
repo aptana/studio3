@@ -2102,7 +2102,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @param offset
 	 *            a document offset
 	 * @param autoActivated
-	 *            determiens whetehr we were autoActivated or not
+	 *            determines whether we were autoActivated or not
 	 * @return an array of completion proposals
 	 * @see IContentAssistProcessor#computeCompletionProposals(ITextViewer, int)
 	 */
