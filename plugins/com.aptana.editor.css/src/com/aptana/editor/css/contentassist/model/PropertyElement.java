@@ -157,9 +157,9 @@ public class PropertyElement
 	 * 
 	 * @param value
 	 */
-	public void setAllowMultipleValues(String value)
+	public void setAllowMultipleValues(Boolean value)
 	{
-		this._allowMultipleValues = "true".equals(value);
+		this._allowMultipleValues = value;
 	}
 
 	/**

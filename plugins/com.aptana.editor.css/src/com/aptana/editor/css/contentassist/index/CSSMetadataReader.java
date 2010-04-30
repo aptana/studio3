@@ -125,7 +125,7 @@ public class CSSMetadataReader extends MetadataReader
 		// grab and set property values
 		property.setName(attributes.getValue("name"));
 		property.setType(attributes.getValue("type"));
-		property.setAllowMultipleValues(attributes.getValue("allow-multipe-values"));
+		property.setAllowMultipleValues("true".equals(attributes.getValue("allow-multipe-values")));
 
 		// set current item
 		this._currentProperty = property;
