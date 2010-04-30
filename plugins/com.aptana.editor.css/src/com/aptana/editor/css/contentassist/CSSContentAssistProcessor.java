@@ -42,7 +42,6 @@ import java.util.List;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -50,7 +49,10 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 
@@ -72,31 +74,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
-
-//	/**
-//	 * getTokenLexemeAtOffset
-//	 * 
-//	 * @param tokenLexems
-//	 * @param offset
-//	 * @return
-//	 */
-//	private static TokenLexeme getTokenLexemeAtOffset(List<TokenLexeme> tokenLexems, int offset)
-//	{
-//		int size = tokenLexems.size();
-//		
-//		if (size > 0)
-//		{
-//			for (TokenLexeme tokenLexeme : tokenLexems)
-//			{
-//				if (offset >= tokenLexeme.getStartingOffset() && offset <= tokenLexeme.getEndingOffset())
-//				{
-//					return tokenLexeme;
-//				}
-//			}
-//		}
-//		
-//		return null;
-//	}
 
 	/**
 	 * CSSContentAssistProcessor
@@ -129,9 +106,13 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = element.getDescription();
 				Image image = ELEMENT_ICON;
 				IContextInformation contextInfo = null;
+				String[] userAgents = element.getUserAgentNames(); 
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				
 				// build a proposal
-				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				proposal.setFileLocation(CSSIndexConstants.METADATA);
+				proposal.setUserAgentImages(userAgentIcons);
 				
 				// add it to the list
 				proposals.add(proposal);
@@ -158,9 +139,13 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = property.getDescription();
 				Image image = PROPERTY_ICON;
 				IContextInformation contextInfo = null;
+				String[] userAgents = property.getUserAgentNames(); 
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				
 				// build a proposal
-				CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				proposal.setFileLocation(CSSIndexConstants.METADATA);
+				proposal.setUserAgentImages(userAgentIcons);
 				
 				// add it to the list
 				proposals.add(proposal);
@@ -249,18 +234,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
+			int i;
+			
 			LOOP:
-			for (int i = offset; i >= 0; i--)
+			for (i = offset; i >= 0; i--)
 			{
 				try
 				{
 					char c = document.getChar(i);
 					
-					// TODO: cover args case
 					switch (c)
 					{
 						case '{':
 						case ')':
+						case ';':
+						case ':':
 							result = Location.INSIDE_RULE;
 							break LOOP;
 							
@@ -280,6 +268,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					e.printStackTrace();
 				}
+			}
+		
+			if (i == 0 && result == Location.ERROR)
+			{
+				result = Location.OUTSIDE_RULE;
 			}
 		}
 		
