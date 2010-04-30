@@ -71,6 +71,51 @@ public class CSSIndexReader
 	 * getProperties
 	 * 
 	 * @param index
+	 * @return
+	 * @throws IOException 
+	 */
+	public List<PropertyElement> getProperties(Index index) throws IOException
+	{
+		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.PROPERTY }, "*", SearchPattern.PATTERN_MATCH);
+		List<PropertyElement> result = new LinkedList<PropertyElement>();
+		
+		if (items != null)
+		{
+			for (QueryResult queryResult : items)
+			{
+				String key = queryResult.getWord();
+				String columns[] = key.split(CSSIndexConstants.DELIMITER);
+				int column = 0;
+				PropertyElement property = new PropertyElement();
+				
+				property.setName(columns[column++]);
+				property.setAllowMultipleValues(Boolean.valueOf(columns[column++]));
+				property.setType(columns[column++]);
+				// TODO: specifications
+				
+				for (String userAgentKey : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
+				{
+					// get user agent and add to element
+					property.addUserAgent(this.getUserAgent(index, userAgentKey));
+				}
+				
+				property.setDescription(columns[column++]);
+				property.setExample(columns[column++]);
+				property.setHint(columns[column++]);
+				property.setRemark(columns[column++]);
+				// TODO: values
+				
+				result.add(property);
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * getProperties
+	 * 
+	 * @param index
 	 * @param names
 	 * @return
 	 */
@@ -82,7 +127,7 @@ public class CSSIndexReader
 		
 		return result;
 	}
-	
+
 	/**
 	 * getUserAgent
 	 * 
@@ -106,7 +151,13 @@ public class CSSIndexReader
 			result.setDescription(columns[column++]);
 			result.setOS(columns[column++]);
 			result.setPlatform(columns[column++]);
-			result.setVersion(columns[column++]);
+			
+			// NOTE: split does not return a final empty element if the string being split
+			// ends with the delimiter.
+			if (column < columns.length)
+			{
+				result.setVersion(columns[column++]);
+			}
 		}
 		
 		return result;
