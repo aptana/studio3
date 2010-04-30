@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="userAgent" name="User Agents" schema="schema/userAgent.exsd"/>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -446,4 +447,37 @@
          </menu>
       </menuContribution>
    </extension>
+    <extension
+          point="com.aptana.editor.common.userAgent">
+       <user-agent
+             icon="icons/ie_icon.png"
+             icon-disabled="icons/ie_icon_grey.png"
+             id="IE"
+             name="Internet Explorer">
+       </user-agent>
+       <user-agent
+             icon="icons/firefox_icon.png"
+             icon-disabled="icons/firefox_icon_grey.png"
+             id="Mozilla"
+             name="Firefox">
+       </user-agent>
+       <user-agent
+             icon="icons/netscape_icon.png"
+             icon-disabled="icons/netscape_icon_grey.png"
+             id="Netscape"
+             name="Netscape">
+       </user-agent>
+       <user-agent
+             icon="icons/opera_icon.png"
+             icon-disabled="icons/opera_icon_grey.png"
+             id="Opera"
+             name="Opera">
+       </user-agent>
+       <user-agent
+             icon="icons/safari_icon.png"
+             icon-disabled="icons/safari_icon_grey.png"
+             id="Safari"
+             name="Safari">
+       </user-agent>
+    </extension>
 </plugin>
