@@ -276,7 +276,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 
 		public Image getColumnImage(Object obj, int index)
 		{
-			return CommonEditorPlugin.getDefault().getImage(TEMPLATE_IMAGE_PATH);
+			return CommonEditorPlugin.getImage(TEMPLATE_IMAGE_PATH);
 		}
 	}
 

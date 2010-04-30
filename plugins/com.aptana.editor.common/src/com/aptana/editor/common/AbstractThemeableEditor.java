@@ -471,11 +471,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		Image cursorImage = null;
 		if (getThemeManager().getCurrentTheme().hasDarkBG())
 		{
-			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_WHITE);
+			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_WHITE);
 		}
 		else
 		{
-			cursorImage = CommonEditorPlugin.getDefault().getImage(CommonEditorPlugin.IBEAM_BLACK);
+			cursorImage = CommonEditorPlugin.getImage(CommonEditorPlugin.IBEAM_BLACK);
 		}
 
 		Display display = getSourceViewer().getTextWidget().getDisplay();

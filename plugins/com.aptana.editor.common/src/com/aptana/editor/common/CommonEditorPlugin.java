@@ -257,7 +257,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return reg;
 	}
 
-	public Image getImage(String path)
+	public static Image getImage(String path)
 	{
 		ImageRegistry registry = plugin.getImageRegistry();
 		Image image = registry.get(path);
