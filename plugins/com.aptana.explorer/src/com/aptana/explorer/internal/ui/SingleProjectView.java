@@ -1,6 +1,7 @@
 package com.aptana.explorer.internal.ui;
 
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashSet;
@@ -1129,7 +1130,10 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 					boolean connected = false;
 					try
 					{
-						new URL(BASE_MESSAGE_URL).openConnection().connect();
+						HttpURLConnection connection = (HttpURLConnection) new URL(BASE_MESSAGE_URL).openConnection();
+						connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
+						connection.setAllowUserInteraction(false);
+						connection.connect();
 						connected = true;
 					}
 					catch (Exception e)

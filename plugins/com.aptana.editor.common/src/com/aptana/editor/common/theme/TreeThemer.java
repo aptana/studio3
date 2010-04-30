@@ -149,11 +149,11 @@ public class TreeThemer
 				DelegatingStyledCellLabelProvider delegating = (DelegatingStyledCellLabelProvider) cellProvider;
 				IStyledLabelProvider styled = delegating.getStyledStringProvider();
 				if (styled.getClass().getName().equals(
-						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider"))
+						"org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider")) //$NON-NLS-1$
 				{
 					try
 					{
-						Field f = styled.getClass().getDeclaredField("fWorkingSetImages");
+						Field f = styled.getClass().getDeclaredField("fWorkingSetImages"); //$NON-NLS-1$
 						f.setAccessible(true);
 						f.set(styled, null);
 					}
@@ -408,11 +408,7 @@ public class TreeThemer
 					@Override
 					public void run()
 					{
-						Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
-						if (font == null)
-						{
-							font = JFaceResources.getTextFont();
-						}
+						Font font = getFont();
 						if (font != null)
 						{
 							tree.setFont(font);
@@ -476,6 +472,16 @@ public class TreeThemer
 		};
 		JFaceResources.getFontRegistry().addListener(fontListener);
 	}
+	
+	protected Font getFont()
+	{
+		Font font = JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME);
+		if (font == null)
+		{
+			font = JFaceResources.getTextFont();
+		}
+		return font;
+	}
 
 	private void addThemeChangeListener()
 	{
@@ -500,6 +506,7 @@ public class TreeThemer
 		{
 			getTree().setBackground(getBackground());
 			getTree().setForeground(getForeground());
+			getTree().setFont(getFont());
 			if (fTreeViewer != null)
 			{
 				fTreeViewer.refresh(true);

@@ -2071,7 +2071,7 @@ public class JSParser extends Parser implements IParser {
 	}
 
 	@Override
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		fScanner.setSource(new String(parseState.getSource()));
 		IParseNode result = (IParseNode) parse(fScanner);

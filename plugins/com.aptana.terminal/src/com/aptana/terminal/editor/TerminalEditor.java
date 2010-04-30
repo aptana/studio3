@@ -56,6 +56,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.terminal.Activator;
 import com.aptana.terminal.Closeable;
+import com.aptana.terminal.Utils;
 import com.aptana.terminal.connector.LocalTerminalConnector;
 import com.aptana.terminal.internal.IProcessListener;
 import com.aptana.terminal.internal.emulator.VT100TerminalControl;
@@ -249,8 +250,13 @@ public class TerminalEditor extends EditorPart implements Closeable, ITerminalLi
 	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setTerminalTitle(java.lang.String)
 	 */
 	@Override
-	public void setTerminalTitle(String title) {
-		setPartName(title);
+	public void setTerminalTitle(final String title) {
+		Utils.runInDisplayThread(new Runnable() {
+			@Override
+			public void run() {
+				setPartName(title);
+			}
+		});
 	}
 
 	/*
