@@ -17,12 +17,13 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
+import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class CommonContentAssistProcessor implements IContentAssistProcessor
+public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
 	private final AbstractThemeableEditor abstractThemeableEditor;
 
@@ -101,6 +102,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor
 		}
 
 		return completionProposals.toArray(new ICompletionProposal[0]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 */
+	@Override
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	{
+		return this.computeCompletionProposals(viewer, offset);
 	}
 
 	/**
