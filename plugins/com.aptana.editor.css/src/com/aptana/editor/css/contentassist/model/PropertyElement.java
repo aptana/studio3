@@ -141,6 +141,23 @@ public class PropertyElement
 	{
 		return this._userAgents;
 	}
+	
+	/**
+	 * getUserAgentNames
+	 * 
+	 * @return
+	 */
+	public String[] getUserAgentNames()
+	{
+		String[] result = new String[this._userAgents.size()];
+		
+		for (int i = 0; i < result.length; i++)
+		{
+			result[i] = this._userAgents.get(i).getPlatform();
+		}
+		
+		return result;
+	}
 
 	/**
 	 * getValues
