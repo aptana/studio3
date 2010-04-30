@@ -63,7 +63,6 @@ import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.HTMLTextPresenter;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
@@ -150,8 +149,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		
 		if (fPreferenceStore != null)
 		{
-			assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
-			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+//			assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
+//			assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
+			assistant.enableAutoActivation(true);
+			assistant.setAutoActivationDelay(200);
 		}
 		
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
