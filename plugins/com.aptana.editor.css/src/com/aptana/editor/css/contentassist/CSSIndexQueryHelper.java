@@ -39,6 +39,10 @@ public class CSSIndexQueryHelper
 		{
 			e.printStackTrace();
 		}
+		catch (Throwable t)
+		{
+			t.printStackTrace();
+		}
 		
 		return result;
 	}
