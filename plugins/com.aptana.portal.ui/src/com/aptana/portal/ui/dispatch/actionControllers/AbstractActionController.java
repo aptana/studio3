@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
 import java.lang.reflect.Method;

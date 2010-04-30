@@ -30,7 +30,7 @@ var Plugins = Class.create({
         // We have to wrap the rows in a tbody, otherwise, the internal browser
         // fails to display the rows.
         var tbodyItem;
-        items = table({'id' : 'plugins'}, tbodyItem = tbody());
+        items = table({'class' : 'configurations'}, tbodyItem = tbody());
         var pluginNames = this.pluginList.keys();
         var items_count = pluginNames.size();
         var errorShown = false;
@@ -55,7 +55,7 @@ var Plugins = Class.create({
                 // We need this to give the page a chance to get the OK notification 
                 // after the initial error notification.
                 window.setTimeout(function() { 
-                  showError("Plugin Installation Problem", "There was an problem updating / installing this plug-in. You can find more information about this problem at the Aptana Studio error log."); 
+                  showError("Plugin Installation Problem", "There was an problem updating / installing this plug-in. More information about this problem can be found at the Aptana Studio error log."); 
                   }, 1000);
                 errorShown = true;
               }
@@ -93,11 +93,12 @@ var Plugins = Class.create({
           }
           tbodyItem.appendChild(itemRow);
           // register the tooltips
-          pluginSpan.observe('mouseover', function(e) {
-            _showTooltip(e);
+          var tt = function(e) {
+            this._showTooltip(e);
             e.stop();
             return true;
-          });
+          }
+          pluginSpan.observe('mouseover', tt.bind(this));
           pluginSpan.observe('mouseout', function(e) {
             tooltip.hide();
             return true;
@@ -161,5 +162,29 @@ var Plugins = Class.create({
        dispatch($H({controller:"portal.plugins", action:"openPluginsDialog", args : [siteURL, featureId, this.pluginList.values()].toJSON()}).toJSON());
        event.stop();
        return true;
-     }
+     }, 
+     /**
+      * Show a tooltip for the plug-in details.
+      */
+      _showTooltip: function(event) {
+        var pid = event.target.getAttribute('pluginId');
+        var pMinVersion = event.target.getAttribute('minVersion');
+        var pInstalledVersion = event.target.getAttribute('installedVersion');
+        var pStatus = event.target.getAttribute('pluginStatus');
+        var ttHtml = '<div><b>Plugin-ID:</b> ' + pid + '</div>';
+        if (pStatus) {
+          switch (pStatus) {
+            case 'install':
+              ttHtml += '<div><b>Version:</b> ' + pMinVersion + '</div><div><b>Status:</b> This plugins is not installed</div>';
+            break;
+            case 'ok':
+              ttHtml += '<div><b>Version:</b> ' + pInstalledVersion + '</div><div><b>Status:</b> This plugins is installed</div>';
+            break;
+            case 'update':
+              ttHtml += '<div><b>Version:</b> ' + pInstalledVersion + '</div><div><b>Status:</b> This plugins is installed but needs to be updated to version '+pMinVersion+'</div>';
+            break;
+          }
+        }
+        tooltip.show(ttHtml);
+      }
 });

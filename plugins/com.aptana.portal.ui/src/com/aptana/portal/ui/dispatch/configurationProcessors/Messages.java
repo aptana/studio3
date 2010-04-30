@@ -14,6 +14,9 @@ public class Messages extends NLS
 	public static String PluginsConfigurationProcessor_missingPluginNames;
 	public static String PluginsConfigurationProcessor_wrongAttributesForConfigure;
 	public static String PluginsConfigurationProcessor_wrongPluginDefinitionRequest;
+	public static String SystemConfigurationProcessor_missingConfigurationItems;
+	public static String SystemConfigurationProcessor_noShellCommandPath;
+	public static String SystemConfigurationProcessor_wrongConfigurationAttributesStructure;
 	static
 	{
 		// initialize resource bundle

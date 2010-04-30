@@ -2,7 +2,7 @@
  * This script manages the portal observer-observable event mechanism.
  */
 // Constants
-var Events = {ERROR : 'error', RECENT_FILES : 'recentFiles', PLUGINS : 'plugins', GEMS : 'gemList'};
+var Events = {ERROR : 'error', RECENT_FILES : 'recentFiles', PLUGINS : 'plugins', GEMS : 'gemList', APP_VERSIONS : 'app-versions'};
 var ConfigurationStatus = {UNKNOWN : 'unknown', OK : 'ok', PROCESSING : 'processing', ERROR : 'error'};
 
 /**
@@ -13,13 +13,16 @@ var Portal = Class.create({
     this.plugins = new Plugins();
     this.files   = new Files();
     this.gems   = new Gems();
+    this.configurations   = new Configurations();
     this.plugins.render($('plugins'));
     this.files.render($('recentFiles'));
     this.gems.render($('gems'));
+    this.configurations.render($('app-versions'));
   }, 
   refreshAll: function() {
     this.plugins.dispatchCheck();
     this.gems.dispatchCheck();
+    // TODO - dispatch a configuration check?
   }
 });
 
@@ -29,6 +32,7 @@ var portal;
 eventsDispatcher.addObserver(Events.RECENT_FILES, function(e) { portal.files.render($('recentFiles')); });
 eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.gems.render($('gems'), e); });
 eventsDispatcher.addObserver(Events.PLUGINS, function(e) { portal.plugins.render($('plugins'), e); });
+eventsDispatcher.addObserver(Events.APP_VERSIONS, function(e) { portal.configurations.render($('app-versions'), e); });
 
 /**
  * This custom error handler is needed when the Portal is viewed in the 
@@ -108,28 +112,14 @@ function _errorStatus(jsonError) {
 }
 
 /**
- * Show a tooltip for the plug-in details.
+ * Finds and return the OS name that the portal is running on.
+ * The returned values are 'windows', 'macosx' and 'linux'. We treat any unknown system as 'linux' to simplify things.
  */
-function _showTooltip(event) {
-  var pid = event.target.getAttribute('pluginId');
-  var pMinVersion = event.target.getAttribute('minVersion');
-  var pInstalledVersion = event.target.getAttribute('installedVersion');
-  var pStatus = event.target.getAttribute('pluginStatus');
-  var ttHtml = '<div><b>Plugin-ID:</b> ' + pid + '</div>';
-  if (pStatus) {
-    switch (pStatus) {
-      case 'install':
-        ttHtml += '<div><b>Version:</b> ' + pMinVersion + '</div><div><b>Status:</b> This plugins is not installed</div>';
-      break;
-      case 'ok':
-        ttHtml += '<div><b>Version:</b> ' + pInstalledVersion + '</div><div><b>Status:</b> This plugins is installed</div>';
-      break;
-      case 'update':
-        ttHtml += '<div><b>Version:</b> ' + pInstalledVersion + '</div><div><b>Status:</b> This plugins is installed but needs to be updated to version '+pMinVersion+'</div>';
-      break;
-    }
-  }
-  tooltip.show(ttHtml);
+function getOS() {
+  var OSName="linux";
+  if (navigator.appVersion.indexOf("Win")!=-1) OSName="windows";
+  if (navigator.appVersion.indexOf("Mac")!=-1) OSName="macosx";
+  return OSName;
 }
 
  

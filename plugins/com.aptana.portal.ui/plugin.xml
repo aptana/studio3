@@ -32,6 +32,12 @@
             id="com.aptana.portal.plugins.processor"
             name="Plugins">
       </processor>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
+            id="com.aptana.portal.versions.processor"
+            name="Program Version Configurations">
+      </processor>
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
@@ -57,6 +63,12 @@
             configurationProcessor="com.aptana.portal.plugins.processor"
             id="portal.plugins"
             name="Plugins Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
+            configurationProcessor="com.aptana.portal.versions.processor"
+            id="portal.system.versions"
+            name="System Configurations Versions Action Controller">
       </actionController>
    </extension>
 </plugin>

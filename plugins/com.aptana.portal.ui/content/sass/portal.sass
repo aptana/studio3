@@ -1,4 +1,4 @@
-table#plugins
+table.configurations
   :border-collapse collapse
   tbody
     tr
@@ -8,8 +8,6 @@ table#plugins
           :padding-left 22px
           :background-position 0 50%
           :background-repeat no-repeat
-          &.processing
-            :background-image url(../images/activity/small_circle.gif)
           &.ok
             :background-image url(../images/tick.png)
           &.notice
@@ -22,3 +20,13 @@ table#plugins
             &.install, &.update
               :padding 0
               :margin 0
+.processing
+  :padding-left 22px
+  :background-position 0 50%
+  :background-repeat no-repeat
+  :background-image url(../images/activity/small_circle.gif)
+  
+#divider
+  :padding-top 5px
+  :margin-bottom 5px
+  :border-bottom 1px dotted #efefef

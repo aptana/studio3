@@ -121,5 +121,10 @@ public interface IBrowserNotificationConstants
 	 * An event id for notifying a change in the plugins list.
 	 */
 	public static final String EVENT_ID_PLUGINS = "plugins"; //$NON-NLS-1$
+	
+	/**
+	 * An event id for notifying a change in the applications versions list.
+	 */
+	public static final String EVENT_ID_VERSIONS_LIST = "app-versions"; //$NON-NLS-1$
 
 }

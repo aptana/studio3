@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.aptana.portal.ui.dispatch.actionControllers;
 
 import java.util.Collections;
@@ -18,33 +15,33 @@ import com.aptana.portal.ui.dispatch.BrowserNotifier;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
- * A action controller for Ruby Gems related actions.<br>
+ * A action controller for configuration related actions.<br>
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class GemsActionController extends AbstractActionController
+public class SystemActionController extends AbstractActionController
 {
 	/**
-	 * Starts a Job that computes the installed Gems in the system.<br>
-	 * This Job will then notify any internal browser the result through the {@link BrowserNotifier}.
+	 * This method checks if the list of items are installed in the system, and eventually calls a browser notification
+	 * that contains metadata information regarding each item.<br>
+	 * This method will run a separate Job to do the computation asynchronously.
 	 * 
-	 * @return An immediate {@link IBrowserNotificationConstants#JSON_OK} to indicate that the Job was started, or an
-	 *         error JSON notification if there is no configuration processor that can deal with this request.
+	 * @param itemsAttributes
+	 * @return An immediate {@link IBrowserNotificationConstants#JSON_OK} response to indicate a successful initiation
+	 *         of the check.
 	 */
 	@ControllerAction
-	public Object computeInstalledGems()
+	public Object computeInstalledVersions(final Object itemsAttributes)
 	{
-		// Get the configuration processor (the method invocation in the AbstractActionController already checked that
-		// it's valid)
 		final IConfigurationProcessor processor = getProcessor();
 		// Start a Job that will call the processor to compute the installed Gems and notify the browse when it's done
-		Job computationJob = new Job(Messages.GemsActionController_computingGemsJobName)
+		Job computationJob = new Job(Messages.PluginsActionController_computingInstalledPlugins)
 		{
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				processor.addConfigurationProcessorListener(GemsActionController.this);
-				processor.getStatus(monitor, null, true);
-				processor.removeConfigurationProcessorListener(GemsActionController.this);
+				processor.addConfigurationProcessorListener(SystemActionController.this);
+				processor.getStatus(monitor, itemsAttributes, true);
+				processor.removeConfigurationProcessorListener(SystemActionController.this);
 				return Status.OK_STATUS;
 			}
 		};
@@ -53,12 +50,12 @@ public class GemsActionController extends AbstractActionController
 	}
 
 	/**
-	 * Returns a browser notification with the current known installed gems.
+	 * Returns a browser notification with the current known installed versions.
 	 * 
 	 * @return a browser notification
 	 */
 	@ControllerAction
-	public Object getInstalledGems()
+	public Object getInstalledVersions()
 	{
 		IConfigurationProcessor processor = getProcessor();
 		// We rely on the fact that the ConfigurationStatus implements the JSON Convertible interface
@@ -69,20 +66,23 @@ public class GemsActionController extends AbstractActionController
 				IBrowserNotificationConstants.EVENT_TYPE_RESPONSE, processorResult);
 	}
 
-	/**
-	 * Listen to configuration status changes and notify the browser when needed.
+	/*
+	 * (non-Javadoc)
+	 * @seecom.aptana.configurations.processor.IConfigurationProcessorListener#configurationStateChanged(com.aptana.
+	 * configurations.processor.ConfigurationStatus, java.util.Set)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void configurationStateChanged(ConfigurationStatus status, Set<String> attributesChanged)
 	{
-		// On the Gems controller, we only care status changes
+		// we only care status changes
 		if (attributesChanged != null && attributesChanged.contains(ConfigurationStatus.STATUS))
 		{
 			String jsonStatus = JSON.toString(status);
 			BrowserNotifier.getInstance().notifyBrowserInUIThread(Collections.EMPTY_LIST,
-					IBrowserNotificationConstants.EVENT_ID_GEM_LIST, IBrowserNotificationConstants.EVENT_TYPE_CHANGED,
+					IBrowserNotificationConstants.EVENT_ID_VERSIONS_LIST, IBrowserNotificationConstants.EVENT_TYPE_CHANGED,
 					jsonStatus);
 		}
 	}
+
 }
