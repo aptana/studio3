@@ -171,7 +171,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IndexContentAssistProcessor(getAbstractThemeableEditor());
+		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
 	/*

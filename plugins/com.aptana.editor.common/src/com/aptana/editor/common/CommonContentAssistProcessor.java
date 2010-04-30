@@ -22,7 +22,7 @@ import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class IndexContentAssistProcessor implements IContentAssistProcessor
+public class CommonContentAssistProcessor implements IContentAssistProcessor
 {
 	private final AbstractThemeableEditor abstractThemeableEditor;
 
@@ -31,7 +31,7 @@ public class IndexContentAssistProcessor implements IContentAssistProcessor
 	 * 
 	 * @param abstractThemeableEditor
 	 */
-	public IndexContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	public CommonContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
 		this.abstractThemeableEditor = abstractThemeableEditor;
 	}

@@ -1,19 +1,20 @@
 package com.aptana.editor.html.contentassist;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.IndexContentAssistProcessor;
 import com.aptana.editor.html.contentassist.model.ElementElement;
-import com.aptana.index.core.Index;
 
-public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
+public class HTMLContentAssistProcessor implements IContentAssistProcessor
 {
 	private HTMLContentAssistHelper _helper;
 	
@@ -24,20 +25,18 @@ public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 	 */
 	public HTMLContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
 	{
-		super(abstractThemeableEditor);
-		
 		this._helper = new HTMLContentAssistHelper();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.IndexContentAssistProcessor#computeCompletionProposalsUsingIndex(org.eclipse.jface.text.ITextViewer, int, com.aptana.index.core.Index, java.util.List)
+	 * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int)
 	 */
 	@Override
-	protected void computeCompletionProposalsUsingIndex(ITextViewer viewer, int offset, Index index,
-			List<ICompletionProposal> completionProposals)
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		List<ElementElement> elements = this._helper.getElements();
+		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
 		if (elements != null)
 		{
@@ -56,8 +55,45 @@ public class HTMLContentAssistProcessor extends IndexContentAssistProcessor
 				CompletionProposal proposal = new CompletionProposal(insertText, offset, 0, length, image, displayName, contextInfo, description);
 				
 				// add it to the list
-				completionProposals.add(proposal);
+				result.add(proposal);
 			}
 		}
+		
+		return result.toArray(new ICompletionProposal[result.size()]);
+	}
+
+	@Override
+	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public char[] getCompletionProposalAutoActivationCharacters()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public char[] getContextInformationAutoActivationCharacters()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IContextInformationValidator getContextInformationValidator()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getErrorMessage()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
