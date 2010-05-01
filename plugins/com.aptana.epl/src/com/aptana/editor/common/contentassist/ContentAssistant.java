@@ -1043,7 +1043,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		 */
 		public void verifyKey(VerifyEvent e)
 		{
-			IContentAssistListener[] listeners = (IContentAssistListener[]) fListeners.clone();
+			IContentAssistListener[] listeners = fListeners.clone();
 			for (int i = 0; i < listeners.length; i++)
 			{
 				if (listeners[i] != null)
@@ -1068,7 +1068,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 
 			installKeyListener();
 
-			IContentAssistListener[] listeners = (IContentAssistListener[]) fListeners.clone();
+			IContentAssistListener[] listeners = fListeners.clone();
 			for (int i = 0; i < listeners.length; i++)
 			{
 				if (listeners[i] != null)
@@ -1242,7 +1242,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			return null;
 		}
 
-		return (IContentAssistProcessor) fProcessors.get(contentType);
+		return fProcessors.get(contentType);
 	}
 
 	/**

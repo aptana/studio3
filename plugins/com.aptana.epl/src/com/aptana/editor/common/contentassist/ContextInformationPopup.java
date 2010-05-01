@@ -148,7 +148,7 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 	private StyledText fContextInfoText;
 	private TextPresentation fTextPresentation;
 
-	private Stack fContextFrameStack = new Stack();
+	private Stack<ContextFrame> fContextFrameStack = new Stack<ContextFrame>();
 	/**
 	 * The code assist subject control.
 	 * 
@@ -269,9 +269,9 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 						}
 
 						// also check all other contexts
-						for (Iterator it = fContextFrameStack.iterator(); it.hasNext();)
+						for (Iterator<ContextFrame> it = fContextFrameStack.iterator(); it.hasNext();)
 						{
-							ContextFrame stackFrame = (ContextFrame) it.next();
+							ContextFrame stackFrame = it.next();
 							if (stackFrame.equals(frame))
 							{
 								validateContextInformation();
@@ -411,7 +411,7 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 			return false;
 		}
 		// stack not empty
-		ContextFrame top = (ContextFrame) fContextFrameStack.peek();
+		ContextFrame top = fContextFrameStack.peek();
 		return frame.equals(top);
 	}
 
@@ -596,13 +596,13 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 			int size = fContextFrameStack.size();
 			if (size > 0)
 			{
-				fLastContext = (ContextFrame) fContextFrameStack.pop();
+				fLastContext = fContextFrameStack.pop();
 				--size;
 			}
 
 			if (size > 0)
 			{
-				ContextFrame current = (ContextFrame) fContextFrameStack.peek();
+				ContextFrame current = fContextFrameStack.peek();
 				internalShowContextFrame(current, false);
 			}
 			else
@@ -1025,7 +1025,7 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 		fContextInfoPopup.getDisplay().asyncExec(new Runnable()
 		{
 
-			private ContextFrame fFrame = (ContextFrame) fContextFrameStack.peek();
+			private ContextFrame fFrame = fContextFrameStack.peek();
 
 			public void run()
 			{
@@ -1037,7 +1037,7 @@ class ContextInformationPopup implements IContentAssistListener, KeyListener
 					// iterate all contexts on the stack
 					while (Helper.okToUse(fContextInfoPopup) && !fContextFrameStack.isEmpty())
 					{
-						ContextFrame top = (ContextFrame) fContextFrameStack.peek();
+						ContextFrame top = fContextFrameStack.peek();
 						if (top.fValidator == null || !top.fValidator.isContextInformationValid(offset))
 						{
 							hideContextInfoPopup(); // loop variant: reduces the number of contexts

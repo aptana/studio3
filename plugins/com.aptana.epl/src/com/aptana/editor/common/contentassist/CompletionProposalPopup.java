@@ -1496,29 +1496,29 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		IDocument document = fContentAssistSubjectControlAdapter.getDocument();
 		int length = proposals.length;
-		List filtered = new ArrayList(length);
+		List<ICompletionProposal> filtered = new ArrayList<ICompletionProposal>(length);
 		for (int i = 0; i < length; i++)
 		{
-
-			if (proposals[i] instanceof ICompletionProposalExtension2)
+			ICompletionProposal proposal = proposals[i];
+			
+			if (proposal instanceof ICompletionProposalExtension2)
 			{
-
-				ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposals[i];
+				ICompletionProposalExtension2 p = (ICompletionProposalExtension2) proposal;
+				
 				if (p.validate(document, offset, event))
 				{
-					filtered.add(p);
+					filtered.add(proposal);
 				}
 
 			}
-			else if (proposals[i] instanceof ICompletionProposalExtension)
+			else if (proposal instanceof ICompletionProposalExtension)
 			{
-
-				ICompletionProposalExtension p = (ICompletionProposalExtension) proposals[i];
+				ICompletionProposalExtension p = (ICompletionProposalExtension) proposal;
+				
 				if (p.isValidFor(document, offset))
 				{
-					filtered.add(p);
+					filtered.add(proposal);
 				}
-
 			}
 			else
 			{
@@ -1526,11 +1526,12 @@ public class CompletionProposalPopup implements IContentAssistListener
 				fIsFilteredSubset = false;
 				fInvocationOffset = offset;
 				fComputedProposals = computeProposals(fInvocationOffset, false);
+				
 				return fComputedProposals;
 			}
 		}
 
-		return (ICompletionProposal[]) filtered.toArray(new ICompletionProposal[filtered.size()]);
+		return filtered.toArray(new ICompletionProposal[filtered.size()]);
 	}
 
 	/**
@@ -1678,7 +1679,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		// contains the common postfix in the case that there are any proposals matching our LHS
 		StringBuffer rightCasePostfix = null;
-		List rightCase = new ArrayList();
+		List<ICompletionProposal> rightCase = new ArrayList<ICompletionProposal>();
 
 		// whether to check for non-case compatible matches. This is initially true, and stays so
 		// as long as there are i) no case-sensitive matches and ii) all proposals share the same
@@ -1690,7 +1691,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		int wrongCasePrefixStart = 0;
 		// contains the common postfix of all case-insensitive matches
 		StringBuffer wrongCasePostfix = null;
-		List wrongCase = new ArrayList();
+		List<ICompletionProposal> wrongCase = new ArrayList<ICompletionProposal>();
 
 		for (int i = 0; i < fFilteredProposals.length; i++)
 		{
@@ -1756,7 +1757,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		if (rightCase.size() == 1)
 		{
-			ICompletionProposal proposal = (ICompletionProposal) rightCase.get(0);
+			ICompletionProposal proposal = rightCase.get(0);
 			if (canAutoInsert(proposal))
 			{
 				insertProposal(proposal, (char) 0, 0, fInvocationOffset);
@@ -1767,7 +1768,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		else if (checkWrongCase && wrongCase.size() == 1)
 		{
-			ICompletionProposal proposal = (ICompletionProposal) wrongCase.get(0);
+			ICompletionProposal proposal = wrongCase.get(0);
 			if (canAutoInsert(proposal))
 			{
 				insertProposal(proposal, (char) 0, 0, fInvocationOffset);

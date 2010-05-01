@@ -68,10 +68,9 @@ public class HTMLTextPresenter implements IInformationPresenter
 		int yoursEnd = offset + insertLength - 1;
 		yoursEnd = Math.max(yoursStart, yoursEnd);
 
-		Iterator e = presentation.getAllStyleRangeIterator();
+		Iterator<?> e = presentation.getAllStyleRangeIterator();
 		while (e.hasNext())
 		{
-
 			StyleRange range = (StyleRange) e.next();
 
 			int myStart = range.start;
