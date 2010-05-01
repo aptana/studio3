@@ -18,7 +18,6 @@ package com.aptana.editor.common.contentassist;
  **************************************************************************************************/
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.text.Assert;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IInformationControlCreatorExtension;
@@ -291,7 +290,6 @@ public abstract class AbstractInformationControlManager
 	 */
 	protected AbstractInformationControlManager(IInformationControlCreator creator)
 	{
-		Assert.isNotNull(creator);
 		fInformationControlCreator = creator;
 	}
 
@@ -437,7 +435,6 @@ public abstract class AbstractInformationControlManager
 	public void setRestoreInformationControlBounds(IDialogSettings dialogSettings, boolean restoreLocation,
 			boolean restoreSize)
 	{
-		Assert.isTrue(dialogSettings != null && (restoreLocation || restoreSize));
 		fDialogSettings = dialogSettings;
 		fIsRestoringLocation = restoreLocation;
 		fIsRestoringSize = restoreSize;
