@@ -7,7 +7,8 @@ Bundle-Activator: com.aptana.configurations.ConfigurationsPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.mortbay.jetty.util,
- com.aptana.scripting
+ com.aptana.scripting,
+ com.aptana.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.configurations,

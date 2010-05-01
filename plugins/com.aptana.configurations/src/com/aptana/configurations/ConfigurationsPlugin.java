@@ -54,17 +54,17 @@ public class ConfigurationsPlugin extends Plugin
 		return plugin;
 	}
 
-	public static void logInfo(String string, Exception e)
+	public static void logInfo(String string, Throwable e)
 	{
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string, e));
 	}
 
-	public static void logError(Exception e)
+	public static void logError(Throwable e)
 	{
 		logError(e.getLocalizedMessage(), e);
 	}
 
-	public static void logError(String string, Exception e)
+	public static void logError(String string, Throwable e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
 	}

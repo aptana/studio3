@@ -2,6 +2,7 @@ package com.aptana.configurations.processor;
 
 import java.util.Set;
 
+
 /**
  * A listener interface for any party that wish to be informed of any change of state during the configuration progress.
  * 

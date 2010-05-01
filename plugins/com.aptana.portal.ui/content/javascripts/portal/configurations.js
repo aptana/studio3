@@ -7,7 +7,7 @@ var Configurations = Class.create({
       this.configItems = $H({
         'windows' : $H({
           'Ruby': ['ruby', '1.8.7', 'http://rubyinstaller.org/'],
-          'Git': ['git', '1.8.0', 'http://code.google.com/p/msysgit/']
+          'Git': ['git', '1.7.0', 'http://code.google.com/p/msysgit/']
         }), 
         'macosx' : $H({
           'Ruby': ['ruby', '1.8.7', 'http://rubyinstaller.org/'],

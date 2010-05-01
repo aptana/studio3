@@ -2,6 +2,7 @@ package com.aptana.configurations.processor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+
 /**
  * A configuration processor interface.
  * 

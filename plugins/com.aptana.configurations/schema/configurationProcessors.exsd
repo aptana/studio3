@@ -19,6 +19,7 @@
       <complexType>
          <sequence>
             <element ref="processor" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="delegate" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -48,6 +49,11 @@
    </element>
 
    <element name="processor">
+      <annotation>
+         <documentation>
+            A configuration processor extenstion point.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -78,6 +84,50 @@
                <documentation>
                   A comma separated list of categories that this configuration processors belongs to. For example: rails-install, git, plugins etc...
 Although optional, it is very recommended to set a category, as a user of this processor might need a hint for the nature of this processor.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="delegate">
+      <annotation>
+         <documentation>
+            A delegated processor extension point. This processor is designed to be invoked from another processor. The target processor that will invoke it is defined in the targetID.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="targetID" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The processor ID (the delegator) that will call this processor.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.configurations.configurationProcessors/processor/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An IConfigurationProcessorDelegate implementation
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.configurations.processor.IConfigurationProcessorDelegate"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
                </documentation>
             </annotation>
          </attribute>

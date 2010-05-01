@@ -38,6 +38,24 @@
             id="com.aptana.portal.versions.processor"
             name="Program Version Configurations">
       </processor>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.RailsVersionProcessor"
+            id="com.aptana.portal.versions.processor.rails"
+            name="Rails Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.SQLiteVersionProcessor"
+            id="com.aptana.portal.versions.processor.sqlite"
+            name="SQLite Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.RubyVersionProcessor"
+            id="com.aptana.portal.versions.processor.ruby"
+            name="Ruby Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
@@ -68,7 +86,7 @@
             class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
             configurationProcessor="com.aptana.portal.versions.processor"
             id="portal.system.versions"
-            name="System Configurations Versions Action Controller">
+            name="Apps Versions Action Controller">
       </actionController>
    </extension>
 </plugin>

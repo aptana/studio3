@@ -1,7 +1,10 @@
 package com.aptana.configurations.processor;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -17,13 +20,17 @@ public class ConfigurationProcessorsRegistry
 {
 	private static final String EXTENSION_POINT_ID = ConfigurationsPlugin.PLUGIN_ID + ".configurationProcessors"; //$NON-NLS-1$
 	private static final String TAG_PROCESSOR = "processor"; //$NON-NLS-1$
+	private static final String TAG_DELEGATE = "delegate"; //$NON-NLS-1$
 	private static final String ATT_ID = "id"; //$NON-NLS-1$
+	private static final String ATT_TARGET_ID = "targetID"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_NAME = "name"; //$NON-NLS-1$
 	private static final String ATT_CATEGORY = "category"; //$NON-NLS-1$
 
 	private static ConfigurationProcessorsRegistry instance = null;
 	private Map<String, AbstractConfigurationProcessor> processors = new HashMap<String, AbstractConfigurationProcessor>();
+	// Maps between the processor and it's delegates. Each processor can be a target at other processors delegates.
+	private Map<String, Set<IConfigurationProcessorDelegate>> delegators = new HashMap<String, Set<IConfigurationProcessorDelegate>>();
 
 	// Initialize the registry
 	private ConfigurationProcessorsRegistry()
@@ -77,6 +84,23 @@ public class ConfigurationProcessorsRegistry
 		return processors.keySet().toArray(new String[processors.size()]);
 	}
 
+	/**
+	 * Returns a set of {@link IConfigurationProcessorDelegate}s that were assigned to the processor with the given id.
+	 * 
+	 * @param processorID
+	 * @return A Set of ConfigurationProcessorDelegate, or an empty set if none were assigned.
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<IConfigurationProcessorDelegate> getProcessorDelegators(String processorID)
+	{
+		Set<IConfigurationProcessorDelegate> set = delegators.get(processorID);
+		if (set != null)
+		{
+			return Collections.unmodifiableSet(set);
+		}
+		return Collections.EMPTY_SET;
+	}
+
 	// Load the extensions
 	private void readExtensionRegistry()
 	{
@@ -90,7 +114,9 @@ public class ConfigurationProcessorsRegistry
 
 	private void readElement(IConfigurationElement element)
 	{
-		if (TAG_PROCESSOR.equals(element.getName()))
+		boolean isProcessor = TAG_PROCESSOR.equals(element.getName());
+		boolean isDelegate = TAG_DELEGATE.equals(element.getName());
+		if (isProcessor || isDelegate)
 		{
 			String id = element.getAttribute(ATT_ID);
 			if (id == null || id.length() == 0)
@@ -107,22 +133,49 @@ public class ConfigurationProcessorsRegistry
 			{
 				return;
 			}
-			try
+
+			if (isProcessor)
 			{
-				AbstractConfigurationProcessor processor = (AbstractConfigurationProcessor) element
-						.createExecutableExtension(ATT_CLASS);
-				processors.put(id, processor);
-				processor.setName(name);
-				processor.setID(id);
-				String categoryStr = element.getAttribute(ATT_CATEGORY);
-				if (categoryStr != null && categoryStr.trim().length() > 0)
+				try
 				{
-					processor.setCategories(categoryStr.split(", ")); //$NON-NLS-1$
+					// TODO - Don't actually create an instance. Create a factory for that instance.
+					AbstractConfigurationProcessor processor = (AbstractConfigurationProcessor) element
+							.createExecutableExtension(ATT_CLASS);
+					processors.put(id, processor);
+					processor.setName(name);
+					processor.setID(id);
+					String categoryStr = element.getAttribute(ATT_CATEGORY);
+					if (categoryStr != null && categoryStr.trim().length() > 0)
+					{
+						processor.setCategories(categoryStr.split(", ")); //$NON-NLS-1$
+					}
+				}
+				catch (Throwable e)
+				{
+					ConfigurationsPlugin.logError("Failed creating a configuration processor extension", e); //$NON-NLS-1$
 				}
 			}
-			catch (Exception e)
+			else
 			{
-				ConfigurationsPlugin.logError("Failed creating a configuration processor extension", e); //$NON-NLS-1$
+				// It's a delegate
+				try
+				{
+					// TODO - Don't actually create an instance. Create a factory for that instance.
+					IConfigurationProcessorDelegate delegate = (IConfigurationProcessorDelegate) element
+							.createExecutableExtension(ATT_CLASS);
+					String targetID = element.getAttribute(ATT_TARGET_ID);
+					Set<IConfigurationProcessorDelegate> otherDelegates = delegators.get(targetID);
+					if (otherDelegates == null)
+					{
+						otherDelegates = new HashSet<IConfigurationProcessorDelegate>(6);
+						delegators.put(targetID, otherDelegates);
+					}
+					otherDelegates.add(delegate);
+				}
+				catch (Throwable e)
+				{
+					ConfigurationsPlugin.logError("Failed creating a configuration processor extension", e); //$NON-NLS-1$
+				}
 			}
 		}
 	}

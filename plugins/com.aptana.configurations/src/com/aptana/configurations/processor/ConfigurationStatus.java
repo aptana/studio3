@@ -15,6 +15,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.configurations.ConfigurationsPlugin;
 
+
 /**
  * This class represents a state of a configuration.<br>
  * The ConfigurationStatus also implements the {@link Convertible} interface, so it can easily be created and stored
