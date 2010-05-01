@@ -260,7 +260,8 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 		
 		getPreferenceStore().setValue(
 			IPreferenceConstants.USER_AGENT_PREFERENCE,
-			StringUtil.join(",", (String[]) al.toArray(new String[al.size()]))); //$NON-NLS-1$
+			StringUtil.join(",", al.toArray(new String[al.size()])) //$NON-NLS-1$
+		);
 		
 		return true;
 	}
