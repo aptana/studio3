@@ -14,14 +14,6 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
-         <view
-               id="com.aptana.explorer.view"
-               minimized="false"
-               ratio="0.25"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
-         </view>
          <viewShortcut
                id="com.aptana.explorer.view">
          </viewShortcut>
@@ -45,13 +37,6 @@
          <viewShortcut
                id="org.eclipse.ui.views.ContentOutline">
          </viewShortcut>
-         <view
-               id="com.aptana.terminal.views.terminal"
-               ratio="0.75"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
-         </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
@@ -92,7 +77,51 @@
          <actionSet
                id="org.eclipse.ui.edit.text.actionSet.presentation">
          </actionSet>
+         <newWizardShortcut
+               id="com.aptana.ui.wizards.NewWebProject">
+         </newWizardShortcut>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="com.aptana.ui.wizards.category"
+            class="com.aptana.ui.internal.wizards.NewProjectWizard"
+            finalPerspective="com.aptana.ui.WebPerspective"
+            icon="icons/new_web_project.gif"
+            id="com.aptana.ui.wizards.NewWebProject"
+            name="Web Project"
+            preferredPerspectives="com.aptana.ui.WebPerspective"
+            project="true">
+         <description>
+            Create a new web project
+         </description>
+      </wizard>
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="Web">
+      </category>
+      <primaryWizard
+            id="com.aptana.ui.wizards.NewWebProject">
+      </primaryWizard>
+   </extension>
+   <extension
+         id="webnature"
+         name="Web Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.aptana.ui.projects.WebProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/webnature.gif"
+            id="com.aptana.ui.webnature.image"
+            natureId="com.aptana.ui.webnature">
+      </image>
    </extension>
 
 </plugin>
