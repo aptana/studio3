@@ -247,6 +247,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 	/**
 	 * @see IInformationControl#setInformation(String)
 	 */
+	@SuppressWarnings("deprecation")
 	public void setInformation(String content) {
 		if (fPresenter == null) {
 			fText.setText(content);
