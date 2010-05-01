@@ -164,7 +164,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				categoryViewer.setCheckedElements(UserAgentManager.getInstance().getUserAgents());
+				categoryViewer.setCheckedElements(UserAgentManager.getInstance().getAllUserAgents());
 			}
 		});
 		enableAll.setText("Select All");
@@ -221,7 +221,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 			{
 			}
 		});
-		categoryViewer.setInput(UserAgentManager.getInstance().getUserAgents());
+		categoryViewer.setInput(UserAgentManager.getInstance().getAllUserAgents());
 		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getActiveUserAgents());
 	}
 
