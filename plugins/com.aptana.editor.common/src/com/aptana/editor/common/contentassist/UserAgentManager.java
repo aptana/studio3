@@ -143,7 +143,7 @@ public class UserAgentManager
 		{
 			UserAgent userAgent = activeUserAgents[i];
 			
-			result[i] = (enabledAgents.contains(userAgent.name)) ? userAgent.enabledIcon : userAgent.disabledIcon;
+			result[i] = (enabledAgents.contains(userAgent.ID)) ? userAgent.enabledIcon : userAgent.disabledIcon;
 		}
 		
 		return result;
