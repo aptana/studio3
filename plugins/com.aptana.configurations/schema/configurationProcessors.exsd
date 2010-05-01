@@ -17,7 +17,7 @@
          </appinfo>
       </annotation>
       <complexType>
-         <sequence>
+         <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="processor" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="delegate" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>

@@ -13,3 +13,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.configurations,
  com.aptana.configurations.processor
+Eclipse-ExtensibleAPI: true

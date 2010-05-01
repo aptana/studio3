@@ -8,6 +8,7 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.browser,
+ com.aptana.configurations,
  org.eclipse.core.resources,
  org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.metadata,
@@ -17,7 +18,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.equinox.p2.artifact.repository,
  org.eclipse.equinox.p2.ui,
  org.mortbay.jetty.util,
- com.aptana.configurations,
  com.aptana.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
@@ -31,3 +31,5 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.processorDelegates,
  com.aptana.portal.ui.internal,
  com.aptana.portal.ui.internal.startup
+Import-Package: com.aptana.configurations
+Eclipse-ExtensibleAPI: true

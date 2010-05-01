@@ -30,14 +30,14 @@ public interface IConfigurationProcessorDelegate
 	 * 
 	 * @return
 	 */
-	public abstract String getSupportedApplication();
+	public String getSupportedApplication();
 
 	/**
 	 * Returns the commands that this delegate support.
 	 * 
 	 * @return A supported commands set.
 	 */
-	public abstract Set<String> getSupportedCommands();
+	public Set<String> getSupportedCommands();
 
 	/**
 	 * Runs a command.
@@ -47,5 +47,5 @@ public interface IConfigurationProcessorDelegate
 	 *            delegate.
 	 * @return An object representing the result of this command (can be null).
 	 */
-	public abstract Object runCommand(String commandType);
+	public Object runCommand(String commandType);
 }

@@ -30,6 +30,7 @@ public abstract class AbstractActionController implements IActionController, ICo
 {
 	private Map<String, Method> actions;
 	private String configurationProcessorID;
+	private IConfigurationProcessor processor;
 
 	/*
 	 * (non-Javadoc)
@@ -189,6 +190,11 @@ public abstract class AbstractActionController implements IActionController, ICo
 	 */
 	protected IConfigurationProcessor getProcessor()
 	{
-		return ConfigurationProcessorsRegistry.getInstance().getConfigurationProcessor(getConfigurationProcessorId());
+		if (processor == null)
+		{
+			processor = ConfigurationProcessorsRegistry.getInstance().getConfigurationProcessor(
+					getConfigurationProcessorId());
+		}
+		return processor;
 	}
 }
