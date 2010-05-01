@@ -237,9 +237,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			int i;
 			
 			LOOP:
-			for (i = offset; i >= 0; i--)
+			try
 			{
-				try
+				for (i = offset; i >= 0; i--)
 				{
 					char c = document.getChar(i);
 					
@@ -264,15 +264,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							break;
 					}
 				}
-				catch (BadLocationException e)
+				
+				if (i == 0 && result == Location.ERROR)
 				{
-					e.printStackTrace();
+					result = Location.OUTSIDE_RULE;
 				}
 			}
-		
-			if (i == 0 && result == Location.ERROR)
+			catch (BadLocationException e)
 			{
-				result = Location.OUTSIDE_RULE;
 			}
 		}
 		
