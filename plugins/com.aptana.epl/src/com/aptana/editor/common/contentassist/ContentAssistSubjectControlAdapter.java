@@ -41,6 +41,7 @@ import com.aptana.editor.common.contentassist.ContextInformationPopup.ContextFra
  * 
  * @since 3.0
  */
+@SuppressWarnings("deprecation")
 final class ContentAssistSubjectControlAdapter implements IContentAssistSubjectControl
 {
 
