@@ -14,7 +14,7 @@ var Portal = Class.create({
     this.files   = new Files();
     this.gems   = new Gems();
     this.configurations   = new Configurations();
-    this.plugins.render($('plugins'));
+    this.plugins.render($('plugins'), 'configurations');
     this.files.render($('recentFiles'));
     this.gems.render($('gems'));
     this.configurations.render($('app-versions'));
@@ -31,7 +31,7 @@ var portal;
 // Add observers to the dispatcher
 eventsDispatcher.addObserver(Events.RECENT_FILES, function(e) { portal.files.render($('recentFiles')); });
 eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.gems.render($('gems'), e); });
-eventsDispatcher.addObserver(Events.PLUGINS, function(e) { portal.plugins.render($('plugins'), e); });
+eventsDispatcher.addObserver(Events.PLUGINS, function(e) { portal.plugins.render($('plugins'), 'configurations', e); });
 eventsDispatcher.addObserver(Events.APP_VERSIONS, function(e) { portal.configurations.render($('app-versions'), e); });
 
 /**
