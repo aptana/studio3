@@ -91,6 +91,10 @@ ItemsView.Base = Class.create({
                 actionsSpan.appendChild(installSpan);
                 installLink.observe('click', this.dispatchInstall.bind(this));
               }
+              if (typeof(this.setAdditionalItemAttributes) !== 'undefined') {
+                // Set more attributes on this item in a subclassing class
+                this.setAdditionalItemAttributes(itemInfo, itemSpan);
+              }
             }
           break;
         }
@@ -136,7 +140,8 @@ ItemsView.create = function(arg) {
     showTooltip: arg.showTooltip, 
     createUpdateLink: arg.createUpdateLink, 
     createInstallLink: arg.createInstallLink, 
-    createExtendedElements: arg.createExtendedElements
+    createExtendedElements: arg.createExtendedElements, 
+    setAdditionalItemAttributes: arg.setAdditionalItemAttributes
   });
   
   Object.extend(classMethods, arg);  
