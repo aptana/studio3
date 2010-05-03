@@ -14,10 +14,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -126,52 +131,52 @@ public class GitIndex
 
 		Set<Job> jobs = new HashSet<Job>();
 		jobs.add(new Job("other files") //$NON-NLS-1$
-				{
+		{
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-								"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
-								"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						if (result != null && result.keySet().iterator().next() == 0)
-						{
-							readOtherFiles(result.values().iterator().next());
-						}
-						return Status.OK_STATUS;
-					}
-				});
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (result != null && result.keySet().iterator().next() == 0)
+				{
+					readOtherFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
 		jobs.add(new Job("unstaged files") //$NON-NLS-1$
-				{
+		{
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-								"diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
-						if (result != null && result.keySet().iterator().next() == 0)
-						{
-							readUnstagedFiles(result.values().iterator().next());
-						}
-						return Status.OK_STATUS;
-					}
-				});
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+				if (result != null && result.keySet().iterator().next() == 0)
+				{
+					readUnstagedFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
 		jobs.add(new Job("staged files") //$NON-NLS-1$
-				{
+		{
 
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
-								"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-								"-z", getParentTree()); //$NON-NLS-1$
-						if (result != null && result.keySet().iterator().next() == 0)
-						{
-							readStagedFiles(result.values().iterator().next());
-						}
-						return Status.OK_STATUS;
-					}
-				});
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+						"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+						"-z", getParentTree()); //$NON-NLS-1$
+				if (result != null && result.keySet().iterator().next() == 0)
+				{
+					readStagedFiles(result.values().iterator().next());
+				}
+				return Status.OK_STATUS;
+			}
+		});
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
 			return Status.CANCEL_STATUS;
@@ -431,11 +436,22 @@ public class GitIndex
 			this.notify = true;
 	}
 
+	/**
+	 * Makes a copy of the internal list of changed files so that iterating won't ever result in a
+	 * ConcurrentModificationException. try to avoid use if possible, since a deep copy is made which can be expensive.
+	 * 
+	 * @return
+	 */
 	public List<ChangedFile> changedFiles()
 	{
 		synchronized (changedFiles)
 		{
-			return changedFiles;
+			List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles.size());
+			for (ChangedFile file : this.changedFiles)
+			{
+				copy.add(new ChangedFile(file));
+			}
+			return copy;
 		}
 	}
 
@@ -801,5 +817,141 @@ public class GitIndex
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * For use in telling if a given resource is a changed file, or is a folder containing changes underneath it.
+	 * 
+	 * @param resource
+	 * @param changedFiles
+	 * @return
+	 */
+	public boolean resourceOrChildHasChanges(IResource resource)
+	{
+		synchronized (changedFiles)
+		{
+			if (changedFiles == null || changedFiles.isEmpty())
+				return false;
+
+			String workingDirectory = repository.workingDirectory();
+			IPath resourcePath = new Path(new File(resource.getLocationURI()).getAbsolutePath());
+			for (ChangedFile changedFile : changedFiles)
+			{
+				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+				if (resourcePath.isPrefixOf(new Path(fullPath)))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isDirty()
+	{
+		synchronized (changedFiles)
+		{
+			return !changedFiles.isEmpty();
+		}
+	}
+
+	public boolean hasUnresolvedMergeConflicts()
+	{
+		synchronized (changedFiles)
+		{
+			if (changedFiles.isEmpty())
+				return false;
+			for (ChangedFile changedFile : changedFiles)
+			{
+				if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
+					return true;
+			}
+			return false;
+		}
+	}
+
+	public Set<IResource> getChangedResources()
+	{
+		String workingDir = repository.workingDirectory();
+		Set<IResource> resources = new HashSet<IResource>();
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+						.getFileForLocation(new Path(workingDir).append(changedFile.getPath()));
+				if (resource != null)
+					resources.add(resource);
+			}
+		}
+		return resources;
+	}
+
+	public ChangedFile getChangedFileForResource(IResource resource)
+	{
+		if (resource == null || resource.getLocationURI() == null)
+			return null;
+		String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
+		String workingDirectory = repository.workingDirectory();
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+				if (resourcePath.equals(fullPath))
+				{
+					return changedFile;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the list of changed files that are underneath the given container.
+	 * 
+	 * @param container
+	 * @return
+	 */
+	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
+	{
+		if (container == null || container.getLocationURI() == null)
+			return Collections.emptyList();
+
+		String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
+		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
+		String workingDirectory = repository.workingDirectory();
+
+		synchronized (changedFiles)
+		{
+			if (changedFiles == null || changedFiles.isEmpty())
+				return Collections.emptyList();
+			for (ChangedFile changedFile : changedFiles)
+			{
+				String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
+				if (fullPath.startsWith(resourcePath))
+					filtered.add(changedFile);
+			}
+		}
+		return filtered;
+	}
+
+	/**
+	 * Find the changed file that corresponds to the repo relative path argument.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public ChangedFile findChangedFile(String path)
+	{
+		synchronized (changedFiles)
+		{
+			for (ChangedFile changedFile : changedFiles)
+			{
+				if (changedFile.getPath().equals(path))
+				{
+					return changedFile;
+				}
+			}
+		}
+		return null;
 	}
 }

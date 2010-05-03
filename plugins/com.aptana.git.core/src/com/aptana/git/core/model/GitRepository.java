@@ -29,11 +29,9 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -768,19 +766,7 @@ public class GitRepository
 
 	public ChangedFile getChangedFileForResource(IResource resource)
 	{
-		if (resource == null || resource.getLocationURI() == null)
-			return null;
-		String resourcePath = new File(resource.getLocationURI()).getAbsolutePath();
-		String workingDirectory = workingDirectory();
-		for (ChangedFile changedFile : index().changedFiles())
-		{
-			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			if (resourcePath.equals(fullPath))
-			{
-				return changedFile;
-			}
-		}
-		return null;
+		return index().getChangedFileForResource(resource);
 	}
 
 	/**
@@ -819,8 +805,8 @@ public class GitRepository
 		if (output == null || output.length() < 40)
 		{
 			GitPlugin.logWarning(MessageFormat.format(
-					"Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}", remote
-							.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
+					"Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}",
+					remote.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
 			return false;
 		}
 		String remoteSHA = output.substring(0, 40);
@@ -837,7 +823,7 @@ public class GitRepository
 
 	public boolean isDirty()
 	{
-		return !index().changedFiles().isEmpty();
+		return index().isDirty();
 	}
 
 	/**
@@ -1068,15 +1054,7 @@ public class GitRepository
 
 	public boolean hasUnresolvedMergeConflicts()
 	{
-		List<ChangedFile> changedFiles = index().changedFiles();
-		if (changedFiles.isEmpty())
-			return false;
-		for (ChangedFile changedFile : changedFiles)
-		{
-			if (changedFile.hasUnmergedChanges() && changedFile.hasUnstagedChanges())
-				return true;
-		}
-		return false;
+		return index().hasUnresolvedMergeConflicts();
 	}
 
 	public List<String> getMergeSHAs()
@@ -1153,19 +1131,7 @@ public class GitRepository
 	 */
 	public boolean resourceOrChildHasChanges(IResource resource)
 	{
-		List<ChangedFile> changedFiles = index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
-			return false;
-
-		String workingDirectory = workingDirectory();
-		IPath resourcePath = new Path(new File(resource.getLocationURI()).getAbsolutePath());
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			if (resourcePath.isPrefixOf(new Path(fullPath)))
-				return true;
-		}
-		return false;
+		return index().resourceOrChildHasChanges(resource);
 	}
 
 	/**
@@ -1176,23 +1142,7 @@ public class GitRepository
 	 */
 	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
 	{
-		List<ChangedFile> changedFiles = index().changedFiles();
-		if (changedFiles == null || changedFiles.isEmpty())
-			return Collections.emptyList();
-
-		if (container == null || container.getLocationURI() == null)
-			return Collections.emptyList();
-
-		String resourcePath = new File(container.getLocationURI()).getAbsolutePath();
-		List<ChangedFile> filtered = new ArrayList<ChangedFile>();
-		String workingDirectory = workingDirectory();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			String fullPath = new File(workingDirectory, changedFile.getPath()).getAbsolutePath();
-			if (fullPath.startsWith(resourcePath))
-				filtered.add(changedFile);
-		}
-		return filtered;
+		return index().getChangedFilesForContainer(container);
 	}
 
 	URI getFileURL()
@@ -1223,6 +1173,11 @@ public class GitRepository
 		{
 			listeners.remove(listener);
 		}
+	}
+
+	public Set<IResource> getChangedResources()
+	{
+		return index().getChangedResources();
 	}
 
 }
