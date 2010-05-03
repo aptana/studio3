@@ -59,7 +59,7 @@ Plugins = ItemsView.create({
     var pid = event.target.getAttribute('pluginId');
     var pMinVersion = event.target.getAttribute('minVersion');
     var pInstalledVersion = event.target.getAttribute('installedVersion');
-    var pStatus = event.target.getAttribute('pluginStatus');
+    var pStatus = event.target.getAttribute('itemStatus');
     var ttHtml = '<div><b>Plugin-ID:</b> ' + pid + '</div>';
     if (pStatus) {
       switch (pStatus) {
@@ -76,7 +76,7 @@ Plugins = ItemsView.create({
     }
     tooltip.show(ttHtml);
   },
-  
+
   createUpdateLink: function(item) {
     var iLink;
     with (Elements.Builder) {
@@ -84,7 +84,7 @@ Plugins = ItemsView.create({
     }
     return iLink;
   },
-  
+
   createInstallLink: function(item) {
     var iLink;
     with (Elements.Builder) {
@@ -107,16 +107,6 @@ Plugins = ItemsView.create({
     checkLink.observe('click', this.dispatchCheck.bind(this));
     return links;
   }, 
-
-  /*
-  dispatchInstallDialog: function(event) {
-    // We pass the plugins list to this function as well. The function will re-compute the installed plugins right after the 
-    // 'New Software' dialog is closed. The first and second args are the update-site URL and the feature-id, which are not needed in this case.
-    dispatch($H({controller:"portal.plugins", action:"openPluginsDialog", args : ["", "", this.items.values()].toJSON()}).toJSON());
-    // Stop the event, otherwise we loose the eclipse BroswerFunctions!
-    event.stop();
-  }, 
-  */
 
   /**
    * Dispatch an plugin check request
