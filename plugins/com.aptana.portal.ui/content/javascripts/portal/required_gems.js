@@ -3,6 +3,7 @@ RequiredGems = ItemsView.create({
    * Returns a plugins list along with their id's, min-version, update-site and feature-id.
    */
   getItems: function() {
+    // TODO - We might need to be OS specific here (as we did with the Apps)
     return $H({'Rails': ['rails', '2.3.5', ''],
                'Ruby Debug': ['ruby-debug-ide', '0.4.9', ''], 
                'SQLite3' : ['sqlite3-ruby', '1.2.5', '']
@@ -49,7 +50,15 @@ RequiredGems = ItemsView.create({
   dispatchInstall: function(event) {
     var siteURL = event.target.getAttribute('install-site') || "";
     // TODO - Dispatch an install gem
-    alert('Install the gem '  + siteURL);
+    // For now, we open a light-box
+    var message;
+    with (Elements.Builder) {
+      message = div(
+        div("To install this gem, please open a shell and type in:"), 
+        div({'class' : 'gem-command'}, "gem install " + event.target.getAttribute("gemName")), 
+        div("Make sure that the installed version is at least " + event.target.getAttribute("gemMinVersion")));
+    }
+    DialogHelper.createInfoBox("Gem Install", message, "back to portal", true);
     event.stop();
     return true;
   }, 
@@ -80,7 +89,7 @@ RequiredGems = ItemsView.create({
   createUpdateLink: function(item) {
     var iLink;
     with (Elements.Builder) {
-      iLink = a({'href' : '#', 'install-site' : item[2]}, 'update');
+      iLink = a({'href' : '#', 'gemName' : item[0], 'gemMinVersion' : item[1], 'install-site' : item[2]}, 'update');
     }
     return iLink;
   },
@@ -88,7 +97,7 @@ RequiredGems = ItemsView.create({
   createInstallLink: function(item) {
     var iLink;
     with (Elements.Builder) {
-      iLink  = a({'href' : '#', 'install-site' : item[2]}, 'install');
+      iLink  = a({'href' : '#', 'gemName' : item[0], 'gemMinVersion' : item[1], 'install-site' : item[2]}, 'install');
     }
     return iLink;
   },

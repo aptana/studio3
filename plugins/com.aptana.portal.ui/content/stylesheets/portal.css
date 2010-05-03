@@ -9,7 +9,7 @@ table.configurations {
       table.configurations tbody tr td span.ok {
         background-image: url(../images/tick.png); }
       table.configurations tbody tr td span.notice {
-        background-image: url(../images/information.png); }
+        background-image: url(../images/warning.png); }
       table.configurations tbody tr td span.missing {
         background-image: url(../images/cross.png); }
       table.configurations tbody tr td span.unknown {
@@ -28,3 +28,9 @@ table.configurations {
   padding-top: 5px;
   margin-bottom: 5px;
   border-bottom: 1px dotted #efefef; }
+
+div.gem-command {
+  padding-top: 5px;
+  margin-bottom: 5px;
+  color: #666666;
+  font-style: italic; }

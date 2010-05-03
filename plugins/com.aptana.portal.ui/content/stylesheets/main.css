@@ -318,23 +318,23 @@ p.highlighted {
   background: url(/images/activity/big_circle.gif) no-repeat top center;
   height: 32px; }
 
-table#plugins {
+table.configurations {
   border-collapse: collapse; }
-  table#plugins tbody tr td {
+  table.configurations tbody tr td {
     height: 18px; }
-    table#plugins tbody tr td span {
+    table.configurations tbody tr td span {
       padding-left: 22px;
       background-position: 0 50%;
       background-repeat: no-repeat; }
-      table#plugins tbody tr td span.ok {
+      table.configurations tbody tr td span.ok {
         background-image: url(../images/tick.png); }
-      table#plugins tbody tr td span.notice {
-        background-image: url(../images/information.png); }
-      table#plugins tbody tr td span.missing {
+      table.configurations tbody tr td span.notice {
+        background-image: url(../images/warning.png); }
+      table.configurations tbody tr td span.missing {
         background-image: url(../images/cross.png); }
-      table#plugins tbody tr td span.unknown {
+      table.configurations tbody tr td span.unknown {
         background-image: url(../images/help.png); }
-      table#plugins tbody tr td span.action.install, table#plugins tbody tr td span.action.update {
+      table.configurations tbody tr td span.action.install, table.configurations tbody tr td span.action.update {
         padding: 0;
         margin: 0; }
 
@@ -348,3 +348,9 @@ table#plugins {
   padding-top: 5px;
   margin-bottom: 5px;
   border-bottom: 1px dotted #efefef; }
+
+div.gem-command {
+  padding-top: 5px;
+  margin-bottom: 5px;
+  color: #666666;
+  font-style: italic; }
