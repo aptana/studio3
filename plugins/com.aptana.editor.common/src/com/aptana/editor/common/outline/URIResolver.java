@@ -6,8 +6,10 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -32,6 +34,24 @@ class URIResolver implements IPathResolver
 	public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		URI uri = resolveURI(path);
+		sub.worked(5);
+		// get the filesystem that can handle the URI
+		IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
+		IFileStore store = fileSystem.getStore(uri);
+		// grab down a local copy TODO What if file is already a local file?
+		File aFile = store.toLocalFile(EFS.CACHE, sub.newChild(90));
+		if (aFile == null || !aFile.exists())
+		{
+			// Need to pass up correct original filename and says that's the one that doesn't exist
+			throw new FileNotFoundException(uri.toString());
+		}
+		// now read in the local copy
+		return IOUtil.read(new FileInputStream(aFile));
+	}
+
+	public URI resolveURI(String path)
+	{
 		URI uri;
 		try
 		{
@@ -50,18 +70,24 @@ class URIResolver implements IPathResolver
 			uri = baseURI.resolve(path);
 			// TODO What if it fails here, then what do we do?
 		}
-		sub.worked(5);
-		// get the filesystem that can handle the URI
-		IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
-		IFileStore store = fileSystem.getStore(uri);
-		// grab down a local copy TODO What if file is already a local file?
-		File aFile = store.toLocalFile(EFS.CACHE, sub.newChild(90));
-		if (aFile == null || !aFile.exists())
+		
+		
+		try
 		{
-			// Need to pass up correct original filename and says that's the one that doesn't exist
-			throw new FileNotFoundException(uri.toString());
+			IFileSystem fileSystem = EFS.getFileSystem(uri.getScheme());
+			IFileStore store = fileSystem.getStore(uri);
+			IFileInfo info = store.fetchInfo();
+			if (info.exists())
+			{
+				return uri;
+			}
 		}
-		// now read in the local copy
-		return IOUtil.read(new FileInputStream(aFile));
+		catch (CoreException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 }

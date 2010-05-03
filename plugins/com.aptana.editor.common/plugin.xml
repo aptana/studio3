@@ -446,4 +446,11 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.ui.hyperlinkTarget"
+            name="Aptana Hyperlink Target">
+      </target>
+   </extension>
 </plugin>

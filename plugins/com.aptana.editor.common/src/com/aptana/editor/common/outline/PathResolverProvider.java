@@ -35,6 +35,7 @@
 package com.aptana.editor.common.outline;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -59,6 +60,21 @@ public final class PathResolverProvider
 		 */
 		public String resolveSource(String path, IProgressMonitor monitor) throws Exception
 		{
+			return null;
+		}
+		
+		@Override
+		public URI resolveURI(String path)
+		{
+			try
+			{
+				return new URI(path);
+			}
+			catch (URISyntaxException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return null;
 		}
 	}
