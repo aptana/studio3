@@ -25,16 +25,16 @@ import com.aptana.index.core.SearchPattern;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
 {
-	private final AbstractThemeableEditor abstractThemeableEditor;
+	protected final AbstractThemeableEditor editor;
 
 	/**
 	 * IndexContentAssistProcessor
 	 * 
-	 * @param abstractThemeableEditor
+	 * @param editor
 	 */
-	public CommonContentAssistProcessor(AbstractThemeableEditor abstractThemeableEditor)
+	public CommonContentAssistProcessor(AbstractThemeableEditor editor)
 	{
-		this.abstractThemeableEditor = abstractThemeableEditor;
+		this.editor = editor;
 	}
 
 	/**
@@ -78,17 +78,12 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
-		IEditorInput editorInput = abstractThemeableEditor.getEditorInput();
 		List<ICompletionProposal> completionProposals = new LinkedList<ICompletionProposal>();
+		Index index = this.getIndex();
 
-		if (editorInput instanceof IFileEditorInput)
+		if (index != null)
 		{
-			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-			IFile file = fileEditorInput.getFile();
-			IProject project = file.getProject();
-			Index index = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
-
-			computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
+			this.computeCompletionProposalsUsingIndex(viewer, offset, index, completionProposals);
 
 			// sort by display name, ignoring case
 			Collections.sort(completionProposals, new Comparator<ICompletionProposal>()
@@ -177,5 +172,27 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	protected Index getIndex()
+	{
+		IEditorInput editorInput = editor.getEditorInput();
+		Index result = null;
+
+		if (editorInput instanceof IFileEditorInput)
+		{
+			IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
+			IFile file = fileEditorInput.getFile();
+			IProject project = file.getProject();
+			
+			result = IndexManager.getInstance().getIndex(project.getFullPath().toPortableString());
+		}
+		
+		return result;
 	}
 }
