@@ -2,6 +2,8 @@ package com.aptana.editor.html;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -74,21 +76,28 @@ public class HyperlinkDetector extends URLHyperlinkDetector
 			return null;
 		}
 
-		for (int i = 0; i < result.length; i++)
+		List<IHyperlink> ours = new ArrayList<IHyperlink>();
+		for (IHyperlink link : result)
 		{
 			// Wrap in our own hyperlink impl, so we can try to open file in editor
-			URLHyperlink hyperlink = (URLHyperlink) result[i];
+			URLHyperlink hyperlink = (URLHyperlink) link;
 			try
 			{
-				// TODO Don't wrap if we can't even open an editor on the file (i.e. have no editor type associated)
-				result[i] = new URIHyperlink(hyperlink);
+				URIHyperlink wrapped = new URIHyperlink(hyperlink);
+				// Don't wrap if we can't even open an editor on the file (i.e. have no editor type associated)
+				if (wrapped.hasAssociatedEditor())
+				{
+					ours.add(wrapped);
+				}
 			}
 			catch (URISyntaxException e)
 			{
 				log(e);
 			}
 		}
-		return result;
+		if (ours.isEmpty())
+			return null;
+		return ours.toArray(new IHyperlink[ours.size()]);
 	}
 
 	private static void log(Exception e)

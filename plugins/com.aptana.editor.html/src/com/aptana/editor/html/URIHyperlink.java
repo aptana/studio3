@@ -39,19 +39,15 @@ public class URIHyperlink extends URLHyperlink
 		// Open in an editor if we can!
 		try
 		{
-			IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
-			IPath path = new Path(uri.getPath());
-			IEditorDescriptor desc = editorReg.getDefaultEditor(path.lastSegment());
+			IEditorDescriptor desc = getEditorDescriptor();
 			if (desc == null)
 			{
 				if (wrapped)
 					super.open();
 				return;
 			}
-			String editorId = desc.getId();
-
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			IDE.openEditor(page, uri, editorId, true);
+			IDE.openEditor(page, uri, desc.getId(), true);
 		}
 		catch (Exception e)
 		{
@@ -59,6 +55,18 @@ public class URIHyperlink extends URLHyperlink
 			if (wrapped)
 				super.open();
 		}
+	}
+
+	public boolean hasAssociatedEditor()
+	{
+		return getEditorDescriptor() != null;
+	}
+
+	protected IEditorDescriptor getEditorDescriptor()
+	{
+		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
+		IPath path = new Path(uri.getPath());
+		return editorReg.getDefaultEditor(path.lastSegment());
 	}
 
 	public String getHyperlinkText()
