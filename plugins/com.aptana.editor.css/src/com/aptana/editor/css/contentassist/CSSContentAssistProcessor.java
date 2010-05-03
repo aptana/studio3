@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -63,15 +65,12 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private static enum Location
 	{
-		OUTSIDE_RULE,
-		INSIDE_RULE,
-		ARG_ASSIST,
-		ERROR
+		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
 	};
 
 	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif");
 	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif");
-	
+
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
 
@@ -83,7 +82,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public CSSContentAssistProcessor(AbstractThemeableEditor editor)
 	{
 		super(editor);
-		
+
 		this._queryHelper = new CSSIndexQueryHelper();
 	}
 
@@ -96,7 +95,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addAllElementProposals(List<ICompletionProposal> proposals, int offset)
 	{
 		List<ElementElement> elements = this._queryHelper.getElements();
-		
+
 		if (elements != null)
 		{
 			for (ElementElement element : elements)
@@ -106,14 +105,15 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = element.getDescription();
 				Image image = ELEMENT_ICON;
 				IContextInformation contextInfo = null;
-				String[] userAgents = element.getUserAgentNames(); 
+				String[] userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-				
+
 				// build a proposal
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
+						contextInfo, description);
 				proposal.setFileLocation(CSSIndexConstants.METADATA);
 				proposal.setUserAgentImages(userAgentIcons);
-				
+
 				// add it to the list
 				proposals.add(proposal);
 			}
@@ -129,7 +129,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	protected void addAllPropertyProposals(List<ICompletionProposal> proposals, int offset)
 	{
 		List<PropertyElement> properties = this._queryHelper.getProperties();
-		
+
 		if (properties != null)
 		{
 			for (PropertyElement property : properties)
@@ -139,47 +139,120 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = property.getDescription();
 				Image image = PROPERTY_ICON;
 				IContextInformation contextInfo = null;
-				String[] userAgents = property.getUserAgentNames(); 
+				String[] userAgents = property.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-				
+
 				// build a proposal
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
+						contextInfo, description);
 				proposal.setFileLocation(CSSIndexConstants.METADATA);
 				proposal.setUserAgentImages(userAgentIcons);
-				
+
 				// add it to the list
 				proposals.add(proposal);
 			}
 		}
 	}
-	
+
+	/**
+	 * addClasses
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addClasses(List<ICompletionProposal> proposals, int offset)
+	{
+		Map<String,String> classes = this._queryHelper.getClasses(this.getIndex());
+		
+		if (classes != null)
+		{
+			for (Entry<String,String> entry : classes.entrySet())
+			{
+				String name = entry.getKey();
+				int length = name.length();
+				String description = null;
+				Image image = ELEMENT_ICON;
+				IContextInformation contextInfo = null;
+				UserAgentManager manager = UserAgentManager.getInstance(); 
+				String[] userAgents = manager.getActiveUserAgentIDs();	// classes can be used by all user agents
+				Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+				
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
+						contextInfo, description);
+				proposal.setFileLocation(entry.getValue());
+				proposal.setUserAgentImages(userAgentIcons);
+
+				// add it to the list
+				proposals.add(proposal);
+			}
+		}
+	}
+
+	/**
+	 * addIDs
+	 * 
+	 * @param result
+	 * @param offset
+	 */
+	protected void addIDs(List<ICompletionProposal> proposals, int offset)
+	{
+		Map<String,String> classes = this._queryHelper.getIDs(this.getIndex());
+		
+		if (classes != null)
+		{
+			for (Entry<String,String> entry : classes.entrySet())
+			{
+				String name = entry.getKey();
+				int length = name.length();
+				String description = null;
+				Image image = ELEMENT_ICON;
+				IContextInformation contextInfo = null;
+				UserAgentManager manager = UserAgentManager.getInstance(); 
+				String[] userAgents = manager.getActiveUserAgentIDs();	// classes can be used by all user agents
+				Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+				
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
+						contextInfo, description);
+				proposal.setFileLocation(entry.getValue());
+				proposal.setUserAgentImages(userAgentIcons);
+
+				// add it to the list
+				proposals.add(proposal);
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer, int, char, boolean)
+	 * @see
+	 * com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
+	 * , int, char, boolean)
 	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
-		Location location = this.getLocation(viewer.getDocument(), offset);
+		IDocument document = viewer.getDocument();
+		Location location = this.getLocation(document, offset);
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-		
+
 		switch (location)
 		{
 			case OUTSIDE_RULE:
-				this.addAllElementProposals(result, offset);
+				this.getOutsideRuleProposals(result, document, offset);
 				break;
-				
+
 			case INSIDE_RULE:
 				this.addAllPropertyProposals(result, offset);
 				break;
-				
+
 			case ARG_ASSIST:
 				// TODO: lookup specific property and shows its values
 				break;
-			
+
 			default:
 				break;
 		}
-		
+
 		Collections.sort(result, new Comparator<ICompletionProposal>()
 		{
 			@Override
@@ -188,7 +261,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
 			}
 		});
-		
+
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
@@ -209,14 +282,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
-		if (_validator == null)
+		if (this._validator == null)
 		{
-			_validator = new CSSContextInformationValidator();
+			this._validator = new CSSContextInformationValidator();
 		}
-		
-		return _validator;
+
+		return this._validator;
 	}
-	
+
 	/**
 	 * getLocation
 	 * 
@@ -227,7 +300,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Location getLocation(IDocument document, int offset)
 	{
 		Location result = Location.ERROR;
-		
+
 		if (offset == 0)
 		{
 			result = Location.OUTSIDE_RULE;
@@ -235,14 +308,15 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		else
 		{
 			int i;
-			
+
 			LOOP:
-			try
+
+			for (i = offset; i >= 0; i--)
 			{
-				for (i = offset; i >= 0; i--)
+				try
 				{
 					char c = document.getChar(i);
-					
+
 					switch (c)
 					{
 						case '{':
@@ -251,30 +325,66 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 						case ':':
 							result = Location.INSIDE_RULE;
 							break LOOP;
-							
+
 						case '}':
 							result = Location.OUTSIDE_RULE;
 							break LOOP;
-							
+
 						case '(':
 							result = Location.ARG_ASSIST;
 							break LOOP;
-							
+
 						default:
 							break;
 					}
 				}
-				
-				if (i == 0 && result == Location.ERROR)
+				catch (BadLocationException e)
 				{
-					result = Location.OUTSIDE_RULE;
 				}
 			}
-			catch (BadLocationException e)
+
+			if (i == 0 && result == Location.ERROR)
 			{
+				result = Location.OUTSIDE_RULE;
 			}
 		}
-		
+
 		return result;
+	}
+
+	/**
+	 * getOutsideRuleProposals
+	 * 
+	 * @param result
+	 * @param document
+	 * @param offset
+	 */
+	private void getOutsideRuleProposals(List<ICompletionProposal> result, IDocument document, int offset)
+	{
+		char c = '\0';
+
+		try
+		{
+			c = document.getChar(offset - 1);
+		}
+		catch (BadLocationException e)
+		{
+		}
+
+		switch (c)
+		{
+			case '.':
+				addClasses(result, offset);
+				break;
+
+			case '#':
+				addIDs(result, offset);
+				break;
+
+			case '\0':
+			default:
+				this.addAllElementProposals(result, offset);
+				break;
+		}
 	}
 }
