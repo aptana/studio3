@@ -13,11 +13,11 @@ var Portal = Class.create({
     this.plugins = new Plugins();
     this.files   = new Files();
     this.gems   = new Gems();
-    this.configurations   = new Configurations();
+    this.apps   = new Apps();
     this.plugins.render($('plugins'), 'configurations');
     this.files.render($('recentFiles'));
     this.gems.render($('gems'));
-    this.configurations.render($('app-versions'));
+    this.apps.render($('app-versions'), 'configurations');
   }, 
   refreshAll: function() {
     this.plugins.dispatchCheck();
@@ -32,7 +32,7 @@ var portal;
 eventsDispatcher.addObserver(Events.RECENT_FILES, function(e) { portal.files.render($('recentFiles')); });
 eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.gems.render($('gems'), e); });
 eventsDispatcher.addObserver(Events.PLUGINS, function(e) { portal.plugins.render($('plugins'), 'configurations', e); });
-eventsDispatcher.addObserver(Events.APP_VERSIONS, function(e) { portal.configurations.render($('app-versions'), e); });
+eventsDispatcher.addObserver(Events.APP_VERSIONS, function(e) { portal.apps.render($('app-versions'), 'configurations', e); });
 
 /**
  * This custom error handler is needed when the Portal is viewed in the 

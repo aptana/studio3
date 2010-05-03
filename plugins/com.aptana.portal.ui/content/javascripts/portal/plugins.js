@@ -107,7 +107,8 @@ Plugins = ItemsView.create({
     checkLink.observe('click', this.dispatchCheck.bind(this));
     return links;
   }, 
-  
+
+  /*
   dispatchInstallDialog: function(event) {
     // We pass the plugins list to this function as well. The function will re-compute the installed plugins right after the 
     // 'New Software' dialog is closed. The first and second args are the update-site URL and the feature-id, which are not needed in this case.
@@ -115,7 +116,8 @@ Plugins = ItemsView.create({
     // Stop the event, otherwise we loose the eclipse BroswerFunctions!
     event.stop();
   }, 
-  
+  */
+
   /**
    * Dispatch an plugin check request
    */
