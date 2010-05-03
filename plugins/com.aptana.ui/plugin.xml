@@ -14,14 +14,6 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
-         <view
-               id="com.aptana.explorer.view"
-               minimized="false"
-               ratio="0.25"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
-         </view>
          <viewShortcut
                id="com.aptana.explorer.view">
          </viewShortcut>
@@ -45,13 +37,6 @@
          <viewShortcut
                id="org.eclipse.ui.views.ContentOutline">
          </viewShortcut>
-         <view
-               id="com.aptana.terminal.views.terminal"
-               ratio="0.75"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               visible="true">
-         </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
