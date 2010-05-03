@@ -10,19 +10,23 @@ var ConfigurationStatus = {UNKNOWN : 'unknown', OK : 'ok', PROCESSING : 'process
  */
 var Portal = Class.create({
   initialize: function() {
-    this.plugins = new Plugins();
-    this.files   = new Files();
-    this.gems   = new Gems();
-    this.apps   = new Apps();
+    this.plugins      = new Plugins();
+    this.files        = new Files();
+    // this.allGems      = new AllGems();
+    this.requiredGems = new RequiredGems();
+    this.apps         = new Apps();
+    
     this.plugins.render($('plugins'), 'configurations');
     this.files.render($('recentFiles'));
-    this.gems.render($('gems'));
+    // this.allGems.render($('gems'));
+    this.requiredGems.render($('required-gems'), 'configurations');
     this.apps.render($('app-versions'), 'configurations');
   }, 
   refreshAll: function() {
     this.plugins.dispatchCheck();
-    this.gems.dispatchCheck();
-    // TODO - dispatch a configuration check?
+    // this.allGems.dispatchCheck();
+    this.requiredGems.dispatchCheck();
+    this.apps.dispatchCheck();
   }
 });
 
@@ -30,7 +34,8 @@ var portal;
 
 // Add observers to the dispatcher
 eventsDispatcher.addObserver(Events.RECENT_FILES, function(e) { portal.files.render($('recentFiles')); });
-eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.gems.render($('gems'), e); });
+// eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.allGems.render($('gems'), e); });
+eventsDispatcher.addObserver(Events.GEMS, function(e) { portal.requiredGems.render($('required-gems'), 'configurations', e); });
 eventsDispatcher.addObserver(Events.PLUGINS, function(e) { portal.plugins.render($('plugins'), 'configurations', e); });
 eventsDispatcher.addObserver(Events.APP_VERSIONS, function(e) { portal.apps.render($('app-versions'), 'configurations', e); });
 

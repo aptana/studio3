@@ -42,6 +42,10 @@ ItemsView.Base = Class.create({
       for( var i = 0; i < itemsCount; i++ ) {
         var item = this.items.get(itemsNames[i]);
         var itemRow = this.createRow(item, itemsNames[i], itemRowElements);
+        if (!itemRow) {
+          // in case the create row rejected that item, move to the next.
+          continue;
+        }
         // Get the items that were assigned as row elements
         var itemSpan = itemRowElements.get('itemSpan');
         var actionsSpan = itemRowElements.get('actionsSpan');

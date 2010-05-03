@@ -56,14 +56,6 @@ import com.aptana.portal.ui.PortalUIPlugin;
 public class PluginsConfigurationProcessor extends AbstractConfigurationProcessor
 {
 	private static final String FEATURE_IU_SUFFIX = ".feature.group"; //$NON-NLS-1$
-
-	private static final String NO = "no"; //$NON-NLS-1$
-	private static final String YES = "yes"; //$NON-NLS-1$
-	private static final String BUNDLE_COMPATIBILITY = "compatibility"; //$NON-NLS-1$
-	private static final String BUNDLE_VERSION = "version"; //$NON-NLS-1$
-	private static final String BUNDLE_EXISTS = "exists"; //$NON-NLS-1$
-	private static final String COMPATIBILITY_UPDATE = "update"; //$NON-NLS-1$
-	private static final String COMPATIBILITY_OK = "ok"; //$NON-NLS-1$
 	private static final String P2_INSTALL = "org.eclipse.equinox.p2.ui.sdk.install"; //$NON-NLS-1$
 	private static final String PLUGINS_ATTR = "plugins"; //$NON-NLS-1$
 
@@ -117,9 +109,9 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 					String compatibility = (bundleVersion.compareTo(requestedVersion) >= 0) ? COMPATIBILITY_OK
 							: COMPATIBILITY_UPDATE;
 					Map<String, String> bundleInfo = new HashMap<String, String>(4);
-					bundleInfo.put(BUNDLE_EXISTS, YES);
-					bundleInfo.put(BUNDLE_VERSION, bundleVersion.toString());
-					bundleInfo.put(BUNDLE_COMPATIBILITY, compatibility);
+					bundleInfo.put(ITEM_EXISTS, YES);
+					bundleInfo.put(ITEM_VERSION, bundleVersion.toString());
+					bundleInfo.put(ITEM_COMPATIBILITY, compatibility);
 					bundleData.put(bundleSymbolicName, bundleInfo);
 					// Remove the name from the original map. Eventually, we will be left with the plugins we could not
 					// locate in the system
@@ -133,16 +125,13 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		for (String pluginId : missingPlugins)
 		{
 			Map<String, String> bundleInfo = new HashMap<String, String>(4);
-			bundleInfo.put(BUNDLE_EXISTS, NO);
+			bundleInfo.put(ITEM_EXISTS, NO);
 			bundleData.put(pluginId, bundleInfo);
 		}
 
 		// Finally, set the bundle data status into the configuration attribute
 		configurationStatus.setAttribute(PLUGINS_ATTR, JSON.toString(bundleData));
-		//gems = gems.replaceAll(EditorUtils.getLineSeparatorValue(null), ";"); //$NON-NLS-1$
-		// configurationStatus.setAttribute(GEMS_ATTR, gems);
 		configurationStatus.setStatus(ConfigurationStatus.OK);
-		// applyErrorAttributes(configurationStatus, Messages.GemsConfigurationProcessor_errorInvokingGemList);
 		return configurationStatus;
 	}
 

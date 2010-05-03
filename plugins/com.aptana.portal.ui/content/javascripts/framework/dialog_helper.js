@@ -24,7 +24,7 @@ DialogHelper = {
     new Lightbox( viewFunct, {cache: false, ajaxify: false}).activate();
   },
   
-  createInfoBox: function(header, message, returnLinkText){
+  createInfoBox: function(header, message, returnLinkText, messageAsHTML){
     if (!returnLinkText)
       returnLinkText = "Close Dialog"
       
@@ -34,8 +34,16 @@ DialogHelper = {
       var lightbox = this;
 
       with(Elements.Builder) {
+        var pContent;
+        if (messageAsHTML)
+        {
+          pContent = p();
+          pContent.appendChild(message);
+        } else {
+          pContent = p(message);
+        }
         contents = div(h2(header), 
-                      p(message), 
+                      pContent, 
                       returnLink = a("<< " + returnLinkText, {'href':'#'}));
       }
       

@@ -1,4 +1,4 @@
-var Gems = Class.create({
+AllGems = Class.create({
   initialize: function() {
       // TODO - Provide a list of gems we want the user to have.
       // Every item has a display name and an array that contains: gem name to use in gem install, min version, optional gem location url.

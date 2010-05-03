@@ -30,16 +30,6 @@ import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
  */
 public class VersionsConfigurationProcessor extends AbstractConfigurationProcessor
 {
-	private static final String CONFIG_ATTR = "configurations"; //$NON-NLS-1$
-	private static final String COMPATIBILITY_OK = "ok"; //$NON-NLS-1$
-	private static final String COMPATIBILITY_UPDATE = "update"; //$NON-NLS-1$
-	private static final String ITEM_EXISTS = "exists"; //$NON-NLS-1$
-	private static final String YES = "yes"; //$NON-NLS-1$
-	private static final String NO = "no"; //$NON-NLS-1$
-	private static final String ITEM_VERSION = "version"; //$NON-NLS-1$
-	private static final String ITEM_COMPATIBILITY = "compatibility"; //$NON-NLS-1$
-	private static final String ITEM_VERSION_OUTPUT = "rawOutput"; //$NON-NLS-1$
-
 	/**
 	 * Compute the versions of the given items in the attributes instance. Items that are not in the supported list of
 	 * programs are set to an 'unknown' state, just as they are not installed.
@@ -74,8 +64,8 @@ public class VersionsConfigurationProcessor extends AbstractConfigurationProcess
 		// Do the actual processing
 		configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
 
-		// For each requested element, check that the item is in the known commands.
-		// If it's there, execute the command. If not, set the item's state as unknown.
+		// For each requested element, check that the item has a processor delegate.
+		// If it's there, execute the delegate. If not, set the item's state as unknown.
 		Map<String, Map<String, String>> itemsData = new HashMap<String, Map<String, String>>();
 		String[] apps = attrItems.keySet().toArray(new String[attrItems.size()]);
 		// This processor should have delegators that do the actual processing of the versions.

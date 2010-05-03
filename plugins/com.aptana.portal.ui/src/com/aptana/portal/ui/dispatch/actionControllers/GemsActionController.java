@@ -28,11 +28,13 @@ public class GemsActionController extends AbstractActionController
 	 * Starts a Job that computes the installed Gems in the system.<br>
 	 * This Job will then notify any internal browser the result through the {@link BrowserNotifier}.
 	 * 
+	 * @param attributes
+	 *            Optional attributes that describes the gems to compute.
 	 * @return An immediate {@link IBrowserNotificationConstants#JSON_OK} to indicate that the Job was started, or an
 	 *         error JSON notification if there is no configuration processor that can deal with this request.
 	 */
 	@ControllerAction
-	public Object computeInstalledGems()
+	public Object computeInstalledGems(final Object attributes)
 	{
 		// Get the configuration processor (the method invocation in the AbstractActionController already checked that
 		// it's valid)
@@ -43,13 +45,31 @@ public class GemsActionController extends AbstractActionController
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				processor.addConfigurationProcessorListener(GemsActionController.this);
-				processor.getStatus(monitor, null, true);
+				processor.getStatus(monitor, attributes, true);
 				processor.removeConfigurationProcessorListener(GemsActionController.this);
 				return Status.OK_STATUS;
 			}
 		};
 		computationJob.schedule();
 		return IBrowserNotificationConstants.JSON_OK;
+	}
+
+	/**
+	 * Starts a Job that computes all the installed Gems in the system.<br>
+	 * This Job will then notify any internal browser the result through the {@link BrowserNotifier}.
+	 * 
+	 * @return An immediate response with the system's gems (Note: This one happens without a Job).
+	 */
+	@ControllerAction
+	public Object computeAllGems()
+	{
+		final IConfigurationProcessor processor = getProcessor();
+		ConfigurationStatus status = processor.getStatus(null, null, true);
+		if (status != null)
+		{
+			return JSON.toString(status);
+		}
+		return IBrowserNotificationConstants.JSON_ERROR;
 	}
 
 	/**

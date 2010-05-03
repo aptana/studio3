@@ -18,6 +18,16 @@ public abstract class AbstractConfigurationProcessor implements IConfigurationPr
 	protected ConfigurationStatus configurationStatus;
 	protected ListenerList listeners;
 
+	protected static final String CONFIG_ATTR = "configurations"; //$NON-NLS-1$
+	protected static final String COMPATIBILITY_OK = "ok"; //$NON-NLS-1$
+	protected static final String COMPATIBILITY_UPDATE = "update"; //$NON-NLS-1$
+	protected static final String ITEM_EXISTS = "exists"; //$NON-NLS-1$
+	protected static final String YES = "yes"; //$NON-NLS-1$
+	protected static final String NO = "no"; //$NON-NLS-1$
+	protected static final String ITEM_VERSION = "version"; //$NON-NLS-1$
+	protected static final String ITEM_COMPATIBILITY = "compatibility"; //$NON-NLS-1$
+	protected static final String ITEM_VERSION_OUTPUT = "rawOutput"; //$NON-NLS-1$
+	
 	private String processorID;
 	private String processorName;
 	private String[] categories;
