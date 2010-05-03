@@ -1,4 +1,4 @@
-package com.aptana.editor.common.outline;
+package com.aptana.editor.common.internal.outline;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.outline.IPathResolver;
 import com.aptana.util.IOUtil;
 
 /**
@@ -21,7 +22,7 @@ import com.aptana.util.IOUtil;
  * 
  * @author cwilliams
  */
-class URIResolver implements IPathResolver
+public class URIResolver implements IPathResolver
 {
 
 	private URI baseURI;

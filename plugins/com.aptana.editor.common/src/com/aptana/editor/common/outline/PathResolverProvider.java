@@ -44,6 +44,8 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
+import com.aptana.editor.common.internal.outline.URIResolver;
+
 /**
  * @author Pavel Petrochenko
  * @author Chris Williams
