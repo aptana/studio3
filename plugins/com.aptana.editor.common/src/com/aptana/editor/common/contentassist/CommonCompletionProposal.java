@@ -18,6 +18,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	private String _replacementString;
 	private String _fileLocation;
 	private boolean _isDefaultSelection;
+	private boolean _isSuggestedSelection;
 	private Image[] _userAgentImages;
 
 	/**
@@ -131,13 +132,24 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 		return this._userAgentImages;
 	}
 
-	/**
-	 * isDefaultSelection
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isDefaultSelection()
 	 */
 	@Override
 	public boolean isDefaultSelection()
 	{
 		return this._isDefaultSelection;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isSuggestedSelection()
+	 */
+	@Override
+	public boolean isSuggestedSelection()
+	{
+		return this._isSuggestedSelection;
 	}
 	
 	/**
@@ -158,6 +170,16 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	public void setIsDefaultSelection(boolean value)
 	{
 		this._isDefaultSelection = value;
+	}
+	
+	/**
+	 * setIsSuggstedSelection
+	 * 
+	 * @param value
+	 */
+	public void setIsSuggestedSelection(boolean value)
+	{
+		this._isSuggestedSelection = value;
 	}
 	
 	/**

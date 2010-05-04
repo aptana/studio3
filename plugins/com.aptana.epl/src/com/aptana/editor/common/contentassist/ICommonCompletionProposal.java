@@ -25,4 +25,11 @@ public interface ICommonCompletionProposal extends ICompletionProposal
 	 * @return
 	 */
 	boolean isDefaultSelection();
+	
+	/**
+	 * isSuggestedSelection
+	 * 
+	 * @return
+	 */
+	boolean isSuggestedSelection();
 }
