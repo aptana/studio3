@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
+import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -194,5 +195,64 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * setSelectedProposal
+	 * 
+	 * @param prefix
+	 * @param proposals
+	 */
+	protected void setSelectedProposal(String prefix, List<ICompletionProposal> proposals)
+	{
+		ICompletionProposal caseSensitiveProposal = null;
+		ICompletionProposal caseInsensitiveProposal = null;
+		ICompletionProposal suggestedProposal = null;
+
+		for (ICompletionProposal proposal : proposals)
+		{
+			String displayString = proposal.getDisplayString();
+			int comparison = displayString.compareToIgnoreCase(prefix);
+
+			if (comparison >= 0)
+			{
+				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
+				{
+					caseInsensitiveProposal = proposal;
+
+					if (displayString.startsWith(prefix))
+					{
+						caseSensitiveProposal = proposal;
+						// found a match, so exit loop
+						break;
+					}
+				}
+			}
+		}
+
+		if (caseSensitiveProposal instanceof CommonCompletionProposal)
+		{
+			((CommonCompletionProposal) caseSensitiveProposal).setIsDefaultSelection(true);
+		}
+		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
+		{
+			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
+		}
+		else if (suggestedProposal instanceof CommonCompletionProposal)
+		{
+			((CommonCompletionProposal) suggestedProposal).setIsSuggestedSelection(true);
+		}
+		else
+		{
+			if (proposals.size() > 0)
+			{
+				ICompletionProposal proposal = proposals.get(0);
+				
+				if (proposal instanceof CommonCompletionProposal)
+				{
+					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
+				}
+			}
+		}
 	}
 }
