@@ -83,6 +83,31 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
+	 * getProperty
+	 * 
+	 * @return
+	 */
+	public PropertyElement getProperty(String name)
+	{
+		PropertyElement result = null;
+		
+		try
+		{
+			List<PropertyElement> properties = this._reader.getProperties(this.getIndex(), name);
+			
+			if (properties != null && properties.size() > 0)
+			{
+				result = properties.get(0);
+			}
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getProperties
 	 * 
 	 * @return
