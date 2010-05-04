@@ -1,5 +1,6 @@
 package com.aptana.core;
 
+
 public class StringUtils
 {
 
@@ -59,4 +60,27 @@ public class StringUtils
 
 		return result.toString();
 	}
+
+	/**
+	 * Adds a colon to the end of the string, as if making a form label
+	 * 
+	 * @param message
+	 * @return string + colon
+	 */
+	public static String makeFormLabel(String message)
+	{
+		return message + ":"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Adds an ellipsis to the end of a string, generally indicating that this string leads to another choice (like a
+	 * dialog)
+	 * 
+	 * @param message
+	 * @return The ellipsif-ied string
+	 */
+	public static String ellipsify(String message)
+	{
+		return message + "..."; //$NON-NLS-1$
+	}	
 }
