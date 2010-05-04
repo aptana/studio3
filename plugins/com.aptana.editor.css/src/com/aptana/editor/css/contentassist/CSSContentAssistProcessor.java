@@ -146,8 +146,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				String[] userAgents = property.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
+				// TEMP:
+				int replaceLength = 0;
+				
+				if (this._currentLexeme != null)
+				{
+					offset = this._currentLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getLength();
+				}
+				
 				// build a proposal
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, name, contextInfo, description);
 				proposal.setFileLocation(CSSIndexConstants.METADATA);
 				proposal.setUserAgentImages(userAgentIcons);
 
@@ -427,6 +436,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		switch (this._currentLexeme.getType())
 		{
+			case ELEMENT: // sometimes occurs with partially typed properties
 			case PROPERTY:
 				location = Location.INSIDE_PROPERTY;
 				break;
@@ -461,25 +471,32 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		else
 		{
 			int index = lexemeProvider.getLexemeFloorIndex(offset);
-			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
-
-			switch (lexeme.getType())
+			
+			LOOP: while (index >= 0)
 			{
-				case ID:
-				case CLASS:
-					result = Location.OUTSIDE_RULE;
-					break;
-
-				case CURLY_BRACE:
-					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
-					break;
-
-				case PROPERTY:
-					result = Location.INSIDE_RULE;
-					break;
-
-				default:
-					break;
+				Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
+				
+				switch (lexeme.getType())
+				{
+					case ID:
+					case CLASS:
+						result = Location.OUTSIDE_RULE;
+						break LOOP;
+	
+					case CURLY_BRACE:
+						result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
+						break LOOP;
+	
+					case PROPERTY:
+					case VALUE:
+						result = Location.INSIDE_RULE;
+						break LOOP;
+	
+					default:
+						break;
+				}
+				
+				index--;
 			}
 		}
 
@@ -527,7 +544,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		for (ICompletionProposal proposal : proposals)
 		{
 			String displayString = proposal.getDisplayString();
-			int comparison = prefix.compareToIgnoreCase(proposal.getDisplayString());
+			int comparison = displayString.compareToIgnoreCase(prefix);
 
 			if (comparison >= 0)
 			{
@@ -545,12 +562,29 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		suggestedProposal = (caseSensitiveProposal != null) ? caseSensitiveProposal : caseInsensitiveProposal;
-
-		// select as default selection
-		if (suggestedProposal instanceof CommonCompletionProposal)
+		if (caseSensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) suggestedProposal).setIsDefaultSelection(true);
+			((CommonCompletionProposal) caseSensitiveProposal).setIsDefaultSelection(true);
+		}
+		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
+		{
+			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
+		}
+		else if (suggestedProposal instanceof CommonCompletionProposal)
+		{
+			((CommonCompletionProposal) suggestedProposal).setIsSuggestedSelection(true);
+		}
+		else
+		{
+			if (proposals.size() > 0)
+			{
+				ICompletionProposal proposal = proposals.get(0);
+				
+				if (proposal instanceof CommonCompletionProposal)
+				{
+					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
+				}
+			}
 		}
 	}
 }
