@@ -10,7 +10,9 @@ import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.css.CSSSourceConfiguration.WordPredicateRule;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSScopeScanner extends CSSCodeScanner
 {
@@ -20,18 +22,23 @@ public class CSSScopeScanner extends CSSCodeScanner
 	public CSSScopeScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
-
-		// Add the rules for block comments, single and double quoted strings
-		rules.add(new SingleLineRule("\"", "\"", createToken("string.quoted.double.css"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new SingleLineRule("\'", "\'", createToken("string.quoted.single.css"), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		rules.add(new WordPredicateRule(createToken("comment.block.css"))); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/*", "*/", createToken("comment.block.css"), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
-
+		
+		// Add the rules created by the super class first so they have higher
+		// precedence
 		if (fRules != null)
 		{
-			// Add the rules created by the super class
 			rules.addAll(Arrays.asList(fRules));
 		}
+
+		// Add the rules for block comments, single and double quoted strings
+		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rules.add(new WordPredicateRule(createToken(CSSTokenType.COMMENT))); //$NON-NLS-1$
+		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$
+		
+		// Add rules for the start characters of classes and ids
+		rules.add(new SingleCharacterRule('#', createToken(CSSTokenType.ID)));
+		rules.add(new SingleCharacterRule('.', createToken(CSSTokenType.CLASS)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
@@ -45,5 +52,16 @@ public class CSSScopeScanner extends CSSCodeScanner
 	{
 		// Simply use the token type string that is passed in as the data
 		return new Token(string);
+	}
+	
+	/**
+	 * createToken
+	 * 
+	 * @param type
+	 * @return
+	 */
+	protected IToken createToken(CSSTokenType type)
+	{
+		return this.createToken(type.getName());
 	}
 }
