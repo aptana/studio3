@@ -6,6 +6,7 @@ public interface CSSIndexConstants
 	static final String DELIMITER = "~";
 	static final String SUB_DELIMITER = ",";
 	static final String METADATA = "css.metadata";
+	static final String CORE = "CSS Core";
 	
 	// index categories
 	static final String ELEMENT = "css.element"; //$NON-NLS-1$
