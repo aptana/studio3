@@ -883,34 +883,35 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			fProposalTable.setItemCount(newLen);
 			fProposalTable.clearAll();
+			
 			for (int i = 0; i < proposals.length; i++)
 			{
 				ICompletionProposal proposal = proposals[i];
 				String entry = proposal.getDisplayString().trim();
+				
 				if (entry.length() > longestString.length())
 				{
 					longestString = entry;
 				}
-				/*
-				if (proposal instanceof IUnifiedCompletionProposal)
+				
+				if (proposal instanceof ICommonCompletionProposal)
 				{
-
-					IUnifiedCompletionProposal prop = (IUnifiedCompletionProposal) proposal;
+					ICommonCompletionProposal prop = (ICommonCompletionProposal) proposal;
 					String loc = prop.getFileLocation();
+					
 					if (loc.length() > longestLoc.length())
 					{
 						longestLoc = loc;
 					}
-					if (((IUnifiedCompletionProposal) proposal).isDefaultSelection())
+					if (prop.isDefaultSelection())
 					{
 						defaultIndex = i;
 					}
-					else if (((IUnifiedCompletionProposal) proposal).isSuggestedSelection())
+					else if (prop.isSuggestedSelection())
 					{
 						suggestedIndex = i;
 					}
 				}
-				*/
 			}
 
 			String measureString = "MMMM" + longestString + "MMM"; //$NON-NLS-1$ //$NON-NLS-2$
