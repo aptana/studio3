@@ -32,11 +32,21 @@ public class UserAgentElement
 		return this._version;
 	}
 
+	/**
+	 * getPlatform
+	 * 
+	 * @param platform
+	 */
 	public void setPlatform(String platform)
 	{
 		this._platform = platform;
 	}
 
+	/**
+	 * setVersion
+	 * 
+	 * @param version
+	 */
 	public void setVersion(String version)
 	{
 		this._version = version;
