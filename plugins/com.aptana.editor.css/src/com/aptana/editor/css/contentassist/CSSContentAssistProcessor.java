@@ -345,7 +345,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, new CSSScopeScanner())
+		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
 		{
 			@Override
 			protected CSSTokenType getTypeFromName(String name)
@@ -392,7 +392,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		});
 
 		// select the current proposal based on the current lexeme
-		this.setSelectedProposal(this._currentLexeme.getText(), result);
+		if (this._currentLexeme != null)
+		{
+			this.setSelectedProposal(this._currentLexeme.getText(), result);
+		}
 
 		// return results
 		return result.toArray(new ICompletionProposal[result.size()]);
@@ -405,7 +408,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return new char[] { ':', '\t', '{', ';' };
+		// TODO: these should be defined in a preference page
+		return new char[] { ':', '{' };
+//		return new char[] { ':', '\t', '{', ';' };
 	}
 
 	/*
@@ -436,12 +441,19 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		switch (this._currentLexeme.getType())
 		{
+			case CURLY_BRACE:
+				location = ("{".equals(this._currentLexeme.getText())) ? Location.INSIDE_PROPERTY : Location.INSIDE_VALUE;
+				break;
+				
 			case ELEMENT: // sometimes occurs with partially typed properties
 			case PROPERTY:
 				location = Location.INSIDE_PROPERTY;
 				break;
 
+			case ARGS:
 			case COLON:
+			case FUNCTION:
+			case SEMICOLON: // ?
 			case VALUE:
 				location = Location.INSIDE_VALUE;
 				break;
@@ -527,64 +539,5 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
-	}
-
-	/**
-	 * setSelectedProposal
-	 * 
-	 * @param prefix
-	 * @param proposals
-	 */
-	private void setSelectedProposal(String prefix, List<ICompletionProposal> proposals)
-	{
-		ICompletionProposal caseSensitiveProposal = null;
-		ICompletionProposal caseInsensitiveProposal = null;
-		ICompletionProposal suggestedProposal = null;
-
-		for (ICompletionProposal proposal : proposals)
-		{
-			String displayString = proposal.getDisplayString();
-			int comparison = displayString.compareToIgnoreCase(prefix);
-
-			if (comparison >= 0)
-			{
-				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
-				{
-					caseInsensitiveProposal = proposal;
-
-					if (displayString.startsWith(prefix))
-					{
-						caseSensitiveProposal = proposal;
-						// found a match, so exit loop
-						break;
-					}
-				}
-			}
-		}
-
-		if (caseSensitiveProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) caseSensitiveProposal).setIsDefaultSelection(true);
-		}
-		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
-		}
-		else if (suggestedProposal instanceof CommonCompletionProposal)
-		{
-			((CommonCompletionProposal) suggestedProposal).setIsSuggestedSelection(true);
-		}
-		else
-		{
-			if (proposals.size() > 0)
-			{
-				ICompletionProposal proposal = proposals.get(0);
-				
-				if (proposal instanceof CommonCompletionProposal)
-				{
-					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
-				}
-			}
-		}
 	}
 }
