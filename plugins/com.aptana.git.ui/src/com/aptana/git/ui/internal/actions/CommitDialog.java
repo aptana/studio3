@@ -437,8 +437,8 @@ public class CommitDialog extends StatusDialog
 
 						String workingDirectory = gitRepository.workingDirectory();
 
-						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-								new Path(workingDirectory).append(filePath));
+						IFile file = ResourcesPlugin.getWorkspace().getRoot()
+								.getFileForLocation(new Path(workingDirectory).append(filePath));
 						if (file != null)
 						{
 							files.add(file);
@@ -581,15 +581,7 @@ public class CommitDialog extends StatusDialog
 
 	protected ChangedFile findChangedFile(String path)
 	{
-		List<ChangedFile> changedFiles = gitRepository.index().changedFiles();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			if (changedFile.getPath().equals(path))
-			{
-				return changedFile;
-			}
-		}
-		return null;
+		return gitRepository.index().findChangedFile(path);
 	}
 
 	/**
