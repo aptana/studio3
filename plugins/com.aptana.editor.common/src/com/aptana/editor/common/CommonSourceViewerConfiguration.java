@@ -327,4 +327,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		
 		return null;
 	}
+	
+	protected AbstractThemeableEditor getEditor()
+	{
+		return fTextEditor;
+	}
 }
