@@ -11,6 +11,7 @@ public interface CSSIndexConstants
 	static final String ELEMENT = "css.element"; //$NON-NLS-1$
 	static final String PROPERTY = "css.property"; //$NON-NLS-1$
 	static final String USER_AGENT = "css.user_agent";
+	static final String VALUE = "css.value";
 	
 	static final String CLASS = "css.class"; //$NON-NLS-1$
 	static final String IDENTIFIER = "css.identifier"; //$NON-NLS-1$
