@@ -9,14 +9,14 @@ import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class HTMLContentAssistHelper
+public class HTMLIndexQueryHelper
 {
 	private HTMLIndexReader _reader;
 	
 	/**
 	 * HTMLContentAssistHelper
 	 */
-	public HTMLContentAssistHelper()
+	public HTMLIndexQueryHelper()
 	{
 		this._reader = new HTMLIndexReader();
 	}
