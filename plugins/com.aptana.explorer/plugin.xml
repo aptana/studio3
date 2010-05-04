@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             category="org.eclipse.ui"
             class="com.aptana.explorer.internal.ui.FilteringProjectView"
             icon="icons/full/cview16/filenav_nav.png"
@@ -121,5 +121,38 @@
 			</or>
 	     </enablement>
       </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.explorer.internal.handlers.ToggleAppExplorerHandler"
+            description="Toggle to show or hide App Explorer view"
+            id="com.aptana.explorer.commands.toggleAppExplorer"
+            name="Show/Hide App Explorer">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.explorer.commands.toggleAppExplorer"
+                  icon="icons/full/cview16/filenav_nav.png"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
 </plugin>

@@ -446,4 +446,60 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.editor.common.globalActionSet"
+            label="Aptana"
+            visible="false">
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.editor.common.contributions.inGlobalActionSet">
+         <with
+               variable="activeContexts">
+            <iterate
+                  operator="or">
+               <equals
+                     value="com.aptana.editor.common.globalActionSet">
+               </equals>
+            </iterate>
+         </with>
+      </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            defaultHandler="com.aptana.editor.common.internal.handlers.ToggleOutlineHandler"
+            description="Toggle to show or hide Outline view"
+            id="com.aptana.editor.common.commands.toggleOutline"
+            name="Show/Hide Outline">
+         <state
+               class="org.eclipse.ui.handlers.RegistryToggleState:true"
+               id="org.eclipse.ui.commands.toggleState">
+         </state>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.editor.common.commands.toggleOutline"
+                  icon="icons/full/eview16/outline_co.gif"
+                  style="toggle">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
 </plugin>

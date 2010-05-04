@@ -80,6 +80,9 @@
          <newWizardShortcut
                id="com.aptana.ui.wizards.NewWebProject">
          </newWizardShortcut>
+         <actionSet
+               id="com.aptana.editor.common.globalActionSet">
+         </actionSet>
       </perspectiveExtension>
    </extension>
    <extension

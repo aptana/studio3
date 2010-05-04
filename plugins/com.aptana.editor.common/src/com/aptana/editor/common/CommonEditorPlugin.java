@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -16,11 +18,16 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
+import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -50,6 +57,10 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static final String PLUGIN_ID = "com.aptana.editor.common"; //$NON-NLS-1$
 
 	private static final String TEMPLATES = PLUGIN_ID + ".templates"; //$NON-NLS-1$
+
+	private static final String OUTLINE_VIEW_ID = "org.eclipse.ui.views.ContentOutline"; //$NON-NLS-1$
+	private static final String COMMAND_ID = "com.aptana.editor.common.commands.toggleOutline"; //$NON-NLS-1$
+	private static final String COMMAND_STATE = "org.eclipse.ui.commands.toggleState"; //$NON-NLS-1$
 
 	// The shared instance
 	private static CommonEditorPlugin plugin;
@@ -98,6 +109,47 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		}
 	};
 
+	private final IPerspectiveListener fPerspectiveListener = new IPerspectiveListener()
+	{
+
+		@Override
+		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
+		{
+			setCommandState(((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null);
+		}
+
+		@Override
+		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
+		{
+			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))
+			{
+				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) == null)
+				{
+					setCommandState(false);
+				}
+			}
+			else if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_SHOW))
+			{
+				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null)
+				{
+					setCommandState(true);
+				}
+			}
+		}
+
+		private void setCommandState(boolean state)
+		{
+			ICommandService service = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+			Command command = service.getCommand(COMMAND_ID);
+			State commandState = command.getState(COMMAND_STATE);
+			if (((Boolean) commandState.getValue()) != state)
+			{
+				commandState.setValue(state);
+				service.refreshElements(COMMAND_ID, null);
+			}
+		}
+	};
+
 	private final IWindowListener fWindowListener = new IWindowListener()
 	{
 
@@ -112,6 +164,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				partService.removePartListener(fPartListener);
 			}
+			window.removePerspectiveListener(fPerspectiveListener);
 		}
 
 		public void windowDeactivated(IWorkbenchWindow window)
@@ -125,6 +178,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				partService.addPartListener(fPartListener);
 			}
+			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
 
@@ -334,6 +388,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				partService.addPartListener(fPartListener);
 			}
+			window.addPerspectiveListener(fPerspectiveListener);
 		}
 
 		// Listen on any future windows
@@ -351,6 +406,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			{
 				partService.removePartListener(fPartListener);
 			}
+			window.removePerspectiveListener(fPerspectiveListener);
 		}
 		PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 	}
