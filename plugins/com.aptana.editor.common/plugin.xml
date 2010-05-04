@@ -450,7 +450,7 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.editor.common.globalActionSet"
-            label="Aptana"
+            label="%actionSet.global.label"
             visible="false">
       </actionSet>
    </extension>
@@ -474,9 +474,9 @@
       <command
             categoryId="org.eclipse.ui.category.views"
             defaultHandler="com.aptana.editor.common.internal.handlers.ToggleOutlineHandler"
-            description="Toggle to show or hide Outline view"
+            description="%command.toggleoutline.description"
             id="com.aptana.editor.common.commands.toggleOutline"
-            name="Show/Hide Outline">
+            name="%command.toggleoutline.name">
          <state
                class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">

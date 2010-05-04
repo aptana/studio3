@@ -127,9 +127,9 @@
       <command
             categoryId="org.eclipse.ui.category.views"
             defaultHandler="com.aptana.explorer.internal.handlers.ToggleAppExplorerHandler"
-            description="Toggle to show or hide App Explorer view"
+            description="%command.toggleappexplorer.description"
             id="com.aptana.explorer.commands.toggleAppExplorer"
-            name="Show/Hide App Explorer">
+            name="%command.toggleappexplorer.name">
          <state
                class="org.eclipse.ui.handlers.RegistryToggleState:true"
                id="org.eclipse.ui.commands.toggleState">

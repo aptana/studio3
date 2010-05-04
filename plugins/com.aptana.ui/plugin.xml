@@ -96,16 +96,16 @@
             finalPerspective="com.aptana.ui.WebPerspective"
             icon="icons/new_web_project.gif"
             id="com.aptana.ui.wizards.NewWebProject"
-            name="Web Project"
+            name="%wizard.webproject.name"
             preferredPerspectives="com.aptana.ui.WebPerspective"
             project="true">
          <description>
-            Create a new web project
+            %wizard.webproject.description
          </description>
       </wizard>
       <category
             id="com.aptana.ui.wizards.category"
-            name="Web">
+            name="%category.web.name">
       </category>
       <primaryWizard
             id="com.aptana.ui.wizards.NewWebProject">
@@ -113,7 +113,7 @@
    </extension>
    <extension
          id="webnature"
-         name="Web Nature"
+         name="%extension.webnature.name"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run

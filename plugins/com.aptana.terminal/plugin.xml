@@ -133,5 +133,13 @@
             platform="win32">
       </configuration>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.views"
+            id="com.aptana.terminal.commands.showTerminalView"
+            name="Show Terminal View">
+      </command>
+   </extension>
 
 </plugin>
