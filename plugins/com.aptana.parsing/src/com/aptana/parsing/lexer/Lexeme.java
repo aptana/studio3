@@ -1,38 +1,25 @@
 package com.aptana.parsing.lexer;
 
-import org.eclipse.jface.text.rules.IToken;
-
-public class Lexeme implements ITokenLexeme
+public class Lexeme<T> implements ILexeme
 {
-	private final String text;
-	private final int startingOffset;
-	private final int endingOffset;
-	private IToken token;
+	private String _text;
+	private int _startingOffset;
+	private int _endingOffset;
+	private T _type;
 
 	/**
 	 * Lexeme
 	 * 
-	 * @param text
 	 * @param startingOffset
 	 * @param endingOffset
-	 * @param token
+	 * @param text
 	 */
-	public Lexeme(String text, int startingOffset, int endingOffset, IToken token)
+	public Lexeme(T type, int startingOffset, int endingOffset, String text)
 	{
-		this.text = text;
-		this.startingOffset = startingOffset;
-		this.endingOffset = endingOffset;
-		this.token = token;
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.lexer.ILexeme#getText()
-	 */
-	@Override
-	public String getText()
-	{
-		return text;
+		this._type = type;
+		this._startingOffset = startingOffset;
+		this._endingOffset = endingOffset;
+		this._text = text;
 	}
 
 	/*
@@ -42,7 +29,7 @@ public class Lexeme implements ITokenLexeme
 	@Override
 	public int getEndingOffset()
 	{
-		return endingOffset;
+		return this._endingOffset;
 	}
 
 	/*
@@ -52,10 +39,11 @@ public class Lexeme implements ITokenLexeme
 	@Override
 	public int getLength()
 	{
-		if (text != null) 
+		if (this._text != null)
 		{
-			return text.length();
+			return this._text.length();
 		}
+
 		return -1;
 	}
 
@@ -66,30 +54,41 @@ public class Lexeme implements ITokenLexeme
 	@Override
 	public int getStartingOffset()
 	{
-		return startingOffset;
+		return this._startingOffset;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.lexer.ITokenLexeme#getToken()
+	 * @see com.aptana.parsing.lexer.ILexeme#getText()
 	 */
 	@Override
-	public IToken getToken()
+	public String getText()
 	{
-		return token;
+		return this._text;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * getType
+	 * 
+	 * @return
+	 */
+	public T getType()
+	{
+		return this._type;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder buffer = new StringBuilder();
-		Object data = this.getToken().getData();
-		
-		buffer.append("[").append(data).append("]~").append(this.getText()).append("~");
-		
+		String type = this._type.toString();
+
+		buffer.append("[").append(type).append("]~").append(this.getText()).append("~");
+
 		return buffer.toString();
 	}
 }
