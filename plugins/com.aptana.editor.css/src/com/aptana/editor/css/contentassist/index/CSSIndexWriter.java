@@ -9,6 +9,7 @@ import java.util.Map;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
+import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.index.core.Index;
 import com.aptana.util.StringUtil;
 
@@ -16,6 +17,7 @@ public class CSSIndexWriter
 {
 	private CSSMetadataReader _reader;
 	private Map<UserAgentElement,String> _userAgentKeyMap = new HashMap<UserAgentElement,String>();
+	private int _valueCount;
 	
 	/**
 	 * CSSIndexWriter
@@ -86,8 +88,8 @@ public class CSSIndexWriter
 			property.getDescription(),
 			property.getExample(),
 			property.getHint(),
-			property.getRemark()
-			// values
+			property.getRemark(),
+			StringUtil.join(CSSIndexConstants.SUB_DELIMITER, this.writeValues(index, property.getValues()))
 		};
 		String key = StringUtil.join(CSSIndexConstants.DELIMITER, columns);
 		
@@ -110,24 +112,6 @@ public class CSSIndexWriter
 		{
 			this.writeProperty(index, property);
 		}
-	}
-	
-	/**
-	 * writeUserAgents
-	 * 
-	 * @param userAgents
-	 * @return
-	 */
-	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
-	{
-		List<String> keys = new LinkedList<String>();
-		
-		for (UserAgentElement userAgent : userAgents)
-		{
-			keys.add(this.writeUserAgent(index, userAgent));
-		}
-		
-		return keys;
 	}
 	
 	/**
@@ -160,5 +144,66 @@ public class CSSIndexWriter
 		}
 		
 		return key;
+	}
+	
+	/**
+	 * writeUserAgents
+	 * 
+	 * @param userAgents
+	 * @return
+	 */
+	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
+	{
+		List<String> keys = new LinkedList<String>();
+		
+		for (UserAgentElement userAgent : userAgents)
+		{
+			keys.add(this.writeUserAgent(index, userAgent));
+		}
+		
+		return keys;
+	}
+	
+	/**
+	 * writeValue
+	 * 
+	 * @param index
+	 * @param value
+	 * @return
+	 */
+	protected String writeValue(Index index, ValueElement value)
+	{
+		String key = Integer.toString(this._valueCount++);
+		
+		String[] columns = new String[] {
+			key,
+			value.getName(),
+			value.getDescription(),
+			StringUtil.join(CSSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, value.getUserAgents()))
+		};
+		String valueString = StringUtil.join(CSSIndexConstants.DELIMITER, columns);
+		
+		index.addEntry(CSSIndexConstants.VALUE, valueString, this.getDocumentPath());
+		
+		return key;
+	}
+	
+	/**
+	 * writeValues
+	 * 
+	 * @param index
+	 * @param values
+	 * @return
+	 */
+	protected List<String> writeValues(Index index, List<ValueElement> values)
+	{
+		List<String> keys = new LinkedList<String>();
+		
+		for (ValueElement value : values)
+		{
+			keys.add(this.writeValue(index, value));
+		}
+		
+		return keys;
 	}
 }
