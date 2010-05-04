@@ -130,7 +130,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 				return Character.isLetter(c);
 			}
 
-		}, createToken(HTMLTokenType.ENTITY), true) {//$NON-NLS-1$
+		}, createToken(HTMLTokenType.ATTRIBUTE), true) {//$NON-NLS-1$
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
