@@ -51,9 +51,9 @@ public class ValueElement
 	 * 
 	 * @return
 	 */
-	public UserAgentElement[] getUserAgents()
+	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents.toArray(new UserAgentElement[this._userAgents.size()]);
+		return this._userAgents;
 	}
 
 	/**
