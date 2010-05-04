@@ -1,16 +1,23 @@
 package com.aptana.editor.html.contentassist.index;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
+import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
+import com.aptana.editor.html.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
 import com.aptana.util.StringUtil;
 
 public class HTMLIndexWriter
 {
 	private HTMLMetadataReader _reader;
+	private Map<UserAgentElement,String> _userAgentKeyMap = new HashMap<UserAgentElement,String>();
 
 	/**
 	 * HTMLIndexWriter
@@ -65,7 +72,7 @@ public class HTMLIndexWriter
 			element.getRelatedClass(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
 			// specifications,
-			// user agents
+			StringUtil.join(CSSIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
 			element.getDeprecated(),
 			element.getDescription(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getEvents()),
@@ -109,5 +116,53 @@ public class HTMLIndexWriter
 		{
 			this.writeEvent(index, event);
 		}
+	}
+	
+	/**
+	 * writeUserAgent
+	 * 
+	 * @param index
+	 * @param userAgent
+	 * @return
+	 */
+	protected String writeUserAgent(Index index, UserAgentElement userAgent)
+	{
+		String key = this._userAgentKeyMap.get(userAgent);
+		
+		if (key == null)
+		{
+			key = Integer.toString(this._userAgentKeyMap.size());
+			
+			String[] columns = new String[] {
+				key,
+				userAgent.getPlatform(),
+				userAgent.getVersion()
+			};
+			String value = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+			
+			index.addEntry(HTMLIndexConstants.USER_AGENT, value, this.getDocumentPath());
+			
+			this._userAgentKeyMap.put(userAgent, key);
+		}
+		
+		return key;
+	}
+	
+	/**
+	 * writeUserAgents
+	 * 
+	 * @param userAgents
+	 * @return
+	 */
+	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
+	{
+		List<String> keys = new LinkedList<String>();
+		
+		for (UserAgentElement userAgent : userAgents)
+		{
+			keys.add(this.writeUserAgent(index, userAgent));
+		}
+		
+		return keys;
 	}
 }
