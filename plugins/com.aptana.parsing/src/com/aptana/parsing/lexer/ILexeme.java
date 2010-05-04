@@ -34,10 +34,10 @@
  */
 package com.aptana.parsing.lexer;
 
-public interface ILexeme extends IRange {
-
-    /**
-     * @return the text of this lexeme
-     */
-    public String getText();
+public interface ILexeme extends IRange
+{
+	/**
+	 * @return the text of this lexeme
+	 */
+	public String getText();
 }
