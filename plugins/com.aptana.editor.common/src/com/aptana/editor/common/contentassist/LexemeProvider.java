@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
@@ -18,8 +19,6 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 {
 	private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.MULTILINE);
 	
-	private IDocument _document;
-	private ITokenScanner _scanner;
 	private List<Lexeme<T>> _lexemes;
 
 	/**
@@ -28,37 +27,36 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	 * @param document
 	 * @param offset
 	 */
-	public LexemeProvider(IDocument document, ITokenScanner scanner)
+	public LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
-		this._document = document;
-		this._scanner = scanner;
-
-		this.createLexemeList();
+		this.createLexemeList(document, offset, scanner);
 	}
 
 	/**
 	 * createLexemeList
 	 */
-	private void createLexemeList()
+	private void createLexemeList(IDocument document, int offset, ITokenScanner scanner)
 	{
 		List<Lexeme<T>> lexemes = new ArrayList<Lexeme<T>>();
 
 		try
 		{
-			this._scanner.setRange(this._document, 0, this._document.getLength());
+			ITypedRegion partition = document.getPartition(offset);
+			
+			scanner.setRange(document, partition.getOffset(), partition.getLength());
 
 			// prime scanner
-			IToken token = this._scanner.nextToken();
+			IToken token = scanner.nextToken();
 
 			while (token != Token.EOF)
 			{
 				Object data = token.getData();
 				
 				// grab the lexeme particulars
-				int tokenOffset = this._scanner.getTokenOffset();
-				int tokenLength = this._scanner.getTokenLength();
+				int tokenOffset = scanner.getTokenOffset();
+				int tokenLength = scanner.getTokenLength();
 				int endingOffset = tokenOffset + tokenLength;
-				String text = this._document.get(tokenOffset, tokenLength);
+				String text = document.get(tokenOffset, tokenLength);
 				T type = this.getTypeFromName((String) data);
 				Lexeme<T> lexeme = new Lexeme<T>(type, tokenOffset, endingOffset, text);
 	
@@ -84,7 +82,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 				}
 				
 				// advance
-				token = this._scanner.nextToken();
+				token = scanner.nextToken();
 			}
 		}
 		catch (BadLocationException e)
