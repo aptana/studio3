@@ -43,6 +43,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 		{
 			ITypedRegion partition = document.getPartition(offset);
 			
+			//System.out.println(partition.getType());
 			scanner.setRange(document, partition.getOffset(), partition.getLength());
 
 			// prime scanner
