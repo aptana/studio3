@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -52,11 +51,16 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.ValueElement;
+import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.parsing.lexer.Lexeme;
 
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -65,7 +69,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private static enum Location
 	{
-		OUTSIDE_RULE, INSIDE_RULE, ARG_ASSIST, ERROR
+		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
 
 	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif");
@@ -73,6 +77,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
+	private Lexeme<CSSTokenType> _currentLexeme;
 
 	/**
 	 * CSSContentAssistProcessor
@@ -109,8 +114,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				// build a proposal
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
-						contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
 				proposal.setFileLocation(CSSIndexConstants.METADATA);
 				proposal.setUserAgentImages(userAgentIcons);
 
@@ -143,8 +147,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				// build a proposal
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
-						contextInfo, description);
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
 				proposal.setFileLocation(CSSIndexConstants.METADATA);
 				proposal.setUserAgentImages(userAgentIcons);
 
@@ -162,23 +165,31 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addClasses(List<ICompletionProposal> proposals, int offset)
 	{
-		Map<String,String> classes = this._queryHelper.getClasses(this.getIndex());
-		
+		Map<String, String> classes = this._queryHelper.getClasses(this.getIndex());
+
 		if (classes != null)
 		{
-			for (Entry<String,String> entry : classes.entrySet())
+			for (Entry<String, String> entry : classes.entrySet())
 			{
-				String name = entry.getKey();
+				String name = "." + entry.getKey();
 				int length = name.length();
 				String description = null;
 				Image image = ELEMENT_ICON;
 				IContextInformation contextInfo = null;
-				UserAgentManager manager = UserAgentManager.getInstance(); 
-				String[] userAgents = manager.getActiveUserAgentIDs();	// classes can be used by all user agents
+				UserAgentManager manager = UserAgentManager.getInstance();
+				String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
 				Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
 				
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
-						contextInfo, description);
+				// TEMP:
+				int replaceLength = 0;
+				
+				if (this._currentLexeme != null)
+				{
+					offset = this._currentLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getLength();
+				}
+
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, name, contextInfo, description);
 				proposal.setFileLocation(entry.getValue());
 				proposal.setUserAgentImages(userAgentIcons);
 
@@ -196,23 +207,31 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addIDs(List<ICompletionProposal> proposals, int offset)
 	{
-		Map<String,String> classes = this._queryHelper.getIDs(this.getIndex());
-		
+		Map<String, String> classes = this._queryHelper.getIDs(this.getIndex());
+
 		if (classes != null)
 		{
-			for (Entry<String,String> entry : classes.entrySet())
+			for (Entry<String, String> entry : classes.entrySet())
 			{
-				String name = entry.getKey();
+				String name = "#" + entry.getKey();
 				int length = name.length();
 				String description = null;
 				Image image = ELEMENT_ICON;
 				IContextInformation contextInfo = null;
-				UserAgentManager manager = UserAgentManager.getInstance(); 
-				String[] userAgents = manager.getActiveUserAgentIDs();	// classes can be used by all user agents
+				UserAgentManager manager = UserAgentManager.getInstance();
+				String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
 				Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
 				
-				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name,
-						contextInfo, description);
+				// TEMP:
+				int replaceLength = 0;
+				
+				if (this._currentLexeme != null)
+				{
+					offset = this._currentLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getLength();
+				}
+
+				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, name, contextInfo, description);
 				proposal.setFileLocation(entry.getValue());
 				proposal.setUserAgentImages(userAgentIcons);
 
@@ -222,30 +241,130 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	/**
+	 * addInsideRuleProposals
+	 * 
+	 * @param proposals
+	 * @param document
+	 * @param offset
+	 */
+	private void addInsideRuleProposals(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	{
+		Location location = this.getInsideLocation(lexemeProvider, offset);
+
+		switch (location)
+		{
+			case INSIDE_PROPERTY:
+				this.addAllPropertyProposals(proposals, offset);
+				break;
+
+			case INSIDE_VALUE:
+				this.addPropertyValues(proposals, lexemeProvider, offset);
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * addOutsideRuleProposals
+	 * 
+	 * @param proposals
+	 * @param document
+	 * @param offset
+	 */
+	private void addOutsideRuleProposals(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	{
+		switch (this._currentLexeme.getType())
+		{
+			case CLASS:
+				this.addClasses(proposals, offset);
+				break;
+
+			case ID:
+				this.addIDs(proposals, offset);
+				break;
+
+			default:
+				this.addAllElementProposals(proposals, offset);
+				break;
+		}
+	}
+
+	/**
+	 * addPropertyValues
+	 * 
+	 * @param proposals
+	 * @param lexemeProvider
+	 * @param offset
+	 */
+	private void addPropertyValues(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	{
+		// get property name
+		String propertyName = this.getPropertyName(lexemeProvider, offset);
+
+		// lookup value list for property
+		PropertyElement property = this._queryHelper.getProperty(propertyName);
+
+		// build proposals from value list
+		for (ValueElement value : property.getValues())
+		{
+			String name = value.getName();
+			int length = name.length();
+			String description = value.getDescription();
+			Image image = PROPERTY_ICON;
+			IContextInformation contextInfo = null;
+			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(property.getUserAgentNames());
+
+			CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
+			proposal.setFileLocation(CSSIndexConstants.METADATA);
+			proposal.setUserAgentImages(userAgentIcons);
+
+			// add it to the list
+			proposals.add(proposal);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see
 	 * com.aptana.editor.common.CommonContentAssistProcessor#computeCompletionProposals(org.eclipse.jface.text.ITextViewer
 	 * , int, char, boolean)
 	 */
-	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
-			boolean autoActivated)
+	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
+		// tokenize the current document
 		IDocument document = viewer.getDocument();
-		Location location = this.getLocation(document, offset);
+		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, new CSSScopeScanner())
+		{
+			@Override
+			protected CSSTokenType getTypeFromName(String name)
+			{
+				return CSSTokenType.get(name);
+			}
+		};
+
+		// store a reference to the lexeme at the current position
+		this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+
+		// first step is to determine if we're inside our outside of a rule
+		Location location = this.getLocation(lexemeProvider, offset);
+
+		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
 		switch (location)
 		{
 			case OUTSIDE_RULE:
-				this.getOutsideRuleProposals(result, document, offset);
+				this.addOutsideRuleProposals(result, lexemeProvider, offset);
 				break;
 
 			case INSIDE_RULE:
-				this.addAllPropertyProposals(result, offset);
+				this.addInsideRuleProposals(result, lexemeProvider, offset);
 				break;
 
-			case ARG_ASSIST:
+			case INSIDE_ARG:
 				// TODO: lookup specific property and shows its values
 				break;
 
@@ -253,6 +372,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 		}
 
+		// sort by display name
 		Collections.sort(result, new Comparator<ICompletionProposal>()
 		{
 			@Override
@@ -262,6 +382,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		});
 
+		// select the current proposal based on the current lexeme
+		this.setSelectedProposal(this._currentLexeme.getText(), result);
+
+		// return results
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
@@ -291,13 +415,42 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getLocation
+	 * getInsideLocation
 	 * 
-	 * @param tokenLexems
+	 * @param document
 	 * @param offset
 	 * @return
 	 */
-	private Location getLocation(IDocument document, int offset)
+	private Location getInsideLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
+	{
+		Location location = Location.ERROR;
+
+		switch (this._currentLexeme.getType())
+		{
+			case PROPERTY:
+				location = Location.INSIDE_PROPERTY;
+				break;
+
+			case COLON:
+			case VALUE:
+				location = Location.INSIDE_VALUE;
+				break;
+
+			default:
+				break;
+		}
+
+		return location;
+	}
+
+	/**
+	 * getLocation
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @return
+	 */
+	private Location getLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
 
@@ -307,45 +460,26 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		else
 		{
-			int i;
+			int index = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
 
-			LOOP:
-
-			for (i = offset; i >= 0; i--)
+			switch (lexeme.getType())
 			{
-				try
-				{
-					char c = document.getChar(i);
+				case ID:
+				case CLASS:
+					result = Location.OUTSIDE_RULE;
+					break;
 
-					switch (c)
-					{
-						case '{':
-						case ')':
-						case ';':
-						case ':':
-							result = Location.INSIDE_RULE;
-							break LOOP;
+				case CURLY_BRACE:
+					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
+					break;
 
-						case '}':
-							result = Location.OUTSIDE_RULE;
-							break LOOP;
+				case PROPERTY:
+					result = Location.INSIDE_RULE;
+					break;
 
-						case '(':
-							result = Location.ARG_ASSIST;
-							break LOOP;
-
-						default:
-							break;
-					}
-				}
-				catch (BadLocationException e)
-				{
-				}
-			}
-
-			if (i == 0 && result == Location.ERROR)
-			{
-				result = Location.OUTSIDE_RULE;
+				default:
+					break;
 			}
 		}
 
@@ -353,38 +487,70 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * getOutsideRuleProposals
+	 * getPropertyName
 	 * 
-	 * @param result
 	 * @param document
 	 * @param offset
+	 * @return
 	 */
-	private void getOutsideRuleProposals(List<ICompletionProposal> result, IDocument document, int offset)
+	private String getPropertyName(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
-		char c = '\0';
+		String result = null;
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
 
-		try
+		for (int i = index; i >= 0; i--)
 		{
-			c = document.getChar(offset - 1);
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(i);
+
+			if (lexeme.getType() == CSSTokenType.PROPERTY)
+			{
+				result = lexeme.getText();
+				break;
+			}
 		}
-		catch (BadLocationException e)
+
+		return result;
+	}
+
+	/**
+	 * setSelectedProposal
+	 * 
+	 * @param prefix
+	 * @param proposals
+	 */
+	private void setSelectedProposal(String prefix, List<ICompletionProposal> proposals)
+	{
+		ICompletionProposal caseSensitiveProposal = null;
+		ICompletionProposal caseInsensitiveProposal = null;
+		ICompletionProposal suggestedProposal = null;
+
+		for (ICompletionProposal proposal : proposals)
 		{
+			String displayString = proposal.getDisplayString();
+			int comparison = prefix.compareToIgnoreCase(proposal.getDisplayString());
+
+			if (comparison >= 0)
+			{
+				if (displayString.toLowerCase().startsWith(prefix.toLowerCase()))
+				{
+					caseInsensitiveProposal = proposal;
+
+					if (displayString.startsWith(prefix))
+					{
+						caseSensitiveProposal = proposal;
+						// found a match, so exit loop
+						break;
+					}
+				}
+			}
 		}
 
-		switch (c)
+		suggestedProposal = (caseSensitiveProposal != null) ? caseSensitiveProposal : caseInsensitiveProposal;
+
+		// select as default selection
+		if (suggestedProposal instanceof CommonCompletionProposal)
 		{
-			case '.':
-				addClasses(result, offset);
-				break;
-
-			case '#':
-				addIDs(result, offset);
-				break;
-
-			case '\0':
-			default:
-				this.addAllElementProposals(result, offset);
-				break;
+			((CommonCompletionProposal) suggestedProposal).setIsDefaultSelection(true);
 		}
 	}
 }
