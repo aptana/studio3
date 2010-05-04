@@ -5,6 +5,7 @@ public interface JSIndexConstants
 	// general constants
 	static final String METADATA = "js.metadata";
 	static final String DELIMITER = "~";
+	static final String CORE = "JS Core";
 	
 	// index categories
 	static final String TYPE = "js.type";
