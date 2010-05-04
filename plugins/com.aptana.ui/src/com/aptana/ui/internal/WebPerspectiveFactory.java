@@ -25,6 +25,6 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 		IPlaceholderFolderLayout terminalArea = layout.createPlaceholderFolder(
 				"terminalArea", IPageLayout.BOTTOM, 0.75f, //$NON-NLS-1$
 				editorArea);
-		terminalArea.addPlaceholder(TERMINAL_VIEW);
+		terminalArea.addPlaceholder(TERMINAL_VIEW+":*"); //$NON-NLS-1$
 	}
 }
