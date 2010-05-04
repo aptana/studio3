@@ -44,6 +44,7 @@ import com.aptana.usage.EventLogger;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 

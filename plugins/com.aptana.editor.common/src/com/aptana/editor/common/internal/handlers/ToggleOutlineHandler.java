@@ -31,7 +31,7 @@ public class ToggleOutlineHandler extends AbstractHandler
 				}
 				catch (PartInitException e)
 				{
-					CommonEditorPlugin.logError("Error opening Outline view", e);
+					CommonEditorPlugin.logError(Messages.ToggleOutlineHandler_ERR_OpeningOutline, e);
 				}
 			}
 			else
