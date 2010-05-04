@@ -115,7 +115,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 				// build a proposal
 				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
-				proposal.setFileLocation(CSSIndexConstants.METADATA);
+				proposal.setFileLocation(CSSIndexConstants.CORE);
 				proposal.setUserAgentImages(userAgentIcons);
 
 				// add it to the list
@@ -157,7 +157,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				
 				// build a proposal
 				CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, name, contextInfo, description);
-				proposal.setFileLocation(CSSIndexConstants.METADATA);
+				proposal.setFileLocation(CSSIndexConstants.CORE);
 				proposal.setUserAgentImages(userAgentIcons);
 
 				// add it to the list
@@ -327,7 +327,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(property.getUserAgentNames());
 
 			CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
-			proposal.setFileLocation(CSSIndexConstants.METADATA);
+			proposal.setFileLocation(CSSIndexConstants.CORE);
 			proposal.setUserAgentImages(userAgentIcons);
 
 			// add it to the list
