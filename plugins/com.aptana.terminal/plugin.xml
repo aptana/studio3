@@ -88,15 +88,6 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="org.radrails.rails.ui.PerspectiveRails">
-         <actionSet
-               id="com.aptana.terminal.actionSet">
-         </actionSet>
-      </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
             targetID="org.eclipse.debug.ui.DebugPerspective">
          <actionSet
                id="com.aptana.terminal.actionSet">

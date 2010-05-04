@@ -83,6 +83,9 @@
          <actionSet
                id="com.aptana.editor.common.globalActionSet">
          </actionSet>
+         <actionSet
+               id="com.aptana.terminal.actionSet">
+         </actionSet>
       </perspectiveExtension>
    </extension>
    <extension
