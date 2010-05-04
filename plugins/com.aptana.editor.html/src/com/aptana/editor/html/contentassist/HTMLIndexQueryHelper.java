@@ -22,6 +22,27 @@ public class HTMLIndexQueryHelper
 	}
 	
 	/**
+	 * getElement
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public ElementElement getElement(String name)
+	{
+		ElementElement result = null;
+		
+		try
+		{
+			result = this._reader.getElement(this.getIndex(), name);
+		}
+		catch (IOException e)
+		{
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * getElements
 	 * 
 	 * @return
