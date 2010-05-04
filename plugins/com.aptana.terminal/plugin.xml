@@ -137,9 +137,30 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.ui.category.views"
-            id="com.aptana.terminal.commands.showTerminalView"
-            name="Show Terminal View">
+            defaultHandler="com.aptana.terminal.internal.handlers.ShowTerminalHandler"
+            description="Show Terminal view"
+            id="com.aptana.terminal.commands.showTerminal"
+            name="Show Terminal">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="aptana">
+            <command
+                  commandId="com.aptana.terminal.commands.showTerminal"
+                  icon="icons/terminal.png"
+                  style="push">
+               <visibleWhen>
+                  <reference
+                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                  </reference>
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
    </extension>
 
 </plugin>
