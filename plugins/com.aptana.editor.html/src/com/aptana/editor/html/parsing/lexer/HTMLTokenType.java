@@ -11,7 +11,7 @@ public enum HTMLTokenType implements ITypePredicate
 	UNDEFINED("undefined.html"),
 	DOUBLE_QUOTED_STRING("string.quoted.double.html"),
 	SINGLE_QUOTED_STRING("string.quoted.single.html"),
-	ENTITY("entity.other.attribute-name.html"),
+	ATTRIBUTE("entity.other.attribute-name.html"),
 	ID("entity.other.attribute-name.id.html"),
 	CLASS("entity.other.attribute-name.class.html"),
 	META("meta.tag.other.html"),
