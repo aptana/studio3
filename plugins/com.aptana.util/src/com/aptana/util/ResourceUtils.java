@@ -7,7 +7,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 public class ResourceUtils
 {
@@ -136,5 +142,30 @@ public class ResourceUtils
 		result.append(path);
 		
 		return result.toString();
+	}
+	
+	/**
+	 * Returns the value that is currently stored for the line separator. In case an IProject reference is given, the
+	 * returned value will be the one that was, potentially, set specifically to that project.
+	 * 
+	 * @param project
+	 *            An {@link IProject} reference. Can be null.
+	 * @return the currently stored line separator
+	 */
+	public static String getLineSeparatorValue(IProject project)
+	{
+		IScopeContext scope;
+		if (project != null)
+		{
+			scope = new ProjectScope(project);
+		}
+		else
+		{
+			scope = new InstanceScope();
+		}
+
+		IScopeContext[] scopeContext = new IScopeContext[] { scope };
+		IEclipsePreferences node = scopeContext[0].getNode(Platform.PI_RUNTIME);
+		return node.get(Platform.PREF_LINE_SEPARATOR, System.getProperty("line.separator")); //$NON-NLS-1$
 	}
 }
