@@ -53,7 +53,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
@@ -132,6 +134,17 @@ public class CommitDialog extends StatusDialog
 		sashForm.setWeights(new int[] { 35, 30, 35 });
 
 		validate();
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				packTable(stagedTable);
+				packTable(unstagedTable);
+			}
+		});
+		
 
 		return container;
 	}
@@ -296,7 +309,6 @@ public class CommitDialog extends StatusDialog
 				createTableItem(table, file, false);
 			}
 		}
-		packTable(table);
 
 		// Drag and Drop
 		// FIXME If user drags and drops while we're still crunching on last drag/drop then we end up hanging
@@ -434,6 +446,57 @@ public class CommitDialog extends StatusDialog
 				Table table = (Table) e.getSource();
 				TableItem[] selected = table.getSelection();
 				moveItems(staged, selected);
+			}
+		});
+		table.addListener(SWT.EraseItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				// Only draw the text custom
+				if (event.index != 1)
+					return;
+
+				event.detail &= ~SWT.FOREGROUND;
+			}
+		});
+		table.addListener(SWT.PaintItem, new Listener()
+		{
+
+			@Override
+			public void handleEvent(Event event)
+			{
+				// Only draw the text custom
+				if (event.index != 1)
+					return;
+				TableItem item = (TableItem) event.item;
+				String text = item.getText(event.index);
+
+				// Truncate middle of string
+				Table theTable = (Table) event.widget;
+				int width = theTable.getColumn(event.index).getWidth();
+
+				Point p = event.gc.stringExtent(text); // is text wider than available width?
+				if (p.x > width)
+				{
+					// chop string in half and drop a few characters
+					int middle = text.length() / 2;
+					String beginning = text.substring(0, middle - 1);
+					String end = text.substring(middle + 2, text.length());
+					// Now repeatedly chop off one char from each end until we fit
+					// TODO Chop each side separately? it'd take more loops, but text would fit tighter when uneven
+					// lengths work better..
+					while (event.gc.stringExtent(beginning + "..." + end).x > width) //$NON-NLS-1$
+					{
+						beginning = beginning.substring(0, beginning.length() - 1);
+						end = end.substring(1);
+					}
+					text = beginning + "..." + end; //$NON-NLS-1$
+				}
+				event.gc.drawText(text, event.x, event.y, true);
+
+				event.detail &= ~SWT.FOREGROUND;
 			}
 		});
 
@@ -652,9 +715,14 @@ public class CommitDialog extends StatusDialog
 
 	private void packTable(Table table)
 	{
-		for (int i = 0; i < table.getColumnCount(); i++)
+		// pack first column (image)
+		table.getColumn(0).pack();
+		// Make the second column take all the available width!
+		int totalWidth = table.getClientArea().width;
+		if (totalWidth > 0)
 		{
-			table.getColumn(i).pack();
+			totalWidth -= table.getColumn(0).getWidth();
+			table.getColumn(1).setWidth(totalWidth);
 		}
 	}
 
