@@ -25,7 +25,7 @@ public class JSModelFormatter
 			return getDescription((FunctionElement) property);
 		}
 		
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		// title
 		buffer.append("<b>").append(property.getName()).append("</b>");
@@ -48,7 +48,7 @@ public class JSModelFormatter
 	 */
 	public static String getDescription(FunctionElement function)
 	{
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		// title
 		buffer.append("<b>").append(function.getName()).append("</b>").append("(");
@@ -103,7 +103,7 @@ public class JSModelFormatter
 		return buffer.toString();
 	}
 
-	private static void addReturnTypes(StringBuffer buffer, ReturnTypeElement[] returnTypes, String defaultType)
+	private static void addReturnTypes(StringBuilder buffer, ReturnTypeElement[] returnTypes, String defaultType)
 	{
 		boolean first;
 		
