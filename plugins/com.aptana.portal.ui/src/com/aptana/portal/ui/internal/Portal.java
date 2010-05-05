@@ -27,7 +27,7 @@ import com.aptana.portal.ui.browser.PortalBrowserEditor;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	public static final String BASE_URL_PREFIX = "http://aptana.com/tools/content/"; //$NON-NLS-1$
+	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/"; //$NON-NLS-1$
 	private static Portal instance;
 	private static URL BASE_LOCAL_URL;
 	{
