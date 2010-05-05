@@ -105,10 +105,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (ElementElement element : elements)
 			{
+				String description = CSSModelFormatter.getDescription(element);
 				String[] userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-				this.addProposal(proposals, element.getName(), ELEMENT_ICON, element.getDescription(), userAgentIcons, offset);
+				this.addProposal(proposals, element.getName(), ELEMENT_ICON, description, userAgentIcons, offset);
 			}
 		}
 	}
@@ -127,10 +128,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			for (PropertyElement property : properties)
 			{
+				String description = CSSModelFormatter.getDescription(property);
 				String[] userAgents = property.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-				this.addProposal(proposals, property.getName(), PROPERTY_ICON, property.getDescription(), userAgentIcons, offset);
+				this.addProposal(proposals, property.getName(), PROPERTY_ICON, description, userAgentIcons, offset);
 			}
 		}
 	}
@@ -244,14 +246,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// get property name
 		String propertyName = this.getPropertyName(lexemeProvider, offset);
 
-		// lookup value list for property
-		PropertyElement property = this._queryHelper.getProperty(propertyName);
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(property.getUserAgentNames());
-
-		// build proposals from value list
-		for (ValueElement value : property.getValues())
+		if (propertyName != null && propertyName.length() > 0)
 		{
-			this.addProposal(proposals, value.getName(), PROPERTY_ICON, value.getDescription(), userAgentIcons, offset);
+			// lookup value list for property
+			PropertyElement property = this._queryHelper.getProperty(propertyName);
+			
+			if (property != null)
+			{
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(property.getUserAgentNames());
+		
+				// build proposals from value list
+				for (ValueElement value : property.getValues())
+				{
+					this.addProposal(proposals, value.getName(), PROPERTY_ICON, value.getDescription(), userAgentIcons, offset);
+				}
+			}
 		}
 	}
 
@@ -362,7 +371,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		// TODO: these should be defined in a preference page
-		return new char[] { ':', '{' };
+		return new char[] { '.', '#', '{', ':', '\t' };
 		// return new char[] { ':', '\t', '{', ';' };
 	}
 
@@ -399,6 +408,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 
 			case ELEMENT: // sometimes occurs with partially typed properties
+			case IDENTIFIER:
 			case PROPERTY:
 				location = Location.INSIDE_PROPERTY;
 				break;
@@ -428,41 +438,46 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Location getLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location result = Location.ERROR;
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
 
-		if (offset == 0)
+		LOOP: while (index >= 0)
 		{
-			result = Location.OUTSIDE_RULE;
-		}
-		else
-		{
-			int index = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
 
-			LOOP: while (index >= 0)
+			switch (lexeme.getType())
 			{
-				Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
+				case ID:
+				case CLASS:
+					result = Location.OUTSIDE_RULE;
+					break LOOP;
 
-				switch (lexeme.getType())
-				{
-					case ID:
-					case CLASS:
-						result = Location.OUTSIDE_RULE;
-						break LOOP;
+				case CURLY_BRACE:
+					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
+					break LOOP;
 
-					case CURLY_BRACE:
-						result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
-						break LOOP;
-
-					case PROPERTY:
-					case VALUE:
+				case PROPERTY:
+				case VALUE:
+					result = Location.INSIDE_RULE;
+					break LOOP;
+					
+				case IDENTIFIER:
+					if (lexeme.getText().charAt(0) == '-')
+					{
 						result = Location.INSIDE_RULE;
 						break LOOP;
+					}
+					break;
 
-					default:
-						break;
-				}
-
-				index--;
+				default:
+					break;
 			}
+
+			index--;
+		}
+		
+		if (index < 0 && result == Location.ERROR)
+		{
+			result = Location.OUTSIDE_RULE;
 		}
 
 		return result;
