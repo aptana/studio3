@@ -39,6 +39,7 @@ public class CSSScopeScanner extends CSSCodeScanner
 		// Add rules for the start characters of classes and ids
 		rules.add(new SingleCharacterRule('#', createToken(CSSTokenType.ID)));
 		rules.add(new SingleCharacterRule('.', createToken(CSSTokenType.CLASS)));
+		rules.add(new SingleCharacterRule(',', createToken(CSSTokenType.COMMA)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}

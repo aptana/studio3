@@ -30,7 +30,8 @@ public enum CSSTokenType implements ITypePredicate
 	IDENTIFIER("source.css"),
 	DOUBLE_QUOTED_STRING("string.quoted.double.css"),
 	SINGLE_QUOTED_STRING("string.quoted.single.css"),
-	COMMENT("comment.block.css");
+	COMMENT("comment.block.css"),
+	COMMA("punctuation.separator.css");
 
 	private static final Map<String, CSSTokenType> NAME_MAP;
 	private String _name;
