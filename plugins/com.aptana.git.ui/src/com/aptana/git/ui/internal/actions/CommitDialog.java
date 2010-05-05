@@ -280,7 +280,6 @@ public class CommitDialog extends StatusDialog
 
 	private Table createTable(Composite composite, final boolean staged)
 	{
-		// TODO Make list entries be able to be truncated when too long to fit, like GitX does
 		Table table = new Table(composite, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
@@ -448,6 +447,7 @@ public class CommitDialog extends StatusDialog
 				moveItems(staged, selected);
 			}
 		});
+		// Custom drawing so we can truncate filepaths in middle...
 		table.addListener(SWT.EraseItem, new Listener()
 		{
 
