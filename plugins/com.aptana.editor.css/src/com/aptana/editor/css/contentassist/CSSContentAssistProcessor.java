@@ -305,6 +305,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
+		offset = Math.max(0, offset - 1);
+		
 		// tokenize the current document
 		IDocument document = viewer.getDocument();
 		LexemeProvider<CSSTokenType> lexemeProvider = new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
@@ -400,29 +402,37 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Location getInsideLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location location = Location.ERROR;
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
 
-		switch (this._currentLexeme.getType())
+		LOOP: while (index >= 0)
 		{
-			case CURLY_BRACE:
-				location = ("{".equals(this._currentLexeme.getText())) ? Location.INSIDE_PROPERTY : Location.INSIDE_VALUE;
-				break;
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(index);
 
-			case ELEMENT: // sometimes occurs with partially typed properties
-			case IDENTIFIER:
-			case PROPERTY:
-				location = Location.INSIDE_PROPERTY;
-				break;
+			switch (lexeme.getType())
+			{
+				case CURLY_BRACE:
+					location = ("{".equals(lexeme.getText())) ? Location.INSIDE_PROPERTY : Location.INSIDE_VALUE;
+					break LOOP;
 
-			case ARGS:
-			case COLON:
-			case FUNCTION:
-			case SEMICOLON: // ?
-			case VALUE:
-				location = Location.INSIDE_VALUE;
-				break;
+				case ELEMENT: // sometimes occurs with partially typed properties
+				case IDENTIFIER:
+				case PROPERTY:
+				case SEMICOLON: // ?
+					location = Location.INSIDE_PROPERTY;
+					break LOOP;
 
-			default:
-				break;
+				case ARGS:
+				case COLON:
+				case FUNCTION:
+				case VALUE:
+					location = Location.INSIDE_VALUE;
+					break LOOP;
+
+				default:
+					break;
+			}
+			
+			index--;
 		}
 
 		return location;
