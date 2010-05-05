@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IPaintPositionManager;
 import org.eclipse.jface.text.IPainter;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension2;
@@ -19,6 +20,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerColumn;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -29,8 +31,10 @@ import org.eclipse.swt.custom.LineBackgroundEvent;
 import org.eclipse.swt.custom.LineBackgroundListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -92,6 +96,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	private Cursor fCursor;
 
 	private ISelectionChangedListener selectionListener;
+	private VerifyKeyListener keyListener;
 
 	private LineNumberRulerColumn fLineColumn;
 	private Composite parent;
@@ -251,6 +256,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 	{
 		fAnnotationAccess = getAnnotationAccess();
 		fOverviewRuler = createOverviewRuler(getSharedColors());
+		
 		// Need to make it a projection viewer now that we have folding...
 		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
@@ -259,6 +265,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
 		};
+		
+		if (viewer instanceof ITextViewerExtension)
+		{
+			// create key listener
+			this.keyListener = new VerifyKeyListener()
+			{
+				@Override
+				public void verifyKey(VerifyEvent event)
+				{
+					onKeyPressed(event);
+				}
+			};
+			
+			// add listener to our viewer
+			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.keyListener);
+		}
+		
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);
 
@@ -273,6 +296,27 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		}
 
 		return viewer;
+	}
+	
+	/**
+	 * onKeyPressed
+	 * 
+	 * @param event
+	 */
+	private void onKeyPressed(VerifyEvent event)
+	{
+//		if (event.character == ' ')
+//		{
+//			// TODO: possibly popup CA for the current partition
+//			ISourceViewer viewer = this.getSourceViewer();
+//
+//			if (viewer instanceof ITextOperationTarget)
+//			{
+//				int operation = SourceViewer.CONTENTASSIST_PROPOSALS;
+//
+//				((ITextOperationTarget) viewer).doOperation(operation);
+//			}
+//		}
 	}
 
 	@Override
@@ -575,6 +619,18 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor
 		{
 			fCursor.dispose();
 			fCursor = null;
+		}
+		
+		if (keyListener != null)
+		{
+			ISourceViewer viewer = this.getSourceViewer();
+			
+			if (viewer instanceof ITextViewerExtension)
+			{
+				((ITextViewerExtension) viewer).removeVerifyKeyListener(this.keyListener);
+			}
+			
+			keyListener = null;
 		}
 
 		removeLineHighlightListener();
