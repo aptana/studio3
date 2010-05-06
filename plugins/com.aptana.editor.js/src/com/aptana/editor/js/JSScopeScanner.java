@@ -41,7 +41,7 @@ public class JSScopeScanner extends JSCodeScanner
 	 */
 	protected IToken createToken(JSTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 
 	/*

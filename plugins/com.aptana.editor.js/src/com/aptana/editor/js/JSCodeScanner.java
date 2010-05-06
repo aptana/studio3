@@ -264,7 +264,7 @@ public class JSCodeScanner extends RuleBasedScanner
 
 	protected IToken createToken(JSTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 	
 	protected IToken createToken(String string)

@@ -37,7 +37,7 @@ public enum JSTokenType implements ITypePredicate
 	NUMBER("constant.numeric.js");
 
 	private static final Map<String, JSTokenType> NAME_MAP;
-	private String _name;
+	private String _scope;
 
 	/**
 	 * static
@@ -48,29 +48,29 @@ public enum JSTokenType implements ITypePredicate
 
 		for (JSTokenType type : EnumSet.allOf(JSTokenType.class))
 		{
-			NAME_MAP.put(type.getName(), type);
+			NAME_MAP.put(type.getScope(), type);
 		}
 	}
 
 	/**
 	 * get
 	 * 
-	 * @param name
+	 * @param scope
 	 * @return
 	 */
-	public static final JSTokenType get(String name)
+	public static final JSTokenType get(String scope)
 	{
-		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
+		return (NAME_MAP.containsKey(scope)) ? NAME_MAP.get(scope) : UNDEFINED;
 	}
 
 	/**
 	 * CSSTokenTypes
 	 * 
-	 * @param name
+	 * @param scope
 	 */
-	private JSTokenType(String name)
+	private JSTokenType(String scope)
 	{
-		this._name = name;
+		this._scope = scope;
 	}
 
 	/**
@@ -78,9 +78,9 @@ public enum JSTokenType implements ITypePredicate
 	 * 
 	 * @return
 	 */
-	public String getName()
+	public String getScope()
 	{
-		return this._name;
+		return this._scope;
 	}
 
 	/*
@@ -98,6 +98,6 @@ public enum JSTokenType implements ITypePredicate
 	 */
 	public String toString()
 	{
-		return this.getName();
+		return this.getScope();
 	}
 }
