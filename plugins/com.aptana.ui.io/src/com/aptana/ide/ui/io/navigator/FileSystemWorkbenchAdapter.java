@@ -212,7 +212,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			if (object instanceof IBaseRemoteConnectionPoint) {
 				IPath path = ((IBaseRemoteConnectionPoint) object).getPath();
 				if (path.segmentCount() > 0) {
-					return MessageFormat.format("{0} ({1})", new String[] { ((IConnectionPoint) object).getName(), path.toPortableString() }); //$NON-NLS-1$
+					return MessageFormat.format("{0} ({1})", new Object[] { ((IConnectionPoint) object).getName(), path.toPortableString() }); //$NON-NLS-1$
 				}
 			}
 			return ((IConnectionPoint) object).getName();

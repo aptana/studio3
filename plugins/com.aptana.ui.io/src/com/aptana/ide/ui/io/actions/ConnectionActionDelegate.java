@@ -38,6 +38,7 @@ package com.aptana.ide.ui.io.actions;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -79,6 +80,11 @@ public abstract class ConnectionActionDelegate implements IObjectActionDelegate 
 		    for (Object element : elements) {
 		        if (element instanceof IConnectionPoint) {
 		            connectionPoints.add((IConnectionPoint) element);
+		        } else if (element instanceof IAdaptable) {
+		        	IConnectionPoint connection = (IConnectionPoint) ((IAdaptable) element).getAdapter(IConnectionPoint.class);
+		        	if (connection != null) {
+		        		connectionPoints.add(connection);
+		        	}
 		        }
 		    }
 		    if (connectionPoints.size() > 0) {

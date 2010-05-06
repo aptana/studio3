@@ -352,8 +352,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 					public void widgetSelected(SelectionEvent e)
 					{
 						// Open a terminal on active project!
-						TerminalView.openView(selectedProject.getName(), selectedProject.getName(), selectedProject
-								.getLocation());
+						TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+								selectedProject.getLocation());
 					}
 				});
 				terminalMenuItem.setEnabled(selectedProject != null && selectedProject.exists());
@@ -723,6 +723,9 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		browserParent.setLayoutData(layoutData);
 
 		browser = new Browser(browserParent, SWT.NONE);
+		browser.setText("<html><head></head><body style=\"background-color: #"
+				+ toHex(getThemeManager().getCurrentTheme().getBackground()) + "; color: #"
+				+ toHex(getThemeManager().getCurrentTheme().getForeground()) + ";\"><h3>Loading...</h3></body></html>");
 		// Open links with target of _new in an internal browser editor
 		browser.addOpenWindowListener(new OpenWindowListener()
 		{
@@ -1122,26 +1125,35 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		{
 			updateMessageAreaJob = new Job("Updating App Explorer message area")
 			{
+				boolean shouldCancel = false;
+
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
-					if (monitor != null && monitor.isCanceled())
+					if (monitor != null && monitor.isCanceled() && shouldCancel)
 						return Status.CANCEL_STATUS;
 					boolean connected = false;
+					HttpURLConnection connection = null;
 					try
 					{
-						HttpURLConnection connection = (HttpURLConnection) new URL(BASE_MESSAGE_URL).openConnection();
+						connection = (HttpURLConnection) new URL(BASE_MESSAGE_URL).openConnection();
 						connection.setRequestMethod("HEAD"); // Don't ask for content //$NON-NLS-1$
 						connection.setAllowUserInteraction(false);
 						connection.connect();
 						connected = true;
+
 					}
 					catch (Exception e)
 					{
 						connected = false;
 					}
+					finally
+					{
+						if (connection != null)
+							connection.disconnect();
+					}
 					final boolean wasConnected = connected;
-					if (monitor != null && monitor.isCanceled())
+					if (monitor != null && monitor.isCanceled() && shouldCancel)
 						return Status.CANCEL_STATUS;
 
 					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
@@ -1173,6 +1185,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 							}
 						}
 					});
+					shouldCancel = true;
 					return Status.OK_STATUS;
 				}
 			};

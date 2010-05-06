@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -77,7 +78,7 @@ public class OpenWithMenu extends ContributionItem {
     private IEditorRegistry registry = PlatformUI.getWorkbench()
             .getEditorRegistry();
 
-    private static Hashtable imageCache = new Hashtable(11);
+    private static Hashtable<ImageDescriptor, Image> imageCache = new Hashtable<ImageDescriptor, Image>(11);
 
     /**
      * The id of this action.
@@ -92,12 +93,12 @@ public class OpenWithMenu extends ContributionItem {
     /*
      * Compares the labels from two IEditorDescriptor objects
      */
-    private static final Comparator comparer = new Comparator() {
+    private static final Comparator<IEditorDescriptor> comparer = new Comparator<IEditorDescriptor>() {
         private Collator collator = Collator.getInstance();
 
-        public int compare(Object arg0, Object arg1) {
-            String s1 = ((IEditorDescriptor) arg0).getLabel();
-            String s2 = ((IEditorDescriptor) arg1).getLabel();
+        public int compare(IEditorDescriptor o1, IEditorDescriptor o2) {
+            String s1 = o1.getLabel();
+            String s2 = o2.getLabel();
             return collator.compare(s1, s2);
         }
     };
@@ -275,17 +276,16 @@ public class OpenWithMenu extends ContributionItem {
                 // ignores the exception
             }
         }
-        Object[] editors = registry.getEditors(file.getName(), finalType);
+        IEditorDescriptor[] editors = registry.getEditors(file.getName(), finalType);
         Collections.sort(Arrays.asList(editors), comparer);
 
         boolean defaultFound = false;
 
         //Check that we don't add it twice. This is possible
         //if the same editor goes to two mappings.
-        ArrayList alreadyMapped = new ArrayList();
+        List<IEditorDescriptor> alreadyMapped = new ArrayList<IEditorDescriptor>();
 
-        for (int i = 0; i < editors.length; i++) {
-            IEditorDescriptor editor = (IEditorDescriptor) editors[i];
+        for (IEditorDescriptor editor : editors) {
             if (!alreadyMapped.contains(editor)) {
                 createMenuItem(menu, editor, preferredEditor);
                 if (defaultEditor != null

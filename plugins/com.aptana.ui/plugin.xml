@@ -39,32 +39,31 @@
          <viewShortcut
                id="org.eclipse.ui.views.ContentOutline">
          </viewShortcut>
+         <view
+               id="com.aptana.terminal.views.terminal"
+               relationship="stack"
+               relative="org.eclipse.ui.console.ConsoleView"
+               visible="false">
+         </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
          </viewShortcut>
          <view
-               id="org.eclipse.ui.console.ConsoleView"
-               minimized="false"
-               relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
-               visible="false">
-         </view>
-         <view
                id="org.eclipse.pde.runtime.LogView"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <view
                id="org.eclipse.ui.views.ProblemView"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <view
                id="org.eclipse.ui.views.TaskList"
                relationship="stack"
-               relative="com.aptana.terminal.views.terminal"
+               relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
          <newWizardShortcut
