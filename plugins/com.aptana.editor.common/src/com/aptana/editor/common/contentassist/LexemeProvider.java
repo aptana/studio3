@@ -18,7 +18,7 @@ import com.aptana.parsing.lexer.Lexeme;
 public abstract class LexemeProvider<T extends ITypePredicate>
 {
 	private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.MULTILINE);
-	
+
 	private List<Lexeme<T>> _lexemes;
 
 	/**
@@ -42,8 +42,8 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
-			
-			//System.out.println(partition.getType());
+
+			// System.out.println(partition.getType());
 			scanner.setRange(document, partition.getOffset(), partition.getLength());
 
 			// prime scanner
@@ -52,7 +52,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 			while (token != Token.EOF)
 			{
 				Object data = token.getData();
-				
+
 				// grab the lexeme particulars
 				int tokenOffset = scanner.getTokenOffset();
 				int tokenLength = scanner.getTokenLength();
@@ -60,13 +60,13 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 				String text = document.get(tokenOffset, tokenLength);
 				T type = this.getTypeFromName((String) data);
 				Lexeme<T> lexeme = new Lexeme<T>(type, tokenOffset, endingOffset, text);
-	
+
 				// skip tokens with null data (typically whitespace)
 				if (data != null)
 				{
 					// add it to our list
 					lexemes.add(lexeme);
-					
+
 					if (type.isDefined() == false)
 					{
 						System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~");
@@ -75,13 +75,13 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 				else
 				{
 					Matcher m = WHITESPACE.matcher(text);
-					
+
 					if (m.matches() == false)
 					{
 						System.out.println("Possible missed token type for text: ~" + text + "~");
 					}
 				}
-				
+
 				// advance
 				token = scanner.nextToken();
 			}
@@ -102,7 +102,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	public Lexeme<T> getCeilingLexeme(int offset)
 	{
 		int index = this.getLexemeCeilingIndex(offset);
-		
+
 		return this.getLexeme(index);
 	}
 
@@ -115,7 +115,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	public Lexeme<T> getFloorLexeme(int offset)
 	{
 		int index = this.getLexemeFloorIndex(offset);
-		
+
 		return this.getLexeme(index);
 	}
 
@@ -128,15 +128,15 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	public Lexeme<T> getLexeme(int index)
 	{
 		Lexeme<T> result = null;
-		
+
 		if (0 <= index && index < this._lexemes.size())
 		{
 			result = this._lexemes.get(index);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getLexemeCeilingIndex
 	 * 
@@ -213,7 +213,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	public Lexeme<T> getLexemeFromOffset(int offset)
 	{
 		int index = this.getLexemeIndex(offset);
-		
+
 		return this.getLexeme(index);
 	}
 
@@ -249,7 +249,7 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 
 		return -(low + 1);
 	}
-	
+
 	/**
 	 * getTypeFromName
 	 * 
@@ -257,4 +257,14 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	 * @return
 	 */
 	protected abstract T getTypeFromName(String name);
+
+	/**
+	 * size
+	 * 
+	 * @return
+	 */
+	public int size()
+	{
+		return this._lexemes.size();
+	}
 }
