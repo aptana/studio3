@@ -329,18 +329,22 @@ public abstract class VirtualCanvas extends Canvas {
 		}
 	}
 	protected boolean isVertialBarVisible() {
-		return getVerticalBar().isVisible();
+		ScrollBar vertical= getVerticalBar();
+		return vertical.isVisible() && vertical.isEnabled();
 	}
 	protected void serVerticalBarVisible(boolean showVScrollBar) {
 		ScrollBar vertical= getVerticalBar();
+		vertical.setEnabled(showVScrollBar);
 		vertical.setVisible(showVScrollBar);
 		vertical.setSelection(0);
 	}
 	protected boolean isHorizontalBarVisble() {
-		return getHorizontalBar().isVisible();
+		ScrollBar horizontal= getHorizontalBar();
+		return horizontal.getVisible() && horizontal.isEnabled();
 	}
 	protected void setHorizontalBarVisible(boolean showHScrollBar) {
 		ScrollBar horizontal= getHorizontalBar();
+		horizontal.setEnabled(showHScrollBar);
 		horizontal.setVisible(showHScrollBar);
 		horizontal.setSelection(0);
 	}
