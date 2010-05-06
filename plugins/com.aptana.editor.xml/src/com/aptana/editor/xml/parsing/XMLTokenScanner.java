@@ -26,10 +26,6 @@ public class XMLTokenScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 		// comments
 		rules.add(new MultiLineRule("<!--", "-->", createToken(XMLToken.COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
-		// quoted string
-		IToken token = createToken(XMLToken.STRING);
-		rules.add(new MultiLineRule("\"", "\"", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("'", "'", token, '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 		// CDATA
 		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(XMLToken.CDATA))); //$NON-NLS-1$ //$NON-NLS-2$
 		// declaration
@@ -39,7 +35,8 @@ public class XMLTokenScanner extends RuleBasedScanner
 		rules.add(new TagRule(createToken(XMLToken.START_TAG)));
 
 		// text
-		rules.add(new WordRule(new WordDetector(), createToken(XMLToken.TEXT)));
+		IToken token = createToken(XMLToken.TEXT);
+		rules.add(new WordRule(new WordDetector(), token));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(token);
