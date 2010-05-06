@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.TeamException;
 
@@ -88,7 +89,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 
 		cachedRepos.remove(p.getLocationURI().getPath());
 		boolean dispose = true;
-		
+
 		// Only dispose if there's no other projects attached to same repo!
 		for (SoftReference<GitRepository> ref : cachedRepos.values())
 		{
@@ -101,14 +102,14 @@ public class GitRepositoryManager implements IGitRepositoryManager
 				break;
 			}
 		}
-		
+
 		// Notify listeners
 		RepositoryRemovedEvent e = new RepositoryRemovedEvent(repo, p);
 		for (IGitRepositoriesListener listener : listeners)
 			listener.repositoryRemoved(e);
-		
+
 		if (dispose)
-		{			
+		{
 			repo.dispose();
 			repo = null;
 		}
@@ -260,6 +261,36 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			if (repo == null)
 				continue;
 			repo.removeListener(listener);
+		}
+	}
+
+	@Override
+	public GitRepository createOrAttach(IProject project, IProgressMonitor monitor) throws CoreException
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		try
+		{
+			if (GitExecutable.instance() == null)
+			{
+				throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(),
+						Messages.GitRepositoryManager_UnableToFindGitExecutableError));
+			}
+
+			GitRepository repo = getUnattachedExisting(project.getLocationURI());
+			if (repo == null)
+			{
+				if (sub.isCanceled())
+					throw new CoreException(Status.CANCEL_STATUS);
+				create(new File(project.getLocationURI()).getAbsolutePath());
+			}
+			sub.worked(50);
+			if (sub.isCanceled())
+				throw new CoreException(Status.CANCEL_STATUS);
+			return attachExisting(project, sub.newChild(50));
+		}
+		finally
+		{
+			sub.done();
 		}
 	}
 
