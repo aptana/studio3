@@ -1,6 +1,5 @@
 package com.aptana.explorer.internal.ui;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +60,6 @@ import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -432,25 +430,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 						SubMonitor sub = SubMonitor.convert(monitor, 100);
 						try
 						{
-							if (GitExecutable.instance() == null)
-							{
-								throw new CoreException(new Status(IStatus.ERROR, ExplorerPlugin.PLUGIN_ID,
-										Messages.GitProjectView_UnableToFindGitExecutableError));
-							}
-
-							GitRepository repo = getGitRepositoryManager().getUnattachedExisting(
-									selectedProject.getLocationURI());
-							if (repo == null)
-							{
-								if (sub.isCanceled())
-									return Status.CANCEL_STATUS;
-								getGitRepositoryManager().create(
-										new File(selectedProject.getLocationURI()).getAbsolutePath());
-							}
-							sub.worked(50);
-							if (sub.isCanceled())
-								return Status.CANCEL_STATUS;
-							getGitRepositoryManager().attachExisting(selectedProject, sub.newChild(50));
+							getGitRepositoryManager().createOrAttach(selectedProject, sub);
 						}
 						catch (CoreException e)
 						{

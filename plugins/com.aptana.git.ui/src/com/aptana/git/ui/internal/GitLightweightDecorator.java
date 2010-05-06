@@ -14,7 +14,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -359,24 +358,10 @@ public class GitLightweightDecorator extends BaseLabelProvider implements ILight
 		return ancestors;
 	}
 
-	private Set<IResource> addChangedFiles(GitRepository repository, Collection<ChangedFile> changedFiles)
-	{
-		String workingDir = repository.workingDirectory();
-		Set<IResource> resources = new HashSet<IResource>();
-		for (ChangedFile changedFile : changedFiles)
-		{
-			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-					new Path(workingDir).append(changedFile.getPath()));
-			if (resource != null)
-				resources.add(resource);
-		}
-		return resources;
-	}
-
 	public void repositoryAdded(RepositoryAddedEvent e)
 	{
 		e.getRepository().addListener(this);
-		Set<IResource> resources = addChangedFiles(e.getRepository(), e.getRepository().index().changedFiles());
+		Set<IResource> resources = e.getRepository().getChangedResources();
 		resources.add(e.getProject());
 		postLabelEvent(new LabelProviderChangedEvent(this, resources.toArray()));
 	}

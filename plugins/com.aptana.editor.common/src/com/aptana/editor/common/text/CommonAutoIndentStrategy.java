@@ -156,7 +156,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 
 			String line = d.get(info.getOffset(), info.getLength());
 			line = line.trim();
-			if (c1 == '*')
+			if (c1 == '*' && !line.endsWith("*/")) //$NON-NLS-1$
 			{
 				buf.append("* "); //$NON-NLS-1$
 			}

@@ -32,5 +32,22 @@
             class="com.aptana.editor.html.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
+      <target
+            id="com.aptana.editor.html"
+            name="%editor.html.name">
+      </target>
+   </extension>
 
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.html.HyperlinkDetector"
+            id="com.aptana.editor.html.hyperlinkDetector"
+            name="name"
+            targetId="com.aptana.editor.html">
+      </hyperlinkDetector>
+   </extension>
 </plugin>

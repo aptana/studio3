@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.outline;
 
+import java.net.URI;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -50,4 +52,6 @@ public interface IPathResolver
 	 * @throws Exception
 	 */
 	String resolveSource(String path, IProgressMonitor monitor) throws Exception;
+	
+	URI resolveURI(String path);
 }
