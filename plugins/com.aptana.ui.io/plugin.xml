@@ -38,8 +38,10 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="true"
+            contentProvider="com.aptana.ide.ui.io.navigator.FileTreeContentProvider"
             icon="icons/full/obj16/projects.png"
             id="com.aptana.ide.ui.io.navigatorContent"
+            labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.default.name"
             priority="normal">
          <enablement>

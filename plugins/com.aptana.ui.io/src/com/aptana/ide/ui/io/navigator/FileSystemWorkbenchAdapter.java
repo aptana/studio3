@@ -126,21 +126,6 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			}
 		} else if (object instanceof IConnectionPointCategory) {
             return ((IConnectionPointCategory) object).getConnectionPoints();
-		} else if (object instanceof LocalRoot) {
-			try {
-				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
-			} catch (CoreException e) {
-				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
-				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
-			}
-		} else if (object instanceof IConnectionPointManager) {
-			List<Object> list = new ArrayList<Object>();
-			list.add(LocalFileSystems.getInstance());
-			list.add(WorkspaceProjects.getInstance());
-			for (IConnectionPointCategory category : ((IConnectionPointManager) object).getConnectionPointCategories()) {
-				list.add(category);
-			}
-			return list.toArray();
 		}
 		return EMPTY;
 	}
