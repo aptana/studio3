@@ -43,6 +43,7 @@ import org.xml.sax.Attributes;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
+import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.SpecificationElement;
 import com.aptana.editor.html.contentassist.model.UserAgentElement;
@@ -63,6 +64,9 @@ public class HTMLMetadataReader extends MetadataReader
 	private ValueElement _currentValue;
 	private List<EventElement> _events = new LinkedList<EventElement>();
 	private EventElement _currentEvent;
+	private List<EntityElement> _entities = new LinkedList<EntityElement>();
+	private EntityElement _currentEntity;
+
 
 	/**
 	 * Create a new instance of CoreLoader
@@ -125,7 +129,7 @@ public class HTMLMetadataReader extends MetadataReader
 	}
 
 	/**
-	 * start processing a class element
+	 * start processing an element element
 	 * 
 	 * @param ns
 	 * @param name
@@ -144,6 +148,28 @@ public class HTMLMetadataReader extends MetadataReader
 
 		// set current item
 		this._currentElement = element;
+	}
+	
+	/**
+	 * start processing an entity element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterEntity(String ns, String name, String qname, Attributes attributes)
+	{
+		// create a new item documentation object
+		EntityElement entity = new EntityElement();
+		
+		// grab and set property values
+		entity.setName(attributes.getValue("name"));
+		entity.setDecimalValue(attributes.getValue("decimal"));
+		entity.setHexValue(attributes.getValue("hex"));
+		
+		// set current item
+		this._currentEntity = entity;
 	}
 
 	/**
@@ -345,10 +371,14 @@ public class HTMLMetadataReader extends MetadataReader
 		{
 			this._currentEvent.setDescription(this.decodeHtml(text));
 		}
+		else if (this._currentEntity != null)
+		{
+			this._currentEntity.setDescription(this.decodeHtml(text));
+		}
 	}
 
 	/**
-	 * Exit a class element
+	 * Exit an element element
 	 * 
 	 * @param ns
 	 * @param name
@@ -358,6 +388,19 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		this._elements.add(this._currentElement);
 		this._currentElement = null;
+	}
+	
+	/**
+	 * Exit an entity element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 */
+	public void exitEntity(String ns, String name, String qname)
+	{
+		this._entities.add(this._currentEntity);
+		this._currentEntity = null;
 	}
 
 	/**
@@ -462,6 +505,16 @@ public class HTMLMetadataReader extends MetadataReader
 		return this._elements;
 	}
 
+	/**
+	 * getEntities
+	 * 
+	 * @return
+	 */
+	public List<EntityElement> getEntities()
+	{
+		return this._entities;
+	}
+	
 	/**
 	 * getEvents
 	 * 
