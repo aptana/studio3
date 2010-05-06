@@ -72,7 +72,7 @@ public abstract class ProcessUtil
 		{
 			builder.environment().putAll(env);
 		}
-		String lineSeparator = EditorUtils.getLineSeparatorValue(null);
+		String lineSeparator = ResourceUtils.getLineSeparatorValue(null);
 		try
 		{
 			Process p = builder.start();
@@ -155,4 +155,5 @@ public abstract class ProcessUtil
 
 		return builder.start();
 	}
+
 }

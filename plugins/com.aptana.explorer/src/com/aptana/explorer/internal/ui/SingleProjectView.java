@@ -191,8 +191,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	private Composite browserComposite;
 
 	private Job updateMessageAreaJob;
-	private static final String BASE_MESSAGE_URL = "http://aptana.com/tools/content/"; //$NON-NLS-1$
-	// private static final String BASE_MESSAGE_URL = "http://localhost:3000/tools/content/"; //$NON-NLS-1$
+	private static final String BASE_MESSAGE_URL = "http://toolbox.aptana.com/"; //$NON-NLS-1$
+	// private static final String BASE_MESSAGE_URL = "http://localhost:3000/"; //$NON-NLS-1$
 	private static final int MINIMUM_BROWSER_HEIGHT = 150;
 	private static final int MINIMUM_BROWSER_WIDTH = 310;
 	private static final String BROWSER_ID = "message.area.browser"; //$NON-NLS-1$
