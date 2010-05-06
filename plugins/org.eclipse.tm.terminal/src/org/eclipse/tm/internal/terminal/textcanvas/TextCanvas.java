@@ -281,6 +281,8 @@ public class TextCanvas extends GridCanvas {
 		fCellRenderer.drawLine(fCellCanvasModel, gc,line,x,y,colFirst, colLast);
 
 	}
+	protected void paintUnoccupiedSpace(GC gc, Rectangle clipping) {
+	}
 	protected void visibleCellRectangleChanged(int x, int y, int width, int height) {
 		fCellCanvasModel.setVisibleRectangle(y,x,height,width);
 		update();
