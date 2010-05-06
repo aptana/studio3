@@ -68,7 +68,7 @@ public class CSSIndexQueryHelper
 		if (this._metadata == null)
 		{
 			this._metadata = new CSSMetadataReader();
-			String[] resources = new String[] { "/metadata/css_metadata.xml" };
+			String[] resources = this.getMetadataResources();
 
 			for (String resource : resources)
 			{
@@ -110,6 +110,16 @@ public class CSSIndexQueryHelper
 		}
 
 		return this._metadata;
+	}
+	
+	/**
+	 * getMetadataResources
+	 * 
+	 * @return
+	 */
+	protected String[] getMetadataResources()
+	{
+		return new String[] { "/metadata/css_metadata.xml" };
 	}
 
 	// /**
@@ -162,7 +172,7 @@ public class CSSIndexQueryHelper
 	 * 
 	 * @return
 	 */
-	private CSSIndexReader getReader()
+	protected CSSIndexReader getReader()
 	{
 		if (this._reader == null)
 		{
