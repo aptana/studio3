@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.GitPlugin;
@@ -111,7 +112,15 @@ public class GitIndex
 	 */
 	public IStatus refresh(IProgressMonitor monitor)
 	{
-		return refresh(true, monitor);
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		try
+		{
+			return refresh(true, sub.newChild(100));
+		}
+		finally
+		{
+			sub.done();
+		}
 	}
 
 	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
