@@ -39,7 +39,7 @@ public enum CSSTokenType implements ITypePredicate
 	STAR("punctuation.asterisk.css");
 
 	private static final Map<String, CSSTokenType> NAME_MAP;
-	private String _name;
+	private String _scope;
 
 	/**
 	 * static
@@ -50,39 +50,39 @@ public enum CSSTokenType implements ITypePredicate
 
 		for (CSSTokenType type : EnumSet.allOf(CSSTokenType.class))
 		{
-			NAME_MAP.put(type.getName(), type);
+			NAME_MAP.put(type.getScope(), type);
 		}
 	}
 
 	/**
 	 * get
 	 * 
-	 * @param name
+	 * @param scope
 	 * @return
 	 */
-	public static final CSSTokenType get(String name)
+	public static final CSSTokenType get(String scope)
 	{
-		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
+		return (NAME_MAP.containsKey(scope)) ? NAME_MAP.get(scope) : UNDEFINED;
 	}
 
 	/**
 	 * CSSTokenTypes
 	 * 
-	 * @param name
+	 * @param scope
 	 */
-	private CSSTokenType(String name)
+	private CSSTokenType(String scope)
 	{
-		this._name = name;
+		this._scope = scope;
 	}
 
 	/**
-	 * getName
+	 * getScope
 	 * 
 	 * @return
 	 */
-	public String getName()
+	public String getScope()
 	{
-		return this._name;
+		return this._scope;
 	}
 
 	/*
@@ -100,6 +100,6 @@ public enum CSSTokenType implements ITypePredicate
 	 */
 	public String toString()
 	{
-		return this.getName();
+		return this.getScope();
 	}
 }

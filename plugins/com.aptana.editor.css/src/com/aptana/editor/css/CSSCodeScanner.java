@@ -275,7 +275,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	 */
 	private IToken createToken(CSSTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 
 	/**

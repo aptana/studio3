@@ -65,6 +65,6 @@ public class CSSScopeScanner extends CSSCodeScanner
 	 */
 	protected IToken createToken(CSSTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 }
