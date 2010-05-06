@@ -217,11 +217,11 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
 					messageLogWriter = FTPPlugin.getDefault().getFTPLogWriter();
 				}
 				if (messageLogWriter != null) {
-					messageLogWriter.println(MessageFormat.format("---------- FTP {0} ----------", host));
+					messageLogWriter.println(MessageFormat.format("---------- FTP {0} ----------", host)); //$NON-NLS-1$
 					setMessageLogger(ftpClient, messageLogWriter);
 				}
 			} else {
-				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTP {0} ----------", host));
+				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTP {0} ----------", host)); //$NON-NLS-1$
 			}
 
 			monitor.beginTask(Messages.FTPConnectionFileManager_establishing_connection, IProgressMonitor.UNKNOWN);
@@ -243,7 +243,7 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
 					Policy.checkCanceled(monitor);
 					if (ftpClient.getLastValidReply() == null || "331".equals(ftpClient.getLastValidReply().getReplyCode())) { //$NON-NLS-1$
 						if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
-							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Authentication failed: {0}", e.getLocalizedMessage()), e));
+							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.FTPConnectionFileManager_FailedAuthenticate, e.getLocalizedMessage()), e));
 						}
 						promptPassword(MessageFormat.format(Messages.FTPConnectionFileManager_ftp_auth, host), Messages.FTPConnectionFileManager_invalid_password);
 						safeQuit();
@@ -274,10 +274,10 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
 			throw e;
 		} catch (UnknownHostException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Host name not found: "+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_HostNameNotFound+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Remote folder not found: "+e.getLocalizedMessage(), e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
 		} catch (Exception e) {
 			safeQuit();
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_connection_failed+e.getLocalizedMessage(), e));
@@ -967,7 +967,7 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Set permissions failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_FailedSetPermissions, e));			
 		} finally {
 			monitor.done();
 		}
@@ -991,7 +991,7 @@ import com.enterprisedt.net.ftp.pro.ProFTPClient;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Set group failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_FailedSetGroup, e));			
 		} finally {
 			monitor.done();
 		}

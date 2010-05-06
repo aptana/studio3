@@ -51,10 +51,9 @@ public class SSLHostValidator extends SSLFTPStandardValidator {
 		if (super.checkCommonName(certCommonName, serverHostName)) {
 			return true;
 		}
-		if (certCommonName.startsWith("*.")) {
+		if (certCommonName.startsWith("*.")) { //$NON-NLS-1$
 			return serverHostName.toLowerCase().endsWith(certCommonName.substring(1).toLowerCase());
 		}
 		return false;
 	}
-
 }

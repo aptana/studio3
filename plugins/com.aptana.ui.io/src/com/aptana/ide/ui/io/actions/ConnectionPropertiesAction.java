@@ -65,7 +65,7 @@ public class ConnectionPropertiesAction extends ConnectionActionDelegate {
 				dlg.open();
 			}
 		} catch (CoreException e) {
-			UIUtils.showErrorMessage("Create dialog failed", e);
+			UIUtils.showErrorMessage(Messages.ConnectionPropertiesAction_FailedToCreate, e);
 		}
 	}
 }

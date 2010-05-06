@@ -89,7 +89,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Compression"));
+		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Compression));
 
 		compressionCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		compressionCombo.add(ISFTPConstants.COMPRESSION_AUTO);
@@ -105,7 +105,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 
 		label = new Label(this, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel("Port"));
+		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Port));
 		
 		portText = new Text(this, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 		portText.setLayoutData(GridDataFactory.swtDefaults().hint(
@@ -119,7 +119,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Encoding"));
+		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));
@@ -191,7 +191,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		} catch (NumberFormatException e) {
 		}
 		if (port <= 0) {
-			return "Please specify correct port number";
+			return Messages.SFTPAdvancedOptionsComposite_InvalidPort;
 		}
 		return null;
 	}

@@ -69,9 +69,9 @@ public final class SecureUtils {
 			SshPrivateKeyFile privateKeyFile = SshPrivateKeyFile.parse(keyFile);
 			return privateKeyFile.isPassphraseProtected();
 		} catch (InvalidSshKeyException e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Private Key file {0} is invalid", keyFile.getAbsolutePath()), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SecureUtils_InvalidPrivateKey, keyFile.getAbsolutePath()), e));
 		} catch (IOException e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Private Key file {0} cannot be read", keyFile.getAbsolutePath())));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SecureUtils_UnableToReadPrivateKey, keyFile.getAbsolutePath())));
 		}
 	}
 	

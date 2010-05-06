@@ -56,12 +56,12 @@ public class SSHHostValidator extends SSHFTPValidator {
 	 */
 	public SSHHostValidator() {
 		String ssh_home = SecureUtils.getSSH_HOME();
-		File knownHosts = new File(ssh_home, "known_hosts");
+		File knownHosts = new File(ssh_home, "known_hosts"); //$NON-NLS-1$
 		if (knownHosts.exists() && knownHosts.isFile()) {
 			try {
 				loadKnownHosts(new FileInputStream(knownHosts));
 			} catch (IOException e) {
-				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, "Load known_hosts failed", e));
+				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SSHHostValidator_FailedLoadKnownHosts, e));
 			}
 		}
 	}

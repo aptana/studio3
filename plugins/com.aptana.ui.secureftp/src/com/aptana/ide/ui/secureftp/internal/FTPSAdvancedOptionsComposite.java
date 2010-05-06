@@ -102,28 +102,28 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("SSL Method"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_SSLMethod));
 
 		securityMethodCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-		securityMethodCombo.add("Explicit - AUTH TLS/SSL");
-		securityMethodCombo.add("Implicit - FTP over SSL");
+		securityMethodCombo.add(Messages.FTPSAdvancedOptionsComposite_MethodExplicit);
+		securityMethodCombo.add(Messages.FTPSAdvancedOptionsComposite_MethodImplicit);
 		securityMethodCombo.setLayoutData(GridDataFactory.swtDefaults().hint(
 				securityMethodCombo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x, SWT.DEFAULT)
 				.span(3, 1).create());
 		
 		validateCertificateCheckbox = new Button(this, SWT.CHECK);
-		validateCertificateCheckbox.setText("Validate Certificate");
+		validateCertificateCheckbox.setText(Messages.FTPSAdvancedOptionsComposite_ValidateCertificate);
 		validateCertificateCheckbox.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		label = new Label(this, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Connect Mode"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_ConnectMode));
 
 		modeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-		modeCombo.add("Active");
-		modeCombo.add("Passive");
+		modeCombo.add(Messages.FTPSAdvancedOptionsComposite_ModeActive);
+		modeCombo.add(Messages.FTPSAdvancedOptionsComposite_ModePassive);
 		modeCombo.setLayoutData(GridDataFactory.swtDefaults().hint(
 				modeCombo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x, SWT.DEFAULT).create());
 
@@ -134,7 +134,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 
 		label = new Label(this, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel("Port"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_Port));
 		
 		portText = new Text(this, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 		portText.setLayoutData(GridDataFactory.swtDefaults().hint(
@@ -148,7 +148,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Encoding"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));
@@ -165,7 +165,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Timezone"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPSAdvancedOptionsComposite_Timezone));
 
 		timezoneCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		String[] timezones = TimeZone.getAvailableIDs();
@@ -177,7 +177,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 				.create());
 		
 		detectButton = new Button(container, SWT.PUSH);
-		detectButton.setText("Detect");
+		detectButton.setText(Messages.FTPSAdvancedOptionsComposite_Detect);
 		detectButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(detectButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
@@ -290,7 +290,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 		} catch (NumberFormatException e) {
 		}
 		if (port <= 0) {
-			return "Please specify correct port number";
+			return Messages.FTPSAdvancedOptionsComposite_InvalidPort;
 		}
 		return null;
 	}

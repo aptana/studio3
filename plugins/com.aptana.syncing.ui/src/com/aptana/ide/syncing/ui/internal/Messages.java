@@ -61,6 +61,8 @@ public class Messages extends NLS {
     public static String SiteConnectionPropertiesWidget_LBL_Project;
     public static String SiteConnectionPropertiesWidget_LBL_Remote;
     public static String SiteConnectionPropertiesWidget_LBL_Source;
+	public static String SiteConnectionPropertiesWidget_NoProject;
+	public static String SiteConnectionPropertiesWidget_NoRemoteSite;
 
     static {
         // initialize resource bundle

@@ -108,7 +108,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 				try {
 					return container.members();
 				} catch (CoreException e) {
-					IOUIPlugin.logImportant("Failed to get members", e);
+					IOUIPlugin.logImportant(Messages.FileSystemWorkbenchAdapter_FailedToGetMembers, e);
 				}
 			} else {
 				try {
@@ -119,8 +119,8 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                         connectionPoint.connect(true, new NullProgressMonitor());
                         return fetchFileSystemChildren(connectionPoint.getRoot(), new NullProgressMonitor());
                     } catch (CoreException e1) {
-                        IOUIPlugin.logError("Fetch children failed", e);
-                        UIUtils.showErrorMessage("Fetch children failed", e);
+                        IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+                        UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
                     }
 				}
 			}
@@ -130,8 +130,8 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			try {
 				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
 			} catch (CoreException e) {
-				IOUIPlugin.logError("Fetch children failed", e);
-				UIUtils.showErrorMessage("Fetch children failed", e);
+				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 			}
 		} else if (object instanceof IConnectionPointManager) {
 			List<Object> list = new ArrayList<Object>();
@@ -263,8 +263,8 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                 } catch (CoreException e1) {
                 }
             }
-			IOUIPlugin.logError("Fetch deferred children failed", e);
-			UIUtils.showErrorMessage("Fetch children failed", e);
+			IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
+			UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 		} finally {
 			collector.done();
 		}

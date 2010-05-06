@@ -261,7 +261,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 		try {
 			memento = storeConnectionPoint((ConnectionPoint) connectionPoint);
 		} catch (Exception e) {
-			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, "Store connection properties failed", e));
+			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, Messages.ConnectionPointManager_FailedStoreConnectionProperties, e));
 		}
 		ConnectionPoint clonedConnectionPoint = restoreConnectionPoint(memento, UUID.randomUUID().toString());
 		return clonedConnectionPoint;
@@ -473,7 +473,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 				category = categories.get(defaultCategoryId);
 				if (category == null) {
 					categories.put(defaultCategoryId, category =
-								new ConnectionPointCategory(defaultCategoryId, "Unknown", Integer.MAX_VALUE));
+								new ConnectionPointCategory(defaultCategoryId, Messages.ConnectionPointManager_CategoryUnknown, Integer.MAX_VALUE));
 				}
 			}
 			ConnectionPointType type = new ConnectionPointType(typeId, name, category);

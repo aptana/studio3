@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
@@ -77,7 +78,7 @@ import com.aptana.ui.IPropertyDialog;
 @SuppressWarnings("restriction")
 public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implements IPropertyDialog {
 
-	private static final String DEFAULT_NAME = "New Project Shortcut";
+	private static final String DEFAULT_NAME = Messages.WorkspaceConnectionPropertyDialog_NewShortcut;
 	
 	private WorkspaceConnectionPoint workspaceConnectionPoint;
 	private boolean isNew = false;
@@ -138,11 +139,11 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		
 		setTitleImage(titleImage);
 		if (workspaceConnectionPoint != null) {
-			setTitle("Edit the Project Shortcut");
-			getShell().setText("Edit Project Shortcut");
+			setTitle(Messages.WorkspaceConnectionPropertyDialog_EditTitle);
+			getShell().setText(Messages.WorkspaceConnectionPropertyDialog_EditText);
 		} else {
-			setTitle("Create a Project Shortcut");
-			getShell().setText("New Project Shortcut");
+			setTitle(Messages.WorkspaceConnectionPropertyDialog_CreateTitle);
+			getShell().setText(Messages.WorkspaceConnectionPropertyDialog_CreateText);
 		}
 		
 		Composite container = new Composite(dialogArea, SWT.NONE);
@@ -157,7 +158,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Shortcut Name"));
+		label.setText(StringUtils.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_ShortcutName));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -169,7 +170,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Workspace Path"));
+		label.setText(StringUtils.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_WorkspacePath));
 
 		workspacePathText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		workspacePathText.setLayoutData(GridDataFactory.swtDefaults()
@@ -178,7 +179,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		workspacePathText.setEditable(false);
 		
 		browseButton = new Button(container, SWT.PUSH);
-		browseButton.setText('&' + StringUtils.ellipsify("Browse"));
+		browseButton.setText('&' + StringUtils.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
@@ -201,7 +202,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 				workspaceConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError("Create new connection failed", e);
+				IOUIPlugin.logError(Messages.WorkspaceConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}
@@ -317,7 +318,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 	public boolean isValid() {
 		String message = null;
 		if (nameText.getText().length() == 0) {
-			message = "Please specify shortcut name";
+			message = Messages.WorkspaceConnectionPropertyDialog_SpecifyShortcutName;
 		} else {
 			IPath path = Path.fromPortableString(workspacePathText.getText());
 			IContainer container = null;
@@ -326,10 +327,10 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 			} else if (path.segmentCount() > 1) {
 				container = ResourcesPlugin.getWorkspace().getRoot().getFolder(path);
 			} else {
-				message = "Please specify workspace location";
+				message = Messages.WorkspaceConnectionPropertyDialog_SpecifyLocation;
 			}
 			if (message == null && (container == null || !container.exists())) {
-				message = "The resource doesn't exist";
+				message = Messages.WorkspaceConnectionPropertyDialog_ResourceNotExist;
 			}
 		}
 		if (message != null) {

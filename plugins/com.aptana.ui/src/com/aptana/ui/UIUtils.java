@@ -86,11 +86,11 @@ public final class UIUtils {
 	}
 
 	public static void showErrorMessage(String title, String message) {
-		showErrorMessage(title != null ? title : "Error", message, null);
+		showErrorMessage(title != null ? title : Messages.UIUtils_Error, message, null);
 	}
 
 	public static void showErrorMessage(String message, Throwable exception) {
-		showErrorMessage("Error", message, exception);
+		showErrorMessage(Messages.UIUtils_Error, message, exception);
 	}
 
 	private static void showErrorMessage(final String title, final String message, final Throwable exception) {

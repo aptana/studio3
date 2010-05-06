@@ -64,6 +64,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -222,7 +223,7 @@ public class FileTreeSelectionDialog extends ElementTreeSelectionDialog {
 		super(parent,
 				new DecoratingLabelProvider(new FileLabelProvider(), PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator()),
 			new FileContentProvider(allowFiles));
-		setTitle("Browse");
+		setTitle(CoreStrings.BROWSE);
 		setComparator(new FileTreeNameSorter());
 	}
 

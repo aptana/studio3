@@ -68,7 +68,7 @@ public final class DialogUtils
 		if (!store.getString(key).equals(MessageDialogWithToggle.ALWAYS))
 		{
 			MessageDialogWithToggle d = MessageDialogWithToggle.openInformation(shell, title, message,
-					"Hide this message in the future", false, store, key);
+					Messages.DialogUtils_HideMessage, false, store, key);
 			if (d.getReturnCode() == 3)
 			{
 				return MessageDialog.CANCEL;
@@ -94,7 +94,7 @@ public final class DialogUtils
 		if (!store.getString(key).equals(MessageDialogWithToggle.ALWAYS))
 		{
 			MessageDialogWithToggle d = MessageDialogWithToggle.openYesNoQuestion(shell, title, message,
-					"Hide this message in the future", false, store, key);
+					Messages.DialogUtils_HideMessage, false, store, key);
 			if (d.getReturnCode() == 3)
 			{
 				return MessageDialog.CANCEL;

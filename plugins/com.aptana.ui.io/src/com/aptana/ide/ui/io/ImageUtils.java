@@ -91,7 +91,7 @@ public final class ImageUtils {
 				jFileChooser = new javax.swing.JFileChooser();
 			}
 			String fileType = jFileChooser.getTypeDescription(file);
-			if (fileType == null || fileType.length() == 0 || "Directory".equals(fileType) || "System Folder".equals(fileType) || "Generic File".equals(fileType)) {
+			if (fileType == null || fileType.length() == 0 || "Directory".equals(fileType) || "System Folder".equals(fileType) || "Generic File".equals(fileType)) {  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				String name = file.getName();
 				try {
                     name = file.getCanonicalFile().getName();
@@ -99,23 +99,23 @@ public final class ImageUtils {
                     name = file.getName();
                 }
                 if (name.equals((new Path(DESKTOP)).lastSegment())) {
-                    fileType = "Desktop";
+                    fileType = "Desktop"; //$NON-NLS-1$
                 } else if (!file.isDirectory()) {
 					int index = name.lastIndexOf('.');
 					if (index >= 0 && index < name.length()-1) {
 						fileType = name.substring(index+1);
 					} else {
-						fileType = "unknown";
+						fileType = "unknown"; //$NON-NLS-1$
 					}
-				} else if ("Directory".equals(fileType) || name.length() == 0) {
+				} else if ("Directory".equals(fileType) || name.length() == 0) { //$NON-NLS-1$
                     fileType = file.getAbsolutePath();
-                } else if ("System Folder".equals(fileType)) {
+                } else if ("System Folder".equals(fileType)) { //$NON-NLS-1$
                     if (file.getAbsolutePath().equals(USER_HOME)) {
-                        fileType = "UserHome";
+                        fileType = "UserHome"; //$NON-NLS-1$
                     }
                 }
 			}
-			String imageKey = "os.fileType_" + fileType;
+			String imageKey = "os.fileType_" + fileType; //$NON-NLS-1$
 	
 			ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
 			ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
@@ -159,7 +159,7 @@ public final class ImageUtils {
 	
 	private static ImageDescriptor getExtensionImageDescriptor(String extension) {
 		ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
-		String imageKey = "extension_" + extension;
+		String imageKey = "extension_" + extension; //$NON-NLS-1$
 		ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
 		if (imageDescriptor == null) {
 			Program program = Program.findProgram(extension);

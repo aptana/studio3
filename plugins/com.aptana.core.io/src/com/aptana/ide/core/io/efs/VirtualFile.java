@@ -261,7 +261,7 @@ import com.aptana.ide.core.io.vfs.IFileTreeVisitor;
 	}
 
 	private static void buildFileTree(FileTree fileTree, VirtualFile parent, IFileTreeVisitor visitor, IProgressMonitor monitor) throws CoreException {
-		monitor.beginTask(MessageFormat.format("Listing directory {0}", parent.path), 20);
+		monitor.beginTask(MessageFormat.format(Messages.VirtualFile_ListingDirectory, parent.path), 20);
 		IFileInfo[] infos = parent.fileManager.childInfos(parent.path, IExtendedFileStore.DETAILED, monitor);
 		List<IFileStore> stores = new ArrayList<IFileStore>();
 		List<IFileStore> dirs = new ArrayList<IFileStore>();

@@ -40,7 +40,11 @@ public class Messages extends NLS {
 
     private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.navigator.messages"; //$NON-NLS-1$
 
-    public static String LocalFileSystems_LBL;
+    public static String FileSystemWorkbenchAdapter_FailedToFetchChildren;
+	public static String FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren;
+	public static String FileSystemWorkbenchAdapter_FailedToGetMembers;
+
+	public static String LocalFileSystems_LBL;
 
     public static String WorkspaceProjects_LBL;
 

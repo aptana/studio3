@@ -82,6 +82,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -298,7 +299,7 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 				.grab(true, false).create());
 		
 		browseButton = new Button(group, SWT.PUSH);
-		browseButton.setText('&' + StringUtils.ellipsify("Browse"));
+		browseButton.setText('&' + StringUtils.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),

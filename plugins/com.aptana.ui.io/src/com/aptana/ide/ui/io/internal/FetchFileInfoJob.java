@@ -60,7 +60,7 @@ public class FetchFileInfoJob extends Job {
 	 * @param name
 	 */
 	public FetchFileInfoJob(IFileStore fileStore) {
-		super(MessageFormat.format("Fetch info for {0}", fileStore.toString()));
+		super(MessageFormat.format(Messages.FetchFileInfoJob_Title, fileStore.toString()));
 		this.fileStore = fileStore;
 	}
 
@@ -76,7 +76,7 @@ public class FetchFileInfoJob extends Job {
 		try {
 			fileInfo = fileStore.fetchInfo(IExtendedFileStore.DETAILED, monitor);
 		} catch (CoreException e) {
-			IOUIPlugin.logImportant("Fetch info failed", e);
+			IOUIPlugin.logImportant(Messages.FetchFileInfoJob_FailedToFetch, e);
 			return e.getStatus();
 		}
 		return new FetchFileInfoStatus(fileInfo);

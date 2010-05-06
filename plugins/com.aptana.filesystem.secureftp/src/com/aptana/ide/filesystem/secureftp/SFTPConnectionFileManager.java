@@ -100,7 +100,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.filesystem.secureftp.ISFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, java.lang.String, char[], java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public void init(String host, int port, IPath basePath, IPath keyFilePath, String login, char[] password, String transferType, String encoding, String compression) {
-		Assert.isTrue(ftpClient == null, "SFTP connection has been already initiated");
+		Assert.isTrue(ftpClient == null, Messages.SFTPConnectionFileManager_ConnectionHasBeenInitialized);
 		try {
 			ftpClient = new SSHFTPClient();
 			this.host = host;
@@ -119,7 +119,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			this.compression = compression;
 			initFTPClient(ftpClient, encoding, compression);
 		} catch (Exception e) {
-			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, "SFTP connection initialization failed", e));
+			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_InitializationFailed, e));
 			ftpClient = null;
 		}		
 	}
@@ -148,7 +148,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void connect(IProgressMonitor monitor) throws CoreException {
-		Assert.isTrue(ftpClient != null, "SFTP connection is not initialized");
+		Assert.isTrue(ftpClient != null, Messages.SFTPConnectionFileManager_ConnectionNotInitialized);
 		monitor = Policy.monitorFor(monitor);
 		try {
 			cwd = null;
@@ -156,7 +156,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 
 			ConnectionContext context = CoreIOPlugin.getConnectionContext(this);
 			
-			monitor.beginTask("Establishing connection", IProgressMonitor.UNKNOWN);
+			monitor.beginTask(Messages.SFTPConnectionFileManager_EstablishingConnection, IProgressMonitor.UNKNOWN);
 			ftpClient.setRemoteHost(host);
 			ftpClient.setRemotePort(port);
 			while (true) {
@@ -165,20 +165,20 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 					try {
 						privateKeyFile = SshPrivateKeyFile.parse(keyFilePath.toFile());
 					} catch (InvalidSshKeyException e) {
-						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Private Key file {0} is invalid.", keyFilePath.toOSString()), e));
+						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_InvalidPrivateKey, keyFilePath.toOSString()), e));
 					} catch (IOException e) {
-						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Private Key file {0} cannot be read.", keyFilePath.toOSString())));
+						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_UnableToReadPrivateKey, keyFilePath.toOSString())));
 					}
 					if (privateKeyFile.isPassphraseProtected() && password.length == 0) {
 						if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
 							password = new char[0];
 						} else {
-							getOrPromptPassword(MessageFormat.format("Public Key Authentication for {0} using {1}", new Object[] { host, keyFilePath.toOSString() }), "Please specify private key passphrase.");
+							getOrPromptPassword(MessageFormat.format(Messages.SFTPConnectionFileManager_PublicKeyAuthentication, new Object[] { host, keyFilePath.toOSString() }), Messages.SFTPConnectionFileManager_SpecifyPassphrase);
 							while (true) {
 								try {
 									privateKeyFile.toPrivateKey(String.copyValueOf(password));
 								} catch (InvalidSshKeyException e) {
-									promptPassword(MessageFormat.format("Public Key Authentication for {0} using {1}", new Object[] { host, keyFilePath.toOSString() }), "Passphrase was not accepted. Please specify again.");
+									promptPassword(MessageFormat.format(Messages.SFTPConnectionFileManager_PublicKeyAuthentication, new Object[] { host, keyFilePath.toOSString() }), Messages.SFTPConnectionFileManager_PassphraseNotAccepted);
 									continue;
 								}
 								break;
@@ -191,31 +191,31 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 						ftpClient.setAuthentication(keyFilePath.toOSString(), login, String.copyValueOf(password));
 					} catch (InvalidSshKeyException e) {
 						if (password.length == 0) {
-							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Private Key {0} requires passphrase.", keyFilePath.toOSString()), e));													
+							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_KeyRequirePassphrase, keyFilePath.toOSString()), e));													
 						}
-						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Passphrase for Private Key {0} is invalid.", keyFilePath.toOSString()), e));						
+						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_InvalidPassphrase, keyFilePath.toOSString()), e));						
 					}
 				} else {
 					if (password.length == 0 && !ISFTPConstants.LOGIN_ANONYMOUS.equals(login) && (context == null || !context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT))) {
                         getOrPromptPassword(
-                                MessageFormat.format("SFTP Authentication for {0}", host),
-                                "Please specify password.");
+                                MessageFormat.format(Messages.SFTPConnectionFileManager_SFTPAuthentication, host),
+                                Messages.SFTPConnectionFileManager_SpecifyPassword);
 					}
 					ftpClient.setAuthentication(login, String.copyValueOf(password));
 				}
 				Policy.checkCanceled(monitor);
-				monitor.subTask("connecting and authenticating");
+				monitor.subTask(Messages.SFTPConnectionFileManager_Authenticating);
 				try {
 					ftpClient.connect();
 				} catch (SSHFTPException e) {
 					Policy.checkCanceled(monitor);
 					if (keyFilePath != null) {
-						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Public Key Authentication failed: {0}", e.getLocalizedMessage()), e));
+						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_FailedAuthenticatePublicKey, e.getLocalizedMessage()), e));
 					}
 					if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
-						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Authentication failed: {0}", "Login/password is incorrect."), e));
+						throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_FailedAuthenticate, Messages.SFTPConnectionFileManager_IncorrectLogin), e));
 					}
-					promptPassword(MessageFormat.format("SFTP Authentication for {0}", host), "Password was not accepted. Please specify again.");
+					promptPassword(MessageFormat.format(Messages.SFTPConnectionFileManager_SFTPAuthentication, host), Messages.SFTPConnectionFileManager_PasswordNotAccepted);
 					safeQuit();
 					continue;
 				}
@@ -235,13 +235,13 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw e;
 		} catch (UnknownHostException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Host name not found: "+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_HostNameNotFound+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Remote folder not found: "+e.getLocalizedMessage(), e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
 		} catch (Exception e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Establishing SFTP connection failed:"+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedEstablishConnection+e.getLocalizedMessage(), e));
 		} finally {
 			monitor.done();
 		}
@@ -272,7 +272,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			return;
 		}
 		monitor = Policy.monitorFor(monitor);
-		monitor.beginTask("Closing SFTP connection", IProgressMonitor.UNKNOWN);
+		monitor.beginTask(Messages.SFTPConnectionFileManager_ClosingConnection, IProgressMonitor.UNKNOWN);
 		try {
 			ftpClient.quit();
 		} catch (Exception e) {
@@ -280,7 +280,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 				ftpClient.quitImmediately();
 			} catch (Exception ignore) {
 			}
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Disconnect SFTP connection failed", e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDisconnectConnection, e));
 		} finally {
 			cwd = null;
 			cleanup();
@@ -426,7 +426,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 				return fetchFile(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Fetching file info failed", e));
+				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchFileInfo, e));
 			}	
 		}
 		ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
@@ -442,7 +442,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		monitor = Policy.subMonitorFor(monitor, 1);
 		try {
 			FTPFile[] ftpFiles = listFiles(path, monitor);
-			monitor.beginTask("Gethering files details", ftpFiles.length);
+			monitor.beginTask(Messages.SFTPConnectionFileManager_GatheringFileDetails, ftpFiles.length);
 			List<ExtendedFileInfo> list = new ArrayList<ExtendedFileInfo>();
 			for (FTPFile ftpFile : ftpFiles) {
 				if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -469,7 +469,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 				return fetchFiles(path, options, monitor);
 			} else {
 				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Fetching directory failed", e));
+				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchDirectory, e));
 			}
 		} finally {
 			monitor.done();
@@ -496,7 +496,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Creating directory failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedCreateDirectory, e));			
 		}
 	}
 
@@ -519,10 +519,10 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw e;
 		} catch (Exception e) {
 			if (!status.isOK()) {
-				MultiStatus multiStatus = new MultiStatus(SecureFTPPlugin.PLUGIN_ID, 0, "Deleting directory failed", e);
+				MultiStatus multiStatus = new MultiStatus(SecureFTPPlugin.PLUGIN_ID, 0, Messages.SFTPConnectionFileManager_FailedDeleteDirectory, e);
 				multiStatus.addAll(status);
 			} else {
-				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Deleting directory failed", e));
+				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDeleteDirectory, e));
 			}
 		} finally {
 			monitor.done();
@@ -541,7 +541,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			try {
 				ftpClient.delete(path.lastSegment());
 			} catch (FTPException e) {
-			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, "Failed to delete " + path.toString(), e));
+			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDeleteFile + path.toString(), e));
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
@@ -550,7 +550,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw e;
 		} catch (Exception e) {
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID,
-					MessageFormat.format("Deleting {0} failed", path), e));			
+					MessageFormat.format(Messages.SFTPConnectionFileManager_FailedDeletingFile, path), e));			
 		} finally {
 			monitor.done();
 		}
@@ -572,7 +572,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			} catch (FTPException e) {
 				throwFileNotFound(e, sourcePath);
                 SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat
-                        .format("Failed to rename {0} to {1}", new Object[] { sourcePath,
+                        .format(Messages.SFTPConnectionFileManager_FailedRename, new Object[] { sourcePath,
                                 destinationPath }), e));
 				throw e;
 			}
@@ -581,7 +581,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Renaming failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedRenaming, e));			
 		} finally {
 			monitor.done();
 		}
@@ -610,7 +610,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Listing directory failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedListDirectory, e));			
 		} finally {
 			monitor.done();
 		}
@@ -621,7 +621,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 */
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
-		monitor.beginTask("Initiating file download", 4);
+		monitor.beginTask(Messages.SFTPConnectionFileManager_InitiatingFileDownload, 4);
 		SSHFTPClient downloadFtpClient = new SSHFTPClient();
 		try {
 			initFTPClient(downloadFtpClient, controlEncoding, compression);
@@ -672,7 +672,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
 			}
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Opening file failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedOpeningFile, e));			
 		} finally {
 			monitor.done();
 		}
@@ -683,7 +683,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 	 */
 	@Override
 	protected OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
-		monitor.beginTask("Initiating file upload", 4);
+		monitor.beginTask(Messages.SFTPConnectionFileManager_FailedInitiatingFile, 4);
 		SSHFTPClient uploadFtpClient = new SSHFTPClient();
 		try {
 			initFTPClient(uploadFtpClient, controlEncoding, compression);
@@ -732,7 +732,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			} else if (e instanceof FileNotFoundException) {
 				throw (FileNotFoundException) e;
 			}
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Opening file failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedOpeningFile, e));			
 		} finally {
 			monitor.done();
 		}
@@ -753,7 +753,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Set modification time failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedSetModificationTime, e));			
 		} finally {
 			monitor.done();
 		}
@@ -772,14 +772,14 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 				int gid = Integer.parseInt(group);
 				ftpClient.changeGroup(gid, path.lastSegment());
 			} catch (NumberFormatException e) {
-				throw new IllegalArgumentException("Group is not numeric");
+				throw new IllegalArgumentException(Messages.SFTPConnectionFileManager_InvalidGroup);
 			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Set permissions failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedSetPermissions, e));			
 		} finally {
 			monitor.done();
 		}
@@ -800,7 +800,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Set permissions failed", e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedSetPermissions, e));			
 		} finally {
 			monitor.done();
 		}
@@ -832,7 +832,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 					ftpClient.delete(name);
 				} catch (FTPException e) {
 					status.add(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID,
-							MessageFormat.format("Deleting {0} failed", path.append(name).toPortableString()), e));
+							MessageFormat.format(Messages.SFTPConnectionFileManager_FailedDeleting, path.append(name).toPortableString()), e));
 				}
 				monitor.worked(1);
 			}
@@ -849,7 +849,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
 			throw e;
 		} catch (Exception e) {
 			status.add(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID,
-					MessageFormat.format("Deleting {0} failed", path.toPortableString()), e));
+					MessageFormat.format(Messages.SFTPConnectionFileManager_FailedDeleting, path.toPortableString()), e));
 		}
 	}
 

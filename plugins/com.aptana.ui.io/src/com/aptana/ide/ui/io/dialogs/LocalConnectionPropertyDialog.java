@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
@@ -72,7 +73,7 @@ import com.aptana.ui.IPropertyDialog;
  */
 public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IPropertyDialog {
 
-	private static final String DEFAULT_NAME = "New Local Shortcut";
+	private static final String DEFAULT_NAME = Messages.LocalConnectionPropertyDialog_NewShortcut;
 	
 	private LocalConnectionPoint localConnectionPoint;
 	private boolean isNew = false;
@@ -133,11 +134,11 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		
 		setTitleImage(titleImage);
 		if (localConnectionPoint != null) {
-			setTitle("Edit the Local Shortcut");
-			getShell().setText("Edit Local Shortcut");
+			setTitle(Messages.LocalConnectionPropertyDialog_EditTitle);
+			getShell().setText(Messages.LocalConnectionPropertyDialog_EditText);
 		} else {
-			setTitle("Create a Local Shortcut");
-			getShell().setText("New Local Shortcut");
+			setTitle(Messages.LocalConnectionPropertyDialog_CreateTitle);
+			getShell().setText(Messages.LocalConnectionPropertyDialog_CreateText);
 		}
 		
 		Composite container = new Composite(dialogArea, SWT.NONE);
@@ -152,7 +153,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Shortcut Name"));
+		label.setText(StringUtils.makeFormLabel(Messages.LocalConnectionPropertyDialog_ShortcutName));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -164,7 +165,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Local Path"));
+		label.setText(StringUtils.makeFormLabel(Messages.LocalConnectionPropertyDialog_LocalPath));
 
 		localPathText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		localPathText.setLayoutData(GridDataFactory.swtDefaults()
@@ -172,7 +173,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				.grab(true, false).create());
 		
 		browseButton = new Button(container, SWT.PUSH);
-		browseButton.setText('&' + StringUtils.ellipsify("Browse"));
+		browseButton.setText('&' + StringUtils.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
@@ -195,7 +196,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				localConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError("Create new connection failed", e);
+				IOUIPlugin.logError(Messages.LocalConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}
@@ -298,11 +299,11 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 	public boolean isValid() {
 		String message = null;
 		if (nameText.getText().length() == 0) {
-			message = "Please specify shortcut name";
+			message = Messages.LocalConnectionPropertyDialog_SpecifyShortcutName;
 		} else {
 			File file = Path.fromPortableString(localPathText.getText()).toFile();
 			if (!file.exists() || !file.isDirectory()) {
-				message = "The location doesn't exist";
+				message = Messages.LocalConnectionPropertyDialog_LocationNotExist;
 			}
 		}
 		if (message != null) {

@@ -38,6 +38,7 @@ package com.aptana.ide.core.io.vfs;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -122,8 +123,8 @@ public class VirtualConnectionManager {
 			}
 		}
 		if (connectionPoint == null) {
-			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID,
-					"No matching connection found for the URI " + uri.toASCIIString()));
+			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.VirtualConnectionManager_NoMatchingConnectionForURI, uri.toASCIIString())));
 		}
 		return connectionPoint;
 	}

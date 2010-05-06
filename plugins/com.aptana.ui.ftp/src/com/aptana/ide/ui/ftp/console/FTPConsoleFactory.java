@@ -73,7 +73,7 @@ public class FTPConsoleFactory implements IConsoleFactory {
 	
 	private static MessageConsole getOrcreateConsole() {
 		if (console == null) {
-			console = new MessageConsole("FTP Console", FTPUIPlugin.getImageDescriptor("/icons/full/eview16/ftp.png")); //$NON-NLS-2$
+			console = new MessageConsole(Messages.FTPConsoleFactory_FTPConsole, FTPUIPlugin.getImageDescriptor("/icons/full/eview16/ftp.png")); //$NON-NLS-1$
 			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
 		}
 		return console;

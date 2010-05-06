@@ -63,17 +63,17 @@ public class DeleteConnectionAction extends ConnectionActionDelegate {
 		if (connections.length == 0) {
 			return;
 		}
-		Job job = new Job("Deleting connection(s)") {
+		Job job = new Job(Messages.DeleteConnectionAction_DeletingConnections) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
                 for (IConnectionPoint connection : connections) {
-                    monitor.subTask(MessageFormat.format("Deleting {0}", connection));
+                    monitor.subTask(MessageFormat.format(Messages.DeleteConnectionAction_Deleting, connection));
                     CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(connection);
                     if (connection.canDisconnect()) {
                         try {
                             connection.disconnect(monitor);
                         } catch (CoreException e) {
-                            IOUIPlugin.logError("Disconnect failed", e);
+                            IOUIPlugin.logError(Messages.DeleteConnectionAction_FailedToDisconnect, e);
                         }
                     }
                 }

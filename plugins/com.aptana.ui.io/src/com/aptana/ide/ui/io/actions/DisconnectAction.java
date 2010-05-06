@@ -61,7 +61,7 @@ public class DisconnectAction extends ConnectionActionDelegate {
 		if (connectionPoint == null || !connectionPoint.canDisconnect()) {
 			return;
 		}
-		Job job = new Job(MessageFormat.format("Disconnect {0}", connectionPoint.getName())) {
+		Job job = new Job(MessageFormat.format(Messages.DisconnectAction_Disconnecting, connectionPoint.getName())) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				if (targetPart instanceof CommonNavigator) {

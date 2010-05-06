@@ -99,7 +99,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 					return password.toCharArray();
 				}
 			} catch (StorageException e) {
-				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, "Getting security props failed", e));
+				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedGetSecurePreference, e));
 			}
 		}
 		if (sessionPasswords.containsKey(authId)) {
@@ -154,7 +154,7 @@ public final class AuthenticationManager implements IAuthenticationManager {
 			}
 			node.flush();
 		} catch (Exception e) {
-			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, "Saving security props failed", e));
+			CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.AuthenticationManager_FailedSaveSecurePreference, e));
 		}
 	}
 

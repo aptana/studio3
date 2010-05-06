@@ -129,7 +129,7 @@ public class VirtualFileSystem extends FileSystem {
 			} catch (CoreException e) {
 				// TODO: this exception could be thrown after 3.6M1
 				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
-				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, "Fetch file tree failed", e));
+				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.VirtualFileSystem_ERR_FetchFileTree, e));
 			}
 		}
 		return null;

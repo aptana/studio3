@@ -93,7 +93,7 @@ public class NavigatorDecoratorLoader
 
 	public static void init()
 	{
-		Job job = new UIJob(PlatformUI.getWorkbench().getDisplay(), "Decorator Init")
+		Job job = new UIJob(PlatformUI.getWorkbench().getDisplay(), "Decorator Init") //$NON-NLS-1$
 		{
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)

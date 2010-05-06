@@ -95,11 +95,11 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Connect Mode"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPAdvancedOptionsComposite_ConnectMode));
 
 		modeCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-		modeCombo.add("Active");
-		modeCombo.add("Passive");
+		modeCombo.add(Messages.FTPAdvancedOptionsComposite_ModeActive);
+		modeCombo.add(Messages.FTPAdvancedOptionsComposite_ModePassive);
 		modeCombo.setLayoutData(GridDataFactory.swtDefaults().hint(
 				modeCombo.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x, SWT.DEFAULT).create());
 
@@ -110,7 +110,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 
 		label = new Label(this, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel("Port"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPAdvancedOptionsComposite_Port));
 		
 		portText = new Text(this, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 		portText.setLayoutData(GridDataFactory.swtDefaults().hint(
@@ -124,7 +124,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Encoding"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));
@@ -141,7 +141,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Timezone"));
+		label.setText(StringUtils.makeFormLabel(Messages.FTPAdvancedOptionsComposite_Timezone));
 
 		timezoneCombo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		String[] timezones = TimeZone.getAvailableIDs();
@@ -153,7 +153,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 				.create());
 		
 		detectButton = new Button(container, SWT.PUSH);
-		detectButton.setText("Detect");
+		detectButton.setText(Messages.FTPAdvancedOptionsComposite_Detect);
 		detectButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(detectButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
@@ -242,7 +242,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 		} catch (NumberFormatException e) {
 		}
 		if (port <= 0) {
-			return "Please specify a valid port number";
+			return Messages.FTPAdvancedOptionsComposite_InvalidPort;
 		}
 		return null;
 	}

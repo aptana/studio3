@@ -137,7 +137,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Protocol"));
+		label.setText(StringUtils.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Protocol));
 
 		protocolButton = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
 		String[] items = new String[protoTypes.length];
@@ -179,7 +179,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 
 		keyAuthButton = new Button(keyAuthComposite, SWT.CHECK);
 		keyAuthButton.setLayoutData(GridDataFactory.fillDefaults().create());
-		keyAuthButton.setText("Use &Public Key Authentication");		
+		keyAuthButton.setText(Messages.CommonFTPConnectionPointPropertyDialog_UsePublicKeyAuthentication);		
 
 		/* row 2 */
 		label = new Label(keyAuthComposite, SWT.NONE);
@@ -190,7 +190,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 		keyPathLabel = new Label(keyAuthComposite, SWT.NONE);
 		keyPathLabel.setLayoutData(GridDataFactory.fillDefaults().create());
 		keyPathLabel.setFont(smallFont);
-		keyPathLabel.setText("No Private Key selected");	
+		keyPathLabel.setText(Messages.CommonFTPConnectionPointPropertyDialog_NoPrivateKeySelected);	
 
 		super.createPasswordSection(parent);		
 		updateKeyAuth();
@@ -228,7 +228,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 	protected String getAuthId(IBaseRemoteConnectionPoint connectionPoint) {
 		if (ISFTPConnectionPoint.TYPE_SFTP.equals(connectionType.getType())) {
 			if (keyAuthButton.getSelection()) {
-				return Policy.generateAuthId(getConnectionPointType().getType().toUpperCase()+"/PUBLICKEY", connectionPoint);			}
+				return Policy.generateAuthId(getConnectionPointType().getType().toUpperCase()+"/PUBLICKEY", connectionPoint);			} //$NON-NLS-1$
 		}
 		return super.getAuthId(connectionPoint);
 	}
@@ -247,7 +247,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 			if (keyFilePath != null && !keyFilePath.isEmpty()) {
 				keyAuthButton.setSelection(true);
 				keyPathLabel.setText(keyFilePath.toOSString());
-				passwordLabel.setText(StringUtils.makeFormLabel("Passphrase"));
+				passwordLabel.setText(StringUtils.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Passphrase));
 				try {
 					boolean passphraseProtected = SecureUtils.isKeyPassphraseProtected(keyFilePath.toFile());
 					makeVisible(passwordLabel, passphraseProtected);
@@ -296,7 +296,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 				char[] password = passwordText.getText().toCharArray();
 				if (passphraseProtected && password.length > 0) {
 					if (!SecureUtils.isPassphraseValid(keyFilePath.toFile(), password)) {
-						message = "Private Key Passphrase is incorrect";
+						message = Messages.CommonFTPConnectionPointPropertyDialog_IncorrectPassphrase;
 					}
 				}
 			} catch (CoreException e) {
@@ -362,7 +362,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 		if (enabled) {
 			while (true) {
 				FileDialog dlg = new FileDialog(getShell(), SWT.OPEN);
-				dlg.setText("Specify Private Key file");
+				dlg.setText(Messages.CommonFTPConnectionPointPropertyDialog_SpecifyPrivateKey);
 				String ssh_home = SecureUtils.getSSH_HOME();
 				if (ssh_home != null && ssh_home.length() != 0) {
 					File dir = new File(ssh_home);
@@ -387,7 +387,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 					makeVisible(passwordText, passphraseProtected);
 					makeVisible(savePasswordButton, passphraseProtected);
 				} catch (CoreException e) {
-					UIUtils.showErrorMessage("Private Key File Error", e.getLocalizedMessage());
+					UIUtils.showErrorMessage(Messages.CommonFTPConnectionPointPropertyDialog_ERR_PrivateKey, e.getLocalizedMessage());
 					continue;
 				}
 				keyPathLabel.setText(keyFilePath);
@@ -395,13 +395,13 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 			}
 			passwordText.setText(""); //$NON-NLS-1$
 		} else {
-			keyPathLabel.setText("No Private Key selected");
+			keyPathLabel.setText(Messages.CommonFTPConnectionPointPropertyDialog_NoPrivateKeySelected);
 			makeVisible(passwordLabel, true);
 			makeVisible(passwordText, true);
 			makeVisible(savePasswordButton, true);
 		}
 		updateLayout();
-		passwordLabel.setText(StringUtils.makeFormLabel(enabled ? "Passphrase" : "Password"));
+		passwordLabel.setText(StringUtils.makeFormLabel(enabled ? Messages.CommonFTPConnectionPointPropertyDialog_Passphrase : Messages.CommonFTPConnectionPointPropertyDialog_Password));
 		savePasswordButton.setSelection(false);
 		validate();
 	}

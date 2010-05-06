@@ -71,6 +71,7 @@ import org.eclipse.swt.widgets.Sash;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -264,7 +265,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		});
 
         fEditButton = new Button(main, SWT.PUSH);
-        fEditButton.setText(StringUtils.ellipsify("Edit"));
+        fEditButton.setText(StringUtils.ellipsify(CoreStrings.EDIT));
         fEditButton.setToolTipText(Messages.FTPManagerComposite_TTP_Edit);
         fEditButton.addSelectionListener(this);
 

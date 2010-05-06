@@ -63,7 +63,7 @@ import com.aptana.ui.IPropertyDialog;
  */
 public class GenericConnectionPropertyDialog extends TitleAreaDialog implements IPropertyDialog {
 
-	private static final String DEFAULT_NAME = "New Connection";
+	private static final String DEFAULT_NAME = Messages.GenericConnectionPropertyDialog_NewConnection;
 	
 	private GenericConnectionPoint genericConnectionPoint;
 	private boolean isNew = false;
@@ -109,11 +109,11 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 
 		if (genericConnectionPoint != null) {
-			setTitle("Edit the Connection");
-			getShell().setText("Edit Connection");
+			setTitle(Messages.GenericConnectionPropertyDialog_EditTitle);
+			getShell().setText(Messages.GenericConnectionPropertyDialog_EditText);
 		} else {
-			setTitle("Create a Connection");
-			getShell().setText("New Connection");
+			setTitle(Messages.GenericConnectionPropertyDialog_CreateTitle);
+			getShell().setText(Messages.GenericConnectionPropertyDialog_CreateText);
 		}
 		
 		Composite container = new Composite(dialogArea, SWT.NONE);
@@ -128,7 +128,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("Name"));
+		label.setText(StringUtils.makeFormLabel(Messages.GenericConnectionPropertyDialog_Name));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -140,7 +140,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel("URI"));
+		label.setText(StringUtils.makeFormLabel(Messages.GenericConnectionPropertyDialog_URI));
 
 		uriText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		uriText.setLayoutData(GridDataFactory.swtDefaults()
@@ -156,7 +156,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 				genericConnectionPoint.setName(DEFAULT_NAME);
 				isNew = true;
 			} catch (CoreException e) {
-				IOUIPlugin.logError("Create new connection failed", e);
+				IOUIPlugin.logError(Messages.GenericConnectionPropertyDialog_FailedToCreate, e);
 				close();
 			}
 		}
@@ -249,14 +249,14 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 	public boolean isValid() {
 		String message = null;
 		if (nameText.getText().length() == 0) {
-			message = "Please specify shortcut name";
+			message = Messages.GenericConnectionPropertyDialog_SpecifyShortcut;
 		} else {
 			try {
 				if (!URI.create(uriText.getText()).isAbsolute()) {
-					message = "Please specify a valid absolute URI";
+					message = Messages.GenericConnectionPropertyDialog_SpecifyValidAbsoluteURI;
 				}
 			} catch (Exception e) {
-				message = "Please specify a valid URI";
+				message = Messages.GenericConnectionPropertyDialog_SpecifyValidURI;
 			}
 		}
 		if (message != null) {

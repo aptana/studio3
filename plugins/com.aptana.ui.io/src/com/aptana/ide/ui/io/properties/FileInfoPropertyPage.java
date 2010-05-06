@@ -38,6 +38,7 @@ package com.aptana.ide.ui.io.properties;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import org.eclipse.core.filesystem.EFS;
@@ -124,7 +125,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 				fFileInfo = result[0];
 			}
 		} catch (CoreException e) {
-			UIUtils.showErrorMessage("Fetch info error", e);
+			UIUtils.showErrorMessage(Messages.FileInfoPropertyPage_FailedToFetchInfo, e);
 		}
 		if (fFileInfo == null) {
 			Label label = new Label(parent, SWT.NONE);
@@ -199,7 +200,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
                         fileStore.putInfo(fFileInfo, IExtendedFileInfo.SET_PERMISSIONS,
                                 new NullProgressMonitor());
                     } catch (CoreException e) {
-                        UIUtils.showErrorMessage("Error storing file info", e);
+                        UIUtils.showErrorMessage(Messages.FileInfoPropertyPage_ErrorStoreInfo, e);
                     }
                 }
             }
@@ -242,7 +243,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 		label.setLayoutData(GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.TOP).create());
 
 		Text typeText = new Text(container, SWT.LEFT | SWT.READ_ONLY);
-		typeText.setText(fileInfo.isDirectory() ? "Folder" : "File");
+		typeText.setText(fileInfo.isDirectory() ? Messages.FileInfoPropertyPage_Folder : Messages.FileInfoPropertyPage_File);
 		typeText.setBackground(typeText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		typeText.setLayoutData(GridDataFactory.swtDefaults().create());
 
@@ -262,7 +263,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 			label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 			Text sizeText = new Text(container, SWT.LEFT | SWT.READ_ONLY);
-			sizeText.setText(Long.toString(fileInfo.getLength()) + " bytes");
+			sizeText.setText(MessageFormat.format(Messages.FileInfoPropertyPage_Bytes, Long.toString(fileInfo.getLength())));
 			sizeText.setBackground(sizeText.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 			sizeText.setLayoutData(GridDataFactory.swtDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER)
 					.hint(convertWidthInCharsToPixels(MAX_VALUE_WIDTH), SWT.DEFAULT).create());
@@ -289,18 +290,18 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 
     private Composite createOwnerGroup(Composite parent, IExtendedFileInfo fileInfo) {
         Group container = new Group(parent, SWT.NONE);
-        container.setText("Owner and Group");
+        container.setText(Messages.FileInfoPropertyPage_OwnerAndGroup);
         container.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).create());
 
         Label label = new Label(container, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel("Owner"));
+        label.setText(StringUtils.makeFormLabel(Messages.FileInfoPropertyPage_Owner));
         Text text = new Text(container, SWT.READ_ONLY);
         text.setText(fileInfo.getOwner());
         text.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true,
                 false).create());
 
         label = new Label(container, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel("Group"));
+        label.setText(StringUtils.makeFormLabel(Messages.FileInfoPropertyPage_Group));
         text = new Text(container, SWT.READ_ONLY);
         text.setText(fileInfo.getGroup());
         text.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true,
@@ -311,7 +312,7 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
 
     private Composite createPermissionsGroup(Composite parent, IExtendedFileInfo fileInfo) {
         fPermissionsGroup = new PermissionsGroup(parent);
-        fPermissionsGroup.setText("Permissions");
+        fPermissionsGroup.setText(Messages.FileInfoPropertyPage_Permissions);
         fPermissionsGroup.setPermissions(fileInfo.getPermissions());
 
         return (Composite) fPermissionsGroup.getControl();

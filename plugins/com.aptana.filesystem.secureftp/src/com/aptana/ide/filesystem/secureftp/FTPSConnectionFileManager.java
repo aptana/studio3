@@ -86,7 +86,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	 * @see com.aptana.ide.filesystem.secureftp.IFTPSConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, java.lang.String, char[], boolean, boolean, java.lang.String, java.lang.String, java.lang.String, boolean)
 	 */
 	public void init(String host, int port, IPath basePath, String login, char[] password, boolean explicit, boolean passive, String transferType, String encoding, String timezone, boolean validateCertificate) {
-		Assert.isTrue(ftpClient == null, "FTPS connection has been already initiated");
+		Assert.isTrue(ftpClient == null, Messages.FTPSConnectionFileManager_ConnectionHasBeenInitiated);
 		try {
 			ftpClient = createFTPClient();
 			this.host = host;
@@ -100,7 +100,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			this.validateCertificate = validateCertificate;
 			initFTPSClient((SSLFTPClient) ftpClient, explicit, passive, encoding, validateCertificate);
 		} catch (Exception e) {
-			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, "FTPS connection initialization failed", e));
+			SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_ConnectionInitializationFailed, e));
 			ftpClient = null;
 		}
 	}
@@ -118,7 +118,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	 */
 	@Override
 	public void connect(IProgressMonitor monitor) throws CoreException {
-		Assert.isTrue(ftpClient != null, "FTPS connection is not initialized");
+		Assert.isTrue(ftpClient != null, Messages.FTPSConnectionFileManager_ConnectionNotInitialized);
 		SSLFTPClient ftpsClient = (SSLFTPClient) ftpClient;
 		monitor = Policy.monitorFor(monitor);
 		try {
@@ -140,18 +140,18 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 					messageLogWriter = FTPPlugin.getDefault().getFTPLogWriter();
 				}
 				if (messageLogWriter != null) {
-					messageLogWriter.println(MessageFormat.format("---------- FTPS {0} ----------", host));
+					messageLogWriter.println(MessageFormat.format("---------- FTPS {0} ----------", host)); //$NON-NLS-1$
 					setMessageLogger(ftpClient, messageLogWriter);
 				}
 			} else {
-				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTPS {0} ----------", host));
+				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTPS {0} ----------", host)); //$NON-NLS-1$
 			}
 
-			monitor.beginTask("Establishing FTPS connection", IProgressMonitor.UNKNOWN);
+			monitor.beginTask(Messages.FTPSConnectionFileManager_EstablishingConnection, IProgressMonitor.UNKNOWN);
 			ftpClient.setRemoteHost(host);
 			ftpClient.setRemotePort(port);
 			while (true) {
-				monitor.subTask("connecting");
+				monitor.subTask(Messages.FTPSConnectionFileManager_Connecting);
 				ftpClient.connect();
 				if (!ftpsClient.isImplicitFTPS()) {
 					if (securityMechanism == null) {
@@ -184,20 +184,20 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 					ftpsClient.auth(securityMechanism);
 				}
 				if (password.length == 0 && !IFTPConstants.LOGIN_ANONYMOUS.equals(login) && (context == null || !context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT))) {
-                    getOrPromptPassword(MessageFormat.format("FTPS Authentication for {0}", host),
-                            "Please specify password.");
+                    getOrPromptPassword(MessageFormat.format(Messages.FTPSConnectionFileManager_FTPSAuthentication, host),
+                            Messages.FTPSConnectionFileManager_SpecifyPassword);
 				}
 				Policy.checkCanceled(monitor);
-				monitor.subTask("authenticating");
+				monitor.subTask(Messages.FTPSConnectionFileManager_Authenticating);
 				try {
 					ftpClient.login(login, String.copyValueOf(password));
 				} catch (FTPException e) {
 					Policy.checkCanceled(monitor);
 					if ("331".equals(ftpClient.getLastValidReply().getReplyCode())) { //$NON-NLS-1$
 						if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
-							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format("Authentication failed: {0}", e.getLocalizedMessage()), e));
+							throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.FTPSConnectionFileManager_FailedAuthenticate, e.getLocalizedMessage()), e));
 						}
-						promptPassword(MessageFormat.format("FTPS Authentication for {0}", host), "Password was not accepted. Please specify again.");
+						promptPassword(MessageFormat.format(Messages.FTPSConnectionFileManager_FTPSAuthentication, host), Messages.FTPSConnectionFileManager_PasswordNotAccepted);
 						safeQuit();
 						continue;
 					}
@@ -230,13 +230,13 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 			throw e;
 		} catch (UnknownHostException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Host name not found: "+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_HostNameNotFound+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Remote folder not found: "+e.getLocalizedMessage(), e));			
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
 		} catch (Exception e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "Establishing FTPS connection failed: "+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.FTPSConnectionFileManager_FailedEstablishConnection+e.getLocalizedMessage(), e));
 		} finally {
 			monitor.done();
 		}

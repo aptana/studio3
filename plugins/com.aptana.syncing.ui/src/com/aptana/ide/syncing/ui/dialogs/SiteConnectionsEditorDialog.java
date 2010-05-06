@@ -69,6 +69,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
@@ -162,12 +163,12 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		addButton = new Button(group, SWT.PUSH);
 		addButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		addButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/add.gif")); //$NON-NLS-1$
-		addButton.setToolTipText(StringUtils.ellipsify("Add"));
+		addButton.setToolTipText(StringUtils.ellipsify(CoreStrings.ADD));
 
 		removeButton = new Button(group, SWT.PUSH);
 		removeButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		removeButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/delete.gif")); //$NON-NLS-1$
-		removeButton.setToolTipText("Remove");
+		removeButton.setToolTipText(CoreStrings.REMOVE);
 
 		/* column 2 - the details of the selected connection */
 		Composite composite = new Composite(sashForm, SWT.NONE);

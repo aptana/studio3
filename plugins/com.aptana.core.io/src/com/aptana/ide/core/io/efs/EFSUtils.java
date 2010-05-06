@@ -129,21 +129,18 @@ public final class EFSUtils {
 
 	/**
 	 * Returns the parent file of this file
+	 * 
 	 * @param file
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	public static String getRelativePath(IFileStore parent, IFileStore file) {
-
-		if(parent == file || parent.isParentOf(file)) {
+		if (parent == file || parent.isParentOf(file)) {
 			String rootFile = getAbsolutePath(parent);
 			String childFile = getAbsolutePath(file);
 			return childFile.substring(rootFile.length());
 		}
-		else
-		{
-			return null;
-		}
+		return null;
 	}
 
 	/**

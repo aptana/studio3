@@ -122,7 +122,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 		
-		titleImage = IOUIPlugin.getImageDescriptor("/icons/full/wizban/security.png").createImage();
+		titleImage = IOUIPlugin.getImageDescriptor("/icons/full/wizban/security.png").createImage(); //$NON-NLS-1$
 		dialogArea.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				if (titleImage != null) {
@@ -147,7 +147,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 		/* row 1 */
 		Label label = new Label(container, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel("User Name"));
+		label.setText(StringUtils.makeFormLabel(Messages.PasswordPromptDialog_UserName));
 		
 		loginText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		loginText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -159,7 +159,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 		/* row 2 */
 		label = new Label(container, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel("Password"));
+		label.setText(StringUtils.makeFormLabel(Messages.PasswordPromptDialog_Password));
 
 		passwordText = new Text(container, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		passwordText.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -173,7 +173,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 
 		savePasswordButton = new Button(container, SWT.CHECK);
 		savePasswordButton.setLayoutData(GridDataFactory.fillDefaults().create());
-		savePasswordButton.setText("&Save Password (secure)");
+		savePasswordButton.setText(Messages.PasswordPromptDialog_SavePassword);
 		savePasswordButton.setSelection(savePassword);
 
 		return dialogArea;
@@ -185,7 +185,7 @@ public class PasswordPromptDialog extends TitleAreaDialog {
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
-		getButton(OK).setText("Login");
+		getButton(OK).setText(Messages.PasswordPromptDialog_Login);
 	}
 
 	/* (non-Javadoc)

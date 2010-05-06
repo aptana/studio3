@@ -147,14 +147,14 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 		if (writer != null && ftpClient.getMessageListener() == null) {
 			listener = new FTPMessageListener() {
 				public void logCommand(String command) {
-					if (command.startsWith("---> ")) {
+					if (command.startsWith("---> ")) { //$NON-NLS-1$
 						command = command.substring(5);
 					}
 					Matcher matcher = PASS_COMMAND_PATTERN.matcher(command);
 					if (matcher.matches()) {
-						command = matcher.replaceFirst("$1********");
+						command = matcher.replaceFirst("$1********"); //$NON-NLS-1$
 					}
-					writer.print("ftp> ");
+					writer.print("ftp> "); //$NON-NLS-1$
 					writer.println(command);
 					writer.flush();
 				}
@@ -194,11 +194,11 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 					messageLogWriter = FTPPlugin.getDefault().getFTPLogWriter();
 				}
 				if (messageLogWriter != null) {
-					messageLogWriter.println(MessageFormat.format("---------- FTP {0} ----------", host));
+					messageLogWriter.println(MessageFormat.format("---------- FTP {0} ----------", host)); //$NON-NLS-1$
 					setMessageLogger(ftpClient, messageLogWriter);
 				}
 			} else {
-				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTP {0} ----------", host));
+				messageLogWriter.println(MessageFormat.format("---------- RECONNECTING - FTP {0} ----------", host)); //$NON-NLS-1$
 			}
 
 			monitor.beginTask(Messages.FTPConnectionFileManager_establishing_connection, IProgressMonitor.UNKNOWN);
@@ -220,7 +220,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 					Policy.checkCanceled(monitor);
 					if ("331".equals(ftpClient.getLastValidReply().getReplyCode())) { //$NON-NLS-1$
 						if (context != null && context.getBoolean(ConnectionContext.NO_PASSWORD_PROMPT)) {
-							throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, MessageFormat.format("Authentication failed: {0}", e.getLocalizedMessage()), e));
+							throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.FTPConnectionFileManager_FailedAuthenticate, e.getLocalizedMessage()), e));
 						}
 						promptPassword(MessageFormat.format(Messages.FTPConnectionFileManager_ftp_auth, host), Messages.FTPConnectionFileManager_invalid_password);
 						safeQuit();
@@ -251,10 +251,10 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 			throw e;
 		} catch (UnknownHostException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, "Host name not found: "+e.getLocalizedMessage(), e));
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_HostNotFound+e.getLocalizedMessage(), e));
 		} catch (FileNotFoundException e) {
 			safeQuit();
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, "Remote folder not found: "+e.getLocalizedMessage(), e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_RemoteFolderNotFound+e.getLocalizedMessage(), e));			
 		} catch (Exception e) {
 			safeQuit();
 			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_connection_failed+e.getLocalizedMessage(), e));
@@ -308,7 +308,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 				if (rootFiles != null) {
 					for (FTPFile ftpFile : rootFiles) {
 						if (ftpFile.isFile()
-								&& !ftpFile.getName().startsWith(".ht")
+								&& !ftpFile.getName().startsWith(".ht") //$NON-NLS-1$
 								&& !(ftpFile.lastModified().getHours() == 0
 										&& ftpFile.lastModified().getMinutes() == 0
 										&& ftpFile.lastModified().getSeconds() == 0)) {
@@ -321,7 +321,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 					FTPFile[] ftpFiles = listFiles(basePath, monitor);
 					for (FTPFile ftpFile : ftpFiles) {
 						if (ftpFile.isFile()
-								&& !ftpFile.getName().startsWith(".ht")
+								&& !ftpFile.getName().startsWith(".ht") //$NON-NLS-1$
 								&& !(ftpFile.lastModified().getHours() == 0
 										&& ftpFile.lastModified().getMinutes() == 0
 										&& ftpFile.lastModified().getSeconds() == 0)) {
@@ -959,7 +959,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, "Set permissions failed", e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_FailedSetPermissions, e));			
 		} finally {
 			monitor.done();
 		}
@@ -983,7 +983,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, "Set group failed", e));			
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_FailedSetGroup, e));			
 		} finally {
 			monitor.done();
 		}
@@ -1042,7 +1042,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
 		if (fileFactory.getSystem().toUpperCase().startsWith(WINDOWS_STR) && ftpFiles != null) {
 			for (FTPFile ftpFile : ftpFiles) {
 				if (ftpFile.getPermissions() == null) {
-					ftpFile.setPermissions("-rw-r-----");
+					ftpFile.setPermissions("-rw-r-----"); //$NON-NLS-1$
 				}
 			}
 		}

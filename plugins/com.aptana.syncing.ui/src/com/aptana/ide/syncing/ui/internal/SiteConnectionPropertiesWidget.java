@@ -75,6 +75,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.StringUtils;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
@@ -390,7 +391,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             updateRemotesViewer();
 
             remoteNewButton = new Button(mainComp, SWT.PUSH);
-            remoteNewButton.setText(StringUtils.ellipsify("New"));
+            remoteNewButton.setText(StringUtils.ellipsify(CoreStrings.NEW));
             remoteNewButton.setLayoutData(GridDataFactory.swtDefaults().exclude(!showRemote)
                     .create());
             remoteNewButton.addSelectionListener(this);
@@ -410,7 +411,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             projectViewer.setContentProvider(new ArrayContentProvider());
             if (projects.length == 0) {
                 projectViewer.setLabelProvider(new LabelProvider());
-                Object[] input = new Object[] { "No project exists in workspace" };
+                Object[] input = new Object[] { Messages.SiteConnectionPropertiesWidget_NoProject };
                 projectViewer.setInput(input);
                 projectViewer.setSelection(new StructuredSelection(input[0]), true);
             } else {
@@ -436,7 +437,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             projectFolderText.addModifyListener(SiteConnectionPropertiesWidget.this);
 
             projectBrowseButton = new Button(mainComp, SWT.PUSH);
-            projectBrowseButton.setText(StringUtils.ellipsify("Browse"));
+            projectBrowseButton.setText(StringUtils.ellipsify(CoreStrings.BROWSE));
             projectBrowseButton.setLayoutData(GridDataFactory.swtDefaults().create());
             projectBrowseButton.addSelectionListener(this);
 
@@ -452,7 +453,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             filesystemFolderText.addModifyListener(SiteConnectionPropertiesWidget.this);
 
             filesystemBrowseButton = new Button(mainComp, SWT.PUSH);
-            filesystemBrowseButton.setText(StringUtils.ellipsify("Browse"));
+            filesystemBrowseButton.setText(StringUtils.ellipsify(CoreStrings.BROWSE));
             filesystemBrowseButton.setLayoutData(GridDataFactory.swtDefaults().create());
             filesystemBrowseButton.addSelectionListener(this);
 
@@ -469,7 +470,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             if (sites.length == 0) {
                 remoteRadio.setEnabled(false);
                 remotesViewer.setLabelProvider(new LabelProvider());
-                Object[] input = new Object[] { "No remote site is defined" };
+                Object[] input = new Object[] { Messages.SiteConnectionPropertiesWidget_NoRemoteSite };
                 remotesViewer.setInput(input);
                 remotesViewer.setSelection(new StructuredSelection(input[0]), true);
             } else {

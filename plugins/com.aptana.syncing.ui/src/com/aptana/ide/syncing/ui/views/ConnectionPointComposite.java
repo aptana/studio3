@@ -88,6 +88,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.FileUtils;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -467,7 +468,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
     private Menu createMenu(Control parent) {
         Menu menu = new Menu(parent);
         fOpenItem = new MenuItem(menu, SWT.PUSH);
-        fOpenItem.setText("Open");
+        fOpenItem.setText(CoreStrings.OPEN);
         fOpenItem.setAccelerator(SWT.F3);
         fOpenItem.addSelectionListener(this);
 
@@ -477,27 +478,27 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 
         new MenuItem(menu, SWT.SEPARATOR);
         fDeleteItem = new MenuItem(menu, SWT.PUSH);
-        fDeleteItem.setText("Delete");
+        fDeleteItem.setText(CoreStrings.DELETE);
         fDeleteItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(
                 ISharedImages.IMG_ETOOL_DELETE));
         fDeleteItem.setAccelerator(SWT.DEL);
         fDeleteItem.addSelectionListener(this);
 
         fRenameItem = new MenuItem(menu, SWT.PUSH);
-        fRenameItem.setText("Rename");
+        fRenameItem.setText(CoreStrings.RENAME);
         fRenameItem.setAccelerator(SWT.F2);
         fRenameItem.addSelectionListener(this);
 
         new MenuItem(menu, SWT.SEPARATOR);
         fRefreshMenuItem = new MenuItem(menu, SWT.PUSH);
-        fRefreshMenuItem.setText("Refresh");
+        fRefreshMenuItem.setText(CoreStrings.REFRESH);
         fRefreshMenuItem.setImage(SyncingUIPlugin.getImage("/icons/full/obj16/refresh.gif")); //$NON-NLS-1$
         fRefreshMenuItem.setAccelerator(SWT.F5);
         fRefreshMenuItem.addSelectionListener(this);
 
         new MenuItem(menu, SWT.SEPARATOR);
         fPropertiesItem = new MenuItem(menu, SWT.PUSH);
-        fPropertiesItem.setText("Properties");
+        fPropertiesItem.setText(CoreStrings.PROPERTIES);
         fPropertiesItem.setAccelerator(SWT.ALT | '\r');
         fPropertiesItem.addSelectionListener(this);
 

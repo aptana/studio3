@@ -16,5 +16,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.filesystem.secureftp,
  com.aptana.core,
  com.aptana.core.io
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
