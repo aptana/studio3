@@ -20,6 +20,8 @@
 		<xsl:apply-templates select="elements"/>
 		<xsl:apply-templates select="fields"/>
 		<xsl:apply-templates select="events"/>
+		<xsl:apply-templates select="entities"/>
+		<!-- xsl:apply-templates select="escape-codes"/ -->
 	</html>
 </xsl:template>
 
@@ -63,6 +65,14 @@
 			<event-ref name="{@name}"/>
 		</xsl:for-each>
 	</event-refs>
+</xsl:template>
+
+<xsl:template match="entities">
+	<entities>
+		<xsl:apply-templates select="entity">
+			<xsl:sort select="@name"/>
+		</xsl:apply-templates>
+	</entities>
 </xsl:template>
 
 <xsl:template match="element">
@@ -110,6 +120,16 @@
 		<xsl:copy-of select="description"/>
 		<xsl:copy-of select="remarks"/>
 	</event>
+</xsl:template>
+
+<xsl:template match="entity">
+	<entity>
+		<xsl:copy-of select="@name"/>
+		<xsl:copy-of select="@decimal"/>
+		<xsl:copy-of select="@hex"/>
+		<xsl:copy-of select="description"/>
+		<!-- skipping examples since they don't seem to provide any benefit -->
+	</entity>
 </xsl:template>
 
 <xsl:template match="text()">

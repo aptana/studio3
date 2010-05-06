@@ -12815,4 +12815,1373 @@ onreset="return confirm('Clear all fields and reset form?');"&amp;gt;
 	
 	</events>
 	
+	<!--  these were brought in from Studio 2.x's html_special_chars.xml -->
+	
+	<entities>
+		
+		<entity name="&amp;nbsp;" decimal="&amp;#160;" hex="&amp;#xA0;">
+			<description>Non-breaking space.</description>
+			<example>&amp;nbsp;</example>
+		</entity>
+		
+		<entity name="&amp;quot;" decimal="&amp;#34;" hex="&amp;#x22;">
+			<description>Quotation mark. (Double.)</description>
+			<example>&amp;quot;</example>
+		</entity>
+		
+		<entity name="&amp;amp;" decimal="&amp;#38;" hex="&amp;#x26;">
+			<description>Ampersand.</description>
+			<example>&amp;amp;</example>
+		</entity>
+		
+		<entity name="&amp;lt;" decimal="&amp;#60;" hex="&amp;#x3C;">
+			<description>Less-than sign.</description>
+			<example>&amp;lt;</example>
+		</entity>
+		
+		<entity name="&amp;gt;" decimal="&amp;#62;" hex="&amp;#x3E;">
+			<description>Greater-than sign.</description>
+			<example>&amp;gt;</example>
+		</entity>
+		
+		<entity name="&amp;iexcl;" decimal="&amp;#161;" hex="&amp;#xA1;">
+			<description>Inverted exclamation mark.</description>
+			<example>&amp;iexcl;</example>
+		</entity>
+		
+		<entity name="&amp;cent;" decimal="&amp;#162;" hex="&amp;#xA2;">
+			<description>Cent sign.</description>
+			<example>&amp;cent;</example>
+		</entity>
+		
+		<entity name="&amp;pound;" decimal="&amp;#163;" hex="&amp;#xA3;">
+			<description>Pound sign. (Currency.)</description>
+			<example>&amp;pound;</example>
+		</entity>
+		
+		<entity name="&amp;curren;" decimal="&amp;#164;" hex="&amp;#xA4;">
+			<description>Currency sign.</description>
+			<example>&amp;curren;</example>
+		</entity>
+		
+		<entity name="&amp;yen;" decimal="&amp;#165;" hex="&amp;#xA5;">
+			<description>Yen sign. (Currency.)</description>
+			<example>&amp;yen;</example>
+		</entity>
+		
+		<entity name="&amp;brvbar;" decimal="&amp;#166;" hex="&amp;#xA6;">
+			<description>Broken bar.</description>
+			<example>&amp;brvbar;</example>
+		</entity>
+		
+		<entity name="&amp;sect;" decimal="&amp;#167;" hex="&amp;#xA7;">
+			<description>Section sign.</description>
+			<example>&amp;sect;</example>
+		</entity>
+		
+		<entity name="&amp;uml;" decimal="&amp;#168;" hex="&amp;#xA8;">
+			<description>Diaeresis.</description>
+			<example>&amp;uml;</example>
+		</entity>
+		
+		<entity name="&amp;copy;" decimal="&amp;#169;" hex="&amp;#xA9;">
+			<description>Copyright sign.</description>
+			<example>&amp;copy;</example>
+		</entity>
+		
+		<entity name="&amp;ordf;" decimal="&amp;#170;" hex="&amp;#xAA;">
+			<description>Feminine ordinal indicator.</description>
+			<example>&amp;ordf;</example>
+		</entity>
+		
+		<entity name="&amp;laquo;" decimal="&amp;#171;" hex="&amp;#xAB;">
+			<description>Left angle quotation marks.</description>
+			<example>&amp;laquo;</example>
+		</entity>
+		
+		<entity name="&amp;not;" decimal="&amp;#172;" hex="&amp;#xAC;">
+			<description>Not sign.</description>
+			<example>&amp;not;</example>
+		</entity>
+		
+		<entity name="&amp;shy;" decimal="&amp;#173;" hex="&amp;#xAD;">
+			<description>Soft hypehn.</description>
+			<example>&amp;shy;</example>
+		</entity>
+		
+		<entity name="&amp;reg;" decimal="&amp;#174;" hex="&amp;#xAE;">
+			<description>Registered trade mark sign.</description>
+			<example>&amp;reg;</example>
+		</entity>
+		
+		<entity name="&amp;macr;" decimal="&amp;#175;" hex="&amp;#xAF;">
+			<description>Macron.</description>
+			<example>&amp;macr;</example>
+		</entity>
+		
+		<entity name="&amp;deg;" decimal="&amp;#176;" hex="&amp;#xB0;">
+			<description>Degree sign.</description>
+			<example>&amp;deg;</example>
+		</entity>
+		
+		<entity name="&amp;plusmn;" decimal="&amp;#177;" hex="&amp;#xB1;">
+			<description>Plus-or-minus sign.</description>
+			<example>&amp;plusmn;</example>
+		</entity>
+		
+		<entity name="&amp;sup2;" decimal="&amp;#178;" hex="&amp;#xB2;">
+			<description>Superscript "2". (Squared.)</description>
+			<example>&amp;sup2;</example>
+		</entity>
+		
+		<entity name="&amp;sup3;" decimal="&amp;#179;" hex="&amp;#xB3;">
+			<description>Superscript "3". (Cubed.)</description>
+			<example>&amp;sup3;</example>
+		</entity>
+		
+		<entity name="&amp;acute;" decimal="&amp;#180;" hex="&amp;#xB4;">
+			<description>Accute accent.</description>
+			<example>&amp;acute;</example>
+		</entity>
+		
+		<entity name="&amp;micro;" decimal="&amp;#181;" hex="&amp;#xB5;">
+			<description>Micro sign.</description>
+			<example>&amp;micro;</example>
+		</entity>
+		
+		<entity name="&amp;para;" decimal="&amp;#182;" hex="&amp;#xB6;">
+			<description>Paragraph sign.</description>
+			<example>&amp;para;</example>
+		</entity>
+		
+		<entity name="&amp;middot;" decimal="&amp;#183;" hex="&amp;#xB7;">
+			<description>Middle dot.</description>
+			<example>&amp;middot;</example>
+		</entity>
+		
+		<entity name="&amp;cedil;" decimal="&amp;#184;" hex="&amp;#xB8;">
+			<description>Cedilla.</description>
+			<example>&amp;cedil;</example>
+		</entity>
+		
+		<entity name="&amp;sup1;" decimal="&amp;#185;" hex="&amp;#xB9;">
+			<description>Superscript "1".</description>
+			<example>&amp;sup1;</example>
+		</entity>
+		
+		<entity name="&amp;ordm;" decimal="&amp;#186;" hex="&amp;#xBA;">
+			<description>Masculine ordinal indicator.</description>
+			<example>&amp;ordm;</example>
+		</entity>
+		
+		<entity name="&amp;raquo;" decimal="&amp;#187;" hex="&amp;#xBB;">
+			<description>Right angle quotation marks.</description>
+			<example>&amp;raquo;</example>
+		</entity>
+		
+		<entity name="&amp;frac14;" decimal="&amp;#188;" hex="&amp;#xBC;">
+			<description>Vulgar fraction for 1/4.</description>
+			<example>&amp;frac14;</example>
+		</entity>
+		
+		<entity name="&amp;frac12;" decimal="&amp;#189;" hex="&amp;#xBD;">
+			<description>Vulgar fraction for 1/2.</description>
+			<example>&amp;frac12;</example>
+		</entity>
+		
+		<entity name="&amp;frac34;" decimal="&amp;#190;" hex="&amp;#xBE;">
+			<description>Vulgar fraction for 3/4.</description>
+			<example>&amp;frac34;</example>
+		</entity>
+		
+		<entity name="&amp;iquest;" decimal="&amp;#191;" hex="&amp;#xBF;">
+			<description>Inverted question mark.</description>
+			<example>&amp;iquest;</example>
+		</entity>
+		
+		<entity name="&amp;Agrave;" decimal="&amp;#192;" hex="&amp;#xC0;">
+			<description>A with grave accent.</description>
+			<example>&amp;Agrave;</example>
+		</entity>
+		
+		<entity name="&amp;Aacute;" decimal="&amp;#193;" hex="&amp;#xC1;">
+			<description>A with acute accent.</description>
+			<example>&amp;Aacute;</example>
+		</entity>
+		
+		<entity name="&amp;Acirc;" decimal="&amp;#194;" hex="&amp;#xC2;">
+			<description>A with circumflex accent.</description>
+			<example>&amp;Acirc;</example>
+		</entity>
+		
+		<entity name="&amp;Atilde;" decimal="&amp;#195;" hex="&amp;#xC3;">
+			<description>A with tilde accent.</description>
+			<example>&amp;Atilde;</example>
+		</entity>
+		
+		<entity name="&amp;Auml;" decimal="&amp;#196;" hex="&amp;#xC4;">
+			<description>A with umlaut.</description>
+			<example>&amp;Auml;</example>
+		</entity>
+		
+		<entity name="&amp;Aring;" decimal="&amp;#197;" hex="&amp;#xC5;">
+			<description>A with ring above.</description>
+			<example>&amp;Aring;</example>
+		</entity>
+		
+		<entity name="&amp;AElig;" decimal="&amp;#198;" hex="&amp;#xC6;">
+			<description>AE Ligature.</description>
+			<example>&amp;AElig;</example>
+		</entity>
+		
+		<entity name="&amp;Ccedil;" decimal="&amp;#199;" hex="&amp;#xC7;">
+			<description>C with cedilla.</description>
+			<example>&amp;Ccedil;</example>
+		</entity>
+		
+		<entity name="&amp;Egrave;" decimal="&amp;#200;" hex="&amp;#xC8;">
+			<description>E with grave accent.</description>
+			<example>&amp;Egrave;</example>
+		</entity>
+		
+		<entity name="&amp;Eacute;" decimal="&amp;#201;" hex="&amp;#xC9;">
+			<description>E with acute accent.</description>
+			<example>&amp;Eacute;</example>
+		</entity>
+		
+		<entity name="&amp;Ecirc;" decimal="&amp;#202;" hex="&amp;#xCA;">
+			<description>E with circumflex accent.</description>
+			<example>&amp;Ecirc;</example>
+		</entity>
+		
+		<entity name="&amp;Euml;" decimal="&amp;#203;" hex="&amp;#xCB;">
+			<description>E with umlaut.</description>
+			<example>&amp;Euml;</example>
+		</entity>
+		
+		<entity name="&amp;Igrave;" decimal="&amp;#204;" hex="&amp;#xCC;">
+			<description>I with grave accent.</description>
+			<example>&amp;Igrave;</example>
+		</entity>
+		
+		<entity name="&amp;Iacute;" decimal="&amp;#205;" hex="&amp;#xCD;">
+			<description>I with acute accent.</description>
+			<example>&amp;Iacute;</example>
+		</entity>
+		
+		<entity name="&amp;Icirc;" decimal="&amp;#206;" hex="&amp;#xCE;">
+			<description>I with circumflex accent.</description>
+			<example>&amp;Icirc;</example>
+		</entity>
+		
+		<entity name="&amp;Iuml;" decimal="&amp;#207;" hex="&amp;#xCF;">
+			<description>I with umlaut.</description>
+			<example>&amp;Iuml;</example>
+		</entity>
+		
+		<entity name="&amp;ETH;" decimal="&amp;#208;" hex="&amp;#xD0;">
+			<description>ETH.</description>
+			<example>&amp;ETH;</example>
+		</entity>
+		
+		<entity name="&amp;Ntilde;" decimal="&amp;#209;" hex="&amp;#xD1;">
+			<description>N with tilde.</description>
+			<example>&amp;Ntilde;</example>
+		</entity>
+		
+		<entity name="&amp;Ograve;" decimal="&amp;#210;" hex="&amp;#xD2;">
+			<description>O with grave accent.</description>
+			<example>&amp;Ograve;</example>
+		</entity>
+		
+		<entity name="&amp;Oacute;" decimal="&amp;#211;" hex="&amp;#xD3;">
+			<description>O with acute accent.</description>
+			<example>&amp;Oacute;</example>
+		</entity>
+		
+		<entity name="&amp;Ocirc;" decimal="&amp;#212;" hex="&amp;#xD4;">
+			<description>O with circumflex accent.</description>
+			<example>&amp;Ocirc;</example>
+		</entity>
+		
+		<entity name="&amp;Otilde;" decimal="&amp;#213;" hex="&amp;#xD5;">
+			<description>O with tilde.</description>
+			<example>&amp;Otilde;</example>
+		</entity>
+		
+		<entity name="&amp;Ouml;" decimal="&amp;#214;" hex="&amp;#xD6;">
+			<description>O with umlaut.</description>
+			<example>&amp;Ouml;</example>
+		</entity>
+		
+		<entity name="&amp;times;" decimal="&amp;#215;" hex="&amp;#xD7;">
+			<description>Mulitplication sign.</description>
+			<example>&amp;times;</example>
+		</entity>
+		
+		<entity name="&amp;Oslash;" decimal="&amp;#216;" hex="&amp;#xD8;">
+			<description>O with slash.</description>
+			<example>&amp;Oslash;</example>
+		</entity>
+		
+		<entity name="&amp;Ugrave;" decimal="&amp;#217;" hex="&amp;#xD9;">
+			<description>U with grave accent.</description>
+			<example>&amp;Ugrave;</example>
+		</entity>
+		
+		<entity name="&amp;Uacute;" decimal="&amp;#218;" hex="&amp;#xDA;">
+			<description>U with acute accent.</description>
+			<example>&amp;Uacute;</example>
+		</entity>
+		
+		<entity name="&amp;Ucirc;" decimal="&amp;#219;" hex="&amp;#xDB;">
+			<description>U with circumflex accent.</description>
+			<example>&amp;Ucirc;</example>
+		</entity>
+		
+		<entity name="&amp;Uuml;" decimal="&amp;#220;" hex="&amp;#xDC;">
+			<description>U with umlaut.</description>
+			<example>&amp;Uuml;</example>
+		</entity>
+		
+		<entity name="&amp;Yacute;" decimal="&amp;#221;" hex="&amp;#xDD;">
+			<description>Y with acute accent.</description>
+			<example>&amp;Yacute;</example>
+		</entity>
+		
+		<entity name="&amp;THORN;" decimal="&amp;#222;" hex="&amp;#xDE;">
+			<description>THORN.</description>
+			<example>&amp;THORN;</example>
+		</entity>
+		
+		<entity name="&amp;szlig;" decimal="&amp;#223;" hex="&amp;#xDF;">
+			<description>Sz ligature.</description>
+			<example>&amp;szlig;</example>
+		</entity>
+		
+		<entity name="&amp;agrave;" decimal="&amp;#224;" hex="&amp;#xE0;">
+			<description>a with grave accent.</description>
+			<example>&amp;agrave;</example>
+		</entity>
+		
+		<entity name="&amp;aacute;" decimal="&amp;#225;" hex="&amp;#xE1;">
+			<description>a with acute accent.</description>
+			<example>&amp;aacute;</example>
+		</entity>
+		
+		<entity name="&amp;acirc;" decimal="&amp;#226;" hex="&amp;#xE2;">
+			<description>a with circumflex accent.</description>
+			<example>&amp;acirc;</example>
+		</entity>
+		
+		<entity name="&amp;atilde;" decimal="&amp;#227;" hex="&amp;#xE3;">
+			<description>a with tilde.</description>
+			<example>&amp;atilde;</example>
+		</entity>
+		
+		<entity name="&amp;auml;" decimal="&amp;#228;" hex="&amp;#xE4;">
+			<description>a with umlaut.</description>
+			<example>&amp;auml;</example>
+		</entity>
+		
+		<entity name="&amp;aring;" decimal="&amp;#229;" hex="&amp;#xE5;">
+			<description>a with ring.</description>
+			<example>&amp;aring;</example>
+		</entity>
+		
+		<entity name="&amp;aelig;" decimal="&amp;#230;" hex="&amp;#xE6;">
+			<description>ae ligature.</description>
+			<example>&amp;aelig;</example>
+		</entity>
+		
+		<entity name="&amp;ccedil;" decimal="&amp;#231;" hex="&amp;#xE7;">
+			<description>c with cedilla.</description>
+			<example>&amp;ccedil;</example>
+		</entity>
+		
+		<entity name="&amp;egrave;" decimal="&amp;#232;" hex="&amp;#xE8;">
+			<description>e with grave accent.</description>
+			<example>&amp;egrave;</example>
+		</entity>
+		
+		<entity name="&amp;eacute;" decimal="&amp;#233;" hex="&amp;#xE9;">
+			<description>e with acute accent.</description>
+			<example>&amp;eacute;</example>
+		</entity>
+		
+		<entity name="&amp;ecirc;" decimal="&amp;#234;" hex="&amp;#xEA;">
+			<description>e with circumflex accent.</description>
+			<example>&amp;ecirc;</example>
+		</entity>
+		
+		<entity name="&amp;euml;" decimal="&amp;#235;" hex="&amp;#xEB;">
+			<description>e with umlaut.</description>
+			<example>&amp;euml;</example>
+		</entity>
+		
+		<entity name="&amp;igrave;" decimal="&amp;#236;" hex="&amp;#xEC;">
+			<description>i with grave accent.</description>
+			<example>&amp;igrave;</example>
+		</entity>
+		
+		<entity name="&amp;iacute;" decimal="&amp;#237;" hex="&amp;#xED;">
+			<description>i with acute accent.</description>
+			<example>&amp;iacute;</example>
+		</entity>
+		
+		<entity name="&amp;icirc;" decimal="&amp;#238;" hex="&amp;#xEE;">
+			<description>i with circumflex accent.</description>
+			<example>&amp;icirc;</example>
+		</entity>
+		
+		<entity name="&amp;iuml;" decimal="&amp;#239;" hex="&amp;#xEF;">
+			<description>i with umlaut.</description>
+			<example>&amp;iuml;</example>
+		</entity>
+		
+		<entity name="&amp;eth;" decimal="&amp;#240;" hex="&amp;#xF0;">
+			<description>eth.</description>
+			<example>&amp;eth;</example>
+		</entity>
+		
+		<entity name="&amp;ntilde;" decimal="&amp;#241;" hex="&amp;#xF1;">
+			<description>n with tilde.</description>
+			<example>&amp;ntilde;</example>
+		</entity>
+		
+		<entity name="&amp;ograve;" decimal="&amp;#242;" hex="&amp;#xF2;">
+			<description>o with grave accent.</description>
+			<example>&amp;ograve;</example>
+		</entity>
+		
+		<entity name="&amp;oacute;" decimal="&amp;#244;" hex="&amp;#xF3;">
+			<description>o with acute accent.</description>
+			<example>&amp;oacute;</example>
+		</entity>
+		
+		<entity name="&amp;ocirc;" decimal="&amp;#245;" hex="&amp;#xF4;">
+			<description>o with circumflex accent.</description>
+			<example>&amp;ocirc;</example>
+		</entity>
+		
+		<entity name="&amp;otilde;" decimal="&amp;#246;" hex="&amp;#xF5;">
+			<description>o with tilde.</description>
+			<example>&amp;otilde;</example>
+		</entity>
+		
+		<entity name="&amp;ouml;" decimal="&amp;#247;" hex="&amp;#xF6;">
+			<description>o with umlaut.</description>
+			<example>&amp;ouml;</example>
+		</entity>
+		
+		<entity name="&amp;divide;" decimal="&amp;#248;" hex="&amp;#xF7;">
+			<description>Division sign.</description>
+			<example>&amp;divide;</example>
+		</entity>
+		
+		<entity name="&amp;oslash;" decimal="&amp;#249;" hex="&amp;#xF8;">
+			<description>o with slash through it.</description>
+			<example>&amp;oslash;</example>
+		</entity>
+		
+		<entity name="&amp;ugrave;" decimal="&amp;#250;" hex="&amp;#xF9;">
+			<description>u with grave accent.</description>
+			<example>&amp;ugrave;</example>
+		</entity>
+		
+		<entity name="&amp;uacute;" decimal="&amp;#251;" hex="&amp;#xFA;">
+			<description>u with acute accent.</description>
+			<example>&amp;uacute;</example>
+		</entity>
+		
+		<entity name="&amp;ucirc;" decimal="&amp;#251;" hex="&amp;#xFB;">
+			<description>u with circumflex accent.</description>
+			<example>&amp;ucirc;</example>
+		</entity>
+		
+		<entity name="&amp;uuml;" decimal="&amp;#252;" hex="&amp;#xFC;">
+			<description>u with umlaut.</description>
+			<example>&amp;uuml;</example>
+		</entity>
+		
+		<entity name="&amp;yacute;" decimal="&amp;#253;" hex="&amp;#xFD;">
+			<description>y with acute accent.</description>
+			<example>&amp;yacute;</example>
+		</entity>
+		
+		<entity name="&amp;thorn;" decimal="&amp;#254;" hex="&amp;#xFE;">
+			<description>thorn.</description>
+			<example>&amp;thorn;</example>
+		</entity>
+		
+		<entity name="&amp;yuml;" decimal="&amp;#255;" hex="&amp;#xFF;">
+			<description>y with umlaut.</description>
+			<example>&amp;yuml;</example>
+		</entity>
+		
+		<entity name="&amp;ndash;" decimal="&amp;#8211;" hex="&amp;#x2013;">
+			<description>En dash.</description>
+			<example>&amp;ndash;</example>
+		</entity>
+		
+		<entity name="&amp;mdash;" decimal="&amp;#8212;" hex="&amp;#x2014;">
+			<description>Em dash.</description>
+			<example>&amp;mdash;</example>
+		</entity>
+		
+		<entity name="&amp;lsquo;" decimal="&amp;#8216;" hex="&amp;#x2018;">
+			<description>Left single quote.</description>
+			<example>&amp;lsquo;</example>
+		</entity>
+		
+		<entity name="&amp;rsquo;" decimal="&amp;#8217;" hex="&amp;#x2019;">
+			<description>Right single quote.</description>
+			<example>&amp;rsquo;</example>
+		</entity>
+		
+		<entity name="&amp;ldquo;" decimal="&amp;#8220;" hex="&amp;#x201C;">
+			<description>Left double quote.</description>
+			<example>&amp;ldquo;</example>
+		</entity>
+		
+		<entity name="&amp;rdquo;" decimal="&amp;#8221;" hex="&amp;#x201D;">
+			<description>Right double quote.</description>
+			<example>&amp;rdquo;</example>
+		</entity>
+		
+		<entity name="&amp;euro;" decimal="&amp;#8364;" hex="&amp;#x20AC;">
+			<description>Euro sign.</description>
+			<example>&amp;euro;</example>
+		</entity>
+		
+		<entity name="&amp;sbquo;" decimal="&amp;#8218;" hex="&amp;#x201A;">
+			<description>Single low-9 quotation mark.</description>
+			<example>&amp;sbquo;</example>
+		</entity>
+		
+		<entity name="&amp;bdquo;" decimal="&amp;#8222;" hex="&amp;#x201E;">
+			<description>Double low-9 quotation mark.</description>
+			<example>&amp;bdquo;</example>
+		</entity>
+		
+		<entity name="&amp;dagger;" decimal="&amp;#8224;" hex="&amp;#x2020;">
+			<description>Dagger.</description>
+			<example>&amp;dagger;</example>
+		</entity>
+		
+		<entity name="&amp;Dagger;" decimal="&amp;#8225;" hex="&amp;#x2021;">
+			<description>Double dagger.</description>
+			<example>&amp;Dagger;</example>
+		</entity>
+		
+		<entity name="&amp;permil;" decimal="&amp;#8240;" hex="&amp;#x2030;">
+			<description>Per mille sign.</description>
+			<example>&amp;permil;</example>
+		</entity>
+		
+		<entity name="&amp;lsaquo;" decimal="&amp;#8249;" hex="&amp;#x2039;">
+			<description>Left-pointing angle quote.</description>
+			<example>&amp;lsaquo;</example>
+		</entity>
+		
+		<entity name="&amp;rsaquo;" decimal="&amp;#8250;" hex="&amp;#x203A;">
+			<description>Right-pointing angle quote.</description>
+			<example>&amp;rsaquo;</example>
+		</entity>
+		
+		<entity name="&amp;OElig;" decimal="&amp;#338;" hex="&amp;#x152;">
+			<description>OE ligature.</description>
+			<example>&amp;OElig;</example>
+		</entity>
+		
+		<entity name="&amp;oelig;" decimal="&amp;#339;" hex="&amp;#x153;">
+			<description>oe ligature.</description>
+			<example>&amp;oelig;</example>
+		</entity>
+		
+		<entity name="&amp;Scaron;" decimal="&amp;#352;" hex="&amp;#x160;">
+			<description>S with caron.</description>
+			<example>&amp;Scaron;</example>
+		</entity>
+		
+		<entity name="&amp;scaron;" decimal="&amp;#353;" hex="&amp;#x161;">
+			<description>s with caron.</description>
+			<example>&amp;scaron;</example>
+		</entity>
+		
+		<entity name="&amp;Yuml;" decimal="&amp;#376;" hex="&amp;#x178;">
+			<description>Y with umlaut.</description>
+			<example>&amp;Yuml;</example>
+		</entity>
+		
+		<entity name="&amp;circ;" decimal="&amp;#710;" hex="&amp;#x2C6;">
+			<description>Circumflex accent.</description>
+			<example>&amp;circ;</example>
+		</entity>
+		
+		<entity name="&amp;tilde" decimal="&amp;#732;" hex="&amp;#x2DC;">
+			<description>Tilde (small).</description>
+			<example>&amp;tilde</example>
+		</entity>
+		
+		<entity name="&amp;ensp;" decimal="&amp;#8194;" hex="&amp;#x2002;">
+			<description>En space.</description>
+			<example>&amp;ensp;</example>
+		</entity>
+		
+		<entity name="&amp;emsp;" decimal="&amp;#8195;" hex="&amp;#x2003;">
+			<description>Em space.</description>
+			<example>&amp;emsp;</example>
+		</entity>
+		
+		<entity name="&amp;thinsp;" decimal="&amp;#8201;" hex="&amp;#x2009;">
+			<description>Thin space.</description>
+			<example>&amp;thinsp;</example>
+		</entity>
+		
+		<entity name="&amp;zwnj;" decimal="&amp;#8204;" hex="&amp;#x200C;">
+			<description>Zero-width non-joiner.</description>
+			<example>&amp;zwnj;</example>
+		</entity>
+		
+		<entity name="&amp;zwj;" decimal="&amp;#8205;" hex="&amp;#x200D;">
+			<description>Zero-width joiner.</description>
+			<example>&amp;zwj;</example>
+		</entity>
+		
+		<entity name="&amp;lrm;" decimal="&amp;#8206;" hex="&amp;#x200E;">
+			<description>Left-to-right mark.</description>
+			<example>&amp;lrm;</example>
+		</entity>
+		
+		<entity name="&amp;rlm;" decimal="&amp;#8207;" hex="&amp;#x200F;">
+			<description>Right-to-left mark.</description>
+			<example>&amp;rlm;</example>
+		</entity>
+		
+		<entity name="&amp;fnof;" decimal="&amp;#402;" hex="&amp;#x192;">
+			<description>f with hook (florin or function).</description>
+			<example>&amp;fnof;</example>
+		</entity>
+		
+		<entity name="&amp;Alpha;" decimal="&amp;#913;" hex="&amp;#x391;">
+			<description>Alpha</description>
+			<example>&amp;Alpha;</example>
+		</entity>
+		
+		<entity name="&amp;Beta;" decimal="&amp;#914;" hex="&amp;#x392;">
+			<description>Beta</description>
+			<example>&amp;Beta;</example>
+		</entity>
+		
+		<entity name="&amp;Gamma;" decimal="&amp;#915;" hex="&amp;#x393;">
+			<description>Gamma</description>
+			<example>&amp;Gamma;</example>
+		</entity>
+		
+		<entity name="&amp;Delta;" decimal="&amp;#916;" hex="&amp;#x394;">
+			<description>Delta</description>
+			<example>&amp;Delta;</example>
+		</entity>
+		
+		<entity name="&amp;Epsilon;" decimal="&amp;#917;" hex="&amp;#x395;">
+			<description>Epsilon</description>
+			<example>&amp;Epsilon;</example>
+		</entity>
+		
+		<entity name="&amp;Zeta;" decimal="&amp;#918;" hex="&amp;#x396;">
+			<description>Zeta</description>
+			<example>&amp;Zeta;</example>
+		</entity>
+		
+		<entity name="&amp;Eta;" decimal="&amp;#919;" hex="&amp;#x397;">
+			<description>Eta</description>
+			<example>&amp;Eta;</example>
+		</entity>
+		
+		<entity name="&amp;Theta;" decimal="&amp;#920;" hex="&amp;#x398;">
+			<description>Theta</description>
+			<example>&amp;Theta;</example>
+		</entity>
+		
+		<entity name="&amp;Iota;" decimal="&amp;#921;" hex="&amp;#x399;">
+			<description>Iota</description>
+			<example>&amp;Iota;</example>
+		</entity>
+		
+		<entity name="&amp;Kappa;" decimal="&amp;#922;" hex="&amp;#x39A;">
+			<description>Kappa</description>
+			<example>&amp;Kappa;</example>
+		</entity>
+		
+		<entity name="&amp;Lambda;" decimal="&amp;#923;" hex="&amp;#x39B;">
+			<description>Lambda</description>
+			<example>&amp;Lambda;</example>
+		</entity>
+		
+		<entity name="&amp;Mu;" decimal="&amp;#924;" hex="&amp;#x39C;">
+			<description>Mu</description>
+			<example>&amp;Mu;</example>
+		</entity>
+		
+		<entity name="&amp;Nu;" decimal="&amp;#925;" hex="&amp;#x39D;">
+			<description>Nu</description>
+			<example>&amp;Nu;</example>
+		</entity>
+		
+		<entity name="&amp;Xi;" decimal="&amp;#926;" hex="&amp;#x39E;">
+			<description>Xi</description>
+			<example>&amp;Xi;</example>
+		</entity>
+		
+		<entity name="&amp;Omicron;" decimal="&amp;#927;" hex="&amp;#x39F;">
+			<description>Omicron</description>
+			<example>&amp;Omicron;</example>
+		</entity>
+		
+		<entity name="&amp;Pi;" decimal="&amp;#928;" hex="&amp;#x3A0;">
+			<description>Pi</description>
+			<example>&amp;Pi;</example>
+		</entity>
+		
+		<entity name="&amp;Rho;" decimal="&amp;#929;" hex="&amp;#x3A1;">
+			<description>Rho</description>
+			<example>&amp;Rho;</example>
+		</entity>
+		
+		<entity name="&amp;Sigma;" decimal="&amp;#931;" hex="&amp;#x3A3;">
+			<description>Sigma</description>
+			<example>&amp;Sigma;</example>
+		</entity>
+		
+		<entity name="&amp;Tau;" decimal="&amp;#932;" hex="&amp;#x3A4;">
+			<description>Tau</description>
+			<example>&amp;Tau;</example>
+		</entity>
+		
+		<entity name="&amp;Upsilon;" decimal="&amp;#933;" hex="&amp;#x3A5;">
+			<description>Upsilon</description>
+			<example>&amp;Upsilon;</example>
+		</entity>
+		
+		<entity name="&amp;Phi;" decimal="&amp;#934;" hex="&amp;#x3A6;">
+			<description>Phi</description>
+			<example>&amp;Phi;</example>
+		</entity>
+		
+		<entity name="&amp;Chi;" decimal="&amp;#935;" hex="&amp;#x3A7;">
+			<description>Chi</description>
+			<example>&amp;Chi;</example>
+		</entity>
+		
+		<entity name="&amp;Psi;" decimal="&amp;#936;" hex="&amp;#x3A8;">
+			<description>Psi</description>
+			<example>&amp;Psi;</example>
+		</entity>
+		
+		<entity name="&amp;Omega;" decimal="&amp;#937;" hex="&amp;#x3A9;">
+			<description>Omega</description>
+			<example>&amp;Omega;</example>
+		</entity>
+		
+		<entity name="&amp;alpha;" decimal="&amp;#945;" hex="&amp;#x3B1;">
+			<description>alpha</description>
+			<example>&amp;alpha;</example>
+		</entity>
+		
+		<entity name="&amp;beta;" decimal="&amp;#946;" hex="&amp;#x3B2;">
+			<description>beta</description>
+			<example>&amp;beta;</example>
+		</entity>
+		
+		<entity name="&amp;gamma;" decimal="&amp;#947;" hex="&amp;#x3B3;">
+			<description>gamma</description>
+			<example>&amp;gamma;</example>
+		</entity>
+		
+		<entity name="&amp;delta;" decimal="&amp;#948;" hex="&amp;#x3B4;">
+			<description>delta</description>
+			<example>&amp;delta;</example>
+		</entity>
+		
+		<entity name="&amp;epsilon;" decimal="&amp;#949;" hex="&amp;#x3B5;">
+			<description>epsilon</description>
+			<example>&amp;epsilon;</example>
+		</entity>
+		
+		<entity name="&amp;zeta;" decimal="&amp;#950;" hex="&amp;#x3B6;">
+			<description>zeta</description>
+			<example>&amp;zeta;</example>
+		</entity>
+		
+		<entity name="&amp;eta;" decimal="&amp;#951;" hex="&amp;#x3B7;">
+			<description>eta</description>
+			<example>&amp;eta;</example>
+		</entity>
+		
+		<entity name="&amp;theta;" decimal="&amp;#952;" hex="&amp;#x3B8;">
+			<description>theta</description>
+			<example>&amp;theta;</example>
+		</entity>
+		
+		<entity name="&amp;iota;" decimal="&amp;#953;" hex="&amp;#x3B9;">
+			<description>iota</description>
+			<example>&amp;iota;</example>
+		</entity>
+		
+		<entity name="&amp;kappa;" decimal="&amp;#954;" hex="&amp;#x3BA;">
+			<description>kappa</description>
+			<example>&amp;kappa;</example>
+		</entity>
+		
+		<entity name="&amp;lambda;" decimal="&amp;#955;" hex="&amp;#x3BB;">
+			<description>lambda</description>
+			<example>&amp;lambda;</example>
+		</entity>
+		
+		<entity name="&amp;mu;" decimal="&amp;#956;" hex="&amp;#x3BC;">
+			<description>mu</description>
+			<example>&amp;mu;</example>
+		</entity>
+		
+		<entity name="&amp;nu;" decimal="&amp;#957;" hex="&amp;#x3BD;">
+			<description>nu</description>
+			<example>&amp;nu;</example>
+		</entity>
+		
+		<entity name="&amp;xi;" decimal="&amp;#958;" hex="&amp;#x3BE;">
+			<description>xi</description>
+			<example>&amp;xi;</example>
+		</entity>
+		
+		<entity name="&amp;omicron;" decimal="&amp;#959;" hex="&amp;#x3BF;">
+			<description>omicron</description>
+			<example>&amp;omicron;</example>
+		</entity>
+		
+		<entity name="&amp;pi;" decimal="&amp;#960;" hex="&amp;#x3C0;">
+			<description>pi</description>
+			<example>&amp;pi;</example>
+		</entity>
+		
+		<entity name="&amp;rho;" decimal="&amp;#961;" hex="&amp;#x3C1;">
+			<description>rho</description>
+			<example>&amp;rho;</example>
+		</entity>
+		
+		<entity name="&amp;sigmaf;" decimal="&amp;#962;" hex="&amp;#x3C2;">
+			<description>sigma - final</description>
+			<example>&amp;sigmaf;</example>
+		</entity>
+		
+		<entity name="&amp;sigma;" decimal="&amp;#963;" hex="&amp;#x3C3;">
+			<description>sigma</description>
+			<example>&amp;sigma;</example>
+		</entity>
+		
+		<entity name="&amp;tau;" decimal="&amp;#964;" hex="&amp;#x3C4;">
+			<description>tau</description>
+			<example>&amp;tau;</example>
+		</entity>
+		
+		<entity name="&amp;upsilon;" decimal="&amp;#965;" hex="&amp;#x3C5;">
+			<description>upsilon</description>
+			<example>&amp;upsilon;</example>
+		</entity>
+		
+		<entity name="&amp;phi;" decimal="&amp;#966;" hex="&amp;#x3C6;">
+			<description>phi</description>
+			<example>&amp;phi;</example>
+		</entity>
+		
+		<entity name="&amp;chi;" decimal="&amp;#967;" hex="&amp;#x3C7;">
+			<description>chi</description>
+			<example>&amp;chi;</example>
+		</entity>
+		
+		<entity name="&amp;psi;" decimal="&amp;#968;" hex="&amp;#x3C8;">
+			<description>psi</description>
+			<example>&amp;psi;</example>
+		</entity>
+		
+		<entity name="&amp;omega;" decimal="&amp;#969;" hex="&amp;#x3C9;">
+			<description>omega</description>
+			<example>&amp;omega;</example>
+		</entity>
+		
+		<entity name="&amp;thetasym;" decimal="&amp;#977;" hex="&amp;#x3D1;">
+			<description>theta symbol</description>
+			<example>&amp;thetasym;</example>
+		</entity>
+		
+		<entity name="&amp;upsih;" decimal="&amp;#978;" hex="&amp;#x3D2;">
+			<description>upsilon with hook symbol</description>
+			<example>&amp;upsih;</example>
+		</entity>
+		
+		<entity name="&amp;piv;" decimal="&amp;#982;" hex="&amp;#x3D6;">
+			<description>pi symbol</description>
+			<example>&amp;piv;</example>
+		</entity>
+		
+		<entity name="&amp;bull;" decimal="&amp;#8226;" hex="&amp;#x2022;">
+			<description>Bullet (small black circle).</description>
+			<example>&amp;bull;</example>
+		</entity>
+		
+		<entity name="&amp;hellip;" decimal="&amp;#8230;" hex="&amp;#x2026;">
+			<description>Horizontal ellipsis.</description>
+			<example>&amp;hellip;</example>
+		</entity>
+		
+		<entity name="&amp;prime;" decimal="&amp;#8242;" hex="&amp;#x2032;">
+			<description>Prime (minutes or feet).</description>
+			<example>&amp;prime;</example>
+		</entity>
+		
+		<entity name="&amp;Prime;" decimal="&amp;#8243;" hex="&amp;#x2033;">
+			<description>Double prime (seconds or inches).</description>
+			<example>&amp;Prime;</example>
+		</entity>
+		
+		<entity name="&amp;oline;" decimal="&amp;#8254;" hex="&amp;#x203E;">
+			<description>Overline.</description>
+			<example>&amp;oline;</example>
+		</entity>
+		
+		<entity name="&amp;frasl;" decimal="&amp;#8260;" hex="&amp;#x2044;">
+			<description>Fraction slash.</description>
+			<example>&amp;frasl;</example>
+		</entity>
+		
+		<entity name="&amp;weierp;" decimal="&amp;#8472;" hex="&amp;#x2118;">
+			<description>Weierstrass P. (Script P.)</description>
+			<example>&amp;weierp;</example>
+		</entity>
+		
+		<entity name="&amp;image;" decimal="&amp;#8465;" hex="&amp;#x2111;">
+			<description>Imaginary part symbol. (Script I.)</description>
+			<example>&amp;image;</example>
+		</entity>
+		
+		<entity name="&amp;real;" decimal="&amp;#8476;" hex="&amp;#x211C;">
+			<description>Real part symbol. (Script R.)</description>
+			<example>&amp;real;</example>
+		</entity>
+		
+		<entity name="&amp;trade;" decimal="&amp;#8482;" hex="&amp;#x2122;">
+			<description>Trademark sign.</description>
+			<example>&amp;trade;</example>
+		</entity>
+		
+		<entity name="&amp;alefsym;" decimal="&amp;#8501;" hex="&amp;#x2135;">
+			<description>Alef symbol.</description>
+			<example>&amp;alefsym;</example>
+		</entity>
+		
+		<entity name="&amp;larr;" decimal="&amp;#8592;" hex="&amp;#x2190;">
+			<description>Left pointing arrow.</description>
+			<example>&amp;larr;</example>
+		</entity>
+		
+		<entity name="&amp;uarr;" decimal="&amp;#8593;" hex="&amp;#x2191;">
+			<description>Up pointing arrow.</description>
+			<example>&amp;uarr;</example>
+		</entity>
+		
+		<entity name="&amp;rarr;" decimal="&amp;#8594;" hex="&amp;#x2192;">
+			<description>Right pointing arrow.</description>
+			<example>&amp;rarr;</example>
+		</entity>
+		
+		<entity name="&amp;darr;" decimal="&amp;#8595;" hex="&amp;#x2193;">
+			<description>Down pointing arrow.</description>
+			<example>&amp;darr;</example>
+		</entity>
+		
+		<entity name="&amp;harr;" decimal="&amp;#8596;" hex="&amp;#x2194;">
+			<description>Left-right double arrow.</description>
+			<example>&amp;harr;</example>
+		</entity>
+		
+		<entity name="&amp;crarr;" decimal="&amp;#8629;" hex="&amp;#x21B5;">
+			<description>Carriage return.</description>
+			<example>&amp;crarr;</example>
+		</entity>
+		
+		<entity name="&amp;lArr;" decimal="&amp;#8656;" hex="&amp;#x21D0;">
+			<description>Left pointing double arrow.</description>
+			<example>&amp;lArr;</example>
+		</entity>
+		
+		<entity name="&amp;uArr;" decimal="&amp;#8657;" hex="&amp;#x21D1;">
+			<description>Up pointing double arrow.</description>
+			<example>&amp;uArr;</example>
+		</entity>
+		
+		<entity name="&amp;rArr;" decimal="&amp;#8658;" hex="&amp;#x21D2;">
+			<description>Right pointing double arrow.</description>
+			<example>&amp;rArr;</example>
+		</entity>
+		
+		<entity name="&amp;dArr;" decimal="&amp;#8659;" hex="&amp;#x21D3;">
+			<description>Down pointing double arrow.</description>
+			<example>&amp;dArr;</example>
+		</entity>
+		
+		<entity name="&amp;hArr;" decimal="&amp;#8660;" hex="&amp;#x21D4;">
+			<description>Left-right horizontal double arrow.</description>
+			<example>&amp;hArr;</example>
+		</entity>
+		
+		<entity name="&amp;forall;" decimal="&amp;#8704;" hex="&amp;#x2200;">
+			<description>For all.</description>
+			<example>&amp;forall;</example>
+		</entity>
+		
+		<entity name="&amp;part;" decimal="&amp;#8706;" hex="&amp;#x2202;">
+			<description>Partial differential.</description>
+			<example>&amp;part;</example>
+		</entity>
+		
+		<entity name="&amp;exist;" decimal="&amp;#8707;" hex="&amp;#x2203;">
+			<description>There exists.</description>
+			<example>&amp;exist;</example>
+		</entity>
+		
+		<entity name="&amp;empty;" decimal="&amp;#8709;" hex="&amp;#x2205;">
+			<description>Empty or null set.</description>
+			<example>&amp;empty;</example>
+		</entity>
+		
+		<entity name="&amp;nabla;" decimal="&amp;#8711;" hex="&amp;#x2207;">
+			<description>Backward difference.</description>
+			<example>&amp;nabla;</example>
+		</entity>
+		
+		<entity name="&amp;isin;" decimal="&amp;#8712;" hex="&amp;#x2208;">
+			<description>Is an element of.</description>
+			<example>&amp;isin;</example>
+		</entity>
+		
+		<entity name="&amp;notin;" decimal="&amp;#8713;" hex="&amp;#x2209;">
+			<description>Is not an element of.</description>
+			<example>&amp;notin;</example>
+		</entity>
+		
+		<entity name="&amp;ni;" decimal="&amp;#8715;" hex="&amp;#x220B;">
+			<description>Contains as a member.</description>
+			<example>&amp;ni;</example>
+		</entity>
+		
+		<entity name="&amp;prod;" decimal="&amp;#8719;" hex="&amp;#x220F;">
+			<description>Product sign (n-ary product).</description>
+			<example>&amp;prod;</example>
+		</entity>
+		
+		<entity name="&amp;sum;" decimal="&amp;#8721;" hex="&amp;#x2211;">
+			<description>Sumation sign (n-ary summation).</description>
+			<example>&amp;sum;</example>
+		</entity>
+		
+		<entity name="&amp;minus;" decimal="&amp;#8722;" hex="&amp;#x2212;">
+			<description>Minus sign.</description>
+			<example>&amp;minus;</example>
+		</entity>
+		
+		<entity name="&amp;lowast;" decimal="&amp;#8727;" hex="&amp;#x2217;">
+			<description>Asterisk operator.</description>
+			<example>&amp;lowast;</example>
+		</entity>
+		
+		<entity name="&amp;radic;" decimal="&amp;#8730;" hex="&amp;#x221A;">
+			<description>Radical sign (square root).</description>
+			<example>&amp;radic;</example>
+		</entity>
+		
+		<entity name="&amp;prop;" decimal="&amp;#8733;" hex="&amp;#x221D;">
+			<description>Proportional to.</description>
+			<example>&amp;prop;</example>
+		</entity>
+		
+		<entity name="&amp;infin;" decimal="&amp;#8734;" hex="&amp;#x221E;">
+			<description>Infinity.</description>
+			<example>&amp;infin;</example>
+		</entity>
+		
+		<entity name="&amp;ang;" decimal="&amp;#8736;" hex="&amp;#x2220;">
+			<description>Angle.</description>
+			<example>&amp;ang;</example>
+		</entity>
+		
+		<entity name="&amp;and;" decimal="&amp;#8743;" hex="&amp;#x2227;">
+			<description>Logical and.</description>
+			<example>&amp;and;</example>
+		</entity>
+		
+		<entity name="&amp;or;" decimal="&amp;#8744;" hex="&amp;#x2228;">
+			<description>Logical or.</description>
+			<example>&amp;or;</example>
+		</entity>
+		
+		<entity name="&amp;cap;" decimal="&amp;#8745;" hex="&amp;#x2229;">
+			<description>Intersection.</description>
+			<example>&amp;cap;</example>
+		</entity>
+		
+		<entity name="&amp;cup;" decimal="&amp;#8746;" hex="&amp;#x222A;">
+			<description>Union.</description>
+			<example>&amp;cup;</example>
+		</entity>
+		
+		<entity name="&amp;int;" decimal="&amp;#8747;" hex="&amp;#x222B;">
+			<description>Integral.</description>
+			<example>&amp;int;</example>
+		</entity>
+		
+		<entity name="&amp;there4;" decimal="&amp;#8756;" hex="&amp;#x2234;">
+			<description>Therefore.</description>
+			<example>&amp;there4;</example>
+		</entity>
+		
+		<entity name="&amp;sim;" decimal="&amp;#8764;" hex="&amp;#x223C;">
+			<description>Tilde operator (similar to).</description>
+			<example>&amp;sim;</example>
+		</entity>
+		
+		<entity name="&amp;cong;" decimal="&amp;#8773;" hex="&amp;#x2245;">
+			<description>Approximately equal to.</description>
+			<example>&amp;cong;</example>
+		</entity>
+		
+		<entity name="&amp;asymp;" decimal="&amp;#8776;" hex="&amp;#x2248;">
+			<description>Almost equal to.</description>
+			<example>asymp;</example>
+		</entity>
+		
+		<entity name="&amp;ne;" decimal="&amp;#8800;" hex="&amp;#x2260;">
+			<description>Not equal to.</description>
+			<example>&amp;ne;</example>
+		</entity>
+		
+		<entity name="&amp;equiv;" decimal="&amp;#8801;" hex="&amp;#x2261;">
+			<description>Identical to.</description>
+			<example>&amp;equiv;</example>
+		</entity>
+		
+		<entity name="&amp;le;" decimal="&amp;#8804;" hex="&amp;#x2264;">
+			<description>Less than or equal to.</description>
+			<example>&amp;le;</example>
+		</entity>
+		
+		<entity name="&amp;ge;" decimal="&amp;#8805;" hex="&amp;#x2265;">
+			<description>Greater than or equal to.</description>
+			<example>&amp;ge;</example>
+		</entity>
+		
+		<entity name="&amp;sub;" decimal="&amp;#8834;" hex="&amp;#x2282;">
+			<description>Subset of.</description>
+			<example>&amp;sub;</example>
+		</entity>
+		
+		<entity name="&amp;sup;" decimal="&amp;#8835;" hex="&amp;#x2283;">
+			<description>Superset of.</description>
+			<example>&amp;sup;</example>
+		</entity>
+		
+		<entity name="&amp;nsub;" decimal="&amp;#8836;" hex="&amp;#x2284;">
+			<description>Not a subset of.</description>
+			<example>&amp;nsub;</example>
+		</entity>
+		
+		<entity name="&amp;sube;" decimal="&amp;#8838;" hex="&amp;#x2286;">
+			<description>Subset of or equal to.</description>
+			<example>&amp;sube;</example>
+		</entity>
+		
+		<entity name="&amp;supe;" decimal="&amp;#8839;" hex="&amp;#x2287;">
+			<description>Superset of or equal to.</description>
+			<example>&amp;supe;</example>
+		</entity>
+		
+		<entity name="&amp;oplus;" decimal="&amp;#8853;" hex="&amp;#x2295;">
+			<description>Circled plus (direct sum).</description>
+			<example>&amp;oplus;</example>
+		</entity>
+		
+		<entity name="&amp;otimes;" decimal="&amp;#8855;" hex="&amp;#x2297;">
+			<description>Circled times (vector product).</description>
+			<example>&amp;otimes;</example>
+		</entity>
+		
+		<entity name="&amp;perp;" decimal="&amp;#8869;" hex="&amp;#x22A5;">
+			<description>Perpendicular to.</description>
+			<example>&amp;perp;</example>
+		</entity>
+		
+		<entity name="&amp;sdot;" decimal="&amp;#8901;" hex="&amp;#x22C5;">
+			<description>Dot operator.</description>
+			<example>&amp;sdot;</example>
+		</entity>
+		
+		<entity name="&amp;lceil;" decimal="&amp;#8968;" hex="&amp;#x2308;">
+			<description>Left ceiling.</description>
+			<example>&amp;lceil;</example>
+		</entity>
+		
+		<entity name="&amp;rceil;" decimal="&amp;#8969;" hex="&amp;#x2309;">
+			<description>Right ceiling.</description>
+			<example>&amp;rceil;</example>
+		</entity>
+		
+		<entity name="&amp;lfloor;" decimal="&amp;#8970;" hex="&amp;#x230A;">
+			<description>Left floor.</description>
+			<example>&amp;lfloor;</example>
+		</entity>
+		
+		<entity name="&amp;rfloor;" decimal="&amp;#8971;" hex="&amp;#x230B;">
+			<description>Right floor.</description>
+			<example>&amp;rfloor;</example>
+		</entity>
+		
+		<entity name="&amp;lang;" decimal="&amp;#9001;" hex="&amp;#x2329;">
+			<description>Left angle bracket.</description>
+			<example>&amp;lang;</example>
+		</entity>
+		
+		<entity name="&amp;rang;" decimal="&amp;#9002;" hex="&amp;#x232A;">
+			<description>Right angle bracket.</description>
+			<example>&amp;rang;</example>
+		</entity>
+		
+		<entity name="&amp;loz;" decimal="&amp;#9674;" hex="&amp;#x25CA;">
+			<description>Lozenge (diamond outline).</description>
+			<example>&amp;loz;</example>
+		</entity>
+		
+		<entity name="&amp;spades;" decimal="&amp;#9824;" hex="&amp;#x2660;">
+			<description>Spade suit.</description>
+			<example>&amp;spades;</example>
+		</entity>
+		
+		<entity name="&amp;clubs;" decimal="&amp;#9827;" hex="&amp;#x2663;">
+			<description>Club suit.</description>
+			<example>&amp;clubs;</example>
+		</entity>
+		
+		<entity name="&amp;hearts;" decimal="&amp;#9829;" hex="&amp;#x2665;">
+			<description>Heart suit.</description>
+			<example>&amp;hearts;</example>
+		</entity>
+		
+		<entity name="&amp;diams;" decimal="&amp;#9830;" hex="&amp;#x2666;">
+			<description>Diamond suit.</description>
+			<example>&amp;diams;</example>
+		</entity>
+	</entities>
+	
+	<escape-codes>
+	
+		<escape-code character=" " code="%20">
+			<description>Space</description>
+		</escape-code>
+		
+		<escape-code character="quotes" code="%22">
+			<description>&amp;quot; (Quotation marks.)</description>
+		</escape-code>
+		
+		<escape-code character="#" code="%23">
+			<description>Pound sign</description>
+		</escape-code>
+		
+		<escape-code character="$" code="%24">
+			<description>Dollar sign</description>
+		</escape-code>
+		
+		<escape-code character="%" code="%25">
+			<description>Percent sign</description>
+		</escape-code>
+		
+		<escape-code character="&amp;" code="%26">
+			<description>Ampersand</description>
+		</escape-code>
+		
+		<escape-code character="+" code="%2B">
+			<description>Plus sign.</description>
+		</escape-code>
+		
+		<escape-code character="," code="%2C">
+			<description>Comma</description>
+		</escape-code>
+		
+		<escape-code character="/" code="%2F">
+			<description>Forward slash</description>
+		</escape-code>
+		
+		<escape-code character=":" code="%3A">
+			<description>Colon</description>
+		</escape-code>
+		
+		<escape-code character=";" code="%3B">
+			<description>Semi-colon</description>
+		</escape-code>
+		
+		<escape-code character="&lt;" code="%3C">
+			<description>Less than symbol</description>
+		</escape-code>
+		
+		<escape-code character="=" code="%3D">
+			<description>Equal sign</description>
+		</escape-code>
+		
+		<escape-code character=">" code="%3E">
+			<description>Greater than symbol</description>
+		</escape-code>
+		
+		<escape-code character="?" code="%3F">
+			<description>Question mark</description>
+		</escape-code>
+		
+		<escape-code character="@" code="%40">
+			<description>"At" symbol</description>
+		</escape-code>
+		
+		<escape-code character="[" code="%5B">
+			<description>Left square bracket</description>
+		</escape-code>
+		
+		<escape-code character="\" code="%5C">
+			<description>Back slash</description>
+		</escape-code>
+		
+		<escape-code character="]" code="%5D">
+			<description>Right square bracket</description>
+		</escape-code>
+		
+		<escape-code character="^" code="%5E">
+			<description>Caret</description>
+		</escape-code>
+				
+		<escape-code character="`" code="%60">
+			<description>Grave accent</description>
+		</escape-code>
+		
+		<escape-code character="{" code="%7B">
+			<description>Left curly brace</description>
+		</escape-code>
+		
+		<escape-code character="|" code="%7C">
+			<description>Pipe</description>
+		</escape-code>
+		
+		<escape-code character="}" code="%7D">
+			<description>Right curly brace</description>
+		</escape-code>
+		
+		<escape-code character="~" code="%7E">
+			<description>Tilde</description>
+		</escape-code>
+	
+	</escape-codes>
+	
 </content-assist>

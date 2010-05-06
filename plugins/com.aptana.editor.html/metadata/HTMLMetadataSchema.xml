@@ -44,6 +44,8 @@
 		<child-element name="elements" />
 		<child-element name="attributes" />
 		<child-element name="events" />
+		<child-element name="entities" />
+		<child-element name="escape-codes" />
 	</element>
 	
 	<element name="elements">
@@ -64,7 +66,27 @@
 		<child-element name="references" />
         <child-element name="remarks" />
 	</element>
+	
+	<element name="entities">
+		<child-element name="entity"/>
+	</element>
+	
+	<element name="entity" onEnter="enterEntity" onExit="exitEntity">
+		<attribute name="name"/>
+		<attribute name="decimal"/>
+		<attribute name="hex"/>
+		<child-element name="description"/>
+	</element>
+	
+	<element name="escape-codes">
+		<child-element name="escape_code"/>
+	</element>
 
+	<element name="escape-code">
+		<attribute name="code"/>
+		<child-element name="description"/>
+	</element>
+	
 	<element name="events">
 		<child-element name="event" />
 	</element>
