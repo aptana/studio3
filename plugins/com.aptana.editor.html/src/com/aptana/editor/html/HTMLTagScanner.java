@@ -180,7 +180,7 @@ public class HTMLTagScanner extends RuleBasedScanner
 	 */
 	protected IToken createToken(HTMLTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 
 	/**

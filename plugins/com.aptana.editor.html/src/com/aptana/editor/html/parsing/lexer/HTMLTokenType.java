@@ -26,7 +26,7 @@ public enum HTMLTokenType implements ITypePredicate
 	TEXT("text");
 
 	private static final Map<String, HTMLTokenType> NAME_MAP;
-	private String _name;
+	private String _scope;
 
 	/**
 	 * static
@@ -37,29 +37,29 @@ public enum HTMLTokenType implements ITypePredicate
 
 		for (HTMLTokenType type : EnumSet.allOf(HTMLTokenType.class))
 		{
-			NAME_MAP.put(type.getName(), type);
+			NAME_MAP.put(type.getScope(), type);
 		}
 	}
 
 	/**
 	 * get
 	 * 
-	 * @param name
+	 * @param scope
 	 * @return
 	 */
-	public static final HTMLTokenType get(String name)
+	public static final HTMLTokenType get(String scope)
 	{
-		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
+		return (NAME_MAP.containsKey(scope)) ? NAME_MAP.get(scope) : UNDEFINED;
 	}
 
 	/**
 	 * CSSTokenTypes
 	 * 
-	 * @param name
+	 * @param scope
 	 */
-	private HTMLTokenType(String name)
+	private HTMLTokenType(String scope)
 	{
-		this._name = name;
+		this._scope = scope;
 	}
 
 	/**
@@ -67,9 +67,9 @@ public enum HTMLTokenType implements ITypePredicate
 	 * 
 	 * @return
 	 */
-	public String getName()
+	public String getScope()
 	{
-		return this._name;
+		return this._scope;
 	}
 
 	/*
@@ -87,6 +87,6 @@ public enum HTMLTokenType implements ITypePredicate
 	 */
 	public String toString()
 	{
-		return this.getName();
+		return this.getScope();
 	}
 }

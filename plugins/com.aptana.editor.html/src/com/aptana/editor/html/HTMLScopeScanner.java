@@ -41,7 +41,7 @@ public class HTMLScopeScanner extends HTMLTagScanner
 	 */
 	protected IToken createToken(HTMLTokenType type)
 	{
-		return this.createToken(type.getName());
+		return this.createToken(type.getScope());
 	}
 
 	/*
