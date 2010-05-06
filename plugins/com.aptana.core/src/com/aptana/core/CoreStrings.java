@@ -3,23 +3,23 @@ package com.aptana.core;
 public interface CoreStrings
 {
 
-	public static final String ADD = "Add";
+	public static final String ADD = Messages.CoreStrings_Add;
 
-	public static final String REMOVE = "Remove";
+	public static final String REMOVE = Messages.CoreStrings_Remove;
 
-	public static final String NEW = "New";
+	public static final String NEW = Messages.CoreStrings_New;
 
-	public static final String BROWSE = "Browse";
+	public static final String BROWSE = Messages.CoreStrings_Browse;
 
-	public static final String EDIT = "Edit";
+	public static final String EDIT = Messages.CoreStrings_Edit;
 
-	public static final String OPEN = "Open";
+	public static final String OPEN = Messages.CoreStrings_Open;
 
-	public static final String DELETE = "Delete";
+	public static final String DELETE = Messages.CoreStrings_Delete;
 
-	public static final String RENAME = "Rename";
+	public static final String RENAME = Messages.CoreStrings_Rename;
 
-	public static final String REFRESH = "Refresh";
+	public static final String REFRESH = Messages.CoreStrings_Refresh;
 
-	public static final String PROPERTIES = "Properties";
+	public static final String PROPERTIES = Messages.CoreStrings_Properties;
 }

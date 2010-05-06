@@ -55,6 +55,17 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String CoreStrings_Add;
+	public static String CoreStrings_Browse;
+	public static String CoreStrings_Delete;
+	public static String CoreStrings_Edit;
+	public static String CoreStrings_New;
+	public static String CoreStrings_Open;
+	public static String CoreStrings_Properties;
+	public static String CoreStrings_Refresh;
+	public static String CoreStrings_Remove;
+	public static String CoreStrings_Rename;
+
 	public static String PlatformUtils_CoreLibraryNotFound;
 
 	public static String URLEncoder_Cannot_Encode_URL;
