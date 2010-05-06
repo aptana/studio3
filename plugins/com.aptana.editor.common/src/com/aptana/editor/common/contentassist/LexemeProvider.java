@@ -1,6 +1,7 @@
 package com.aptana.editor.common.contentassist;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +16,7 @@ import org.eclipse.jface.text.rules.Token;
 import com.aptana.parsing.lexer.ITypePredicate;
 import com.aptana.parsing.lexer.Lexeme;
 
-public abstract class LexemeProvider<T extends ITypePredicate>
+public abstract class LexemeProvider<T extends ITypePredicate> implements Iterable<Lexeme<T>>
 {
 	private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.MULTILINE);
 
@@ -266,6 +267,14 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 	 */
 	protected abstract T getTypeFromName(String name);
 
+	/**
+	 * iterator
+	 */
+	public Iterator<Lexeme<T>> iterator()
+	{
+		return this._lexemes.iterator();
+	}
+	
 	/**
 	 * size
 	 * 
