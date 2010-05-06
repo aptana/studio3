@@ -40,6 +40,8 @@ public class CSSScopeScanner extends CSSCodeScanner
 		rules.add(new SingleCharacterRule('#', createToken(CSSTokenType.ID)));
 		rules.add(new SingleCharacterRule('.', createToken(CSSTokenType.CLASS)));
 		rules.add(new SingleCharacterRule(',', createToken(CSSTokenType.COMMA)));
+		rules.add(new SingleCharacterRule('/', createToken(CSSTokenType.SLASH)));
+		rules.add(new SingleCharacterRule('*', createToken(CSSTokenType.STAR)));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
