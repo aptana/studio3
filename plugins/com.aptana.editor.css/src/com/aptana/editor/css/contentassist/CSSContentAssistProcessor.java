@@ -106,18 +106,18 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (elements != null)
 		{
-			switch (this._currentLexeme.getType())
-			{
-				case CURLY_BRACE:
-				case SEMICOLON:
-				case COMMA:
-					offset = this._currentLexeme.getEndingOffset();
-					this._replaceRange = null;
-					break;
-					
-				default:
-					break;
-			}
+//			switch (this._currentLexeme.getType())
+//			{
+//				case CURLY_BRACE:
+//				case SEMICOLON:
+//				case COMMA:
+//					offset = this._currentLexeme.getEndingOffset();
+//					this._replaceRange = null;
+//					break;
+//					
+//				default:
+//					break;
+//			}
 			
 			for (ElementElement element : elements)
 			{
@@ -143,10 +143,16 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		if (properties != null)
 		{
 			// don't replace the semicolon when inserting a new property name
-			if (this._currentLexeme.getType() == CSSTokenType.SEMICOLON)
+			switch (this._currentLexeme.getType())
 			{
-				offset = this._currentLexeme.getEndingOffset();
-				this._replaceRange = null;
+				case SEMICOLON:
+				case CURLY_BRACE:
+					offset = this._currentLexeme.getEndingOffset();
+					this._replaceRange = null;
+					break;
+					
+				default:
+					break;
 			}
 			
 			for (PropertyElement property : properties)
@@ -241,19 +247,33 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addOutsideRuleProposals(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
-		switch (this._currentLexeme.getType())
+		if (this._currentLexeme != null && this._currentLexeme.getType() == CSSTokenType.COMMA)
 		{
-			case CLASS:
-				this.addClasses(proposals, offset);
-				break;
+			int index = lexemeProvider.getLexemeCeilingIndex(offset);
 
-			case ID:
-				this.addIDs(proposals, offset);
-				break;
-
-			default:
-				this.addAllElementProposals(proposals, offset);
-				break;
+			this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
+		}
+		
+		if (this._currentLexeme != null)
+		{
+			switch (this._currentLexeme.getType())
+			{
+				case CLASS:
+					this.addClasses(proposals, offset);
+					break;
+	
+				case ID:
+					this.addIDs(proposals, offset);
+					break;
+	
+				default:
+					this.addAllElementProposals(proposals, offset);
+					break;
+			}
+		}
+		else
+		{
+			this.addAllElementProposals(proposals, offset);
 		}
 	}
 
@@ -303,8 +323,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		int length = name.length();
 		String displayName = name;
 		IContextInformation contextInfo = null;
-
-		// TEMP:
 		int replaceLength = 0;
 
 		if (this._replaceRange != null)
@@ -363,7 +381,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		};
 
 		// store a reference to the lexeme at the current position
-		this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+		this._currentLexeme = lexemeProvider.getCeilingLexeme(offset);
 		
 		// replace the current lexeme by default. This may be adjusted as the
 		// CA context is fine-tuned below
@@ -421,7 +439,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		// TODO: these should be defined in a preference page
-		return new char[] { '.', '#', '{', ':', '\t' };
+		return new char[] { '.', '#', ':', '\t' };
 		// return new char[] { ':', '\t', '{', ';' };
 	}
 
