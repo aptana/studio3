@@ -42,9 +42,17 @@ public abstract class LexemeProvider<T extends ITypePredicate>
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
+			
+			/*
+			String partitionType = partition.getType();
+			int startingOffset = partition.getOffset();
+			int length = partition.getLength();
+			
+			System.out.println(partitionType + ": " + startingOffset + "-" + (startingOffset + length));
+			*/
 
-			// System.out.println(partition.getType());
 			scanner.setRange(document, partition.getOffset(), partition.getLength());
+			
 
 			// prime scanner
 			IToken token = scanner.nextToken();
