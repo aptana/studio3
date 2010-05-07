@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.aptana.core.CorePlugin;
+
 /**
  * A stream gobbler thread that reads from an InputStream, collects the read text, and allows retrieving it by calling
  * getResult, during, or at the end of the execution.
@@ -84,7 +86,7 @@ public class InputStreamGobbler extends Thread
 		}
 		catch (IOException ioe)
 		{
-			UtilPlugin.logError(ioe.getMessage(), ioe);
+			CorePlugin.logError(ioe.getMessage(), ioe);
 		}
 		finally
 		{

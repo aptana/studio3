@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.CorePlugin;
+
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
  * infrastructure or our terminal!
@@ -124,11 +126,11 @@ public abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			UtilPlugin.logError(e.getMessage(), e);
+			CorePlugin.logError(e.getMessage(), e);
 		}
 		catch (InterruptedException e)
 		{
-			UtilPlugin.logError(e.getMessage(), e);
+			CorePlugin.logError(e.getMessage(), e);
 		}
 		return null;
 	}

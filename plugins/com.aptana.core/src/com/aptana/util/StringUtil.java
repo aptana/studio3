@@ -10,6 +10,8 @@ import java.util.StringTokenizer;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.CorePlugin;
+
 public abstract class StringUtil
 {
 	/**
@@ -81,7 +83,7 @@ public abstract class StringUtil
 		}
 		catch (Exception e)
 		{
-			UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
+			CorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 		return null;
 	}

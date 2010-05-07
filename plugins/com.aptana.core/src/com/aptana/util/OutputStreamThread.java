@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
+import com.aptana.core.CorePlugin;
+
 /**
  * A runnable class that is designed to write into the given OutputStream in a thread.
  * 
@@ -59,7 +61,7 @@ class OutputStreamThread extends Thread
 		}
 		catch (IOException ioe)
 		{
-			UtilPlugin.logError(ioe.getMessage(), ioe);
+			CorePlugin.logError(ioe.getMessage(), ioe);
 		}
 		finally
 		{

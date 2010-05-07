@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.CorePlugin;
+
 public abstract class IOUtil
 {
 
@@ -77,9 +79,9 @@ public abstract class IOUtil
 
 	private static void log(Exception e)
 	{
-		if (UtilPlugin.getDefault() == null)
+		if (CorePlugin.getDefault() == null)
 			return;
-		UtilPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, UtilPlugin.PLUGIN_ID, e.getMessage(), e));
+		CorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
 	}
 	
 	// If targetLocation does not exist, it will be created.

@@ -15,6 +15,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
+import com.aptana.core.CorePlugin;
+
 public class ResourceUtils
 {
 	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
@@ -49,7 +51,7 @@ public class ResourceUtils
 					new Object[] { url }
 				);
 				
-				UtilPlugin.logError(message, e);
+				CorePlugin.logError(message, e);
 			}
 			catch (URISyntaxException e)
 			{
@@ -58,7 +60,7 @@ public class ResourceUtils
 					new Object [] { url }
 				);
 				
-				UtilPlugin.logError(message, e);
+				CorePlugin.logError(message, e);
 			}
 		}
 

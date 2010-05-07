@@ -5,8 +5,10 @@ Bundle-SymbolicName: com.aptana.core
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.core.CorePlugin
 Bundle-Vendor: %providerName
-Require-Bundle: org.eclipse.core.runtime
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.core
+Export-Package: com.aptana.core,
+ com.aptana.util
 Eclipse-ExtensibleAPI: true
