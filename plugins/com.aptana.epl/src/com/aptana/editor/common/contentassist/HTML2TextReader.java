@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Display;
  */
 class HTML2TextReader extends SubstitutionTextReader {
 
-	private static final String EMPTY_STRING = ""; 
+	private static final String EMPTY_STRING = "";  //$NON-NLS-1$
 	private static final Map<String, String> fgEntityLookup;
 	private static final Set<String> fgTags;
 
@@ -89,7 +89,7 @@ class HTML2TextReader extends SubstitutionTextReader {
 	private int fStartPreOffset= -1;
 
 	private boolean fIsPreformattedText= false;
-	private String fPreviousTag = "";
+	private String fPreviousTag = ""; //$NON-NLS-1$
 
 	private Color fLinkColor = null;
 	private Color fPreColor = null;

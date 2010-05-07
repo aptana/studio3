@@ -258,7 +258,7 @@ public class InformationControl implements IInformationControl, IInformationCont
 				fText.setText(content);
 				TextPresentation.applyTextPresentation(fPresentation, fText);
 			} else {
-				fText.setText(""); 
+				fText.setText("");  //$NON-NLS-1$
 			}
 		}
 	}

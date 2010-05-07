@@ -207,7 +207,7 @@ public class HTMLTextPresenter implements IInformationPresenter
 			if (line != null)
 			{
 				append(buffer, LINE_DELIM, lineFormatted ? presentation : null);
-				append(buffer, System.getProperty("HTMLTextPresenter.ellipse", "..."), presentation); //$NON-NLS-1$
+				append(buffer, System.getProperty("HTMLTextPresenter.ellipse", "..."), presentation); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			return trim(buffer, presentation);
@@ -239,7 +239,7 @@ public class HTMLTextPresenter implements IInformationPresenter
 
 		if (end == -1)
 		{
-			return ""; 
+			return "";  //$NON-NLS-1$
 		}
 
 		if (end < length - 1)

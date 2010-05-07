@@ -371,8 +371,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 		_insertOnTab = false; //store.getBoolean(IPreferenceConstants.INSERT_ON_TAB);
 
 		// TODO: grab list from preferences
-		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
-		if (agents != null && !agents.equals(""))
+		String agents = ""; //store.getString(IPreferenceConstants.USER_AGENT_PREFERENCE); //$NON-NLS-1$
+		if (agents != null && !agents.equals("")) //$NON-NLS-1$
 		{
 			fUserAgents = agents.split(",").length; //$NON-NLS-1$
 		}
@@ -877,8 +877,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 			final int newLen = proposals.length;
 			int defaultIndex = -1;
 			int suggestedIndex = -1;
-			String longestString = "";
-			String longestLoc = "";
+			String longestString = ""; //$NON-NLS-1$
+			String longestLoc = ""; //$NON-NLS-1$
 			int totalItems = 0;
 
 			fProposalTable.setItemCount(newLen);
@@ -1788,7 +1788,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 		else
 		{
-			prefix = "";
+			prefix = ""; //$NON-NLS-1$
 		}
 
 		CharSequence postfix;

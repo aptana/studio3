@@ -1255,7 +1255,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	{
 		if (fProcessors == null)
 		{
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 
 		StringBuffer buf = new StringBuffer(5);
