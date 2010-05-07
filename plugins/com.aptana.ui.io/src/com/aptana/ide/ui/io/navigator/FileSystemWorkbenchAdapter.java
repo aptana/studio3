@@ -61,7 +61,6 @@ import org.eclipse.ui.progress.IElementCollector;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
-import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
