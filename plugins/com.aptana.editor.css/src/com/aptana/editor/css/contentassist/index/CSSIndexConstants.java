@@ -1,9 +1,10 @@
 package com.aptana.editor.css.contentassist.index;
 
+
 public interface CSSIndexConstants
 {
 	// general constants
-	static final String DELIMITER = "~"; //$NON-NLS-1$
+	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String METADATA = "css.metadata"; //$NON-NLS-1$
 	static final String CORE = "CSS Core"; //$NON-NLS-1$

@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.html.Activator;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -57,13 +58,11 @@ public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 				}
 				catch (CoreException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.logError("An error occurred while indexing " + file.getName(), e);
 				}
 				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.logError("An error occurred while indexing " + file.getName(), e);
 				}
 			}
 		}

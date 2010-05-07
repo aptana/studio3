@@ -1,10 +1,12 @@
 package com.aptana.editor.js.contentassist.index;
 
+
 public interface JSIndexConstants
 {
 	// general constants
 	static final String METADATA = "js.metadata"; //$NON-NLS-1$
-	static final String DELIMITER = "~"; //$NON-NLS-1$
+	static final String DELIMITER = "\0"; //$NON-NLS-1$
+	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String CORE = "JS Core"; //$NON-NLS-1$
 	
 	// index categories
