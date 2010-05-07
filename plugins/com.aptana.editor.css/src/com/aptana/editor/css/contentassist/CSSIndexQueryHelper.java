@@ -23,7 +23,7 @@ public class CSSIndexQueryHelper
 	private CSSMetadataReader _metadata;
 
 	/**
-	 * CSSContentAssistHelper
+	 * CSSIndexQueryHelper
 	 */
 	public CSSIndexQueryHelper()
 	{
@@ -86,11 +86,11 @@ public class CSSIndexQueryHelper
 					}
 					catch (IOException e)
 					{
-						e.printStackTrace();
+						Activator.logError("An error occurred while reading a CSS metadatafile", e);
 					}
 					catch (Throwable t)
 					{
-						t.printStackTrace();
+						Activator.logError("An error occurred while reading a CSS metadatafile", t);
 					}
 					finally
 					{
@@ -121,16 +121,6 @@ public class CSSIndexQueryHelper
 	{
 		return new String[] { "/metadata/css_metadata.xml" }; //$NON-NLS-1$
 	}
-
-	// /**
-	// * getIndex
-	// *
-	// * @return
-	// */
-	// private Index getIndex()
-	// {
-	// return IndexManager.getInstance().getIndex(CSSIndexConstants.METADATA);
-	// }
 
 	/**
 	 * getProperties
