@@ -73,7 +73,7 @@ public class CSSIndexReader
 	 */
 	public List<ElementElement> getElements(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.ELEMENT }, "*",
+		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.ELEMENT }, "*", //$NON-NLS-1$
 				SearchPattern.PATTERN_MATCH);
 		List<ElementElement> result = new LinkedList<ElementElement>();
 
@@ -121,7 +121,7 @@ public class CSSIndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.PROPERTY }, "*",
+		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.PROPERTY }, "*", //$NON-NLS-1$
 				SearchPattern.PATTERN_MATCH);
 		List<PropertyElement> result = new LinkedList<PropertyElement>();
 
@@ -260,7 +260,7 @@ public class CSSIndexReader
 
 		if (index != null)
 		{
-			String pattern = "*";
+			String pattern = "*"; //$NON-NLS-1$
 
 			try
 			{
@@ -273,7 +273,7 @@ public class CSSIndexReader
 					for (QueryResult item : items)
 					{
 						String[] paths = item.getDocuments();
-						String path = (paths != null && paths.length > 0) ? paths[0] : "";
+						String path = (paths != null && paths.length > 0) ? paths[0] : ""; //$NON-NLS-1$
 
 						result.put(item.getWord(), path);
 					}

@@ -119,7 +119,7 @@ public class CSSIndexQueryHelper
 	 */
 	protected String[] getMetadataResources()
 	{
-		return new String[] { "/metadata/css_metadata.xml" };
+		return new String[] { "/metadata/css_metadata.xml" }; //$NON-NLS-1$
 	}
 
 	// /**

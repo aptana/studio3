@@ -74,8 +74,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif");
-	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif");
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.gif"); //$NON-NLS-1$
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
@@ -184,7 +184,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : classes.entrySet())
 			{
-				this.addProposal(proposals, "." + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset);
+				this.addProposal(proposals, "." + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset); //$NON-NLS-1$
 			}
 		}
 	}
@@ -207,7 +207,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			for (Entry<String, String> entry : ids.entrySet())
 			{
-				this.addProposal(proposals, "#" + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset);
+				this.addProposal(proposals, "#" + entry.getKey(), ELEMENT_ICON, null, userAgentIcons, offset); //$NON-NLS-1$
 			}
 		}
 	}
@@ -503,7 +503,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			switch (lexeme.getType())
 			{
 				case CURLY_BRACE:
-					location = ("{".equals(lexeme.getText())) ? Location.INSIDE_PROPERTY : Location.INSIDE_VALUE;
+					location = ("{".equals(lexeme.getText())) ? Location.INSIDE_PROPERTY : Location.INSIDE_VALUE; //$NON-NLS-1$
 					break LOOP;
 
 				//case ELEMENT: // sometimes occurs with partially typed properties
@@ -642,7 +642,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					break LOOP;
 
 				case CURLY_BRACE:
-					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE;
+					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE; //$NON-NLS-1$
 					break LOOP;
 
 				case PROPERTY:

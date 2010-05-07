@@ -26,14 +26,14 @@ public class CSSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		
 		// emit name
-		buffer.append("<b>").append(element.getName()).append("</b><br>");
+		buffer.append("<b>").append(element.getName()).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// emit description
 		String description = element.getDescription();
 		
 		if (description != null && description.length() > 0)
 		{
-			buffer.append(description).append("<br>");
+			buffer.append(description).append("<br>"); //$NON-NLS-1$
 		}
 		
 		// emit support browsers
@@ -41,8 +41,8 @@ public class CSSModelFormatter
 		
 		if (userAgents != null && userAgents.size() > 0)
 		{
-			buffer.append("<br>");
-			buffer.append("<b>").append("Supported User Agents:").append("</b><br>");
+			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 			for (int i = 0; i < userAgents.size(); i++)
 			{
@@ -50,10 +50,10 @@ public class CSSModelFormatter
 				
 				if (i > 0)
 				{
-					buffer.append(", ");
+					buffer.append(", "); //$NON-NLS-1$
 				}
 				
-				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion());
+				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion()); //$NON-NLS-1$
 			}
 		}
 		
@@ -71,14 +71,14 @@ public class CSSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		
 		// emit name
-		buffer.append("<b>").append(property.getName()).append("</b><br>");
+		buffer.append("<b>").append(property.getName()).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// emit description
 		String description = property.getDescription();
 		
 		if (description != null && description.length() > 0)
 		{
-			buffer.append(description).append("<br>");
+			buffer.append(description).append("<br>"); //$NON-NLS-1$
 		}
 		
 		// emit support browsers
@@ -86,8 +86,8 @@ public class CSSModelFormatter
 		
 		if (userAgents != null && userAgents.size() > 0)
 		{
-			buffer.append("<br>");
-			buffer.append("<b>").append("Supported User Agents:").append("</b><br>");
+			buffer.append("<br>"); //$NON-NLS-1$
+			buffer.append("<b>").append(Messages.CSSModelFormatter_Supported_User_Agents).append("</b><br>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 			for (int i = 0; i < userAgents.size(); i++)
 			{
@@ -95,10 +95,10 @@ public class CSSModelFormatter
 				
 				if (i > 0)
 				{
-					buffer.append(", ");
+					buffer.append(", "); //$NON-NLS-1$
 				}
 				
-				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion());
+				buffer.append(userAgent.getPlatform()).append(" ").append(userAgent.getVersion()); //$NON-NLS-1$
 			}
 		}
 		

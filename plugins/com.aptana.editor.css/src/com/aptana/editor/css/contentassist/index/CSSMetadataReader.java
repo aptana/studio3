@@ -81,9 +81,9 @@ public class CSSMetadataReader extends MetadataReader
 		// create a new item documentation object
 		UserAgentElement userAgent = new UserAgentElement();
 
-		userAgent.setPlatform(attributes.getValue("platform"));
-		userAgent.setVersion(attributes.getValue("version"));
-		userAgent.setOS(attributes.getValue("os"));
+		userAgent.setPlatform(attributes.getValue("platform")); //$NON-NLS-1$
+		userAgent.setVersion(attributes.getValue("version")); //$NON-NLS-1$
+		userAgent.setOS(attributes.getValue("os")); //$NON-NLS-1$
 
 		this._currentUserAgent = userAgent;
 	}
@@ -102,8 +102,8 @@ public class CSSMetadataReader extends MetadataReader
 		ElementElement element = new ElementElement();
 		
 		// grab and set property values
-		element.setName(attributes.getValue("name"));
-		element.setDisplayName(attributes.getValue("display-name"));
+		element.setName(attributes.getValue("name")); //$NON-NLS-1$
+		element.setDisplayName(attributes.getValue("display-name")); //$NON-NLS-1$
 
 		// set current item
 		this._currentElement = element;
@@ -123,9 +123,9 @@ public class CSSMetadataReader extends MetadataReader
 		PropertyElement property = new PropertyElement();
 
 		// grab and set property values
-		property.setName(attributes.getValue("name"));
-		property.setType(attributes.getValue("type"));
-		property.setAllowMultipleValues("true".equals(attributes.getValue("allow-multipe-values")));
+		property.setName(attributes.getValue("name")); //$NON-NLS-1$
+		property.setType(attributes.getValue("type")); //$NON-NLS-1$
+		property.setAllowMultipleValues("true".equals(attributes.getValue("allow-multipe-values"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// set current item
 		this._currentProperty = property;
@@ -141,7 +141,7 @@ public class CSSMetadataReader extends MetadataReader
 	 */
 	public void enterPropertyReference(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentElement.addProperty(attributes.getValue("name"));
+		this._currentElement.addProperty(attributes.getValue("name")); //$NON-NLS-1$
 	}
 
 	/**
@@ -156,8 +156,8 @@ public class CSSMetadataReader extends MetadataReader
 	{
 		SpecificationElement specification = new SpecificationElement();
 		
-		specification.setName(attributes.getValue("name"));
-		specification.setVersion(attributes.getValue("version"));
+		specification.setName(attributes.getValue("name")); //$NON-NLS-1$
+		specification.setVersion(attributes.getValue("version")); //$NON-NLS-1$
 		
 		this._currentProperty.addSpecification(specification);
 	}
@@ -176,8 +176,8 @@ public class CSSMetadataReader extends MetadataReader
 		ValueElement value = new ValueElement();
 
 		// grab and set property values
-		value.setName(attributes.getValue("name"));
-		value.setDescription(attributes.getValue("description"));
+		value.setName(attributes.getValue("name")); //$NON-NLS-1$
+		value.setDescription(attributes.getValue("description")); //$NON-NLS-1$
 
 		this._currentValue = value;
 	}
