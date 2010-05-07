@@ -119,9 +119,9 @@ public class JSIndexWriter
 			ParameterElement parameter = parameters[i];
 			String name = parameter.getName();
 			String usage = parameter.getUsage();
-			String types = StringUtil.join(",", parameter.getTypes());
+			String types = StringUtil.join(",", parameter.getTypes()); //$NON-NLS-1$
 			
-			keyList.add(name + "," + usage + "," + types);
+			keyList.add(name + "," + usage + "," + types); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
@@ -175,7 +175,7 @@ public class JSIndexWriter
 			String type = returnType.getType();
 			String descriptionKey = this.writeDescription(index, returnType.getDescription());
 			
-			keyList.add(type + "," + descriptionKey);
+			keyList.add(type + "," + descriptionKey); //$NON-NLS-1$
 		}
 		
 		String value = StringUtil.join(JSIndexConstants.DELIMITER, keyList);
@@ -208,7 +208,7 @@ public class JSIndexWriter
 	 */
 	public void writeType(Index index, TypeElement type)
 	{
-		String documentPath = "";
+		String documentPath = ""; //$NON-NLS-1$
 
 		// write type entry
 		String[] parentTypes = type.getParentTypes();
@@ -220,7 +220,7 @@ public class JSIndexWriter
 		String value = StringUtil.join(
 			JSIndexConstants.DELIMITER,
 			type.getName(),
-			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object",
+			(parentTypes.length > 0) ? StringUtil.join(",", parentTypes) : "Object", //$NON-NLS-1$ //$NON-NLS-2$
 			descriptionKey
 		);
 

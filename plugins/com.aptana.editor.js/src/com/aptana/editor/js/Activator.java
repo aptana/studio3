@@ -52,11 +52,11 @@ public class Activator extends AbstractUIPlugin
 		
 		this.loadMetadata(
 			indexer,
-			"/metadata/js_core.xml",
-			"/metadata/dom_0.xml",
-			"/metadata/dom_2.xml",
-			"/metadata/dom_3.xml",
-			"/metadata/dom_5.xml"
+			"/metadata/js_core.xml", //$NON-NLS-1$
+			"/metadata/dom_0.xml", //$NON-NLS-1$
+			"/metadata/dom_2.xml", //$NON-NLS-1$
+			"/metadata/dom_3.xml", //$NON-NLS-1$
+			"/metadata/dom_5.xml" //$NON-NLS-1$
 		);
 		
 		IndexManager manager = IndexManager.getInstance();

@@ -32,7 +32,7 @@ public class JSContentAssistHelper
 		
 		try
 		{
-			result = this._reader.getTypeProperties(this.getIndex(), "Window");
+			result = this._reader.getTypeProperties(this.getIndex(), "Window"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{

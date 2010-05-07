@@ -26,7 +26,7 @@ public class JSIndexReader
 	 */
 	public String getDescription(Index index, String descriptionKey) throws IOException
 	{
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 
 		if (descriptionKey != null && descriptionKey.length() > 0 && !descriptionKey.equals(JSIndexConstants.NO_ENTRY))
 		{
@@ -101,7 +101,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName)
 	{
-		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName });
+		return MessageFormat.format("^[^{0}]+{0}{1}(?:{0}|$)", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class JSIndexReader
 			for (int i = 1; i < parameterValues.length; i++)
 			{
 				String parameterValue = parameterValues[i];
-				String[] columns = parameterValue.split(",");
+				String[] columns = parameterValue.split(","); //$NON-NLS-1$
 				ParameterElement parameter = new ParameterElement();
 
 				parameter.setName(columns[0]);
@@ -207,7 +207,7 @@ public class JSIndexReader
 			for (int i = 1; i < returnTypesValues.length; i++)
 			{
 				String returnTypeValue = returnTypesValues[i];
-				String[] columns = returnTypeValue.split(",");
+				String[] columns = returnTypeValue.split(","); //$NON-NLS-1$
 				ReturnTypeElement returnType = new ReturnTypeElement();
 
 				returnType.setType(columns[0]);
@@ -255,7 +255,7 @@ public class JSIndexReader
 			{
 				String[] columns = types.get(0).getWord().split(JSIndexConstants.DELIMITER);
 				String retrievedName = columns[0];
-				String[] parentTypes = columns[1].split(",");
+				String[] parentTypes = columns[1].split(","); //$NON-NLS-1$
 				String descriptionKey = columns[2];
 
 				// create type

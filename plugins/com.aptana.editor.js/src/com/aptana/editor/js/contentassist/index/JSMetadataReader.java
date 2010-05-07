@@ -120,8 +120,8 @@ public class JSMetadataReader extends ValidatingReader
 	{
 		AliasElement alias = new AliasElement();
 		
-		alias.setName(attributes.getValue("name"));
-		alias.setType(attributes.getValue("type"));
+		alias.setName(attributes.getValue("name")); //$NON-NLS-1$
+		alias.setType(attributes.getValue("type")); //$NON-NLS-1$
 		
 		// add somewhere?
 	}
@@ -140,7 +140,7 @@ public class JSMetadataReader extends ValidatingReader
 		UserAgentElement userAgent = new UserAgentElement();
 
 		// set platform
-		userAgent.setPlatform(attributes.getValue("platform"));
+		userAgent.setPlatform(attributes.getValue("platform")); //$NON-NLS-1$
 
 		// set version
 		String version = attributes.getValue("version"); //$NON-NLS-1$
@@ -180,7 +180,7 @@ public class JSMetadataReader extends ValidatingReader
 	public void enterClass(String ns, String name, String qname, Attributes attributes)
 	{
 		// create a new class documentation object
-		TypeElement type = this.getType(attributes.getValue("type"));
+		TypeElement type = this.getType(attributes.getValue("type")); //$NON-NLS-1$
 
 		// set optional superclass
 		String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
@@ -228,7 +228,7 @@ public class JSMetadataReader extends ValidatingReader
 	{
 		ExceptionElement exception = new ExceptionElement();
 		
-		exception.setType(attributes.getValue("type"));
+		exception.setType(attributes.getValue("type")); //$NON-NLS-1$
 		
 		this._currentException = exception;
 	}
@@ -316,14 +316,14 @@ public class JSMetadataReader extends ValidatingReader
 		ParameterElement parameter = new ParameterElement();
 
 		// grab and set properties
-		parameter.setName(attributes.getValue("name"));
+		parameter.setName(attributes.getValue("name")); //$NON-NLS-1$
 		
-		for (String type : attributes.getValue("type").split("\\s*[,|]\\s*"))
+		for (String type : attributes.getValue("type").split("\\s*[,|]\\s*")) //$NON-NLS-1$ //$NON-NLS-2$
 		{
 			parameter.addType(type);
 		}
 		
-		parameter.setUsage(attributes.getValue("usage"));
+		parameter.setUsage(attributes.getValue("usage")); //$NON-NLS-1$
 
 		// store parameter
 		this._currentParameter = parameter;
@@ -343,7 +343,7 @@ public class JSMetadataReader extends ValidatingReader
 		PropertyElement property = new PropertyElement();
 
 		// grab and set property values
-		property.setName(attributes.getValue("name"));
+		property.setName(attributes.getValue("name")); //$NON-NLS-1$
 
 		// set scope
 		String scope = attributes.getValue("scope"); //$NON-NLS-1$
@@ -426,10 +426,10 @@ public class JSMetadataReader extends ValidatingReader
 		SinceElement since = new SinceElement();
 		
 		// set name
-		since.setName(attributes.getValue("name"));
+		since.setName(attributes.getValue("name")); //$NON-NLS-1$
 		
 		// set version
-		String version = attributes.getValue("version");
+		String version = attributes.getValue("version"); //$NON-NLS-1$
 		
 		if (version != null)
 		{
@@ -772,7 +772,7 @@ public class JSMetadataReader extends ValidatingReader
 		{
 			// get schema for our documentation XML format
 			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(
-					"/metadata/JSMetadataSchema.xml"), null);
+					"/metadata/JSMetadataSchema.xml"), null); //$NON-NLS-1$
 			InputStream schemaStream = null;
 
 			try
@@ -836,7 +836,7 @@ public class JSMetadataReader extends ValidatingReader
 			}
 			catch (ParserConfigurationException e)
 			{
-				String msg = Messages.ScriptDocReader_SaxError;
+				String msg = Messages.JSMetadataReader_SAX_Error;
 				ScriptDocException de = new ScriptDocException(msg, e);
 
 				throw de;
@@ -844,7 +844,7 @@ public class JSMetadataReader extends ValidatingReader
 			catch (SAXException e)
 			{
 				Exception ex = e.getException();
-				String msg = Messages.ScriptDocReader_ParseError;
+				String msg = Messages.JSMetadataReader_Parse_Error;
 
 				if (ex != null)
 				{
@@ -861,7 +861,7 @@ public class JSMetadataReader extends ValidatingReader
 			}
 			catch (IOException e)
 			{
-				String msg = Messages.ScriptDocReader_IOParseError;
+				String msg = Messages.JSMetadataReader_Parse_IO_Error;
 				ScriptDocException de = new ScriptDocException(msg, e);
 
 				throw de;

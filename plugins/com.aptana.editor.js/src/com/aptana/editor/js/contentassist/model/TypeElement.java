@@ -62,7 +62,7 @@ public class TypeElement extends BaseElement
 		}
 		else
 		{
-			result = new String[] { "Object" };
+			result = new String[] { "Object" }; //$NON-NLS-1$
 		}
 		
 		return result;

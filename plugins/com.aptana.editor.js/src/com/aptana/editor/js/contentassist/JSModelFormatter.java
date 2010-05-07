@@ -28,13 +28,13 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		
 		// title
-		buffer.append("<b>").append(property.getName()).append("</b>");
+		buffer.append("<b>").append(property.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// type
-		addReturnTypes(buffer, property.getTypes(), "undefined");
+		addReturnTypes(buffer, property.getTypes(), "undefined"); //$NON-NLS-1$
 		
 		// description
-		buffer.append("<br><br>");
+		buffer.append("<br><br>"); //$NON-NLS-1$
 		buffer.append(property.getDescription());
 		
 		return buffer.toString();
@@ -51,7 +51,7 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		
 		// title
-		buffer.append("<b>").append(function.getName()).append("</b>").append("(");
+		buffer.append("<b>").append(function.getName()).append("</b>").append("("); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		
 		// append parameters
 		boolean first = true;
@@ -60,7 +60,7 @@ public class JSModelFormatter
 		{
 			if (first == false)
 			{
-				buffer.append(", ");
+				buffer.append(", "); //$NON-NLS-1$
 			}
 			else
 			{
@@ -68,36 +68,36 @@ public class JSModelFormatter
 			}
 			
 			String usage = parameter.getUsage();
-			boolean isOptional = ("zero-or-more".equals(usage) || "optional".equals(usage));
-			boolean isRepeating = ("zero-or-more".equals(usage) || "one-or-more".equals(usage));
+			boolean isOptional = ("zero-or-more".equals(usage) || "optional".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
+			boolean isRepeating = ("zero-or-more".equals(usage) || "one-or-more".equals(usage)); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			if (isOptional)
 			{
-				buffer.append("[");
+				buffer.append("["); //$NON-NLS-1$
 			}
 			
-			buffer.append("<b>").append(parameter.getName()).append("</b>");
+			buffer.append("<b>").append(parameter.getName()).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			if (isRepeating)
 			{
-				buffer.append("+");
+				buffer.append("+"); //$NON-NLS-1$
 			}
 			
-			buffer.append(" : ").append(StringUtil.join("|", parameter.getTypes()));
+			buffer.append(" : ").append(StringUtil.join("|", parameter.getTypes())); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			if (isOptional)
 			{
-				buffer.append("]");
+				buffer.append("]"); //$NON-NLS-1$
 			}
 		}
 		
-		buffer.append(")");
+		buffer.append(")"); //$NON-NLS-1$
 		
 		// return type
-		addReturnTypes(buffer, function.getReturnTypes(), "void");
+		addReturnTypes(buffer, function.getReturnTypes(), "void"); //$NON-NLS-1$
 		
 		// description
-		buffer.append("<br><br>");
+		buffer.append("<br><br>"); //$NON-NLS-1$
 		buffer.append(function.getDescription());
 		
 		return buffer.toString();
@@ -109,7 +109,7 @@ public class JSModelFormatter
 		
 		if (returnTypes != null && returnTypes.length > 0)
 		{
-			buffer.append(" : ");
+			buffer.append(" : "); //$NON-NLS-1$
 			
 			first = true;
 			
@@ -117,7 +117,7 @@ public class JSModelFormatter
 			{
 				if (first == false)
 				{
-					buffer.append("|");
+					buffer.append("|"); //$NON-NLS-1$
 				}
 				else
 				{
@@ -129,7 +129,7 @@ public class JSModelFormatter
 		}
 		else
 		{
-			buffer.append(" : ").append(defaultType);
+			buffer.append(" : ").append(defaultType); //$NON-NLS-1$
 		}
 	}
 	
@@ -159,6 +159,6 @@ public class JSModelFormatter
 	 */
 	public static String getName(FunctionElement function)
 	{
-		return function.getName() + "()";
+		return function.getName() + "()"; //$NON-NLS-1$
 	}
 }

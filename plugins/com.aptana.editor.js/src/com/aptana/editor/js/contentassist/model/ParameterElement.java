@@ -95,9 +95,9 @@ public class ParameterElement
 	 */
 	public String toString()
 	{
-		if ("optional".equals(this.getUsage()))
+		if ("optional".equals(this.getUsage())) //$NON-NLS-1$
 		{
-			return "[" + this.getName() + "]";
+			return "[" + this.getName() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		else
 		{

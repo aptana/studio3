@@ -32,8 +32,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		ERROR
 	};
 
-	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif");
-	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif");
+	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.gif"); //$NON-NLS-1$
+	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.gif"); //$NON-NLS-1$
 
 	private JSContentAssistHelper _helper;
 	private IContextInformationValidator _validator;
