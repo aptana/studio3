@@ -89,7 +89,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.FileUtils;
+import com.aptana.core.util.FileUtil;
 import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -636,7 +636,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
             // removes the leading separator
             path = path.substring(1);
         }
-        String displayedPath = FileUtils.compressLeadingPath(path, 60);
+        String displayedPath = FileUtil.compressLeadingPath(path, 60);
         if (displayedPath.equals(path)) {
             String[] folders = path.split(separator);
             int i;

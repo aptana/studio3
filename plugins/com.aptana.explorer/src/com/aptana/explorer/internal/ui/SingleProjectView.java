@@ -25,9 +25,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -96,6 +96,8 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.IScopeReference;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -108,7 +110,6 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
 import com.aptana.usage.PingStartup;
-import com.aptana.util.EclipseUtils;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -120,6 +121,8 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 {
 
 	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
+	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
+	private static final String WEB_NATURE = "com.aptana.ui.webnature"; //$NON-NLS-1$
 
 	/**
 	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
@@ -314,6 +317,43 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 		listenToActiveProjectPrefChanges();
 
 		hookToThemes();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object getAdapter(Class adapter)
+	{
+		if (adapter == IScopeReference.class)
+		{
+			return new IScopeReference()
+			{
+
+				@Override
+				public String getScopeId()
+				{
+					if (selectedProject != null)
+					{
+						try
+						{
+							if (selectedProject.hasNature(RAILS_NATURE))
+							{
+								return "project.rails"; //$NON-NLS-1$
+							}
+							if (selectedProject.hasNature(WEB_NATURE))
+							{
+								return "project.web"; //$NON-NLS-1$
+							}
+						}
+						catch (CoreException e)
+						{
+							ExplorerPlugin.logError(e);
+						}
+					}
+					return null;
+				}
+			};
+		}
+		return super.getAdapter(adapter);
 	}
 
 	public void init(IViewSite aSite, IMemento aMemento) throws PartInitException
@@ -895,7 +935,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 			try
 			{
 				// FIXME This id is a constant in the rails plugins...
-				if (selectedProject.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+				if (selectedProject.hasNature(RAILS_NATURE))
 					return 'R';
 			}
 			catch (CoreException e)
@@ -910,7 +950,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	private String getVersion()
 	{
 		// FIXME Do we want this plugin's version, or some other version?
-		return EclipseUtils.getPluginVersion(ExplorerPlugin.getDefault());
+		return EclipseUtil.getPluginVersion(ExplorerPlugin.getDefault());
 	}
 
 	private String toHex(RGB rgb)

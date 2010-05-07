@@ -19,7 +19,7 @@ import org.jruby.RubyModule;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
-import com.aptana.util.ExecutableUtil;
+import com.aptana.core.util.ExecutableUtil;
 
 public class ScriptUtils
 {

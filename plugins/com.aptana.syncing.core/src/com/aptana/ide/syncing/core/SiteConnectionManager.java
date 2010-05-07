@@ -53,9 +53,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.StringUtils;
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint15Constants;
@@ -310,11 +310,11 @@ public class SiteConnectionManager implements ISiteConnectionManager {
 
         String s = contents.toString();
         if (s.indexOf(IConnectionPoint15Constants.DELIMITER) < 0) {
-            s = StringUtils.replace(s, "%%%%", IConnectionPoint15Constants.DELIMITER); //$NON-NLS-1$
-            s = StringUtils.replace(s, "@@@@", IConnectionPoint15Constants.OBJ_DELIMITER); //$NON-NLS-1$
-            s = StringUtils.replace(s, "~~~~", IConnectionPoint15Constants.SECTION_DELIMITER); //$NON-NLS-1$
-            s = StringUtils.replace(s, "!!!!", IConnectionPoint15Constants.TYPE_DELIMITER); //$NON-NLS-1$
-            s = StringUtils.replace(s, "}}}}", IConnectionPoint15Constants.FILE_DELIMITER); //$NON-NLS-1$
+            s = StringUtil.replace(s, "%%%%", IConnectionPoint15Constants.DELIMITER); //$NON-NLS-1$
+            s = StringUtil.replace(s, "@@@@", IConnectionPoint15Constants.OBJ_DELIMITER); //$NON-NLS-1$
+            s = StringUtil.replace(s, "~~~~", IConnectionPoint15Constants.SECTION_DELIMITER); //$NON-NLS-1$
+            s = StringUtil.replace(s, "!!!!", IConnectionPoint15Constants.TYPE_DELIMITER); //$NON-NLS-1$
+            s = StringUtil.replace(s, "}}}}", IConnectionPoint15Constants.FILE_DELIMITER); //$NON-NLS-1$
         }
 
         String[] sections = s.split(IConnectionPoint15Constants.SECTION_DELIMITER);

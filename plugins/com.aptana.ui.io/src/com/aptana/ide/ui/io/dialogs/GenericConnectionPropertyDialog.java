@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.GenericConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -128,7 +128,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.GenericConnectionPropertyDialog_Name));
+		label.setText(StringUtil.makeFormLabel(Messages.GenericConnectionPropertyDialog_Name));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -140,7 +140,7 @@ public class GenericConnectionPropertyDialog extends TitleAreaDialog implements 
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.GenericConnectionPropertyDialog_URI));
+		label.setText(StringUtil.makeFormLabel(Messages.GenericConnectionPropertyDialog_URI));
 
 		uriText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		uriText.setLayoutData(GridDataFactory.swtDefaults()

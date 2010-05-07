@@ -43,8 +43,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import com.aptana.core.ClassUtils;
 import com.aptana.core.Identifiable;
+import com.aptana.core.util.ClassUtil;
 
 /**
  * @author Max Stepanov
@@ -137,7 +137,7 @@ public final class ImageAssociations {
 	public ImageDescriptor getImageDescriptor(Class<?> clazz) {
 		ImageDescriptor imageDescriptor = classToImageMap.get(clazz);
 		if (imageDescriptor == null && !classToImageMap.containsKey(clazz)) {
-			for (Class<?> i : ClassUtils.getClassesTree(clazz)) {
+			for (Class<?> i : ClassUtil.getClassesTree(clazz)) {
 				imageDescriptor = classToImageMap.get(i);
 				if (imageDescriptor == null) {
 					imageDescriptor = classNameToImageMap.get(i.getName());

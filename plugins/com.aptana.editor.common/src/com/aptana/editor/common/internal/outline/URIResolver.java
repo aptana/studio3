@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.IPathResolver;
-import com.aptana.util.IOUtil;
 
 /**
  * Resolves paths that may be relative to a base URI (filesystem, remote, etc)

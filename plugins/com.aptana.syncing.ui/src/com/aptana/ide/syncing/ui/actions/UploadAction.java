@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -58,7 +58,7 @@ import com.aptana.ui.DialogUtils;
  */
 public class UploadAction extends BaseSyncAction {
 
-    private static String MESSAGE_TITLE = StringUtils.ellipsify(Messages.UploadAction_MessageTitle);
+    private static String MESSAGE_TITLE = StringUtil.ellipsify(Messages.UploadAction_MessageTitle);
 
     protected void performAction(final IAdaptable[] files, final ISiteConnection site)
             throws CoreException {

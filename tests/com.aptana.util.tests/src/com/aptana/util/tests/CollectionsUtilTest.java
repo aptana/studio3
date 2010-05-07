@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.aptana.util.CollectionsUtil;
+import com.aptana.core.util.CollectionsUtil;
 
 public class CollectionsUtilTest extends TestCase
 {
