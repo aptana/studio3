@@ -111,6 +111,10 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
+		<antcall target="run.director">
+      <param name="p2.installIU" value="com.aptana.ide.feature.libraries.subscription.feature.group" />
+      <param name="p2.repo" value="${libraries-com.p2.repo}" />
+    </antcall>
 		<!-- Install Red Core feature -->
 		<antcall target="install.red.core" />
 		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
