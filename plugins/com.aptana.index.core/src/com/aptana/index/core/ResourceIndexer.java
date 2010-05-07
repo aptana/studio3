@@ -50,7 +50,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public boolean belongsTo(Object family)
 		{
-			return super.belongsTo(project.getName().equals(family));
+			return project.getName().equals(family);
 		}
 
 		@Override
@@ -76,7 +76,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public boolean belongsTo(Object family)
 		{
-			return super.belongsTo(project.getName().equals(family));
+			return project.getName().equals(family);
 		}
 
 		@Override
@@ -113,7 +113,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public boolean belongsTo(Object family)
 		{
-			return super.belongsTo(project.getName().equals(family));
+			return project.getName().equals(family);
 		}
 
 		@Override
@@ -142,7 +142,7 @@ public class ResourceIndexer implements IResourceChangeListener
 					index.remove(file.getProjectRelativePath().toPortableString());
 				}
 
-				for (IFileIndexingParticipant fileIndexingParticipant : getContextContributors())
+				for (IFileIndexingParticipant fileIndexingParticipant : getFileIndexingParticipants())
 				{
 					if (monitor.isCanceled())
 					{
@@ -160,8 +160,7 @@ public class ResourceIndexer implements IResourceChangeListener
 				}
 				catch (IOException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					IndexActivator.logError("An error occurred while saving an index", e);
 				}
 			}
 			return Status.OK_STATUS;
@@ -185,7 +184,7 @@ public class ResourceIndexer implements IResourceChangeListener
 		@Override
 		public boolean belongsTo(Object family)
 		{
-			return super.belongsTo(project.getName().equals(family));
+			return project.getName().equals(family);
 		}
 
 		@Override
@@ -417,8 +416,7 @@ public class ResourceIndexer implements IResourceChangeListener
 					}
 					catch (CoreException e)
 					{
-						// TODO
-						e.printStackTrace();
+						IndexActivator.logError(e);
 					}
 				}
 				break;
@@ -430,7 +428,7 @@ public class ResourceIndexer implements IResourceChangeListener
 	 *
 	 * @return
 	 */
-	public static IFileIndexingParticipant[] getContextContributors()
+	public static IFileIndexingParticipant[] getFileIndexingParticipants()
 	{
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		List<IFileIndexingParticipant> fileIndexingParticipants = new ArrayList<IFileIndexingParticipant>();
