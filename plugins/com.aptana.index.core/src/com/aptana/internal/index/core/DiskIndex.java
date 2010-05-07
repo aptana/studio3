@@ -107,7 +107,7 @@ public class DiskIndex
 				String signature = readString(stream);
 				if (!signature.equals(SIGNATURE))
 				{
-					throw new IOException("Messages.exception_wrongFormat");
+					throw new IOException(Messages.DiskIndex_Wrong_Format);
 				}
 				this.headerInfoOffset = readStreamInt(stream);
 				if (this.headerInfoOffset > 0)
@@ -140,7 +140,7 @@ public class DiskIndex
 				}
 			}
 			else
-				throw new IOException("Failed to create new index file " + indexFile);
+				throw new IOException(Messages.DiskIndex_Unable_To_Create_Index_File + indexFile);
 		}
 	}
 
@@ -726,7 +726,7 @@ public class DiskIndex
 				this.streamEnd += 2;
 
 				int last = next.length() - end;
-				writeString(stream, (start < last ? next.substring(start, last) : ""));
+				writeString(stream, (start < last ? next.substring(start, last) : "")); //$NON-NLS-1$
 				current = next;
 			}
 		}
