@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.syncing.core,
  com.aptana.ui,
  com.aptana.ui.io,
- com.aptana.ui.ftp
+ com.aptana.ui.ftp,
+ com.aptana.editor.common
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.syncing.ui,

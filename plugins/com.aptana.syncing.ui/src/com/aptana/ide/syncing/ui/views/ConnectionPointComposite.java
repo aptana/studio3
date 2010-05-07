@@ -90,6 +90,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.FileUtils;
+import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -138,12 +139,17 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
     private List<IAdaptable> fEndPointData;
     private Client fClient;
 
+	private TreeThemer treeThemer;
+
     public ConnectionPointComposite(Composite parent, String name, Client client) {
         fName = name;
         fClient = client;
         fEndPointData = new ArrayList<IAdaptable>();
 
         fMain = createControl(parent);
+
+        treeThemer = new TreeThemer(fTreeViewer);
+		treeThemer.apply();
     }
 
     public Control getControl() {
@@ -376,6 +382,15 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 
         TreeViewer treeViewer = createTreeViewer(main);
         treeViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        treeViewer.getTree().addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e)
+			{
+				treeThemer.dispose();
+				treeThemer = null;
+			}
+        });
 
         return main;
     }
