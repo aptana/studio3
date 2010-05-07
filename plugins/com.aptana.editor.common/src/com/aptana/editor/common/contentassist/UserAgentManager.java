@@ -18,7 +18,7 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.util.SWTUtils;
+import com.aptana.ui.SWTUtils;
 
 public class UserAgentManager
 {
