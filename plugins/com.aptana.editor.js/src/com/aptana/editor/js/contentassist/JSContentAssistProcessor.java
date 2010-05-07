@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
@@ -17,6 +18,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSScopeScanner;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -93,45 +95,49 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
-		// tokenize the current document
-		IDocument document = viewer.getDocument();
-		LexemeProvider<JSTokenType> lexemeProvider = new LexemeProvider<JSTokenType>(document, offset, new JSScopeScanner())
-		{
-			@Override
-			protected JSTokenType getTypeFromName(String name)
-			{
-				return JSTokenType.get(name);
-			}
-		};
-
-		// store a reference to the lexeme at the current position
-		this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
-
-		// first step is to determine where we are
-		Location location = this.getLocation(lexemeProvider, offset);
-
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
-		switch (location)
+		if (Platform.inDevelopmentMode())
 		{
-			default:
-				break;
-		}
-
-		// sort by display name
-		Collections.sort(result, new Comparator<ICompletionProposal>()
-		{
-			@Override
-			public int compare(ICompletionProposal o1, ICompletionProposal o2)
+			// tokenize the current document
+			IDocument document = viewer.getDocument();
+			LexemeProvider<JSTokenType> lexemeProvider = new LexemeProvider<JSTokenType>(document, offset, new JSScopeScanner())
 			{
-				return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				@Override
+				protected JSTokenType getTypeFromName(String name)
+				{
+					return JSTokenType.get(name);
+				}
+			};
+	
+			// store a reference to the lexeme at the current position
+			this._currentLexeme = lexemeProvider.getFloorLexeme(offset);
+	
+			// first step is to determine where we are
+			Location location = this.getLocation(lexemeProvider, offset);
+	
+			
+			switch (location)
+			{
+				default:
+					break;
 			}
-		});
-
-		// select the current proposal based on the current lexeme
-		if (this._currentLexeme != null)
-		{
-			this.setSelectedProposal(this._currentLexeme.getText(), result);
+	
+			// sort by display name
+			Collections.sort(result, new Comparator<ICompletionProposal>()
+			{
+				@Override
+				public int compare(ICompletionProposal o1, ICompletionProposal o2)
+				{
+					return o1.getDisplayString().compareToIgnoreCase(o2.getDisplayString());
+				}
+			});
+	
+			// select the current proposal based on the current lexeme
+			if (this._currentLexeme != null)
+			{
+				this.setSelectedProposal(this._currentLexeme.getText(), result);
+			}
 		}
 
 		return result.toArray(new ICompletionProposal[result.size()]);
@@ -176,16 +182,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// grab the interesting parts
 			String name = JSModelFormatter.getName(property);
-			int length = isFunction ? name.length() - 1 : name.length();
+			//int length = isFunction ? name.length() - 1 : name.length();
 			String description = JSModelFormatter.getDescription(property);
 			Image image = isFunction ? JS_FUNCTION : JS_PROPERTY;
-			IContextInformation contextInfo = null; // new ContextInformation(JS_FUNCTION, "Display String", "Info");
-
-			// build a proposal
-			CompletionProposal proposal = new CompletionProposal(name, offset, 0, length, image, name, contextInfo, description);
-
-			// add it to the list
-			proposals.add(proposal);
+			String[] userAgentNames = property.getUserAgentNames();
+			Image[] userAgents = UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
+			
+			this.addProposal(proposals, name, image, description, userAgents, offset);
 		}
 	}
 
