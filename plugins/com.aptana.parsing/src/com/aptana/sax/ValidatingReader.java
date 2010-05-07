@@ -34,7 +34,6 @@
  */
 package com.aptana.sax;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -114,22 +113,6 @@ public class ValidatingReader extends DefaultHandler
 	}
 
 	/**
-	 * Load a xml file and validate it against this reader's schema
-	 * 
-	 * @param filename
-	 *            The name of the xml file to load and validate
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 */
-	public void read(String filename) throws ParserConfigurationException, SAXException, IOException
-	{
-		FileInputStream fi = new FileInputStream(filename);
-		this.read(fi);
-		fi.close();
-	}
-
-	/**
 	 * Load an XML stream and validate it against this reader's schema
 	 * 
 	 * @param in
@@ -153,14 +136,11 @@ public class ValidatingReader extends DefaultHandler
 		//saxParser.setProperty("http://apache.org/xml/features/validation/warn-on-duplicate-attdef", Boolean.FALSE);
 		
 		// associate our custom entity resolver
-//		XMLReader reader = saxParser.getXMLReader();
-//		reader.setEntityResolver(new SimpleResolver());
+		//XMLReader reader = saxParser.getXMLReader();
+		//reader.setEntityResolver(new SimpleResolver());
 		
 		// parse the XML
 		saxParser.parse(in, this);
-		
-		// close stream
-		in.close();
 	}
 
 	/**
