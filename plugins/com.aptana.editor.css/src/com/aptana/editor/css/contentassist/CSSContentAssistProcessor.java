@@ -106,19 +106,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (elements != null)
 		{
-//			switch (this._currentLexeme.getType())
-//			{
-//				case CURLY_BRACE:
-//				case SEMICOLON:
-//				case COMMA:
-//					offset = this._currentLexeme.getEndingOffset();
-//					this._replaceRange = null;
-//					break;
-//					
-//				default:
-//					break;
-//			}
-			
 			for (ElementElement element : elements)
 			{
 				String description = CSSModelFormatter.getDescription(element);
@@ -247,11 +234,23 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addOutsideRuleProposals(List<ICompletionProposal> proposals, LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
-		if (this._currentLexeme != null && this._currentLexeme.getType() == CSSTokenType.COMMA)
+		if (this._currentLexeme != null)
 		{
-			int index = lexemeProvider.getLexemeCeilingIndex(offset);
-
-			this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
+			switch (this._currentLexeme.getType())
+			{
+				case COMMA:
+					int index = lexemeProvider.getLexemeCeilingIndex(offset);
+					this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index + 1);
+					break;
+				
+				case CURLY_BRACE:
+					this._replaceRange = this._currentLexeme = null;
+					offset++;
+					break;
+					
+				default:
+					break;
+			}
 		}
 		
 		if (this._currentLexeme != null)
@@ -494,7 +493,23 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Location getInsideLocation(LexemeProvider<CSSTokenType> lexemeProvider, int offset)
 	{
 		Location location = Location.ERROR;
-		int index = lexemeProvider.getLexemeFloorIndex(offset);
+		
+		int index = lexemeProvider.getLexemeIndex(offset);
+		
+		if (index < 0)
+		{
+			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
+			
+			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			{
+				index = candidateIndex;
+			}
+			else
+			{
+				index = lexemeProvider.getLexemeCeilingIndex(offset);
+			}
+		}
 
 		LOOP: while (index >= 0)
 		{
@@ -636,11 +651,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 
 			switch (lexeme.getType())
 			{
-				case ID:
-				case CLASS:
-					result = Location.OUTSIDE_RULE;
-					break LOOP;
-
 				case CURLY_BRACE:
 					result = ("{".equals(lexeme.getText())) ? Location.INSIDE_RULE : Location.OUTSIDE_RULE; //$NON-NLS-1$
 					break LOOP;
