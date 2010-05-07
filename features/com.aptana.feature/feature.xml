@@ -18,6 +18,10 @@
       %license
    </license>
 
+   <includes
+         id="com.aptana.ide.feature.libraries.subscription"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
