@@ -45,17 +45,17 @@ public final class CoreNatives {
 	/**
 	 * Major version number (must be >= 0)
 	 */
-    private static final int MAJOR_VERSION = 1;
+    private static final int MAJOR_VERSION = 3;
 	
 	/**
 	 * Minor version number (must be in the range 0..999)
 	 */
-    private static final int MINOR_VERSION = 3;
+    private static final int MINOR_VERSION = 0;
 	
 	/**
 	 * release number (must be >= 0)
 	 */
-	private static final int RELEASE = 1;
+	private static final int RELEASE = 0;
 
 	
 	/* Win32 */
