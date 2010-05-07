@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
@@ -43,17 +44,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
-			
-			/*
-			String partitionType = partition.getType();
-			int startingOffset = partition.getOffset();
-			int length = partition.getLength();
-			
-			System.out.println(partitionType + ": " + startingOffset + "-" + (startingOffset + length));
-			*/
 
 			scanner.setRange(document, partition.getOffset(), partition.getLength());
-			
 
 			// prime scanner
 			IToken token = scanner.nextToken();
@@ -75,19 +67,27 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 				{
 					// add it to our list
 					lexemes.add(lexeme);
-
-					if (type.isDefined() == false)
-					{
-						System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~");
-					}
 				}
-				else
-				{
-					Matcher m = WHITESPACE.matcher(text);
 
-					if (m.matches() == false)
+				// NOTE: the following is useful during development to capture any
+				// scopes that weren't converted to enumerations
+				if (Platform.inDevelopmentMode())
+				{
+					if (data != null)
 					{
-						System.out.println("Possible missed token type for text: ~" + text + "~");
+						if (type.isDefined() == false)
+						{
+							System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~");
+						}
+					}
+					else
+					{
+						Matcher m = WHITESPACE.matcher(text);
+
+						if (m.matches() == false)
+						{
+							System.out.println("Possible missed token type for text: ~" + text + "~");
+						}
 					}
 				}
 
@@ -274,7 +274,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		return this._lexemes.iterator();
 	}
-	
+
 	/**
 	 * size
 	 * 
