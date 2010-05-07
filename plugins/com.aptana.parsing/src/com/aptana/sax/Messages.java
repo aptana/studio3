@@ -54,99 +54,25 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 	
-	/**
-	 * Schema_Element_Stack_Trace
-	 */
 	public static String Schema_Element_Stack_Trace;
-	
-	/**
-	 * Schema_Missing_Root_Element
-	 */
 	public static String Schema_Missing_Root_Element;
-
-	/**
-	 * SchemaBuilder_Insufficient_Reflection_Security
-	 */
 	public static String SchemaBuilder_Insufficient_Reflection_Security;
-
-	/**
-	 * SchemaBuilder_Missing_Handler_Method
-	 */
 	public static String SchemaBuilder_Missing_Handler_Method;
-
-	/**
-	 * SchemaBuilder_File_Unlocatable
-	 */
 	public static String SchemaBuilder_File_Unlocatable;
-
-	/**
-	 * SchemaBuilder_SAX_Parser_Initialization_Error
-	 */
 	public static String SchemaBuilder_SAX_Parser_Initialization_Error;
-
-	/**
-	 * SchemaBuilder_SAX_Parser_Error
-	 */
 	public static String SchemaBuilder_SAX_Parser_Error;
-
-	/**
-	 * SchemaBuilder_IO_Error
-	 */
 	public static String SchemaBuilder_IO_Error;
-
 	public static String SchemaElement_Attribute_already_defined;
-
 	public static String SchemaElement_Invalid_attribute_on_tag;
-
 	public static String SchemaElement_Not_valid_usage_attribute;
-
-	/**
-	 * SchemaElement_Undefined_Owning_Schema
-	 */
 	public static String SchemaElement_Undefined_Owning_Schema;
-
-	/**
-	 * SchemaElement_Undefined_Name
-	 */
 	public static String SchemaElement_Undefined_Name;
-
-	/**
-	 * SchemaElement_Undefined_Node
-	 */
 	public static String SchemaElement_Undefined_Node;
-
-	/**
-	 * Schema_Invalid_Child
-	 */
 	public static String Schema_Invalid_Child;
-
-	/**
-	 * SchemaBuilder_Unknown_Schema_Namespace
-	 */
 	public static String SchemaBuilder_Unknown_Schema_Namespace;
-
-	/**
-	 * SchemaBuilder_Unable_To_Get_OnEnter_Method
-	 */
 	public static String SchemaBuilder_Unable_To_Get_OnEnter_Method;
-
-	/**
-	 * SchemaBuilder_Unable_To_Locate_OnEnter_Method
-	 */
 	public static String SchemaBuilder_Unable_To_Locate_OnEnter_Method;
-
-	/**
-	 * SchemaBuilder_Unable_To_Get_OnExit_Method
-	 */
 	public static String SchemaBuilder_Unable_To_Get_OnExit_Method;
-
-	/**
-	 * SchemaBuilder_Unable_To_Locate_OnExit_Method
-	 */
 	public static String SchemaBuilder_Unable_To_Locate_OnExit_Method;
-
-	/**
-	 * SchemaBuilder_Set_ID_Not_Defined
-	 */
 	public static String SchemaBuilder_Set_ID_Not_Defined;
 }
