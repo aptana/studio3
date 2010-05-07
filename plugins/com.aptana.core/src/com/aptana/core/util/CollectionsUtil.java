@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.util;
 
 import java.util.LinkedHashSet;
 import java.util.List;

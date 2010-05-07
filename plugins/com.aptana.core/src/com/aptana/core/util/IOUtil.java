@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.util;
 
 import java.io.BufferedReader;
 import java.io.File;

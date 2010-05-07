@@ -1,9 +1,9 @@
-package com.aptana.core;
+package com.aptana.core.util;
 
-public class FileUtils
+public class FileUtil
 {
 
-	private FileUtils()
+	private FileUtil()
 	{
 	}
 

@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +17,12 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
 
-public class ResourceUtils
+public class ResourceUtil
 {
 	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
 	private static final String SCHEME_FILE = "file"; //$NON-NLS-1$
 
-	private ResourceUtils()
+	private ResourceUtil()
 	{
 	}
 

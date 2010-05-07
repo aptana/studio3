@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core;
+package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FileReader;
@@ -51,13 +51,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.CorePlugin;
 import com.aptana.ide.internal.core.CoreMacOSX;
 import com.aptana.ide.internal.core.CoreNatives;
 
 /**
  * @author Max Stepanov
  */
-public final class PlatformUtils
+public final class PlatformUtil
 {
 	
 	public static class ProcessItem {
@@ -102,7 +103,7 @@ public final class PlatformUtils
 	 */
 	public static final String HOME_DIRECTORY = Platform.OS_WIN32.equals(Platform.getOS()) ? "%USERPROFILE%" : "~"; //$NON-NLS-1$ //$NON-NLS-2$	
 	
-	private PlatformUtils()
+	private PlatformUtil()
 	{
 	}
 

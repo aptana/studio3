@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.util;
 
 import java.io.File;
 import java.util.List;

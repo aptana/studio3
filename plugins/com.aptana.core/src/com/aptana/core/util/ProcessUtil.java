@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.internal.InputStreamGobbler;
+import com.aptana.core.internal.OutputStreamThread;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
@@ -74,7 +76,7 @@ public abstract class ProcessUtil
 		{
 			builder.environment().putAll(env);
 		}
-		String lineSeparator = ResourceUtils.getLineSeparatorValue(null);
+		String lineSeparator = ResourceUtil.getLineSeparatorValue(null);
 		try
 		{
 			Process p = builder.start();

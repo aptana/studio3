@@ -66,7 +66,4 @@ public final class Messages extends NLS
 	public static String CoreStrings_Remove;
 	public static String CoreStrings_Rename;
 
-	public static String PlatformUtils_CoreLibraryNotFound;
-
-	public static String URLEncoder_Cannot_Encode_URL;
 }

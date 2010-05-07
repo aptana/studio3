@@ -48,8 +48,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.FileUtils;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ui.SWTUtils;
@@ -209,7 +209,7 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
         comp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         label = new Label(comp, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.ChooseSiteConnectionDialog_LBL_Connection));
+        label.setText(StringUtil.makeFormLabel(Messages.ChooseSiteConnectionDialog_LBL_Connection));
         fSiteCombo = new Combo(comp, SWT.DROP_DOWN | SWT.READ_ONLY);
         fSiteCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
         fSiteCombo.addSelectionListener(this);
@@ -306,11 +306,11 @@ public class ChooseSiteConnectionDialog extends TrayDialog implements SelectionL
         IConnectionPoint target = fSelectedSite.getDestination();
 
         try {
-            fSiteDescriptionLabel.setText(FileUtils.compressPath(source.getRoot().toString(), 25)
-                    + " <-> " + FileUtils.compressPath(target.getRoot().toString(), 25)); //$NON-NLS-1$
+            fSiteDescriptionLabel.setText(FileUtil.compressPath(source.getRoot().toString(), 25)
+                    + " <-> " + FileUtil.compressPath(target.getRoot().toString(), 25)); //$NON-NLS-1$
         } catch (CoreException e) {
-            fSiteDescriptionLabel.setText(FileUtils.compressPath(source.getName(), 25) + " <-> " //$NON-NLS-1$
-                    + FileUtils.compressPath(target.getName(), 25));
+            fSiteDescriptionLabel.setText(FileUtil.compressPath(source.getName(), 25) + " <-> " //$NON-NLS-1$
+                    + FileUtil.compressPath(target.getName(), 25));
         }
     }
 }

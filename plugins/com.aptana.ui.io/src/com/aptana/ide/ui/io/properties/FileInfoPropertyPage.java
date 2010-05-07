@@ -63,7 +63,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
@@ -294,14 +294,14 @@ public class FileInfoPropertyPage extends PropertyPage implements IWorkbenchProp
         container.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).create());
 
         Label label = new Label(container, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.FileInfoPropertyPage_Owner));
+        label.setText(StringUtil.makeFormLabel(Messages.FileInfoPropertyPage_Owner));
         Text text = new Text(container, SWT.READ_ONLY);
         text.setText(fileInfo.getOwner());
         text.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true,
                 false).create());
 
         label = new Label(container, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.FileInfoPropertyPage_Group));
+        label.setText(StringUtil.makeFormLabel(Messages.FileInfoPropertyPage_Group));
         text = new Text(container, SWT.READ_ONLY);
         text.setText(fileInfo.getGroup());
         text.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true,

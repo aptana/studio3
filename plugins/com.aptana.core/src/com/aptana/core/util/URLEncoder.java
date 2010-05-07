@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.core;
+package com.aptana.core.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -44,6 +44,8 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
+import com.aptana.core.CorePlugin;
 
 /**
  * @author Max Stepanov

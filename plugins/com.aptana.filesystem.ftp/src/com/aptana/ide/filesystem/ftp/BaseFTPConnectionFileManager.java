@@ -58,7 +58,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.URLEncoder;
+import com.aptana.core.util.URLEncoder;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;

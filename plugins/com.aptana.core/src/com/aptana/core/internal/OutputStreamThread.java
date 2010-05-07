@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.internal;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import com.aptana.core.CorePlugin;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-class OutputStreamThread extends Thread
+public class OutputStreamThread extends Thread
 {
 	private OutputStream is;
 	private String charset;

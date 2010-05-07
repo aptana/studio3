@@ -1,4 +1,4 @@
-package com.aptana.util;
+package com.aptana.core.internal;
 
 import java.io.BufferedReader;
 import java.io.IOException;

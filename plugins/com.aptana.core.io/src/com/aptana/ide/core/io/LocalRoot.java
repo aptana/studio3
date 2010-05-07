@@ -49,7 +49,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.PlatformObject;
 
-import com.aptana.core.PlatformUtils;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.ide.core.io.efs.LocalFile;
 
 /**
@@ -58,10 +58,10 @@ import com.aptana.ide.core.io.efs.LocalFile;
  */
 public final class LocalRoot extends PlatformObject {
 
-    private static final String HOME_DIR = PlatformUtils
-            .expandEnvironmentStrings(PlatformUtils.HOME_DIRECTORY);
-    private static final String DESKTOP = PlatformUtils
-            .expandEnvironmentStrings(PlatformUtils.DESKTOP_DIRECTORY);
+    private static final String HOME_DIR = PlatformUtil
+            .expandEnvironmentStrings(PlatformUtil.HOME_DIRECTORY);
+    private static final String DESKTOP = PlatformUtil
+            .expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
     private static final boolean ON_WINDOWS = Platform.OS_WIN32.equals(Platform.getOS());
 
 	private final String name;
@@ -199,7 +199,7 @@ public final class LocalRoot extends PlatformObject {
             }
 		}
 		{	/* Documents */
-			IPath docsPath = new Path(PlatformUtils.expandEnvironmentStrings(PlatformUtils.DOCUMENTS_DIRECTORY));
+			IPath docsPath = new Path(PlatformUtil.expandEnvironmentStrings(PlatformUtil.DOCUMENTS_DIRECTORY));
 			File docsFile = docsPath.toFile();
 			if (docsFile.exists() && docsFile.isDirectory()) {
 				try {

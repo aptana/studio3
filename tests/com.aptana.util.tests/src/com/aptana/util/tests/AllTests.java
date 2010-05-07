@@ -8,7 +8,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.util.tests");
+		TestSuite suite = new TestSuite("Test for com.aptana.core.util.tests");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);

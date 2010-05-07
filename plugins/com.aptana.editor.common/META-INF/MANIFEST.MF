@@ -18,6 +18,7 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.editor.findbar;bundle-version="1.0.0",
  com.aptana.scripting,
  org.eclipse.ui.workbench.texteditor,
+ com.aptana.core;bundle-version="3.0.0",
  com.aptana.epl;bundle-version="1.0.0",
  plistreader;bundle-version="1.0.0",
  com.aptana.parsing,
@@ -37,5 +38,4 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text,
  com.aptana.editor.common.text.rules,
  com.aptana.editor.common.theme
-Import-Package: com.aptana.util
 Eclipse-ExtensibleAPI: true

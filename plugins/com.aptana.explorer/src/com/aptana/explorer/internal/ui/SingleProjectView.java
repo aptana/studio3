@@ -96,6 +96,7 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.editor.common.theme.TreeThemer;
@@ -108,7 +109,6 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.terminal.views.TerminalView;
 import com.aptana.usage.PingStartup;
-import com.aptana.util.EclipseUtils;
 
 /**
  * Customized CommonNavigator that adds a project combo and focuses the view on a single project.
@@ -910,7 +910,7 @@ public abstract class SingleProjectView extends CommonNavigator implements ISize
 	private String getVersion()
 	{
 		// FIXME Do we want this plugin's version, or some other version?
-		return EclipseUtils.getPluginVersion(ExplorerPlugin.getDefault());
+		return EclipseUtil.getPluginVersion(ExplorerPlugin.getDefault());
 	}
 
 	private String toHex(RGB rgb)

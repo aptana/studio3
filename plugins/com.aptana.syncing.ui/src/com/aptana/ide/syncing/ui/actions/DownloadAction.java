@@ -46,7 +46,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
@@ -60,7 +60,7 @@ import com.aptana.ui.DialogUtils;
  */
 public class DownloadAction extends BaseSyncAction {
 
-    private static String MESSAGE_TITLE = StringUtils
+    private static String MESSAGE_TITLE = StringUtil
             .ellipsify(Messages.DownloadAction_MessageTitle);
 
     protected void performAction(final IAdaptable[] files, final ISiteConnection site)
