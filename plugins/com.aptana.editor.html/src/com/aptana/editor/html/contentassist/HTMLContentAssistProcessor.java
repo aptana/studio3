@@ -633,8 +633,23 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		Location result = Location.ERROR;
 
-		int index = lexemeProvider.getLexemeCeilingIndex(offset);
-
+		int index = lexemeProvider.getLexemeIndex(offset);
+		
+		if (index < 0)
+		{
+			int candidateIndex = lexemeProvider.getLexemeFloorIndex(offset);
+			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(candidateIndex);
+			
+			if (lexeme != null && lexeme.getEndingOffset() == offset)
+			{
+				index = candidateIndex;
+			}
+			else
+			{
+				result = Location.IN_ATTRIBUTE_NAME;
+			}
+		}
+		
 		while (index >= 0)
 		{
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(index);
@@ -689,7 +704,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				case SINGLE_QUOTED_STRING:
 				case DOUBLE_QUOTED_STRING:
-					result = (this._currentLexeme.getEndingOffset() == offset) ? Location.IN_ATTRIBUTE_NAME : Location.IN_ATTRIBUTE_VALUE;
+					if (lexeme.getEndingOffset() == offset)
+					{
+						result = Location.IN_ATTRIBUTE_NAME;
+						this._replaceRange = null;
+					}
+					else
+					{
+						result = Location.IN_ATTRIBUTE_VALUE;
+					}
 					break;
 
 				default:
