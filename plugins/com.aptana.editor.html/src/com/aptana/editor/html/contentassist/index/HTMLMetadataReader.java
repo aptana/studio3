@@ -89,8 +89,8 @@ public class HTMLMetadataReader extends MetadataReader
 		AttributeElement attribute = new AttributeElement();
 
 		// grab and set property values
-		attribute.setName(attributes.getValue("name"));
-		attribute.setType(attributes.getValue("type"));
+		attribute.setName(attributes.getValue("name")); //$NON-NLS-1$
+		attribute.setType(attributes.getValue("type")); //$NON-NLS-1$
 
 		// set current item
 		this._currentAttribute = attribute;
@@ -106,7 +106,7 @@ public class HTMLMetadataReader extends MetadataReader
 	 */
 	public void enterAttributeReference(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentElement.addAttribute(attributes.getValue("name"));
+		this._currentElement.addAttribute(attributes.getValue("name")); //$NON-NLS-1$
 	}
 
 	/**
@@ -122,8 +122,8 @@ public class HTMLMetadataReader extends MetadataReader
 		// create a new item documentation object
 		UserAgentElement userAgent = new UserAgentElement();
 
-		userAgent.setPlatform(attributes.getValue("platform"));
-		userAgent.setVersion(attributes.getValue("version"));
+		userAgent.setPlatform(attributes.getValue("platform")); //$NON-NLS-1$
+		userAgent.setVersion(attributes.getValue("version")); //$NON-NLS-1$
 
 		this._currentUserAgent = userAgent;
 	}
@@ -142,9 +142,9 @@ public class HTMLMetadataReader extends MetadataReader
 		ElementElement element = new ElementElement();
 
 		// grab and set property values
-		element.setName(attributes.getValue("name"));
-		element.setRelatedClass(attributes.getValue("related-class"));
-		element.setDisplayName(attributes.getValue("display-name"));
+		element.setName(attributes.getValue("name")); //$NON-NLS-1$
+		element.setRelatedClass(attributes.getValue("related-class")); //$NON-NLS-1$
+		element.setDisplayName(attributes.getValue("display-name")); //$NON-NLS-1$
 
 		// set current item
 		this._currentElement = element;
@@ -164,9 +164,9 @@ public class HTMLMetadataReader extends MetadataReader
 		EntityElement entity = new EntityElement();
 		
 		// grab and set property values
-		entity.setName(attributes.getValue("name"));
-		entity.setDecimalValue(attributes.getValue("decimal"));
-		entity.setHexValue(attributes.getValue("hex"));
+		entity.setName(attributes.getValue("name")); //$NON-NLS-1$
+		entity.setDecimalValue(attributes.getValue("decimal")); //$NON-NLS-1$
+		entity.setHexValue(attributes.getValue("hex")); //$NON-NLS-1$
 		
 		// set current item
 		this._currentEntity = entity;
@@ -186,8 +186,8 @@ public class HTMLMetadataReader extends MetadataReader
 		EventElement event = new EventElement();
 
 		// grab and set property values
-		event.setName(attributes.getValue("name"));
-		event.setType(attributes.getValue("type"));
+		event.setName(attributes.getValue("name")); //$NON-NLS-1$
+		event.setType(attributes.getValue("type")); //$NON-NLS-1$
 
 		// set current item
 		this._currentEvent = event;
@@ -203,7 +203,7 @@ public class HTMLMetadataReader extends MetadataReader
 	 */
 	public void enterEventReference(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentElement.addEvent(attributes.getValue("name"));
+		this._currentElement.addEvent(attributes.getValue("name")); //$NON-NLS-1$
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class HTMLMetadataReader extends MetadataReader
 	 */
 	public void enterReference(String ns, String name, String qname, Attributes attributes)
 	{
-		String reference = attributes.getValue("name");
+		String reference = attributes.getValue("name"); //$NON-NLS-1$
 
 		if (this._currentAttribute != null)
 		{
@@ -240,8 +240,8 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		SpecificationElement specification = new SpecificationElement();
 
-		specification.setName(attributes.getValue("name"));
-		specification.setVersion(attributes.getValue("version"));
+		specification.setName(attributes.getValue("name")); //$NON-NLS-1$
+		specification.setVersion(attributes.getValue("version")); //$NON-NLS-1$
 
 		if (this._currentAttribute != null)
 		{
@@ -271,8 +271,8 @@ public class HTMLMetadataReader extends MetadataReader
 		ValueElement value = new ValueElement();
 
 		// grab and set property values
-		value.setName(attributes.getValue("name"));
-		value.setDescription(attributes.getValue("description"));
+		value.setName(attributes.getValue("name")); //$NON-NLS-1$
+		value.setDescription(attributes.getValue("description")); //$NON-NLS-1$
 
 		this._currentValue = value;
 	}

@@ -99,7 +99,7 @@ public class HTMLIndexReader
 	 */
 	public List<ElementElement> getElements(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, "*", SearchPattern.PATTERN_MATCH);
+		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 		List<ElementElement> result = new LinkedList<ElementElement>();
 
 		if (items != null)
@@ -160,7 +160,7 @@ public class HTMLIndexReader
 
 		if (index != null)
 		{
-			String pattern = "*";
+			String pattern = "*"; //$NON-NLS-1$
 
 			try
 			{
@@ -173,7 +173,7 @@ public class HTMLIndexReader
 					for (QueryResult item : items)
 					{
 						String[] paths = item.getDocuments();
-						String path = (paths != null && paths.length > 0) ? paths[0] : "";
+						String path = (paths != null && paths.length > 0) ? paths[0] : ""; //$NON-NLS-1$
 
 						result.put(item.getWord(), path);
 					}

@@ -209,7 +209,7 @@ public class HTMLIndexQueryHelper
 	 */
 	protected String[] getMetadataResources()
 	{
-		return new String[] { "/metadata/html_metadata.xml" };
+		return new String[] { "/metadata/html_metadata.xml" }; //$NON-NLS-1$
 	}
 
 	/**

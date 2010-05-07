@@ -48,9 +48,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// fine-grain locations
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif");
-	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.gif");
-	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif");
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.gif"); //$NON-NLS-1$
+	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.gif"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, Location> locationMap;
 
 	private HTMLIndexQueryHelper _queryHelper;
@@ -201,11 +201,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 			}
 
-			if (attributeName.equals("id"))
+			if (attributeName.equals("id")) //$NON-NLS-1$
 			{
 				this.addIDProposals(proposals, offset);
 			}
-			else if (attributeName.equals("class"))
+			else if (attributeName.equals("class")) //$NON-NLS-1$
 			{
 				this.addClassProposals(proposals, offset);
 			}
@@ -588,18 +588,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								result = Location.IN_TEXT;
 							}
-							else if ("</".equals(lexeme.getText()))
+							else if ("</".equals(lexeme.getText())) //$NON-NLS-1$
 							{
 								result = Location.IN_CLOSE_TAG;
 							}
 							break;
 
 						case IN_TEXT:
-							if ("<".equals(lexeme.getText()))
+							if ("<".equals(lexeme.getText())) //$NON-NLS-1$
 							{
 								result = Location.IN_OPEN_TAG;
 							}
-							else if ("</".equals(lexeme.getText()))
+							else if ("</".equals(lexeme.getText())) //$NON-NLS-1$
 							{
 								result = Location.IN_CLOSE_TAG;
 							}
@@ -724,7 +724,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			startingLexeme = lexemeProvider.getLexeme(i);
 
-			if ("&".equals(startingLexeme.getText()))
+			if ("&".equals(startingLexeme.getText())) //$NON-NLS-1$
 			{
 				break;
 			}
@@ -737,7 +737,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			Lexeme<HTMLTokenType> candidate = lexemeProvider.getLexeme(index);
 
-			if (";".equals(candidate.getText()))
+			if (";".equals(candidate.getText())) //$NON-NLS-1$
 			{
 				endingLexeme = candidate;
 			}
