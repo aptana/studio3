@@ -78,6 +78,23 @@ public class BaseElement
 	}
 	
 	/**
+	 * getUserAgentNames
+	 * 
+	 * @return
+	 */
+	public String[] getUserAgentNames()
+	{
+		String[] result = new String[this._userAgents.size()];
+		
+		for (int i = 0; i < result.length; i++)
+		{
+			result[i] = this._userAgents.get(i).getPlatform();
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * setDescription
 	 * 
 	 * @param description
