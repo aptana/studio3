@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="userAgent" name="User Agents" schema="schema/userAgent.exsd"/>
+   <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -507,7 +507,7 @@
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
       <target
             id="com.aptana.editor.ui.hyperlinkTarget"
-            name="Aptana Hyperlink Target">
+            name="%target.name">
       </target>
    </extension>
     <extension
@@ -549,6 +549,6 @@
             category="com.aptana.common"
             class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="Browsers/User Agents"/>            
+            name="%page.name.0"/>            
    </extension>
 </plugin>
