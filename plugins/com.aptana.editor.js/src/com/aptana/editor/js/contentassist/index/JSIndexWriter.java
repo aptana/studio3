@@ -4,13 +4,13 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
-import com.aptana.util.StringUtil;
 
 public class JSIndexWriter
 {

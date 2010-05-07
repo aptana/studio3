@@ -1,6 +1,6 @@
 package com.aptana.editor.css.contentassist.model;
 
-import com.aptana.util.StringUtil;
+import com.aptana.core.util.StringUtil;
 
 public class UserAgentElement
 {

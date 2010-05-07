@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -19,7 +20,6 @@ import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.util.IOUtil;
 
 public class HTMLFileIndexingParticipant implements IFileIndexingParticipant
 {

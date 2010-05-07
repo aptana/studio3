@@ -6,12 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.UserAgentElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.index.core.Index;
-import com.aptana.util.StringUtil;
 
 public class CSSIndexWriter
 {

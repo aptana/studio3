@@ -6,13 +6,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
-import com.aptana.util.StringUtil;
 
 public class HTMLIndexWriter
 {

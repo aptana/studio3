@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.ruby.Activator;
 import com.aptana.editor.ruby.parsing.RubyParser;
 import com.aptana.editor.ruby.parsing.ast.RubyImport;
@@ -17,7 +18,6 @@ import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.util.IOUtil;
 
 public class RubyFileIndexingParticipant implements IFileIndexingParticipant
 {

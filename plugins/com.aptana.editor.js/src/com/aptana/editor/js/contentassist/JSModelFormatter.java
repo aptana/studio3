@@ -1,10 +1,10 @@
 package com.aptana.editor.js.contentassist;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
-import com.aptana.util.StringUtil;
 
 public class JSModelFormatter
 {

@@ -9,13 +9,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.index.core.IFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.util.IOUtil;
 
 public class JSFileIndexingParticipant implements IFileIndexingParticipant
 {

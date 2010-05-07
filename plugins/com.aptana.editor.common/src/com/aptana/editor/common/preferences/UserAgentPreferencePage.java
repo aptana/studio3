@@ -38,9 +38,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.util.StringUtil;
 
 /**
  * Allows the user to edit the set of user agents
