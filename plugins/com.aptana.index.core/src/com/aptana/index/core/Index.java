@@ -234,7 +234,6 @@ public class Index
 			}
 			catch (PatternSyntaxException e)
 			{
-				e.printStackTrace();
 			}
 		}
 
@@ -364,8 +363,7 @@ public class Index
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			IndexActivator.logError("An error occurred while remove categories from the index", e);
 		}
 	}
 
