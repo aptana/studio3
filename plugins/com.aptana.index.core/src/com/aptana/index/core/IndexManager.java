@@ -14,18 +14,26 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 public class IndexManager
 {
 	private static IndexManager instance;
-
 	private Map<String, Index> indexes;
 
-	static final ISchedulingRule MUTEX_RULE = new ISchedulingRule() {
-		public boolean isConflicting(ISchedulingRule rule) {
+	static final ISchedulingRule MUTEX_RULE = new ISchedulingRule()
+	{
+		public boolean contains(ISchedulingRule rule)
+		{
 			return rule == this;
 		}
-		public boolean contains(ISchedulingRule rule) {
+
+		public boolean isConflicting(ISchedulingRule rule)
+		{
 			return rule == this;
 		}
 	};
 
+	/**
+	 * getInstance
+	 * 
+	 * @return
+	 */
 	public synchronized static IndexManager getInstance()
 	{
 		if (instance == null)
@@ -33,11 +41,35 @@ public class IndexManager
 		return instance;
 	}
 
+	/**
+	 * IndexManager
+	 */
 	private IndexManager()
 	{
 		indexes = new HashMap<String, Index>();
 	}
 
+	/**
+	 * computeIndexLocation
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public IPath computeIndexLocation(String path)
+	{
+		CRC32 crc = new CRC32();
+		crc.reset();
+		crc.update(path.getBytes());
+		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
+		return IndexActivator.getDefault().getStateLocation().append(fileName);
+	}
+
+	/**
+	 * getIndex
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public Index getIndex(String path)
 	{
 		Index index = indexes.get(path);
@@ -50,39 +82,18 @@ public class IndexManager
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				IndexActivator.logError("An error occurred while trying to access an index", e);
 			}
 		}
 		return index;
 	}
 
 	/**
-	 * Removes the index for a given path.
-	 * This is a no-op if the index did not exist.
+	 * removeDocument
+	 * 
+	 * @param container
+	 * @param documentPath
 	 */
-	public synchronized void removeIndex(String path) {
-		Index index = getIndex(path);
-		File indexFile = null;
-		if (index != null) {
-			index.monitor = null;
-			indexFile = index.getIndexFile();
-		}
-		if (indexFile.exists()) {
-			indexFile.delete();
-		}
-		this.indexes.remove(path);
-	}
-
-	public IPath computeIndexLocation(String path)
-	{
-		CRC32 crc = new CRC32();
-		crc.reset();
-		crc.update(path.getBytes());
-		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
-		return IndexActivator.getDefault().getStateLocation().append(fileName);
-	}
-
 	@SuppressWarnings("unused")
 	private void removeDocument(IPath container, String documentPath)
 	{
@@ -104,4 +115,22 @@ public class IndexManager
 		}
 	}
 
+	/**
+	 * Removes the index for a given path. This is a no-op if the index did not exist.
+	 */
+	public synchronized void removeIndex(String path)
+	{
+		Index index = getIndex(path);
+		File indexFile = null;
+		if (index != null)
+		{
+			index.monitor = null;
+			indexFile = index.getIndexFile();
+		}
+		if (indexFile.exists())
+		{
+			indexFile.delete();
+		}
+		this.indexes.remove(path);
+	}
 }
