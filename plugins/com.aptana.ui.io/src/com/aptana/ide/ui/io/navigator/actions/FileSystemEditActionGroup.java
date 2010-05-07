@@ -34,6 +34,8 @@
  */
 package com.aptana.ide.ui.io.navigator.actions;
 
+import java.lang.reflect.Method;
+
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -109,7 +111,18 @@ public class FileSystemEditActionGroup extends ActionGroup {
         // fTextActionHandler.setPasteAction(fPasteAction);
         fTextActionHandler.setDeleteAction(fDeleteAction);
         updateActionBars();
-        fTextActionHandler.updateActionBars();
+        
+//      fTextActionHandler.updateActionBars(); // 3.6+ only, so we need to use reflection
+        try
+		{
+			Method m = TextActionHandler.class.getMethod("updateActionBars"); //$NON-NLS-1$
+			m.invoke(fTextActionHandler);
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
     }
 
     @Override
