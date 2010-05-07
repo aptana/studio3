@@ -7,14 +7,13 @@ Bundle-Activator: com.aptana.ide.ui.secureftp.SecureFTPUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
+ com.aptana.core,
+ com.aptana.core.io,
  org.eclipse.ui,
- org.eclipse.ui.forms,
  com.aptana.ui,
  com.aptana.ui.io,
  com.aptana.ui.ftp,
  com.aptana.filesystem.ftp,
- com.aptana.filesystem.secureftp,
- com.aptana.core,
- com.aptana.core.io
+ com.aptana.filesystem.secureftp
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
