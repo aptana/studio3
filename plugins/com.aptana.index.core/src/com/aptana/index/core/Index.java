@@ -17,101 +17,106 @@ import com.aptana.internal.index.core.ReadWriteMonitor;
 
 public class Index
 {
-	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH
-			| SearchPattern.PATTERN_MATCH | SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
-	
-	private static final Map<String,Pattern> PATTERNS = new HashMap<String,Pattern>();
-	
+	private static final int MATCH_RULE_INDEX_MASK = SearchPattern.EXACT_MATCH | SearchPattern.PREFIX_MATCH | SearchPattern.PATTERN_MATCH
+		| SearchPattern.CASE_SENSITIVE | SearchPattern.REGEX_MATCH;
+
+	private static final Map<String, Pattern> PATTERNS = new HashMap<String, Pattern>();
+
 	// Separator to use after the container path
 	public static final char DEFAULT_SEPARATOR = '/';
-	public char separator = DEFAULT_SEPARATOR;
-
-	private MemoryIndex memoryIndex;
-	private DiskIndex diskIndex;
-	public ReadWriteMonitor monitor;
 
 	/**
-	 * Index
+	 * appendAsRegEx
 	 * 
-	 * @param path
-	 * @throws IOException
-	 */
-	public Index(String path) throws IOException
-	{
-		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
-		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath
-				.toOSString();
-		this.memoryIndex = new MemoryIndex();
-		this.monitor = new ReadWriteMonitor();
-
-		this.diskIndex = new DiskIndex(containerPathString);
-		this.diskIndex.initialize();
-	}
-
-	/**
-	 * getIndexFile
-	 * 
+	 * @param pattern
+	 * @param buffer
 	 * @return
 	 */
-	public File getIndexFile()
+	private static StringBuffer appendAsRegEx(String pattern, StringBuffer buffer)
 	{
-		return this.diskIndex == null ? null : this.diskIndex.indexFile;
-	}
+		boolean isEscaped = false;
 
-	/**
-	 * addEntry
-	 * 
-	 * @param category
-	 * @param key
-	 * @param documentPath
-	 */
-	public void addEntry(String category, String key, String documentPath)
-	{
-		this.memoryIndex.addEntry(category, key, documentPath);
-	}
-
-	/**
-	 * query
-	 * 
-	 * @param categories
-	 * @param key
-	 * @param matchRule
-	 * @return
-	 * @throws IOException
-	 */
-	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
-	{
-		if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+		for (int i = 0; i < pattern.length(); i++)
 		{
-			try
+			char c = pattern.charAt(i);
+
+			switch (c)
 			{
-				save();
-			}
-			finally
-			{
-				monitor.exitWriteEnterRead();
+				// the backslash
+				case '\\':
+					// the backslash is escape char in string matcher
+					if (!isEscaped)
+					{
+						isEscaped = true;
+					}
+					else
+					{
+						buffer.append("\\\\"); //$NON-NLS-1$
+						isEscaped = false;
+					}
+					break;
+				// characters that need to be escaped in the regex.
+				case '(':
+				case ')':
+				case '{':
+				case '}':
+				case '.':
+				case '[':
+				case ']':
+				case '$':
+				case '^':
+				case '+':
+				case '|':
+					if (isEscaped)
+					{
+						buffer.append("\\\\"); //$NON-NLS-1$
+						isEscaped = false;
+					}
+					buffer.append('\\');
+					buffer.append(c);
+					break;
+				case '?':
+					if (!isEscaped)
+					{
+						buffer.append('.');
+					}
+					else
+					{
+						buffer.append('\\');
+						buffer.append(c);
+						isEscaped = false;
+					}
+					break;
+				case '*':
+					if (!isEscaped)
+					{
+						buffer.append(".*"); //$NON-NLS-1$
+					}
+					else
+					{
+						buffer.append('\\');
+						buffer.append(c);
+						isEscaped = false;
+					}
+					break;
+				default:
+					if (isEscaped)
+					{
+						buffer.append("\\\\"); //$NON-NLS-1$
+						isEscaped = false;
+					}
+					buffer.append(c);
+					break;
 			}
 		}
 
-		Map<String, QueryResult> results;
-		int rule = matchRule & MATCH_RULE_INDEX_MASK;
-		
-		if (this.memoryIndex.hasChanged())
+		if (isEscaped)
 		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
-			results = this.memoryIndex.addQueryResults(categories, key, rule, results);
-		}
-		else
-		{
-			results = this.diskIndex.addQueryResults(categories, key, rule, null);
-		}
-		
-		if ((matchRule & SearchPattern.REGEX_MATCH) == SearchPattern.REGEX_MATCH)
-		{
-			PATTERNS.clear();
+			buffer.append("\\\\"); //$NON-NLS-1$
+			isEscaped = false;
 		}
 
-		return (results == null) ? null : new ArrayList<QueryResult>(results.values());
+		return buffer;
 	}
 
 	/**
@@ -153,6 +158,17 @@ public class Index
 	}
 
 	/**
+	 * isWordChar
+	 * 
+	 * @param c
+	 * @return
+	 */
+	private static boolean isWordChar(char c)
+	{
+		return Character.isLetterOrDigit(c);
+	}
+
+	/**
 	 * patternMatch
 	 * 
 	 * @param pattern
@@ -161,12 +177,40 @@ public class Index
 	 */
 	private static boolean patternMatch(String pattern, String word)
 	{
-		// TODO Sort of like a regexp match, just handle * and ? wildcards in the pattern
 		if (pattern.equals("*")) //$NON-NLS-1$
 			return true;
-		return false;
+
+		// see if we've cached a regex for this pattern already
+		Pattern p = PATTERNS.get(pattern);
+
+		// nope, so try and create one
+		if (p == null)
+		{
+			int len = pattern.length();
+			StringBuffer buffer = new StringBuffer(len + 10);
+
+			if (len > 0 && isWordChar(pattern.charAt(0)))
+			{
+				buffer.append("\\b"); //$NON-NLS-1$
+			}
+
+			appendAsRegEx(pattern, buffer);
+
+			if (len > 0 && isWordChar(pattern.charAt(len - 1)))
+			{
+				buffer.append("\\b"); //$NON-NLS-1$
+			}
+
+			String regex = buffer.toString();
+
+			p = Pattern.compile(regex);
+
+			PATTERNS.put(pattern, p);
+		}
+
+		return (p != null) ? p.matcher(word).find() : false;
 	}
-	
+
 	/**
 	 * regexPatternMatch
 	 * 
@@ -177,14 +221,14 @@ public class Index
 	private static boolean regexPatternMatch(String regex, String word, boolean caseSensitive)
 	{
 		Pattern pattern = PATTERNS.get(regex);
-		
+
 		if (pattern == null)
 		{
 			try
 			{
 				// compile the pattern
 				pattern = (caseSensitive) ? Pattern.compile(regex) : Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-				
+
 				// cache for later
 				PATTERNS.put(regex, pattern);
 			}
@@ -193,26 +237,55 @@ public class Index
 				e.printStackTrace();
 			}
 		}
-		
+
 		return (pattern != null) ? pattern.matcher(word).find() : false;
 	}
 
+	public char separator = DEFAULT_SEPARATOR;
+
+	private MemoryIndex memoryIndex;
+
+	private DiskIndex diskIndex;
+
+	public ReadWriteMonitor monitor;
+
 	/**
-	 * save
+	 * Index
 	 * 
+	 * @param path
 	 * @throws IOException
 	 */
-	public void save() throws IOException
+	public Index(String path) throws IOException
 	{
-		// must own the write lock of the monitor
-		if (!hasChanged())
-			return;
-
-		int numberOfChanges = this.memoryIndex.numberOfChanges();
-		this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
+		IPath containerPath = IndexManager.getInstance().computeIndexLocation(path);
+		String containerPathString = containerPath.getDevice() == null ? containerPath.toString() : containerPath.toOSString();
 		this.memoryIndex = new MemoryIndex();
-		if (numberOfChanges > 1000)
-			System.gc(); // reclaim space if the MemoryIndex was very BIG
+		this.monitor = new ReadWriteMonitor();
+
+		this.diskIndex = new DiskIndex(containerPathString);
+		this.diskIndex.initialize();
+	}
+
+	/**
+	 * addEntry
+	 * 
+	 * @param category
+	 * @param key
+	 * @param documentPath
+	 */
+	public void addEntry(String category, String key, String documentPath)
+	{
+		this.memoryIndex.addEntry(category, key, documentPath);
+	}
+
+	/**
+	 * getIndexFile
+	 * 
+	 * @return
+	 */
+	public File getIndexFile()
+	{
+		return this.diskIndex == null ? null : this.diskIndex.indexFile;
 	}
 
 	/**
@@ -223,6 +296,48 @@ public class Index
 	private boolean hasChanged()
 	{
 		return memoryIndex.hasChanged();
+	}
+
+	/**
+	 * query
+	 * 
+	 * @param categories
+	 * @param key
+	 * @param matchRule
+	 * @return
+	 * @throws IOException
+	 */
+	public List<QueryResult> query(String[] categories, String key, int matchRule) throws IOException
+	{
+		if (this.memoryIndex.shouldMerge() && monitor.exitReadEnterWrite())
+		{
+			try
+			{
+				save();
+			}
+			finally
+			{
+				monitor.exitWriteEnterRead();
+			}
+		}
+
+		Map<String, QueryResult> results;
+		int rule = matchRule & MATCH_RULE_INDEX_MASK;
+
+		if (this.memoryIndex.hasChanged())
+		{
+			results = this.diskIndex.addQueryResults(categories, key, rule, this.memoryIndex);
+			results = this.memoryIndex.addQueryResults(categories, key, rule, results);
+		}
+		else
+		{
+			results = this.diskIndex.addQueryResults(categories, key, rule, null);
+		}
+
+		// clear any cached regexes or patterns we might have used during the query
+		PATTERNS.clear();
+
+		return (results == null) ? null : new ArrayList<QueryResult>(results.values());
 	}
 
 	/**
@@ -252,5 +367,23 @@ public class Index
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * save
+	 * 
+	 * @throws IOException
+	 */
+	public void save() throws IOException
+	{
+		// must own the write lock of the monitor
+		if (!hasChanged())
+			return;
+
+		int numberOfChanges = this.memoryIndex.numberOfChanges();
+		this.diskIndex = this.diskIndex.mergeWith(this.memoryIndex);
+		this.memoryIndex = new MemoryIndex();
+		if (numberOfChanges > 1000)
+			System.gc(); // reclaim space if the MemoryIndex was very BIG
 	}
 }
