@@ -1,11 +1,10 @@
 package com.aptana.editor.html.contentassist.index;
 
-import org.eclipse.core.runtime.Platform;
 
 public interface HTMLIndexConstants
 {
 	// general constants
-	static final String DELIMITER = Platform.inDevelopmentMode() ? "~" : "\0"; //$NON-NLS-1$ //$NON-NLS-2$
+	static final String DELIMITER = "\0";
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
 	static final String METADATA = "html.metadata"; //$NON-NLS-1$
 	static final String CORE = "HTML Core"; //$NON-NLS-1$
