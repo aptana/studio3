@@ -21,10 +21,12 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.IScopeReference;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -89,12 +91,21 @@ public class EditorCommandsMenuContributor extends ContributionItem
 
 	public static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem)
 	{
-		String contentTypeAtOffset = null;
+		String scope = null;
 		List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
 		MenuElement[] menusFromScope;
 		MenuElement[] menusFromOtherScopes = null;
 		if (textEditor == null)
 		{
+			IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+			if (part != null)
+			{
+				IScopeReference scopeRef = (IScopeReference) part.getAdapter(IScopeReference.class);
+				if (scopeRef != null)
+				{
+					scope = scopeRef.getScopeId();
+				}
+			}
 			menusFromScope = BundleManager.getInstance().getMenus(new IModelFilter()
 			{
 
@@ -116,7 +127,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
 				// Get the scope at caret offset
-				contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
+				scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(
 						document, caretOffset);
 			}
 			catch (BadLocationException e)
@@ -125,9 +136,9 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			}
 
 			// First pull all possible menus from the current caret position's scopes
-			if (contentTypeAtOffset != null)
+			if (scope != null)
 			{
-				ScopeFilter filter = new ScopeFilter(contentTypeAtOffset);
+				ScopeFilter filter = new ScopeFilter(scope);
 				menusFromScope = BundleManager.getInstance().getMenus(filter);
 				if (menusFromScope.length > 0)
 				{
@@ -189,7 +200,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 			menusFromScopeList.toArray(menusFromScope);
 
 			// Now build the menu
-			buildMenu(menu, menusFromScope, textEditor, contentTypeAtOffset, contributionItem);
+			buildMenu(menu, menusFromScope, textEditor, scope, contributionItem);
 		}
 
 		// Are there any menus that belong to scopes other than top level scopes
@@ -205,7 +216,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 
 			Menu menuForOtherScopes = new Menu(menu);
 			menuItemForOtherScopes.setMenu(menuForOtherScopes);
-			buildMenu(menuForOtherScopes, menusFromOtherScopes, textEditor, contentTypeAtOffset, contributionItem);
+			buildMenu(menuForOtherScopes, menusFromOtherScopes, textEditor, scope, contributionItem);
 		}
 	}
 
@@ -220,10 +231,10 @@ public class EditorCommandsMenuContributor extends ContributionItem
 	 * @param menu
 	 * @param menusFromScope
 	 * @param textEditor
-	 * @param contentTypeAtOffset
+	 * @param scope
 	 */
 	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor,
-			String contentTypeAtOffset, IContributionItem contributionItem)
+			String scope, IContributionItem contributionItem)
 	{
 		for (MenuElement menuForScope : menusFromScope)
 		{
@@ -237,7 +248,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				menuItem.setMenu(menuForMenuForScope);
 
 				// Recursive
-				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, contentTypeAtOffset, contributionItem);
+				buildMenu(menuForMenuForScope, menuForScope.getChildren(), textEditor, scope, contributionItem);
 			}
 			else if (menuForScope.isSeparator())
 			{
@@ -310,7 +321,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 				// 2. The command did not specify the scope
 				// 3. The command specified the scope and it matches the current scope
 				menuItem.setEnabled(command == null || command.getScope() == null
-						|| command.getScopeSelector().matches(contentTypeAtOffset));
+						|| command.getScopeSelector().matches(scope));
 			}
 		}
 		if (menusFromScope.length > 0)

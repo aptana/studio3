@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.parsing,
  org.jruby;bundle-version="1.4.0",
  com.aptana.git.core;bundle-version="1.0.0",
- com.aptana.usage
+ com.aptana.usage,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
