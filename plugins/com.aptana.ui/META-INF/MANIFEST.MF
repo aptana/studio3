@@ -17,3 +17,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
  com.aptana.ui.projects
+Eclipse-ExtensibleAPI: true

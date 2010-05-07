@@ -20,3 +20,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.ftp.actions,
  com.aptana.ide.ui.ftp.dialogs,
  com.aptana.ide.ui.ftp.internal;x-friends:="com.aptana.ide.ui.secureftp"
+Eclipse-ExtensibleAPI: true

@@ -15,3 +15,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.syncing.core,
  com.aptana.ide.syncing.core.events
+Eclipse-ExtensibleAPI: true
