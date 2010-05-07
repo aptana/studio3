@@ -7,59 +7,93 @@ import org.eclipse.core.resources.ISavedState;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class IndexActivator extends Plugin {
+public class IndexActivator extends Plugin
+{
 
-	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.index.core"; //$NON-NLS-1$
-
-	// The shared instance
 	private static IndexActivator plugin;
-	
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static IndexActivator getDefault()
+	{
+		return plugin;
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 */
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	}
+
 	private ResourceIndexer resourceChangeListener;
-	
+
 	ISaveParticipant saveParticipant = new ISaveParticipant()
 	{
-		
+
+		public void doneSaving(ISaveContext context)
+		{
+
+		}
+
+		public void prepareToSave(ISaveContext context) throws CoreException
+		{
+
+		}
+
+		public void rollback(ISaveContext context)
+		{
+
+		}
+
 		public void saving(ISaveContext context) throws CoreException
 		{
-			if (context.getKind() == ISaveContext.FULL_SAVE) {
+			if (context.getKind() == ISaveContext.FULL_SAVE)
+			{
 				context.needDelta();
 			}
 		}
-		
-		public void rollback(ISaveContext context)
-		{
-			
-		}
-		
-		public void prepareToSave(ISaveContext context) throws CoreException
-		{
-			
-		}
-		
-		public void doneSaving(ISaveContext context)
-		{
-			
-		}
 	};
-	
+
 	/**
 	 * The constructor
 	 */
-	public IndexActivator() {
+	public IndexActivator()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 		IndexManager.getInstance();
@@ -69,35 +103,30 @@ public class IndexActivator extends Plugin {
 
 		// Register save participant to process any deltas that occured since last save
 		ISavedState savedState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, saveParticipant);
-		if (savedState != null) {
-			try {
+		if (savedState != null)
+		{
+			try
+			{
 				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(savedState);
 				savedState.processResourceChangeEvents(resourceChangeListener);
-			} finally {
+			}
+			finally
+			{
 				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(null);
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		// Clean up
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
 
 		plugin = null;
 		super.stop(context);
 	}
-	
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static IndexActivator getDefault() {
-		return plugin;
-	}
-
 }
