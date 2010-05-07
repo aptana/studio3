@@ -12,11 +12,13 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
+import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -185,6 +187,20 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * getAllUserAgentIcons
+	 * 
+	 * @return
+	 */
+	protected Image[] getAllUserAgentIcons()
+	{
+		UserAgentManager manager = UserAgentManager.getInstance();
+		String[] userAgents = manager.getActiveUserAgentIDs();
+		Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+		
+		return userAgentIcons;
 	}
 	
 	/**

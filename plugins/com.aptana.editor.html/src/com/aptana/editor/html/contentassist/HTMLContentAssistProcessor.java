@@ -380,14 +380,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		return result.toArray(new ICompletionProposal[result.size()]);
 	}
 
-	private Image[] getAllUserAgentIcons()
-	{
-		UserAgentManager manager = UserAgentManager.getInstance();
-		String[] userAgents = manager.getActiveUserAgentIDs();
-		Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
-		return userAgentIcons;
-	}
-
 	/**
 	 * getAttributeName
 	 * 
