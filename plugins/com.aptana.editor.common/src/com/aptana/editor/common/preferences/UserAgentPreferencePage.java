@@ -131,7 +131,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 		layout.marginWidth = 0;
 		composite.setLayout(layout);
 		Label label = new Label(composite, SWT.WRAP);
-		label.setText("Select which browsers/user agents are shown in code assist");
+		label.setText(Messages.UserAgentPreferencePage_Select_User_Agents);
 		label.setFont(parent.getFont());
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.widthHint = 400;
@@ -167,7 +167,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 				categoryViewer.setCheckedElements(UserAgentManager.getInstance().getAllUserAgents());
 			}
 		});
-		enableAll.setText("Select All");
+		enableAll.setText(Messages.UserAgentPreferencePage_Select_All);
 		setButtonLayoutData(enableAll);
 
 		Button disableAll = new Button(composite, SWT.PUSH);
@@ -179,7 +179,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 				categoryViewer.setCheckedElements(new Object[0]);
 			}
 		});
-		disableAll.setText("Select None");
+		disableAll.setText(Messages.UserAgentPreferencePage_Select_None);
 		setButtonLayoutData(disableAll);
 	}
 
@@ -231,7 +231,7 @@ public final class UserAgentPreferencePage extends PreferencePage implements IWo
 	protected void clearDetails()
 	{
 		dependantViewer.setInput(Collections.EMPTY_SET);
-		descriptionText.setText(""); 
+		descriptionText.setText("");  //$NON-NLS-1$
 	}
 
 	/**

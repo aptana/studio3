@@ -99,7 +99,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal
 	@Override
 	public String getFileLocation()
 	{
-		return (this._fileLocation != null) ? this._fileLocation : "";
+		return (this._fileLocation != null) ? this._fileLocation : ""; //$NON-NLS-1$
 	}
 
 	/*

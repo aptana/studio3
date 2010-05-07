@@ -250,8 +250,8 @@ class EditBundleJob extends Job
 	@SuppressWarnings("nls")
 	private boolean looksLikeSVNURI(String repoURI)
 	{
-		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk")
-				|| repoURI.contains("/tags") || repoURI.contains("/branches");
+		return repoURI.startsWith("svn:") || repoURI.startsWith("svn+") || repoURI.contains("/trunk") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				|| repoURI.contains("/tags") || repoURI.contains("/branches"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -263,7 +263,7 @@ class EditBundleJob extends Job
 	@SuppressWarnings("nls")
 	private boolean looksLikeGitURI(String repoURI)
 	{
-		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com");
+		return repoURI.startsWith("git:") || repoURI.endsWith(".git") || repoURI.contains("github.com"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

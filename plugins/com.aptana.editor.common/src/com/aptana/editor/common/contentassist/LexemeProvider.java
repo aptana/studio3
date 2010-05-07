@@ -19,7 +19,7 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public abstract class LexemeProvider<T extends ITypePredicate> implements Iterable<Lexeme<T>>
 {
-	private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.MULTILINE);
+	private static final Pattern WHITESPACE = Pattern.compile("\\s+", Pattern.MULTILINE); //$NON-NLS-1$
 
 	private List<Lexeme<T>> _lexemes;
 
@@ -77,7 +77,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 					{
 						if (type.isDefined() == false)
 						{
-							System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~");
+							System.out.println("Possible missed token type for text: [" + data + "]~" + text + "~"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					}
 					else
@@ -86,7 +86,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 
 						if (m.matches() == false)
 						{
-							System.out.println("Possible missed token type for text: ~" + text + "~");
+							System.out.println("Possible missed token type for text: ~" + text + "~"); //$NON-NLS-1$ //$NON-NLS-2$
 						}
 					}
 				}

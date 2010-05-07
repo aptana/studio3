@@ -44,7 +44,7 @@ public class UserAgentManager
 		}
 	}
 	
-	private static final String[] DEFAULT_USERAGENT_IDS = new String[] { "IE", "Mozilla" };
+	private static final String[] DEFAULT_USERAGENT_IDS = new String[] { "IE", "Mozilla" }; //$NON-NLS-1$ //$NON-NLS-2$
 	
 	private static final String USERAGENT_ID = "userAgent"; //$NON-NLS-1$
 	private static final String ELEMENT_USERAGENT = "user-agent"; //$NON-NLS-1$
@@ -89,7 +89,7 @@ public class UserAgentManager
 		IPreferenceStore prefs = CommonEditorPlugin.getDefault().getPreferenceStore();
 		String agentsValue = prefs.getString(IPreferenceConstants.USER_AGENT_PREFERENCE);
 		
-		return agentsValue.split(",");
+		return agentsValue.split(","); //$NON-NLS-1$
 	}
 	
 	/**

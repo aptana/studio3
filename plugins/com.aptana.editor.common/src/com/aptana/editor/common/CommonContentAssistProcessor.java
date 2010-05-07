@@ -59,7 +59,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				{
 					String text = queryResult.getWord();
 					int length = text.length();
-					String info = category + " : " + text;
+					String info = category + " : " + text; //$NON-NLS-1$
 					
 					completionProposals.add(new CompletionProposal(text, offset, 0, length, null, text, null, info));
 				}
