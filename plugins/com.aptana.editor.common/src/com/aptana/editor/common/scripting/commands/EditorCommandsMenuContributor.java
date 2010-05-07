@@ -27,6 +27,7 @@ import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.IScopeReference;
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ITopContentTypesProvider;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -42,7 +43,6 @@ import com.aptana.scripting.model.SnippetElement;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.NotFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
-import com.aptana.util.CollectionsUtil;
 
 /**
  * This contributes the menus for editor scope to the Commands menu.

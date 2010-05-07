@@ -7,8 +7,8 @@ Bundle-Activator: com.aptana.usage.UsagePlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- com.aptana.util,
- com.aptana.libraries
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.libraries;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.usage

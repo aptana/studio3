@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor;
 
-import com.aptana.core.PlatformUtils;
+import com.aptana.core.util.PlatformUtil;
 
 /**
  * @author Max Stepanov
@@ -66,8 +66,8 @@ import com.aptana.core.PlatformUtils;
 @SuppressWarnings("restriction")
 public final class ImageUtils {
 
-    private static final String USER_HOME = PlatformUtils.expandEnvironmentStrings(PlatformUtils.HOME_DIRECTORY);
-    private static final String DESKTOP = PlatformUtils.expandEnvironmentStrings(PlatformUtils.DESKTOP_DIRECTORY);
+    private static final String USER_HOME = PlatformUtil.expandEnvironmentStrings(PlatformUtil.HOME_DIRECTORY);
+    private static final String DESKTOP = PlatformUtil.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
     private static final boolean ON_WINDOWS = Platform.OS_WIN32.equals(Platform.getOS());
 
 	private static javax.swing.JFileChooser jFileChooser;

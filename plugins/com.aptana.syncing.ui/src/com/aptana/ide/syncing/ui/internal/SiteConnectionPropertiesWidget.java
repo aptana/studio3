@@ -76,7 +76,7 @@ import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -122,7 +122,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
 
         /* row 1 - name */
         Label label = new Label(this, SWT.NONE);
-        label.setText(StringUtils.makeFormLabel(Messages.SiteConnectionPropertiesWidget_LBL_Name));
+        label.setText(StringUtil.makeFormLabel(Messages.SiteConnectionPropertiesWidget_LBL_Name));
         label.setLayoutData(GridDataFactory.swtDefaults().create());
 
         nameText = new Text(this, SWT.SINGLE | SWT.BORDER);
@@ -391,7 +391,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             updateRemotesViewer();
 
             remoteNewButton = new Button(mainComp, SWT.PUSH);
-            remoteNewButton.setText(StringUtils.ellipsify(CoreStrings.NEW));
+            remoteNewButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
             remoteNewButton.setLayoutData(GridDataFactory.swtDefaults().exclude(!showRemote)
                     .create());
             remoteNewButton.addSelectionListener(this);
@@ -426,7 +426,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             new Label(mainComp, SWT.NONE).setLayoutData(GridDataFactory.swtDefaults().create());
 
             Label label = new Label(mainComp, SWT.NONE);
-            label.setText(StringUtils
+            label.setText(StringUtil
                     .makeFormLabel(Messages.SiteConnectionPropertiesWidget_LBL_Folder));
             label.setLayoutData(GridDataFactory.swtDefaults().create());
 
@@ -437,7 +437,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             projectFolderText.addModifyListener(SiteConnectionPropertiesWidget.this);
 
             projectBrowseButton = new Button(mainComp, SWT.PUSH);
-            projectBrowseButton.setText(StringUtils.ellipsify(CoreStrings.BROWSE));
+            projectBrowseButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
             projectBrowseButton.setLayoutData(GridDataFactory.swtDefaults().create());
             projectBrowseButton.addSelectionListener(this);
 
@@ -453,7 +453,7 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             filesystemFolderText.addModifyListener(SiteConnectionPropertiesWidget.this);
 
             filesystemBrowseButton = new Button(mainComp, SWT.PUSH);
-            filesystemBrowseButton.setText(StringUtils.ellipsify(CoreStrings.BROWSE));
+            filesystemBrowseButton.setText(StringUtil.ellipsify(CoreStrings.BROWSE));
             filesystemBrowseButton.setLayoutData(GridDataFactory.swtDefaults().create());
             filesystemBrowseButton.addSelectionListener(this);
 

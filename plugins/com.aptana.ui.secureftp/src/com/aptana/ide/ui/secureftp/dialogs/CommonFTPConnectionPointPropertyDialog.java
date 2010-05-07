@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
@@ -137,7 +137,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Protocol));
+		label.setText(StringUtil.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Protocol));
 
 		protocolButton = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
 		String[] items = new String[protoTypes.length];
@@ -247,7 +247,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 			if (keyFilePath != null && !keyFilePath.isEmpty()) {
 				keyAuthButton.setSelection(true);
 				keyPathLabel.setText(keyFilePath.toOSString());
-				passwordLabel.setText(StringUtils.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Passphrase));
+				passwordLabel.setText(StringUtil.makeFormLabel(Messages.CommonFTPConnectionPointPropertyDialog_Passphrase));
 				try {
 					boolean passphraseProtected = SecureUtils.isKeyPassphraseProtected(keyFilePath.toFile());
 					makeVisible(passwordLabel, passphraseProtected);
@@ -401,7 +401,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 			makeVisible(savePasswordButton, true);
 		}
 		updateLayout();
-		passwordLabel.setText(StringUtils.makeFormLabel(enabled ? Messages.CommonFTPConnectionPointPropertyDialog_Passphrase : Messages.CommonFTPConnectionPointPropertyDialog_Password));
+		passwordLabel.setText(StringUtil.makeFormLabel(enabled ? Messages.CommonFTPConnectionPointPropertyDialog_Passphrase : Messages.CommonFTPConnectionPointPropertyDialog_Password));
 		savePasswordButton.setSelection(false);
 		validate();
 	}

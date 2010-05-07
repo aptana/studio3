@@ -52,7 +52,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import com.aptana.core.URLEncoder;
+import com.aptana.core.util.URLEncoder;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.core.io.vfs.IConnectionFileManager;

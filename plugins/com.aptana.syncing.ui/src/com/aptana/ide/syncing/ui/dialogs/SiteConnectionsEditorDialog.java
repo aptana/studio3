@@ -70,7 +70,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -163,7 +163,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 		addButton = new Button(group, SWT.PUSH);
 		addButton.setLayoutData(GridDataFactory.swtDefaults().create());
 		addButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/add.gif")); //$NON-NLS-1$
-		addButton.setToolTipText(StringUtils.ellipsify(CoreStrings.ADD));
+		addButton.setToolTipText(StringUtil.ellipsify(CoreStrings.ADD));
 
 		removeButton = new Button(group, SWT.PUSH);
 		removeButton.setLayoutData(GridDataFactory.swtDefaults().create());

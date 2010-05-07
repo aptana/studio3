@@ -47,7 +47,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import com.aptana.core.PlatformUtils;
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.ui.io.CoreIOImages;
 
@@ -59,8 +59,8 @@ public class LocalFileSystems implements IWorkbenchAdapter {
 
 	private static final String MY_COMPUTER_GUID = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"; //$NON-NLS-1$
 	private static final String MY_NETWORK_PLACES_GUID = "::{208D2C60-3AEA-1069-A2D7-08002B30309D}"; //$NON-NLS-1$
-	private static final String DESKTOP = PlatformUtils
-			.expandEnvironmentStrings(PlatformUtils.DESKTOP_DIRECTORY);
+	private static final String DESKTOP = PlatformUtil
+			.expandEnvironmentStrings(PlatformUtil.DESKTOP_DIRECTORY);
     
 	private static LocalFileSystems instance;
 	

@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.ide.filesystem.secureftp.ISFTPConstants;
 import com.aptana.ide.ui.ftp.internal.IConnectionDialog;
@@ -89,7 +89,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Compression));
+		label.setText(StringUtil.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Compression));
 
 		compressionCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		compressionCombo.add(ISFTPConstants.COMPRESSION_AUTO);
@@ -105,7 +105,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 
 		label = new Label(this, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Port));
+		label.setText(StringUtil.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Port));
 		
 		portText = new Text(this, SWT.SINGLE | SWT.RIGHT | SWT.BORDER);
 		portText.setLayoutData(GridDataFactory.swtDefaults().hint(
@@ -119,7 +119,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(this).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Encoding));
+		label.setText(StringUtil.makeFormLabel(Messages.SFTPAdvancedOptionsComposite_Encoding));
 
 		encodingCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
 		encodingCombo.setItems(Charset.availableCharsets().keySet().toArray(new String[0]));

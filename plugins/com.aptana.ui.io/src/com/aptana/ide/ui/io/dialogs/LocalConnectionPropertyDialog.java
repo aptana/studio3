@@ -61,7 +61,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
@@ -153,7 +153,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.LocalConnectionPropertyDialog_ShortcutName));
+		label.setText(StringUtil.makeFormLabel(Messages.LocalConnectionPropertyDialog_ShortcutName));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -165,7 +165,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.LocalConnectionPropertyDialog_LocalPath));
+		label.setText(StringUtil.makeFormLabel(Messages.LocalConnectionPropertyDialog_LocalPath));
 
 		localPathText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		localPathText.setLayoutData(GridDataFactory.swtDefaults()
@@ -173,7 +173,7 @@ public class LocalConnectionPropertyDialog extends TitleAreaDialog implements IP
 				.grab(true, false).create());
 		
 		browseButton = new Button(container, SWT.PUSH);
-		browseButton.setText('&' + StringUtils.ellipsify(CoreStrings.BROWSE));
+		browseButton.setText('&' + StringUtil.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),

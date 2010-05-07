@@ -46,7 +46,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
 
-import com.aptana.util.ResourceUtils;
+import com.aptana.core.util.ResourceUtil;
 
 /**
  * @author Kevin Lindsey
@@ -281,7 +281,7 @@ public class AptanaDB
 			}
 			if (location != null)
 			{
-				File homeDirectory = ResourceUtils.resourcePathToFile(location.getURL());
+				File homeDirectory = ResourceUtil.resourcePathToFile(location.getURL());
 
 				// makes sure home directory exists
 				homeDirectory.mkdirs();

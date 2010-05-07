@@ -54,7 +54,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
@@ -176,7 +176,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
             throws CoreException;
 
     protected String getMessageTitle() {
-        return StringUtils.ellipsify(Messages.BaseSyncAction_MessageTitle);
+        return StringUtil.ellipsify(Messages.BaseSyncAction_MessageTitle);
     }
 
     protected Shell getShell() {

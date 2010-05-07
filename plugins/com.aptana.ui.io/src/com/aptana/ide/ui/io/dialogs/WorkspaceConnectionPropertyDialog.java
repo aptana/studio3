@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.StringUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
@@ -158,7 +158,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_ShortcutName));
+		label.setText(StringUtil.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_ShortcutName));
 		
 		nameText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults()
@@ -170,7 +170,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(IDialogConstants.LABEL_WIDTH),
 				SWT.DEFAULT).create());
-		label.setText(StringUtils.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_WorkspacePath));
+		label.setText(StringUtil.makeFormLabel(Messages.WorkspaceConnectionPropertyDialog_WorkspacePath));
 
 		workspacePathText = new Text(container, SWT.SINGLE | SWT.BORDER);
 		workspacePathText.setLayoutData(GridDataFactory.swtDefaults()
@@ -179,7 +179,7 @@ public class WorkspaceConnectionPropertyDialog extends TitleAreaDialog implement
 		workspacePathText.setEditable(false);
 		
 		browseButton = new Button(container, SWT.PUSH);
-		browseButton.setText('&' + StringUtils.ellipsify(CoreStrings.BROWSE));
+		browseButton.setText('&' + StringUtil.ellipsify(CoreStrings.BROWSE));
 		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
 				Math.max(
 					new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
