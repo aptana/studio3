@@ -90,31 +90,34 @@ public abstract class MetadataReader extends ValidatingReader
 			// get schema for our documentation XML format
 			InputStream schemaStream = this.getSchemaStream();
 
-			try
+			if (schemaStream != null)
 			{
-				// create the schema
-				this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
-			}
-			catch (SchemaInitializationException e)
-			{
-				String msg = Messages.MetadataReader_ErrorLoadingDocumentationXML;
-				Exception ie = new Exception(msg, e);
-
-				throw ie;
-			}
-			finally
-			{
-				// close the input stream
 				try
 				{
-					schemaStream.close();
+					// create the schema
+					this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
 				}
-				catch (IOException e)
+				catch (SchemaInitializationException e)
 				{
-					String msg = Messages.MetadataReader_IOErrorProcessingDocumentationXML;
+					String msg = Messages.MetadataReader_ErrorLoadingDocumentationXML;
 					Exception ie = new Exception(msg, e);
-
+	
 					throw ie;
+				}
+				finally
+				{
+					// close the input stream
+					try
+					{
+						schemaStream.close();
+					}
+					catch (IOException e)
+					{
+						String msg = Messages.MetadataReader_IOErrorProcessingDocumentationXML;
+						Exception ie = new Exception(msg, e);
+	
+						throw ie;
+					}
 				}
 			}
 		}
