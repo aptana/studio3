@@ -1,5 +1,6 @@
 package com.aptana.parsing.lexer;
 
+
 public class Lexeme<T> implements ILexeme
 {
 	private String _text;
@@ -22,6 +23,25 @@ public class Lexeme<T> implements ILexeme
 		this._text = text;
 	}
 
+	/**
+	 * areContiguous
+	 * 
+	 * @param firstLexeme
+	 * @param secondLexeme
+	 * @return
+	 */
+	public boolean isContiguousWith(Lexeme<T> secondLexeme)
+	{
+		boolean result = true;
+		
+		if (secondLexeme != null)
+		{
+			result = this.getEndingOffset() == secondLexeme.getStartingOffset();
+		}
+		
+		return result;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getEndingOffset()
