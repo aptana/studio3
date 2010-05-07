@@ -44,6 +44,8 @@ public class UserAgentManager
 		}
 	}
 	
+	private static final String[] DEFAULT_USERAGENT_IDS = new String[] { "IE", "Mozilla" };
+	
 	private static final String USERAGENT_ID = "userAgent"; //$NON-NLS-1$
 	private static final String ELEMENT_USERAGENT = "user-agent"; //$NON-NLS-1$
 	private static final String ATTR_USER_AGENT_NAME = "name"; //$NON-NLS-1$
@@ -107,7 +109,7 @@ public class UserAgentManager
 	 */
 	public UserAgent[] getDefaultActiveUserAgents()
 	{
-		return this.getUserAgentsByID("IE", "Mozilla");
+		return this.getUserAgentsByID(DEFAULT_USERAGENT_IDS);
 	}
 	
 	/**
