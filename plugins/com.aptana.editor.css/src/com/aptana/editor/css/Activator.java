@@ -1,5 +1,8 @@
 package com.aptana.editor.css;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -13,8 +16,6 @@ public class Activator extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.css"; //$NON-NLS-1$
 	private static Activator plugin;
-	
-	private CSSCodeScanner _codeScanner;
 
 	/**
 	 * Returns the shared instance
@@ -63,6 +64,29 @@ public class Activator extends AbstractUIPlugin
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 */
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	}
+
+	private CSSCodeScanner _codeScanner;
 
 	/**
 	 * The constructor
