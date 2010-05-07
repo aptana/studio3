@@ -339,25 +339,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		proposals.add(proposal);
 	}
 	
-	/**
-	 * areContiguous
-	 * 
-	 * @param firstLexeme
-	 * @param secondLexeme
-	 * @return
-	 */
-	private boolean areContiguous(Lexeme<CSSTokenType> firstLexeme, Lexeme<CSSTokenType> secondLexeme)
-	{
-		boolean result = true;
-		
-		if (firstLexeme != null && secondLexeme != null)
-		{
-			result = firstLexeme.getEndingOffset() == secondLexeme.getStartingOffset();
-		}
-		
-		return result;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -566,7 +547,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				index = i + 1;
 				break;
 			}
-			else if (this.areContiguous(previousLexeme, currentLexeme) == false)
+			else if (previousLexeme.isContiguousWith(currentLexeme) == false)
 			{
 				// there's a space between this lexeme and the previous lexeme
 				// treat the previous lexeme like it is the delimiter
@@ -608,7 +589,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> candidateLexeme = lexemeProvider.getLexeme(index);
 				
-				if (this.isValueDelimiter(candidateLexeme) || this.areContiguous(endingLexeme, candidateLexeme) == false)
+				if (this.isValueDelimiter(candidateLexeme) || endingLexeme.isContiguousWith(candidateLexeme) == false)
 				{
 					// we've hit a delimiting lexeme or have passed over whitespace, so we're done
 					break;
