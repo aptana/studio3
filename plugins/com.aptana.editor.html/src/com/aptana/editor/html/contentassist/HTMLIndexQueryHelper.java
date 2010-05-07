@@ -107,16 +107,6 @@ public class HTMLIndexQueryHelper
 		return result;
 	}
 
-	// /**
-	// * getIndex
-	// *
-	// * @return
-	// */
-	// private Index getIndex()
-	// {
-	// return IndexManager.getInstance().getIndex(HTMLIndexConstants.METADATA);
-	// }
-
 	/**
 	 * getElements
 	 * 
@@ -176,11 +166,11 @@ public class HTMLIndexQueryHelper
 					}
 					catch (IOException e)
 					{
-						e.printStackTrace();
+						Activator.logError("An error occurred while reading HTML metadata", e);
 					}
 					catch (Throwable t)
 					{
-						t.printStackTrace();
+						Activator.logError("An error occurred while reading HTML metadata", t);
 					}
 					finally
 					{
