@@ -118,6 +118,13 @@
 		<!-- Install Red Core feature -->
 		<antcall target="install.red.core" />
 		<!-- FIXME For some reason even though we install RED Core, it doesn't pick it up for building the test plugins/fragments! -->
+		<!-- Need to copy over linux plugin manually since it won't get installed when feature does -->
+    <mkdir dir="${baseLocation}/dropins/eclipse" />
+    <copy todir="${baseLocation}/dropins/eclipse">
+      <fileset dir="${red-core.p2.repo}" defaultexcludes="true">
+        <include name="plugins/com.aptana.ide.security.linux*" />
+      </fileset>
+    </copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -125,8 +132,8 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="install.red.core" unless="dont.install.red.core">
 		<antcall target="run.director">
-			<param name="p2.installIU" value="com.aptana.red.core.feature.group" />
-			<param name="p2.repo" value="${red-core.p2.repo}" />
+			<param name="p2.installIU" value="com.aptana.feature.feature.group" />
+			<param name="p2.repo" value="file:${red-core.p2.repo}" />
 		</antcall>
 	</target>
 	<!-- - - - - - - - - - - - - - - - - - 
