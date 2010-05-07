@@ -25,7 +25,6 @@
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.core.resources"/>
-      <import feature="com.aptana.feature" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
    </requires>
 
