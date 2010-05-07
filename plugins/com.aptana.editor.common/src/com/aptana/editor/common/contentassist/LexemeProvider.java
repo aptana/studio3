@@ -232,7 +232,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 * @param offset
 	 * @return
 	 */
-	private int getLexemeIndex(int offset)
+	public int getLexemeIndex(int offset)
 	{
 		int low = 0;
 		int high = this._lexemes.size() - 1;
