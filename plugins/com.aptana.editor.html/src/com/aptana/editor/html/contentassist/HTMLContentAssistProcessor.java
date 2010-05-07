@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -135,6 +136,44 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * addAttributeValueProposals
 	 * 
 	 * @param proposals
+	 * @param offset
+	 * @param attributeName
+	 */
+	private void addAttributeValueProposals(List<ICompletionProposal> proposals, int offset, String attributeName)
+	{
+		// NOTE: the logic for handling an attribute list and duplicate values
+		// will go away once the metadata format is fixed so that multiple
+		// attributes with the same name can disambiguate what elements they
+		// belong to.
+		List<AttributeElement> attributes = this._queryHelper.getAttribute(attributeName);
+
+		if (attributes != null)
+		{
+			Set<String> addedNames = new HashSet<String>();
+
+			for (AttributeElement attribute : attributes)
+			{
+				for (ValueElement value : attribute.getValues())
+				{
+					String name = value.getName();
+
+					if (addedNames.contains(name) == false)
+					{
+						Image[] userAgentIcons = this.getAllUserAgentIcons();
+
+						this.addProposal(proposals, value.getName(), ATTRIBUTE_ICON, value.getDescription(), userAgentIcons, offset);
+
+						addedNames.add(name);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * addAttributeValueProposals
+	 * 
+	 * @param proposals
 	 * @param lexemeProvider
 	 * @param offset
 	 */
@@ -153,7 +192,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						int startingOffset = this._currentLexeme.getStartingOffset() + 1;
 						int endingOffset = this._currentLexeme.getEndingOffset() - 2;
-						
+
 						this._replaceRange = new Range(startingOffset, endingOffset);
 					}
 					break;
@@ -162,32 +201,40 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 			}
 
-			// NOTE: the logic for handling an attribute list and duplicate values
-			// will go away once the metadata format is fixed so that multiple
-			// attributes with the same name can disambiguate what elements they
-			// belong to.
-			List<AttributeElement> attributes = this._queryHelper.getAttribute(attributeName);
-
-			if (attributes != null)
+			if (attributeName.equals("id"))
 			{
-				Set<String> addedNames = new HashSet<String>();
-				
-				for (AttributeElement attribute : attributes)
-				{
-					for (ValueElement value : attribute.getValues())
-					{
-						String name = value.getName();
-						
-						if (addedNames.contains(name) == false)
-						{
-							Image[] userAgentIcons = this.getAllUserAgentIcons();
-	
-							this.addProposal(proposals, value.getName(), ATTRIBUTE_ICON, value.getDescription(), userAgentIcons, offset);
-							
-							addedNames.add(name);
-						}
-					}
-				}
+				this.addIDProposals(proposals, offset);
+			}
+			else if (attributeName.equals("class"))
+			{
+				this.addClassProposals(proposals, offset);
+			}
+			else
+			{
+				addAttributeValueProposals(proposals, offset, attributeName);
+			}
+		}
+	}
+
+	/**
+	 * addClasses
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addClassProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		Map<String, String> classes = this._queryHelper.getClasses(this.getIndex());
+
+		if (classes != null)
+		{
+			UserAgentManager manager = UserAgentManager.getInstance();
+			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+
+			for (Entry<String, String> entry : classes.entrySet())
+			{
+				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
 			}
 		}
 	}
@@ -246,6 +293,29 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addIDs
+	 * 
+	 * @param result
+	 * @param offset
+	 */
+	protected void addIDProposals(List<ICompletionProposal> proposals, int offset)
+	{
+		Map<String, String> ids = this._queryHelper.getIDs(this.getIndex());
+
+		if (ids != null)
+		{
+			UserAgentManager manager = UserAgentManager.getInstance();
+			String[] userAgents = manager.getActiveUserAgentIDs(); // classes can be used by all user agents
+			Image[] userAgentIcons = manager.getUserAgentImages(userAgents);
+
+			for (Entry<String, String> entry : ids.entrySet())
+			{
+				this.addProposal(proposals, entry.getKey(), ELEMENT_ICON, null, userAgentIcons, entry.getValue(), offset);
+			}
+		}
+	}
+
+	/**
 	 * addOpenTagProposals
 	 * 
 	 * @param lexemeProvider
@@ -280,11 +350,26 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * 
 	 * @param proposals
 	 * @param name
-	 * @param icon
+	 * @param image
+	 * @param description
 	 * @param userAgents
 	 * @param offset
 	 */
 	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, int offset)
+	{
+		this.addProposal(proposals, name, image, description, userAgents, HTMLIndexConstants.CORE, offset);
+	}
+	
+	/**
+	 * addProposal
+	 * 
+	 * @param proposals
+	 * @param name
+	 * @param icon
+	 * @param userAgents
+	 * @param offset
+	 */
+	private void addProposal(List<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation, int offset)
 	{
 		int length = name.length();
 		String displayName = name;
@@ -301,7 +386,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		// build proposal
 		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
-		proposal.setFileLocation(HTMLIndexConstants.CORE);
+		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
 		// add it to the list
@@ -488,15 +573,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			ITypedRegion partition = document.getPartition(offset);
 			String type = partition.getType();
 
-			// START: debug info
-			String content = document.get(partition.getOffset(), partition.getLength());
-			System.out.println(type + ": '" + content + "'");
-			for (Lexeme<HTMLTokenType> lexeme : lexemeProvider)
-			{
-				System.out.println("  " + lexeme);
-			}
-			// END: debug info
-
 			if (locationMap.containsKey(type))
 			{
 				result = locationMap.get(type);
@@ -667,6 +743,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+		if (startingLexeme != null && endingLexeme != null)
+		{
+			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+		}
 	}
 }
