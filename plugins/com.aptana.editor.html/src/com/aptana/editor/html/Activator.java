@@ -1,5 +1,8 @@
 package com.aptana.editor.html;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -34,18 +37,18 @@ public class Activator extends AbstractUIPlugin
 	{
 		ImageRegistry registry = plugin.getImageRegistry();
 		Image image = registry.get(path);
-		
+
 		if (image == null)
 		{
 			ImageDescriptor id = getImageDescriptor(path);
-			
+
 			if (id != null)
 			{
 				registry.put(path, id);
 				image = registry.get(path);
 			}
 		}
-		
+
 		return image;
 	}
 
@@ -58,6 +61,27 @@ public class Activator extends AbstractUIPlugin
 	public static ImageDescriptor getImageDescriptor(String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 */
+	public static void logError(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
 	/**
@@ -74,7 +98,7 @@ public class Activator extends AbstractUIPlugin
 	public void start(BundleContext context) throws Exception
 	{
 		super.start(context);
-		
+
 		plugin = this;
 	}
 
@@ -85,7 +109,7 @@ public class Activator extends AbstractUIPlugin
 	public void stop(BundleContext context) throws Exception
 	{
 		plugin = null;
-		
+
 		super.stop(context);
 	}
 }
