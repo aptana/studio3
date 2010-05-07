@@ -45,13 +45,12 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionGroup;
-import org.eclipse.ui.internal.navigator.resources.actions.TextActionHandler;
+import org.eclipse.ui.actions.TextActionHandler;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 
-@SuppressWarnings("restriction")
 public class FileSystemEditActionGroup extends ActionGroup {
 
     private Clipboard fClipboard;
