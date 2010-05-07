@@ -23,7 +23,7 @@ public abstract class StringUtil
 	 *            The array of items to join
 	 * @return The resulting string
 	 */
-	public static String join(String delimiter, String[] items)
+	public static String join(String delimiter, String ... items)
 	{
 		if (items == null)
 		{
@@ -41,6 +41,38 @@ public abstract class StringUtil
 			}
 			sb.append(items[length - 1]);
 
+			result = sb.toString();
+		}
+		return result;
+	}
+	
+	/**
+	 * Create a string by concatenating the elements of a string array using a delimited between each item
+	 * 
+	 * @param delimiter
+	 *            The text to place between each element in the array
+	 * @param items
+	 *            The array of items to join
+	 * @return The resulting string
+	 */
+	public static String join(String delimiter, List<String> items)
+	{
+		if (items == null)
+		{
+			return null;
+		}
+		
+		int length = items.size();
+		String result = ""; //$NON-NLS-1$
+		if (length > 0)
+		{
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < length - 1; i++)
+			{
+				sb.append(items.get(i)).append(delimiter);
+			}
+			sb.append(items.get(length - 1));
+			
 			result = sb.toString();
 		}
 		return result;
@@ -189,5 +221,17 @@ public abstract class StringUtil
 	public static boolean areNotEqual(String s1, String s2)
 	{
 		return (s1 == null) ? (s2 != null) : (s2 == null) ? true : !s1.equals(s2);
+	}
+	
+	/**
+	 * Compares two strings for equality taking into account that none, one, or both may be null
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static boolean areEqual(String s1, String s2)
+	{
+		return (s1 == null) ? (s2 == null) : (s2 != null) ? s1.equals(s2) : false;
 	}
 }
