@@ -21,7 +21,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.eclipse.core.internal.preferences.Base64;
+import org.eclipse.core.internal.preferences.Base64; // FIXME Argh! so many Base64 impls and they're all internal! Just make one in the util plugin and use that!
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -33,6 +33,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.ide.security.linux.Activator;
 
+@SuppressWarnings("restriction")
 public class PasswordProvider extends org.eclipse.equinox.security.storage.provider.PasswordProvider
 {
 
