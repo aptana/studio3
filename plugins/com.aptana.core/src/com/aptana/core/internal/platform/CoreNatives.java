@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.internal.core;
+package com.aptana.core.internal.platform;
 
 import java.text.MessageFormat;
 

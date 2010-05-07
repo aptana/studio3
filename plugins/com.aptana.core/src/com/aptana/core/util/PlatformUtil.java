@@ -52,8 +52,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.ide.internal.core.CoreMacOSX;
-import com.aptana.ide.internal.core.CoreNatives;
+import com.aptana.core.internal.platform.CoreMacOSX;
+import com.aptana.core.internal.platform.CoreNatives;
 
 /**
  * @author Max Stepanov
