@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -128,8 +129,9 @@ public class GitExecutable
 			fgLocations = new ArrayList<String>();
 			if (Platform.getOS().equals(Platform.OS_WIN32))
 			{
-				fgLocations.add("C:\\Program Files (x86)\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
-				fgLocations.add("C:\\Program Files\\Git\\cmd\\git.cmd"); //$NON-NLS-1$
+				fgLocations.add(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\cmd\\git.cmd")); //$NON-NLS-1$
+				fgLocations.add(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\cmd\\git.cmd")); //$NON-NLS-1$
+				fgLocations.add(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\cmd\\git.cmd")); //$NON-NLS-1$
 			}
 			else
 			{

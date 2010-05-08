@@ -92,6 +92,11 @@ public final class PlatformUtil
 	 */
 	public static final String DESKTOP_DIRECTORY = "%DesktopDirectory%"; //$NON-NLS-1$
 
+	/**
+	 * LOCAL_APPDATA
+	 */
+	public static final String LOCAL_APPDATA = "%LOCAL_APPDATA%"; //$NON-NLS-1$
+
 
 	/**
 	 * DOCUMENTS_DIRECTORY
@@ -355,6 +360,13 @@ public final class PlatformUtil
 				if (desktopDirectory != null)
 				{
 					path = desktopDirectory + path.substring(DESKTOP_DIRECTORY.length());
+				}
+			} else if (path.startsWith(LOCAL_APPDATA))
+			{
+				String localAppData = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_LOCAL_APPDATA);
+				if (localAppData != null)
+				{
+					path = localAppData + path.substring(LOCAL_APPDATA.length());
 				}
 			}
 		} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
