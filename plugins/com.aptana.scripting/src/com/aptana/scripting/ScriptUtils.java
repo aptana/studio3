@@ -20,6 +20,7 @@ import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.util.ExecutableUtil;
+import com.aptana.core.util.PlatformUtil;
 
 public class ScriptUtils
 {
@@ -110,8 +111,9 @@ public class ScriptUtils
 			
 			for (File root : File.listRoots())
 			{
-				list.add(Path.fromOSString(root.getAbsolutePath()).append(Path.fromOSString("Program Files\\Git\\bin"))); //$NON-NLS-1$
-				list.add(Path.fromOSString(root.getAbsolutePath()).append(Path.fromOSString("Program Files (x86)\\Git\\bin"))); //$NON-NLS-1$
+				list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMW6432%\\Git\\bin"))); //$NON-NLS-1$
+				list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
+				list.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
 			}
 		}
 		

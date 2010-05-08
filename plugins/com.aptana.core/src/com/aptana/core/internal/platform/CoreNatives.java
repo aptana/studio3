@@ -64,6 +64,11 @@ public final class CoreNatives {
 	 * CSIDL_DESKTOPDIRECTORY
 	 */
 	public static final int CSIDL_DESKTOPDIRECTORY = 0x0010;
+	
+	/**
+	 * CSIDL_DESKTOPDIRECTORY
+	 */
+	public static final int CSIDL_LOCAL_APPDATA = 0x001C;
 
 	/**
 	 * FILE_ATTRIBUTE_HIDDEN
