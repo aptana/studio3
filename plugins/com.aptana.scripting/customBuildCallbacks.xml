@@ -141,6 +141,10 @@
 		  	<param name="bundle.name" value="yaml.ruble" />
 		  	<param name="bundle.dir.name" value="yaml.ruble" />
 		</antcall>
+		<antcall target="clone-bundle">
+        <param name="bundle.name" value="capistrano.ruble" />
+        <param name="bundle.dir.name" value="capistrano.ruble" />
+    </antcall>
 	</target>
 
 	<!-- ===================================================================== -->

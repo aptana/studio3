@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IEditorPart;
@@ -36,6 +37,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.progress.ProgressView;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
 import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
@@ -117,8 +119,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		else
 		{
 			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, "console.error", new RGB(0x80, 0, 0));
-			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, "console.output", currentTheme
-					.getForeground());
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, "console.output",
+					currentTheme.getForeground());
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, "console.input", currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
 		}
@@ -223,6 +225,11 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 				}
 				return;
 			}
+			else if (page instanceof MessagePage)
+			{
+				// Grab the label
+				control = ((Composite) control).getChildren()[0];
+			}
 			hookTheme(control, revertToDefaults);
 			return;
 		}
@@ -269,28 +276,30 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 	}
 
-	protected void hookTheme(Control tree, boolean revert)
+	protected void hookTheme(Control control, boolean revert)
 	{
-		if (tree instanceof Tree)
+		if (control instanceof Tree)
 		{
-			overrideTreeDrawing((Tree) tree, revert);
+			overrideTreeDrawing((Tree) control, revert);
 		}
 		else
 		{
+			control.setRedraw(false);
 			if (revert)
 			{
-				tree.setBackground(null);
-				tree.setForeground(null);
-				tree.setFont(null);
+				control.setBackground(null);
+				control.setForeground(null);
+				control.setFont(null);
 			}
 			else
 			{
-				tree.setBackground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getCurrentTheme().getBackground()));
-				tree.setForeground(CommonEditorPlugin.getDefault().getColorManager().getColor(
-						getCurrentTheme().getForeground()));
-				tree.setFont(JFaceResources.getTextFont());
+				control.setBackground(CommonEditorPlugin.getDefault().getColorManager()
+						.getColor(getCurrentTheme().getBackground()));
+				control.setForeground(CommonEditorPlugin.getDefault().getColorManager()
+						.getColor(getCurrentTheme().getForeground()));
+				control.setFont(JFaceResources.getTextFont());
 			}
+			control.setRedraw(true);
 		}
 	}
 
@@ -457,12 +466,12 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 		}
 		else
 		{
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme
-					.getSelection()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+					StringConverter.asString(theme.getSelection()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
-			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR, StringConverter
-					.asString(theme.getLineHighlight()));
+			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+					StringConverter.asString(theme.getLineHighlight()));
 		}
 
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, revertToDefaults);
@@ -591,7 +600,8 @@ class InvasiveThemeHijacker extends UIJob implements IPartListener, IPreferenceC
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event)
 	{
-		if (event.getKey().equals(IThemeManager.THEME_CHANGED) || event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
+		if (event.getKey().equals(IThemeManager.THEME_CHANGED)
+				|| event.getKey().equals(IPreferenceConstants.INVASIVE_THEMES))
 		{
 			// enablement changed, schedule job to run (it'll stop if it's turned to false in "shouldRun()")
 			cancel();

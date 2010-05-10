@@ -80,7 +80,7 @@ public abstract class ExecutableUtil
 			String[] extensions = System.getenv("PATHEXT").split(File.pathSeparator); //$NON-NLS-1$
 			for (String ext : extensions) 
 			{
-				if (ext.startsWith("."))
+				if (ext.startsWith(".")) //$NON-NLS-1$
 					ext = ext.substring(1);
 				IPath pathWithExt = basename.addFileExtension(ext);
 				if (isExecutable(pathWithExt)) 

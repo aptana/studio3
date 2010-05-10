@@ -190,6 +190,7 @@ public class HttpFileStore extends FileStore
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException
 	{
+		monitor = SubMonitor.convert(monitor, 2);
 		try
 		{
 			monitor.beginTask("", 1); //$NON-NLS-1$

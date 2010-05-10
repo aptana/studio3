@@ -4,6 +4,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.IPlaceholderFolderLayout;
+import org.eclipse.ui.console.IConsoleConstants;
 
 public class WebPerspectiveFactory implements IPerspectiveFactory
 {
@@ -21,10 +22,11 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, 0.25f, editorArea); //$NON-NLS-1$
 		left.addView(APP_EXPLORER_ID);
 
-		// Bottom right
-		IPlaceholderFolderLayout terminalArea = layout.createPlaceholderFolder(
+		// Bottom right: Console. Had to leave this programmatic to get the Console appear in bottom right
+		IPlaceholderFolderLayout consoleArea = layout.createPlaceholderFolder(
 				"terminalArea", IPageLayout.BOTTOM, 0.75f, //$NON-NLS-1$
 				editorArea);
-		terminalArea.addPlaceholder(TERMINAL_VIEW);
+		consoleArea.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
+		consoleArea.addPlaceholder(TERMINAL_VIEW+":*"); //$NON-NLS-1$
 	}
 }

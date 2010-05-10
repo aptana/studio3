@@ -256,4 +256,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		}
 		return fDoubleClickStrategy;
 	}
+	
+	protected AbstractThemeableEditor getEditor()
+	{
+		return fTextEditor;
+	}
 }

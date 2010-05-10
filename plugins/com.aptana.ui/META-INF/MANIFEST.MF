@@ -8,8 +8,10 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.core.expressions,
  org.eclipse.ui.workbench,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ org.eclipse.ui.console
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui.projects

@@ -18,6 +18,8 @@ public interface IGitRepositoryManager
 
 	public void removeListener(IGitRepositoriesListener listener);
 
+	public GitRepository createOrAttach(IProject project, IProgressMonitor monitor) throws CoreException;
+	
 	/**
 	 * Generates a brand new git repository in the specified location.
 	 */
